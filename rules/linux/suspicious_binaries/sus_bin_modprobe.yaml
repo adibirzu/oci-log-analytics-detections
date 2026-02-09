@@ -1,0 +1,15 @@
+title: Suspicious Usage of modprobe
+id: a02a5117-562d-4b9b-a782-2ca880d0d0f9
+status: experimental
+description: Detects execution of potentially suspicious binary modprobe.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: modprobe
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: mshta'
+id: fc4e9735-3c40-43bd-a22e-592577934d4e
+status: experimental
+description: Detects usage of Living off the Land binary mshta.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: mshta.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

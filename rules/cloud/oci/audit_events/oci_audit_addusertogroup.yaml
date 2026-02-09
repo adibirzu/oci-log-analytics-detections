@@ -1,0 +1,14 @@
+title: 'OCI Action: AddUserToGroup'
+id: 6a4dca3d-85a8-4959-9c3e-05909298a09d
+status: stable
+description: Detects the execution of AddUserToGroup action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.group.adduser
+  condition: selection
+level: informational
+tags:
+- oci.audit

@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: tasklist'
+id: 876b4791-8fb8-419a-9840-230a0ba2b661
+status: experimental
+description: Detects usage of Living off the Land binary tasklist.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: tasklist.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

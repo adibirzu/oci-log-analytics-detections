@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: bitsadmin'
+id: dcd67a6e-377d-4dfd-be9a-8b78401575b6
+status: experimental
+description: Detects usage of Living off the Land binary bitsadmin.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: bitsadmin.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

@@ -1,0 +1,14 @@
+title: 'OCI Action: CreateRouteTable'
+id: 5142c85c-4927-4b88-959f-6c8b89cd8d69
+status: stable
+description: Detects the execution of CreateRouteTable action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.createroutetable
+  condition: selection
+level: informational
+tags:
+- oci.audit

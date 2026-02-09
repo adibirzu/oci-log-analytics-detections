@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: taskkill",
+  "description": "Detects usage of Living off the Land binary taskkill.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'taskkill.exe'",
+  "sigma_id": "8d440043-431b-4da6-8b8a-83dee6999da2",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

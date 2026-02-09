@@ -1,0 +1,9 @@
+{
+  "title": "OCI IAM Policy Modified",
+  "description": "Detects changes to OCI IAM Policies.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where (Event Type = 'com.oraclecloud.identity.policy.create' or Event Type = 'com.oraclecloud.identity.policy.update' or Event Type = 'com.oraclecloud.identity.policy.delete')",
+  "sigma_id": "uuid-2",
+  "tags": [
+    "attack.persistence"
+  ]
+}

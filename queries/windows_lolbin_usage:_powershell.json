@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: powershell",
+  "description": "Detects usage of Living off the Land binary powershell.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'powershell.exe'",
+  "sigma_id": "cdf49607-a57a-4ea9-9da8-374ebf470475",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

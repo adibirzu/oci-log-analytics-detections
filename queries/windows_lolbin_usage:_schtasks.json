@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: schtasks",
+  "description": "Detects usage of Living off the Land binary schtasks.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'schtasks.exe'",
+  "sigma_id": "e200e23f-895d-4779-8f7d-44f0e1095584",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

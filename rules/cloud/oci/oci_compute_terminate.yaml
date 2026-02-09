@@ -1,0 +1,14 @@
+title: OCI Compute Instance Terminated
+id: uuid-7
+status: stable
+description: Detects termination of a compute instance.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.computeapi.terminateinstance
+  condition: selection
+level: medium
+tags:
+- attack.impact

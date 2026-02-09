@@ -1,0 +1,15 @@
+title: Suspicious Usage of insmod
+id: bf7f366a-aeb1-44a8-aeba-554287bbba3d
+status: experimental
+description: Detects execution of potentially suspicious binary insmod.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: insmod
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

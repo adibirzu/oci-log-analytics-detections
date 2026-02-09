@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of wget",
+  "description": "Detects execution of potentially suspicious binary wget.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'wget'",
+  "sigma_id": "141358f7-27c7-4b9c-a4f3-0cdc490e7c9b",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

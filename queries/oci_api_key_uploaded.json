@@ -1,0 +1,9 @@
+{
+  "title": "OCI API Key Uploaded",
+  "description": "Detects upload of a new API key to a user account.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where Event Type = 'com.oraclecloud.identity.user.uploadapikey'",
+  "sigma_id": "uuid-4",
+  "tags": [
+    "attack.persistence"
+  ]
+}

@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: at'
+id: 3b5ab6bb-8caf-4bd8-b21f-54fe3fb67d87
+status: experimental
+description: Detects usage of Living off the Land binary at.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: at.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

@@ -1,0 +1,14 @@
+title: 'OCI Action: CreateUser'
+id: 8723eb0b-d1f9-4a00-a77a-1c1658493d8b
+status: stable
+description: Detects the execution of CreateUser action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.user.create
+  condition: selection
+level: informational
+tags:
+- oci.audit

@@ -1,0 +1,14 @@
+title: 'Cloud Guard Problem: Instance Principals Enabled'
+id: 54e23bf0-f5ee-4638-821a-a94618cd508c
+status: stable
+description: 'Detects Cloud Guard reporting problem: Instance_Principals_Enabled.'
+logsource:
+  product: oci
+  service: cloud_guard
+detection:
+  selection:
+    problem_name: Instance_Principals_Enabled
+  condition: selection
+level: high
+tags:
+- oci.cloud_guard

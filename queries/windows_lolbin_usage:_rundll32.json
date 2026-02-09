@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: rundll32",
+  "description": "Detects usage of Living off the Land binary rundll32.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'rundll32.exe'",
+  "sigma_id": "b0758071-c147-42fd-82c3-a477af3cb3d8",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "title": "OCI Network Security Group Updated",
+  "description": "Detects updates to Network Security Groups (NSGs).",
+  "query": "'Log Source' = 'OCI Audit Logs' | where (Event Type = 'com.oraclecloud.virtualnetwork.updatenetworksecuritygroup' or Event Type = 'com.oraclecloud.virtualnetwork.addnetworksecuritygroupsecurityrules')",
+  "sigma_id": "uuid-8",
+  "tags": [
+    "attack.defense_evasion"
+  ]
+}

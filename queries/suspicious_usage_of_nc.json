@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of nc",
+  "description": "Detects execution of potentially suspicious binary nc.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'nc'",
+  "sigma_id": "fa45e5b0-0ab3-45c3-9a73-0c65b10108e7",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

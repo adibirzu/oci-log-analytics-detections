@@ -1,0 +1,14 @@
+title: 'OCI Action: StopInstance'
+id: ad4ab5d8-7cb4-42b7-96dd-40b093825b83
+status: stable
+description: Detects the execution of StopInstance action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.computeapi.stopinstance
+  condition: selection
+level: informational
+tags:
+- oci.audit

@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of ruby",
+  "description": "Detects execution of potentially suspicious binary ruby.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'ruby'",
+  "sigma_id": "fa6b1601-bd1b-4722-8697-da640ad83edf",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

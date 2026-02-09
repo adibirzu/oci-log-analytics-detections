@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: ipconfig",
+  "description": "Detects usage of Living off the Land binary ipconfig.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'ipconfig.exe'",
+  "sigma_id": "36cb0605-69d7-4f35-aca1-e8cc54728c7c",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

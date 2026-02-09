@@ -1,0 +1,14 @@
+title: 'OCI Action: DeleteBucket'
+id: 11565887-8bdb-44de-a05c-9c1c7d0ca722
+status: stable
+description: Detects the execution of DeleteBucket action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.objectstorage.deletebucket
+  condition: selection
+level: informational
+tags:
+- oci.audit

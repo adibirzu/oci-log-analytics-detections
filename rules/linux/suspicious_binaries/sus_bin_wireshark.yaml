@@ -1,0 +1,15 @@
+title: Suspicious Usage of wireshark
+id: bc8616ca-d018-4517-8781-902d64e106ac
+status: experimental
+description: Detects execution of potentially suspicious binary wireshark.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: wireshark
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

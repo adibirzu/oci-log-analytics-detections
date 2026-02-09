@@ -1,0 +1,14 @@
+title: 'OCI Action: CreateBucket'
+id: b3d62a9e-d04a-4ae7-af52-c2caa2678609
+status: stable
+description: Detects the execution of CreateBucket action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.objectstorage.createbucket
+  condition: selection
+level: informational
+tags:
+- oci.audit

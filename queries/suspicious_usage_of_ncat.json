@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of ncat",
+  "description": "Detects execution of potentially suspicious binary ncat.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'ncat'",
+  "sigma_id": "c5613cc5-4dbd-489e-b2c9-28bcd5ee9ea2",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

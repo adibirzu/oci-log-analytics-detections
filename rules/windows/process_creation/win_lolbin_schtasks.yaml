@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: schtasks'
+id: e200e23f-895d-4779-8f7d-44f0e1095584
+status: experimental
+description: Detects usage of Living off the Land binary schtasks.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: schtasks.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

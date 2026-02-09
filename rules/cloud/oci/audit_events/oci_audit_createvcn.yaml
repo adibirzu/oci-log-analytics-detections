@@ -1,0 +1,14 @@
+title: 'OCI Action: CreateVcn'
+id: d8ff362f-cb67-42d0-a401-502e7061ff36
+status: stable
+description: Detects the execution of CreateVcn action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.createvcn
+  condition: selection
+level: informational
+tags:
+- oci.audit

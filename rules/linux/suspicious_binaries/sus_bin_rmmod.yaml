@@ -1,0 +1,15 @@
+title: Suspicious Usage of rmmod
+id: 7fe696ec-966a-418d-b9f7-7a09fae0876d
+status: experimental
+description: Detects execution of potentially suspicious binary rmmod.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: rmmod
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

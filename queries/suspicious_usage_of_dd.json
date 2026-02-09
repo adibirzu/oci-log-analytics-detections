@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of dd",
+  "description": "Detects execution of potentially suspicious binary dd.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'dd'",
+  "sigma_id": "2fe382db-f191-4c01-af3e-3dff8ab380cb",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: rundll32'
+id: b0758071-c147-42fd-82c3-a477af3cb3d8
+status: experimental
+description: Detects usage of Living off the Land binary rundll32.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: rundll32.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

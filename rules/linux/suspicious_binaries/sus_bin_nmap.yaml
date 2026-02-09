@@ -1,0 +1,15 @@
+title: Suspicious Usage of nmap
+id: 48b37671-d0ad-42fe-bd00-fd5ddde2d528
+status: experimental
+description: Detects execution of potentially suspicious binary nmap.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: nmap
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

@@ -1,0 +1,16 @@
+title: OCI Route Table Update
+id: uuid-10
+status: stable
+description: Detects changes to VCN Route Tables.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.virtualnetwork.updateroutetable
+    - com.oraclecloud.virtualnetwork.createroutetable
+  condition: selection
+level: medium
+tags:
+- attack.persistence

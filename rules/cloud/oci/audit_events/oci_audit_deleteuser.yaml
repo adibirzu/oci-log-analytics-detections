@@ -1,0 +1,14 @@
+title: 'OCI Action: DeleteUser'
+id: bde13849-0933-4589-bfed-c3e0c0febd9c
+status: stable
+description: Detects the execution of DeleteUser action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.user.delete
+  condition: selection
+level: informational
+tags:
+- oci.audit

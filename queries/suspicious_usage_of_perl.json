@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of perl",
+  "description": "Detects execution of potentially suspicious binary perl.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'perl'",
+  "sigma_id": "122ed5cd-9597-4b8c-bc40-752428aa0673",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

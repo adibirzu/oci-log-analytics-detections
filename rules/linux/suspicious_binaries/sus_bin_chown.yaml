@@ -1,0 +1,15 @@
+title: Suspicious Usage of chown
+id: 7e7d49c3-786b-4848-9a0d-584b9616f842
+status: experimental
+description: Detects execution of potentially suspicious binary chown.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: chown
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

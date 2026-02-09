@@ -1,0 +1,14 @@
+title: 'OCI Action: DetachInternetGateway'
+id: 6b62f044-288b-4079-8b15-b03bc6da34d1
+status: stable
+description: Detects the execution of DetachInternetGateway action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.detachinternetgateway
+  condition: selection
+level: informational
+tags:
+- oci.audit

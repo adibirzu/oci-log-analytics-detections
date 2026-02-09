@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of insmod",
+  "description": "Detects execution of potentially suspicious binary insmod.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'insmod'",
+  "sigma_id": "bf7f366a-aeb1-44a8-aeba-554287bbba3d",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

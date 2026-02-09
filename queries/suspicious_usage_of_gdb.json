@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of gdb",
+  "description": "Detects execution of potentially suspicious binary gdb.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'gdb'",
+  "sigma_id": "df525fb1-3830-48ee-a9af-319b50dacd07",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

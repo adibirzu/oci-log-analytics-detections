@@ -1,0 +1,16 @@
+title: OCI WAF Configuration Updated
+id: uuid-9
+status: stable
+description: Detects changes to Web Application Firewall configurations.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.waf.updatewebappfirewall
+    - com.oraclecloud.waf.updatewebappfirewallpolicy
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion

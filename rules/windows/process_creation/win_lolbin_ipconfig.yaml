@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: ipconfig'
+id: 36cb0605-69d7-4f35-aca1-e8cc54728c7c
+status: experimental
+description: Detects usage of Living off the Land binary ipconfig.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: ipconfig.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

@@ -1,0 +1,15 @@
+title: OCI Object Storage Bucket Made Public
+id: uuid-3
+status: high
+description: Detects when a bucket's visibility is set to public.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.objectstorage.updatebucket
+    response_payload|contains: '"publicAccessType":"ObjectRead"'
+  condition: selection
+level: high
+tags:
+- attack.exfiltration

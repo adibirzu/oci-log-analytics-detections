@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: regsvr32",
+  "description": "Detects usage of Living off the Land binary regsvr32.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'regsvr32.exe'",
+  "sigma_id": "aa90d7d6-a6fb-4d57-8450-6d41c189342c",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

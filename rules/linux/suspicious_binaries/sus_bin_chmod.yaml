@@ -1,0 +1,15 @@
+title: Suspicious Usage of chmod
+id: dc725e73-e395-459a-84b9-bed57c25ab59
+status: experimental
+description: Detects execution of potentially suspicious binary chmod.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: chmod
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

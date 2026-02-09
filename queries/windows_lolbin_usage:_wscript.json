@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: wscript",
+  "description": "Detects usage of Living off the Land binary wscript.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'wscript.exe'",
+  "sigma_id": "4ab18cdc-4545-43d4-9cdf-9d84a5b31f32",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

@@ -1,0 +1,14 @@
+title: 'OCI Action: DeleteKey'
+id: 728f65b3-584d-496c-8c75-bb983928b9bd
+status: stable
+description: Detects the execution of DeleteKey action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.kms.deletekey
+  condition: selection
+level: informational
+tags:
+- oci.audit

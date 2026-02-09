@@ -1,0 +1,17 @@
+title: OCI IAM Policy Modified
+id: uuid-2
+status: stable
+description: Detects changes to OCI IAM Policies.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.identity.policy.create
+    - com.oraclecloud.identity.policy.update
+    - com.oraclecloud.identity.policy.delete
+  condition: selection
+level: medium
+tags:
+- attack.persistence

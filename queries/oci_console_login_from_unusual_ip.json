@@ -1,0 +1,10 @@
+{
+  "title": "OCI Console Login from Unusual IP",
+  "description": "Detects a successful login to the OCI Console from an IP address not typically associated with the user.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where Event Type = 'com.oraclecloud.identity.authentication.login' and Status = 'Success'",
+  "sigma_id": "56d4458d-7890-4abc-8890-1234567890ab",
+  "tags": [
+    "attack.initial_access",
+    "attack.t1078"
+  ]
+}

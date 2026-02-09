@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of chmod",
+  "description": "Detects execution of potentially suspicious binary chmod.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'chmod'",
+  "sigma_id": "dc725e73-e395-459a-84b9-bed57c25ab59",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

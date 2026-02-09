@@ -1,0 +1,15 @@
+title: Suspicious Usage of perl
+id: 122ed5cd-9597-4b8c-bc40-752428aa0673
+status: experimental
+description: Detects execution of potentially suspicious binary perl.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: perl
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

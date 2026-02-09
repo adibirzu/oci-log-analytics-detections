@@ -1,0 +1,9 @@
+{
+  "title": "OCI Object Storage Bucket Made Public",
+  "description": "Detects when a bucket's visibility is set to public.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where Event Type = 'com.oraclecloud.objectstorage.updatebucket' and 'Response Payload' like '*\"publicAccessType\":\"ObjectRead\"*'",
+  "sigma_id": "uuid-3",
+  "tags": [
+    "attack.exfiltration"
+  ]
+}

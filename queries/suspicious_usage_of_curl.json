@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of curl",
+  "description": "Detects execution of potentially suspicious binary curl.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'curl'",
+  "sigma_id": "f9cba04d-c56b-45bb-8ece-c664e79bb94e",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

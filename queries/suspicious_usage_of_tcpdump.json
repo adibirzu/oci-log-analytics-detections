@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of tcpdump",
+  "description": "Detects execution of potentially suspicious binary tcpdump.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'tcpdump'",
+  "sigma_id": "1d693344-8013-4129-a8e9-2cabb094b9ae",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

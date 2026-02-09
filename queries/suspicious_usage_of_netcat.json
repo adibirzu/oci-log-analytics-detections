@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of netcat",
+  "description": "Detects execution of potentially suspicious binary netcat.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'netcat'",
+  "sigma_id": "d68b1276-c40c-4505-a5dc-c822ea0b2eb3",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

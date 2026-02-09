@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: systeminfo'
+id: 19daf1a4-88ec-4fce-8e23-ebee760fcb8f
+status: experimental
+description: Detects usage of Living off the Land binary systeminfo.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: systeminfo.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: powershell'
+id: cdf49607-a57a-4ea9-9da8-374ebf470475
+status: experimental
+description: Detects usage of Living off the Land binary powershell.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: powershell.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

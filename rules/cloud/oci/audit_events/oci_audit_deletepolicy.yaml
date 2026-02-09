@@ -1,0 +1,14 @@
+title: 'OCI Action: DeletePolicy'
+id: 3ce97be5-9038-440e-8d0e-b06ee6c28685
+status: stable
+description: Detects the execution of DeletePolicy action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.policy.delete
+  condition: selection
+level: informational
+tags:
+- oci.audit

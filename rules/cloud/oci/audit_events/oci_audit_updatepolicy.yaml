@@ -1,0 +1,14 @@
+title: 'OCI Action: UpdatePolicy'
+id: 7c3544ad-42dd-4839-ab49-789a4300b151
+status: stable
+description: Detects the execution of UpdatePolicy action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.policy.update
+  condition: selection
+level: informational
+tags:
+- oci.audit

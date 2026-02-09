@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: bitsadmin",
+  "description": "Detects usage of Living off the Land binary bitsadmin.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'bitsadmin.exe'",
+  "sigma_id": "dcd67a6e-377d-4dfd-be9a-8b78401575b6",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of id",
+  "description": "Detects execution of potentially suspicious binary id.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'id'",
+  "sigma_id": "a030b6cb-b30e-4c06-91b6-3f1df0cddc67",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

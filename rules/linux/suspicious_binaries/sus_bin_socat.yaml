@@ -1,0 +1,15 @@
+title: Suspicious Usage of socat
+id: 1fbec72e-50d4-4c98-89e0-b8b8901eac04
+status: experimental
+description: Detects execution of potentially suspicious binary socat.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: socat
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

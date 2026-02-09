@@ -1,0 +1,9 @@
+{
+  "title": "OCI WAF Configuration Updated",
+  "description": "Detects changes to Web Application Firewall configurations.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where (Event Type = 'com.oraclecloud.waf.updatewebappfirewall' or Event Type = 'com.oraclecloud.waf.updatewebappfirewallpolicy')",
+  "sigma_id": "uuid-9",
+  "tags": [
+    "attack.defense_evasion"
+  ]
+}

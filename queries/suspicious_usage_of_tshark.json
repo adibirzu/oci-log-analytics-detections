@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of tshark",
+  "description": "Detects execution of potentially suspicious binary tshark.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'tshark'",
+  "sigma_id": "7cb57d24-6134-4a81-9b60-9689ff9cde29",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Cloud Guard Problem: VCN Security List Port SSH",
+  "description": "Detects Cloud Guard reporting problem: VCN_Security_List_Port_SSH.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where Problem Name = 'VCN_Security_List_Port_SSH'",
+  "sigma_id": "fe8587f3-b7ba-4232-8606-154f594d6889",
+  "tags": [
+    "oci.cloud_guard"
+  ]
+}

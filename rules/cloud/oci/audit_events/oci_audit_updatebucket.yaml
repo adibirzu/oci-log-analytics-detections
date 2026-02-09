@@ -1,0 +1,14 @@
+title: 'OCI Action: UpdateBucket'
+id: d62e8b1a-1300-4286-bb14-0f638e39ffba
+status: stable
+description: Detects the execution of UpdateBucket action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.objectstorage.updatebucket
+  condition: selection
+level: informational
+tags:
+- oci.audit

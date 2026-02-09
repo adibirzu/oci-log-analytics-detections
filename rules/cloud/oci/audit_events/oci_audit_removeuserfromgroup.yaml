@@ -1,0 +1,14 @@
+title: 'OCI Action: RemoveUserFromGroup'
+id: 57437287-e9c1-4d55-8eb7-62469ea94950
+status: stable
+description: Detects the execution of RemoveUserFromGroup action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.group.removeuser
+  condition: selection
+level: informational
+tags:
+- oci.audit

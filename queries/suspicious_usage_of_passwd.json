@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of passwd",
+  "description": "Detects execution of potentially suspicious binary passwd.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'passwd'",
+  "sigma_id": "1583e3f2-8fc1-4874-94d3-b893202a2700",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

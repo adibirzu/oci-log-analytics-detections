@@ -1,0 +1,15 @@
+title: Suspicious Usage of ruby
+id: fa6b1601-bd1b-4722-8697-da640ad83edf
+status: experimental
+description: Detects execution of potentially suspicious binary ruby.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: ruby
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

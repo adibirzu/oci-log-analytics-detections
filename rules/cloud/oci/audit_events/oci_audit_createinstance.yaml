@@ -1,0 +1,14 @@
+title: 'OCI Action: CreateInstance'
+id: ebffc976-d456-4a92-a086-4796b2571f0a
+status: stable
+description: Detects the execution of CreateInstance action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.computeapi.launchinstance
+  condition: selection
+level: informational
+tags:
+- oci.audit

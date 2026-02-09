@@ -1,0 +1,15 @@
+title: Suspicious Usage of strace
+id: 4a094fc9-8c77-4699-bd12-789f9763313b
+status: experimental
+description: Detects execution of potentially suspicious binary strace.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: strace
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

@@ -1,0 +1,15 @@
+title: Suspicious Usage of gdb
+id: df525fb1-3830-48ee-a9af-319b50dacd07
+status: experimental
+description: Detects execution of potentially suspicious binary gdb.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: gdb
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

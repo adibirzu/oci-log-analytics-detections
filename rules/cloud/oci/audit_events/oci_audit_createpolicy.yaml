@@ -1,0 +1,14 @@
+title: 'OCI Action: CreatePolicy'
+id: ac76ba90-c547-4f46-bb1e-01e9a8eb1fc9
+status: stable
+description: Detects the execution of CreatePolicy action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.policy.create
+  condition: selection
+level: informational
+tags:
+- oci.audit

@@ -1,0 +1,14 @@
+title: 'OCI Action: AttachInternetGateway'
+id: 2f5f7104-8000-4b27-856f-3fdb46aa7737
+status: stable
+description: Detects the execution of AttachInternetGateway action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.attachinternetgateway
+  condition: selection
+level: informational
+tags:
+- oci.audit

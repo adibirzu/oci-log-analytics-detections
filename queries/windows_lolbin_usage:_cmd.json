@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: cmd",
+  "description": "Detects usage of Living off the Land binary cmd.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'cmd.exe'",
+  "sigma_id": "9bfa545c-b08d-42e6-8dc3-d2d429bb7d3a",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

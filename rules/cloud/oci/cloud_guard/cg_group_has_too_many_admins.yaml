@@ -1,0 +1,14 @@
+title: 'Cloud Guard Problem: Group Has Too Many Admins'
+id: e262f895-bd75-49d5-94f5-231ea2c65d9a
+status: stable
+description: 'Detects Cloud Guard reporting problem: Group_Has_Too_Many_Admins.'
+logsource:
+  product: oci
+  service: cloud_guard
+detection:
+  selection:
+    problem_name: Group_Has_Too_Many_Admins
+  condition: selection
+level: high
+tags:
+- oci.cloud_guard

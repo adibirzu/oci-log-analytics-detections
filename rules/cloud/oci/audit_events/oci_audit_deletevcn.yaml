@@ -1,0 +1,14 @@
+title: 'OCI Action: DeleteVcn'
+id: dc360521-87da-4ff8-b0d4-1a318e932864
+status: stable
+description: Detects the execution of DeleteVcn action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.deletevcn
+  condition: selection
+level: informational
+tags:
+- oci.audit

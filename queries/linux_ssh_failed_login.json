@@ -1,0 +1,9 @@
+{
+  "title": "Linux SSH Failed Login",
+  "description": "Detects failed SSH login attempts.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'sshd' and Message like '*Failed password*'",
+  "sigma_id": "uuid-6",
+  "tags": [
+    "attack.initial_access"
+  ]
+}

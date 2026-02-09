@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: wmic'
+id: a6372b09-869a-4e67-ac13-62af106bb903
+status: experimental
+description: Detects usage of Living off the Land binary wmic.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: wmic.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

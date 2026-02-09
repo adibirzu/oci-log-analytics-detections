@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: taskkill'
+id: 8d440043-431b-4da6-8b8a-83dee6999da2
+status: experimental
+description: Detects usage of Living off the Land binary taskkill.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: taskkill.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

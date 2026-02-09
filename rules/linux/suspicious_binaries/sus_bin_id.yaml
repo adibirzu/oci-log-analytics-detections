@@ -1,0 +1,15 @@
+title: Suspicious Usage of id
+id: a030b6cb-b30e-4c06-91b6-3f1df0cddc67
+status: experimental
+description: Detects execution of potentially suspicious binary id.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: id
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

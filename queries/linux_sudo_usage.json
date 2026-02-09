@@ -1,0 +1,9 @@
+{
+  "title": "Linux Sudo Usage",
+  "description": "Detects execution of sudo commands.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'sudo' and Message like '*COMMAND=*'",
+  "sigma_id": "uuid-5",
+  "tags": [
+    "attack.privilege_escalation"
+  ]
+}

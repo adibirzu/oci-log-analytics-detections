@@ -1,0 +1,14 @@
+title: 'OCI Action: CreateInternetGateway'
+id: 184fc0e0-6054-47eb-a62a-a06c74cd6263
+status: stable
+description: Detects the execution of CreateInternetGateway action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.createinternetgateway
+  condition: selection
+level: informational
+tags:
+- oci.audit

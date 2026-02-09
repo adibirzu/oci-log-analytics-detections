@@ -1,0 +1,14 @@
+title: 'OCI Action: UpdateSecurityList'
+id: 1205be5b-f1e4-411d-975d-0e8cb63801a2
+status: stable
+description: Detects the execution of UpdateSecurityList action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.updatesecuritylist
+  condition: selection
+level: informational
+tags:
+- oci.audit

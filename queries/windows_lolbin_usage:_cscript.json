@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: cscript",
+  "description": "Detects usage of Living off the Land binary cscript.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'cscript.exe'",
+  "sigma_id": "4e9ed028-558a-4e19-81c9-4742e79e6867",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

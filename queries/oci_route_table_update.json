@@ -1,0 +1,9 @@
+{
+  "title": "OCI Route Table Update",
+  "description": "Detects changes to VCN Route Tables.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where (Event Type = 'com.oraclecloud.virtualnetwork.updateroutetable' or Event Type = 'com.oraclecloud.virtualnetwork.createroutetable')",
+  "sigma_id": "uuid-10",
+  "tags": [
+    "attack.persistence"
+  ]
+}

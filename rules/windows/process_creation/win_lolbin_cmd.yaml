@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: cmd'
+id: 9bfa545c-b08d-42e6-8dc3-d2d429bb7d3a
+status: experimental
+description: Detects usage of Living off the Land binary cmd.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: cmd.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

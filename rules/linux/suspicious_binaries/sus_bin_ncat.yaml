@@ -1,0 +1,15 @@
+title: Suspicious Usage of ncat
+id: c5613cc5-4dbd-489e-b2c9-28bcd5ee9ea2
+status: experimental
+description: Detects execution of potentially suspicious binary ncat.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: ncat
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

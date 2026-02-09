@@ -1,0 +1,14 @@
+title: 'OCI Action: CreateGroup'
+id: 44b1ff9e-9903-4a27-bfab-997366021f31
+status: stable
+description: Detects the execution of CreateGroup action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.group.create
+  condition: selection
+level: informational
+tags:
+- oci.audit

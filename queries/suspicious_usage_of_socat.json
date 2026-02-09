@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of socat",
+  "description": "Detects execution of potentially suspicious binary socat.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'socat'",
+  "sigma_id": "1fbec72e-50d4-4c98-89e0-b8b8901eac04",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

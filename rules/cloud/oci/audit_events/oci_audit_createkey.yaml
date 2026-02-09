@@ -1,0 +1,14 @@
+title: 'OCI Action: CreateKey'
+id: b47f1b30-e61d-4afe-8ac3-fbf7fb7f880e
+status: stable
+description: Detects the execution of CreateKey action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.kms.createkey
+  condition: selection
+level: informational
+tags:
+- oci.audit

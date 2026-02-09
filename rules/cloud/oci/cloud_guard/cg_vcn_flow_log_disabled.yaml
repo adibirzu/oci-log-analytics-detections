@@ -1,0 +1,14 @@
+title: 'Cloud Guard Problem: VCN Flow Log Disabled'
+id: 5f85eead-971e-470c-837e-df45a433bb32
+status: stable
+description: 'Detects Cloud Guard reporting problem: VCN_Flow_Log_Disabled.'
+logsource:
+  product: oci
+  service: cloud_guard
+detection:
+  selection:
+    problem_name: VCN_Flow_Log_Disabled
+  condition: selection
+level: high
+tags:
+- oci.cloud_guard

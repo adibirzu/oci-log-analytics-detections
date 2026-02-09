@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of strace",
+  "description": "Detects execution of potentially suspicious binary strace.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'strace'",
+  "sigma_id": "4a094fc9-8c77-4699-bd12-789f9763313b",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

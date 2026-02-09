@@ -1,0 +1,9 @@
+{
+  "title": "OCI VCN Security List Open to World",
+  "description": "Detects creation or update of a Security List allowing ingress from 0.0.0.0/0.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where (Event Type = 'com.oraclecloud.virtualnetwork.createsecuritylist' or Event Type = 'com.oraclecloud.virtualnetwork.updatesecuritylist') and Request Action Type = 'POST' and 'Response Payload' like '*0.0.0.0/0*'",
+  "sigma_id": "uuid-1",
+  "tags": [
+    "attack.defense_evasion"
+  ]
+}

@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: sc'
+id: cf0b79ee-7d12-4a22-8f7f-82ab28b58dee
+status: experimental
+description: Detects usage of Living off the Land binary sc.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: sc.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

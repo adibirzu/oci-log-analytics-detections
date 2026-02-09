@@ -1,0 +1,14 @@
+title: 'OCI Action: TerminateInstance'
+id: 4ef740bd-94d3-4f3d-89d1-0d3d7a8714b7
+status: stable
+description: Detects the execution of TerminateInstance action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.computeapi.terminateinstance
+  condition: selection
+level: informational
+tags:
+- oci.audit

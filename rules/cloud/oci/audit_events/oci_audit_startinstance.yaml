@@ -1,0 +1,14 @@
+title: 'OCI Action: StartInstance'
+id: 9cc99179-9940-4a68-a03e-37817b102940
+status: stable
+description: Detects the execution of StartInstance action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.computeapi.startinstance
+  condition: selection
+level: informational
+tags:
+- oci.audit

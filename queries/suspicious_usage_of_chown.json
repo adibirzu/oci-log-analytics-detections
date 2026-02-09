@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of chown",
+  "description": "Detects execution of potentially suspicious binary chown.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'chown'",
+  "sigma_id": "7e7d49c3-786b-4848-9a0d-584b9616f842",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

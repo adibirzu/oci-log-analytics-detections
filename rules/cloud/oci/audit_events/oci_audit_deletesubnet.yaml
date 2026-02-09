@@ -1,0 +1,14 @@
+title: 'OCI Action: DeleteSubnet'
+id: df4494ae-5d5b-4e1e-be60-89d803bdcdb6
+status: stable
+description: Detects the execution of DeleteSubnet action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.deletesubnet
+  condition: selection
+level: informational
+tags:
+- oci.audit

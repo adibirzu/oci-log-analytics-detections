@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of whoami",
+  "description": "Detects execution of potentially suspicious binary whoami.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'whoami'",
+  "sigma_id": "a0746565-dc95-4fe5-aebb-b98c6ec523ee",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

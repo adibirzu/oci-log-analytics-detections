@@ -1,0 +1,51 @@
+# Mapping from Sigma standardized fields to OCI Log Analytics fields
+# Format: sigma_field: oci_field
+
+field_mappings:
+  # Common
+  user: "User"
+  src_ip: "Client Host"
+  dst_ip: "Destination IP"
+  action: "Action"
+  status: "Status"
+  
+  # OCI Audit Specific
+  event_type: "Event Type"
+  resource_id: "ResourceIdentifier"
+  resource_type: "Resource Type"
+  request_action: "Request Action Type"
+  compartment_name: "Compartment Name"
+  compartment_id: "Compartment OCID"
+  
+  # Network
+  src_port: "Source Port"
+  dst_port: "Destination Port"
+  protocol: "Protocol"
+  
+  # Payload / Generic
+  response_payload: "'Response Payload'"
+  process_name: "'Process Name'"
+  message: "Message"
+  
+  # Cloud Guard
+  problem_name: "Problem Name"
+  
+  # Sysmon / Security
+  CommandLine: "Command Line"
+  Image: "Process Name"
+  ParentImage: "Parent Process Name"
+  ParentCommandLine: "Parent Command Line"
+  Hashes: "Hashes"
+  LogonId: "Logon ID"
+  TerminalSessionId: "Terminal Session ID"
+  IntegrityLevel: "Integrity Level"
+  User: "User"
+  TargetFilename: "Target Filename"
+  SourceFilename: "Source Filename"
+
+logsource_mappings:
+  # Sigma Category/Product -> OCI Log Source Name
+  oci_audit: "'OCI Audit Logs'"
+  oci_vcn: "'OCI VCN Flow Logs'"
+  linux_syslog: "'Linux Syslog'"
+  windows_event: "'Windows Event System'"

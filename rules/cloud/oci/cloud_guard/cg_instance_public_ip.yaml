@@ -1,0 +1,14 @@
+title: 'Cloud Guard Problem: INSTANCE PUBLIC IP'
+id: 696b9fa8-96d2-41a5-8ea4-ee869c544fa3
+status: stable
+description: 'Detects Cloud Guard reporting problem: INSTANCE_PUBLIC_IP.'
+logsource:
+  product: oci
+  service: cloud_guard
+detection:
+  selection:
+    problem_name: INSTANCE_PUBLIC_IP
+  condition: selection
+level: high
+tags:
+- oci.cloud_guard

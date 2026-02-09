@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: net'
+id: 2b75fec4-14d6-4e8f-b82c-ffc3f28804b0
+status: experimental
+description: Detects usage of Living off the Land binary net.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: net.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

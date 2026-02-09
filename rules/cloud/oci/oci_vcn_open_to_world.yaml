@@ -1,0 +1,18 @@
+title: OCI VCN Security List Open to World
+id: uuid-1
+status: experimental
+description: Detects creation or update of a Security List allowing ingress from 0.0.0.0/0.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.virtualnetwork.createsecuritylist
+    - com.oraclecloud.virtualnetwork.updatesecuritylist
+    request_action: POST
+    response_payload|contains: 0.0.0.0/0
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion

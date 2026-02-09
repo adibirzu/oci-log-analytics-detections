@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: wscript'
+id: 4ab18cdc-4545-43d4-9cdf-9d84a5b31f32
+status: experimental
+description: Detects usage of Living off the Land binary wscript.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: wscript.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of modprobe",
+  "description": "Detects execution of potentially suspicious binary modprobe.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'modprobe'",
+  "sigma_id": "a02a5117-562d-4b9b-a782-2ca880d0d0f9",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

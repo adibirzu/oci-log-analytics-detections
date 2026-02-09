@@ -1,0 +1,14 @@
+title: 'OCI Action: DeleteGroup'
+id: 451e2ab8-d3c6-44d6-9f0c-501f45f85fea
+status: stable
+description: Detects the execution of DeleteGroup action in OCI.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.group.delete
+  condition: selection
+level: informational
+tags:
+- oci.audit

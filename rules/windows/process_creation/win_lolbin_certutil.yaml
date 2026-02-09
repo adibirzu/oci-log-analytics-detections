@@ -1,0 +1,15 @@
+title: 'Windows LOLBin Usage: certutil'
+id: 1ab58fb3-dfe9-43b0-8df1-8c5d0219bef5
+status: experimental
+description: Detects usage of Living off the Land binary certutil.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name: certutil.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218

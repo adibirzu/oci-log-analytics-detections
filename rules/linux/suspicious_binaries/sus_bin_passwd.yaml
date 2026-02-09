@@ -1,0 +1,15 @@
+title: Suspicious Usage of passwd
+id: 1583e3f2-8fc1-4874-94d3-b893202a2700
+status: experimental
+description: Detects execution of potentially suspicious binary passwd.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: passwd
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

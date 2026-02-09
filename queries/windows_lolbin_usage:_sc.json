@@ -1,0 +1,10 @@
+{
+  "title": "Windows LOLBin Usage: sc",
+  "description": "Detects usage of Living off the Land binary sc.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'sc.exe'",
+  "sigma_id": "cf0b79ee-7d12-4a22-8f7f-82ab28b58dee",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ]
+}

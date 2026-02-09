@@ -1,0 +1,15 @@
+title: Linux Sudo Usage
+id: uuid-5
+status: stable
+description: Detects execution of sudo commands.
+logsource:
+  product: linux
+  service: auth
+detection:
+  selection:
+    process_name: sudo
+    message|contains: COMMAND=
+  condition: selection
+level: low
+tags:
+- attack.privilege_escalation

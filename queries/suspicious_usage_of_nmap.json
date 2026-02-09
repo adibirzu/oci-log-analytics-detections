@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of nmap",
+  "description": "Detects execution of potentially suspicious binary nmap.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'nmap'",
+  "sigma_id": "48b37671-d0ad-42fe-bd00-fd5ddde2d528",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

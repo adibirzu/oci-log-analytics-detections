@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of wireshark",
+  "description": "Detects execution of potentially suspicious binary wireshark.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'wireshark'",
+  "sigma_id": "bc8616ca-d018-4517-8781-902d64e106ac",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

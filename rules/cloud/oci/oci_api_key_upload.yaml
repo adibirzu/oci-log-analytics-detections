@@ -1,0 +1,14 @@
+title: OCI API Key Uploaded
+id: uuid-4
+status: stable
+description: Detects upload of a new API key to a user account.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identity.user.uploadapikey
+  condition: selection
+level: medium
+tags:
+- attack.persistence

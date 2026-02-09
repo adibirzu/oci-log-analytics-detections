@@ -1,0 +1,10 @@
+{
+  "title": "Suspicious Usage of shadow",
+  "description": "Detects execution of potentially suspicious binary shadow.",
+  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'shadow'",
+  "sigma_id": "262ec507-79bb-43b0-a641-3bb9cf69a4b4",
+  "tags": [
+    "attack.execution",
+    "attack.t1204"
+  ]
+}

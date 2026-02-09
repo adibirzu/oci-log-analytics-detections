@@ -1,0 +1,15 @@
+title: Suspicious Usage of netcat
+id: d68b1276-c40c-4505-a5dc-c822ea0b2eb3
+status: experimental
+description: Detects execution of potentially suspicious binary netcat.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: netcat
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1204

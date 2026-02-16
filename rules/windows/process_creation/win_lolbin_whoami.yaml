@@ -7,7 +7,7 @@ logsource:
   service: process_creation
 detection:
   selection:
-    process_name: whoami.exe
+    process_name|endswith: whoami.exe
   condition: selection
 level: medium
 tags:

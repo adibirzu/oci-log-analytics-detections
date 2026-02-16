@@ -1,0 +1,21 @@
+title: OCI Log Group Deleted
+id: e1f2a3b4-4006-4000-8000-000000000006
+status: stable
+description: Detects deletion of OCI Log Analytics log groups. Deleting log groups destroys collected log data and can indicate an attacker covering their tracks.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.loganalytics.deleteloganalyticsloggroup
+    - com.oraclecloud.logging.deleteloggroup
+  condition: selection
+level: critical
+tags:
+- attack.defense_evasion
+- attack.t1562.001
+- stig.AU-11
+falsepositives:
+- Log group consolidation during infrastructure cleanup
+- Decommissioning of monitoring infrastructure

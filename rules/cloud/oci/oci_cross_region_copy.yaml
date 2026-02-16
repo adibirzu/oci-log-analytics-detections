@@ -1,0 +1,20 @@
+title: OCI Cross-Region Data Copy
+id: d1a2b3c4-1010-4000-8000-000000000010
+status: stable
+description: Detects cross-region copy operations for boot volumes, block volumes, or object storage buckets. This could indicate data staging for exfiltration to a region outside organizational control.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.blockvolumes.copybootvolumeregion
+    - com.oraclecloud.blockvolumes.copyvolumeregion
+    - com.oraclecloud.objectstorage.copyobject
+    - com.oraclecloud.objectstorage.createreplicationpolicy
+  condition: selection
+level: high
+tags:
+- attack.exfiltration
+- attack.t1537
+- stig.SC-28

@@ -1,0 +1,33 @@
+{
+  "title": "Windows NTDS.dit Database Extraction",
+  "description": "Detects attempts to extract the Active Directory NTDS.dit database file using ntdsutil, vssadmin shadow copies, or direct copy commands. This file contains all domain password hashes.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*ntdsutil.exe' and ('Command Line' like '*ac i ntds*' or 'Command Line' like '*ifm*' or 'Command Line' like '*create full*')) or (('Command Line' like '*ntds.dit*' or 'Command Line' like '*SYSTEM.hiv*')))",
+  "sigma_id": "f1e2d3c4-5020-4000-8000-000000000020",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.credential_access",
+    "attack.t1003.003"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "credential_access"
+    ],
+    "techniques": [
+      "T1003.003"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate Active Directory backup procedures",
+    "Domain controller disaster recovery testing"
+  ]
+}

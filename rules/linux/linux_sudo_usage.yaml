@@ -1,5 +1,5 @@
 title: Linux Sudo Usage
-id: uuid-5
+id: 42793848-2b55-462d-a986-fd84dcf64063
 status: stable
 description: Detects execution of sudo commands.
 logsource:

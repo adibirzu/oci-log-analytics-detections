@@ -7,7 +7,7 @@ logsource:
   service: process_creation
 detection:
   selection:
-    process_name: wscript.exe
+    process_name|endswith: wscript.exe
   condition: selection
 level: medium
 tags:

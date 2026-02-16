@@ -13,7 +13,7 @@ dashboard_widgets = [
     {"title": "Object Storage Public Buckets", "query_file": "oci_object_storage_bucket_made_public.json", "type": "TABLE"},
     {"title": "VCN Security List Open to World", "query_file": "oci_vcn_security_list_open_to_world.json", "type": "TABLE"},
     {"title": "SSH Failed Logins Trend", "query_file": "linux_ssh_failed_login.json", "type": "CHART"},
-    {"title": "Cloud Guard Critical Problems", "query_file": "cloud_guard_problem:_instance_public_ip.json", "type": "TABLE"}
+    {"title": "Cloud Guard Critical Problems", "query_file": "cloud_guard_problem_instance_public_ip.json", "type": "TABLE"}
 ]
 
 def generate_oci_cli_commands():

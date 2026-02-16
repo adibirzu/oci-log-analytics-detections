@@ -1,9 +1,0 @@
-{
-  "title": "Cloud Guard Problem: Bucket Public Read",
-  "description": "Detects Cloud Guard reporting problem: Bucket_Public_Read.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where Problem Name = 'Bucket_Public_Read'",
-  "sigma_id": "e8d34b6b-b877-45ab-a23e-c3e78af06b71",
-  "tags": [
-    "oci.cloud_guard"
-  ]
-}

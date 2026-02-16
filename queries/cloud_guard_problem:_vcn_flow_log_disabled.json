@@ -1,9 +1,0 @@
-{
-  "title": "Cloud Guard Problem: VCN Flow Log Disabled",
-  "description": "Detects Cloud Guard reporting problem: VCN_Flow_Log_Disabled.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where Problem Name = 'VCN_Flow_Log_Disabled'",
-  "sigma_id": "5f85eead-971e-470c-837e-df45a433bb32",
-  "tags": [
-    "oci.cloud_guard"
-  ]
-}

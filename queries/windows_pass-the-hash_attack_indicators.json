@@ -1,0 +1,33 @@
+{
+  "title": "Windows Pass-the-Hash Attack Indicators",
+  "description": "Detects command-line patterns associated with pass-the-hash attacks using tools like Impacket, CrackMapExec, or built-in Windows commands with NTLM hash parameters.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*sekurlsa::pth*' or 'Command Line' like '*Invoke-SMBExec*' or 'Command Line' like '*Invoke-WMIExec*' or 'Command Line' like '*crackmapexec*' or 'Command Line' like '*smbexec*' or 'Command Line' like '*wmiexec*' or 'Command Line' like '*atexec*')) or ('Process Name' like '*runas.exe' and 'Command Line' like '*/netonly*'))",
+  "sigma_id": "f1e2d3c4-5017-4000-8000-000000000017",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.lateral_movement",
+    "attack.t1550.002"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "lateral_movement"
+    ],
+    "techniques": [
+      "T1550.002"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Authorized penetration testing",
+    "Legitimate use of runas /netonly for cross-domain authentication"
+  ]
+}

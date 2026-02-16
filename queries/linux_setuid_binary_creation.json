@@ -1,0 +1,36 @@
+{
+  "title": "Linux Setuid Binary Creation",
+  "description": "Detects creation of setuid/setgid binaries. Attackers set the SUID bit on binaries to maintain root-level access even when running as unprivileged users. This is a classic privilege escalation persistence technique.\n",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*chmod +s*' or msg like '*chmod u+s*' or msg like '*chmod g+s*' or msg like '*chmod 4755*' or msg like '*chmod 4775*' or msg like '*chmod 2755*' or msg like '*chmod 6755*')))",
+  "sigma_id": "a1b2c3d4-6019-4000-8000-000000000019",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.privilege_escalation",
+    "attack.t1548.001",
+    "attack.persistence"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "privilege_escalation",
+      "persistence"
+    ],
+    "techniques": [
+      "T1548.001"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "syslog",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Package installation setting legitimate SUID bits",
+    "Application requiring elevated permissions"
+  ]
+}

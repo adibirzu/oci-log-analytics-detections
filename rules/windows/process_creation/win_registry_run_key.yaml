@@ -1,0 +1,19 @@
+title: Windows Registry Run Key Modification
+id: d1a2b3c4-3004-4000-8000-000000000004
+status: stable
+description: Detects modification of Windows Registry Run/RunOnce keys for persistence, allowing malicious programs to execute at system startup or user login.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - 'CurrentVersion\Run'
+    - 'CurrentVersion\RunOnce'
+    - 'CurrentVersion\RunServices'
+    - 'CurrentVersion\Policies\Explorer\Run'
+  condition: selection
+level: high
+tags:
+- attack.persistence
+- attack.t1547.001

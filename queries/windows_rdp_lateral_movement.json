@@ -1,0 +1,33 @@
+{
+  "title": "Windows RDP Lateral Movement",
+  "description": "Detects use of mstsc.exe (Remote Desktop client) or enabling RDP via registry, indicating potential lateral movement between systems.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*mstsc.exe' and 'Command Line' like '*/v:*') or ('Process Name' like '*reg.exe' and 'Command Line' like '*fDenyTSConnections*'))",
+  "sigma_id": "e1f2a3b4-4017-4000-8000-000000000017",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.lateral_movement",
+    "attack.t1021.001"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "lateral_movement"
+    ],
+    "techniques": [
+      "T1021.001"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "IT administrators using RDP for legitimate remote management",
+    "Help desk remote support sessions"
+  ]
+}

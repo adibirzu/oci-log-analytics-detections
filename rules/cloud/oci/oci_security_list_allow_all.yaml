@@ -1,0 +1,20 @@
+title: OCI Security List Allows All Protocols
+id: d1a2b3c4-1007-4000-8000-000000000007
+status: stable
+description: Detects security list updates that allow all protocols (protocol=all) from any source, creating an overly permissive network configuration that violates STIG network segmentation requirements.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.virtualnetwork.createsecuritylist
+    - com.oraclecloud.virtualnetwork.updatesecuritylist
+    response_payload|contains: '"protocol":"all"'
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1562.007
+- stig.SC-7
+- compliance.cis_oci_2.4

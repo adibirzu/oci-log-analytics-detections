@@ -1,0 +1,40 @@
+title: Windows Screen Capture Activity
+id: a1b2c3d4-6014-4000-8000-000000000014
+status: stable
+description: >
+  Detects screen capture tools and commands used by attackers to collect visual
+  intelligence from victim systems. Screen captures can reveal sensitive data
+  displayed on screen, credentials in open windows, and security posture.
+author: SOC Detection Team
+date: 2026/02/11
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_snippingtool:
+    process_name|endswith:
+    - SnippingTool.exe
+    - ScreenClippingHost.exe
+  sel_nircmd:
+    CommandLine|contains:
+    - nircmd savescreenshot
+    - nircmd.exe savescreenshot
+  sel_powershell_capture:
+    CommandLine|contains:
+    - '[System.Drawing.Graphics]::CopyFromScreen'
+    - 'System.Windows.Forms.Screen'
+    - Screenshot
+    - CopyFromScreen
+  sel_tools:
+    CommandLine|contains:
+    - screencapture
+    - screenshot.exe
+    - capture.exe
+  condition: sel_snippingtool or sel_nircmd or sel_powershell_capture or sel_tools
+level: medium
+tags:
+- attack.collection
+- attack.t1113
+falsepositives:
+- Legitimate screen capture for documentation
+- Remote support tools taking screenshots

@@ -1,0 +1,16 @@
+title: OCI Dynamic Group Created
+id: d1a2b3c4-1003-4000-8000-000000000003
+status: stable
+description: Detects creation of dynamic groups which grant instance principal permissions. Attackers can abuse this for lateral movement from compromised compute instances.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identitycontrolplane.createdynamicgroup
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1098.001
+- stig.AC-6

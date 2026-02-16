@@ -1,0 +1,34 @@
+{
+  "title": "Linux At Job Scheduled",
+  "description": "Detects scheduling of at jobs for deferred command execution. Attackers use at jobs for timed persistence or delayed payload execution.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'at') or ('Process Name' = 'batch'))",
+  "sigma_id": "e1f2a3b4-4014-4000-8000-000000000014",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.persistence",
+    "attack.t1053.002"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1053.002"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate scheduled maintenance tasks",
+    "Batch processing systems"
+  ]
+}

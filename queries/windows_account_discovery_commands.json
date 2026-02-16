@@ -1,0 +1,35 @@
+{
+  "title": "Windows Account Discovery Commands",
+  "description": "Detects commands used to enumerate user accounts and groups in Active Directory. Attackers perform account discovery to identify privileged accounts, service accounts, and domain administrators for targeting.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*net.exe' and ('Command Line' like '*user /domain*' or 'Command Line' like '*group /domain*' or 'Command Line' like '*localgroup administrators*')) or ('Process Name' like '*net1.exe' and ('Command Line' like '*user /domain*' or 'Command Line' like '*group /domain*')) or (('Command Line' like '*Get-ADUser*' or 'Command Line' like '*Get-ADGroup*' or 'Command Line' like '*Get-ADGroupMember*' or 'Command Line' like '*Get-LocalUser*' or 'Command Line' like '*Get-LocalGroupMember*')) or ('Process Name' like '*dsquery.exe'))",
+  "sigma_id": "a1b2c3d4-6002-4000-8000-000000000002",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.discovery",
+    "attack.t1087.001",
+    "attack.t1087.002"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "discovery"
+    ],
+    "techniques": [
+      "T1087.001",
+      "T1087.002"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Help desk account management",
+    "IT administrators auditing group memberships"
+  ]
+}

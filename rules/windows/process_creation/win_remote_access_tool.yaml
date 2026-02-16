@@ -1,0 +1,40 @@
+title: Windows Remote Access Tool Detected
+id: a1b2c3d4-6016-4000-8000-000000000016
+status: stable
+description: >
+  Detects installation or execution of remote access tools commonly abused by
+  attackers. Tools like AnyDesk, TeamViewer, ngrok, and ScreenConnect provide
+  persistent remote access that can bypass firewall rules.
+author: SOC Detection Team
+date: 2026/02/11
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_anydesk:
+    process_name|endswith: AnyDesk.exe
+  sel_teamviewer:
+    process_name|endswith: TeamViewer.exe
+  sel_ngrok:
+    CommandLine|contains:
+    - ngrok
+    - ngrok.exe
+  sel_screenconnect:
+    process_name|endswith: ScreenConnect.ClientService.exe
+  sel_rustdesk:
+    process_name|endswith: rustdesk.exe
+  sel_generic:
+    CommandLine|contains:
+    - AnyDesk
+    - TeamViewer
+    - ScreenConnect
+    - RustDesk
+  condition: sel_anydesk or sel_teamviewer or sel_ngrok or sel_screenconnect or sel_rustdesk or sel_generic
+level: high
+tags:
+- attack.command_and_control
+- attack.t1219
+- attack.persistence
+falsepositives:
+- Authorized remote support tools
+- IT help desk using approved remote access software

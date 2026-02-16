@@ -1,0 +1,34 @@
+{
+  "title": "Linux Systemd Service Persistence",
+  "description": "Detects creation or enabling of systemd services, a common persistence mechanism where attackers install malicious services that survive reboots.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*systemctl enable*' or msg like '*systemctl daemon-reload*' or msg like '*/etc/systemd/system/*')) and (msg like '*.service*'))",
+  "sigma_id": "e1f2a3b4-4008-4000-8000-000000000008",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.persistence",
+    "attack.t1543.002"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1543.002"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate software installation",
+    "System administration tasks"
+  ]
+}

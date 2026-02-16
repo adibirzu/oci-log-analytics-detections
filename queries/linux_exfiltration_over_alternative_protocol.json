@@ -1,0 +1,34 @@
+{
+  "title": "Linux Exfiltration Over Alternative Protocol",
+  "description": "Detects data exfiltration using non-standard protocols. Attackers use tools like netcat, socat, or raw sockets to send data over TCP/UDP to external hosts, bypassing HTTP/HTTPS-based monitoring.\n",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*nc -w*' or msg like '*nc -q*' or msg like '*ncat --send*' or msg like '*socat - TCP*' or msg like '*socat STDIN TCP*')) or ((msg like '*| nc *' or msg like '*| ncat *' or msg like '*| socat *' or msg like '*| curl -X POST*')) or ((msg like '*scp -r /*' or msg like '*scp /etc*' or msg like '*scp /var/log*' or msg like '*scp /home*')))",
+  "sigma_id": "a1b2c3d4-6010-4000-8000-000000000010",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.exfiltration",
+    "attack.t1048"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1048"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "syslog",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Authorized data transfers",
+    "Backup scripts using scp"
+  ]
+}

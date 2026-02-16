@@ -1,0 +1,36 @@
+{
+  "title": "Linux Archive Data Collected for Exfiltration",
+  "description": "Detects creation of compressed archives from sensitive directories. Attackers archive collected data (credentials, source code, configs) before exfiltrating to reduce transfer size and avoid detection.\n",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (( ((msg like '*tar -czf*' or msg like '*tar czf*' or msg like '*tar -cjf*' or msg like '*tar cjf*')) or ((msg like '*zip -r /tmp*' or msg like '*zip -r /dev/shm*' or msg like '*zip -r /var/tmp*')) ) and ((msg like '*/etc/*' or msg like '*/home/*' or msg like '*/root/*' or msg like '*/var/www/*' or msg like '*/opt/*')))",
+  "sigma_id": "a1b2c3d4-6012-4000-8000-000000000012",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.collection",
+    "attack.t1560.001",
+    "attack.exfiltration"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "collection",
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1560.001"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "syslog",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "System backup scripts",
+    "Application deployment archives"
+  ]
+}

@@ -7,7 +7,7 @@ logsource:
   service: process_creation
 detection:
   selection:
-    process_name: net1.exe
+    process_name|endswith: net1.exe
   condition: selection
 level: medium
 tags:

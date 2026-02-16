@@ -1,0 +1,37 @@
+{
+  "title": "Windows PowerShell Download Cradle",
+  "description": "Detects PowerShell download cradle patterns commonly used to fetch and execute remote payloads including Invoke-WebRequest, Net.WebClient, and Start-BitsTransfer.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*powershell.exe' or 'Process Name' like '*pwsh.exe')) and (('Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*Net.WebClient*' or 'Command Line' like '*DownloadString*' or 'Command Line' like '*DownloadFile*' or 'Command Line' like '*Start-BitsTransfer*' or 'Command Line' like '*Invoke-RestMethod*')))",
+  "sigma_id": "e1f2a3b4-4019-4000-8000-000000000019",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.execution",
+    "attack.t1059.001",
+    "attack.command_and_control",
+    "attack.t1105"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1059.001",
+      "T1105"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate PowerShell scripts downloading modules",
+    "System administration automation"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "title": "Windows Firewall Rule Modification",
+  "description": "Detects modification of Windows Firewall rules via netsh. Attackers disable or modify firewall rules to enable lateral movement or C2 communication.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*netsh.exe' and ('Command Line' like '*advfirewall firewall add*' or 'Command Line' like '*advfirewall set allprofiles state off*' or 'Command Line' like '*advfirewall firewall delete*' or 'Command Line' like '*advfirewall firewall set rule*')))",
+  "sigma_id": "e1f2a3b4-4016-4000-8000-000000000016",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1562.004"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1562.004"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate firewall administration",
+    "Software installation requiring firewall exceptions"
+  ]
+}

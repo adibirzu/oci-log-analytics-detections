@@ -1,0 +1,19 @@
+title: OCI Notification Subscription Created
+id: e1f2a3b4-4005-4000-8000-000000000005
+status: stable
+description: Detects creation of notification topic subscriptions. Attackers may create subscriptions to exfiltrate alerts or intercept security notifications.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.ons.createsubscription
+  condition: selection
+level: medium
+tags:
+- attack.collection
+- attack.t1114
+- stig.AU-12
+falsepositives:
+- Normal notification infrastructure setup
+- CI/CD pipeline configuration

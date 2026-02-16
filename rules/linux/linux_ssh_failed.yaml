@@ -1,5 +1,5 @@
 title: Linux SSH Failed Login
-id: uuid-6
+id: 4cda756f-09a8-4261-86c0-e566a0f2a9a4
 status: stable
 description: Detects failed SSH login attempts.
 logsource:

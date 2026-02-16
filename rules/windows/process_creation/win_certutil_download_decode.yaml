@@ -1,0 +1,23 @@
+title: Windows Certutil Download or Decode
+id: 3ae1f203-ef01-2345-6789-012345678090
+status: stable
+description: Detects usage of certutil.exe to download files from URLs or decode Base64 payloads, a common LOLBin abuse technique.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name|endswith: certutil.exe
+    CommandLine|contains:
+    - urlcache
+    - decode
+    - encode
+    - '-urlcache'
+    - '-decode'
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1140
+- attack.command_and_control
+- attack.t1105

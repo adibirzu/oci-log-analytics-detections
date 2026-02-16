@@ -1,5 +1,5 @@
 title: OCI Compute Instance Terminated
-id: uuid-7
+id: 2bce3086-0d16-4b92-b303-76a9d66932e5
 status: stable
 description: Detects termination of a compute instance.
 logsource:

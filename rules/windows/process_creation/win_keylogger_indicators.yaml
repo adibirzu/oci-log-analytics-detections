@@ -1,0 +1,35 @@
+title: Windows Keylogger Indicators
+id: a1b2c3d4-6013-4000-8000-000000000013
+status: stable
+description: >
+  Detects indicators of keylogging activity. Attackers deploy keyloggers to
+  capture credentials, sensitive data, and user activity. Detects common keylogger
+  tools, SetWindowsHookEx API calls, and suspicious input recording patterns.
+author: SOC Detection Team
+date: 2026/02/11
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_keylogger_tools:
+    CommandLine|contains:
+    - keylogger
+    - GetAsyncKeyState
+    - SetWindowsHookEx
+    - GetKeyboardState
+    - MapVirtualKey
+  sel_input_capture:
+    CommandLine|contains:
+    - logkeys
+    - keystroke
+    - keystrokes.txt
+    - keylog.txt
+  condition: sel_keylogger_tools or sel_input_capture
+level: critical
+tags:
+- attack.collection
+- attack.t1056.001
+- attack.credential_access
+falsepositives:
+- Accessibility software
+- Input monitoring for compliance

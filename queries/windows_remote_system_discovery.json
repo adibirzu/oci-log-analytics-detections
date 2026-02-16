@@ -1,0 +1,33 @@
+{
+  "title": "Windows Remote System Discovery",
+  "description": "Detects commands and tools used to discover remote systems on the network. Attackers perform network sweeps, ARP scans, and DNS lookups to identify targets for lateral movement.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*arp.exe' and 'Command Line' like '*-a*') or (('Command Line' like '*for /l*' or 'Command Line' like '*ping -n 1*')) or ('Process Name' like '*nslookup.exe') or (('Command Line' like '*Test-Connection*' or 'Command Line' like '*Test-NetConnection*' or 'Command Line' like '*Resolve-DnsName*' or 'Command Line' like '*Get-ADComputer*')) or (('Command Line' like '*nbtscan*' or 'Command Line' like '*nbtstat -a*')))",
+  "sigma_id": "a1b2c3d4-6004-4000-8000-000000000004",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.discovery",
+    "attack.t1018"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "discovery"
+    ],
+    "techniques": [
+      "T1018"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Network troubleshooting",
+    "IT monitoring scripts"
+  ]
+}

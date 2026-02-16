@@ -1,5 +1,5 @@
 title: OCI Route Table Update
-id: uuid-10
+id: eb715728-3f76-4c55-afd6-246f25531e2e
 status: stable
 description: Detects changes to VCN Route Tables.
 logsource:

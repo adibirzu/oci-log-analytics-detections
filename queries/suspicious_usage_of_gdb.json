@@ -1,10 +1,30 @@
 {
   "title": "Suspicious Usage of gdb",
   "description": "Detects execution of potentially suspicious binary gdb.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'gdb'",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'gdb'))",
   "sigma_id": "df525fb1-3830-48ee-a9af-319b50dacd07",
+  "level": "low",
+  "stig_category": "CAT III",
   "tags": [
     "attack.execution",
     "attack.t1204"
-  ]
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1204"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
 }

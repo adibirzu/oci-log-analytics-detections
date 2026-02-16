@@ -1,10 +1,30 @@
 {
   "title": "Suspicious Usage of ruby",
   "description": "Detects execution of potentially suspicious binary ruby.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'ruby'",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'ruby'))",
   "sigma_id": "fa6b1601-bd1b-4722-8697-da640ad83edf",
+  "level": "low",
+  "stig_category": "CAT III",
   "tags": [
     "attack.execution",
     "attack.t1204"
-  ]
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1204"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
 }

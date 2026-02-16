@@ -1,0 +1,17 @@
+title: OCI Network Load Balancer Deleted
+id: e5f6a7b8-9abc-def0-1234-567890123045
+status: stable
+description: Detects deletion of an OCI load balancer, which may cause service outages or indicate infrastructure sabotage.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.loadbalancer.deleteloadbalancer
+    - com.oraclecloud.networkloadbalancer.deletenetworkloadbalancer
+  condition: selection
+level: high
+tags:
+- attack.impact
+- attack.t1489

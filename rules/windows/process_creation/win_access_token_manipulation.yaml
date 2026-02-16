@@ -1,0 +1,42 @@
+title: Windows Access Token Manipulation
+id: a1b2c3d4-6020-4000-8000-000000000020
+status: stable
+description: >
+  Detects access token manipulation techniques used for privilege escalation.
+  Attackers steal or forge tokens to impersonate other users, especially
+  SYSTEM or domain admin, without needing their credentials.
+author: SOC Detection Team
+date: 2026/02/11
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_token_tools:
+    CommandLine|contains:
+    - Invoke-TokenManipulation
+    - token::elevate
+    - token::revert
+    - incognito.exe
+  sel_impersonate:
+    CommandLine|contains:
+    - ImpersonateLoggedOnUser
+    - DuplicateTokenEx
+    - CreateProcessWithToken
+    - SetThreadToken
+    - AdjustTokenPrivileges
+  sel_potato:
+    CommandLine|contains:
+    - JuicyPotato
+    - SweetPotato
+    - PrintSpoofer
+    - GodPotato
+    - RottenPotato
+  condition: sel_token_tools or sel_impersonate or sel_potato
+level: critical
+tags:
+- attack.privilege_escalation
+- attack.t1134
+- attack.defense_evasion
+falsepositives:
+- Security assessment tools
+- Authorized penetration testing

@@ -1,0 +1,29 @@
+{
+  "title": "Windows AMSI Bypass Attempt",
+  "description": "Detects attempts to bypass the Antimalware Scan Interface (AMSI) through PowerShell commands or .NET reflection techniques.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*amsiInitFailed*' or 'Command Line' like '*AmsiScanBuffer*' or 'Command Line' like '*amsi.dll*' or 'Command Line' like '*amsiContext*' or 'Command Line' like '*AmsiUtils*')))",
+  "sigma_id": "d1a2b3c4-3002-4000-8000-000000000002",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1562.001"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1562.001"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+title: Windows Account Discovery Commands
+id: a1b2c3d4-6002-4000-8000-000000000002
+status: stable
+description: >
+  Detects commands used to enumerate user accounts and groups in Active Directory.
+  Attackers perform account discovery to identify privileged accounts, service accounts,
+  and domain administrators for targeting.
+author: SOC Detection Team
+date: 2026/02/11
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_net_user:
+    process_name|endswith: net.exe
+    CommandLine|contains:
+    - user /domain
+    - group /domain
+    - localgroup administrators
+  sel_net1_user:
+    process_name|endswith: net1.exe
+    CommandLine|contains:
+    - user /domain
+    - group /domain
+  sel_powershell:
+    CommandLine|contains:
+    - Get-ADUser
+    - Get-ADGroup
+    - Get-ADGroupMember
+    - Get-LocalUser
+    - Get-LocalGroupMember
+  sel_dsquery:
+    process_name|endswith: dsquery.exe
+  condition: sel_net_user or sel_net1_user or sel_powershell or sel_dsquery
+level: medium
+tags:
+- attack.discovery
+- attack.t1087.001
+- attack.t1087.002
+falsepositives:
+- Help desk account management
+- IT administrators auditing group memberships

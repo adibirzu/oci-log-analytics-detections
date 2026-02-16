@@ -7,7 +7,7 @@ logsource:
   service: process_creation
 detection:
   selection:
-    process_name: wmic.exe
+    process_name|endswith: wmic.exe
   condition: selection
 level: medium
 tags:

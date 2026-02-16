@@ -1,0 +1,22 @@
+title: Windows RDP Lateral Movement
+id: e1f2a3b4-4017-4000-8000-000000000017
+status: stable
+description: Detects use of mstsc.exe (Remote Desktop client) or enabling RDP via registry, indicating potential lateral movement between systems.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_mstsc:
+    process_name|endswith: mstsc.exe
+    CommandLine|contains: '/v:'
+  sel_rdp_enable:
+    process_name|endswith: reg.exe
+    CommandLine|contains: fDenyTSConnections
+  condition: sel_mstsc or sel_rdp_enable
+level: medium
+tags:
+- attack.lateral_movement
+- attack.t1021.001
+falsepositives:
+- IT administrators using RDP for legitimate remote management
+- Help desk remote support sessions

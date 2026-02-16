@@ -1,0 +1,3283 @@
+{
+  "project": "oci-log-analytics-detections",
+  "version": "2.0.0",
+  "generated_at": "2026-02-13T10:03:00.075745+00:00",
+  "stats": {
+    "total_rules": 200,
+    "total_sigma_rules": 200,
+    "platforms": {
+      "oci": 80,
+      "linux": 65,
+      "windows": 55
+    },
+    "severity": {
+      "high": 63,
+      "medium": 50,
+      "critical": 23,
+      "low": 34,
+      "informational": 30
+    },
+    "stig_tagged": 24,
+    "mitre_techniques": [
+      "T1003.001",
+      "T1003.003",
+      "T1003.007",
+      "T1005",
+      "T1018",
+      "T1021",
+      "T1021.001",
+      "T1021.002",
+      "T1027",
+      "T1033",
+      "T1046",
+      "T1048",
+      "T1053.002",
+      "T1053.003",
+      "T1053.005",
+      "T1055.008",
+      "T1055.012",
+      "T1056.001",
+      "T1059",
+      "T1059.001",
+      "T1059.004",
+      "T1070.001",
+      "T1070.002",
+      "T1070.003",
+      "T1071.004",
+      "T1074.001",
+      "T1078",
+      "T1082",
+      "T1087.001",
+      "T1087.002",
+      "T1090",
+      "T1090.001",
+      "T1098",
+      "T1098.001",
+      "T1098.004",
+      "T1105",
+      "T1110.003",
+      "T1113",
+      "T1114",
+      "T1127.001",
+      "T1133",
+      "T1134",
+      "T1135",
+      "T1136.001",
+      "T1140",
+      "T1197",
+      "T1204",
+      "T1204.002",
+      "T1218",
+      "T1219",
+      "T1485",
+      "T1489",
+      "T1490",
+      "T1496",
+      "T1505.003",
+      "T1528",
+      "T1537",
+      "T1543.002",
+      "T1543.003",
+      "T1546.003",
+      "T1546.004",
+      "T1547.001",
+      "T1547.006",
+      "T1548.001",
+      "T1548.002",
+      "T1548.003",
+      "T1550.002",
+      "T1556",
+      "T1556.007",
+      "T1557",
+      "T1558.003",
+      "T1560.001",
+      "T1562.001",
+      "T1562.004",
+      "T1562.007",
+      "T1562.008",
+      "T1564.001",
+      "T1565.001",
+      "T1566.001",
+      "T1567",
+      "T1569.002",
+      "T1572",
+      "T1573",
+      "T1573.002",
+      "T1574.002",
+      "T1574.006",
+      "T1580",
+      "T1600",
+      "T1611",
+      "T1648"
+    ],
+    "mitre_tactics": [
+      "collection",
+      "command_and_control",
+      "credential_access",
+      "defense_evasion",
+      "discovery",
+      "execution",
+      "exfiltration",
+      "impact",
+      "initial_access",
+      "lateral_movement",
+      "persistence",
+      "privilege_escalation"
+    ]
+  },
+  "rules": [
+    {
+      "filename": "cloud_guard_problem_audit_log_retention.json",
+      "title": "Cloud Guard Problem: Audit Log Retention",
+      "sigma_id": "323f7813-0c1e-48d8-9b7d-6aa98a963942",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Audit_Log_Retention'))"
+    },
+    {
+      "filename": "cloud_guard_problem_bucket_public_read.json",
+      "title": "Cloud Guard Problem: Bucket Public Read",
+      "sigma_id": "e8d34b6b-b877-45ab-a23e-c3e78af06b71",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Bucket_Public_Read'))"
+    },
+    {
+      "filename": "cloud_guard_problem_bucket_public_write.json",
+      "title": "Cloud Guard Problem: Bucket Public Write",
+      "sigma_id": "9a6c6c06-0967-41ae-99fd-376b2b0d1426",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Bucket_Public_Write'))"
+    },
+    {
+      "filename": "cloud_guard_problem_group_has_too_many_admins.json",
+      "title": "Cloud Guard Problem: Group Has Too Many Admins",
+      "sigma_id": "e262f895-bd75-49d5-94f5-231ea2c65d9a",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Group_Has_Too_Many_Admins'))"
+    },
+    {
+      "filename": "cloud_guard_problem_iam_user_api_key_old.json",
+      "title": "Cloud Guard Problem: IAM User API Key Old",
+      "sigma_id": "1f3fa599-8f20-428f-a253-79832933e825",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'IAM_User_API_Key_Old'))"
+    },
+    {
+      "filename": "cloud_guard_problem_iam_user_console_password_old.json",
+      "title": "Cloud Guard Problem: IAM User Console Password Old",
+      "sigma_id": "2cf17b40-c22e-4ca3-9de8-5169651a1f1a",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'IAM_User_Console_Password_Old'))"
+    },
+    {
+      "filename": "cloud_guard_problem_instance_principals_enabled.json",
+      "title": "Cloud Guard Problem: Instance Principals Enabled",
+      "sigma_id": "54e23bf0-f5ee-4638-821a-a94618cd508c",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Instance_Principals_Enabled'))"
+    },
+    {
+      "filename": "cloud_guard_problem_instance_public_ip.json",
+      "title": "Cloud Guard Problem: INSTANCE PUBLIC IP",
+      "sigma_id": "696b9fa8-96d2-41a5-8ea4-ee869c544fa3",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'INSTANCE_PUBLIC_IP'))"
+    },
+    {
+      "filename": "cloud_guard_problem_policy_too_permissive.json",
+      "title": "Cloud Guard Problem: Policy Too Permissive",
+      "sigma_id": "b41e83fc-910d-473d-befb-9475109aa4a7",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Policy_Too_Permissive'))"
+    },
+    {
+      "filename": "cloud_guard_problem_vcn_flow_log_disabled.json",
+      "title": "Cloud Guard Problem: VCN Flow Log Disabled",
+      "sigma_id": "5f85eead-971e-470c-837e-df45a433bb32",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'VCN_Flow_Log_Disabled'))"
+    },
+    {
+      "filename": "cloud_guard_problem_vcn_security_list_port_rdp.json",
+      "title": "Cloud Guard Problem: VCN Security List Port RDP",
+      "sigma_id": "7f8abb6a-4159-42ac-b20a-8eac660e3100",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'VCN_Security_List_Port_RDP'))"
+    },
+    {
+      "filename": "cloud_guard_problem_vcn_security_list_port_ssh.json",
+      "title": "Cloud Guard Problem: VCN Security List Port SSH",
+      "sigma_id": "fe8587f3-b7ba-4232-8606-154f594d6889",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "cloud_guard",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'VCN_Security_List_Port_SSH'))"
+    },
+    {
+      "filename": "linux_archive_data_collected_for_exfiltration.json",
+      "title": "Linux Archive Data Collected for Exfiltration",
+      "sigma_id": "a1b2c3d4-6012-4000-8000-000000000012",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1560.001"
+      ],
+      "mitre_tactics": [
+        "collection",
+        "exfiltration"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (( ((msg like '*tar -czf*' or msg like '*tar czf*' or msg like '*tar -cjf*' or msg like '*tar cjf*')) or ((msg like '*zip -r /tmp*' or msg like '*zip -r /dev/shm*' or msg like '*zip -r /var/tmp*')) ) and ((msg like '*/etc/*' or msg like '*/home/*' or msg like '*/root/*' or msg like '*/var/www/*' or msg like '*/opt/*')))"
+    },
+    {
+      "filename": "linux_at_job_scheduled.json",
+      "title": "Linux At Job Scheduled",
+      "sigma_id": "e1f2a3b4-4014-4000-8000-000000000014",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1053.002"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'at') or ('Process Name' = 'batch'))"
+    },
+    {
+      "filename": "linux_bind_shell_listener.json",
+      "title": "Linux Bind Shell Listener",
+      "sigma_id": "f1e2d3c4-5008-4000-8000-000000000008",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1059.004"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*nc -lvp*' or msg like '*nc -lp*' or msg like '*ncat -lvp*' or msg like '*ncat -lp*' or msg like '*netcat -lvp*')) or (msg like '*socat TCP-LISTEN*'))"
+    },
+    {
+      "filename": "linux_container_escape_attempt.json",
+      "title": "Linux Container Escape Attempt",
+      "sigma_id": "d1a2b3c4-2001-4000-8000-000000000001",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1611"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*nsenter -t 1 -m -u -i -n -p*' or msg like '*/var/run/docker.sock*' or msg like '*mount -t cgroup*' or msg like '*release_agent*' or msg like '*core_pattern*')))"
+    },
+    {
+      "filename": "linux_crontab_modification.json",
+      "title": "Linux Crontab Modification",
+      "sigma_id": "07b8c9d0-bcde-f012-3456-789012345067",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1053.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'crontab'))"
+    },
+    {
+      "filename": "linux_cryptominer_activity_detected.json",
+      "title": "Linux Cryptominer Activity Detected",
+      "sigma_id": "f1e2d3c4-5005-4000-8000-000000000005",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1496"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*xmrig*' or msg like '*minerd*' or msg like '*cpuminer*' or msg like '*stratum+tcp*' or msg like '*stratum+ssl*' or msg like '*cryptonight*' or msg like '*--donate-level*')))"
+    },
+    {
+      "filename": "linux_dns_tunneling_detected.json",
+      "title": "Linux DNS Tunneling Detected",
+      "sigma_id": "f1e2d3c4-5001-4000-8000-000000000001",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1071.004"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*iodine*' or msg like '*dns2tcp*' or msg like '*dnscat*' or msg like '*dnscrypt-proxy*' or msg like '*dnsmasq --server*')))"
+    },
+    {
+      "filename": "linux_encrypted_channel_c2_communication.json",
+      "title": "Linux Encrypted Channel C2 Communication",
+      "sigma_id": "a1b2c3d4-6018-4000-8000-000000000018",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1573",
+        "T1573.002"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*openssl s_client -connect*' or msg like '*openssl s_server*')) or ((msg like '*stunnel*' or msg like '*stunnel.conf*')) or ((msg like '*ncat --ssl*' or msg like '*socat openssl-connect*' or msg like '*socat OPENSSL*')) or ((msg like '*ssh -R*' or msg like '*ssh -fNR*')))"
+    },
+    {
+      "filename": "linux_exfiltration_over_alternative_protocol.json",
+      "title": "Linux Exfiltration Over Alternative Protocol",
+      "sigma_id": "a1b2c3d4-6010-4000-8000-000000000010",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1048"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*nc -w*' or msg like '*nc -q*' or msg like '*ncat --send*' or msg like '*socat - TCP*' or msg like '*socat STDIN TCP*')) or ((msg like '*| nc *' or msg like '*| ncat *' or msg like '*| socat *' or msg like '*| curl -X POST*')) or ((msg like '*scp -r /*' or msg like '*scp /etc*' or msg like '*scp /var/log*' or msg like '*scp /home*')))"
+    },
+    {
+      "filename": "linux_external_remote_service_abuse.json",
+      "title": "Linux External Remote Service Abuse",
+      "sigma_id": "a1b2c3d4-6008-4000-8000-000000000008",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "auth",
+      "mitre_techniques": [
+        "T1133"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'sshd' and msg like '*Accepted*') or ((msg like '*openvpn*' or msg like '*wireguard*' or msg like '*strongswan*')) or ((msg like '*xfreerdp*' or msg like '*rdesktop*')))"
+    },
+    {
+      "filename": "linux_hidden_file_or_directory_creation_in_suspicious_location.json",
+      "title": "Linux Hidden File or Directory Creation in Suspicious Location",
+      "sigma_id": "f1e2d3c4-5010-4000-8000-000000000010",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1564.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*/tmp/.*' or msg like '*/var/tmp/.*' or msg like '*/dev/shm/.*' or msg like '*/run/lock/.*')))"
+    },
+    {
+      "filename": "linux_history_file_cleared.json",
+      "title": "Linux History File Cleared",
+      "sigma_id": "29d0e1f2-def0-1234-5678-901234567089",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1070.003"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((msg like '*unset HISTFILE*') or (msg like '*history -c*'))"
+    },
+    {
+      "filename": "linux_hosts_file_modification.json",
+      "title": "Linux Hosts File Modification",
+      "sigma_id": "f1e2d3c4-5002-4000-8000-000000000002",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1565.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*/etc/hosts*' or msg like '*/etc/resolv.conf*')))"
+    },
+    {
+      "filename": "linux_kernel_module_loaded_from_temp_directory.json",
+      "title": "Linux Kernel Module Loaded from Temp Directory",
+      "sigma_id": "d1a2b3c4-2003-4000-8000-000000000003",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1547.006"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'insmod' and (msg like '*/tmp/*' or msg like '*/dev/shm/*' or msg like '*/var/tmp/*')))"
+    },
+    {
+      "filename": "linux_ld_preload_library_hijacking.json",
+      "title": "Linux LD_PRELOAD Library Hijacking",
+      "sigma_id": "d1a2b3c4-2002-4000-8000-000000000002",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1574.006"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*LD_PRELOAD=*' or msg like '*/etc/ld.so.preload*' or msg like '*ld.so.preload*')))"
+    },
+    {
+      "filename": "linux_log_file_tampering.json",
+      "title": "Linux Log File Tampering",
+      "sigma_id": "f1e2d3c4-5006-4000-8000-000000000006",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1070.002"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*rm -f /var/log*' or msg like '*rm -rf /var/log*' or msg like '*truncate -s 0 /var/log*' or msg like '*cat /dev/null > /var/log*' or msg like '*shred /var/log*' or msg like '*journalctl --vacuum*')))"
+    },
+    {
+      "filename": "linux_network_service_scanning.json",
+      "title": "Linux Network Service Scanning",
+      "sigma_id": "a1b2c3d4-6001-4000-8000-000000000001",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1046"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' like '*nmap') or ('Process Name' like '*masscan') or ('Process Name' like '*zmap') or ((msg like '*nmap -s*' or msg like '*nmap -p*' or msg like '*masscan -p*' or msg like '*zmap -p*')))"
+    },
+    {
+      "filename": "linux_password_file_direct_modification.json",
+      "title": "Linux Password File Direct Modification",
+      "sigma_id": "d1a2b3c4-2004-4000-8000-000000000004",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1136.001"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*>> /etc/passwd*' or msg like '*> /etc/passwd*' or msg like '*>> /etc/shadow*' or msg like '*> /etc/shadow*')) or ((msg like '*tee /etc/passwd*' or msg like '*tee -a /etc/passwd*' or msg like '*sed -i.*\\/etc\\/passwd*' or msg like '*sed -i.*\\/etc\\/shadow*')))"
+    },
+    {
+      "filename": "linux_post-exploitation_enumeration_script.json",
+      "title": "Linux Post-Exploitation Enumeration Script",
+      "sigma_id": "f1e2d3c4-5007-4000-8000-000000000007",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1082"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*linpeas*' or msg like '*LinEnum*' or msg like '*linux-exploit-suggester*' or msg like '*linux-smart-enumeration*' or msg like '*pspy*' or msg like '*unix-privesc-check*')))"
+    },
+    {
+      "filename": "linux_process_execution_from_devshm.json",
+      "title": "Linux Process Execution from /dev/shm",
+      "sigma_id": "e1f2a3b4-4011-4000-8000-000000000011",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1059"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((msg like '*/dev/shm/*'))"
+    },
+    {
+      "filename": "linux_process_injection_via_ptrace.json",
+      "title": "Linux Process Injection via Ptrace",
+      "sigma_id": "d1a2b3c4-2005-4000-8000-000000000005",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1055.008"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ptrace(PTRACE_ATTACH*' or msg like '*PTRACE_POKETEXT*' or msg like '*PTRACE_POKEDATA*' or msg like '*strace -p*' or msg like '*gdb --pid*' or msg like '*gdb -p*')))"
+    },
+    {
+      "filename": "linux_process_memory_access_via_proc.json",
+      "title": "Linux Process Memory Access via /proc",
+      "sigma_id": "f1e2d3c4-5003-4000-8000-000000000003",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1003.007"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*/proc/self/maps*' or msg like '*/proc/self/mem*' or msg like '*/proc/self/environ*' or msg like '*/proc/*/maps*' or msg like '*/proc/*/mem*' or msg like '*/proc/*/environ*')))"
+    },
+    {
+      "filename": "linux_proxy_and_tunneling_tool_detected.json",
+      "title": "Linux Proxy and Tunneling Tool Detected",
+      "sigma_id": "a1b2c3d4-6017-4000-8000-000000000017",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1090",
+        "T1090.001"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*chisel client*' or msg like '*chisel server*')) or ((msg like '*ligolo-ng*' or msg like '*ligolo-proxy*')) or ((msg like '*frpc -c*' or msg like '*frps -c*' or msg like '*frp.ini*')) or ((msg like '*reGeorg*' or msg like '*tunnel.aspx*' or msg like '*tunnel.jsp*')) or ((msg like '*proxychains*' or msg like '*tsocks*' or msg like '*revsocks*')))"
+    },
+    {
+      "filename": "linux_reverse_shell_detected.json",
+      "title": "Linux Reverse Shell Detected",
+      "sigma_id": "f6a7b8c9-abcd-ef01-2345-678901234056",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1059"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*nc -e /bin*' or msg like '*ncat -e /bin*' or msg like '*mkfifo /tmp*')))"
+    },
+    {
+      "filename": "linux_sensitive_data_collection_from_local_system.json",
+      "title": "Linux Sensitive Data Collection from Local System",
+      "sigma_id": "a1b2c3d4-6015-4000-8000-000000000015",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1005"
+      ],
+      "mitre_tactics": [
+        "collection",
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*cat /root/.ssh/id_rsa*' or msg like '*cat /home/*/.ssh/id_rsa*' or msg like '*cp /root/.ssh/*' or msg like '*find / -name id_rsa*')) or ((msg like '*.oci/config*' or msg like '*.aws/credentials*' or msg like '*.gcloud/*' or msg like '*.kube/config*')) or ((msg like '*.env*' or msg like '*database.yml*' or msg like '*wp-config.php*' or msg like '*application.properties*' or msg like '*settings.py*')))"
+    },
+    {
+      "filename": "linux_setuid_binary_creation.json",
+      "title": "Linux Setuid Binary Creation",
+      "sigma_id": "a1b2c3d4-6019-4000-8000-000000000019",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1548.001"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation",
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*chmod +s*' or msg like '*chmod u+s*' or msg like '*chmod g+s*' or msg like '*chmod 4755*' or msg like '*chmod 4775*' or msg like '*chmod 2755*' or msg like '*chmod 6755*')))"
+    },
+    {
+      "filename": "linux_shell_profile_persistence.json",
+      "title": "Linux Shell Profile Persistence",
+      "sigma_id": "e1f2a3b4-4013-4000-8000-000000000013",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1546.004"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*.bashrc*' or msg like '*.bash_profile*' or msg like '*.profile*' or msg like '*/etc/profile.d/*' or msg like '*/etc/bash.bashrc*')))"
+    },
+    {
+      "filename": "linux_ssh_authorized_keys_modified.json",
+      "title": "Linux SSH Authorized Keys Modified",
+      "sigma_id": "18c9d0e1-cdef-0123-4567-890123456078",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1098.004"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((msg like '*authorized_keys*'))"
+    },
+    {
+      "filename": "linux_ssh_failed_login.json",
+      "title": "Linux SSH Failed Login",
+      "sigma_id": "4cda756f-09a8-4261-86c0-e566a0f2a9a4",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "auth",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'sshd' and msg like '*Failed password*'))"
+    },
+    {
+      "filename": "linux_ssh_tunneling_detected.json",
+      "title": "Linux SSH Tunneling Detected",
+      "sigma_id": "e1f2a3b4-4009-4000-8000-000000000009",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1572"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ssh -L*' or msg like '*ssh -R*' or msg like '*ssh -D*' or msg like '*ssh -N -f*' or msg like '*autossh*')))"
+    },
+    {
+      "filename": "linux_sudo_usage.json",
+      "title": "Linux Sudo Usage",
+      "sigma_id": "42793848-2b55-462d-a986-fd84dcf64063",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "auth",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'sudo' and msg like '*COMMAND=*'))"
+    },
+    {
+      "filename": "linux_sudoers_file_modification.json",
+      "title": "Linux Sudoers File Modification",
+      "sigma_id": "e1f2a3b4-4012-4000-8000-000000000012",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1548.003"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*visudo*' or msg like '*/etc/sudoers*' or msg like '*/etc/sudoers.d/*')))"
+    },
+    {
+      "filename": "linux_suspicious_cron_job_content.json",
+      "title": "Linux Suspicious Cron Job Content",
+      "sigma_id": "f1e2d3c4-5009-4000-8000-000000000009",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1053.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*/etc/cron*' or msg like '*/var/spool/cron*')) and ((msg like '*curl|sh*' or msg like '*wget|sh*' or msg like '*curl|bash*' or msg like '*wget|bash*' or msg like '*base64 -d*')))"
+    },
+    {
+      "filename": "linux_suspicious_download_to_tmp.json",
+      "title": "Linux Suspicious Download to /tmp",
+      "sigma_id": "e1f2a3b4-4010-4000-8000-000000000010",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1105"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((('Process Name' = 'wget' or 'Process Name' = 'curl')) and ((msg like '*/tmp/*' or msg like '*-o /tmp*' or msg like '*-O /tmp*')))"
+    },
+    {
+      "filename": "linux_suspicious_network_traffic_redirect.json",
+      "title": "Linux Suspicious Network Traffic Redirect",
+      "sigma_id": "d1a2b3c4-2006-4000-8000-000000000006",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1557"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*iptables -t nat -A PREROUTING*' or msg like '*iptables -t nat -A OUTPUT*' or msg like '*iptables -A FORWARD*' or msg like '*nft add rule.*dnat*' or msg like '*nft add rule.*redirect*')))"
+    },
+    {
+      "filename": "linux_system_owner_and_user_discovery.json",
+      "title": "Linux System Owner and User Discovery",
+      "sigma_id": "a1b2c3d4-6006-4000-8000-000000000006",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1033"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*w *' or msg like '*who -a*' or msg like '*last -a*' or msg like '*lastlog*' or msg like '*getent passwd*' or msg like '*cat /etc/group*' or msg like '*groups root*')))"
+    },
+    {
+      "filename": "linux_systemd_service_persistence.json",
+      "title": "Linux Systemd Service Persistence",
+      "sigma_id": "e1f2a3b4-4008-4000-8000-000000000008",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1543.002"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*systemctl enable*' or msg like '*systemctl daemon-reload*' or msg like '*/etc/systemd/system/*')) and (msg like '*.service*'))"
+    },
+    {
+      "filename": "linux_web_shell_file_creation.json",
+      "title": "Linux Web Shell File Creation",
+      "sigma_id": "f1e2d3c4-5004-4000-8000-000000000004",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1505.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*/var/www/html/*' or msg like '*/var/www/cgi-bin/*' or msg like '*/usr/share/nginx/html/*' or msg like '*/opt/lampp/htdocs/*' or msg like '*/srv/http/*')) and ((msg like '*.php*' or msg like '*.jsp*' or msg like '*.aspx*' or msg like '*.sh*')))"
+    },
+    {
+      "filename": "oci_action_addusertogroup.json",
+      "title": "OCI Action: AddUserToGroup",
+      "sigma_id": "6a4dca3d-85a8-4959-9c3e-05909298a09d",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.addusertogroup'))"
+    },
+    {
+      "filename": "oci_action_attachinternetgateway.json",
+      "title": "OCI Action: AttachInternetGateway",
+      "sigma_id": "2f5f7104-8000-4b27-856f-3fdb46aa7737",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.attachinternetgateway'))"
+    },
+    {
+      "filename": "oci_action_createbucket.json",
+      "title": "OCI Action: CreateBucket",
+      "sigma_id": "b3d62a9e-d04a-4ae7-af52-c2caa2678609",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.objectstorage.createbucket'))"
+    },
+    {
+      "filename": "oci_action_creategroup.json",
+      "title": "OCI Action: CreateGroup",
+      "sigma_id": "44b1ff9e-9903-4a27-bfab-997366021f31",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.creategroup'))"
+    },
+    {
+      "filename": "oci_action_createinstance.json",
+      "title": "OCI Action: CreateInstance",
+      "sigma_id": "ebffc976-d456-4a92-a086-4796b2571f0a",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.computeapi.launchinstance'))"
+    },
+    {
+      "filename": "oci_action_createinternetgateway.json",
+      "title": "OCI Action: CreateInternetGateway",
+      "sigma_id": "184fc0e0-6054-47eb-a62a-a06c74cd6263",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.createinternetgateway'))"
+    },
+    {
+      "filename": "oci_action_createkey.json",
+      "title": "OCI Action: CreateKey",
+      "sigma_id": "b47f1b30-e61d-4afe-8ac3-fbf7fb7f880e",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.kms.createkey'))"
+    },
+    {
+      "filename": "oci_action_createpolicy.json",
+      "title": "OCI Action: CreatePolicy",
+      "sigma_id": "ac76ba90-c547-4f46-bb1e-01e9a8eb1fc9",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.createpolicy'))"
+    },
+    {
+      "filename": "oci_action_createroutetable.json",
+      "title": "OCI Action: CreateRouteTable",
+      "sigma_id": "5142c85c-4927-4b88-959f-6c8b89cd8d69",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.createroutetable'))"
+    },
+    {
+      "filename": "oci_action_createsecuritylist.json",
+      "title": "OCI Action: CreateSecurityList",
+      "sigma_id": "c01a3359-b3b3-4b60-8dad-0d87bc34b656",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.createsecuritylist'))"
+    },
+    {
+      "filename": "oci_action_createsubnet.json",
+      "title": "OCI Action: CreateSubnet",
+      "sigma_id": "095fc1ca-9eb2-49c0-83fb-fcdb977c6951",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.createsubnet'))"
+    },
+    {
+      "filename": "oci_action_createuser.json",
+      "title": "OCI Action: CreateUser",
+      "sigma_id": "8723eb0b-d1f9-4a00-a77a-1c1658493d8b",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.createuser'))"
+    },
+    {
+      "filename": "oci_action_createvcn.json",
+      "title": "OCI Action: CreateVcn",
+      "sigma_id": "d8ff362f-cb67-42d0-a401-502e7061ff36",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.createvcn'))"
+    },
+    {
+      "filename": "oci_action_deletebucket.json",
+      "title": "OCI Action: DeleteBucket",
+      "sigma_id": "11565887-8bdb-44de-a05c-9c1c7d0ca722",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.objectstorage.deletebucket'))"
+    },
+    {
+      "filename": "oci_action_deletegroup.json",
+      "title": "OCI Action: DeleteGroup",
+      "sigma_id": "451e2ab8-d3c6-44d6-9f0c-501f45f85fea",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.deletegroup'))"
+    },
+    {
+      "filename": "oci_action_deleteinternetgateway.json",
+      "title": "OCI Action: DeleteInternetGateway",
+      "sigma_id": "51579f46-bc51-4fba-98ab-ab402a8e144e",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.deleteinternetgateway'))"
+    },
+    {
+      "filename": "oci_action_deletekey.json",
+      "title": "OCI Action: DeleteKey",
+      "sigma_id": "728f65b3-584d-496c-8c75-bb983928b9bd",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.kms.deletekey'))"
+    },
+    {
+      "filename": "oci_action_deletepolicy.json",
+      "title": "OCI Action: DeletePolicy",
+      "sigma_id": "3ce97be5-9038-440e-8d0e-b06ee6c28685",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.deletepolicy'))"
+    },
+    {
+      "filename": "oci_action_deletesubnet.json",
+      "title": "OCI Action: DeleteSubnet",
+      "sigma_id": "df4494ae-5d5b-4e1e-be60-89d803bdcdb6",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.deletesubnet'))"
+    },
+    {
+      "filename": "oci_action_deleteuser.json",
+      "title": "OCI Action: DeleteUser",
+      "sigma_id": "bde13849-0933-4589-bfed-c3e0c0febd9c",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.deleteuser'))"
+    },
+    {
+      "filename": "oci_action_deletevcn.json",
+      "title": "OCI Action: DeleteVcn",
+      "sigma_id": "dc360521-87da-4ff8-b0d4-1a318e932864",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.deletevcn'))"
+    },
+    {
+      "filename": "oci_action_detachinternetgateway.json",
+      "title": "OCI Action: DetachInternetGateway",
+      "sigma_id": "6b62f044-288b-4079-8b15-b03bc6da34d1",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.detachinternetgateway'))"
+    },
+    {
+      "filename": "oci_action_removeuserfromgroup.json",
+      "title": "OCI Action: RemoveUserFromGroup",
+      "sigma_id": "57437287-e9c1-4d55-8eb7-62469ea94950",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.removeuserfromgroup'))"
+    },
+    {
+      "filename": "oci_action_startinstance.json",
+      "title": "OCI Action: StartInstance",
+      "sigma_id": "9cc99179-9940-4a68-a03e-37817b102940",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.computeapi.startinstance'))"
+    },
+    {
+      "filename": "oci_action_stopinstance.json",
+      "title": "OCI Action: StopInstance",
+      "sigma_id": "ad4ab5d8-7cb4-42b7-96dd-40b093825b83",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.computeapi.stopinstance'))"
+    },
+    {
+      "filename": "oci_action_terminateinstance.json",
+      "title": "OCI Action: TerminateInstance",
+      "sigma_id": "4ef740bd-94d3-4f3d-89d1-0d3d7a8714b7",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.computeapi.terminateinstance'))"
+    },
+    {
+      "filename": "oci_action_updatebucket.json",
+      "title": "OCI Action: UpdateBucket",
+      "sigma_id": "d62e8b1a-1300-4286-bb14-0f638e39ffba",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.objectstorage.updatebucket'))"
+    },
+    {
+      "filename": "oci_action_updatepolicy.json",
+      "title": "OCI Action: UpdatePolicy",
+      "sigma_id": "7c3544ad-42dd-4839-ab49-789a4300b151",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.updatepolicy'))"
+    },
+    {
+      "filename": "oci_action_updateroutetable.json",
+      "title": "OCI Action: UpdateRouteTable",
+      "sigma_id": "da881cc3-ebc2-4e59-a550-6ef8d2c72d28",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.updateroutetable'))"
+    },
+    {
+      "filename": "oci_action_updatesecuritylist.json",
+      "title": "OCI Action: UpdateSecurityList",
+      "sigma_id": "1205be5b-f1e4-411d-975d-0e8cb63801a2",
+      "level": "informational",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.virtualnetwork.updatesecuritylist'))"
+    },
+    {
+      "filename": "oci_api_key_uploaded.json",
+      "title": "OCI API Key Uploaded",
+      "sigma_id": "4a7049ed-cd0c-48dc-a051-2a84c9ca6b97",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.uploadapikey'))"
+    },
+    {
+      "filename": "oci_audit_configuration_changed.json",
+      "title": "OCI Audit Configuration Changed",
+      "sigma_id": "d1a2b3c4-1012-4000-8000-000000000012",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1562.008"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.audit.updateconfiguration'))",
+      "stig_ids": [
+        "AU-11"
+      ],
+      "compliance_frameworks": [
+        "cis_oci_3.14"
+      ]
+    },
+    {
+      "filename": "oci_auth_token_created.json",
+      "title": "OCI Auth Token Created",
+      "sigma_id": "d1a2b3c4-1004-4000-8000-000000000004",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1528"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.createauthtoken'))",
+      "stig_ids": [
+        "IA-5"
+      ]
+    },
+    {
+      "filename": "oci_autonomous_database_terminated.json",
+      "title": "OCI Autonomous Database Terminated",
+      "sigma_id": "a1d2e3f4-5678-9abc-def0-123456789001",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1485"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.databaseservice.deleteautonomousdatabase'))"
+    },
+    {
+      "filename": "oci_bastion_session_created.json",
+      "title": "OCI Bastion Session Created",
+      "sigma_id": "e1f2a3b4-4003-4000-8000-000000000003",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1021"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.bastion.createsession'))",
+      "stig_ids": [
+        "AC-17"
+      ]
+    },
+    {
+      "filename": "oci_cloud_infrastructure_discovery.json",
+      "title": "OCI Cloud Infrastructure Discovery",
+      "sigma_id": "a1b2c3d4-6005-4000-8000-000000000005",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1580"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.computeapi.listinstances' or 'Event Type' = 'com.oraclecloud.virtualnetwork.listvcns' or 'Event Type' = 'com.oraclecloud.virtualnetwork.listsubnets' or 'Event Type' = 'com.oraclecloud.objectstorage.listbuckets' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.listusers' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.listgroups' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.listpolicies' or 'Event Type' = 'com.oraclecloud.databaseservice.listautonomousdatabases')))",
+      "stig_ids": [
+        "AU-12"
+      ]
+    },
+    {
+      "filename": "oci_cloud_shell_session_started.json",
+      "title": "OCI Cloud Shell Session Started",
+      "sigma_id": "d1a2b3c4-1006-4000-8000-000000000006",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1059.004"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.cloudshell.startenvironment' or 'Event Type' = 'com.oraclecloud.cloudshell.createenvironment')))",
+      "stig_ids": [
+        "AU-12"
+      ]
+    },
+    {
+      "filename": "oci_compartment_deleted.json",
+      "title": "OCI Compartment Deleted",
+      "sigma_id": "d1a2b3c4-1005-4000-8000-000000000005",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1485"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.deletecompartment'))",
+      "stig_ids": [
+        "AC-6"
+      ]
+    },
+    {
+      "filename": "oci_compute_instance_terminated.json",
+      "title": "OCI Compute Instance Terminated",
+      "sigma_id": "2bce3086-0d16-4b92-b303-76a9d66932e5",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.computeapi.terminateinstance'))"
+    },
+    {
+      "filename": "oci_console_login_failure.json",
+      "title": "OCI Console Login Failure",
+      "sigma_id": "d4e5f6a7-89ab-cdef-0123-456789012034",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1078"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.consolesignon.login' and Status = 'Failure'))"
+    },
+    {
+      "filename": "oci_console_login_from_unusual_ip.json",
+      "title": "OCI Console Login from Unusual IP",
+      "sigma_id": "56d4458d-7890-4abc-8890-1234567890ab",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1078"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.consolesignon.login' and Status = 'Success'))"
+    },
+    {
+      "filename": "oci_cross-region_data_copy.json",
+      "title": "OCI Cross-Region Data Copy",
+      "sigma_id": "d1a2b3c4-1010-4000-8000-000000000010",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1537"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.blockvolumes.copybootvolumeregion' or 'Event Type' = 'com.oraclecloud.blockvolumes.copyvolumeregion' or 'Event Type' = 'com.oraclecloud.objectstorage.copyobject' or 'Event Type' = 'com.oraclecloud.objectstorage.createreplicationpolicy')))",
+      "stig_ids": [
+        "SC-28"
+      ]
+    },
+    {
+      "filename": "oci_customer_secret_key_created.json",
+      "title": "OCI Customer Secret Key Created",
+      "sigma_id": "e1f2a3b4-4007-4000-8000-000000000007",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1098.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.createcustomersecretkey'))",
+      "stig_ids": [
+        "IA-5"
+      ]
+    },
+    {
+      "filename": "oci_database_system_terminated.json",
+      "title": "OCI Database System Terminated",
+      "sigma_id": "d1a2b3c4-1011-4000-8000-000000000011",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1485"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.databaseservice.terminatedbsystem' or 'Event Type' = 'com.oraclecloud.databaseservice.deletedbhome')))",
+      "stig_ids": [
+        "CP-9"
+      ]
+    },
+    {
+      "filename": "oci_dynamic_group_created.json",
+      "title": "OCI Dynamic Group Created",
+      "sigma_id": "d1a2b3c4-1003-4000-8000-000000000003",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1098.001"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.createdynamicgroup'))",
+      "stig_ids": [
+        "AC-6"
+      ]
+    },
+    {
+      "filename": "oci_function_invoked.json",
+      "title": "OCI Function Invoked",
+      "sigma_id": "d1a2b3c4-1009-4000-8000-000000000009",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1648"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.functions.invokefunction'))",
+      "stig_ids": [
+        "AU-12"
+      ]
+    },
+    {
+      "filename": "oci_iam_admin_policy_created_with_manage_all.json",
+      "title": "OCI IAM Admin Policy Created with Manage All",
+      "sigma_id": "c3d4e5f6-789a-bcde-f012-345678901023",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.createpolicy' and 'Original Log Content' like '*manage all-resources*'))"
+    },
+    {
+      "filename": "oci_iam_policy_modified.json",
+      "title": "OCI IAM Policy Modified",
+      "sigma_id": "7ef0e132-0491-4b9b-9228-dfe953a97ae1",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.identitycontrolplane.createpolicy' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.updatepolicy' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.deletepolicy')))"
+    },
+    {
+      "filename": "oci_identity_provider_created.json",
+      "title": "OCI Identity Provider Created",
+      "sigma_id": "d1a2b3c4-1002-4000-8000-000000000002",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1556.007"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.identitycontrolplane.createidentityprovider' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.createsaml2identityprovider')))",
+      "stig_ids": [
+        "IA-8"
+      ]
+    },
+    {
+      "filename": "oci_instance_console_connection_created.json",
+      "title": "OCI Instance Console Connection Created",
+      "sigma_id": "e1f2a3b4-4004-4000-8000-000000000004",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1021"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.computeapi.createinstanceconsoleconnection'))",
+      "stig_ids": [
+        "AC-17"
+      ]
+    },
+    {
+      "filename": "oci_kms_key_scheduled_for_deletion.json",
+      "title": "OCI KMS Key Scheduled for Deletion",
+      "sigma_id": "b2c3d4e5-6789-abcd-ef01-234567890012",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1490"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.kms.schedulekeydeletion'))"
+    },
+    {
+      "filename": "oci_log_group_deleted.json",
+      "title": "OCI Log Group Deleted",
+      "sigma_id": "e1f2a3b4-4006-4000-8000-000000000006",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1562.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.loganalytics.deleteloganalyticsloggroup' or 'Event Type' = 'com.oraclecloud.logging.deleteloggroup')))",
+      "stig_ids": [
+        "AU-11"
+      ]
+    },
+    {
+      "filename": "oci_network_firewall_policy_modified.json",
+      "title": "OCI Network Firewall Policy Modified",
+      "sigma_id": "d1a2b3c4-1013-4000-8000-000000000013",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1562.004"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.networkfirewall.updatenetworkfirewallpolicy' or 'Event Type' = 'com.oraclecloud.networkfirewall.deletenetworkfirewall' or 'Event Type' = 'com.oraclecloud.networkfirewall.updatenetworkfirewall')))",
+      "stig_ids": [
+        "SC-7"
+      ]
+    },
+    {
+      "filename": "oci_network_load_balancer_deleted.json",
+      "title": "OCI Network Load Balancer Deleted",
+      "sigma_id": "e5f6a7b8-9abc-def0-1234-567890123045",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1489"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.loadbalancer.deleteloadbalancer' or 'Event Type' = 'com.oraclecloud.networkloadbalancer.deletenetworkloadbalancer')))"
+    },
+    {
+      "filename": "oci_network_security_group_updated.json",
+      "title": "OCI Network Security Group Updated",
+      "sigma_id": "b8dd55ff-e76f-426b-aae4-0e850f209bed",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.virtualnetwork.updatenetworksecuritygroup' or 'Event Type' = 'com.oraclecloud.virtualnetwork.addnetworksecuritygroupsecurityrules')))"
+    },
+    {
+      "filename": "oci_notification_subscription_created.json",
+      "title": "OCI Notification Subscription Created",
+      "sigma_id": "e1f2a3b4-4005-4000-8000-000000000005",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1114"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.ons.createsubscription'))",
+      "stig_ids": [
+        "AU-12"
+      ]
+    },
+    {
+      "filename": "oci_object_storage_bucket_made_public.json",
+      "title": "OCI Object Storage Bucket Made Public",
+      "sigma_id": "3ea8400b-e89c-4a99-8eb1-6d0baa299963",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.objectstorage.updatebucket' and 'Original Log Content' like '*\"publicAccessType\":\"ObjectRead\"*'))"
+    },
+    {
+      "filename": "oci_object_storage_pre-authenticated_request_created.json",
+      "title": "OCI Object Storage Pre-Authenticated Request Created",
+      "sigma_id": "d1a2b3c4-1015-4000-8000-000000000015",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1567"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.objectstorage.createpreauthenticatedrequest'))",
+      "stig_ids": [
+        "AC-3"
+      ]
+    },
+    {
+      "filename": "oci_password_spraying_attack.json",
+      "title": "OCI Password Spraying Attack",
+      "sigma_id": "a1b2c3d4-6007-4000-8000-000000000007",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1110.003"
+      ],
+      "mitre_tactics": [
+        "initial_access",
+        "credential_access"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.consolesignon.login' and Status = 'Failure'))",
+      "stig_ids": [
+        "IA-2"
+      ]
+    },
+    {
+      "filename": "oci_route_table_update.json",
+      "title": "OCI Route Table Update",
+      "sigma_id": "eb715728-3f76-4c55-afd6-246f25531e2e",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.virtualnetwork.updateroutetable' or 'Event Type' = 'com.oraclecloud.virtualnetwork.createroutetable')))"
+    },
+    {
+      "filename": "oci_security_list_allows_all_protocols.json",
+      "title": "OCI Security List Allows All Protocols",
+      "sigma_id": "d1a2b3c4-1007-4000-8000-000000000007",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1562.007"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.virtualnetwork.createsecuritylist' or 'Event Type' = 'com.oraclecloud.virtualnetwork.updatesecuritylist') and 'Original Log Content' like '*\"protocol\":\"all\"*'))",
+      "stig_ids": [
+        "SC-7"
+      ],
+      "compliance_frameworks": [
+        "cis_oci_2.4"
+      ]
+    },
+    {
+      "filename": "oci_user_mfa_not_enabled.json",
+      "title": "OCI User MFA Not Enabled",
+      "sigma_id": "d1a2b3c4-1001-4000-8000-000000000001",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1556"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.identitycontrolplane.deletemfatotpdevice' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.deletemfatotpdevice')))",
+      "stig_ids": [
+        "IA-2"
+      ],
+      "compliance_frameworks": [
+        "cis_oci_1.2"
+      ]
+    },
+    {
+      "filename": "oci_user_password_reset_by_admin.json",
+      "title": "OCI User Password Reset by Admin",
+      "sigma_id": "e1f2a3b4-4002-4000-8000-000000000002",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.identitycontrolplane.createorupdateuiconsolepassword' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.resetuiconsolepassword')))",
+      "stig_ids": [
+        "IA-5"
+      ]
+    },
+    {
+      "filename": "oci_vault_key_rotation_overdue.json",
+      "title": "OCI Vault Key Rotation Overdue",
+      "sigma_id": "d1a2b3c4-1008-4000-8000-000000000008",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1600"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.kms.updatekeyversion'))",
+      "stig_ids": [
+        "SC-12"
+      ],
+      "compliance_frameworks": [
+        "cis_oci_3.1"
+      ]
+    },
+    {
+      "filename": "oci_vault_secret_deleted.json",
+      "title": "OCI Vault Secret Deleted",
+      "sigma_id": "e1f2a3b4-4001-4000-8000-000000000001",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1485"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.vault.schedulesecretdeletion' or 'Event Type' = 'com.oraclecloud.vault.deletesecret')))",
+      "stig_ids": [
+        "SC-28"
+      ]
+    },
+    {
+      "filename": "oci_vcn_peering_connection_created.json",
+      "title": "OCI VCN Peering Connection Created",
+      "sigma_id": "d1a2b3c4-1014-4000-8000-000000000014",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1021"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.virtualnetwork.createlocalpeeringgateway' or 'Event Type' = 'com.oraclecloud.virtualnetwork.createremotepeeringconnection' or 'Event Type' = 'com.oraclecloud.virtualnetwork.connectremotepeeringconnections')))",
+      "stig_ids": [
+        "SC-7"
+      ]
+    },
+    {
+      "filename": "oci_vcn_security_list_open_to_world.json",
+      "title": "OCI VCN Security List Open to World",
+      "sigma_id": "9c06a57b-ab20-4b92-881a-80026bbfa699",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.virtualnetwork.createsecuritylist' or 'Event Type' = 'com.oraclecloud.virtualnetwork.updatesecuritylist') and 'Request Action Type' = 'POST' and 'Original Log Content' like '*0.0.0.0/0*'))"
+    },
+    {
+      "filename": "oci_waf_configuration_updated.json",
+      "title": "OCI WAF Configuration Updated",
+      "sigma_id": "304b9611-27f5-4c59-879c-eae6f1ca4966",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.waf.updatewebappfirewall' or 'Event Type' = 'com.oraclecloud.waf.updatewebappfirewallpolicy')))"
+    },
+    {
+      "filename": "suspicious_usage_of_base64.json",
+      "title": "Suspicious Usage of base64",
+      "sigma_id": "b1f48409-0288-4b01-827c-32104b199e31",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'base64'))"
+    },
+    {
+      "filename": "suspicious_usage_of_chmod.json",
+      "title": "Suspicious Usage of chmod",
+      "sigma_id": "dc725e73-e395-459a-84b9-bed57c25ab59",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'chmod'))"
+    },
+    {
+      "filename": "suspicious_usage_of_chown.json",
+      "title": "Suspicious Usage of chown",
+      "sigma_id": "7e7d49c3-786b-4848-9a0d-584b9616f842",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'chown'))"
+    },
+    {
+      "filename": "suspicious_usage_of_curl.json",
+      "title": "Suspicious Usage of curl",
+      "sigma_id": "f9cba04d-c56b-45bb-8ece-c664e79bb94e",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'curl'))"
+    },
+    {
+      "filename": "suspicious_usage_of_dd.json",
+      "title": "Suspicious Usage of dd",
+      "sigma_id": "2fe382db-f191-4c01-af3e-3dff8ab380cb",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'dd'))"
+    },
+    {
+      "filename": "suspicious_usage_of_gdb.json",
+      "title": "Suspicious Usage of gdb",
+      "sigma_id": "df525fb1-3830-48ee-a9af-319b50dacd07",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'gdb'))"
+    },
+    {
+      "filename": "suspicious_usage_of_id.json",
+      "title": "Suspicious Usage of id",
+      "sigma_id": "a030b6cb-b30e-4c06-91b6-3f1df0cddc67",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'id'))"
+    },
+    {
+      "filename": "suspicious_usage_of_insmod.json",
+      "title": "Suspicious Usage of insmod",
+      "sigma_id": "bf7f366a-aeb1-44a8-aeba-554287bbba3d",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'insmod'))"
+    },
+    {
+      "filename": "suspicious_usage_of_lua.json",
+      "title": "Suspicious Usage of lua",
+      "sigma_id": "1f1a868f-1f24-4435-b934-a82c58918b1b",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'lua'))"
+    },
+    {
+      "filename": "suspicious_usage_of_modprobe.json",
+      "title": "Suspicious Usage of modprobe",
+      "sigma_id": "a02a5117-562d-4b9b-a782-2ca880d0d0f9",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'modprobe'))"
+    },
+    {
+      "filename": "suspicious_usage_of_nc.json",
+      "title": "Suspicious Usage of nc",
+      "sigma_id": "fa45e5b0-0ab3-45c3-9a73-0c65b10108e7",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'nc'))"
+    },
+    {
+      "filename": "suspicious_usage_of_ncat.json",
+      "title": "Suspicious Usage of ncat",
+      "sigma_id": "c5613cc5-4dbd-489e-b2c9-28bcd5ee9ea2",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'ncat'))"
+    },
+    {
+      "filename": "suspicious_usage_of_netcat.json",
+      "title": "Suspicious Usage of netcat",
+      "sigma_id": "d68b1276-c40c-4505-a5dc-c822ea0b2eb3",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'netcat'))"
+    },
+    {
+      "filename": "suspicious_usage_of_nmap.json",
+      "title": "Suspicious Usage of nmap",
+      "sigma_id": "48b37671-d0ad-42fe-bd00-fd5ddde2d528",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'nmap'))"
+    },
+    {
+      "filename": "suspicious_usage_of_passwd.json",
+      "title": "Suspicious Usage of passwd",
+      "sigma_id": "1583e3f2-8fc1-4874-94d3-b893202a2700",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'passwd'))"
+    },
+    {
+      "filename": "suspicious_usage_of_perl.json",
+      "title": "Suspicious Usage of perl",
+      "sigma_id": "122ed5cd-9597-4b8c-bc40-752428aa0673",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'perl'))"
+    },
+    {
+      "filename": "suspicious_usage_of_python.json",
+      "title": "Suspicious Usage of python",
+      "sigma_id": "177ee6a5-cca9-4604-8765-b6983f0ad54c",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'python'))"
+    },
+    {
+      "filename": "suspicious_usage_of_rmmod.json",
+      "title": "Suspicious Usage of rmmod",
+      "sigma_id": "7fe696ec-966a-418d-b9f7-7a09fae0876d",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'rmmod'))"
+    },
+    {
+      "filename": "suspicious_usage_of_ruby.json",
+      "title": "Suspicious Usage of ruby",
+      "sigma_id": "fa6b1601-bd1b-4722-8697-da640ad83edf",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'ruby'))"
+    },
+    {
+      "filename": "suspicious_usage_of_shadow.json",
+      "title": "Suspicious Usage of shadow",
+      "sigma_id": "262ec507-79bb-43b0-a641-3bb9cf69a4b4",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'shadow'))"
+    },
+    {
+      "filename": "suspicious_usage_of_socat.json",
+      "title": "Suspicious Usage of socat",
+      "sigma_id": "1fbec72e-50d4-4c98-89e0-b8b8901eac04",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'socat'))"
+    },
+    {
+      "filename": "suspicious_usage_of_strace.json",
+      "title": "Suspicious Usage of strace",
+      "sigma_id": "4a094fc9-8c77-4699-bd12-789f9763313b",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'strace'))"
+    },
+    {
+      "filename": "suspicious_usage_of_tcpdump.json",
+      "title": "Suspicious Usage of tcpdump",
+      "sigma_id": "1d693344-8013-4129-a8e9-2cabb094b9ae",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'tcpdump'))"
+    },
+    {
+      "filename": "suspicious_usage_of_tshark.json",
+      "title": "Suspicious Usage of tshark",
+      "sigma_id": "7cb57d24-6134-4a81-9b60-9689ff9cde29",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'tshark'))"
+    },
+    {
+      "filename": "suspicious_usage_of_wget.json",
+      "title": "Suspicious Usage of wget",
+      "sigma_id": "141358f7-27c7-4b9c-a4f3-0cdc490e7c9b",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'wget'))"
+    },
+    {
+      "filename": "suspicious_usage_of_whoami.json",
+      "title": "Suspicious Usage of whoami",
+      "sigma_id": "a0746565-dc95-4fe5-aebb-b98c6ec523ee",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'whoami'))"
+    },
+    {
+      "filename": "suspicious_usage_of_wireshark.json",
+      "title": "Suspicious Usage of wireshark",
+      "sigma_id": "bc8616ca-d018-4517-8781-902d64e106ac",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'wireshark'))"
+    },
+    {
+      "filename": "windows_access_token_manipulation.json",
+      "title": "Windows Access Token Manipulation",
+      "sigma_id": "a1b2c3d4-6020-4000-8000-000000000020",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1134"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation",
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Invoke-TokenManipulation*' or 'Command Line' like '*token::elevate*' or 'Command Line' like '*token::revert*' or 'Command Line' like '*incognito.exe*')) or (('Command Line' like '*ImpersonateLoggedOnUser*' or 'Command Line' like '*DuplicateTokenEx*' or 'Command Line' like '*CreateProcessWithToken*' or 'Command Line' like '*SetThreadToken*' or 'Command Line' like '*AdjustTokenPrivileges*')) or (('Command Line' like '*JuicyPotato*' or 'Command Line' like '*SweetPotato*' or 'Command Line' like '*PrintSpoofer*' or 'Command Line' like '*GodPotato*' or 'Command Line' like '*RottenPotato*')))"
+    },
+    {
+      "filename": "windows_account_discovery_commands.json",
+      "title": "Windows Account Discovery Commands",
+      "sigma_id": "a1b2c3d4-6002-4000-8000-000000000002",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1087.001",
+        "T1087.002"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*net.exe' and ('Command Line' like '*user /domain*' or 'Command Line' like '*group /domain*' or 'Command Line' like '*localgroup administrators*')) or ('Process Name' like '*net1.exe' and ('Command Line' like '*user /domain*' or 'Command Line' like '*group /domain*')) or (('Command Line' like '*Get-ADUser*' or 'Command Line' like '*Get-ADGroup*' or 'Command Line' like '*Get-ADGroupMember*' or 'Command Line' like '*Get-LocalUser*' or 'Command Line' like '*Get-LocalGroupMember*')) or ('Process Name' like '*dsquery.exe'))"
+    },
+    {
+      "filename": "windows_amsi_bypass_attempt.json",
+      "title": "Windows AMSI Bypass Attempt",
+      "sigma_id": "d1a2b3c4-3002-4000-8000-000000000002",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1562.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*amsiInitFailed*' or 'Command Line' like '*AmsiScanBuffer*' or 'Command Line' like '*amsi.dll*' or 'Command Line' like '*amsiContext*' or 'Command Line' like '*AmsiUtils*')))"
+    },
+    {
+      "filename": "windows_bits_job_abuse_for_persistence.json",
+      "title": "Windows BITS Job Abuse for Persistence",
+      "sigma_id": "f1e2d3c4-5015-4000-8000-000000000015",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1197"
+      ],
+      "mitre_tactics": [
+        "persistence",
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*bitsadmin.exe' and ('Command Line' like '*/SetNotifyCmdLine*' or 'Command Line' like '*/SetNotifyFlags*' or 'Command Line' like '*/AddFile*' or 'Command Line' like '*/Resume*')) or ('Command Line' like '*Start-BitsTransfer*'))"
+    },
+    {
+      "filename": "windows_boot_configuration_modified.json",
+      "title": "Windows Boot Configuration Modified",
+      "sigma_id": "d1a2b3c4-3006-4000-8000-000000000006",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1490"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*bcdedit.exe' and ('Command Line' like '*recoveryenabled no*' or 'Command Line' like '*bootstatuspolicy ignoreallfailures*' or 'Command Line' like '*safeboot*')))"
+    },
+    {
+      "filename": "windows_certutil_download_or_decode.json",
+      "title": "Windows Certutil Download or Decode",
+      "sigma_id": "3ae1f203-ef01-2345-6789-012345678090",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1140",
+        "T1105"
+      ],
+      "mitre_tactics": [
+        "defense_evasion",
+        "command_and_control"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*certutil.exe' and ('Command Line' like '*urlcache*' or 'Command Line' like '*decode*' or 'Command Line' like '*encode*' or 'Command Line' like '*-urlcache*' or 'Command Line' like '*-decode*')))"
+    },
+    {
+      "filename": "windows_credential_dumping_via_procdump.json",
+      "title": "Windows Credential Dumping via Procdump",
+      "sigma_id": "6dh4i536-1234-5678-9abc-3456789c2d13",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1003.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' = 'procdump.exe' and 'Command Line' like '*lsass*') or ('Command Line' like '*lsass.dmp*'))"
+    },
+    {
+      "filename": "windows_data_staging_for_exfiltration.json",
+      "title": "Windows Data Staging for Exfiltration",
+      "sigma_id": "a1b2c3d4-6011-4000-8000-000000000011",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1074.001"
+      ],
+      "mitre_tactics": [
+        "collection",
+        "exfiltration"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*robocopy.exe' and ('Command Line' like '*/MIR*' or 'Command Line' like '*/E*' or 'Command Line' like '*/S*')) or ('Process Name' like '*xcopy.exe' and ('Command Line' like '*/S*' or 'Command Line' like '*/E*')) or (('Command Line' like '*C:\\Temp\\staging*' or 'Command Line' like '*C:\\Users\\Public\\*' or 'Command Line' like '*C:\\ProgramData\\staging*')) or (('Command Line' like '*compact /c*' or 'Command Line' like '*makecab*')))"
+    },
+    {
+      "filename": "windows_dll_side-loading_via_suspicious_path.json",
+      "title": "Windows DLL Side-Loading via Suspicious Path",
+      "sigma_id": "d1a2b3c4-3005-4000-8000-000000000005",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1574.002"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*rundll32.exe' or 'Process Name' like '*regsvr32.exe' or 'Process Name' like '*msiexec.exe')) and (('Command Line' like '*\\AppData\\Local\\Temp\\*' or 'Command Line' like '*\\Users\\Public\\*' or 'Command Line' like '*\\ProgramData\\*' or 'Command Line' like '*\\Downloads\\*')))"
+    },
+    {
+      "filename": "windows_encoded_powershell_execution.json",
+      "title": "Windows Encoded PowerShell Execution",
+      "sigma_id": "4bf2g314-f012-3456-789a-12345678a0b1",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1059.001",
+        "T1027"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*powershell.exe' and ('Command Line' like '*-enc *' or 'Command Line' like '*-EncodedCommand*' or 'Command Line' like '*-ec *' or 'Command Line' like '*FromBase64String*')))"
+    },
+    {
+      "filename": "windows_event_log_clearing.json",
+      "title": "Windows Event Log Clearing",
+      "sigma_id": "f1e2d3c4-5011-4000-8000-000000000011",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1070.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*wevtutil.exe' and ('Command Line' like '*cl Security*' or 'Command Line' like '*cl System*' or 'Command Line' like '*cl Application*' or 'Command Line' like '*clear-log*')) or (('Process Name' like '*powershell.exe' or 'Process Name' like '*pwsh.exe') and 'Command Line' like '*Clear-EventLog*'))"
+    },
+    {
+      "filename": "windows_firewall_rule_modification.json",
+      "title": "Windows Firewall Rule Modification",
+      "sigma_id": "e1f2a3b4-4016-4000-8000-000000000016",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1562.004"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*netsh.exe' and ('Command Line' like '*advfirewall firewall add*' or 'Command Line' like '*advfirewall set allprofiles state off*' or 'Command Line' like '*advfirewall firewall delete*' or 'Command Line' like '*advfirewall firewall set rule*')))"
+    },
+    {
+      "filename": "windows_kerberoasting_attack.json",
+      "title": "Windows Kerberoasting Attack",
+      "sigma_id": "f1e2d3c4-5014-4000-8000-000000000014",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1558.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Rubeus*' or 'Command Line' like '*kerberoast*')) or (('Command Line' like '*Invoke-Kerberoast*' or 'Command Line' like '*Get-SPNUsers*' or 'Command Line' like '*Request-SPNTicket*')) or ('Process Name' like '*setspn.exe' and 'Command Line' like '*-Q */**'))"
+    },
+    {
+      "filename": "windows_keylogger_indicators.json",
+      "title": "Windows Keylogger Indicators",
+      "sigma_id": "a1b2c3d4-6013-4000-8000-000000000013",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1056.001"
+      ],
+      "mitre_tactics": [
+        "collection",
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*keylogger*' or 'Command Line' like '*GetAsyncKeyState*' or 'Command Line' like '*SetWindowsHookEx*' or 'Command Line' like '*GetKeyboardState*' or 'Command Line' like '*MapVirtualKey*')) or (('Command Line' like '*logkeys*' or 'Command Line' like '*keystroke*' or 'Command Line' like '*keystrokes.txt*' or 'Command Line' like '*keylog.txt*')))"
+    },
+    {
+      "filename": "windows_lolbin_usage_at.json",
+      "title": "Windows LOLBin Usage: at",
+      "sigma_id": "3b5ab6bb-8caf-4bd8-b21f-54fe3fb67d87",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*at.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_bitsadmin.json",
+      "title": "Windows LOLBin Usage: bitsadmin",
+      "sigma_id": "dcd67a6e-377d-4dfd-be9a-8b78401575b6",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*bitsadmin.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_certutil.json",
+      "title": "Windows LOLBin Usage: certutil",
+      "sigma_id": "1ab58fb3-dfe9-43b0-8df1-8c5d0219bef5",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*certutil.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_cmd.json",
+      "title": "Windows LOLBin Usage: cmd",
+      "sigma_id": "9bfa545c-b08d-42e6-8dc3-d2d429bb7d3a",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*cmd.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_cscript.json",
+      "title": "Windows LOLBin Usage: cscript",
+      "sigma_id": "4e9ed028-558a-4e19-81c9-4742e79e6867",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*cscript.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_ipconfig.json",
+      "title": "Windows LOLBin Usage: ipconfig",
+      "sigma_id": "36cb0605-69d7-4f35-aca1-e8cc54728c7c",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*ipconfig.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_mshta.json",
+      "title": "Windows LOLBin Usage: mshta",
+      "sigma_id": "fc4e9735-3c40-43bd-a22e-592577934d4e",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*mshta.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_net.json",
+      "title": "Windows LOLBin Usage: net",
+      "sigma_id": "2b75fec4-14d6-4e8f-b82c-ffc3f28804b0",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*net.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_net1.json",
+      "title": "Windows LOLBin Usage: net1",
+      "sigma_id": "f2fb546e-be45-4959-8ac4-0340cf54c2d9",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*net1.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_powershell.json",
+      "title": "Windows LOLBin Usage: powershell",
+      "sigma_id": "cdf49607-a57a-4ea9-9da8-374ebf470475",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*powershell.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_regsvr32.json",
+      "title": "Windows LOLBin Usage: regsvr32",
+      "sigma_id": "aa90d7d6-a6fb-4d57-8450-6d41c189342c",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*regsvr32.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_rundll32.json",
+      "title": "Windows LOLBin Usage: rundll32",
+      "sigma_id": "b0758071-c147-42fd-82c3-a477af3cb3d8",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*rundll32.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_sc.json",
+      "title": "Windows LOLBin Usage: sc",
+      "sigma_id": "cf0b79ee-7d12-4a22-8f7f-82ab28b58dee",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*sc.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_schtasks.json",
+      "title": "Windows LOLBin Usage: schtasks",
+      "sigma_id": "e200e23f-895d-4779-8f7d-44f0e1095584",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*schtasks.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_systeminfo.json",
+      "title": "Windows LOLBin Usage: systeminfo",
+      "sigma_id": "19daf1a4-88ec-4fce-8e23-ebee760fcb8f",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*systeminfo.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_taskkill.json",
+      "title": "Windows LOLBin Usage: taskkill",
+      "sigma_id": "8d440043-431b-4da6-8b8a-83dee6999da2",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*taskkill.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_tasklist.json",
+      "title": "Windows LOLBin Usage: tasklist",
+      "sigma_id": "876b4791-8fb8-419a-9840-230a0ba2b661",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*tasklist.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_whoami.json",
+      "title": "Windows LOLBin Usage: whoami",
+      "sigma_id": "5ae8143c-7938-4185-8bd7-b761f0cf17aa",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*whoami.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_wmic.json",
+      "title": "Windows LOLBin Usage: wmic",
+      "sigma_id": "a6372b09-869a-4e67-ac13-62af106bb903",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*wmic.exe'))"
+    },
+    {
+      "filename": "windows_lolbin_usage_wscript.json",
+      "title": "Windows LOLBin Usage: wscript",
+      "sigma_id": "4ab18cdc-4545-43d4-9cdf-9d84a5b31f32",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*wscript.exe'))"
+    },
+    {
+      "filename": "windows_lsass_memory_access.json",
+      "title": "Windows LSASS Memory Access",
+      "sigma_id": "e1f2a3b4-4020-4000-8000-000000000020",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1003.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*rundll32.exe' and 'Command Line' like '*MiniDump*') or ('Process Name' like '*taskmgr.exe' and 'Command Line' like '*lsass*'))"
+    },
+    {
+      "filename": "windows_mimikatz_execution_patterns.json",
+      "title": "Windows Mimikatz Execution Patterns",
+      "sigma_id": "e1f2a3b4-4015-4000-8000-000000000015",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1003.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*mimikatz.exe') or (('Command Line' like '*sekurlsa::logonpasswords*' or 'Command Line' like '*sekurlsa::wdigest*' or 'Command Line' like '*lsadump::sam*' or 'Command Line' like '*lsadump::dcsync*' or 'Command Line' like '*privilege::debug*' or 'Command Line' like '*token::elevate*')))"
+    },
+    {
+      "filename": "windows_msbuild_execution_for_code_bypass.json",
+      "title": "Windows MSBuild Execution for Code Bypass",
+      "sigma_id": "f1e2d3c4-5016-4000-8000-000000000016",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1127.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion",
+        "execution"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*MSBuild.exe'))"
+    },
+    {
+      "filename": "windows_network_share_discovery.json",
+      "title": "Windows Network Share Discovery",
+      "sigma_id": "a1b2c3d4-6003-4000-8000-000000000003",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1135"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*net.exe' and ('Command Line' like '*share*' or 'Command Line' like '*view*')) or (('Command Line' like '*Get-SmbShare*' or 'Command Line' like '*Get-FileShare*' or 'Command Line' like '*Get-WmiObject Win32_Share*')) or (('Command Line' like '*SharpHound*' or 'Command Line' like '*Invoke-ShareFinder*' or 'Command Line' like '*Find-DomainShare*')))"
+    },
+    {
+      "filename": "windows_ntdsdit_database_extraction.json",
+      "title": "Windows NTDS.dit Database Extraction",
+      "sigma_id": "f1e2d3c4-5020-4000-8000-000000000020",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1003.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*ntdsutil.exe' and ('Command Line' like '*ac i ntds*' or 'Command Line' like '*ifm*' or 'Command Line' like '*create full*')) or (('Command Line' like '*ntds.dit*' or 'Command Line' like '*SYSTEM.hiv*')))"
+    },
+    {
+      "filename": "windows_pass-the-hash_attack_indicators.json",
+      "title": "Windows Pass-the-Hash Attack Indicators",
+      "sigma_id": "f1e2d3c4-5017-4000-8000-000000000017",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1550.002"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*sekurlsa::pth*' or 'Command Line' like '*Invoke-SMBExec*' or 'Command Line' like '*Invoke-WMIExec*' or 'Command Line' like '*crackmapexec*' or 'Command Line' like '*smbexec*' or 'Command Line' like '*wmiexec*' or 'Command Line' like '*atexec*')) or ('Process Name' like '*runas.exe' and 'Command Line' like '*/netonly*'))"
+    },
+    {
+      "filename": "windows_powershell_download_cradle.json",
+      "title": "Windows PowerShell Download Cradle",
+      "sigma_id": "e1f2a3b4-4019-4000-8000-000000000019",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1059.001",
+        "T1105"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "command_and_control"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*powershell.exe' or 'Process Name' like '*pwsh.exe')) and (('Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*Net.WebClient*' or 'Command Line' like '*DownloadString*' or 'Command Line' like '*DownloadFile*' or 'Command Line' like '*Start-BitsTransfer*' or 'Command Line' like '*Invoke-RestMethod*')))"
+    },
+    {
+      "filename": "windows_process_hollowing_indicators.json",
+      "title": "Windows Process Hollowing Indicators",
+      "sigma_id": "f1e2d3c4-5018-4000-8000-000000000018",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1055.012"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*CREATE_SUSPENDED*' or 'Command Line' like '*NtUnmapViewOfSection*' or 'Command Line' like '*ZwUnmapViewOfSection*' or 'Command Line' like '*WriteProcessMemory*' or 'Command Line' like '*NtResumeThread*')))"
+    },
+    {
+      "filename": "windows_psexec_remote_execution.json",
+      "title": "Windows PsExec Remote Execution",
+      "sigma_id": "f1e2d3c4-5012-4000-8000-000000000012",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1021.002",
+        "T1569.002"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*psexec.exe' or 'Process Name' like '*psexec64.exe' or 'Process Name' like '*PsExec.exe')) or ( (('Command Line' like '*psexec*' or 'Command Line' like '*\\\\\\\\*')) and ('Command Line' like '*-accepteula*') ))"
+    },
+    {
+      "filename": "windows_rdp_lateral_movement.json",
+      "title": "Windows RDP Lateral Movement",
+      "sigma_id": "e1f2a3b4-4017-4000-8000-000000000017",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1021.001"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*mstsc.exe' and 'Command Line' like '*/v:*') or ('Process Name' like '*reg.exe' and 'Command Line' like '*fDenyTSConnections*'))"
+    },
+    {
+      "filename": "windows_registry_run_key_modification.json",
+      "title": "Windows Registry Run Key Modification",
+      "sigma_id": "d1a2b3c4-3004-4000-8000-000000000004",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1547.001"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*CurrentVersion\\Run*' or 'Command Line' like '*CurrentVersion\\RunOnce*' or 'Command Line' like '*CurrentVersion\\RunServices*' or 'Command Line' like '*CurrentVersion\\Policies\\Explorer\\Run*')))"
+    },
+    {
+      "filename": "windows_remote_access_tool_detected.json",
+      "title": "Windows Remote Access Tool Detected",
+      "sigma_id": "a1b2c3d4-6016-4000-8000-000000000016",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1219"
+      ],
+      "mitre_tactics": [
+        "command_and_control",
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*AnyDesk.exe') or ('Process Name' like '*TeamViewer.exe') or (('Command Line' like '*ngrok*' or 'Command Line' like '*ngrok.exe*')) or ('Process Name' like '*ScreenConnect.ClientService.exe') or ('Process Name' like '*rustdesk.exe') or (('Command Line' like '*AnyDesk*' or 'Command Line' like '*TeamViewer*' or 'Command Line' like '*ScreenConnect*' or 'Command Line' like '*RustDesk*')))"
+    },
+    {
+      "filename": "windows_remote_system_discovery.json",
+      "title": "Windows Remote System Discovery",
+      "sigma_id": "a1b2c3d4-6004-4000-8000-000000000004",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1018"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*arp.exe' and 'Command Line' like '*-a*') or (('Command Line' like '*for /l*' or 'Command Line' like '*ping -n 1*')) or ('Process Name' like '*nslookup.exe') or (('Command Line' like '*Test-Connection*' or 'Command Line' like '*Test-NetConnection*' or 'Command Line' like '*Resolve-DnsName*' or 'Command Line' like '*Get-ADComputer*')) or (('Command Line' like '*nbtscan*' or 'Command Line' like '*nbtstat -a*')))"
+    },
+    {
+      "filename": "windows_scheduled_task_creation_via_schtasks.json",
+      "title": "Windows Scheduled Task Creation via Schtasks",
+      "sigma_id": "e1f2a3b4-4018-4000-8000-000000000018",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1053.005"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*schtasks.exe' and ('Command Line' like '*/create*' or 'Command Line' like '*-create*')))"
+    },
+    {
+      "filename": "windows_screen_capture_activity.json",
+      "title": "Windows Screen Capture Activity",
+      "sigma_id": "a1b2c3d4-6014-4000-8000-000000000014",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1113"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*SnippingTool.exe' or 'Process Name' like '*ScreenClippingHost.exe')) or (('Command Line' like '*nircmd savescreenshot*' or 'Command Line' like '*nircmd.exe savescreenshot*')) or (('Command Line' like '*[System.Drawing.Graphics]::CopyFromScreen*' or 'Command Line' like '*System.Windows.Forms.Screen*' or 'Command Line' like '*Screenshot*' or 'Command Line' like '*CopyFromScreen*')) or (('Command Line' like '*screencapture*' or 'Command Line' like '*screenshot.exe*' or 'Command Line' like '*capture.exe*')))"
+    },
+    {
+      "filename": "windows_service_creation_via_sc.json",
+      "title": "Windows Service Creation via SC",
+      "sigma_id": "5cg3h425-0123-4567-89ab-2345678b1c02",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1543.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*sc.exe' and 'Command Line' like '*create*'))"
+    },
+    {
+      "filename": "windows_shadow_copy_deletion.json",
+      "title": "Windows Shadow Copy Deletion",
+      "sigma_id": "d1a2b3c4-3001-4000-8000-000000000001",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1490"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*vssadmin.exe' and ('Command Line' like '*delete shadows*' or 'Command Line' like '*Delete Shadows*')) or ('Process Name' like '*wmic.exe' and 'Command Line' like '*shadowcopy delete*'))"
+    },
+    {
+      "filename": "windows_spearphishing_attachment_execution.json",
+      "title": "Windows Spearphishing Attachment Execution",
+      "sigma_id": "a1b2c3d4-6009-4000-8000-000000000009",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1566.001",
+        "T1204.002"
+      ],
+      "mitre_tactics": [
+        "initial_access",
+        "execution"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Parent Process Name' like '*winword.exe' or 'Parent Process Name' like '*excel.exe' or 'Parent Process Name' like '*powerpnt.exe' or 'Parent Process Name' like '*outlook.exe' or 'Parent Process Name' like '*msaccess.exe')) and (('Process Name' like '*cmd.exe' or 'Process Name' like '*powershell.exe' or 'Process Name' like '*pwsh.exe' or 'Process Name' like '*wscript.exe' or 'Process Name' like '*cscript.exe' or 'Process Name' like '*mshta.exe' or 'Process Name' like '*regsvr32.exe' or 'Process Name' like '*rundll32.exe' or 'Process Name' like '*certutil.exe')))"
+    },
+    {
+      "filename": "windows_uac_bypass_attempt.json",
+      "title": "Windows UAC Bypass Attempt",
+      "sigma_id": "f1e2d3c4-5013-4000-8000-000000000013",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1548.002"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation",
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*fodhelper.exe') or ('Process Name' like '*eventvwr.exe') or ('Process Name' like '*sdclt.exe' and 'Command Line' like '*/kickoffelev*') or ('Process Name' like '*cmstp.exe' and 'Command Line' like '*/au*'))"
+    },
+    {
+      "filename": "windows_wdigest_authentication_enabled_for_credential_harvesting.json",
+      "title": "Windows WDigest Authentication Enabled for Credential Harvesting",
+      "sigma_id": "f1e2d3c4-5019-4000-8000-000000000019",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1003.001"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*reg.exe' and 'Command Line' like '*UseLogonCredential*'))"
+    },
+    {
+      "filename": "windows_wmi_event_subscription_persistence.json",
+      "title": "Windows WMI Event Subscription Persistence",
+      "sigma_id": "d1a2b3c4-3003-4000-8000-000000000003",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "process_creation",
+      "mitre_techniques": [
+        "T1546.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*__EventFilter*' or 'Command Line' like '*__EventConsumer*' or 'Command Line' like '*__FilterToConsumerBinding*' or 'Command Line' like '*ActiveScriptEventConsumer*' or 'Command Line' like '*CommandLineEventConsumer*')) or (('Command Line' like '*Set-WmiInstance*' or 'Command Line' like '*Register-WmiEvent*' or 'Command Line' like '*New-CimInstance -ClassName __*')))"
+    }
+  ],
+  "dashboards": {
+    "total": 7,
+    "names": [
+      "SOC Overview Dashboard",
+      "SOC: OCI STIG Compliance Dashboard",
+      "SOC: OCI Audit Security Dashboard",
+      "SOC: Cloud Guard Security Dashboard",
+      "SOC: Linux Security Dashboard",
+      "SOC: Windows Security Dashboard",
+      "SOC: Threat Hunting Dashboard"
+    ]
+  },
+  "log_sources": {
+    "oci_audit": [
+      "OCI Audit Logs"
+    ],
+    "cloud_guard": [
+      "OCI Cloud Guard Problems",
+      "OCI Cloud Guard Logs",
+      "SOC Cloud Guard Logs"
+    ],
+    "linux_syslog": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ],
+    "windows_sysmon": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  }
+}

@@ -1,10 +1,30 @@
 {
   "title": "Suspicious Usage of base64",
   "description": "Detects execution of potentially suspicious binary base64.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'base64'",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'base64'))",
   "sigma_id": "b1f48409-0288-4b01-827c-32104b199e31",
+  "level": "low",
+  "stig_category": "CAT III",
   "tags": [
     "attack.execution",
     "attack.t1204"
-  ]
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1204"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
 }

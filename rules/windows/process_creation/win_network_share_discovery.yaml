@@ -1,0 +1,36 @@
+title: Windows Network Share Discovery
+id: a1b2c3d4-6003-4000-8000-000000000003
+status: stable
+description: >
+  Detects commands used to enumerate network shares. Attackers discover shared
+  resources to identify sensitive data repositories, admin shares, and lateral
+  movement paths.
+author: SOC Detection Team
+date: 2026/02/11
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_net_share:
+    process_name|endswith: net.exe
+    CommandLine|contains:
+    - share
+    - view
+  sel_powershell:
+    CommandLine|contains:
+    - Get-SmbShare
+    - Get-FileShare
+    - Get-WmiObject Win32_Share
+  sel_sharphound:
+    CommandLine|contains:
+    - SharpHound
+    - Invoke-ShareFinder
+    - Find-DomainShare
+  condition: sel_net_share or sel_powershell or sel_sharphound
+level: medium
+tags:
+- attack.discovery
+- attack.t1135
+falsepositives:
+- Administrators managing file shares
+- Backup software enumerating shares

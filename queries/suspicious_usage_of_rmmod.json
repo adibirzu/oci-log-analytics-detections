@@ -1,10 +1,30 @@
 {
   "title": "Suspicious Usage of rmmod",
   "description": "Detects execution of potentially suspicious binary rmmod.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'rmmod'",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'rmmod'))",
   "sigma_id": "7fe696ec-966a-418d-b9f7-7a09fae0876d",
+  "level": "low",
+  "stig_category": "CAT III",
   "tags": [
     "attack.execution",
     "attack.t1204"
-  ]
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1204"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
 }

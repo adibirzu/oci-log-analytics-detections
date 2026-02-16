@@ -1,0 +1,16 @@
+title: Windows Service Creation via SC
+id: 5cg3h425-0123-4567-89ab-2345678b1c02
+status: stable
+description: Detects creation of new Windows services using sc.exe, which may indicate persistence or privilege escalation.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name|endswith: sc.exe
+    CommandLine|contains: create
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1543.003

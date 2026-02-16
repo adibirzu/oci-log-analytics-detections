@@ -1,0 +1,24 @@
+# Local environment config (contains OCIDs)
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Generated test data
+test_data/
+
+# SigmaHQ clone (managed by sync_sigmahq.py)
+.sigmahq/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

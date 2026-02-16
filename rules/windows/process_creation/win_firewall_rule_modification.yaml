@@ -1,0 +1,23 @@
+title: Windows Firewall Rule Modification
+id: e1f2a3b4-4016-4000-8000-000000000016
+status: stable
+description: Detects modification of Windows Firewall rules via netsh. Attackers disable or modify firewall rules to enable lateral movement or C2 communication.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_netsh:
+    process_name|endswith: netsh.exe
+    CommandLine|contains:
+    - advfirewall firewall add
+    - advfirewall set allprofiles state off
+    - advfirewall firewall delete
+    - advfirewall firewall set rule
+  condition: sel_netsh
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1562.004
+falsepositives:
+- Legitimate firewall administration
+- Software installation requiring firewall exceptions

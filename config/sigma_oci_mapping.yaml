@@ -1,51 +1,115 @@
 # Mapping from Sigma standardized fields to OCI Log Analytics fields
 # Format: sigma_field: oci_field
+# Multi-word OCL field names must be wrapped in single quotes: "'Field Name'"
+#
+# This file is the single source of truth for field translation between
+# Sigma detection rules and OCI Log Analytics Query Language (OCL).
 
 field_mappings:
-  # Common
-  user: "User"
-  src_ip: "Client Host"
-  dst_ip: "Destination IP"
-  action: "Action"
-  status: "Status"
-  
-  # OCI Audit Specific
-  event_type: "Event Type"
-  resource_id: "ResourceIdentifier"
-  resource_type: "Resource Type"
-  request_action: "Request Action Type"
-  compartment_name: "Compartment Name"
-  compartment_id: "Compartment OCID"
-  
-  # Network
-  src_port: "Source Port"
-  dst_port: "Destination Port"
-  protocol: "Protocol"
-  
-  # Payload / Generic
-  response_payload: "'Response Payload'"
+  # ─── Common Fields ────────────────────────────────────────────
+  user: User
+  src_ip: "'Client Host'"
+  dst_ip: "'Destination IP'"
+  action: Action
+  status: Status
+  hostname: "'Host Name'"
+
+  # ─── OCI Audit Event Fields ──────────────────────────────────
+  event_type: "'Event Type'"
+  resource_id: ResourceIdentifier
+  resource_name: "'Resource Name'"
+  resource_type: "'Resource Type'"
+  request_action: "'Request Action Type'"
+  compartment_name: "'Compartment Name'"
+  compartment_id: "'Compartment OCID'"
+  region: "'Region'"
+  principal_name: "'Principal Name'"
+  auth_type: "'Auth Type'"
+
+  # ─── Network Fields ──────────────────────────────────────────
+  src_port: "'Source Port'"
+  dst_port: "'Destination Port'"
+  protocol: Protocol
+
+  # ─── Payload / Generic ───────────────────────────────────────
+  response_payload: "'Original Log Content'"
   process_name: "'Process Name'"
-  message: "Message"
-  
-  # Cloud Guard
-  problem_name: "Problem Name"
-  
-  # Sysmon / Security
-  CommandLine: "Command Line"
-  Image: "Process Name"
-  ParentImage: "Parent Process Name"
-  ParentCommandLine: "Parent Command Line"
-  Hashes: "Hashes"
-  LogonId: "Logon ID"
-  TerminalSessionId: "Terminal Session ID"
-  IntegrityLevel: "Integrity Level"
-  User: "User"
-  TargetFilename: "Target Filename"
-  SourceFilename: "Source Filename"
+  message: msg
+
+  # ─── Cloud Guard Fields ──────────────────────────────────────
+  problem_name: "'Problem Name'"
+  risk_level: "'Risk Level'"
+  detector_id: "'Detector ID'"
+
+  # ─── Windows Sysmon / Security Fields ────────────────────────
+  CommandLine: "'Command Line'"
+  Image: "'Process Name'"
+  ParentImage: "'Parent Process Name'"
+  ParentCommandLine: "'Parent Command Line'"
+  Hashes: Hashes
+  LogonId: "'Logon ID'"
+  TerminalSessionId: "'Terminal Session ID'"
+  IntegrityLevel: "'Integrity Level'"
+  User: User
+  TargetFilename: "'Target Filename'"
+  SourceFilename: "'Source Filename'"
+  command_line: "'Command Line'"
+  OriginalFileName: "'Original File Name'"
+  EventID: "'Event ID'"
+  Provider: "'Provider'"
+  Channel: "'Channel'"
 
 logsource_mappings:
-  # Sigma Category/Product -> OCI Log Source Name
-  oci_audit: "'OCI Audit Logs'"
-  oci_vcn: "'OCI VCN Flow Logs'"
-  linux_syslog: "'Linux Syslog'"
-  windows_event: "'Windows Event System'"
+  # Sigma Category/Product -> ordered OCI Log Source candidates.
+  # Converter emits a query filter that matches any listed source.
+  #
+  # Strategy:
+  #   - Prefer native OCI sources where they exist and are data-rich.
+  #   - Keep SOC custom sources as fallback for compatibility.
+  #   - Linux detections keep SOC-first because there is no single native
+  #     equivalent that matches the SOC Linux Syslog pattern coverage.
+
+  # OCI Audit (native)
+  oci_audit:
+    - OCI Audit Logs
+
+  # Cloud Guard (native-first, SOC fallback)
+  oci_cloud_guard:
+    - OCI Cloud Guard Problems
+    - OCI Cloud Guard Logs
+    - SOC Cloud Guard Logs
+
+  # Linux (SOC-first, then native alternatives)
+  linux_audit:
+    - SOC Linux Syslog Logs
+    - Linux Secure Logs
+    - Linux Syslog Logs
+    - Linux Audit Logs
+  linux_auth:
+    - SOC Linux Syslog Logs
+    - Linux Secure Logs
+    - Linux Syslog Logs
+    - Linux Audit Logs
+  linux_syslog:
+    - SOC Linux Syslog Logs
+    - Linux Secure Logs
+    - Linux Syslog Logs
+    - Linux Audit Logs
+
+  # Windows Sysmon/process creation (native-first, SOC fallback)
+  windows_process_creation:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs
+  windows_sysmon:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs
+  windows_event:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs
+  windows_security:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs

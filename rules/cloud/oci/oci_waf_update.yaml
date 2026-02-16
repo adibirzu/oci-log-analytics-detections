@@ -1,5 +1,5 @@
 title: OCI WAF Configuration Updated
-id: uuid-9
+id: 304b9611-27f5-4c59-879c-eae6f1ca4966
 status: stable
 description: Detects changes to Web Application Firewall configurations.
 logsource:

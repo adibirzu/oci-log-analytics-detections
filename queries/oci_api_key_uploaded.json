@@ -1,9 +1,24 @@
 {
   "title": "OCI API Key Uploaded",
   "description": "Detects upload of a new API key to a user account.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where Event Type = 'com.oraclecloud.identity.user.uploadapikey'",
-  "sigma_id": "uuid-4",
+  "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.identitycontrolplane.uploadapikey'))",
+  "sigma_id": "4a7049ed-cd0c-48dc-a051-2a84c9ca6b97",
+  "level": "medium",
+  "stig_category": "CAT II",
   "tags": [
     "attack.persistence"
-  ]
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "audit",
+    "candidates": [
+      "OCI Audit Logs"
+    ]
+  }
 }

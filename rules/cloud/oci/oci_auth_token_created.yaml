@@ -1,0 +1,16 @@
+title: OCI Auth Token Created
+id: d1a2b3c4-1004-4000-8000-000000000004
+status: stable
+description: Detects creation of auth tokens (SWIFT passwords) which provide programmatic access to OCI Object Storage and Container Registry. Could indicate credential staging for data exfiltration.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identitycontrolplane.createauthtoken
+  condition: selection
+level: medium
+tags:
+- attack.credential_access
+- attack.t1528
+- stig.IA-5

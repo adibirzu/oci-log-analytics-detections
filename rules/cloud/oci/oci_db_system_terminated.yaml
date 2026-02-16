@@ -1,0 +1,18 @@
+title: OCI Database System Terminated
+id: d1a2b3c4-1011-4000-8000-000000000011
+status: stable
+description: Detects termination of OCI Database Systems (BaseDB, Exadata). Unauthorized database termination can result in critical data loss and service disruption.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.databaseservice.terminatedbsystem
+    - com.oraclecloud.databaseservice.deletedbhome
+  condition: selection
+level: critical
+tags:
+- attack.impact
+- attack.t1485
+- stig.CP-9

@@ -1,0 +1,33 @@
+{
+  "title": "Windows Screen Capture Activity",
+  "description": "Detects screen capture tools and commands used by attackers to collect visual intelligence from victim systems. Screen captures can reveal sensitive data displayed on screen, credentials in open windows, and security posture.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*SnippingTool.exe' or 'Process Name' like '*ScreenClippingHost.exe')) or (('Command Line' like '*nircmd savescreenshot*' or 'Command Line' like '*nircmd.exe savescreenshot*')) or (('Command Line' like '*[System.Drawing.Graphics]::CopyFromScreen*' or 'Command Line' like '*System.Windows.Forms.Screen*' or 'Command Line' like '*Screenshot*' or 'Command Line' like '*CopyFromScreen*')) or (('Command Line' like '*screencapture*' or 'Command Line' like '*screenshot.exe*' or 'Command Line' like '*capture.exe*')))",
+  "sigma_id": "a1b2c3d4-6014-4000-8000-000000000014",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.collection",
+    "attack.t1113"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "collection"
+    ],
+    "techniques": [
+      "T1113"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate screen capture for documentation",
+    "Remote support tools taking screenshots"
+  ]
+}

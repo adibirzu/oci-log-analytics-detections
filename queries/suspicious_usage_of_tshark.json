@@ -1,10 +1,30 @@
 {
   "title": "Suspicious Usage of tshark",
   "description": "Detects execution of potentially suspicious binary tshark.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'tshark'",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'tshark'))",
   "sigma_id": "7cb57d24-6134-4a81-9b60-9689ff9cde29",
+  "level": "low",
+  "stig_category": "CAT III",
   "tags": [
     "attack.execution",
     "attack.t1204"
-  ]
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1204"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
 }

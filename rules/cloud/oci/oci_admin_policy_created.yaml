@@ -1,0 +1,16 @@
+title: OCI IAM Admin Policy Created with Manage All
+id: c3d4e5f6-789a-bcde-f012-345678901023
+status: stable
+description: Detects creation of an IAM policy containing overly permissive 'manage all-resources' statement, which grants full administrative access.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identitycontrolplane.createpolicy
+    response_payload|contains: manage all-resources
+  condition: selection
+level: high
+tags:
+- attack.privilege_escalation
+- attack.t1098

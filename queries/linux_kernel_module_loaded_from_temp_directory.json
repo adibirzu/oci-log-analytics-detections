@@ -1,0 +1,30 @@
+{
+  "title": "Linux Kernel Module Loaded from Temp Directory",
+  "description": "Detects loading of kernel modules from temporary directories (/tmp, /dev/shm, /var/tmp), a strong indicator of rootkit installation.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'insmod' and (msg like '*/tmp/*' or msg like '*/dev/shm/*' or msg like '*/var/tmp/*')))",
+  "sigma_id": "d1a2b3c4-2003-4000-8000-000000000003",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.persistence",
+    "attack.t1547.006"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1547.006"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
+}

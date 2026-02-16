@@ -1,0 +1,33 @@
+{
+  "title": "Windows Kerberoasting Attack",
+  "description": "Detects Kerberoasting techniques using tools or PowerShell commands that request TGS tickets for service accounts to crack offline.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Rubeus*' or 'Command Line' like '*kerberoast*')) or (('Command Line' like '*Invoke-Kerberoast*' or 'Command Line' like '*Get-SPNUsers*' or 'Command Line' like '*Request-SPNTicket*')) or ('Process Name' like '*setspn.exe' and 'Command Line' like '*-Q */**'))",
+  "sigma_id": "f1e2d3c4-5014-4000-8000-000000000014",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.credential_access",
+    "attack.t1558.003"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "credential_access"
+    ],
+    "techniques": [
+      "T1558.003"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Authorized security assessment",
+    "SPN enumeration by service account management tools"
+  ]
+}

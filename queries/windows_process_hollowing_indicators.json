@@ -1,0 +1,33 @@
+{
+  "title": "Windows Process Hollowing Indicators",
+  "description": "Detects suspicious process creation patterns indicative of process hollowing where a legitimate process is spawned in a suspended state and its memory replaced with malicious code.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*CREATE_SUSPENDED*' or 'Command Line' like '*NtUnmapViewOfSection*' or 'Command Line' like '*ZwUnmapViewOfSection*' or 'Command Line' like '*WriteProcessMemory*' or 'Command Line' like '*NtResumeThread*')))",
+  "sigma_id": "f1e2d3c4-5018-4000-8000-000000000018",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1055.012"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1055.012"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Debugging and development tools",
+    "Security products inspecting process memory"
+  ]
+}

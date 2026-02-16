@@ -1,0 +1,15 @@
+title: Linux Crontab Modification
+id: 07b8c9d0-bcde-f012-3456-789012345067
+status: stable
+description: Detects crontab command execution, which may indicate persistence via scheduled tasks.
+logsource:
+  product: linux
+  service: audit
+detection:
+  selection:
+    process_name: crontab
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1053.003

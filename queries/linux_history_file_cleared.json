@@ -1,0 +1,30 @@
+{
+  "title": "Linux History File Cleared",
+  "description": "Detects clearing of command history files or unsetting of history environment variable, a common anti-forensics technique.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((msg like '*unset HISTFILE*') or (msg like '*history -c*'))",
+  "sigma_id": "29d0e1f2-def0-1234-5678-901234567089",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1070.003"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1070.003"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
+}

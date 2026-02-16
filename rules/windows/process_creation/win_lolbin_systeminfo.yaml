@@ -7,7 +7,7 @@ logsource:
   service: process_creation
 detection:
   selection:
-    process_name: systeminfo.exe
+    process_name|endswith: systeminfo.exe
   condition: selection
 level: medium
 tags:

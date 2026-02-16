@@ -1,5 +1,5 @@
 title: OCI VCN Security List Open to World
-id: uuid-1
+id: 9c06a57b-ab20-4b92-881a-80026bbfa699
 status: experimental
 description: Detects creation or update of a Security List allowing ingress from 0.0.0.0/0.
 logsource:

@@ -1,0 +1,29 @@
+{
+  "title": "Windows LOLBin Usage: net1",
+  "description": "Detects usage of Living off the Land binary net1.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*net1.exe'))",
+  "sigma_id": "f2fb546e-be45-4959-8ac4-0340cf54c2d9",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1218"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+title: Windows Encoded PowerShell Execution
+id: 4bf2g314-f012-3456-789a-12345678a0b1
+status: stable
+description: Detects execution of PowerShell with encoded commands, commonly used to obfuscate malicious scripts.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  selection:
+    process_name|endswith: powershell.exe
+    CommandLine|contains:
+    - '-enc '
+    - '-EncodedCommand'
+    - '-ec '
+    - 'FromBase64String'
+  condition: selection
+level: high
+tags:
+- attack.execution
+- attack.t1059.001
+- attack.defense_evasion
+- attack.t1027

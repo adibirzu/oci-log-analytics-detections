@@ -9,7 +9,7 @@ logsource:
     service: audit
 detection:
     selection:
-        event_type: 'com.oraclecloud.identity.authentication.login'
+        event_type: 'com.oraclecloud.consolesignon.login'
         status: 'Success'
     condition: selection
 falsepositives:

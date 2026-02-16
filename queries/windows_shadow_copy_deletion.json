@@ -1,0 +1,29 @@
+{
+  "title": "Windows Shadow Copy Deletion",
+  "description": "Detects deletion of volume shadow copies via vssadmin or wmic, a common ransomware indicator to prevent recovery from encrypted files.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*vssadmin.exe' and ('Command Line' like '*delete shadows*' or 'Command Line' like '*Delete Shadows*')) or ('Process Name' like '*wmic.exe' and 'Command Line' like '*shadowcopy delete*'))",
+  "sigma_id": "d1a2b3c4-3001-4000-8000-000000000001",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.impact",
+    "attack.t1490"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "impact"
+    ],
+    "techniques": [
+      "T1490"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  }
+}

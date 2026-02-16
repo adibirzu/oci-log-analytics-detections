@@ -1,5 +1,5 @@
 title: OCI Network Security Group Updated
-id: uuid-8
+id: b8dd55ff-e76f-426b-aae4-0e850f209bed
 status: stable
 description: Detects updates to Network Security Groups (NSGs).
 logsource:

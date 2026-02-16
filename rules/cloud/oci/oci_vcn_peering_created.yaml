@@ -1,0 +1,19 @@
+title: OCI VCN Peering Connection Created
+id: d1a2b3c4-1014-4000-8000-000000000014
+status: stable
+description: Detects creation of VCN peering connections (local or remote). Unauthorized peering can extend network access across compartments or regions, enabling lateral movement.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.virtualnetwork.createlocalpeeringgateway
+    - com.oraclecloud.virtualnetwork.createremotepeeringconnection
+    - com.oraclecloud.virtualnetwork.connectremotepeeringconnections
+  condition: selection
+level: medium
+tags:
+- attack.lateral_movement
+- attack.t1021
+- stig.SC-7

@@ -1,0 +1,34 @@
+{
+  "title": "Linux Process Memory Access via /proc",
+  "description": "Detects reading process memory via /proc filesystem entries (maps, mem, environ). Used to extract credentials, secrets, or encryption keys from running processes.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*/proc/self/maps*' or msg like '*/proc/self/mem*' or msg like '*/proc/self/environ*' or msg like '*/proc/*/maps*' or msg like '*/proc/*/mem*' or msg like '*/proc/*/environ*')))",
+  "sigma_id": "f1e2d3c4-5003-4000-8000-000000000003",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.credential_access",
+    "attack.t1003.007"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "credential_access"
+    ],
+    "techniques": [
+      "T1003.007"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Debugging tools and profilers",
+    "Application performance monitoring agents"
+  ]
+}

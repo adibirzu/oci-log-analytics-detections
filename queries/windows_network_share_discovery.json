@@ -1,0 +1,33 @@
+{
+  "title": "Windows Network Share Discovery",
+  "description": "Detects commands used to enumerate network shares. Attackers discover shared resources to identify sensitive data repositories, admin shares, and lateral movement paths.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*net.exe' and ('Command Line' like '*share*' or 'Command Line' like '*view*')) or (('Command Line' like '*Get-SmbShare*' or 'Command Line' like '*Get-FileShare*' or 'Command Line' like '*Get-WmiObject Win32_Share*')) or (('Command Line' like '*SharpHound*' or 'Command Line' like '*Invoke-ShareFinder*' or 'Command Line' like '*Find-DomainShare*')))",
+  "sigma_id": "a1b2c3d4-6003-4000-8000-000000000003",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.discovery",
+    "attack.t1135"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "discovery"
+    ],
+    "techniques": [
+      "T1135"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Administrators managing file shares",
+    "Backup software enumerating shares"
+  ]
+}

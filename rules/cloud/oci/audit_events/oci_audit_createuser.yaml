@@ -7,7 +7,7 @@ logsource:
   service: audit
 detection:
   selection:
-    event_type: com.oraclecloud.identity.user.create
+    event_type: com.oraclecloud.identitycontrolplane.createuser
   condition: selection
 level: informational
 tags:

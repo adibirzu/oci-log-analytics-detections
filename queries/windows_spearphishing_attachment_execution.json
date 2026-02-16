@@ -1,0 +1,37 @@
+{
+  "title": "Windows Spearphishing Attachment Execution",
+  "description": "Detects suspicious child processes spawned by Microsoft Office applications, indicating potential macro-based spearphishing payload execution. Office documents should not spawn cmd.exe, powershell.exe, or scripting engines.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Parent Process Name' like '*winword.exe' or 'Parent Process Name' like '*excel.exe' or 'Parent Process Name' like '*powerpnt.exe' or 'Parent Process Name' like '*outlook.exe' or 'Parent Process Name' like '*msaccess.exe')) and (('Process Name' like '*cmd.exe' or 'Process Name' like '*powershell.exe' or 'Process Name' like '*pwsh.exe' or 'Process Name' like '*wscript.exe' or 'Process Name' like '*cscript.exe' or 'Process Name' like '*mshta.exe' or 'Process Name' like '*regsvr32.exe' or 'Process Name' like '*rundll32.exe' or 'Process Name' like '*certutil.exe')))",
+  "sigma_id": "a1b2c3d4-6009-4000-8000-000000000009",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.initial_access",
+    "attack.t1566.001",
+    "attack.execution",
+    "attack.t1204.002"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "initial_access",
+      "execution"
+    ],
+    "techniques": [
+      "T1566.001",
+      "T1204.002"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate Office add-ins that spawn processes",
+    "Office macros for approved business automation"
+  ]
+}

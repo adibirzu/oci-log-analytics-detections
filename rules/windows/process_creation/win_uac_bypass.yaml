@@ -1,0 +1,27 @@
+title: Windows UAC Bypass Attempt
+id: f1e2d3c4-5013-4000-8000-000000000013
+status: stable
+description: Detects common UAC bypass techniques including fodhelper, eventvwr, and sdclt abuse. These auto-elevate binaries can be hijacked via registry to execute arbitrary code with elevated privileges.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_fodhelper:
+    process_name|endswith: fodhelper.exe
+  sel_eventvwr:
+    process_name|endswith: eventvwr.exe
+  sel_sdclt:
+    process_name|endswith: sdclt.exe
+    CommandLine|contains: /kickoffelev
+  sel_cmstp:
+    process_name|endswith: cmstp.exe
+    CommandLine|contains: /au
+  condition: sel_fodhelper or sel_eventvwr or sel_sdclt or sel_cmstp
+level: high
+tags:
+- attack.privilege_escalation
+- attack.defense_evasion
+- attack.t1548.002
+falsepositives:
+- Legitimate use of fodhelper for language settings
+- Event Viewer launched by administrators

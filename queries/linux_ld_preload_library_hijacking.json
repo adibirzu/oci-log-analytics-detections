@@ -1,0 +1,30 @@
+{
+  "title": "Linux LD_PRELOAD Library Hijacking",
+  "description": "Detects LD_PRELOAD environment variable injection or /etc/ld.so.preload modification, used for library hijacking and process injection.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*LD_PRELOAD=*' or msg like '*/etc/ld.so.preload*' or msg like '*ld.so.preload*')))",
+  "sigma_id": "d1a2b3c4-2002-4000-8000-000000000002",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.persistence",
+    "attack.t1574.006"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1574.006"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
+}

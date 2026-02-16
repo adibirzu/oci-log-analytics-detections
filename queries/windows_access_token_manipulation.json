@@ -1,0 +1,35 @@
+{
+  "title": "Windows Access Token Manipulation",
+  "description": "Detects access token manipulation techniques used for privilege escalation. Attackers steal or forge tokens to impersonate other users, especially SYSTEM or domain admin, without needing their credentials.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Invoke-TokenManipulation*' or 'Command Line' like '*token::elevate*' or 'Command Line' like '*token::revert*' or 'Command Line' like '*incognito.exe*')) or (('Command Line' like '*ImpersonateLoggedOnUser*' or 'Command Line' like '*DuplicateTokenEx*' or 'Command Line' like '*CreateProcessWithToken*' or 'Command Line' like '*SetThreadToken*' or 'Command Line' like '*AdjustTokenPrivileges*')) or (('Command Line' like '*JuicyPotato*' or 'Command Line' like '*SweetPotato*' or 'Command Line' like '*PrintSpoofer*' or 'Command Line' like '*GodPotato*' or 'Command Line' like '*RottenPotato*')))",
+  "sigma_id": "a1b2c3d4-6020-4000-8000-000000000020",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.privilege_escalation",
+    "attack.t1134",
+    "attack.defense_evasion"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "privilege_escalation",
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1134"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Security assessment tools",
+    "Authorized penetration testing"
+  ]
+}

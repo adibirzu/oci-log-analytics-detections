@@ -1,0 +1,26 @@
+title: Windows NTDS.dit Database Extraction
+id: f1e2d3c4-5020-4000-8000-000000000020
+status: stable
+description: Detects attempts to extract the Active Directory NTDS.dit database file using ntdsutil, vssadmin shadow copies, or direct copy commands. This file contains all domain password hashes.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_ntdsutil:
+    process_name|endswith: ntdsutil.exe
+    CommandLine|contains:
+    - ac i ntds
+    - ifm
+    - create full
+  sel_copy:
+    CommandLine|contains:
+    - ntds.dit
+    - SYSTEM.hiv
+  condition: sel_ntdsutil or sel_copy
+level: critical
+tags:
+- attack.credential_access
+- attack.t1003.003
+falsepositives:
+- Legitimate Active Directory backup procedures
+- Domain controller disaster recovery testing

@@ -1,0 +1,15 @@
+title: OCI Autonomous Database Terminated
+id: a1d2e3f4-5678-9abc-def0-123456789001
+status: stable
+description: Detects termination of an OCI Autonomous Database, which may indicate sabotage or unauthorized resource destruction.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.databaseservice.deleteautonomousdatabase
+  condition: selection
+level: high
+tags:
+- attack.impact
+- attack.t1485

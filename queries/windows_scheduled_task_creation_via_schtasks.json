@@ -1,0 +1,33 @@
+{
+  "title": "Windows Scheduled Task Creation via Schtasks",
+  "description": "Detects creation of scheduled tasks via schtasks.exe with suspicious patterns. Scheduled tasks are a common persistence and execution mechanism.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*schtasks.exe' and ('Command Line' like '*/create*' or 'Command Line' like '*-create*')))",
+  "sigma_id": "e1f2a3b4-4018-4000-8000-000000000018",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.persistence",
+    "attack.t1053.005"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1053.005"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate task scheduling by system administrators",
+    "Software installation creating maintenance tasks"
+  ]
+}

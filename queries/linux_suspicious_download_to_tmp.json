@@ -1,0 +1,34 @@
+{
+  "title": "Linux Suspicious Download to /tmp",
+  "description": "Detects file downloads to /tmp directory using common tools. Attackers frequently stage payloads in /tmp as it is world-writable.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((('Process Name' = 'wget' or 'Process Name' = 'curl')) and ((msg like '*/tmp/*' or msg like '*-o /tmp*' or msg like '*-O /tmp*')))",
+  "sigma_id": "e1f2a3b4-4010-4000-8000-000000000010",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.command_and_control",
+    "attack.t1105"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1105"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Package managers downloading to temporary locations",
+    "Legitimate admin scripts"
+  ]
+}

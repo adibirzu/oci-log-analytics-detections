@@ -1,0 +1,30 @@
+title: Windows PowerShell Download Cradle
+id: e1f2a3b4-4019-4000-8000-000000000019
+status: stable
+description: Detects PowerShell download cradle patterns commonly used to fetch and execute remote payloads including Invoke-WebRequest, Net.WebClient, and Start-BitsTransfer.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_ps:
+    process_name|endswith:
+    - powershell.exe
+    - pwsh.exe
+  sel_download:
+    CommandLine|contains:
+    - Invoke-WebRequest
+    - Net.WebClient
+    - DownloadString
+    - DownloadFile
+    - Start-BitsTransfer
+    - Invoke-RestMethod
+  condition: sel_ps and sel_download
+level: high
+tags:
+- attack.execution
+- attack.t1059.001
+- attack.command_and_control
+- attack.t1105
+falsepositives:
+- Legitimate PowerShell scripts downloading modules
+- System administration automation

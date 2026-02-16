@@ -1,0 +1,34 @@
+{
+  "title": "Linux System Owner and User Discovery",
+  "description": "Detects commands used to discover system owner, logged-in users, and user context. Attackers run these commands early in post-compromise to understand their privilege level and identify other active users.\n",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*w *' or msg like '*who -a*' or msg like '*last -a*' or msg like '*lastlog*' or msg like '*getent passwd*' or msg like '*cat /etc/group*' or msg like '*groups root*')))",
+  "sigma_id": "a1b2c3d4-6006-4000-8000-000000000006",
+  "level": "low",
+  "stig_category": "CAT III",
+  "tags": [
+    "attack.discovery",
+    "attack.t1033"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "discovery"
+    ],
+    "techniques": [
+      "T1033"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "syslog",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "System administrators checking active sessions",
+    "Monitoring scripts"
+  ]
+}

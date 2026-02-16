@@ -1,0 +1,33 @@
+{
+  "title": "Windows Certutil Download or Decode",
+  "description": "Detects usage of certutil.exe to download files from URLs or decode Base64 payloads, a common LOLBin abuse technique.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*certutil.exe' and ('Command Line' like '*urlcache*' or 'Command Line' like '*decode*' or 'Command Line' like '*encode*' or 'Command Line' like '*-urlcache*' or 'Command Line' like '*-decode*')))",
+  "sigma_id": "3ae1f203-ef01-2345-6789-012345678090",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1140",
+    "attack.command_and_control",
+    "attack.t1105"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion",
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1140",
+      "T1105"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  }
+}

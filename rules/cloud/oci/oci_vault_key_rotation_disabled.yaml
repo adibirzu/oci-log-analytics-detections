@@ -1,0 +1,17 @@
+title: OCI Vault Key Rotation Overdue
+id: d1a2b3c4-1008-4000-8000-000000000008
+status: stable
+description: Detects disabling of key rotation schedule for OCI Vault encryption keys. Key rotation is a STIG requirement for cryptographic key management.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.kms.updatekeyversion
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1600
+- stig.SC-12
+- compliance.cis_oci_3.1

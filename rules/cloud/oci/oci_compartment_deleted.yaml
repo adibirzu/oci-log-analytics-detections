@@ -1,0 +1,16 @@
+title: OCI Compartment Deleted
+id: d1a2b3c4-1005-4000-8000-000000000005
+status: stable
+description: Detects deletion of an OCI compartment. This is a high-impact destructive action that removes all resources within the compartment and could indicate sabotage or insider threat.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identitycontrolplane.deletecompartment
+  condition: selection
+level: critical
+tags:
+- attack.impact
+- attack.t1485
+- stig.AC-6

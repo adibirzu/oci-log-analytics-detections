@@ -1,0 +1,35 @@
+{
+  "title": "Windows Remote Access Tool Detected",
+  "description": "Detects installation or execution of remote access tools commonly abused by attackers. Tools like AnyDesk, TeamViewer, ngrok, and ScreenConnect provide persistent remote access that can bypass firewall rules.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*AnyDesk.exe') or ('Process Name' like '*TeamViewer.exe') or (('Command Line' like '*ngrok*' or 'Command Line' like '*ngrok.exe*')) or ('Process Name' like '*ScreenConnect.ClientService.exe') or ('Process Name' like '*rustdesk.exe') or (('Command Line' like '*AnyDesk*' or 'Command Line' like '*TeamViewer*' or 'Command Line' like '*ScreenConnect*' or 'Command Line' like '*RustDesk*')))",
+  "sigma_id": "a1b2c3d4-6016-4000-8000-000000000016",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.command_and_control",
+    "attack.t1219",
+    "attack.persistence"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control",
+      "persistence"
+    ],
+    "techniques": [
+      "T1219"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Authorized remote support tools",
+    "IT help desk using approved remote access software"
+  ]
+}

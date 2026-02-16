@@ -1,0 +1,33 @@
+{
+  "title": "Windows Encoded PowerShell Execution",
+  "description": "Detects execution of PowerShell with encoded commands, commonly used to obfuscate malicious scripts.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*powershell.exe' and ('Command Line' like '*-enc *' or 'Command Line' like '*-EncodedCommand*' or 'Command Line' like '*-ec *' or 'Command Line' like '*FromBase64String*')))",
+  "sigma_id": "4bf2g314-f012-3456-789a-12345678a0b1",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.execution",
+    "attack.t1059.001",
+    "attack.defense_evasion",
+    "attack.t1027"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1059.001",
+      "T1027"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  }
+}

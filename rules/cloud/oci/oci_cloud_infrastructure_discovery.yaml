@@ -1,0 +1,33 @@
+title: OCI Cloud Infrastructure Discovery
+id: a1b2c3d4-6005-4000-8000-000000000005
+status: stable
+description: >
+  Detects excessive cloud infrastructure enumeration via OCI API calls.
+  Attackers with compromised credentials perform reconnaissance by listing
+  instances, networks, buckets, and databases to map the cloud environment.
+author: SOC Detection Team
+date: 2026/02/11
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.computeapi.listinstances
+    - com.oraclecloud.virtualnetwork.listvcns
+    - com.oraclecloud.virtualnetwork.listsubnets
+    - com.oraclecloud.objectstorage.listbuckets
+    - com.oraclecloud.identitycontrolplane.listusers
+    - com.oraclecloud.identitycontrolplane.listgroups
+    - com.oraclecloud.identitycontrolplane.listpolicies
+    - com.oraclecloud.databaseservice.listautonomousdatabases
+  condition: selection
+level: low
+tags:
+- attack.discovery
+- attack.t1580
+- stig.AU-12
+falsepositives:
+- Cloud management consoles
+- Infrastructure-as-code tools
+- Monitoring and compliance scanners

@@ -1,9 +1,27 @@
 {
   "title": "Linux Sudo Usage",
   "description": "Detects execution of sudo commands.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'sudo' and Message like '*COMMAND=*'",
-  "sigma_id": "uuid-5",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'sudo' and msg like '*COMMAND=*'))",
+  "sigma_id": "42793848-2b55-462d-a986-fd84dcf64063",
+  "level": "low",
+  "stig_category": "CAT III",
   "tags": [
     "attack.privilege_escalation"
-  ]
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "privilege_escalation"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "auth",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
 }

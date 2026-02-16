@@ -1,9 +1,0 @@
-{
-  "title": "Cloud Guard Problem: Group Has Too Many Admins",
-  "description": "Detects Cloud Guard reporting problem: Group_Has_Too_Many_Admins.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where Problem Name = 'Group_Has_Too_Many_Admins'",
-  "sigma_id": "e262f895-bd75-49d5-94f5-231ea2c65d9a",
-  "tags": [
-    "oci.cloud_guard"
-  ]
-}

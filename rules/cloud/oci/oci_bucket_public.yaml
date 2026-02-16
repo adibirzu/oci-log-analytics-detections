@@ -1,5 +1,5 @@
 title: OCI Object Storage Bucket Made Public
-id: uuid-3
+id: 3ea8400b-e89c-4a99-8eb1-6d0baa299963
 status: high
 description: Detects when a bucket's visibility is set to public.
 logsource:

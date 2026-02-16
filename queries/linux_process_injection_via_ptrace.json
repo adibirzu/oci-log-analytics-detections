@@ -1,0 +1,30 @@
+{
+  "title": "Linux Process Injection via Ptrace",
+  "description": "Detects use of ptrace for process injection or debugging, which can be used to inject malicious code into running processes.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ptrace(PTRACE_ATTACH*' or msg like '*PTRACE_POKETEXT*' or msg like '*PTRACE_POKEDATA*' or msg like '*strace -p*' or msg like '*gdb --pid*' or msg like '*gdb -p*')))",
+  "sigma_id": "d1a2b3c4-2005-4000-8000-000000000005",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1055.008"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1055.008"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+title: OCI Audit Configuration Changed
+id: d1a2b3c4-1012-4000-8000-000000000012
+status: stable
+description: Detects modifications to OCI Audit service configuration including retention period changes. Reducing audit retention is a defense evasion tactic.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.audit.updateconfiguration
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1562.008
+- stig.AU-11
+- compliance.cis_oci_3.14

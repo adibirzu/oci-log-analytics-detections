@@ -1,0 +1,41 @@
+title: Windows Spearphishing Attachment Execution
+id: a1b2c3d4-6009-4000-8000-000000000009
+status: stable
+description: >
+  Detects suspicious child processes spawned by Microsoft Office applications,
+  indicating potential macro-based spearphishing payload execution. Office
+  documents should not spawn cmd.exe, powershell.exe, or scripting engines.
+author: SOC Detection Team
+date: 2026/02/11
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_office_parent:
+    ParentImage|endswith:
+    - winword.exe
+    - excel.exe
+    - powerpnt.exe
+    - outlook.exe
+    - msaccess.exe
+  sel_suspicious_child:
+    process_name|endswith:
+    - cmd.exe
+    - powershell.exe
+    - pwsh.exe
+    - wscript.exe
+    - cscript.exe
+    - mshta.exe
+    - regsvr32.exe
+    - rundll32.exe
+    - certutil.exe
+  condition: sel_office_parent and sel_suspicious_child
+level: critical
+tags:
+- attack.initial_access
+- attack.t1566.001
+- attack.execution
+- attack.t1204.002
+falsepositives:
+- Legitimate Office add-ins that spawn processes
+- Office macros for approved business automation

@@ -1,0 +1,42 @@
+title: Windows Data Staging for Exfiltration
+id: a1b2c3d4-6011-4000-8000-000000000011
+status: stable
+description: >
+  Detects data staging activity where an attacker collects and stages files
+  before exfiltration. Indicators include copying files to temp directories,
+  creating archives, or writing to removable media staging areas.
+author: SOC Detection Team
+date: 2026/02/11
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_robocopy:
+    process_name|endswith: robocopy.exe
+    CommandLine|contains:
+    - /MIR
+    - /E
+    - /S
+  sel_xcopy:
+    process_name|endswith: xcopy.exe
+    CommandLine|contains:
+    - /S
+    - /E
+  sel_staging_dir:
+    CommandLine|contains:
+    - C:\Temp\staging
+    - C:\Users\Public\
+    - C:\ProgramData\staging
+  sel_compress_stage:
+    CommandLine|contains:
+    - compact /c
+    - makecab
+  condition: sel_robocopy or sel_xcopy or sel_staging_dir or sel_compress_stage
+level: medium
+tags:
+- attack.collection
+- attack.t1074.001
+- attack.exfiltration
+falsepositives:
+- Authorized file migrations
+- Backup operations

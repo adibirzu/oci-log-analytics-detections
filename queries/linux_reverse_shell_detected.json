@@ -1,0 +1,30 @@
+{
+  "title": "Linux Reverse Shell Detected",
+  "description": "Detects common reverse shell patterns in process execution, indicating potential remote access backdoor activity.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*nc -e /bin*' or msg like '*ncat -e /bin*' or msg like '*mkfifo /tmp*')))",
+  "sigma_id": "f6a7b8c9-abcd-ef01-2345-678901234056",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.execution",
+    "attack.t1059"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1059"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
+}

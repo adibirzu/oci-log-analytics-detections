@@ -1,0 +1,16 @@
+title: OCI Console Login Failure
+id: d4e5f6a7-89ab-cdef-0123-456789012034
+status: stable
+description: Detects failed console login attempts to OCI, which may indicate brute-force or credential stuffing attacks.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.consolesignon.login
+    status: Failure
+  condition: selection
+level: medium
+tags:
+- attack.initial_access
+- attack.t1078

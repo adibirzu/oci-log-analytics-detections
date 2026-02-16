@@ -1,0 +1,21 @@
+title: Windows Shadow Copy Deletion
+id: d1a2b3c4-3001-4000-8000-000000000001
+status: stable
+description: Detects deletion of volume shadow copies via vssadmin or wmic, a common ransomware indicator to prevent recovery from encrypted files.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_vss:
+    process_name|endswith: vssadmin.exe
+    CommandLine|contains:
+    - delete shadows
+    - 'Delete Shadows'
+  sel_wmic:
+    process_name|endswith: wmic.exe
+    CommandLine|contains: shadowcopy delete
+  condition: sel_vss or sel_wmic
+level: critical
+tags:
+- attack.impact
+- attack.t1490

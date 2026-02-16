@@ -1,0 +1,34 @@
+{
+  "title": "Linux DNS Tunneling Detected",
+  "description": "Detects execution of DNS tunneling tools such as iodine, dns2tcp, or dnscat2 used to exfiltrate data or establish covert C2 channels over DNS.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*iodine*' or msg like '*dns2tcp*' or msg like '*dnscat*' or msg like '*dnscrypt-proxy*' or msg like '*dnsmasq --server*')))",
+  "sigma_id": "f1e2d3c4-5001-4000-8000-000000000001",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.command_and_control",
+    "attack.t1071.004"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1071.004"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate DNS privacy tools (dnscrypt-proxy)",
+    "Network testing by administrators"
+  ]
+}

@@ -1,9 +1,0 @@
-{
-  "title": "OCI Action: CreateInstance",
-  "description": "Detects the execution of CreateInstance action in OCI.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where Event Type = 'com.oraclecloud.computeapi.launchinstance'",
-  "sigma_id": "ebffc976-d456-4a92-a086-4796b2571f0a",
-  "tags": [
-    "oci.audit"
-  ]
-}

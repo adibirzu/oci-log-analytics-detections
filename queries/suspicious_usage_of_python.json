@@ -1,10 +1,30 @@
 {
   "title": "Suspicious Usage of python",
   "description": "Detects execution of potentially suspicious binary python.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where 'Process Name' = 'python'",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'python'))",
   "sigma_id": "177ee6a5-cca9-4604-8765-b6983f0ad54c",
+  "level": "low",
+  "stig_category": "CAT III",
   "tags": [
     "attack.execution",
     "attack.t1204"
-  ]
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1204"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  }
 }

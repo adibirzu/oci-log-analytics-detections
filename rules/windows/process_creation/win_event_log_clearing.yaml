@@ -1,0 +1,27 @@
+title: Windows Event Log Clearing
+id: f1e2d3c4-5011-4000-8000-000000000011
+status: stable
+description: Detects clearing of Windows event logs via wevtutil or PowerShell. Attackers clear logs to destroy evidence of their activities and hinder forensic investigation.
+logsource:
+  product: windows
+  service: process_creation
+detection:
+  sel_wevtutil:
+    process_name|endswith: wevtutil.exe
+    CommandLine|contains:
+    - cl Security
+    - cl System
+    - cl Application
+    - clear-log
+  sel_ps:
+    process_name|endswith:
+    - powershell.exe
+    - pwsh.exe
+    CommandLine|contains: Clear-EventLog
+  condition: sel_wevtutil or sel_ps
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1070.001
+falsepositives:
+- Legitimate log maintenance during disk space emergencies

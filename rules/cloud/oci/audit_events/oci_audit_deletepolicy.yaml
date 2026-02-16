@@ -7,7 +7,7 @@ logsource:
   service: audit
 detection:
   selection:
-    event_type: com.oraclecloud.identity.policy.delete
+    event_type: com.oraclecloud.identitycontrolplane.deletepolicy
   condition: selection
 level: informational
 tags:

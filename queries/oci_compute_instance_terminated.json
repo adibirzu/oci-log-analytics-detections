@@ -1,9 +1,24 @@
 {
   "title": "OCI Compute Instance Terminated",
   "description": "Detects termination of a compute instance.",
-  "query": "'Log Source' = 'OCI Audit Logs' | where Event Type = 'com.oraclecloud.computeapi.terminateinstance'",
-  "sigma_id": "uuid-7",
+  "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.computeapi.terminateinstance'))",
+  "sigma_id": "2bce3086-0d16-4b92-b303-76a9d66932e5",
+  "level": "medium",
+  "stig_category": "CAT II",
   "tags": [
     "attack.impact"
-  ]
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "impact"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "audit",
+    "candidates": [
+      "OCI Audit Logs"
+    ]
+  }
 }

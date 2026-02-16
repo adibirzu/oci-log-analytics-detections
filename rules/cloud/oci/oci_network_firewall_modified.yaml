@@ -1,0 +1,19 @@
+title: OCI Network Firewall Policy Modified
+id: d1a2b3c4-1013-4000-8000-000000000013
+status: stable
+description: Detects modifications to OCI Network Firewall policies. Unauthorized changes could weaken network security posture or create bypass routes.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.networkfirewall.updatenetworkfirewallpolicy
+    - com.oraclecloud.networkfirewall.deletenetworkfirewall
+    - com.oraclecloud.networkfirewall.updatenetworkfirewall
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1562.004
+- stig.SC-7

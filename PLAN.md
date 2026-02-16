@@ -25,8 +25,17 @@ Enhance the OCI Log Analytics project by creating a comprehensive library of det
 - [x] **Test Data:** `scripts/ingest_test_data.py` created for simulation.
 - [x] **Dashboard Completion:** Successfully deployed the SOC Security Dashboard with 6 core widgets.
 
-## Phase 5: Advanced Features & Documentation 🔄
-- [x] **Basic Documentation:** `README.md`, `CONTRIBUTING.md`, `STATUS.md`.
+## Phase 5: OCI Log Analytics Deployment ✅
+- [x] **Log Source Mapping Fix:** Corrected Cloud Guard, Linux, and Windows log source mappings.
+- [x] **UUID Fix:** Replaced all placeholder UUIDs with proper UUIDs.
+- [x] **Query Regeneration:** All 113 queries regenerated with correct mappings.
+- [x] **Saved Searches:** 58 saved searches deployed to OCI Log Analytics.
+- [x] **Dashboards:** 5 dashboards deployed (SOC Overview, OCI Audit, Cloud Guard, Linux, Windows).
+- [x] **Test Data Pipeline:** 279 NDJSON events generated and uploaded for all 113 rules.
+- [x] **Dashboard Widget Fix:** Rewrote saved searches with proper `ui_config`/`scopeFilters` format and embedded in dashboard JSON for `import_dashboard` API.
+- [x] **Documentation:** Updated README.md, STATUS.md, PLAN.md.
+
+## Phase 6: Advanced Features & Automation 🔄
 - [ ] **Remote Rule Sync:** Script to fetch latest rules from `SigmaHQ/sigma` repository.
 - [ ] **Rule Catalog:** Auto-generate a searchable markdown or HTML catalog of all rules.
 - [ ] **CI/CD Integration:** GitHub Actions to validate rules and auto-generate queries on push.
@@ -49,8 +58,19 @@ Enhance the OCI Log Analytics project by creating a comprehensive library of det
         process_creation/
     ```
 
+## Phase 7: STIG Compliance & Advanced Attack Patterns
+- [x] **OCI STIG Rules:** 15 new rules with STIG control mappings (IA-2, SC-7, AU-11, etc.)
+- [x] **Advanced Linux Rules:** Container escape, LD_PRELOAD hijack, kernel module from /tmp, passwd modification, ptrace injection, network redirect.
+- [x] **Advanced Windows Rules:** Shadow copy deletion (ransomware), AMSI bypass, WMI persistence, registry run key, DLL side-loading, bcdedit recovery disable.
+- [x] **Enhanced Converter:** List support for startswith/endswith, STIG metadata, condition tokenizer, validation and stats modes.
+- [x] **STIG Compliance Dashboard:** New dedicated dashboard with 14 compliance widgets.
+- [x] **Test Data Expansion:** 360 events (up from 279) covering all 140 rules.
+- [x] **Multicloud Integration:** Export script for ~/dev/multicloudoperations with shared manifest.
+
 ## Success Criteria
-1.  100+ high-quality detection rules implemented. (Achieved: 100)
-2.  Functional conversion script from Sigma to OCL. (Achieved: Advanced version)
-3.  Comprehensive documentation. (In Progress)
-4.  Functional SOC Dashboard in OCI. (Achieved: SOC Security Dashboard deployed)
+1.  100+ high-quality detection rules implemented. (Achieved: 140)
+2.  Functional conversion script from Sigma to OCL. (Achieved: Advanced version with STIG metadata)
+3.  Comprehensive documentation. (Achieved)
+4.  Functional SOC Dashboards in OCI. (Achieved: 6 dashboards, 76 saved searches)
+5.  STIG compliance mapping for OCI rules. (Achieved: 15 rules with DoD STIG IDs)
+6.  Cross-project integration with multicloudoperations. (Achieved: export script + manifest)

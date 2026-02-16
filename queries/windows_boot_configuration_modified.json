@@ -1,0 +1,29 @@
+{
+  "title": "Windows Boot Configuration Modified",
+  "description": "Detects use of bcdedit.exe to disable recovery mode or modify boot configuration, commonly seen in ransomware attacks to prevent system recovery.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*bcdedit.exe' and ('Command Line' like '*recoveryenabled no*' or 'Command Line' like '*bootstatuspolicy ignoreallfailures*' or 'Command Line' like '*safeboot*')))",
+  "sigma_id": "d1a2b3c4-3006-4000-8000-000000000006",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.impact",
+    "attack.t1490"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "impact"
+    ],
+    "techniques": [
+      "T1490"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  }
+}

@@ -1,0 +1,89 @@
+name: Validate Detection Rules
+
+on:
+  push:
+    paths:
+      - 'rules/**'
+      - 'config/**'
+      - 'scripts/convert_sigma.py'
+      - 'scripts/generate_catalog.py'
+  pull_request:
+    paths:
+      - 'rules/**'
+      - 'config/**'
+      - 'scripts/convert_sigma.py'
+      - 'scripts/generate_catalog.py'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Convert Sigma rules to OCL
+        run: python3 scripts/convert_sigma.py
+
+      - name: Validate OCL syntax
+        run: python3 scripts/convert_sigma.py --validate
+
+      - name: Print rule statistics
+        run: python3 scripts/convert_sigma.py --stats
+
+      - name: Generate catalog
+        run: python3 scripts/generate_catalog.py
+
+      - name: Verify rule count
+        run: |
+          RULE_COUNT=$(find rules -name '*.yaml' -type f | wc -l)
+          QUERY_COUNT=$(find queries -name '*.json' -not -name 'manifest.json' -not -name 'catalog.json' -maxdepth 1 | wc -l)
+          echo "Rules: $RULE_COUNT, Queries: $QUERY_COUNT"
+          if [ "$RULE_COUNT" -ne "$QUERY_COUNT" ]; then
+            echo "ERROR: Rule count ($RULE_COUNT) != Query count ($QUERY_COUNT)"
+            exit 1
+          fi
+
+      - name: Verify YAML validity
+        run: |
+          python3 -c "
+          import yaml, sys, os
+          errors = 0
+          for root, dirs, files in os.walk('rules'):
+              for f in sorted(files):
+                  if f.endswith('.yaml'):
+                      path = os.path.join(root, f)
+                      try:
+                          with open(path) as fh:
+                              rule = yaml.safe_load(fh)
+                          if not rule or 'detection' not in rule:
+                              print(f'WARN: {path} missing detection block')
+                              errors += 1
+                          if not rule.get('title'):
+                              print(f'WARN: {path} missing title')
+                              errors += 1
+                          if not rule.get('logsource'):
+                              print(f'WARN: {path} missing logsource')
+                              errors += 1
+                      except Exception as e:
+                          print(f'ERROR: {path}: {e}')
+                          errors += 1
+          if errors:
+              print(f'\n{errors} issues found')
+              sys.exit(1)
+          print('All YAML rules valid')
+          "
+
+      - name: Check for deprecated event types
+        run: |
+          if grep -r "com\.oraclecloud\.identity\." rules/ --include="*.yaml" | grep -v identitycontrolplane; then
+            echo "ERROR: Found deprecated identity event types (should use identitycontrolplane)"
+            exit 1
+          fi
+          echo "No deprecated event types found"

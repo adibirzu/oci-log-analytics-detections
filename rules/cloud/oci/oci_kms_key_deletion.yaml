@@ -1,0 +1,15 @@
+title: OCI KMS Key Scheduled for Deletion
+id: b2c3d4e5-6789-abcd-ef01-234567890012
+status: stable
+description: Detects scheduling an OCI Vault key for deletion. This can render encrypted data permanently inaccessible.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.kms.schedulekeydeletion
+  condition: selection
+level: critical
+tags:
+- attack.impact
+- attack.t1490

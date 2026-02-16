@@ -1,0 +1,33 @@
+{
+  "title": "Linux Bind Shell Listener",
+  "description": "Detects creation of bind shell listeners using netcat, socat, or ncat. Bind shells open a listening port that allows remote attackers to connect and execute commands.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*nc -lvp*' or msg like '*nc -lp*' or msg like '*ncat -lvp*' or msg like '*ncat -lp*' or msg like '*netcat -lvp*')) or (msg like '*socat TCP-LISTEN*'))",
+  "sigma_id": "f1e2d3c4-5008-4000-8000-000000000008",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.execution",
+    "attack.t1059.004"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1059.004"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Network troubleshooting using netcat in listen mode"
+  ]
+}

@@ -1,0 +1,18 @@
+title: OCI Identity Provider Created
+id: d1a2b3c4-1002-4000-8000-000000000002
+status: stable
+description: Detects creation of a new identity provider (SAML/OIDC federation), which could indicate an attacker establishing persistent backdoor access via federated identity.
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.identitycontrolplane.createidentityprovider
+    - com.oraclecloud.identitycontrolplane.createsaml2identityprovider
+  condition: selection
+level: high
+tags:
+- attack.persistence
+- attack.t1556.007
+- stig.IA-8

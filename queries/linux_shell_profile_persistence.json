@@ -1,0 +1,34 @@
+{
+  "title": "Linux Shell Profile Persistence",
+  "description": "Detects modification of shell profile files (.bashrc, .bash_profile, .profile) for persistence. Malicious commands added to these files execute on every user login.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*.bashrc*' or msg like '*.bash_profile*' or msg like '*.profile*' or msg like '*/etc/profile.d/*' or msg like '*/etc/bash.bashrc*')))",
+  "sigma_id": "e1f2a3b4-4013-4000-8000-000000000013",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.persistence",
+    "attack.t1546.004"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1546.004"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "User customizing their shell environment",
+    "Dotfile management tools"
+  ]
+}

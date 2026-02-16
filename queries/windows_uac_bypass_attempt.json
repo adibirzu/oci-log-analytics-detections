@@ -1,0 +1,35 @@
+{
+  "title": "Windows UAC Bypass Attempt",
+  "description": "Detects common UAC bypass techniques including fodhelper, eventvwr, and sdclt abuse. These auto-elevate binaries can be hijacked via registry to execute arbitrary code with elevated privileges.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*fodhelper.exe') or ('Process Name' like '*eventvwr.exe') or ('Process Name' like '*sdclt.exe' and 'Command Line' like '*/kickoffelev*') or ('Process Name' like '*cmstp.exe' and 'Command Line' like '*/au*'))",
+  "sigma_id": "f1e2d3c4-5013-4000-8000-000000000013",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.privilege_escalation",
+    "attack.defense_evasion",
+    "attack.t1548.002"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "privilege_escalation",
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1548.002"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate use of fodhelper for language settings",
+    "Event Viewer launched by administrators"
+  ]
+}

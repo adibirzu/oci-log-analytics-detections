@@ -1,0 +1,35 @@
+{
+  "title": "Windows Keylogger Indicators",
+  "description": "Detects indicators of keylogging activity. Attackers deploy keyloggers to capture credentials, sensitive data, and user activity. Detects common keylogger tools, SetWindowsHookEx API calls, and suspicious input recording patterns.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*keylogger*' or 'Command Line' like '*GetAsyncKeyState*' or 'Command Line' like '*SetWindowsHookEx*' or 'Command Line' like '*GetKeyboardState*' or 'Command Line' like '*MapVirtualKey*')) or (('Command Line' like '*logkeys*' or 'Command Line' like '*keystroke*' or 'Command Line' like '*keystrokes.txt*' or 'Command Line' like '*keylog.txt*')))",
+  "sigma_id": "a1b2c3d4-6013-4000-8000-000000000013",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.collection",
+    "attack.t1056.001",
+    "attack.credential_access"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "collection",
+      "credential_access"
+    ],
+    "techniques": [
+      "T1056.001"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Accessibility software",
+    "Input monitoring for compliance"
+  ]
+}

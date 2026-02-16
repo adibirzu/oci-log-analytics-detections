@@ -1,0 +1,29 @@
+{
+  "title": "Windows WMI Event Subscription Persistence",
+  "description": "Detects creation of WMI event subscriptions for persistence, allowing attackers to execute code triggered by system events.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*__EventFilter*' or 'Command Line' like '*__EventConsumer*' or 'Command Line' like '*__FilterToConsumerBinding*' or 'Command Line' like '*ActiveScriptEventConsumer*' or 'Command Line' like '*CommandLineEventConsumer*')) or (('Command Line' like '*Set-WmiInstance*' or 'Command Line' like '*Register-WmiEvent*' or 'Command Line' like '*New-CimInstance -ClassName __*')))",
+  "sigma_id": "d1a2b3c4-3003-4000-8000-000000000003",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.persistence",
+    "attack.t1546.003"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1546.003"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "process_creation",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  }
+}

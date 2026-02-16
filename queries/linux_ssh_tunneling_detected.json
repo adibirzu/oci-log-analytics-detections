@@ -1,0 +1,34 @@
+{
+  "title": "Linux SSH Tunneling Detected",
+  "description": "Detects SSH tunneling and port forwarding commands used for pivoting, data exfiltration, or bypassing network security controls.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ssh -L*' or msg like '*ssh -R*' or msg like '*ssh -D*' or msg like '*ssh -N -f*' or msg like '*autossh*')))",
+  "sigma_id": "e1f2a3b4-4009-4000-8000-000000000009",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.command_and_control",
+    "attack.t1572"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1572"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate development tunnels",
+    "Bastion host port forwarding"
+  ]
+}

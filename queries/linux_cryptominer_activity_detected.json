@@ -1,0 +1,34 @@
+{
+  "title": "Linux Cryptominer Activity Detected",
+  "description": "Detects execution of known cryptomining software or command patterns associated with unauthorized cryptocurrency mining on compromised hosts.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*xmrig*' or msg like '*minerd*' or msg like '*cpuminer*' or msg like '*stratum+tcp*' or msg like '*stratum+ssl*' or msg like '*cryptonight*' or msg like '*--donate-level*')))",
+  "sigma_id": "f1e2d3c4-5005-4000-8000-000000000005",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.impact",
+    "attack.t1496"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "impact"
+    ],
+    "techniques": [
+      "T1496"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Authorized mining operations",
+    "Blockchain development testing"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "title": "Linux Hidden File or Directory Creation in Suspicious Location",
+  "description": "Detects creation of hidden files or directories (starting with dot) in world-writable or suspicious locations commonly used by attackers to stash tools and payloads.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*/tmp/.*' or msg like '*/var/tmp/.*' or msg like '*/dev/shm/.*' or msg like '*/run/lock/.*')))",
+  "sigma_id": "f1e2d3c4-5010-4000-8000-000000000010",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1564.001"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1564.001"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "audit",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
+    ]
+  },
+  "falsepositives": [
+    "Applications creating hidden temporary configuration files"
+  ]
+}

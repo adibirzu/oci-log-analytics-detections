@@ -174,11 +174,48 @@ scripts/
   setup_streaming_pipeline.py   # Production OCI Streaming pipeline
   export_for_multicloud.py      # Integration with multicloudoperations
 test_data/                      # Generated NDJSON test logs
+stack/                          # OCI Resource Manager (Terraform) stack
+  schema.yaml                   # ORM variable UI definition
+  variables.tf                  # Input variables
+  provider.tf                   # OCI provider (ORM auto-injects auth)
+  main.tf                       # Data sources (compartment, LA namespace)
+  iam.tf                        # IAM policies for Service Connector Hub
+  log_analytics.tf              # Log Analytics log group
+  streaming.tf                  # 4 OCI Streaming streams
+  service_connector.tf          # 4 SCH connectors (stream → LA)
+  provisioners.tf               # null_resource calling Python scripts
+  outputs.tf                    # Resource OCIDs and endpoints
+  build_stack.sh                # Builds ORM-uploadable zip
 ```
 
-## Configuration
+## Deployment
 
-### Quick Setup
+### Option 1: OCI Resource Manager (One-Click)
+
+Deploy the full SOC detection stack through ORM's web UI:
+
+1. Build the stack zip:
+   ```bash
+   bash stack/build_stack.sh
+   ```
+2. In the OCI Console, go to **Resource Manager > Stacks > Create Stack**.
+3. Upload `soc-detection-stack.zip`.
+4. Fill in the form (compartment, log group name, toggle log sources/dashboards).
+5. Click **Plan**, then **Apply**.
+
+The stack creates: 1 Log Analytics log group, 4 streams, 4 Service Connector Hub pipelines, IAM policies, and optionally deploys log sources, dashboards, and test data via Python provisioners.
+
+### Option 2: Terraform CLI
+
+```bash
+cd stack
+terraform init
+terraform plan -var="compartment_id=ocid1.compartment..." -var="tenancy_ocid=ocid1.tenancy..." -var="region=us-ashburn-1"
+terraform apply
+```
+
+### Option 3: Manual (Scripts)
+
 ```bash
 cp .env.local.example .env.local
 # Edit .env.local with your OCI tenancy and compartment OCIDs

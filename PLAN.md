@@ -35,10 +35,18 @@ Enhance the OCI Log Analytics project by creating a comprehensive library of det
 - [x] **Dashboard Widget Fix:** Rewrote saved searches with proper `ui_config`/`scopeFilters` format and embedded in dashboard JSON for `import_dashboard` API.
 - [x] **Documentation:** Updated README.md, STATUS.md, PLAN.md.
 
-## Phase 6: Advanced Features & Automation 🔄
-- [ ] **Remote Rule Sync:** Script to fetch latest rules from `SigmaHQ/sigma` repository.
-- [ ] **Rule Catalog:** Auto-generate a searchable markdown or HTML catalog of all rules.
-- [ ] **CI/CD Integration:** GitHub Actions to validate rules and auto-generate queries on push.
+## Phase 6: Advanced Features & Automation ✅
+- [x] **Remote Rule Sync:** `scripts/sync_sigmahq.py` fetches rules from SigmaHQ repository.
+- [x] **Rule Catalog:** `scripts/generate_catalog.py` generates CATALOG.md and catalog.json.
+- [x] **CI/CD Integration:** `.github/workflows/validate-rules.yml` validates on push/PR.
+
+## Phase 8: OCI Resource Manager Stack ✅
+- [x] **Terraform Stack:** Full ORM-compatible stack in `stack/` directory for one-click deployment.
+- [x] **ORM Schema:** `schema.yaml` renders variable form UI in OCI Console (compartment picker, toggles for log sources/dashboards/test data).
+- [x] **Infrastructure as Code:** Log Analytics log group, 4 streams, 4 SCH connectors, IAM policies — all managed declaratively.
+- [x] **Python Provisioners:** `null_resource` blocks call existing scripts (`setup_log_sources.py`, `deploy_dashboard.py`, `ingest_test_data.py`) with proper dependency ordering.
+- [x] **Build Script:** `build_stack.sh` produces `soc-detection-stack.zip` ready for ORM upload.
+- [x] **Validation:** `terraform init` + `terraform validate` pass cleanly.
 
 ## Rule Organization
 - **Format:** Sigma (YAML) as the source of truth.
@@ -74,3 +82,4 @@ Enhance the OCI Log Analytics project by creating a comprehensive library of det
 4.  Functional SOC Dashboards in OCI. (Achieved: 6 dashboards, 76 saved searches)
 5.  STIG compliance mapping for OCI rules. (Achieved: 15 rules with DoD STIG IDs)
 6.  Cross-project integration with multicloudoperations. (Achieved: export script + manifest)
+7.  One-click deployment via OCI Resource Manager. (Achieved: Terraform stack with ORM schema)

@@ -125,6 +125,18 @@
 - **SigmaHQ Sync Script:** New `scripts/sync_sigmahq.py` clones/updates official SigmaHQ repository, identifies compatible rules (189 Linux, Windows process_creation, cloud), and imports with automatic logsource adaptation.
 - **MITRE Coverage:** 100 techniques across 12 tactics (up from 90).
 
+### OCI Resource Manager Stack (Feb 18, 2026)
+- **Terraform Stack:** Created `stack/` directory with full ORM-compatible Terraform configuration for one-click deployment.
+- **Resources Managed:**
+  - 1 Log Analytics log group (`oci_log_analytics_log_analytics_log_group`)
+  - 4 OCI Streaming streams via `for_each` (`soc-detection-oci-audit`, `soc-detection-cloud-guard`, `soc-detection-linux-audit`, `soc-detection-windows-sysmon`)
+  - 4 Service Connector Hub connectors routing streams to Log Analytics
+  - IAM policies for SCH (stream pull/push + LA upload)
+  - 3 `null_resource` provisioners calling existing Python scripts (log sources, dashboards, test data)
+- **ORM Schema:** `schema.yaml` with variable groups for General, Log Analytics, Streaming, and Provisioning options.
+- **Build Script:** `build_stack.sh` packages all Terraform + project assets into `soc-detection-stack.zip` for ORM upload.
+- **Validation:** `terraform init` and `terraform validate` pass cleanly (OCI provider v8.2.0, null provider v3.2.4).
+
 ## Next Steps
 1. **Multicloud Full Sync:** Deploy OCI STIG rules into multicloudoperations as a shared detection module.
 2. **SigmaHQ Rule Import:** Review and import highest-value rules from 189 available SigmaHQ Linux rules.

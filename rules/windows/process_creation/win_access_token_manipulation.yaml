@@ -1,10 +1,11 @@
 title: Windows Access Token Manipulation
 id: a1b2c3d4-6020-4000-8000-000000000020
 status: stable
-description: >
-  Detects access token manipulation techniques used for privilege escalation.
-  Attackers steal or forge tokens to impersonate other users, especially
-  SYSTEM or domain admin, without needing their credentials.
+description: 'Detects access token manipulation techniques used for privilege escalation.
+  Attackers steal or forge tokens to impersonate other users, especially SYSTEM or
+  domain admin, without needing their credentials.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -40,3 +41,4 @@ tags:
 falsepositives:
 - Security assessment tools
 - Authorized penetration testing
+version: 1

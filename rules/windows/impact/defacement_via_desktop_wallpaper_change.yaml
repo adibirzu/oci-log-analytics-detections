@@ -1,0 +1,22 @@
+title: Defacement via Desktop Wallpaper Change
+id: 014caac1-79d2-4eaa-ad2d-2a5fb1bc2190
+status: stable
+description: Detects commands changing the desktop wallpaper, which may indicate ransomware
+  defacement.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - Wallpaper
+    - reg
+    - add
+  condition: selection
+level: medium
+tags:
+- attack.impact
+- attack.t1491.001
+falsepositives:
+- Group Policy wallpaper deployment
+version: 1

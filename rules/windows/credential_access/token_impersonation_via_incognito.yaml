@@ -1,0 +1,22 @@
+title: Token Impersonation via Incognito
+id: fd438170-b7bc-456f-882c-00aaefa36226
+status: stable
+description: Detects usage of Incognito or similar tools for Windows access token
+  manipulation and impersonation.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - incognito
+    - list_tokens
+    - impersonate_token
+  condition: selection
+level: high
+tags:
+- attack.credential_access
+- attack.t1134
+falsepositives:
+- Authorized security testing
+version: 1

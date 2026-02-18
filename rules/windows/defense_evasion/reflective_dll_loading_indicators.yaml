@@ -1,0 +1,22 @@
+title: Reflective DLL Loading Indicators
+id: a31a29fc-e8ee-4a26-b7fb-7ca3da17e2c0
+status: stable
+description: Detects indicators of reflective DLL loading where DLLs are loaded from
+  memory without touching disk.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - ReflectiveLoader
+    - Invoke-ReflectivePEInjection
+    - sRDI
+  condition: selection
+level: critical
+tags:
+- attack.defense_evasion
+- attack.t1620
+falsepositives:
+- Security research tools
+version: 1

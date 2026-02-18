@@ -137,6 +137,17 @@ def generate_markdown(queries, hunting):
             w(f"| {SEVERITY_EMOJI.get(s, '')} {s.title()} | {severities[s]} |")
     w("")
 
+    # ART Coverage
+    testable = [q for q in queries
+                if q.get("logsource", {}).get("product") in ("windows", "linux")]
+    with_art = [q for q in testable if q.get("atomic_red_team", {}).get("has_tests")]
+    if testable:
+        art_pct = len(with_art) / len(testable) * 100
+        total_tests = sum(q.get("atomic_red_team", {}).get("test_count", 0) for q in testable)
+        w(f"**Atomic Red Team Coverage:** {len(with_art)}/{len(testable)} testable rules "
+          f"have ART tests ({art_pct:.0f}%) | {total_tests} total test mappings")
+        w("")
+
     # STIG
     stig_rules = [q for q in queries if q.get("stig_ids")]
     if stig_rules:
@@ -190,8 +201,13 @@ def generate_markdown(queries, hunting):
         display = PLATFORM_DISPLAY.get(platform, platform)
         w(f"### {display} ({len(plat_rules)} rules)")
         w("")
-        w("| # | Title | Severity | MITRE | STIG |")
-        w("|---|-------|----------|-------|------|")
+        has_art = platform in ("windows", "linux")
+        if has_art:
+            w("| # | Title | Severity | MITRE | ART Tests | STIG |")
+            w("|---|-------|----------|-------|-----------|------|")
+        else:
+            w("| # | Title | Severity | MITRE | STIG |")
+            w("|---|-------|----------|-------|------|")
 
         # Sort by severity then title
         def sev_key(q):
@@ -207,7 +223,12 @@ def generate_markdown(queries, hunting):
             emoji = SEVERITY_EMOJI.get(level, "")
             techniques = ", ".join(q.get("mitre_attack", {}).get("techniques", [])) or "-"
             stig = ", ".join(q.get("stig_ids", [])) or "-"
-            w(f"| {i} | {title} | {emoji} {level} | {techniques} | {stig} |")
+            if has_art:
+                art_count = q.get("atomic_red_team", {}).get("test_count", 0)
+                art_str = str(art_count) if art_count else "-"
+                w(f"| {i} | {title} | {emoji} {level} | {techniques} | {art_str} | {stig} |")
+            else:
+                w(f"| {i} | {title} | {emoji} {level} | {techniques} | {stig} |")
         w("")
 
     # --- Hunting Queries ---
@@ -302,6 +323,18 @@ def generate_json_catalog(queries, hunting):
     catalog["mitre_techniques"] = sorted(techniques)
     catalog["mitre_tactics"] = sorted(tactics)
     catalog["stig_controls"] = sorted(stig_controls)
+
+    # ART coverage stats
+    testable = [q for q in queries
+                if q.get("logsource", {}).get("product") in ("windows", "linux")]
+    with_art = [q for q in testable if q.get("atomic_red_team", {}).get("has_tests")]
+    total_tests = sum(q.get("atomic_red_team", {}).get("test_count", 0) for q in testable)
+    catalog["art_coverage"] = {
+        "testable_rules": len(testable),
+        "rules_with_tests": len(with_art),
+        "coverage_percent": round(len(with_art) / len(testable) * 100, 1) if testable else 0,
+        "total_test_mappings": total_tests,
+    }
 
     return catalog
 

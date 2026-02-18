@@ -144,6 +144,7 @@ def adapt_rule_for_oci(rule, category):
     """Adapt a SigmaHQ rule for OCI Log Analytics compatibility.
 
     Adjusts the logsource mapping to match our project's conventions.
+    Preserves original service for Windows Security/System event rules.
     """
     logsource = rule.get("logsource", {})
 
@@ -153,14 +154,20 @@ def adapt_rule_for_oci(rule, category):
             logsource["service"] = "syslog"
     elif category == "windows":
         logsource["product"] = "windows"
-        if not logsource.get("service"):
+        # Preserve original service if it's security or system (not sysmon)
+        original_service = logsource.get("service", "")
+        if original_service in ("security", "system"):
+            pass  # keep original service
+        elif not original_service:
             logsource["service"] = "sysmon"
-        logsource["category"] = "process_creation"
+        if not logsource.get("category"):
+            logsource["category"] = "process_creation"
     elif category == "cloud":
-        # Only adapt if it's not already OCI
-        if logsource.get("product") != "oci":
-            logsource["product"] = "oci"
-            logsource["service"] = "audit"
+        # Only import OCI-native cloud rules; skip AWS/Azure/GCP
+        # (Phase 4 handles CSP mapping with proper OCI equivalents)
+        if logsource.get("product") not in ("oci",):
+            return None  # signal to skip this rule
+        logsource["service"] = "audit"
 
     rule["logsource"] = logsource
     return rule
@@ -224,6 +231,8 @@ def import_rule(rule, category, dry_run=False):
 
     # Adapt for OCI LA
     adapted = adapt_rule_for_oci(rule.copy(), category)
+    if adapted is None:
+        return None  # non-OCI cloud rule, skip
 
     # Remove internal keys
     adapted.pop("_source_path", None)

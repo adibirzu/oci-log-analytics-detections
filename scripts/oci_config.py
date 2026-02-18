@@ -4,7 +4,7 @@ Centralized OCI configuration, client factories, and validation for SOC detectio
 Config resolution order (highest priority first):
   1. Environment variables (OCI_TENANCY_ID, OCI_COMPARTMENT_ID, etc.)
   2. .env.local file in project root
-  3. Hardcoded defaults below
+  3. Empty string (no hardcoded defaults — use require_oci_config() to guard API calls)
 
 Client factories defer `import oci` so offline scripts (convert_sigma.py,
 generate_test_logs.py) can import constants without requiring the OCI SDK.
@@ -47,17 +47,17 @@ def _cfg(env_key, default):
 
 # ─── Configuration constants ──────────────────────────────────
 
-TENANCY_ID = (
-    _cfg("OCI_TENANCY_ID", "")
-    or _cfg("OCI_TENANCY_OCID", "")
-    or "ocid1.tenancy.oc1..aaaaaaaaxzpxbcag7zgamh2erlggqro3y63tvm2rbkkjz4z2zskvagupiz7a"
-)
-COMPARTMENT_ID = _cfg(
-    "OCI_COMPARTMENT_ID",
-    "ocid1.compartment.oc1..aaaaaaaaghzlt3b6zl3nb7fsyh4nuiuzsuh4zzghfxmtfvvk4byylbvh56ba",
+TENANCY_ID = _cfg("OCI_TENANCY_ID", "") or _cfg("OCI_TENANCY_OCID", "")
+COMPARTMENT_ID = (
+    _cfg("OCI_COMPARTMENT_ID", "")
+    or _cfg("COMP_OBSERVABILITY", "")  # fallback: set by OCI-DEMO provisioning
 )
 OCI_PROFILE = _cfg("OCI_PROFILE", "") or _cfg("OCI_CONFIG_PROFILE", "DEFAULT")
 OCI_REGION = _cfg("OCI_REGION", "")
+
+# Log Analytics identifiers — honour values set by upstream provisioning (OCI-DEMO)
+LOG_GROUP_ID = _cfg("LOG_ANALYTICS_LOG_GROUP_ID", "") or _cfg("LA_LOG_GROUP_ID", "")
+LA_NAMESPACE = _cfg("LA_NAMESPACE", "")
 
 QUERIES_DIR = os.path.join(PROJECT_DIR, 'queries')
 HUNTING_DIR = os.path.join(QUERIES_DIR, 'hunting')
@@ -123,6 +123,25 @@ TEST_DATA_FILES = [
 ]
 
 
+def require_oci_config():
+    """Verify that essential OCI identifiers are set. Call before any API access.
+
+    Raises SystemExit with a descriptive message if TENANCY_ID or COMPARTMENT_ID
+    is empty.  NOT called at import time so offline scripts still work.
+    """
+    missing = []
+    if not TENANCY_ID:
+        missing.append("TENANCY_ID (set OCI_TENANCY_ID or OCI_TENANCY_OCID)")
+    if not COMPARTMENT_ID:
+        missing.append("COMPARTMENT_ID (set OCI_COMPARTMENT_ID or COMP_OBSERVABILITY)")
+    if missing:
+        print("ERROR: Required OCI configuration is missing:")
+        for m in missing:
+            print(f"  - {m}")
+        print("\nSet these in .env.local or as environment variables.")
+        sys.exit(1)
+
+
 # ─── OCI client factories (deferred import) ──────────────────
 
 def get_oci_config():
@@ -164,7 +183,10 @@ def get_sch_client():
 # ─── Shared utilities ─────────────────────────────────────────
 
 def get_namespace(la_client):
-    """Discover the Log Analytics namespace for this tenancy."""
+    """Return the Log Analytics namespace, using LA_NAMESPACE env var if set."""
+    if LA_NAMESPACE:
+        print(f"  Namespace (from env): {LA_NAMESPACE}")
+        return LA_NAMESPACE
     namespaces = la_client.list_namespaces(compartment_id=TENANCY_ID).data
     if not namespaces.items:
         print("ERROR: No Log Analytics namespace found. Is Log Analytics enabled?")
@@ -175,8 +197,29 @@ def get_namespace(la_client):
 
 
 def ensure_log_group(la_client, namespace):
-    """Find or create the SOC detection test log group."""
+    """Find or create the SOC detection test log group.
+
+    Resolution priority:
+      1. LOG_GROUP_ID env var — verify it exists via API
+      2. Search by LOG_GROUP_NAME in the compartment
+      3. Create a new log group
+    """
     import oci
+
+    # Priority 1: use LOG_GROUP_ID from env if set
+    if LOG_GROUP_ID:
+        try:
+            lg = la_client.get_log_analytics_log_group(
+                namespace_name=namespace,
+                log_analytics_log_group_id=LOG_GROUP_ID,
+            ).data
+            print(f"  Log Group (from env): {lg.display_name} ({lg.id})")
+            return lg.id
+        except oci.exceptions.ServiceError as e:
+            print(f"  WARNING: LOG_GROUP_ID from env not accessible ({e.status}): {LOG_GROUP_ID}")
+            print("  Falling back to name-based search...")
+
+    # Priority 2: search by name
     existing = la_client.list_log_analytics_log_groups(
         namespace_name=namespace,
         compartment_id=COMPARTMENT_ID,
@@ -185,8 +228,13 @@ def ensure_log_group(la_client, namespace):
     for lg in existing:
         if lg.display_name == LOG_GROUP_NAME:
             print(f"  Log Group exists: {lg.display_name} ({lg.id})")
+            if LOG_GROUP_ID and lg.id != LOG_GROUP_ID:
+                print(f"  WARNING: Found log group differs from LOG_GROUP_ID env var!")
+                print(f"    env:   {LOG_GROUP_ID}")
+                print(f"    found: {lg.id}")
             return lg.id
 
+    # Priority 3: create new
     print(f"  Creating Log Group: {LOG_GROUP_NAME}")
     details = oci.log_analytics.models.CreateLogAnalyticsLogGroupDetails(
         display_name=LOG_GROUP_NAME,
@@ -241,10 +289,15 @@ _OCID_RE = re.compile(
 
 
 def validate_ocid_format():
-    """Check that TENANCY_ID and COMPARTMENT_ID look like valid OCIDs."""
+    """Check that TENANCY_ID, COMPARTMENT_ID, and LOG_GROUP_ID look like valid OCIDs."""
     results = []
-    for name, value in [("TENANCY_ID", TENANCY_ID), ("COMPARTMENT_ID", COMPARTMENT_ID)]:
-        if _OCID_RE.match(value):
+    checks = [("TENANCY_ID", TENANCY_ID), ("COMPARTMENT_ID", COMPARTMENT_ID)]
+    if LOG_GROUP_ID:
+        checks.append(("LOG_GROUP_ID", LOG_GROUP_ID))
+    for name, value in checks:
+        if not value:
+            results.append((name, False, "not set"))
+        elif _OCID_RE.match(value):
             results.append((name, True, value[:40] + "..."))
         else:
             results.append((name, False, f"invalid format: {value[:50]}"))
@@ -356,6 +409,123 @@ def validate_test_data():
     return results
 
 
+def validate_log_group():
+    """Check that the target log group is accessible (online)."""
+    if not LOG_GROUP_ID:
+        return [("Log Group", False, "LOG_ANALYTICS_LOG_GROUP_ID / LA_LOG_GROUP_ID not set")]
+    try:
+        la_client = get_la_client()
+        ns = get_namespace.__wrapped__(la_client) if hasattr(get_namespace, '__wrapped__') else (
+            LA_NAMESPACE or la_client.list_namespaces(compartment_id=TENANCY_ID).data.items[0].namespace_name
+        )
+        lg = la_client.get_log_analytics_log_group(
+            namespace_name=ns,
+            log_analytics_log_group_id=LOG_GROUP_ID,
+        ).data
+        return [("Log Group", True, f"{lg.display_name} ({LOG_GROUP_ID[:40]}...)")]
+    except Exception as e:
+        return [("Log Group", False, f"{LOG_GROUP_ID[:40]}... — {str(e)[:60]}")]
+
+
+def validate_streams():
+    """Check that the 4 SOC detection streams are ACTIVE (online)."""
+    expected_names = [
+        "soc-detection-oci-audit",
+        "soc-detection-cloud-guard",
+        "soc-detection-linux-audit",
+        "soc-detection-windows-sysmon",
+    ]
+    try:
+        stream_admin = get_streaming_admin_client()
+        results = []
+        for name in expected_names:
+            streams = stream_admin.list_streams(
+                compartment_id=COMPARTMENT_ID, name=name, lifecycle_state="ACTIVE"
+            ).data
+            if streams:
+                results.append((name, True, f"ACTIVE ({streams[0].id[:40]}...)"))
+            else:
+                results.append((name, False, "not found or not ACTIVE"))
+        return results
+    except Exception as e:
+        return [("Streams", False, str(e)[:100])]
+
+
+def validate_service_connectors():
+    """Check that the 4 SCH connectors are ACTIVE (online)."""
+    expected_prefixes = [
+        "sch-soc-detection-oci-audit-to-la",
+        "sch-soc-detection-cloud-guard-to-la",
+        "sch-soc-detection-linux-audit-to-la",
+        "sch-soc-detection-windows-sysmon-to-la",
+    ]
+    try:
+        sch = get_sch_client()
+        results = []
+        for name in expected_prefixes:
+            connectors = sch.list_service_connectors(
+                compartment_id=COMPARTMENT_ID, display_name=name
+            ).data.items
+            active = [c for c in connectors if getattr(c, "lifecycle_state", "") == "ACTIVE"]
+            if active:
+                results.append((name, True, f"ACTIVE ({active[0].id[:40]}...)"))
+            else:
+                results.append((name, False, "not found or not ACTIVE"))
+        return results
+    except Exception as e:
+        return [("Service Connectors", False, str(e)[:100])]
+
+
+def validate_streaming_config():
+    """Check consistency between streaming_config.json and env vars (offline)."""
+    import json
+    config_path = os.path.join(PROJECT_DIR, 'config', 'streaming_config.json')
+    if not os.path.exists(config_path):
+        return [("streaming_config.json", False, "file not found")]
+
+    try:
+        with open(config_path) as f:
+            cfg = json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        return [("streaming_config.json", False, str(e)[:80])]
+
+    results = []
+    meta = cfg.get("_metadata", {})
+
+    # Check log group ID consistency
+    cfg_lg = meta.get("log_group_id", "")
+    if LOG_GROUP_ID and cfg_lg and cfg_lg != LOG_GROUP_ID:
+        results.append(("log_group_id", False,
+                         f"MISMATCH: config={cfg_lg[-12:]} vs env={LOG_GROUP_ID[-12:]}"))
+    elif cfg_lg:
+        results.append(("log_group_id", True, f"...{cfg_lg[-12:]}"))
+    else:
+        results.append(("log_group_id", False, "not set in config"))
+
+    # Check compartment consistency
+    cfg_comp = meta.get("compartment_id", "")
+    if COMPARTMENT_ID and cfg_comp and cfg_comp != COMPARTMENT_ID:
+        results.append(("compartment_id", False,
+                         f"MISMATCH: config={cfg_comp[-12:]} vs env={COMPARTMENT_ID[-12:]}"))
+    elif cfg_comp:
+        results.append(("compartment_id", True, f"...{cfg_comp[-12:]}"))
+
+    # Check namespace consistency
+    cfg_ns = meta.get("la_namespace", "")
+    if LA_NAMESPACE and cfg_ns and cfg_ns != LA_NAMESPACE:
+        results.append(("la_namespace", False,
+                         f"MISMATCH: config={cfg_ns} vs env={LA_NAMESPACE}"))
+    elif cfg_ns:
+        results.append(("la_namespace", True, cfg_ns))
+
+    # Check stream entries
+    stream_count = sum(1 for k in cfg if k != "_metadata")
+    results.append(("streams", True if stream_count >= 4 else False,
+                     f"{stream_count} stream(s) configured"))
+
+    return results
+
+
 # ─── Validation orchestrator ──────────────────────────────────
 
 _VALIDATORS = {
@@ -366,6 +536,10 @@ _VALIDATORS = {
     'query_files': ('Query Files', validate_query_files),
     'log_sources': ('Log Sources', validate_log_sources),
     'test_data': ('Test Data', validate_test_data),
+    'log_group': ('Log Group', validate_log_group),
+    'streams': ('Streams', validate_streams),
+    'service_connectors': ('Service Connectors', validate_service_connectors),
+    'streaming_config': ('Streaming Config', validate_streaming_config),
 }
 
 

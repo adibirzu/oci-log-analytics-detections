@@ -1,0 +1,22 @@
+title: Service Permissions Weakness Discovery
+id: 0c0ce680-f1d4-4ca3-bc38-10170e5f7f8e
+status: stable
+description: Detects tools checking for weak service permissions that allow privilege
+  escalation.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - accesschk
+    - sc sdshow
+    - Get-ServiceAcl
+  condition: selection
+level: medium
+tags:
+- attack.privilege_escalation
+- attack.t1574.011
+falsepositives:
+- Security auditing
+version: 1

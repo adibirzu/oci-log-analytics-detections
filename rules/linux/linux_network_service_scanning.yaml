@@ -1,10 +1,11 @@
 title: Linux Network Service Scanning
 id: a1b2c3d4-6001-4000-8000-000000000001
 status: stable
-description: >
-  Detects network scanning tools (nmap, masscan, zmap) used for host and service
-  discovery. Attackers use these tools during the discovery phase to map network
+description: 'Detects network scanning tools (nmap, masscan, zmap) used for host and
+  service discovery. Attackers use these tools during the discovery phase to map network
   topology and identify vulnerable services.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -31,3 +32,4 @@ tags:
 falsepositives:
 - Authorized vulnerability scanning
 - Network monitoring tools
+version: 1

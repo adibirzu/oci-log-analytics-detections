@@ -1,0 +1,21 @@
+title: Parent PID Spoofing
+id: f7b73317-0177-4f69-829c-ebf338ce3ac7
+status: stable
+description: Detects indicators of Parent PID spoofing, where a process fakes its
+  parent for evasion.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - PROC_THREAD_ATTRIBUTE_PARENT_PROCESS
+    - ppid
+  condition: selection
+level: high
+tags:
+- attack.privilege_escalation
+- attack.t1134.004
+falsepositives:
+- Security testing tools
+version: 1

@@ -1,0 +1,23 @@
+title: Windows Script Host Execution from Temp
+id: 0f7c1fa1-2983-4c83-8ebd-eb9a475a8e18
+status: stable
+description: Detects cscript or wscript executing scripts from temporary directories.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \cscript.exe
+    - \wscript.exe
+    CommandLine|contains:
+    - \Temp\
+    - \tmp\
+  condition: selection
+level: high
+tags:
+- attack.execution
+- attack.t1059.005
+falsepositives:
+- Legitimate scripts running from temp during installations
+version: 1

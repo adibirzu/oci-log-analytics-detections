@@ -1,0 +1,23 @@
+title: Windows Admin Share Access via Net Use
+id: a810df3e-0caf-4546-a72c-84e415f5efe7
+status: stable
+description: Detects access to admin shares (C$, ADMIN$, IPC$) for lateral movement.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \net.exe
+    - \net1.exe
+    CommandLine|contains:
+    - \\
+    - $
+  condition: selection
+level: medium
+tags:
+- attack.lateral_movement
+- attack.t1021.002
+falsepositives:
+- Network file sharing by administrators
+version: 1

@@ -1,10 +1,11 @@
 title: Windows Keylogger Indicators
 id: a1b2c3d4-6013-4000-8000-000000000013
 status: stable
-description: >
-  Detects indicators of keylogging activity. Attackers deploy keyloggers to
-  capture credentials, sensitive data, and user activity. Detects common keylogger
+description: 'Detects indicators of keylogging activity. Attackers deploy keyloggers
+  to capture credentials, sensitive data, and user activity. Detects common keylogger
   tools, SetWindowsHookEx API calls, and suspicious input recording patterns.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -33,3 +34,4 @@ tags:
 falsepositives:
 - Accessibility software
 - Input monitoring for compliance
+version: 1

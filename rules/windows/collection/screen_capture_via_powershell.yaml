@@ -1,0 +1,22 @@
+title: Screen Capture via PowerShell
+id: 2ae6d2f4-69c3-4bf6-931a-a7569d717e67
+status: stable
+description: Detects PowerShell commands capturing screenshots using .NET classes.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - CopyFromScreen
+    - Drawing.Bitmap
+    - screenshot
+  condition: selection
+level: high
+tags:
+- attack.collection
+- attack.t1113
+falsepositives:
+- Legitimate screenshot utilities
+- Automated testing tools
+version: 1

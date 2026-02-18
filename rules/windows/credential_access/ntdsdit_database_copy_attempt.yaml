@@ -1,0 +1,23 @@
+title: NTDS.dit Database Copy Attempt
+id: e0910e9e-f01e-40c1-9055-d3bc0f403125
+status: stable
+description: Detects attempts to copy the NTDS.dit Active Directory database file
+  using ntdsutil, vssadmin, or esentutl.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_ntdsutil:
+    Image|endswith: \ntdsutil.exe
+    CommandLine|contains: ifm
+  selection_esentutl:
+    Image|endswith: \esentutl.exe
+    CommandLine|contains: ntds
+  condition: 1 of selection*
+level: critical
+tags:
+- attack.credential_access
+- attack.t1003.003
+falsepositives:
+- Legitimate AD backup by domain administrators
+version: 1

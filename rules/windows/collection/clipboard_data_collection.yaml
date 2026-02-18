@@ -1,0 +1,23 @@
+title: Clipboard Data Collection
+id: 7632906d-bf61-4f10-8f17-25760ada1784
+status: stable
+description: Detects PowerShell or command-line access to clipboard data for credential
+  or data theft.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - Get-Clipboard
+    - clip.exe
+    - powershell.*clipboard
+  condition: selection
+level: medium
+tags:
+- attack.collection
+- attack.t1115
+falsepositives:
+- Clipboard managers
+- Automation scripts
+version: 1

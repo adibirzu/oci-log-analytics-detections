@@ -27,5 +27,8 @@
   },
   "stig_ids": [
     "IA-5"
+  ],
+  "falsepositives": [
+    "Authorized Docker registry or API access setup"
   ]
 }

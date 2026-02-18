@@ -1,0 +1,20 @@
+title: ScreenSaver Hijacking Persistence
+id: 60537cd1-5951-4e75-8f68-a56ddde649ff
+status: stable
+description: Detects modification of screensaver registry settings for persistence.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - SCRNSAVE.EXE
+    - reg
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1546.002
+falsepositives:
+- Legitimate screensaver configuration
+version: 1

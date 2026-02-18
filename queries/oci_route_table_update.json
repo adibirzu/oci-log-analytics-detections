@@ -6,13 +6,18 @@
   "level": "medium",
   "stig_category": "CAT II",
   "tags": [
-    "attack.persistence"
+    "attack.persistence",
+    "attack.defense_evasion",
+    "attack.t1562.007"
   ],
   "mitre_attack": {
     "tactics": [
-      "persistence"
+      "persistence",
+      "defense_evasion"
     ],
-    "techniques": []
+    "techniques": [
+      "T1562.007"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -20,5 +25,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Network infrastructure changes during maintenance windows",
+    "Automated IaC deployments"
+  ]
 }

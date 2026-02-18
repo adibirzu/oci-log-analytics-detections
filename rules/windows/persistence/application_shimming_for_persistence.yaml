@@ -1,0 +1,18 @@
+title: Application Shimming for Persistence
+id: d1ddde6e-fc36-494e-b9c6-30430981156f
+status: stable
+description: Detects creation of application compatibility shims using sdbinst.exe.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \sdbinst.exe
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1546.011
+falsepositives:
+- Legitimate application compatibility fixes
+version: 1

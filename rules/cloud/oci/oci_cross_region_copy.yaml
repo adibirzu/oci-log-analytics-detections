@@ -1,7 +1,8 @@
 title: OCI Cross-Region Data Copy
 id: d1a2b3c4-1010-4000-8000-000000000010
 status: stable
-description: Detects cross-region copy operations for boot volumes, block volumes, or object storage buckets. This could indicate data staging for exfiltration to a region outside organizational control.
+description: Detects cross-region copy operations for boot volumes, block volumes, or object storage buckets. This could indicate
+  data staging for exfiltration to a region outside organizational control.
 logsource:
   product: oci
   service: audit
@@ -18,3 +19,7 @@ tags:
 - attack.exfiltration
 - attack.t1537
 - stig.SC-28
+version: 1
+falsepositives:
+- Planned disaster recovery operations
+- Automated backup replication

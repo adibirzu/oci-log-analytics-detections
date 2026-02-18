@@ -1,0 +1,19 @@
+title: SyncAppvPublishingServer Abuse
+id: 4aa766aa-722c-46f7-aae9-f499375da0f1
+status: stable
+description: Detects abuse of SyncAppvPublishingServer.exe for code execution through
+  PowerShell.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \SyncAppvPublishingServer.exe
+  condition: selection
+level: high
+tags:
+- attack.execution
+- attack.t1218
+falsepositives:
+- Legitimate App-V publishing operations
+version: 1

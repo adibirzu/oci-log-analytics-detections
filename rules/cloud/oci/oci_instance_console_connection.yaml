@@ -1,7 +1,8 @@
 title: OCI Instance Console Connection Created
 id: e1f2a3b4-4004-4000-8000-000000000004
 status: stable
-description: Detects creation of serial or VNC console connections to compute instances. Console connections bypass network controls and may indicate unauthorized access.
+description: Detects creation of serial or VNC console connections to compute instances.
+  Console connections bypass network controls and may indicate unauthorized access.
 logsource:
   product: oci
   service: audit
@@ -17,3 +18,4 @@ tags:
 falsepositives:
 - Troubleshooting instances with network connectivity issues
 - Emergency break-glass procedures
+version: 1

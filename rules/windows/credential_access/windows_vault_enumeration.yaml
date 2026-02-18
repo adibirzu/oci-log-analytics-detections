@@ -1,0 +1,23 @@
+title: Windows Vault Enumeration
+id: 99dee989-fe2b-4097-8838-f1c2f43f1f36
+status: stable
+description: Detects enumeration of Windows Vault credentials using cmdkey or rundll32
+  with keymgr.dll.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_cmdkey:
+    Image|endswith: \cmdkey.exe
+    CommandLine|contains: /list
+  selection_keymgr:
+    Image|endswith: \rundll32.exe
+    CommandLine|contains: keymgr.dll
+  condition: 1 of selection*
+level: medium
+tags:
+- attack.credential_access
+- attack.t1555
+falsepositives:
+- IT administration scripts
+version: 1

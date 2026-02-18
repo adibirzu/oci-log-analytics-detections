@@ -1,0 +1,22 @@
+title: BloodHound AD Enumeration
+id: a06ab772-724c-4ac4-adcb-bd84a9b055da
+status: stable
+description: Detects execution of BloodHound or SharpHound for Active Directory reconnaissance.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - SharpHound
+    - BloodHound
+    - Invoke-BloodHound
+    - azurehound
+  condition: selection
+level: critical
+tags:
+- attack.discovery
+- attack.t1087.002
+falsepositives:
+- Authorized AD security assessments
+version: 1

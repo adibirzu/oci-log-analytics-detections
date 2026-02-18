@@ -13,3 +13,8 @@ detection:
 level: high
 tags:
 - attack.exfiltration
+- attack.t1537
+version: 1
+falsepositives:
+- Routine storage operations by authorized administrators
+- Automated backup or archival processes

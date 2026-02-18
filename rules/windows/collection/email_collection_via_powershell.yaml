@@ -1,0 +1,23 @@
+title: Email Collection via PowerShell
+id: 45994aca-9e84-4d45-98db-972a1b77bd25
+status: stable
+description: Detects PowerShell commands accessing Outlook COM objects or .pst files
+  for email collection.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - Outlook.Application
+    - .pst
+    - Get-ChildItem.*\.msg
+  condition: selection
+level: high
+tags:
+- attack.collection
+- attack.t1114
+falsepositives:
+- Email backup scripts
+- E-discovery tools
+version: 1

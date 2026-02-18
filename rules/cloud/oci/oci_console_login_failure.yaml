@@ -14,3 +14,7 @@ level: medium
 tags:
 - attack.initial_access
 - attack.t1078
+version: 1
+falsepositives:
+- Users with expired passwords or MFA issues
+- Scheduled password rotation

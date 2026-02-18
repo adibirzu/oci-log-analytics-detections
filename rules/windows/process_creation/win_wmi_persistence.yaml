@@ -1,25 +1,29 @@
 title: Windows WMI Event Subscription Persistence
 id: d1a2b3c4-3003-4000-8000-000000000003
 status: stable
-description: Detects creation of WMI event subscriptions for persistence, allowing attackers to execute code triggered by system events.
+description: Detects creation of WMI event subscriptions for persistence, allowing attackers to execute code triggered by
+  system events.
 logsource:
   product: windows
   service: process_creation
 detection:
   sel_wmic:
     CommandLine|contains:
-    - '__EventFilter'
-    - '__EventConsumer'
-    - '__FilterToConsumerBinding'
-    - 'ActiveScriptEventConsumer'
-    - 'CommandLineEventConsumer'
+    - __EventFilter
+    - __EventConsumer
+    - __FilterToConsumerBinding
+    - ActiveScriptEventConsumer
+    - CommandLineEventConsumer
   sel_powershell:
     CommandLine|contains:
     - Set-WmiInstance
     - Register-WmiEvent
-    - 'New-CimInstance -ClassName __'
+    - New-CimInstance -ClassName __
   condition: sel_wmic or sel_powershell
 level: high
 tags:
 - attack.persistence
 - attack.t1546.003
+version: 1
+falsepositives:
+- Legitimate WMI usage by management tools

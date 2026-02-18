@@ -1,0 +1,22 @@
+title: Disable Windows Firewall via Netsh
+id: 63e2dcf3-3530-4837-9f3f-0b62acfd07dd
+status: stable
+description: Detects commands to disable the Windows firewall using netsh, enabling
+  network-based attacks.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \netsh.exe
+    CommandLine|contains|all:
+    - firewall
+    - disable
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1562.004
+falsepositives:
+- Network troubleshooting by administrators
+version: 1

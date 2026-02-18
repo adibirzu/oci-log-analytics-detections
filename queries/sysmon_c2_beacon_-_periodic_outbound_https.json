@@ -31,5 +31,47 @@
   "falsepositives": [
     "Legitimate software update processes",
     "System management tools"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 4,
+    "techniques_with_tests": [
+      "T1071.001",
+      "T1573"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1071.001",
+        "test_name": "Malicious User Agents - Powershell",
+        "test_guid": "81c13829-f6c9-45b8-85a6-053366d55297",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1071.001/T1071.001.md"
+      },
+      {
+        "technique_id": "T1071.001",
+        "test_name": "Malicious User Agents - CMD",
+        "test_guid": "dc3488b0-08c7-4fea-b585-905c83b48180",
+        "executor": "command_prompt",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1071.001/T1071.001.md"
+      },
+      {
+        "technique_id": "T1071.001",
+        "test_name": "Malicious User Agents - Nix",
+        "test_guid": "2d7c471a-e887-4b78-b0dc-b0df1f2e0658",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1071.001/T1071.001.md"
+      },
+      {
+        "technique_id": "T1573",
+        "test_name": "OpenSSL C2",
+        "test_guid": "21caf58e-87ad-440c-a6b8-3ac259964003",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1573/T1573.md"
+      }
+    ]
+  }
 }

@@ -1,7 +1,8 @@
 title: Linux Suspicious Download to /tmp
 id: e1f2a3b4-4010-4000-8000-000000000010
 status: stable
-description: Detects file downloads to /tmp directory using common tools. Attackers frequently stage payloads in /tmp as it is world-writable.
+description: Detects file downloads to /tmp directory using common tools. Attackers
+  frequently stage payloads in /tmp as it is world-writable.
 logsource:
   product: linux
   service: audit
@@ -23,3 +24,4 @@ tags:
 falsepositives:
 - Package managers downloading to temporary locations
 - Legitimate admin scripts
+version: 1

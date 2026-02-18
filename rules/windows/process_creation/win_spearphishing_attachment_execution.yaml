@@ -1,10 +1,11 @@
 title: Windows Spearphishing Attachment Execution
 id: a1b2c3d4-6009-4000-8000-000000000009
 status: stable
-description: >
-  Detects suspicious child processes spawned by Microsoft Office applications,
-  indicating potential macro-based spearphishing payload execution. Office
-  documents should not spawn cmd.exe, powershell.exe, or scripting engines.
+description: 'Detects suspicious child processes spawned by Microsoft Office applications,
+  indicating potential macro-based spearphishing payload execution. Office documents
+  should not spawn cmd.exe, powershell.exe, or scripting engines.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -39,3 +40,4 @@ tags:
 falsepositives:
 - Legitimate Office add-ins that spawn processes
 - Office macros for approved business automation
+version: 1

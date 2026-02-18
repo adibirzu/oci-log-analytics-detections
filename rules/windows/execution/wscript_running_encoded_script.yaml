@@ -1,0 +1,26 @@
+title: Wscript Running Encoded Script
+id: 42042c55-0db5-46ba-8d80-e308d8320420
+status: stable
+description: Detects execution of encoded VBScript or JScript files (.vbe, .jse) via
+  wscript.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \wscript.exe
+    - \cscript.exe
+    CommandLine|endswith:
+    - .vbe
+    - .jse
+    - .wse
+    - .wsf
+  condition: selection
+level: high
+tags:
+- attack.execution
+- attack.t1059.005
+falsepositives:
+- Legitimate encoded scripts from software vendors
+version: 1

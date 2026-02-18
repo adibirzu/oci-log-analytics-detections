@@ -1,0 +1,21 @@
+title: OCI Boot Volume Backup Created by Non-Admin
+id: 3a50793f-6425-47e2-81e8-5fa7ef983b77
+status: stable
+description: Detects boot volume backup creation which could be used to copy instance
+  data for exfiltration.
+references:
+- https://attack.mitre.org/techniques/T1537/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.computeapi.createbootvolumebackup
+  condition: selection
+level: medium
+tags:
+- attack.exfiltration
+- attack.t1537
+falsepositives:
+- Routine backup operations
+version: 1

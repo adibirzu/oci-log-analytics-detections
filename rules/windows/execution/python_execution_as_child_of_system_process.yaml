@@ -1,0 +1,25 @@
+title: Python Execution as Child of System Process
+id: 8261c2a6-2044-469a-81c0-d898624b9cc2
+status: stable
+description: Detects Python being executed as a child of system services or common
+  LOLBins.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \python.exe
+    ParentImage|endswith:
+    - \cmd.exe
+    - \powershell.exe
+    - \services.exe
+    - \svchost.exe
+  condition: selection
+level: medium
+tags:
+- attack.execution
+- attack.t1059.006
+falsepositives:
+- Automated build systems
+- Python-based system services
+version: 1

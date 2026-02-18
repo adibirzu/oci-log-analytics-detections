@@ -27,5 +27,9 @@
   },
   "stig_ids": [
     "SC-7"
+  ],
+  "falsepositives": [
+    "Network infrastructure changes during maintenance windows",
+    "Automated IaC deployments"
   ]
 }

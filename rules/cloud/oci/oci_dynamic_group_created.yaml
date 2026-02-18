@@ -1,7 +1,8 @@
 title: OCI Dynamic Group Created
 id: d1a2b3c4-1003-4000-8000-000000000003
 status: stable
-description: Detects creation of dynamic groups which grant instance principal permissions. Attackers can abuse this for lateral movement from compromised compute instances.
+description: Detects creation of dynamic groups which grant instance principal permissions. Attackers can abuse this for lateral
+  movement from compromised compute instances.
 logsource:
   product: oci
   service: audit
@@ -14,3 +15,7 @@ tags:
 - attack.persistence
 - attack.t1098.001
 - stig.AC-6
+version: 1
+falsepositives:
+- Routine IAM group management
+- Automated provisioning systems

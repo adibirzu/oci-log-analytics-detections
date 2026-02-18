@@ -27,5 +27,9 @@
   },
   "stig_ids": [
     "SC-7"
+  ],
+  "falsepositives": [
+    "Routine policy changes by authorized administrators",
+    "Automated IaC deployments (Terraform, Pulumi)"
   ]
 }

@@ -1,0 +1,19 @@
+title: RDP Session Hijacking via tscon
+id: c739684d-c886-4084-af23-3385ddde9cae
+status: stable
+description: Detects RDP session hijacking using tscon.exe to connect to disconnected
+  sessions.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \tscon.exe
+  condition: selection
+level: high
+tags:
+- attack.lateral_movement
+- attack.t1021.001
+falsepositives:
+- Legitimate session management
+version: 1

@@ -1,0 +1,24 @@
+title: Control Panel Item Execution
+id: 9944ea1f-fbd2-4cf6-a421-92bc209447a4
+status: stable
+description: Detects execution of .cpl files which can be used to execute arbitrary
+  DLLs.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \control.exe
+    CommandLine|endswith: .cpl
+  filter:
+    CommandLine|contains:
+    - \System32\
+    - \SysWOW64\
+  condition: selection and not filter
+level: medium
+tags:
+- attack.execution
+- attack.t1218
+falsepositives:
+- Custom control panel applets
+version: 1

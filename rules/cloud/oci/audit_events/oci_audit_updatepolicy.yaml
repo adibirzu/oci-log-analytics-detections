@@ -12,3 +12,9 @@ detection:
 level: informational
 tags:
 - oci.audit
+- attack.privilege_escalation
+- attack.t1098
+version: 1
+falsepositives:
+- Routine policy changes by authorized administrators
+- Automated IaC deployments (Terraform, Pulumi)

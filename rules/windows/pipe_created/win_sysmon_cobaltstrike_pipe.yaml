@@ -1,10 +1,11 @@
 title: Sysmon Cobalt Strike Named Pipe
 id: a1b2c3d4-7002-4000-8000-000000000001
 status: stable
-description: >
-  Detects named pipe creation matching known Cobalt Strike default patterns.
-  Cobalt Strike uses named pipes for inter-process communication and
-  lateral movement via SMB beacon.
+description: 'Detects named pipe creation matching known Cobalt Strike default patterns.
+  Cobalt Strike uses named pipes for inter-process communication and lateral movement
+  via SMB beacon.
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -36,3 +37,4 @@ tags:
 - attack.t1055
 falsepositives:
 - Some legitimate software may use similar pipe naming patterns
+version: 1

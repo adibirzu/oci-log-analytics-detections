@@ -32,5 +32,71 @@
   "falsepositives": [
     "Authorized penetration testing tools",
     "VPN or proxy for development"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 7,
+    "techniques_with_tests": [
+      "T1090.001",
+      "T1090.003"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1090.003",
+        "test_name": "Psiphon",
+        "test_guid": "14d55ca0-920e-4b44-8425-37eedd72b173",
+        "executor": "powershell",
+        "match_type": "sub_technique",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1090.003/T1090.003.md"
+      },
+      {
+        "technique_id": "T1090.003",
+        "test_name": "Tor Proxy Usage - Windows",
+        "test_guid": "7b9d85e5-c4ce-4434-8060-d3de83595e69",
+        "executor": "powershell",
+        "match_type": "sub_technique",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1090.003/T1090.003.md"
+      },
+      {
+        "technique_id": "T1090.003",
+        "test_name": "Tor Proxy Usage - Debian/Ubuntu/FreeBSD",
+        "test_guid": "5ff9d047-6e9c-4357-b39b-5cf89d9b59c7",
+        "executor": "sh",
+        "match_type": "sub_technique",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1090.003/T1090.003.md"
+      },
+      {
+        "technique_id": "T1090.003",
+        "test_name": "Tor Proxy Usage - MacOS",
+        "test_guid": "12631354-fdbc-4164-92be-402527e748da",
+        "executor": "sh",
+        "match_type": "sub_technique",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1090.003/T1090.003.md"
+      },
+      {
+        "technique_id": "T1090.001",
+        "test_name": "Connection Proxy",
+        "test_guid": "0ac21132-4485-4212-a681-349e8a6637cd",
+        "executor": "sh",
+        "match_type": "sub_technique",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1090.001/T1090.001.md"
+      },
+      {
+        "technique_id": "T1090.001",
+        "test_name": "Connection Proxy for macOS UI",
+        "test_guid": "648d68c1-8bcd-4486-9abe-71c6655b6a2c",
+        "executor": "sh",
+        "match_type": "sub_technique",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1090.001/T1090.001.md"
+      },
+      {
+        "technique_id": "T1090.001",
+        "test_name": "portproxy reg key",
+        "test_guid": "b8223ea9-4be2-44a6-b50a-9657a3d4e72a",
+        "executor": "powershell",
+        "match_type": "sub_technique",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1090.001/T1090.001.md"
+      }
+    ]
+  }
 }

@@ -1,7 +1,9 @@
 title: Windows BITS Job Abuse for Persistence
 id: f1e2d3c4-5015-4000-8000-000000000015
 status: stable
-description: Detects abuse of Background Intelligent Transfer Service (BITS) for persistence or payload download. BITS jobs survive reboots and can notify on completion with arbitrary commands.
+description: Detects abuse of Background Intelligent Transfer Service (BITS) for persistence
+  or payload download. BITS jobs survive reboots and can notify on completion with
+  arbitrary commands.
 logsource:
   product: windows
   service: process_creation
@@ -24,3 +26,4 @@ tags:
 falsepositives:
 - WSUS and SCCM using BITS for updates
 - Legitimate large file downloads
+version: 1

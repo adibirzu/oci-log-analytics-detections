@@ -30,5 +30,11 @@
   "falsepositives": [
     "Network configuration management",
     "Container orchestration updating DNS resolution"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": false,
+    "test_count": 0,
+    "techniques_with_tests": [],
+    "tests": []
+  }
 }

@@ -28,5 +28,38 @@
   },
   "falsepositives": [
     "Legitimate log maintenance during disk space emergencies"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 3,
+    "techniques_with_tests": [
+      "T1070.001"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1070.001",
+        "test_name": "Clear Logs",
+        "test_guid": "e6abb60e-26b8-41da-8aae-0c35174b0967",
+        "executor": "command_prompt",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1070.001/T1070.001.md"
+      },
+      {
+        "technique_id": "T1070.001",
+        "test_name": "Delete System Logs Using Clear-EventLog",
+        "test_guid": "b13e9306-3351-4b4b-a6e8-477358b0b498",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1070.001/T1070.001.md"
+      },
+      {
+        "technique_id": "T1070.001",
+        "test_name": "Clear Event Logs via VBA",
+        "test_guid": "1b682d84-f075-4f93-9a89-8a8de19ffd6e",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1070.001/T1070.001.md"
+      }
+    ]
+  }
 }

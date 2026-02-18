@@ -27,5 +27,8 @@
   },
   "stig_ids": [
     "AU-12"
+  ],
+  "falsepositives": [
+    "Authorized administrator troubleshooting sessions"
   ]
 }

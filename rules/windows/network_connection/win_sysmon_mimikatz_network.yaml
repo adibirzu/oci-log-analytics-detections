@@ -1,9 +1,10 @@
 title: Sysmon Mimikatz Network Activity
 id: a1b2c3d4-7001-4000-8000-000000000010
 status: stable
-description: >
-  Detects network connections from mimikatz or known credential theft
+description: 'Detects network connections from mimikatz or known credential theft
   tools accessing domain controller services (LDAP, Kerberos, SMB).
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -34,3 +35,4 @@ tags:
 falsepositives:
 - Authorized penetration testing
 - Security assessment tools
+version: 1

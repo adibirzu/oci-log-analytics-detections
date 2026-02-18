@@ -1,0 +1,23 @@
+title: Port Monitor DLL Persistence
+id: 27dc99d0-bfbd-46f8-9174-f5dedf14a2d6
+status: stable
+description: Detects registration of port monitor DLLs which run in the context of
+  the Print Spooler service.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - Monitors
+    - Driver
+    - reg
+    - add
+  condition: selection
+level: high
+tags:
+- attack.persistence
+- attack.t1547.010
+falsepositives:
+- Legitimate print port monitor installation
+version: 1

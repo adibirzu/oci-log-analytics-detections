@@ -1,7 +1,8 @@
 title: Windows Boot Configuration Modified
 id: d1a2b3c4-3006-4000-8000-000000000006
 status: stable
-description: Detects use of bcdedit.exe to disable recovery mode or modify boot configuration, commonly seen in ransomware attacks to prevent system recovery.
+description: Detects use of bcdedit.exe to disable recovery mode or modify boot configuration, commonly seen in ransomware
+  attacks to prevent system recovery.
 logsource:
   product: windows
   service: process_creation
@@ -17,3 +18,6 @@ level: critical
 tags:
 - attack.impact
 - attack.t1490
+version: 1
+falsepositives:
+- Authorized administrative operations

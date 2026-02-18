@@ -6,13 +6,16 @@
   "level": "medium",
   "stig_category": "CAT II",
   "tags": [
-    "attack.defense_evasion"
+    "attack.defense_evasion",
+    "attack.t1562.007"
   ],
   "mitre_attack": {
     "tactics": [
       "defense_evasion"
     ],
-    "techniques": []
+    "techniques": [
+      "T1562.007"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -20,5 +23,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Routine IAM group management",
+    "Automated provisioning systems"
+  ]
 }

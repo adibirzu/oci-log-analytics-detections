@@ -1,0 +1,21 @@
+title: DCSync Attack via Replication Request
+id: 4e67285e-e578-40ea-b7aa-1a9e45d9bfdf
+status: stable
+description: Detects potential DCSync attacks by looking for mimikatz-style commands
+  requesting directory replication.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - lsadump
+    - dcsync
+  condition: selection
+level: critical
+tags:
+- attack.credential_access
+- attack.t1003.006
+falsepositives:
+- Legitimate domain replication testing
+version: 1

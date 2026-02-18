@@ -27,5 +27,8 @@
   },
   "stig_ids": [
     "AC-3"
+  ],
+  "falsepositives": [
+    "Authorized data sharing workflows"
   ]
 }

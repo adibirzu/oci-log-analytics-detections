@@ -1,0 +1,20 @@
+title: Startup Folder Modification
+id: f4150941-abb1-4646-9f79-da1588bb370e
+status: stable
+description: Detects commands copying or creating files in the Windows startup folder.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - \Start Menu\Programs\Startup
+    - \Startup\
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1547.001
+falsepositives:
+- Legitimate application startup shortcuts
+version: 1

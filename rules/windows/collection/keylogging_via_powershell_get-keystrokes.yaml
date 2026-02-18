@@ -1,0 +1,23 @@
+title: Keylogging via PowerShell Get-Keystrokes
+id: 06d1d7c8-0eb3-431e-a2fb-b408990e5659
+status: stable
+description: Detects PowerShell-based keylogging techniques using API hooks or input
+  monitoring.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - Get-Keystrokes
+    - SetWindowsHookEx
+    - GetAsyncKeyState
+    - keylog
+  condition: selection
+level: critical
+tags:
+- attack.collection
+- attack.t1056.001
+falsepositives:
+- Input monitoring accessibility tools
+version: 1

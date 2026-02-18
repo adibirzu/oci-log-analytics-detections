@@ -10,9 +10,9 @@ detection:
     process_name|endswith: powershell.exe
     CommandLine|contains:
     - '-enc '
-    - '-EncodedCommand'
+    - -EncodedCommand
     - '-ec '
-    - 'FromBase64String'
+    - FromBase64String
   condition: selection
 level: high
 tags:
@@ -20,3 +20,7 @@ tags:
 - attack.t1059.001
 - attack.defense_evasion
 - attack.t1027
+version: 1
+falsepositives:
+- Legitimate PowerShell administration scripts
+- Automated management tools (SCCM, Intune)

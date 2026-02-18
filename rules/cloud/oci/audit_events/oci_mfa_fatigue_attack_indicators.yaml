@@ -1,0 +1,21 @@
+title: OCI MFA Fatigue Attack Indicators
+id: 3636ef08-2392-4916-815f-8532e617910e
+status: stable
+description: Detects multiple MFA enrollment or verification attempts that may indicate
+  MFA fatigue push attack.
+references:
+- https://attack.mitre.org/techniques/T1621/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identitycontrolplane.updatemfatotpdevice
+  condition: selection
+level: high
+tags:
+- attack.initial_access
+- attack.t1621
+falsepositives:
+- Legitimate MFA device enrollment
+version: 1

@@ -1,0 +1,19 @@
+title: UAC Bypass via DiskCleanup
+id: 6e95243b-abd8-4bfe-9590-2296b2d4a161
+status: stable
+description: Detects UAC bypass using environment variable manipulation with DiskCleanup.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    ParentImage|endswith: \svchost.exe
+    Image|endswith: \DismHost.exe
+  condition: selection
+level: medium
+tags:
+- attack.privilege_escalation
+- attack.t1548.002
+falsepositives:
+- Legitimate disk cleanup operations
+version: 1

@@ -1,14 +1,14 @@
 title: Windows LSASS Memory Access
 id: e1f2a3b4-4020-4000-8000-000000000020
 status: stable
-description: Detects tools accessing LSASS process memory for credential dumping. LSASS stores authentication credentials and is a primary target for credential theft.
+description: Detects tools accessing LSASS process memory for credential dumping.
+  LSASS stores authentication credentials and is a primary target for credential theft.
 logsource:
   product: windows
   service: process_creation
 detection:
   sel_comsvcs:
     process_name|endswith: rundll32.exe
-    CommandLine|contains: comsvcs.dll
     CommandLine|contains: MiniDump
   sel_taskmgr:
     process_name|endswith: taskmgr.exe
@@ -21,3 +21,4 @@ tags:
 falsepositives:
 - Authorized security testing
 - Memory dump for Microsoft support cases
+version: 1

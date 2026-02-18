@@ -1,0 +1,20 @@
+title: Sysmon Configuration Tampering
+id: 8fa1a537-413b-4aec-a9f4-4c90007d3b69
+status: stable
+description: Detects attempts to unload or reconfigure Sysmon to blind endpoint monitoring.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - sysmon
+    - -u
+  condition: selection
+level: critical
+tags:
+- attack.defense_evasion
+- attack.t1562.001
+falsepositives:
+- Sysmon upgrade procedures
+version: 1

@@ -13,3 +13,7 @@ level: critical
 tags:
 - attack.impact
 - attack.t1490
+version: 1
+falsepositives:
+- Scheduled key rotation
+- Authorized cryptographic operations

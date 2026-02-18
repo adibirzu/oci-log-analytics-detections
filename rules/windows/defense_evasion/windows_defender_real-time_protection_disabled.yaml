@@ -1,0 +1,26 @@
+title: Windows Defender Real-Time Protection Disabled
+id: 54d547fe-0c87-44ea-9203-716d7a262c3a
+status: stable
+description: Detects commands disabling Windows Defender real-time protection via
+  PowerShell or registry.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_ps:
+    CommandLine|contains|all:
+    - Set-MpPreference
+    - -DisableRealtimeMonitoring
+    - 'True'
+  selection_reg:
+    CommandLine|contains|all:
+    - DisableRealtimeMonitoring
+    - '1'
+  condition: 1 of selection*
+level: critical
+tags:
+- attack.defense_evasion
+- attack.t1562.001
+falsepositives:
+- IT administrators during software installation
+version: 1

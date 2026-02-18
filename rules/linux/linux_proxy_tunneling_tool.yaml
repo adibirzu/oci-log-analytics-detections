@@ -1,10 +1,11 @@
 title: Linux Proxy and Tunneling Tool Detected
 id: a1b2c3d4-6017-4000-8000-000000000017
 status: stable
-description: >
-  Detects proxy and tunneling tools used to create covert communication channels.
-  Attackers use tools like chisel, ligolo, reGeorg, and frp to proxy C2 traffic
-  through compromised hosts and evade network security controls.
+description: 'Detects proxy and tunneling tools used to create covert communication
+  channels. Attackers use tools like chisel, ligolo, reGeorg, and frp to proxy C2
+  traffic through compromised hosts and evade network security controls.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -43,3 +44,4 @@ tags:
 falsepositives:
 - Authorized penetration testing tools
 - VPN or proxy for development
+version: 1

@@ -6,11 +6,17 @@
   "level": "informational",
   "stig_category": "CAT III",
   "tags": [
-    "oci.audit"
+    "oci.audit",
+    "attack.privilege_escalation",
+    "attack.t1098"
   ],
   "mitre_attack": {
-    "tactics": [],
-    "techniques": []
+    "tactics": [
+      "privilege_escalation"
+    ],
+    "techniques": [
+      "T1098"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -18,5 +24,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Routine policy changes by authorized administrators",
+    "Automated IaC deployments (Terraform, Pulumi)"
+  ]
 }

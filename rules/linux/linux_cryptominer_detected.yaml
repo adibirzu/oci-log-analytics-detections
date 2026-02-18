@@ -1,7 +1,8 @@
 title: Linux Cryptominer Activity Detected
 id: f1e2d3c4-5005-4000-8000-000000000005
 status: stable
-description: Detects execution of known cryptomining software or command patterns associated with unauthorized cryptocurrency mining on compromised hosts.
+description: Detects execution of known cryptomining software or command patterns
+  associated with unauthorized cryptocurrency mining on compromised hosts.
 logsource:
   product: linux
   service: audit
@@ -23,3 +24,4 @@ tags:
 falsepositives:
 - Authorized mining operations
 - Blockchain development testing
+version: 1

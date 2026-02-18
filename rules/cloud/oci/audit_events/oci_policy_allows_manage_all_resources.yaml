@@ -1,0 +1,22 @@
+title: OCI Policy Allows Manage All Resources
+id: e48b6f69-5779-45f9-b22b-be74beffa433
+status: stable
+description: Detects update of existing IAM policies to include manage all-resources,
+  an overprivileged access pattern that may indicate privilege escalation.
+references:
+- https://attack.mitre.org/techniques/T1098/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identitycontrolplane.updatepolicy
+    response_payload|contains: manage all-resources
+  condition: selection
+level: critical
+tags:
+- attack.privilege_escalation
+- attack.t1098
+falsepositives:
+- Emergency access policy creation by tenancy admins
+version: 1

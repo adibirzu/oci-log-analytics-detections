@@ -1,0 +1,23 @@
+title: Kerberos Ticket Export via Mimikatz
+id: 1beb31b9-8f20-498f-9f02-3e8360622a74
+status: stable
+description: Detects Kerberos ticket exporting commands used in pass-the-ticket and
+  golden ticket attacks.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - kerberos::list
+    - kerberos::ptt
+    - export
+    - .kirbi
+  condition: selection
+level: critical
+tags:
+- attack.credential_access
+- attack.t1558
+falsepositives:
+- Kerberos troubleshooting by domain admins
+version: 1

@@ -1,0 +1,23 @@
+title: OCI Audit Configuration Retention Reduced
+id: 9ce2dcb4-704a-4726-9081-9b03a316f50e
+status: stable
+description: Detects changes to audit configuration that may shorten retention period
+  to destroy evidence.
+references:
+- https://attack.mitre.org/techniques/T1562/008/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.audit.updateconfiguration
+  filter_retention:
+    response_payload|contains: retentionPeriodDays
+  condition: selection and filter_retention
+level: critical
+tags:
+- attack.defense_evasion
+- attack.t1562.008
+falsepositives:
+- Compliance-driven audit configuration changes
+version: 1

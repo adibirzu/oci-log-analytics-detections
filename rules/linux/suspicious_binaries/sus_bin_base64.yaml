@@ -1,15 +1,25 @@
 title: Suspicious Usage of base64
 id: b1f48409-0288-4b01-827c-32104b199e31
 status: experimental
-description: Detects execution of potentially suspicious binary base64.
+description: Detects execution of base64 with decode or sensitive file operations.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: base64
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - '-d '
+    - --decode
+    - /etc/shadow
+    - /etc/passwd
+level: medium
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate base64 usage by system administrators
+- Automated system scripts

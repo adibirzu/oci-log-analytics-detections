@@ -1,110 +1,207 @@
 {
   "version": "1.0",
-  "total_rules": 200,
+  "total_rules": 383,
   "total_hunting": 20,
   "platforms": {
-    "oci": 80,
-    "linux": 65,
-    "windows": 55
+    "windows": 218,
+    "oci": 100,
+    "linux": 65
   },
   "severities": {
-    "high": 63,
-    "medium": 50,
-    "critical": 23,
-    "low": 34,
+    "critical": 60,
+    "high": 167,
+    "medium": 110,
+    "low": 16,
     "informational": 30
   },
   "mitre_techniques": [
+    "T1003",
     "T1003.001",
+    "T1003.002",
     "T1003.003",
+    "T1003.004",
+    "T1003.006",
     "T1003.007",
     "T1005",
     "T1018",
     "T1021",
     "T1021.001",
     "T1021.002",
+    "T1021.003",
+    "T1021.006",
     "T1027",
     "T1033",
+    "T1036.003",
+    "T1036.005",
     "T1046",
+    "T1047",
     "T1048",
+    "T1048.003",
     "T1053.002",
     "T1053.003",
     "T1053.005",
+    "T1055",
+    "T1055.001",
     "T1055.008",
     "T1055.012",
+    "T1055.013",
     "T1056.001",
+    "T1057",
     "T1059",
     "T1059.001",
     "T1059.004",
+    "T1059.005",
+    "T1059.006",
+    "T1059.007",
+    "T1068",
+    "T1069.001",
+    "T1069.002",
     "T1070.001",
     "T1070.002",
     "T1070.003",
+    "T1070.004",
+    "T1070.006",
+    "T1071",
+    "T1071.001",
     "T1071.004",
     "T1074.001",
     "T1078",
     "T1082",
+    "T1083",
     "T1087.001",
     "T1087.002",
     "T1090",
     "T1090.001",
+    "T1095",
     "T1098",
     "T1098.001",
     "T1098.004",
     "T1105",
+    "T1110",
+    "T1110.001",
     "T1110.003",
     "T1113",
     "T1114",
+    "T1115",
     "T1127.001",
     "T1133",
     "T1134",
+    "T1134.001",
+    "T1134.002",
+    "T1134.004",
     "T1135",
     "T1136.001",
+    "T1136.003",
+    "T1137",
     "T1140",
+    "T1187",
+    "T1190",
     "T1197",
+    "T1201",
+    "T1202",
     "T1204",
     "T1204.002",
     "T1218",
+    "T1218.001",
+    "T1218.003",
+    "T1218.004",
+    "T1218.005",
+    "T1218.009",
+    "T1218.011",
     "T1219",
+    "T1220",
+    "T1221",
+    "T1482",
     "T1485",
+    "T1486",
     "T1489",
     "T1490",
+    "T1491.001",
     "T1496",
+    "T1497",
     "T1505.003",
+    "T1518",
+    "T1518.001",
     "T1528",
+    "T1529",
+    "T1530",
+    "T1531",
     "T1537",
+    "T1542",
     "T1543.002",
     "T1543.003",
+    "T1546.001",
+    "T1546.002",
     "T1546.003",
     "T1546.004",
+    "T1546.007",
+    "T1546.008",
+    "T1546.010",
+    "T1546.011",
+    "T1546.012",
+    "T1546.015",
     "T1547.001",
+    "T1547.003",
+    "T1547.004",
+    "T1547.005",
     "T1547.006",
+    "T1547.009",
+    "T1547.010",
+    "T1547.012",
+    "T1547.014",
     "T1548.001",
     "T1548.002",
     "T1548.003",
     "T1550.002",
+    "T1550.003",
+    "T1552.001",
+    "T1552.004",
+    "T1552.005",
+    "T1552.006",
+    "T1553",
+    "T1553.004",
+    "T1555",
+    "T1555.003",
     "T1556",
     "T1556.007",
     "T1557",
+    "T1558",
     "T1558.003",
+    "T1558.004",
     "T1560.001",
+    "T1561",
     "T1562.001",
+    "T1562.002",
     "T1562.004",
     "T1562.007",
     "T1562.008",
     "T1564.001",
+    "T1564.003",
+    "T1564.004",
     "T1565.001",
     "T1566.001",
     "T1567",
+    "T1568.002",
     "T1569.002",
+    "T1570",
     "T1572",
     "T1573",
     "T1573.002",
     "T1574.002",
     "T1574.006",
+    "T1574.009",
+    "T1574.011",
     "T1580",
+    "T1583",
+    "T1583.003",
+    "T1599",
     "T1600",
+    "T1606",
     "T1611",
-    "T1648"
+    "T1620",
+    "T1621",
+    "T1648",
+    "T1649"
   ],
   "mitre_tactics": [
     "collection",
@@ -118,7 +215,8 @@
     "initial_access",
     "lateral_movement",
     "persistence",
-    "privilege_escalation"
+    "privilege_escalation",
+    "resource_development"
   ],
   "stig_controls": [
     "AC-17",
@@ -136,12 +234,256 @@
   ],
   "rules": [
     {
+      "title": "Accessibility Features Backdoor",
+      "description": "Detects replacement of accessibility programs (sethc, utilman, osk) with cmd.exe for pre-login access.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1546.008"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "accessibility_features_backdoor.json"
+    },
+    {
+      "title": "Account Access Removal",
+      "description": "Detects deletion or disabling of user accounts which may indicate an attempt to lock out legitimate users.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1531"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "account_access_removal.json"
+    },
+    {
+      "title": "Active Setup Persistence",
+      "description": "Detects creation of Active Setup entries in the registry for per-user persistence.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1547.014"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "active_setup_persistence.json"
+    },
+    {
+      "title": "AD Enumeration via ADFind",
+      "description": "Detects usage of AdFind.exe for Active Directory enumeration and reconnaissance.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1087.002"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "ad_enumeration_via_adfind.json"
+    },
+    {
+      "title": "Alternate Data Stream Execution",
+      "description": "Detects execution of payloads hidden in NTFS Alternate Data Streams.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1564.004"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "alternate_data_stream_execution.json"
+    },
+    {
+      "title": "AlwaysInstallElevated Exploitation",
+      "description": "Detects exploitation of AlwaysInstallElevated policy for privilege escalation via MSI.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1548.002"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "alwaysinstallelevated_exploitation.json"
+    },
+    {
+      "title": "AMSI Bypass via PowerShell Reflection",
+      "description": "Detects PowerShell reflection techniques used to bypass AMSI by patching the AmsiScanBuffer function.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1562.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "amsi_bypass_via_powershell_reflection.json"
+    },
+    {
+      "title": "AppInit DLLs Persistence",
+      "description": "Detects modification of AppInit_DLLs registry value to inject DLLs into every process that loads User32.dll.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1546.010"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "appinit_dlls_persistence.json"
+    },
+    {
+      "title": "Application Shimming for Persistence",
+      "description": "Detects creation of application compatibility shims using sdbinst.exe.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1546.011"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "application_shimming_for_persistence.json"
+    },
+    {
+      "title": "AppLocker Policy Bypass via MSHTML",
+      "description": "Detects MSHTA or similar MSHTML-based execution paths used to bypass AppLocker policies.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218.005"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "applocker_policy_bypass_via_mshtml.json"
+    },
+    {
+      "title": "AS-REP Roasting via Rubeus",
+      "description": "Detects AS-REP Roasting attempts using Rubeus or similar tools targeting accounts without Kerberos pre-authentication.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1558.004"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "as-rep_roasting_via_rubeus.json"
+    },
+    {
+      "title": "BITS Job Persistence",
+      "description": "Detects BITS jobs created for persistent execution or file download.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1197"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "bits_job_persistence.json"
+    },
+    {
+      "title": "BloodHound AD Enumeration",
+      "description": "Detects execution of BloodHound or SharpHound for Active Directory reconnaissance.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1087.002"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "bloodhound_ad_enumeration.json"
+    },
+    {
+      "title": "Boot Configuration Change for Persistence",
+      "description": "Detects BCDEdit commands that modify boot configuration for safe mode persistence.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1542"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "boot_configuration_change_for_persistence.json"
+    },
+    {
+      "title": "Browser Credential Store Access",
+      "description": "Detects processes accessing browser credential stores (Chrome Login Data, Firefox logins.json).",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1555.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "browser_credential_store_access.json"
+    },
+    {
+      "title": "Clipboard Data Collection",
+      "description": "Detects PowerShell or command-line access to clipboard data for credential or data theft.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1115"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "clipboard_data_collection.json"
+    },
+    {
       "title": "Cloud Guard Problem: Audit Log Retention",
       "description": "Detects Cloud Guard reporting problem: Audit_Log_Retention.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1562.008"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_audit_log_retention.json"
@@ -151,8 +493,12 @@
       "description": "Detects Cloud Guard reporting problem: Bucket_Public_Read.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1537"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_bucket_public_read.json"
@@ -162,8 +508,12 @@
       "description": "Detects Cloud Guard reporting problem: Bucket_Public_Write.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_bucket_public_write.json"
@@ -173,8 +523,12 @@
       "description": "Detects Cloud Guard reporting problem: Group_Has_Too_Many_Admins.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_group_has_too_many_admins.json"
@@ -184,8 +538,12 @@
       "description": "Detects Cloud Guard reporting problem: IAM_User_API_Key_Old.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1552.004"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_iam_user_api_key_old.json"
@@ -195,8 +553,12 @@
       "description": "Detects Cloud Guard reporting problem: IAM_User_Console_Password_Old.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1110"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_iam_user_console_password_old.json"
@@ -206,8 +568,12 @@
       "description": "Detects Cloud Guard reporting problem: Instance_Principals_Enabled.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1098.001"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_instance_principals_enabled.json"
@@ -217,8 +583,12 @@
       "description": "Detects Cloud Guard reporting problem: INSTANCE_PUBLIC_IP.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_instance_public_ip.json"
@@ -228,8 +598,12 @@
       "description": "Detects Cloud Guard reporting problem: Policy_Too_Permissive.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_policy_too_permissive.json"
@@ -239,8 +613,12 @@
       "description": "Detects Cloud Guard reporting problem: VCN_Flow_Log_Disabled.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1562.008"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_vcn_flow_log_disabled.json"
@@ -250,8 +628,12 @@
       "description": "Detects Cloud Guard reporting problem: VCN_Security_List_Port_RDP.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1133"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_vcn_security_list_port_rdp.json"
@@ -261,11 +643,585 @@
       "description": "Detects Cloud Guard reporting problem: VCN_Security_List_Port_SSH.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1133"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "cloud_guard_problem_vcn_security_list_port_ssh.json"
+    },
+    {
+      "title": "CMSTP UAC Bypass",
+      "description": "Detects usage of CMSTP.exe to bypass UAC and execute arbitrary commands through .inf files.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218.003"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "cmstp_uac_bypass.json"
+    },
+    {
+      "title": "COM Object Hijacking via Registry",
+      "description": "Detects modification of COM object registry entries to hijack execution flow.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1546.015"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "com_object_hijacking_via_registry.json"
+    },
+    {
+      "title": "Compiled HTML File Execution",
+      "description": "Detects execution of compiled HTML (.chm) files via hh.exe, which can execute embedded scripts.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "compiled_html_file_execution.json"
+    },
+    {
+      "title": "Control Panel Item Execution",
+      "description": "Detects execution of .cpl files which can be used to execute arbitrary DLLs.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "control_panel_item_execution.json"
+    },
+    {
+      "title": "Credential Access via Certutil Certificate Export",
+      "description": "Detects usage of certutil.exe to export certificates which may contain private keys for authentication.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1649"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "credential_access_via_certutil_certificate_export.json"
+    },
+    {
+      "title": "Credential Dumping via Comsvcs with Rundll32",
+      "description": "Detects usage of rundll32 with comsvcs.dll to dump process memory, commonly targeting LSASS.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "credential_dumping_via_comsvcs_with_rundll32.json"
+    },
+    {
+      "title": "Credential Dumping via Windows Task Manager",
+      "description": "Detects creation of LSASS dump files by Task Manager, which can be used to extract credentials.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "credential_dumping_via_windows_task_manager.json"
+    },
+    {
+      "title": "Credential File Discovery",
+      "description": "Detects searches for files commonly containing credentials such as passwords.txt, credentials.xml, or web.config.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1552.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "credential_file_discovery.json"
+    },
+    {
+      "title": "Cryptominer Deployment Indicators",
+      "description": "Detects indicators of cryptocurrency mining software deployment on Windows systems.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1496"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "cryptominer_deployment_indicators.json"
+    },
+    {
+      "title": "Data Compression for Exfiltration via 7zip",
+      "description": "Detects data compression using 7-Zip or WinRAR with password protection, often used before exfiltration.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1560.001"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "data_compression_for_exfiltration_via_7zip.json"
+    },
+    {
+      "title": "DCOM Lateral Movement via MMC20",
+      "description": "Detects lateral movement using DCOM MMC20.Application object to execute commands remotely.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.003"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "dcom_lateral_movement_via_mmc20.json"
+    },
+    {
+      "title": "DCSync Attack via Replication Request",
+      "description": "Detects potential DCSync attacks by looking for mimikatz-style commands requesting directory replication.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.006"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "dcsync_attack_via_replication_request.json"
+    },
+    {
+      "title": "Defacement via Desktop Wallpaper Change",
+      "description": "Detects commands changing the desktop wallpaper, which may indicate ransomware defacement.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1491.001"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "defacement_via_desktop_wallpaper_change.json"
+    },
+    {
+      "title": "Default File Association Hijack",
+      "description": "Detects modification of default file associations for persistence.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1546.001"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "default_file_association_hijack.json"
+    },
+    {
+      "title": "Disable Windows Firewall via Netsh",
+      "description": "Detects commands to disable the Windows firewall using netsh, enabling network-based attacks.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1562.004"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "disable_windows_firewall_via_netsh.json"
+    },
+    {
+      "title": "Disk Wipe via Format Command",
+      "description": "Detects format command execution that could indicate destructive disk wiping.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1561"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "disk_wipe_via_format_command.json"
+    },
+    {
+      "title": "DLL Execution via Rundll32 from User Path",
+      "description": "Detects rundll32.exe loading DLLs from user-writable directories.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218.011"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "dll_execution_via_rundll32_from_user_path.json"
+    },
+    {
+      "title": "DLL Hijacking via Service Registry Permission",
+      "description": "Detects modification of service registry entries to point to attacker-controlled DLLs.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1574.011"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "dll_hijacking_via_service_registry_permission.json"
+    },
+    {
+      "title": "DLL Side-Loading from Suspicious Directory",
+      "description": "Detects execution of legitimate signed binaries from temp or user-writable directories, suggesting DLL side-loading.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1574.002"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "dll_side-loading_from_suspicious_directory.json"
+    },
+    {
+      "title": "Domain Trust Discovery via Nltest",
+      "description": "Detects domain trust enumeration using nltest.exe.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1482"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "domain_trust_discovery_via_nltest.json"
+    },
+    {
+      "title": "DPAPI Master Key Extraction",
+      "description": "Detects extraction of DPAPI master keys which protect user credentials, browser passwords, and other secrets.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1555"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "dpapi_master_key_extraction.json"
+    },
+    {
+      "title": "Email Collection via PowerShell",
+      "description": "Detects PowerShell commands accessing Outlook COM objects or .pst files for email collection.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1114"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "email_collection_via_powershell.json"
+    },
+    {
+      "title": "ETW Provider Disabled",
+      "description": "Detects disabling of ETW (Event Tracing for Windows) providers, which can blind security monitoring.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1562.002"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "etw_provider_disabled.json"
+    },
+    {
+      "title": "File and Directory Discovery via dir",
+      "description": "Detects recursive directory listings often used during post-exploitation to find sensitive files.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1083"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "file_and_directory_discovery_via_dir.json"
+    },
+    {
+      "title": "File Deletion of Security Tools",
+      "description": "Detects deletion of security-related files and configurations that could impair defenses.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1070.004"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "file_deletion_of_security_tools.json"
+    },
+    {
+      "title": "Finger.exe Abuse for File Download",
+      "description": "Detects abuse of finger.exe to download files or exfiltrate data via the finger protocol.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1105"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "fingerexe_abuse_for_file_download.json"
+    },
+    {
+      "title": "Forced Authentication via PetitPotam",
+      "description": "Detects PetitPotam and related NTLM relay tools that force authentication to attacker-controlled servers.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1187"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "forced_authentication_via_petitpotam.json"
+    },
+    {
+      "title": "Group Policy Preferences Password Extraction",
+      "description": "Detects tools searching for cpassword in Group Policy Preferences XML files.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1552.006"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "group_policy_preferences_password_extraction.json"
+    },
+    {
+      "title": "Hidden PowerShell Window Execution",
+      "description": "Detects PowerShell execution with hidden window style, commonly used to avoid user visibility.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1564.003"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "hidden_powershell_window_execution.json"
+    },
+    {
+      "title": "Image File Execution Options Debugger",
+      "description": "Detects setting of Image File Execution Options debugger for persistence or tampering.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1546.012"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "image_file_execution_options_debugger.json"
+    },
+    {
+      "title": "Indirect Command Execution via Forfiles",
+      "description": "Detects usage of forfiles.exe for indirect command execution to bypass application controls.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1202"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "indirect_command_execution_via_forfiles.json"
+    },
+    {
+      "title": "InstallUtil Application Whitelisting Bypass",
+      "description": "Detects usage of InstallUtil.exe to execute code through .NET assemblies, bypassing application controls.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218.004"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "installutil_application_whitelisting_bypass.json"
+    },
+    {
+      "title": "Internal Monologue NTLM Hash Theft",
+      "description": "Detects Internal Monologue attack which retrieves NTLM hashes without touching LSASS.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "internal_monologue_ntlm_hash_theft.json"
+    },
+    {
+      "title": "JavaScript Execution via Node.js",
+      "description": "Detects Node.js executing inline JavaScript or scripts from suspicious locations.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.007"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "javascript_execution_via_nodejs.json"
+    },
+    {
+      "title": "Kerberos Ticket Export via Mimikatz",
+      "description": "Detects Kerberos ticket exporting commands used in pass-the-ticket and golden ticket attacks.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1558"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "kerberos_ticket_export_via_mimikatz.json"
+    },
+    {
+      "title": "Keylogging via PowerShell Get-Keystrokes",
+      "description": "Detects PowerShell-based keylogging techniques using API hooks or input monitoring.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1056.001"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "keylogging_via_powershell_get-keystrokes.json"
+    },
+    {
+      "title": "Lateral Tool Transfer via Robocopy",
+      "description": "Detects usage of robocopy to transfer tools or files to remote systems.",
+      "level": "low",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1570"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "lateral_tool_transfer_via_robocopy.json"
+    },
+    {
+      "title": "LaZagne Credential Harvester",
+      "description": "Detects execution of LaZagne, an open-source credential harvesting tool that extracts passwords from multiple applications.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1555"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "lazagne_credential_harvester.json"
     },
     {
       "title": "Linux Archive Data Collected for Exfiltration",
@@ -697,9 +1653,12 @@
       "description": "Detects failed SSH login attempts.",
       "level": "low",
       "platform": "linux",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1110.001"
+      ],
       "mitre_tactics": [
-        "initial_access"
+        "initial_access",
+        "credential_access"
       ],
       "stig_ids": [],
       "stig_category": "CAT III",
@@ -725,7 +1684,9 @@
       "description": "Detects execution of sudo commands.",
       "level": "low",
       "platform": "linux",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1548.003"
+      ],
       "mitre_tactics": [
         "privilege_escalation"
       ],
@@ -839,12 +1800,211 @@
       "file": "linux_web_shell_file_creation.json"
     },
     {
+      "title": "Local Group Membership Discovery",
+      "description": "Detects commands enumerating local group membership, especially administrators.",
+      "level": "low",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1069.001"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "local_group_membership_discovery.json"
+    },
+    {
+      "title": "LSA Secrets Registry Extraction",
+      "description": "Detects extraction of LSA Secrets from the registry, which stores service account passwords and other sensitive data.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.004"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "lsa_secrets_registry_extraction.json"
+    },
+    {
+      "title": "LSASS Clone via ProcDump Evasion",
+      "description": "Detects LSASS cloning techniques that create a clone of the LSASS process to dump credentials without directly accessing the original.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "lsass_clone_via_procdump_evasion.json"
+    },
+    {
+      "title": "LSASS Memory Dump via Comsvcs DLL",
+      "description": "Detects LSASS memory dumping using comsvcs.dll MiniDump export, a technique to extract credentials without dropping tools.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "lsass_memory_dump_via_comsvcs_dll.json"
+    },
+    {
+      "title": "Masquerading System Binary in Non-Standard Path",
+      "description": "Detects execution of common system binaries from non-standard locations, indicating masquerading.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1036.005"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "masquerading_system_binary_in_non-standard_path.json"
+    },
+    {
+      "title": "MSBuild Execution from Non-Standard Location",
+      "description": "Detects MSBuild.exe executing project files from user-writable directories.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1127.001"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "msbuild_execution_from_non-standard_location.json"
+    },
+    {
+      "title": "MSHTA JavaScript Execution",
+      "description": "Detects MSHTA executing inline JavaScript or VBScript content.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218.005"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "mshta_javascript_execution.json"
+    },
+    {
+      "title": "Named Pipe Impersonation via PowerShell",
+      "description": "Detects named pipe impersonation technique for privilege escalation via PowerShell.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1134.001"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "named_pipe_impersonation_via_powershell.json"
+    },
+    {
+      "title": "Netsh Helper DLL Persistence",
+      "description": "Detects registration of netsh helper DLLs which execute every time netsh.exe is invoked.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1546.007"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "netsh_helper_dll_persistence.json"
+    },
+    {
+      "title": "Network Share Enumeration via Net View",
+      "description": "Detects network share enumeration using net view command.",
+      "level": "low",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1135"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "network_share_enumeration_via_net_view.json"
+    },
+    {
+      "title": "New Local Account Created via Net.exe",
+      "description": "Detects creation of local accounts using net.exe or net1.exe.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1136.001"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "new_local_account_created_via_netexe.json"
+    },
+    {
+      "title": "NPPSpy Credential Interception",
+      "description": "Detects installation of NPPSpy or similar credential-intercepting DLLs in the Network Provider order.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1556"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "nppspy_credential_interception.json"
+    },
+    {
+      "title": "NTDS.dit Database Copy Attempt",
+      "description": "Detects attempts to copy the NTDS.dit Active Directory database file using ntdsutil, vssadmin, or esentutl.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "ntdsdit_database_copy_attempt.json"
+    },
+    {
       "title": "OCI Action: AddUserToGroup",
       "description": "Detects the execution of AddUserToGroup action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1098.001"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_addusertogroup.json"
@@ -854,8 +2014,12 @@
       "description": "Detects the execution of AttachInternetGateway action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1583"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_attachinternetgateway.json"
@@ -865,8 +2029,12 @@
       "description": "Detects the execution of CreateBucket action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1530"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createbucket.json"
@@ -876,8 +2044,12 @@
       "description": "Detects the execution of CreateGroup action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1136.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_creategroup.json"
@@ -887,8 +2059,12 @@
       "description": "Detects the execution of CreateInstance action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1583.003"
+      ],
+      "mitre_tactics": [
+        "resource_development"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createinstance.json"
@@ -898,8 +2074,12 @@
       "description": "Detects the execution of CreateInternetGateway action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1583"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createinternetgateway.json"
@@ -909,8 +2089,12 @@
       "description": "Detects the execution of CreateKey action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1553"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createkey.json"
@@ -920,8 +2104,12 @@
       "description": "Detects the execution of CreatePolicy action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createpolicy.json"
@@ -931,8 +2119,12 @@
       "description": "Detects the execution of CreateRouteTable action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1583"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createroutetable.json"
@@ -942,8 +2134,12 @@
       "description": "Detects the execution of CreateSecurityList action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1562.007"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createsecuritylist.json"
@@ -953,8 +2149,12 @@
       "description": "Detects the execution of CreateSubnet action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1583"
+      ],
+      "mitre_tactics": [
+        "resource_development"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createsubnet.json"
@@ -964,8 +2164,12 @@
       "description": "Detects the execution of CreateUser action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1136.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createuser.json"
@@ -975,8 +2179,12 @@
       "description": "Detects the execution of CreateVcn action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1583"
+      ],
+      "mitre_tactics": [
+        "resource_development"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_createvcn.json"
@@ -986,8 +2194,12 @@
       "description": "Detects the execution of DeleteBucket action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1485"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_deletebucket.json"
@@ -997,8 +2209,12 @@
       "description": "Detects the execution of DeleteGroup action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1531"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_deletegroup.json"
@@ -1008,8 +2224,12 @@
       "description": "Detects the execution of DeleteInternetGateway action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1489"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_deleteinternetgateway.json"
@@ -1019,8 +2239,12 @@
       "description": "Detects the execution of DeleteKey action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1485"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_deletekey.json"
@@ -1030,8 +2254,12 @@
       "description": "Detects the execution of DeletePolicy action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1531"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_deletepolicy.json"
@@ -1041,8 +2269,12 @@
       "description": "Detects the execution of DeleteSubnet action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1489"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_deletesubnet.json"
@@ -1052,8 +2284,12 @@
       "description": "Detects the execution of DeleteUser action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1531"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_deleteuser.json"
@@ -1063,8 +2299,12 @@
       "description": "Detects the execution of DeleteVcn action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1489"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_deletevcn.json"
@@ -1074,8 +2314,12 @@
       "description": "Detects the execution of DetachInternetGateway action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1489"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_detachinternetgateway.json"
@@ -1085,8 +2329,12 @@
       "description": "Detects the execution of RemoveUserFromGroup action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1531"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_removeuserfromgroup.json"
@@ -1096,8 +2344,12 @@
       "description": "Detects the execution of StartInstance action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1204"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_startinstance.json"
@@ -1107,8 +2359,12 @@
       "description": "Detects the execution of StopInstance action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1489"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_stopinstance.json"
@@ -1118,8 +2374,12 @@
       "description": "Detects the execution of TerminateInstance action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1485"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_terminateinstance.json"
@@ -1129,8 +2389,12 @@
       "description": "Detects the execution of UpdateBucket action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1562.007"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_updatebucket.json"
@@ -1140,8 +2404,12 @@
       "description": "Detects the execution of UpdatePolicy action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_updatepolicy.json"
@@ -1151,8 +2419,12 @@
       "description": "Detects the execution of UpdateRouteTable action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1562.007"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_updateroutetable.json"
@@ -1162,8 +2434,12 @@
       "description": "Detects the execution of UpdateSecurityList action in OCI.",
       "level": "informational",
       "platform": "oci",
-      "mitre_techniques": [],
-      "mitre_tactics": [],
+      "mitre_techniques": [
+        "T1562.007"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
       "stig_ids": [],
       "stig_category": "CAT III",
       "file": "oci_action_updatesecuritylist.json"
@@ -1173,7 +2449,9 @@
       "description": "Detects upload of a new API key to a user account.",
       "level": "medium",
       "platform": "oci",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1098.001"
+      ],
       "mitre_tactics": [
         "persistence"
       ],
@@ -1197,6 +2475,21 @@
       ],
       "stig_category": "CAT I",
       "file": "oci_audit_configuration_changed.json"
+    },
+    {
+      "title": "OCI Audit Configuration Retention Reduced",
+      "description": "Detects changes to audit configuration that may shorten retention period to destroy evidence.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1562.008"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_audit_configuration_retention_reduced.json"
     },
     {
       "title": "OCI Auth Token Created",
@@ -1246,6 +2539,21 @@
       ],
       "stig_category": "CAT II",
       "file": "oci_bastion_session_created.json"
+    },
+    {
+      "title": "OCI Boot Volume Backup Created by Non-Admin",
+      "description": "Detects boot volume backup creation which could be used to copy instance data for exfiltration.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1537"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "oci_boot_volume_backup_created_by_non-admin.json"
     },
     {
       "title": "OCI Cloud Infrastructure Discovery",
@@ -1300,10 +2608,12 @@
     },
     {
       "title": "OCI Compute Instance Terminated",
-      "description": "Detects termination of a compute instance.",
+      "description": "Detects successful termination of a compute instance, indicating potential resource destruction or evidence tampering.",
       "level": "medium",
       "platform": "oci",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1485"
+      ],
       "mitre_tactics": [
         "impact"
       ],
@@ -1325,6 +2635,21 @@
       "stig_ids": [],
       "stig_category": "CAT II",
       "file": "oci_console_login_failure.json"
+    },
+    {
+      "title": "OCI Console Login from Suspicious IP Range",
+      "description": "Detects console login events that may indicate unauthorized access from unusual sources.",
+      "level": "low",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1078"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "oci_console_login_from_suspicious_ip_range.json"
     },
     {
       "title": "OCI Console Login from Unusual IP",
@@ -1376,6 +2701,21 @@
       "file": "oci_customer_secret_key_created.json"
     },
     {
+      "title": "OCI Database Backup Exported",
+      "description": "Detects database backup creation that could be used to extract sensitive data.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1537"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "oci_database_backup_exported.json"
+    },
+    {
       "title": "OCI Database System Terminated",
       "description": "Detects termination of OCI Database Systems (BaseDB, Exadata). Unauthorized database termination can result in critical data loss and service disruption.",
       "level": "critical",
@@ -1393,6 +2733,21 @@
       "file": "oci_database_system_terminated.json"
     },
     {
+      "title": "OCI DRG Attachment Created",
+      "description": "Detects creation of Dynamic Routing Gateway attachment, enabling network connectivity between VCNs or on-premises.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1599"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "oci_drg_attachment_created.json"
+    },
+    {
       "title": "OCI Dynamic Group Created",
       "description": "Detects creation of dynamic groups which grant instance principal permissions. Attackers can abuse this for lateral movement from compromised compute instances.",
       "level": "medium",
@@ -1408,6 +2763,36 @@
       ],
       "stig_category": "CAT II",
       "file": "oci_dynamic_group_created.json"
+    },
+    {
+      "title": "OCI Dynamic Group Created with Broad Matching",
+      "description": "Detects creation of dynamic groups with instance principal matching that may grant excessive permissions.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_dynamic_group_created_with_broad_matching.json"
+    },
+    {
+      "title": "OCI Federated Identity Provider Modified",
+      "description": "Detects modification of SAML/OIDC identity provider configuration which could enable unauthorized access.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1606"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_federated_identity_provider_modified.json"
     },
     {
       "title": "OCI Function Invoked",
@@ -1446,9 +2831,12 @@
       "description": "Detects changes to OCI IAM Policies.",
       "level": "medium",
       "platform": "oci",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1098"
+      ],
       "mitre_tactics": [
-        "persistence"
+        "persistence",
+        "privilege_escalation"
       ],
       "stig_ids": [],
       "stig_category": "CAT II",
@@ -1489,6 +2877,21 @@
       "file": "oci_instance_console_connection_created.json"
     },
     {
+      "title": "OCI Instance Metadata Service Accessed",
+      "description": "Detects access to instance metadata service which may reveal instance principal credentials.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1552.005"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "oci_instance_metadata_service_accessed.json"
+    },
+    {
       "title": "OCI KMS Key Scheduled for Deletion",
       "description": "Detects scheduling an OCI Vault key for deletion. This can render encrypted data permanently inaccessible.",
       "level": "critical",
@@ -1502,6 +2905,51 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "oci_kms_key_scheduled_for_deletion.json"
+    },
+    {
+      "title": "OCI KMS Key Version Disabled",
+      "description": "Detects disabling of a KMS key version which may impact data encryption or indicate key compromise response.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1600"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_kms_key_version_disabled.json"
+    },
+    {
+      "title": "OCI Local Peering Gateway Created",
+      "description": "Detects creation of VCN local peering gateway enabling communication between VCNs within same region.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1599"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "oci_local_peering_gateway_created.json"
+    },
+    {
+      "title": "OCI Log Archival Policy Disabled",
+      "description": "Detects modification of logging configuration that may reduce log retention or disable archival.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1562.008"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_log_archival_policy_disabled.json"
     },
     {
       "title": "OCI Log Group Deleted",
@@ -1519,6 +2967,21 @@
       ],
       "stig_category": "CAT I",
       "file": "oci_log_group_deleted.json"
+    },
+    {
+      "title": "OCI MFA Fatigue Attack Indicators",
+      "description": "Detects multiple MFA enrollment or verification attempts that may indicate MFA fatigue push attack.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1621"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_mfa_fatigue_attack_indicators.json"
     },
     {
       "title": "OCI Network Firewall Policy Modified",
@@ -1553,11 +3016,28 @@
       "file": "oci_network_load_balancer_deleted.json"
     },
     {
+      "title": "OCI Network Security Group Rule Added for All Protocols",
+      "description": "Detects adding NSG rules that allow all protocols, potentially opening attack surface.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1562.004"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "oci_network_security_group_rule_added_for_all_protocols.json"
+    },
+    {
       "title": "OCI Network Security Group Updated",
       "description": "Detects updates to Network Security Groups (NSGs).",
       "level": "medium",
       "platform": "oci",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1562.007"
+      ],
       "mitre_tactics": [
         "defense_evasion"
       ],
@@ -1587,7 +3067,9 @@
       "description": "Detects when a bucket's visibility is set to public.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1537"
+      ],
       "mitre_tactics": [
         "exfiltration"
       ],
@@ -1613,6 +3095,21 @@
       "file": "oci_object_storage_pre-authenticated_request_created.json"
     },
     {
+      "title": "OCI Object Storage Replication Policy Created",
+      "description": "Detects creation of cross-region object storage replication policy, a potential data movement vector.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1537"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_object_storage_replication_policy_created.json"
+    },
+    {
       "title": "OCI Password Spraying Attack",
       "description": "Detects password spraying by monitoring failed OCI Console login attempts across multiple user accounts. Unlike brute force (many attempts against one user), password spraying tries a few passwords against many accounts to avoid lockout thresholds.\n",
       "level": "high",
@@ -1631,13 +3128,31 @@
       "file": "oci_password_spraying_attack.json"
     },
     {
+      "title": "OCI Policy Allows Manage All Resources",
+      "description": "Detects update of existing IAM policies to include manage all-resources, an overprivileged access pattern that may indicate privilege escalation.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_policy_allows_manage_all_resources.json"
+    },
+    {
       "title": "OCI Route Table Update",
       "description": "Detects changes to VCN Route Tables.",
       "level": "medium",
       "platform": "oci",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1562.007"
+      ],
       "mitre_tactics": [
-        "persistence"
+        "persistence",
+        "defense_evasion"
       ],
       "stig_ids": [],
       "stig_category": "CAT II",
@@ -1659,6 +3174,36 @@
       ],
       "stig_category": "CAT I",
       "file": "oci_security_list_allows_all_protocols.json"
+    },
+    {
+      "title": "OCI Service Gateway Created",
+      "description": "Detects creation of a service gateway that bypasses internet to access OCI services, a potential lateral movement path.",
+      "level": "low",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1599"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "oci_service_gateway_created.json"
+    },
+    {
+      "title": "OCI User Capabilities Escalation",
+      "description": "Detects enabling console password for a user, potentially escalating a service account to interactive access.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_user_capabilities_escalation.json"
     },
     {
       "title": "OCI User MFA Not Enabled",
@@ -1729,6 +3274,36 @@
       "file": "oci_vault_secret_deleted.json"
     },
     {
+      "title": "OCI Vault Secret Version Deprecated",
+      "description": "Detects deprecation of vault secret versions which may indicate secret rotation bypass.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1600"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "oci_vault_secret_version_deprecated.json"
+    },
+    {
+      "title": "OCI VCN Flow Log Disabled",
+      "description": "Detects deletion or disabling of VCN flow logs which may indicate an attempt to hide network activity.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1562.008"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_vcn_flow_log_disabled.json"
+    },
+    {
       "title": "OCI VCN Peering Connection Created",
       "description": "Detects creation of VCN peering connections (local or remote). Unauthorized peering can extend network access across compartments or regions, enabling lateral movement.",
       "level": "medium",
@@ -1750,7 +3325,9 @@
       "description": "Detects creation or update of a Security List allowing ingress from 0.0.0.0/0.",
       "level": "high",
       "platform": "oci",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1562.007"
+      ],
       "mitre_tactics": [
         "defense_evasion"
       ],
@@ -1763,7 +3340,9 @@
       "description": "Detects changes to Web Application Firewall configurations.",
       "level": "medium",
       "platform": "oci",
-      "mitre_techniques": [],
+      "mitre_techniques": [
+        "T1562.007"
+      ],
       "mitre_tactics": [
         "defense_evasion"
       ],
@@ -1772,9 +3351,654 @@
       "file": "oci_waf_configuration_updated.json"
     },
     {
-      "title": "Suspicious Usage of base64",
-      "description": "Detects execution of potentially suspicious binary base64.",
+      "title": "OCI WAF Policy Deleted",
+      "description": "Detects deletion of Web Application Firewall policies which may expose applications to attacks.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1562.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "oci_waf_policy_deleted.json"
+    },
+    {
+      "title": "Office Application Startup Persistence",
+      "description": "Detects modification of Office startup locations for add-in persistence.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1137"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "office_application_startup_persistence.json"
+    },
+    {
+      "title": "Parent PID Spoofing",
+      "description": "Detects indicators of Parent PID spoofing, where a process fakes its parent for evasion.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1134.004"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "parent_pid_spoofing.json"
+    },
+    {
+      "title": "Pass-the-Ticket via Rubeus",
+      "description": "Detects Rubeus commands for pass-the-ticket lateral movement using Kerberos tickets.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1550.003"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "pass-the-ticket_via_rubeus.json"
+    },
+    {
+      "title": "Password Policy Discovery",
+      "description": "Detects commands querying password policy settings, often part of pre-brute-force recon.",
       "level": "low",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1201"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "password_policy_discovery.json"
+    },
+    {
+      "title": "Port Monitor DLL Persistence",
+      "description": "Detects registration of port monitor DLLs which run in the context of the Print Spooler service.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1547.010"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "port_monitor_dll_persistence.json"
+    },
+    {
+      "title": "Potato Privilege Escalation Tool",
+      "description": "Detects execution of various Potato family privilege escalation tools (JuicyPotato, SweetPotato, etc.).",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1134.001"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "potato_privilege_escalation_tool.json"
+    },
+    {
+      "title": "PowerShell Execution via Alternate Shell",
+      "description": "Detects PowerShell execution using alternate host processes (pwsh, powershell_ise) that may bypass logging.",
+      "level": "low",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.001"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "powershell_execution_via_alternate_shell.json"
+    },
+    {
+      "title": "PowerShell Script Block with Suspicious Keywords",
+      "description": "Detects PowerShell commands containing keywords commonly associated with offensive techniques.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.001"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "powershell_script_block_with_suspicious_keywords.json"
+    },
+    {
+      "title": "Print Processor Persistence",
+      "description": "Detects registration of malicious print processors for persistence via the Print Spooler service.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1547.012"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "print_processor_persistence.json"
+    },
+    {
+      "title": "PrintNightmare Exploitation Attempt",
+      "description": "Detects exploitation of Print Spooler vulnerability (CVE-2021-34527) for privilege escalation.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1068"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "printnightmare_exploitation_attempt.json"
+    },
+    {
+      "title": "Process Discovery via Tasklist",
+      "description": "Detects tasklist.exe with verbose or SVC flags often used during post-exploitation reconnaissance.",
+      "level": "low",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1057"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "process_discovery_via_tasklist.json"
+    },
+    {
+      "title": "Process Doppelganging via TxF",
+      "description": "Detects indicators of process doppelganging using transactional NTFS to replace process memory.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1055.013"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "process_doppelganging_via_txf.json"
+    },
+    {
+      "title": "Process Ghosting or Herpaderping",
+      "description": "Detects indicators of process ghosting or herpaderping evasion techniques based on suspicious process creation patterns.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1055"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "process_ghosting_or_herpaderping.json"
+    },
+    {
+      "title": "Process Injection via CreateRemoteThread",
+      "description": "Detects suspicious processes commonly used as injection vehicles with command-line indicators of injection.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1055.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "process_injection_via_createremotethread.json"
+    },
+    {
+      "title": "PsExec Service Installation",
+      "description": "Detects PsExec creating its service (PSEXESVC) on a remote machine.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.002"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "psexec_service_installation.json"
+    },
+    {
+      "title": "Python Execution as Child of System Process",
+      "description": "Detects Python being executed as a child of system services or common LOLBins.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.006"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "python_execution_as_child_of_system_process.json"
+    },
+    {
+      "title": "Query Registry for Security Products",
+      "description": "Detects registry queries checking for installed security products.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1518.001"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "query_registry_for_security_products.json"
+    },
+    {
+      "title": "Ransomware File Extension Indicators",
+      "description": "Detects commands associated with ransomware encryption activities based on known file extension patterns.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1486"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "ransomware_file_extension_indicators.json"
+    },
+    {
+      "title": "RDP Session Hijacking via tscon",
+      "description": "Detects RDP session hijacking using tscon.exe to connect to disconnected sessions.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.001"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "rdp_session_hijacking_via_tscon.json"
+    },
+    {
+      "title": "Reflective DLL Loading Indicators",
+      "description": "Detects indicators of reflective DLL loading where DLLs are loaded from memory without touching disk.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1620"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "reflective_dll_loading_indicators.json"
+    },
+    {
+      "title": "Registry Run Key Modification via Reg.exe",
+      "description": "Detects registry run key modifications using reg.exe for persistence.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1547.001"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "registry_run_key_modification_via_regexe.json"
+    },
+    {
+      "title": "Regsvcs or Regasm Execution for Code Bypass",
+      "description": "Detects execution of Regsvcs.exe or Regasm.exe to register COM objects from untrusted locations.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218.009"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "regsvcs_or_regasm_execution_for_code_bypass.json"
+    },
+    {
+      "title": "Remote Service Creation via SC",
+      "description": "Detects remote service creation using sc.exe with the \\\\hostname syntax.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.002"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "remote_service_creation_via_sc.json"
+    },
+    {
+      "title": "Renamed System Binary Execution",
+      "description": "Detects execution of renamed system utilities where the original filename does not match the current image name.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1036.003"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "renamed_system_binary_execution.json"
+    },
+    {
+      "title": "Root Certificate Installation via Certutil",
+      "description": "Detects installation of root certificates which could enable MitM attacks or trust arbitrary code.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1553.004"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "root_certificate_installation_via_certutil.json"
+    },
+    {
+      "title": "SAM Database Extraction via Reg Save",
+      "description": "Detects extraction of the SAM database using reg.exe save command, used to obtain password hashes offline.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.002"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sam_database_extraction_via_reg_save.json"
+    },
+    {
+      "title": "Scheduled Task XML Import",
+      "description": "Detects importing scheduled tasks from XML files, which may bypass task creation monitoring.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1053.005"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "scheduled_task_xml_import.json"
+    },
+    {
+      "title": "Screen Capture via PowerShell",
+      "description": "Detects PowerShell commands capturing screenshots using .NET classes.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1113"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "screen_capture_via_powershell.json"
+    },
+    {
+      "title": "ScreenSaver Hijacking Persistence",
+      "description": "Detects modification of screensaver registry settings for persistence.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1546.002"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "screensaver_hijacking_persistence.json"
+    },
+    {
+      "title": "Scripting Engine Spawning Network Utility",
+      "description": "Detects scripting engines spawning network utilities like curl, wget, or net.exe.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.005"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "scripting_engine_spawning_network_utility.json"
+    },
+    {
+      "title": "SDelete Secure File Deletion",
+      "description": "Detects usage of Sysinternals SDelete for secure file deletion to destroy forensic evidence.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1070.004"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "sdelete_secure_file_deletion.json"
+    },
+    {
+      "title": "Security Support Provider DLL Persistence",
+      "description": "Detects registration of Security Support Provider DLLs for credential interception.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1547.005"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "security_support_provider_dll_persistence.json"
+    },
+    {
+      "title": "SeDebugPrivilege Abuse",
+      "description": "Detects tools attempting to enable or abuse SeDebugPrivilege for process manipulation.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1134"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sedebugprivilege_abuse.json"
+    },
+    {
+      "title": "Service Execution via sc.exe Create",
+      "description": "Detects creation of new Windows services via sc.exe, which can be used for persistence or privilege escalation.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1569.002"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "service_execution_via_scexe_create.json"
+    },
+    {
+      "title": "Service Permissions Weakness Discovery",
+      "description": "Detects tools checking for weak service permissions that allow privilege escalation.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1574.011"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "service_permissions_weakness_discovery.json"
+    },
+    {
+      "title": "Service Stop via Net Stop",
+      "description": "Detects stopping of critical services that may indicate pre-ransomware activity.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1489"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "service_stop_via_net_stop.json"
+    },
+    {
+      "title": "Shadow Credentials Attack via Whisker",
+      "description": "Detects Shadow Credentials attacks using Whisker or similar tools that modify msDS-KeyCredentialLink attribute.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1556"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "shadow_credentials_attack_via_whisker.json"
+    },
+    {
+      "title": "SharpRDP Lateral Movement",
+      "description": "Detects indicators of SharpRDP or similar tools performing authenticated RDP lateral movement.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.001"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sharprdp_lateral_movement.json"
+    },
+    {
+      "title": "Shortcut Modification for Persistence",
+      "description": "Detects creation of suspicious .lnk shortcut files using PowerShell COM objects.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1547.009"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "shortcut_modification_for_persistence.json"
+    },
+    {
+      "title": "Software Discovery via WMIC",
+      "description": "Detects software enumeration using WMIC to identify installed applications.",
+      "level": "low",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1518"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "software_discovery_via_wmic.json"
+    },
+    {
+      "title": "Startup Folder Modification",
+      "description": "Detects commands copying or creating files in the Windows startup folder.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1547.001"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "startup_folder_modification.json"
+    },
+    {
+      "title": "Suspicious Scheduled Task Creation",
+      "description": "Detects schtasks.exe creating tasks that execute scripts or binaries from user-writable paths.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1053.005"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "suspicious_scheduled_task_creation.json"
+    },
+    {
+      "title": "Suspicious Usage of base64",
+      "description": "Detects execution of base64 with decode or sensitive file operations.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1783,13 +4007,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_base64.json"
     },
     {
       "title": "Suspicious Usage of chmod",
-      "description": "Detects execution of potentially suspicious binary chmod.",
-      "level": "low",
+      "description": "Detects execution of chmod with SUID/world-writable permission changes.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1798,13 +4022,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_chmod.json"
     },
     {
       "title": "Suspicious Usage of chown",
-      "description": "Detects execution of potentially suspicious binary chown.",
-      "level": "low",
+      "description": "Detects execution of chown targeting system directories or changing to root ownership.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1813,13 +4037,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_chown.json"
     },
     {
       "title": "Suspicious Usage of curl",
-      "description": "Detects execution of potentially suspicious binary curl.",
-      "level": "low",
+      "description": "Detects execution of curl downloading to temp directories or piping to shell.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1828,13 +4052,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_curl.json"
     },
     {
       "title": "Suspicious Usage of dd",
-      "description": "Detects execution of potentially suspicious binary dd.",
-      "level": "low",
+      "description": "Detects execution of dd accessing raw devices or memory.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1843,13 +4067,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_dd.json"
     },
     {
       "title": "Suspicious Usage of gdb",
-      "description": "Detects execution of potentially suspicious binary gdb.",
-      "level": "low",
+      "description": "Detects execution of gdb attaching to process or dumping memory.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1858,13 +4082,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_gdb.json"
     },
     {
       "title": "Suspicious Usage of id",
-      "description": "Detects execution of potentially suspicious binary id.",
-      "level": "low",
+      "description": "Detects execution of id in command chain suggesting enumeration.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1873,13 +4097,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_id.json"
     },
     {
       "title": "Suspicious Usage of insmod",
-      "description": "Detects execution of potentially suspicious binary insmod.",
-      "level": "low",
+      "description": "Detects execution of insmod loading modules from non-standard paths.",
+      "level": "critical",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1888,13 +4112,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_insmod.json"
     },
     {
       "title": "Suspicious Usage of lua",
-      "description": "Detects execution of potentially suspicious binary lua.",
-      "level": "low",
+      "description": "Detects execution of lua with command execution capabilities.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1903,13 +4127,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_lua.json"
     },
     {
       "title": "Suspicious Usage of modprobe",
-      "description": "Detects execution of potentially suspicious binary modprobe.",
-      "level": "low",
+      "description": "Detects execution of modprobe loading modules from non-standard paths.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1918,13 +4142,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_modprobe.json"
     },
     {
       "title": "Suspicious Usage of nc",
-      "description": "Detects execution of potentially suspicious binary nc.",
-      "level": "low",
+      "description": "Detects execution of nc with listen or execute flags.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1933,13 +4157,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_nc.json"
     },
     {
       "title": "Suspicious Usage of ncat",
-      "description": "Detects execution of potentially suspicious binary ncat.",
-      "level": "low",
+      "description": "Detects execution of ncat with execute or listen flags.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1948,13 +4172,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_ncat.json"
     },
     {
       "title": "Suspicious Usage of netcat",
-      "description": "Detects execution of potentially suspicious binary netcat.",
-      "level": "low",
+      "description": "Detects execution of netcat with execute or listen flags.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1963,13 +4187,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_netcat.json"
     },
     {
       "title": "Suspicious Usage of nmap",
-      "description": "Detects execution of potentially suspicious binary nmap.",
-      "level": "low",
+      "description": "Detects execution of nmap with scanning or fingerprinting flags.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1978,13 +4202,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_nmap.json"
     },
     {
       "title": "Suspicious Usage of passwd",
-      "description": "Detects execution of potentially suspicious binary passwd.",
-      "level": "low",
+      "description": "Detects execution of passwd with automated password change or removal.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -1993,13 +4217,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_passwd.json"
     },
     {
       "title": "Suspicious Usage of perl",
-      "description": "Detects execution of potentially suspicious binary perl.",
-      "level": "low",
+      "description": "Detects execution of perl with inline execution or network operations.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2008,13 +4232,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_perl.json"
     },
     {
       "title": "Suspicious Usage of python",
-      "description": "Detects execution of potentially suspicious binary python.",
-      "level": "low",
+      "description": "Detects execution of python with inline execution or suspicious imports.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2023,13 +4247,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_python.json"
     },
     {
       "title": "Suspicious Usage of rmmod",
-      "description": "Detects execution of potentially suspicious binary rmmod.",
-      "level": "low",
+      "description": "Detects execution of rmmod removing kernel modules (potential rootkit management).",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2038,13 +4262,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_rmmod.json"
     },
     {
       "title": "Suspicious Usage of ruby",
-      "description": "Detects execution of potentially suspicious binary ruby.",
-      "level": "low",
+      "description": "Detects execution of ruby with inline execution or network operations.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2053,13 +4277,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_ruby.json"
     },
     {
       "title": "Suspicious Usage of shadow",
-      "description": "Detects execution of potentially suspicious binary shadow.",
-      "level": "low",
+      "description": "Detects execution of shadow with direct access to shadow password file.",
+      "level": "critical",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2068,13 +4292,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_shadow.json"
     },
     {
       "title": "Suspicious Usage of socat",
-      "description": "Detects execution of potentially suspicious binary socat.",
-      "level": "low",
+      "description": "Detects execution of socat with network or execution redirections.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2083,13 +4307,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_socat.json"
     },
     {
       "title": "Suspicious Usage of strace",
-      "description": "Detects execution of potentially suspicious binary strace.",
-      "level": "low",
+      "description": "Detects execution of strace tracing other processes.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2098,13 +4322,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_strace.json"
     },
     {
       "title": "Suspicious Usage of tcpdump",
-      "description": "Detects execution of potentially suspicious binary tcpdump.",
-      "level": "low",
+      "description": "Detects execution of tcpdump capturing network traffic.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2113,13 +4337,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_tcpdump.json"
     },
     {
       "title": "Suspicious Usage of tshark",
-      "description": "Detects execution of potentially suspicious binary tshark.",
-      "level": "low",
+      "description": "Detects execution of tshark capturing network traffic.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2128,13 +4352,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_tshark.json"
     },
     {
       "title": "Suspicious Usage of wget",
-      "description": "Detects execution of potentially suspicious binary wget.",
-      "level": "low",
+      "description": "Detects execution of wget downloading to temp directories or bypassing cert checks.",
+      "level": "high",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2143,13 +4367,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT I",
       "file": "suspicious_usage_of_wget.json"
     },
     {
       "title": "Suspicious Usage of whoami",
-      "description": "Detects execution of potentially suspicious binary whoami.",
-      "level": "low",
+      "description": "Detects execution of whoami in command chain suggesting post-exploitation enumeration.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2158,13 +4382,13 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_whoami.json"
     },
     {
       "title": "Suspicious Usage of wireshark",
-      "description": "Detects execution of potentially suspicious binary wireshark.",
-      "level": "low",
+      "description": "Detects execution of wireshark potentially capturing network traffic.",
+      "level": "medium",
       "platform": "linux",
       "mitre_techniques": [
         "T1204"
@@ -2173,8 +4397,569 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "CAT III",
+      "stig_category": "CAT II",
       "file": "suspicious_usage_of_wireshark.json"
+    },
+    {
+      "title": "SyncAppvPublishingServer Abuse",
+      "description": "Detects abuse of SyncAppvPublishingServer.exe for code execution through PowerShell.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "syncappvpublishingserver_abuse.json"
+    },
+    {
+      "title": "Sysmon C2 Beacon - Periodic Outbound HTTPS",
+      "description": "Detects periodic outbound HTTPS connections to non-standard destinations that may indicate C2 beaconing activity. Suspicious processes making repeated connections to external IPs on port 443 are flagged.\n",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1071.001",
+        "T1573"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_c2_beacon_-_periodic_outbound_https.json"
+    },
+    {
+      "title": "Sysmon Cobalt Strike C2 Network Indicators",
+      "description": "Detects network connections from processes commonly associated with Cobalt Strike beacon activity. Includes default Cobalt Strike process injection targets and malleable C2 patterns.\n",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1071.001",
+        "T1095"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_cobalt_strike_c2_network_indicators.json"
+    },
+    {
+      "title": "Sysmon Cobalt Strike Named Pipe",
+      "description": "Detects named pipe creation matching known Cobalt Strike default patterns. Cobalt Strike uses named pipes for inter-process communication and lateral movement via SMB beacon.\n",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1071",
+        "T1055"
+      ],
+      "mitre_tactics": [
+        "command_and_control",
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_cobalt_strike_named_pipe.json"
+    },
+    {
+      "title": "Sysmon Configuration Tampering",
+      "description": "Detects attempts to unload or reconfigure Sysmon to blind endpoint monitoring.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1562.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_configuration_tampering.json"
+    },
+    {
+      "title": "Sysmon DNS Data Exfiltration",
+      "description": "Detects DNS queries with high-entropy subdomains that may indicate data exfiltration via DNS tunneling. Encoded data in subdomain labels is a common technique for covert data transfer.\n",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1048.003",
+        "T1071.004"
+      ],
+      "mitre_tactics": [
+        "exfiltration",
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_dns_data_exfiltration.json"
+    },
+    {
+      "title": "Sysmon DNS Query to Known C2 Framework Domains",
+      "description": "Detects DNS queries to domains associated with known C2 frameworks and dynamic DNS services commonly used by attackers for C2 infrastructure.\n",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1071.004",
+        "T1568.002"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_dns_query_to_known_c2_framework_domains.json"
+    },
+    {
+      "title": "Sysmon DNS Query to Suspicious TLDs",
+      "description": "Detects DNS queries to top-level domains frequently associated with malicious infrastructure, phishing, and C2 operations.\n",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1071.004"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "sysmon_dns_query_to_suspicious_tlds.json"
+    },
+    {
+      "title": "Sysmon DNS Tunneling via Network Connection",
+      "description": "Detects suspicious processes making DNS connections (port 53) that could indicate DNS tunneling for data exfiltration or C2 communication.\n",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1071.004",
+        "T1048.003"
+      ],
+      "mitre_tactics": [
+        "command_and_control",
+        "exfiltration"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_dns_tunneling_via_network_connection.json"
+    },
+    {
+      "title": "Sysmon Kerberoasting Network Indicator",
+      "description": "Detects Kerberos ticket requests (port 88) from anomalous processes. Kerberoasting attacks request service tickets (TGS) to crack service account passwords offline.\n",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1558.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_kerberoasting_network_indicator.json"
+    },
+    {
+      "title": "Sysmon Lateral Movement via SMB",
+      "description": "Detects SMB connections (port 445) from processes commonly used for lateral movement. Attackers use PsExec, WMI, and other tools to move laterally through SMB/Windows Admin Shares.\n",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.002",
+        "T1570"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_lateral_movement_via_smb.json"
+    },
+    {
+      "title": "Sysmon Lateral Movement via WinRM",
+      "description": "Detects WinRM/PSRemoting connections (ports 5985/5986) from suspicious processes. Attackers use PowerShell Remoting for lateral movement and remote command execution.\n",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.006",
+        "T1059.001"
+      ],
+      "mitre_tactics": [
+        "lateral_movement",
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_lateral_movement_via_winrm.json"
+    },
+    {
+      "title": "Sysmon LDAP Reconnaissance",
+      "description": "Detects LDAP enumeration patterns (port 389/636) from suspicious processes. Attackers use LDAP queries to enumerate Active Directory users, groups, computers, and service accounts.\n",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1087.002",
+        "T1069.002"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "sysmon_ldap_reconnaissance.json"
+    },
+    {
+      "title": "Sysmon Mimikatz Named Pipe",
+      "description": "Detects named pipe creation matching known Mimikatz pipe patterns. Mimikatz uses named pipes for credential extraction and token manipulation operations.\n",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.001",
+        "T1134"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_mimikatz_named_pipe.json"
+    },
+    {
+      "title": "Sysmon Mimikatz Network Activity",
+      "description": "Detects network connections from mimikatz or known credential theft tools accessing domain controller services (LDAP, Kerberos, SMB).\n",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.001",
+        "T1558.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_mimikatz_network_activity.json"
+    },
+    {
+      "title": "Sysmon PsExec Named Pipe",
+      "description": "Detects named pipe creation matching PsExec default pipe names. PsExec creates named pipes for remote command execution and is commonly used for lateral movement.\n",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.002",
+        "T1569.002"
+      ],
+      "mitre_tactics": [
+        "lateral_movement",
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_psexec_named_pipe.json"
+    },
+    {
+      "title": "Sysmon RDP Lateral Movement",
+      "description": "Detects outbound RDP connections (port 3389) from unusual processes. While RDP is commonly used for administration, connections from non-standard processes may indicate lateral movement.\n",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.001"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "sysmon_rdp_lateral_movement.json"
+    },
+    {
+      "title": "Sysmon Suspicious Named Pipe Pattern",
+      "description": "Detects named pipe creation matching common C2 framework patterns including Metasploit, Covenant, and other post-exploitation tools.\n",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1071",
+        "T1059"
+      ],
+      "mitre_tactics": [
+        "command_and_control",
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_suspicious_named_pipe_pattern.json"
+    },
+    {
+      "title": "Sysmon Suspicious Outbound Connection from LOLBin",
+      "description": "Detects outbound network connections from Living-off-the-Land binaries (LOLBins) to external IP addresses. These binaries are commonly abused by attackers for downloading payloads and establishing C2.\n",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1218",
+        "T1105"
+      ],
+      "mitre_tactics": [
+        "defense_evasion",
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sysmon_suspicious_outbound_connection_from_lolbin.json"
+    },
+    {
+      "title": "System Recovery Disabled via BCDEdit",
+      "description": "Detects BCDEdit commands disabling system recovery, commonly seen in ransomware attacks.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1490"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "system_recovery_disabled_via_bcdedit.json"
+    },
+    {
+      "title": "System Shutdown or Reboot via shutdown.exe",
+      "description": "Detects forced system shutdown or reboot commands that may be part of destructive operations.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1529"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "system_shutdown_or_reboot_via_shutdownexe.json"
+    },
+    {
+      "title": "Template Injection via Microsoft Office",
+      "description": "Detects Office applications loading remote templates, a technique to deliver malicious macros.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1221"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "template_injection_via_microsoft_office.json"
+    },
+    {
+      "title": "Time Provider DLL Persistence",
+      "description": "Detects registration of time provider DLLs for high-privilege persistence.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1547.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "time_provider_dll_persistence.json"
+    },
+    {
+      "title": "Timestomping via PowerShell",
+      "description": "Detects PowerShell commands modifying file timestamps to blend malicious files with legitimate ones.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1070.006"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "timestomping_via_powershell.json"
+    },
+    {
+      "title": "Token Impersonation via Incognito",
+      "description": "Detects usage of Incognito or similar tools for Windows access token manipulation and impersonation.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1134"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "token_impersonation_via_incognito.json"
+    },
+    {
+      "title": "Token Manipulation via RunAs",
+      "description": "Detects suspicious RunAs usage that may indicate token manipulation for privilege escalation.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1134.002"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "token_manipulation_via_runas.json"
+    },
+    {
+      "title": "UAC Bypass via ComputerDefaults",
+      "description": "Detects UAC bypass using computerdefaults.exe auto-elevation.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1548.002"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "uac_bypass_via_computerdefaults.json"
+    },
+    {
+      "title": "UAC Bypass via DiskCleanup",
+      "description": "Detects UAC bypass using environment variable manipulation with DiskCleanup.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1548.002"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "uac_bypass_via_diskcleanup.json"
+    },
+    {
+      "title": "UAC Bypass via Eventvwr",
+      "description": "Detects UAC bypass using eventvwr.exe registry hijacking.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1548.002"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "uac_bypass_via_eventvwr.json"
+    },
+    {
+      "title": "UAC Bypass via Fodhelper",
+      "description": "Detects UAC bypass using fodhelper.exe to execute commands with elevated privileges.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1548.002"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "uac_bypass_via_fodhelper.json"
+    },
+    {
+      "title": "Unquoted Service Path Exploitation",
+      "description": "Detects commands querying for unquoted service paths, a privilege escalation vector.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1574.009"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "unquoted_service_path_exploitation.json"
+    },
+    {
+      "title": "VBA Macro Spawning Suspicious Child Process",
+      "description": "Detects Office applications spawning command shells or scripting engines, indicating macro execution.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1204.002"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "vba_macro_spawning_suspicious_child_process.json"
+    },
+    {
+      "title": "Virtualization Sandbox Evasion Check",
+      "description": "Detects commands checking for virtualization or sandbox environments before executing payloads.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1497"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "virtualization_sandbox_evasion_check.json"
+    },
+    {
+      "title": "Visual Basic Script Compilation via vbc.exe",
+      "description": "Detects compilation of Visual Basic code using vbc.exe from non-standard locations.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.005"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "visual_basic_script_compilation_via_vbcexe.json"
+    },
+    {
+      "title": "Volume Shadow Copy Deletion via WMIC",
+      "description": "Detects deletion of volume shadow copies using WMIC, a common ransomware preparation step.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1490"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "volume_shadow_copy_deletion_via_wmic.json"
+    },
+    {
+      "title": "WiFi Password Extraction via Netsh",
+      "description": "Detects extraction of stored WiFi passwords using netsh wlan show profile with key=clear.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1552.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "wifi_password_extraction_via_netsh.json"
     },
     {
       "title": "Windows Access Token Manipulation",
@@ -2209,6 +4994,21 @@
       "file": "windows_account_discovery_commands.json"
     },
     {
+      "title": "Windows Admin Share Access via Net Use",
+      "description": "Detects access to admin shares (C$, ADMIN$, IPC$) for lateral movement.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.002"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "windows_admin_share_access_via_net_use.json"
+    },
+    {
       "title": "Windows AMSI Bypass Attempt",
       "description": "Detects attempts to bypass the Antimalware Scan Interface (AMSI) through PowerShell commands or .NET reflection techniques.",
       "level": "high",
@@ -2222,6 +5022,21 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "windows_amsi_bypass_attempt.json"
+    },
+    {
+      "title": "Windows Backup Deletion via wbadmin",
+      "description": "Detects deletion of Windows backup catalog using wbadmin, preventing backup-based recovery.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1490"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "windows_backup_deletion_via_wbadmin.json"
     },
     {
       "title": "Windows BITS Job Abuse for Persistence",
@@ -2287,6 +5102,36 @@
       "file": "windows_credential_dumping_via_procdump.json"
     },
     {
+      "title": "Windows Credential Dumping via Secretsdump",
+      "description": "Detects execution of secretsdump.py or similar Impacket tools for credential extraction.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "windows_credential_dumping_via_secretsdump.json"
+    },
+    {
+      "title": "Windows Credential Manager Access via VaultCmd",
+      "description": "Detects usage of VaultCmd.exe to enumerate or export Windows Credential Manager entries.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1555"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "windows_credential_manager_access_via_vaultcmd.json"
+    },
+    {
       "title": "Windows Data Staging for Exfiltration",
       "description": "Detects data staging activity where an attacker collects and stages files before exfiltration. Indicators include copying files to temp directories, creating archives, or writing to removable media staging areas.\n",
       "level": "medium",
@@ -2301,6 +5146,36 @@
       "stig_ids": [],
       "stig_category": "CAT II",
       "file": "windows_data_staging_for_exfiltration.json"
+    },
+    {
+      "title": "Windows Defender Exclusion Added via PowerShell",
+      "description": "Detects addition of Windows Defender exclusions via PowerShell, often used to whitelist malware locations.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1562.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "windows_defender_exclusion_added_via_powershell.json"
+    },
+    {
+      "title": "Windows Defender Real-Time Protection Disabled",
+      "description": "Detects commands disabling Windows Defender real-time protection via PowerShell or registry.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1562.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "windows_defender_real-time_protection_disabled.json"
     },
     {
       "title": "Windows DLL Side-Loading via Suspicious Path",
@@ -2333,6 +5208,21 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "windows_encoded_powershell_execution.json"
+    },
+    {
+      "title": "Windows Event Log Cleared via Wevtutil",
+      "description": "Detects clearing of Windows Event Logs using wevtutil.exe to remove forensic evidence.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1070.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "windows_event_log_cleared_via_wevtutil.json"
     },
     {
       "title": "Windows Event Log Clearing",
@@ -2711,6 +5601,21 @@
       "file": "windows_lsass_memory_access.json"
     },
     {
+      "title": "Windows Management Instrumentation Event Subscription",
+      "description": "Detects WMI event subscription creation for persistence via command-line WMI tools.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1047"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "windows_management_instrumentation_event_subscription.json"
+    },
+    {
       "title": "Windows Mimikatz Execution Patterns",
       "description": "Detects execution of Mimikatz or tools with Mimikatz-like command line patterns used for credential harvesting from Windows systems.",
       "level": "critical",
@@ -2881,6 +5786,21 @@
       "file": "windows_remote_access_tool_detected.json"
     },
     {
+      "title": "Windows Remote Management Shell via Winrs",
+      "description": "Detects usage of winrs.exe for remote command execution over WinRM.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.006"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "windows_remote_management_shell_via_winrs.json"
+    },
+    {
       "title": "Windows Remote System Discovery",
       "description": "Detects commands and tools used to discover remote systems on the network. Attackers perform network sweeps, ARP scans, and DNS lookups to identify targets for lateral movement.\n",
       "level": "medium",
@@ -2924,6 +5844,36 @@
       "stig_ids": [],
       "stig_category": "CAT II",
       "file": "windows_screen_capture_activity.json"
+    },
+    {
+      "title": "Windows Script Host Execution from Temp",
+      "description": "Detects cscript or wscript executing scripts from temporary directories.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.005"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "windows_script_host_execution_from_temp.json"
+    },
+    {
+      "title": "Windows Service Created with Suspicious Binary Path",
+      "description": "Detects creation of Windows services pointing to executables in user-writable paths.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1543.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "windows_service_created_with_suspicious_binary_path.json"
     },
     {
       "title": "Windows Service Creation via SC",
@@ -2989,6 +5939,21 @@
       "file": "windows_uac_bypass_attempt.json"
     },
     {
+      "title": "Windows Vault Enumeration",
+      "description": "Detects enumeration of Windows Vault credentials using cmdkey or rundll32 with keymgr.dll.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1555"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "windows_vault_enumeration.json"
+    },
+    {
       "title": "Windows WDigest Authentication Enabled for Credential Harvesting",
       "description": "Detects enabling WDigest authentication via registry modification. When enabled, plaintext credentials are stored in LSASS memory, making them available for extraction by tools like Mimikatz.",
       "level": "high",
@@ -3018,6 +5983,96 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "windows_wmi_event_subscription_persistence.json"
+    },
+    {
+      "title": "Winlogon Helper DLL Modification",
+      "description": "Detects modification of Winlogon helper DLL registry entries for persistence.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1547.004"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "winlogon_helper_dll_modification.json"
+    },
+    {
+      "title": "WinRM Lateral Movement via PowerShell",
+      "description": "Detects WinRM-based lateral movement using PowerShell Invoke-Command or Enter-PSSession.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.006"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "winrm_lateral_movement_via_powershell.json"
+    },
+    {
+      "title": "WMI Event Subscription Persistence",
+      "description": "Detects creation of WMI event subscriptions for fileless persistence.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1546.003"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "wmi_event_subscription_persistence.json"
+    },
+    {
+      "title": "WMI Process Execution via Wmic",
+      "description": "Detects WMI-based process execution using wmic process call create.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1047"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "wmi_process_execution_via_wmic.json"
+    },
+    {
+      "title": "Wscript Running Encoded Script",
+      "description": "Detects execution of encoded VBScript or JScript files (.vbe, .jse) via wscript.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.005"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "wscript_running_encoded_script.json"
+    },
+    {
+      "title": "XSL Script Processing via WMIC or Msxsl",
+      "description": "Detects execution of XSL scripts through WMIC /format or msxsl.exe for code execution.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1220"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "xsl_script_processing_via_wmic_or_msxsl.json"
     }
   ],
   "hunting_queries": [
@@ -3259,5 +6314,11 @@
       ],
       "file": "hunting/windows_rare_process.json"
     }
-  ]
+  ],
+  "art_coverage": {
+    "testable_rules": 283,
+    "rules_with_tests": 278,
+    "coverage_percent": 98.2,
+    "total_test_mappings": 3217
+  }
 }

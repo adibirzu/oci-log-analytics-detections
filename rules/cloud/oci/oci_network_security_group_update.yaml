@@ -14,3 +14,8 @@ detection:
 level: medium
 tags:
 - attack.defense_evasion
+- attack.t1562.007
+version: 1
+falsepositives:
+- Routine IAM group management
+- Automated provisioning systems

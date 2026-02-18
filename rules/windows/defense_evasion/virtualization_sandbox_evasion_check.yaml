@@ -1,0 +1,26 @@
+title: Virtualization Sandbox Evasion Check
+id: 8b04ce8f-1cda-484c-a824-4f5ef541551c
+status: stable
+description: Detects commands checking for virtualization or sandbox environments
+  before executing payloads.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - VBOX
+    - VMware
+    - VirtualBox
+    - qemu
+    - xen
+    - SbieDll.dll
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1497
+falsepositives:
+- Virtualization management tools
+- VM guest agents
+version: 1

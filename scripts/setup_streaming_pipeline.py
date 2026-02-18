@@ -28,10 +28,11 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oci_config import (
-    TENANCY_ID, COMPARTMENT_ID,
+    TENANCY_ID, COMPARTMENT_ID, LOG_GROUP_ID, _cfg,
     get_la_client, get_streaming_admin_client, get_sch_client,
     get_namespace, ensure_log_group, validate_oci_setup,
-    SOURCE_CANDIDATE_GROUPS,
+    require_oci_config,
+    SOURCE_CANDIDATE_GROUPS, LOG_GROUP_NAME, LOG_GROUP_DESC,
     list_available_log_sources,
     resolve_source_from_candidates,
 )
@@ -66,21 +67,10 @@ STREAMS = [
     }
 ]
 
-LOG_GROUP_NAME = "soc-detection-test-logs"
-LOG_GROUP_DESC = "Log group for SOC detection rule test data ingested via Streaming"
-
-
-def _clean(value):
-    """Trim quotes/whitespace from env-derived values."""
-    if value is None:
-        return ""
-    return str(value).strip().strip('"').strip("'")
-
-
-TARGET_STREAM_POOL_ID = _clean(
-    os.environ.get("OCI_STREAM_POOL_OCID")
-    or os.environ.get("C3_STREAM_POOL_OCID")
-    or os.environ.get("OCI_KAFKA_CONNECT_STREAM_POOL_OCID")
+TARGET_STREAM_POOL_ID = (
+    _cfg("OCI_STREAM_POOL_OCID", "")
+    or _cfg("C3_STREAM_POOL_OCID", "")
+    or _cfg("OCI_KAFKA_CONNECT_STREAM_POOL_OCID", "")
 )
 
 
@@ -162,8 +152,10 @@ def find_or_create_stream(stream_admin_client, stream_config):
             return stream_state.id, stream_state.messages_endpoint
         time.sleep(2)
 
-    print("  WARNING: Stream not yet ACTIVE after 60s, continuing anyway")
-    return new_stream.id, new_stream.messages_endpoint
+    print("  ERROR: Stream not ACTIVE after 60s — aborting.")
+    print(f"  Stream ID: {new_stream.id}")
+    print("  Check the OCI Console for stream status and retry.")
+    sys.exit(1)
 
 
 def create_service_connector(sch_client, stream_id, stream_name, log_source,
@@ -283,19 +275,27 @@ def main():
         print(f"\n  Log Group: {LOG_GROUP_NAME}")
         return
 
+    require_oci_config()
     stream_admin_client = get_streaming_admin_client()
     la_client = get_la_client()
     sch_client = get_sch_client()
 
     # Step 1: Log Analytics namespace and log group
-    print("\n[1/3] Setting up Log Analytics...")
+    print("\n[1/4] Setting up Log Analytics...")
     la_namespace = get_namespace(la_client)
     log_group_id = ensure_log_group(la_client, la_namespace)
+
+    # Cross-check: warn if runtime log_group_id differs from env var
+    if LOG_GROUP_ID and log_group_id != LOG_GROUP_ID:
+        print(f"\n  WARNING: Runtime log_group_id differs from LOG_GROUP_ID env var!")
+        print(f"    runtime: {log_group_id}")
+        print(f"    env:     {LOG_GROUP_ID}")
+        print("    Connectors will use the runtime value. Update .env.local if needed.")
     available_sources = list_available_log_sources(la_client, la_namespace, COMPARTMENT_ID)
     print(f"  Discovered {len(available_sources)} available log sources")
 
     # Step 2: Create streams
-    print("\n[2/3] Setting up Streaming streams...")
+    print("\n[2/4] Setting up Streaming streams...")
     stream_configs = {}
     for sc in STREAMS:
         stream_id, messages_endpoint = find_or_create_stream(stream_admin_client, sc)
@@ -312,7 +312,7 @@ def main():
         }
 
     # Step 3: Create Service Connector Hub connectors
-    print("\n[3/3] Setting up Service Connector Hub...")
+    print("\n[3/4] Setting up Service Connector Hub...")
     for sc in STREAMS:
         cfg = stream_configs[sc['name']]
         create_service_connector(
@@ -323,6 +323,25 @@ def main():
             log_group_id=log_group_id,
             la_namespace=la_namespace
         )
+
+    # Step 4: Post-creation validation
+    print("\n[4/4] Verifying connector states...")
+    all_active = True
+    for sc in STREAMS:
+        connector_name = f"sch-{sc['name']}-to-la"
+        connectors = sch_client.list_service_connectors(
+            compartment_id=COMPARTMENT_ID, display_name=connector_name
+        ).data.items
+        active = [c for c in connectors if getattr(c, "lifecycle_state", "") == "ACTIVE"]
+        if active:
+            print(f"  [OK  ] {connector_name}")
+        else:
+            states = [getattr(c, "lifecycle_state", "?") for c in connectors]
+            print(f"  [WAIT] {connector_name} — state(s): {states or 'not found'}")
+            all_active = False
+    if not all_active:
+        print("\n  Some connectors are not yet ACTIVE. They may still be provisioning.")
+        print("  Re-run: python3 scripts/validate_pipeline.py")
 
     # Save config for ingest script
     stream_configs['_metadata'] = {

@@ -1,15 +1,26 @@
 title: Suspicious Usage of chmod
 id: dc725e73-e395-459a-84b9-bed57c25ab59
 status: experimental
-description: Detects execution of potentially suspicious binary chmod.
+description: Detects execution of chmod with SUID/world-writable permission changes.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: chmod
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - '+s '
+    - '4755'
+    - '777'
+    - +x /tmp
+    - +x /dev/shm
+level: high
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate chmod usage by system administrators
+- Automated system scripts

@@ -27,5 +27,9 @@
   },
   "stig_ids": [
     "SC-28"
+  ],
+  "falsepositives": [
+    "Planned disaster recovery operations",
+    "Automated backup replication"
   ]
 }

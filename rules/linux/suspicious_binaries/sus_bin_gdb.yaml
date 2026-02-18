@@ -1,15 +1,25 @@
 title: Suspicious Usage of gdb
 id: df525fb1-3830-48ee-a9af-319b50dacd07
 status: experimental
-description: Detects execution of potentially suspicious binary gdb.
+description: Detects execution of gdb attaching to process or dumping memory.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: gdb
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - '-p '
+    - --pid
+    - attach
+    - dump memory
+level: high
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate gdb usage by system administrators
+- Automated system scripts

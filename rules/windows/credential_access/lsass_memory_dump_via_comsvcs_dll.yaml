@@ -1,0 +1,22 @@
+title: LSASS Memory Dump via Comsvcs DLL
+id: 0adcf3e1-86af-455e-83da-39a8cbf53592
+status: stable
+description: Detects LSASS memory dumping using comsvcs.dll MiniDump export, a technique
+  to extract credentials without dropping tools.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - comsvcs
+    - MiniDump
+    - lsass
+  condition: selection
+level: critical
+tags:
+- attack.credential_access
+- attack.t1003.001
+falsepositives:
+- Legitimate memory dump by administrators for debugging
+version: 1

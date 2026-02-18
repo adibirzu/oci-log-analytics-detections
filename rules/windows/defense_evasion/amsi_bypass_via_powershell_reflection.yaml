@@ -1,0 +1,21 @@
+title: AMSI Bypass via PowerShell Reflection
+id: f3735c1f-a5ee-4225-a1af-bb62ff251923
+status: stable
+description: Detects PowerShell reflection techniques used to bypass AMSI by patching
+  the AmsiScanBuffer function.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - System.Management.Automation
+    - amsi
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1562.001
+falsepositives:
+- Security research tools
+version: 1

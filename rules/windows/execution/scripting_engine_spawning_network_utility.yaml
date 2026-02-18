@@ -1,0 +1,27 @@
+title: Scripting Engine Spawning Network Utility
+id: dd93ff28-0930-4cba-9f95-2efff6d8bc28
+status: stable
+description: Detects scripting engines spawning network utilities like curl, wget,
+  or net.exe.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    ParentImage|endswith:
+    - \wscript.exe
+    - \cscript.exe
+    - \mshta.exe
+    Image|endswith:
+    - \cmd.exe
+    - \powershell.exe
+    - \net.exe
+    - \net1.exe
+  condition: selection
+level: high
+tags:
+- attack.execution
+- attack.t1059.005
+falsepositives:
+- Legitimate deployment scripts
+version: 1

@@ -1,0 +1,22 @@
+title: SAM Database Extraction via Reg Save
+id: 1e32f76b-e708-44ad-8265-aa73d4e65189
+status: stable
+description: Detects extraction of the SAM database using reg.exe save command, used
+  to obtain password hashes offline.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \reg.exe
+    CommandLine|contains|all:
+    - save
+    - sam
+  condition: selection
+level: high
+tags:
+- attack.credential_access
+- attack.t1003.002
+falsepositives:
+- Legitimate backup procedures
+version: 1

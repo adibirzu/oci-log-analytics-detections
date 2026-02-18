@@ -1,0 +1,21 @@
+title: Office Application Startup Persistence
+id: bcad9305-2e01-4bce-a177-e00dd645db66
+status: stable
+description: Detects modification of Office startup locations for add-in persistence.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - \Microsoft\Word\STARTUP
+    - \Microsoft\Excel\XLSTART
+    - AddIns
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1137
+falsepositives:
+- Legitimate Office add-in installations
+version: 1

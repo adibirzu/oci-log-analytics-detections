@@ -1,0 +1,21 @@
+title: Time Provider DLL Persistence
+id: ad1a6254-eab5-461e-96a3-e4bac4b35fa1
+status: stable
+description: Detects registration of time provider DLLs for high-privilege persistence.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - TimeProviders
+    - DllName
+    - reg
+  condition: selection
+level: high
+tags:
+- attack.persistence
+- attack.t1547.003
+falsepositives:
+- NTP software installation
+version: 1

@@ -1,0 +1,26 @@
+title: Data Compression for Exfiltration via 7zip
+id: 916c4602-12f1-4ee9-8f82-be1609a891c0
+status: stable
+description: Detects data compression using 7-Zip or WinRAR with password protection,
+  often used before exfiltration.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \7z.exe
+    - \7za.exe
+    - \rar.exe
+    - \WinRAR.exe
+    CommandLine|contains:
+    - -p
+    - -hp
+  condition: selection
+level: medium
+tags:
+- attack.collection
+- attack.t1560.001
+falsepositives:
+- Legitimate file archiving with passwords
+version: 1

@@ -1,7 +1,8 @@
 title: Windows AMSI Bypass Attempt
 id: d1a2b3c4-3002-4000-8000-000000000002
 status: stable
-description: Detects attempts to bypass the Antimalware Scan Interface (AMSI) through PowerShell commands or .NET reflection techniques.
+description: Detects attempts to bypass the Antimalware Scan Interface (AMSI) through PowerShell commands or .NET reflection
+  techniques.
 logsource:
   product: windows
   service: process_creation
@@ -18,3 +19,6 @@ level: high
 tags:
 - attack.defense_evasion
 - attack.t1562.001
+version: 1
+falsepositives:
+- Security tool testing in lab environments

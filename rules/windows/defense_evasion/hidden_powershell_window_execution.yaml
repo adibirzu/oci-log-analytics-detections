@@ -1,0 +1,21 @@
+title: Hidden PowerShell Window Execution
+id: b8710dd4-273a-4e97-8b35-e22f0b47ffb1
+status: stable
+description: Detects PowerShell execution with hidden window style, commonly used
+  to avoid user visibility.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \powershell.exe
+    CommandLine|contains: -WindowStyle Hidden
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1564.003
+falsepositives:
+- Legitimate automation scripts
+- System management tools
+version: 1

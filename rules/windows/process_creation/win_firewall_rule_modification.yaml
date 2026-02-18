@@ -1,7 +1,8 @@
 title: Windows Firewall Rule Modification
 id: e1f2a3b4-4016-4000-8000-000000000016
 status: stable
-description: Detects modification of Windows Firewall rules via netsh. Attackers disable or modify firewall rules to enable lateral movement or C2 communication.
+description: Detects modification of Windows Firewall rules via netsh. Attackers disable
+  or modify firewall rules to enable lateral movement or C2 communication.
 logsource:
   product: windows
   service: process_creation
@@ -21,3 +22,4 @@ tags:
 falsepositives:
 - Legitimate firewall administration
 - Software installation requiring firewall exceptions
+version: 1

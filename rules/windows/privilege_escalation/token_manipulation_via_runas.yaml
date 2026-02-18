@@ -1,0 +1,20 @@
+title: Token Manipulation via RunAs
+id: 6ba8f6c4-7c54-4ab2-a4fb-7d239c64a6c1
+status: stable
+description: Detects suspicious RunAs usage that may indicate token manipulation for
+  privilege escalation.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \runas.exe
+    CommandLine|contains: /netonly
+  condition: selection
+level: medium
+tags:
+- attack.privilege_escalation
+- attack.t1134.002
+falsepositives:
+- Legitimate administrative access
+version: 1

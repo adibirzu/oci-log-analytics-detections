@@ -6,11 +6,17 @@
   "level": "informational",
   "stig_category": "CAT III",
   "tags": [
-    "oci.audit"
+    "oci.audit",
+    "attack.persistence",
+    "attack.t1583"
   ],
   "mitre_attack": {
-    "tactics": [],
-    "techniques": []
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1583"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -18,5 +24,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Planned network architecture changes",
+    "Automated IaC deployments"
+  ]
 }

@@ -30,5 +30,46 @@
   "falsepositives": [
     "Authorized data transfers",
     "Backup scripts using scp"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 4,
+    "techniques_with_tests": [
+      "T1048"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1048",
+        "test_name": "Exfiltration Over Alternative Protocol - SSH",
+        "test_guid": "f6786cc8-beda-4915-a4d6-ac2f193bb988",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1048/T1048.md"
+      },
+      {
+        "technique_id": "T1048",
+        "test_name": "Exfiltration Over Alternative Protocol - SSH",
+        "test_guid": "7c3cb337-35ae-4d06-bf03-3032ed2ec268",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1048/T1048.md"
+      },
+      {
+        "technique_id": "T1048",
+        "test_name": "DNSExfiltration (doh)",
+        "test_guid": "c943d285-ada3-45ca-b3aa-7cd6500c6a48",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1048/T1048.md"
+      },
+      {
+        "technique_id": "T1048",
+        "test_name": "Exfiltrate Data using DNS Queries via dig",
+        "test_guid": "a27916da-05f2-4316-a3ee-feec67a437be",
+        "executor": "bash",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1048/T1048.md"
+      }
+    ]
+  }
 }

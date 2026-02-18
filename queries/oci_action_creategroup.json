@@ -6,11 +6,17 @@
   "level": "informational",
   "stig_category": "CAT III",
   "tags": [
-    "oci.audit"
+    "oci.audit",
+    "attack.persistence",
+    "attack.t1136.003"
   ],
   "mitre_attack": {
-    "tactics": [],
-    "techniques": []
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1136.003"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -18,5 +24,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Routine IAM group management",
+    "Automated provisioning systems"
+  ]
 }

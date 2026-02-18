@@ -13,3 +13,6 @@ level: medium
 tags:
 - attack.defense_evasion
 - attack.t1218
+version: 1
+falsepositives:
+- Legitimate usage of built-in Windows tools by administrators

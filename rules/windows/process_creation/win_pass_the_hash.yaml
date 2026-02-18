@@ -1,7 +1,8 @@
 title: Windows Pass-the-Hash Attack Indicators
 id: f1e2d3c4-5017-4000-8000-000000000017
 status: stable
-description: Detects command-line patterns associated with pass-the-hash attacks using tools like Impacket, CrackMapExec, or built-in Windows commands with NTLM hash parameters.
+description: Detects command-line patterns associated with pass-the-hash attacks using
+  tools like Impacket, CrackMapExec, or built-in Windows commands with NTLM hash parameters.
 logsource:
   product: windows
   service: process_creation
@@ -26,3 +27,4 @@ tags:
 falsepositives:
 - Authorized penetration testing
 - Legitimate use of runas /netonly for cross-domain authentication
+version: 1

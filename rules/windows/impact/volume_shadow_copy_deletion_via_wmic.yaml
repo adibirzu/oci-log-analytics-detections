@@ -1,0 +1,22 @@
+title: Volume Shadow Copy Deletion via WMIC
+id: 790cfaca-a0bb-4647-bbfb-08a41c82db4e
+status: stable
+description: Detects deletion of volume shadow copies using WMIC, a common ransomware
+  preparation step.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \wmic.exe
+    CommandLine|contains|all:
+    - shadowcopy
+    - delete
+  condition: selection
+level: critical
+tags:
+- attack.impact
+- attack.t1490
+falsepositives:
+- Shadow copy cleanup by storage management
+version: 1

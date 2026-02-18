@@ -13,3 +13,7 @@ level: high
 tags:
 - attack.persistence
 - attack.t1098.004
+version: 1
+falsepositives:
+- Authorized remote administration
+- Automated SSH-based deployments

@@ -1,7 +1,8 @@
 title: OCI Compartment Deleted
 id: d1a2b3c4-1005-4000-8000-000000000005
 status: stable
-description: Detects deletion of an OCI compartment. This is a high-impact destructive action that removes all resources within the compartment and could indicate sabotage or insider threat.
+description: Detects deletion of an OCI compartment. This is a high-impact destructive action that removes all resources within
+  the compartment and could indicate sabotage or insider threat.
 logsource:
   product: oci
   service: audit
@@ -14,3 +15,7 @@ tags:
 - attack.impact
 - attack.t1485
 - stig.AC-6
+version: 1
+falsepositives:
+- Organizational restructuring
+- Automated IaC cleanup

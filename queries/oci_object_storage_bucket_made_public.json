@@ -6,13 +6,16 @@
   "level": "high",
   "stig_category": "CAT I",
   "tags": [
-    "attack.exfiltration"
+    "attack.exfiltration",
+    "attack.t1537"
   ],
   "mitre_attack": {
     "tactics": [
       "exfiltration"
     ],
-    "techniques": []
+    "techniques": [
+      "T1537"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -20,5 +23,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Routine storage operations by authorized administrators",
+    "Automated backup or archival processes"
+  ]
 }

@@ -31,5 +31,9 @@
   ],
   "compliance_frameworks": [
     "cis_oci_1.2"
+  ],
+  "falsepositives": [
+    "Routine IAM administration",
+    "Automated provisioning systems"
   ]
 }

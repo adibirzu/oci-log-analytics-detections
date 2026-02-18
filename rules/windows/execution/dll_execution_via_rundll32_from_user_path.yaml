@@ -1,0 +1,22 @@
+title: DLL Execution via Rundll32 from User Path
+id: 7687c4d3-827b-4101-ba2a-2308c98af11b
+status: stable
+description: Detects rundll32.exe loading DLLs from user-writable directories.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \rundll32.exe
+    CommandLine|contains:
+    - \Users\
+    - \Temp\
+    - \Downloads\
+  condition: selection
+level: high
+tags:
+- attack.execution
+- attack.t1218.011
+falsepositives:
+- Legitimate DLLs in user directories
+version: 1

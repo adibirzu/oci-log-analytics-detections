@@ -30,5 +30,46 @@
   "falsepositives": [
     "Debugging tools and profilers",
     "Application performance monitoring agents"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 4,
+    "techniques_with_tests": [
+      "T1003.007"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1003.007",
+        "test_name": "Dump individual process memory with sh (Local)",
+        "test_guid": "7e91138a-8e74-456d-a007-973d67a0bb80",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.007/T1003.007.md"
+      },
+      {
+        "technique_id": "T1003.007",
+        "test_name": "Dump individual process memory with sh on FreeBSD (Local)",
+        "test_guid": "fa37b633-e097-4415-b2b8-c5bf4c86e423",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.007/T1003.007.md"
+      },
+      {
+        "technique_id": "T1003.007",
+        "test_name": "Dump individual process memory with Python (Local)",
+        "test_guid": "437b2003-a20d-4ed8-834c-4964f24eec63",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.007/T1003.007.md"
+      },
+      {
+        "technique_id": "T1003.007",
+        "test_name": "Capture Passwords with MimiPenguin",
+        "test_guid": "a27418de-bdce-4ebd-b655-38f04842bf0c",
+        "executor": "bash",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1003.007/T1003.007.md"
+      }
+    ]
+  }
 }

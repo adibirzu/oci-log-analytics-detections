@@ -23,5 +23,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Infrastructure scaling operations",
+    "Automated IaC deployments"
+  ]
 }

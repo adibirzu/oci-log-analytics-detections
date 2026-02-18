@@ -1,7 +1,9 @@
 title: Windows MSBuild Execution for Code Bypass
 id: f1e2d3c4-5016-4000-8000-000000000016
 status: stable
-description: Detects execution of MSBuild.exe which can compile and execute inline C# code from XML project files, bypassing application whitelisting and AppLocker policies.
+description: Detects execution of MSBuild.exe which can compile and execute inline
+  C# code from XML project files, bypassing application whitelisting and AppLocker
+  policies.
 logsource:
   product: windows
   service: process_creation
@@ -17,3 +19,4 @@ tags:
 falsepositives:
 - Legitimate software development build processes
 - CI/CD build agents using MSBuild
+version: 1

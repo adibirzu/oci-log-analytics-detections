@@ -1,0 +1,22 @@
+title: DPAPI Master Key Extraction
+id: f71e4a84-2baa-41b8-908c-c9875a06c6a9
+status: stable
+description: Detects extraction of DPAPI master keys which protect user credentials,
+  browser passwords, and other secrets.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - dpapi::masterkey
+    - sekurlsa::dpapi
+    - Protect\S-1-
+  condition: selection
+level: high
+tags:
+- attack.credential_access
+- attack.t1555
+falsepositives:
+- Authorized security assessments
+version: 1

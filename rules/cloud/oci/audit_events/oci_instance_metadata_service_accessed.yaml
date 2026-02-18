@@ -1,0 +1,21 @@
+title: OCI Instance Metadata Service Accessed
+id: a315feca-89ce-449b-a96a-33d884e1fe75
+status: stable
+description: Detects access to instance metadata service which may reveal instance
+  principal credentials.
+references:
+- https://attack.mitre.org/techniques/T1552/005/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.computeapi.getinstancecredentials
+  condition: selection
+level: medium
+tags:
+- attack.credential_access
+- attack.t1552.005
+falsepositives:
+- Legitimate instance principal authentication
+version: 1

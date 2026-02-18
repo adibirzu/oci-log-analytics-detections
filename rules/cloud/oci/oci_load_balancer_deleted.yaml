@@ -15,3 +15,7 @@ level: high
 tags:
 - attack.impact
 - attack.t1489
+version: 1
+falsepositives:
+- Infrastructure scaling operations
+- Automated IaC deployments

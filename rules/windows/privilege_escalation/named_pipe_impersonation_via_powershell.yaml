@@ -1,0 +1,21 @@
+title: Named Pipe Impersonation via PowerShell
+id: eed41b6b-7ee9-4113-bd76-abd0d0fb8ecd
+status: stable
+description: Detects named pipe impersonation technique for privilege escalation via
+  PowerShell.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - Get-System
+    - NamedPipe
+  condition: selection
+level: critical
+tags:
+- attack.privilege_escalation
+- attack.t1134.001
+falsepositives:
+- Authorized penetration testing
+version: 1

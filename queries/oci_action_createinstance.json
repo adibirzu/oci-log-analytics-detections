@@ -6,11 +6,17 @@
   "level": "informational",
   "stig_category": "CAT III",
   "tags": [
-    "oci.audit"
+    "oci.audit",
+    "attack.resource_development",
+    "attack.t1583.003"
   ],
   "mitre_attack": {
-    "tactics": [],
-    "techniques": []
+    "tactics": [
+      "resource_development"
+    ],
+    "techniques": [
+      "T1583.003"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -18,5 +24,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Authorized scaling operations",
+    "Automated IaC deployments"
+  ]
 }

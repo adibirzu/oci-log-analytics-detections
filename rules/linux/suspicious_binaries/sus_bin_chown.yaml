@@ -1,15 +1,26 @@
 title: Suspicious Usage of chown
 id: 7e7d49c3-786b-4848-9a0d-584b9616f842
 status: experimental
-description: Detects execution of potentially suspicious binary chown.
+description: Detects execution of chown targeting system directories or changing to
+  root ownership.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: chown
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - 'root:'
+    - :root
+    - /etc/
+    - /usr/
+level: medium
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate chown usage by system administrators
+- Automated system scripts

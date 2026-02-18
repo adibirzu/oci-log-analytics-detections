@@ -14,3 +14,6 @@ level: medium
 tags:
 - attack.persistence
 - attack.t1543.003
+version: 1
+falsepositives:
+- Legitimate service installation during software deployment

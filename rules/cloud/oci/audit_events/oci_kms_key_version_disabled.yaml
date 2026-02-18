@@ -1,0 +1,21 @@
+title: OCI KMS Key Version Disabled
+id: f0414af9-9639-44c8-99ca-98ff70f159a5
+status: stable
+description: Detects disabling of a KMS key version which may impact data encryption
+  or indicate key compromise response.
+references:
+- https://attack.mitre.org/techniques/T1600/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.keymanagement.disablekeyversion
+  condition: selection
+level: high
+tags:
+- attack.impact
+- attack.t1600
+falsepositives:
+- Key rotation procedures
+version: 1

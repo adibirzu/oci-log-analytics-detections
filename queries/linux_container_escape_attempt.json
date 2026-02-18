@@ -26,5 +26,41 @@
       "Linux Syslog Logs",
       "Linux Audit Logs"
     ]
+  },
+  "falsepositives": [
+    "Legitimate container debugging operations"
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 3,
+    "techniques_with_tests": [
+      "T1611"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1611",
+        "test_name": "Deploy container using nsenter container escape",
+        "test_guid": "0b2f9520-a17a-4671-9dba-3bd034099fff",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1611/T1611.md"
+      },
+      {
+        "technique_id": "T1611",
+        "test_name": "Mount host filesystem to escape privileged Docker container",
+        "test_guid": "6c499943-b098-4bc6-8d38-0956fc182984",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1611/T1611.md"
+      },
+      {
+        "technique_id": "T1611",
+        "test_name": "Privilege Escalation via Docker Volume Mapping",
+        "test_guid": "39fab1bc-fcb9-406f-bc2e-fe03e42ff0e4",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1611/T1611.md"
+      }
+    ]
   }
 }

@@ -1,0 +1,20 @@
+title: Disk Wipe via Format Command
+id: 94777073-9b92-463b-9b6d-48ff833121df
+status: stable
+description: Detects format command execution that could indicate destructive disk
+  wiping.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \format.com
+    CommandLine|contains: /y
+  condition: selection
+level: critical
+tags:
+- attack.impact
+- attack.t1561
+falsepositives:
+- Legitimate disk formatting
+version: 1

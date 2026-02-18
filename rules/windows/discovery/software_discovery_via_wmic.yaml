@@ -1,0 +1,21 @@
+title: Software Discovery via WMIC
+id: d7e23910-3d80-4a54-9e23-77c6898da091
+status: stable
+description: Detects software enumeration using WMIC to identify installed applications.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \wmic.exe
+    CommandLine|contains:
+    - product get
+    - qfe list
+  condition: selection
+level: low
+tags:
+- attack.discovery
+- attack.t1518
+falsepositives:
+- IT inventory scripts
+version: 1

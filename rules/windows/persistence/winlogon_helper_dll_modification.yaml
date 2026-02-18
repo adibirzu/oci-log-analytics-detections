@@ -1,0 +1,21 @@
+title: Winlogon Helper DLL Modification
+id: 8a0754d8-a47e-4cf1-bba3-a79689629944
+status: stable
+description: Detects modification of Winlogon helper DLL registry entries for persistence.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - Winlogon
+    - Shell
+    - reg
+  condition: selection
+level: high
+tags:
+- attack.persistence
+- attack.t1547.004
+falsepositives:
+- Custom shell replacements by administrators
+version: 1

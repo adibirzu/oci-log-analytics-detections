@@ -30,5 +30,22 @@
   "falsepositives": [
     "Legitimate web application deployments",
     "CMS plugin installations"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 1,
+    "techniques_with_tests": [
+      "T1505.003"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1505.003",
+        "test_name": "Web Shell Written to Disk",
+        "test_guid": "0a2ce662-1efa-496f-a472-2fe7b080db16",
+        "executor": "command_prompt",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1505.003/T1505.003.md"
+      }
+    ]
+  }
 }

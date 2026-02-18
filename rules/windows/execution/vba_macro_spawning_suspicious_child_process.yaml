@@ -1,0 +1,29 @@
+title: VBA Macro Spawning Suspicious Child Process
+id: 8eb3f12c-434b-42d2-bb2f-655d8a5c869f
+status: stable
+description: Detects Office applications spawning command shells or scripting engines,
+  indicating macro execution.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    ParentImage|endswith:
+    - \WINWORD.EXE
+    - \EXCEL.EXE
+    - \POWERPNT.EXE
+    - \OUTLOOK.EXE
+    Image|endswith:
+    - \cmd.exe
+    - \powershell.exe
+    - \wscript.exe
+    - \cscript.exe
+    - \mshta.exe
+  condition: selection
+level: high
+tags:
+- attack.execution
+- attack.t1204.002
+falsepositives:
+- Legitimate macros that launch helper scripts
+version: 1

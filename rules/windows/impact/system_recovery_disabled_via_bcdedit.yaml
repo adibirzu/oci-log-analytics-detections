@@ -1,0 +1,22 @@
+title: System Recovery Disabled via BCDEdit
+id: e0dfde69-53e6-4f14-a664-d865be504ae4
+status: stable
+description: Detects BCDEdit commands disabling system recovery, commonly seen in
+  ransomware attacks.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \bcdedit.exe
+    CommandLine|contains:
+    - recoveryenabled
+    - 'No'
+  condition: selection
+level: critical
+tags:
+- attack.impact
+- attack.t1490
+falsepositives:
+- IT configuration changes
+version: 1

@@ -1,0 +1,20 @@
+title: Default File Association Hijack
+id: b4e4b0b5-7ea5-42b4-8558-d7d5d4b972f1
+status: stable
+description: Detects modification of default file associations for persistence.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \assoc.exe
+    - \ftype.exe
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1546.001
+falsepositives:
+- Legitimate file association changes by applications
+version: 1

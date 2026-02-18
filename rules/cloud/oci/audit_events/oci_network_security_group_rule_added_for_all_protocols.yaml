@@ -1,0 +1,21 @@
+title: OCI Network Security Group Rule Added for All Protocols
+id: 97943766-68a0-4aa8-838d-5fd21bbbfcc6
+status: stable
+description: Detects adding NSG rules that allow all protocols, potentially opening
+  attack surface.
+references:
+- https://attack.mitre.org/techniques/T1562/004/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.addnetworksecuritygroupsecurityrules
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1562.004
+falsepositives:
+- Security group configuration during deployment
+version: 1

@@ -1,0 +1,23 @@
+title: Process Discovery via Tasklist
+id: b079f5ba-7de4-4e62-9517-4b45805a6942
+status: stable
+description: Detects tasklist.exe with verbose or SVC flags often used during post-exploitation
+  reconnaissance.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \tasklist.exe
+    CommandLine|contains:
+    - /v
+    - /svc
+    - /fi
+  condition: selection
+level: low
+tags:
+- attack.discovery
+- attack.t1057
+falsepositives:
+- System administration scripts
+version: 1

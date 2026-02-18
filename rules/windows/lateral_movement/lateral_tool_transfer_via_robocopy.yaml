@@ -1,0 +1,19 @@
+title: Lateral Tool Transfer via Robocopy
+id: f298059c-0e62-46c1-ab63-e3fd9bea8d19
+status: stable
+description: Detects usage of robocopy to transfer tools or files to remote systems.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \robocopy.exe
+    CommandLine|contains: \\
+  condition: selection
+level: low
+tags:
+- attack.lateral_movement
+- attack.t1570
+falsepositives:
+- Legitimate file synchronization
+version: 1

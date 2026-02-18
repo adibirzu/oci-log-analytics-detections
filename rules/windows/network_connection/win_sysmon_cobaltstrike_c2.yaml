@@ -1,10 +1,11 @@
 title: Sysmon Cobalt Strike C2 Network Indicators
 id: a1b2c3d4-7001-4000-8000-000000000009
 status: stable
-description: >
-  Detects network connections from processes commonly associated with
-  Cobalt Strike beacon activity. Includes default Cobalt Strike
-  process injection targets and malleable C2 patterns.
+description: 'Detects network connections from processes commonly associated with
+  Cobalt Strike beacon activity. Includes default Cobalt Strike process injection
+  targets and malleable C2 patterns.
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -33,8 +34,8 @@ detection:
   filter_internal:
     DestinationIp|startswith:
     - '10.'
-    - '172.16.'
-    - '192.168.'
+    - 172.16.
+    - 192.168.
     - '127.'
   condition: (sel_beacon_process or sel_injected_outbound) and not filter_internal
 level: critical
@@ -45,3 +46,4 @@ tags:
 falsepositives:
 - Legitimate DLL host operations
 - Windows service communication
+version: 1

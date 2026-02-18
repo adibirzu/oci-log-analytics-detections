@@ -12,6 +12,16 @@ test_data/
 # SigmaHQ clone (managed by sync_sigmahq.py)
 .sigmahq/
 
+# Terraform
+stack/.terraform/
+stack/.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# ORM stack zip
+soc-detection-stack.zip
+
 # OS files
 .DS_Store
 Thumbs.db

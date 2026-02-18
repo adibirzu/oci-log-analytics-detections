@@ -1,0 +1,21 @@
+title: OCI Object Storage Replication Policy Created
+id: 2ad1fc65-7141-47aa-8f10-f55428dd65e7
+status: stable
+description: Detects creation of cross-region object storage replication policy, a
+  potential data movement vector.
+references:
+- https://attack.mitre.org/techniques/T1537/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.objectstorage.createreplicationpolicy
+  condition: selection
+level: high
+tags:
+- attack.exfiltration
+- attack.t1537
+falsepositives:
+- Disaster recovery replication setup
+version: 1

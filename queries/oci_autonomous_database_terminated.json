@@ -23,5 +23,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Authorized database lifecycle operations",
+    "Test environment cleanup"
+  ]
 }

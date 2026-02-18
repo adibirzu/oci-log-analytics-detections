@@ -30,5 +30,30 @@
   "falsepositives": [
     "Authorized mining operations",
     "Blockchain development testing"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 2,
+    "techniques_with_tests": [
+      "T1496"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1496",
+        "test_name": "FreeBSD/macOS/Linux - Simulate CPU Load with Yes",
+        "test_guid": "904a5a0e-fb02-490d-9f8d-0e256eb37549",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1496/T1496.md"
+      },
+      {
+        "technique_id": "T1496",
+        "test_name": "Windows - Simulate CPU Load with PowerShell",
+        "test_guid": "44315fb0-f78d-4cef-b10f-cf21c1fe2c75",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1496/T1496.md"
+      }
+    ]
+  }
 }

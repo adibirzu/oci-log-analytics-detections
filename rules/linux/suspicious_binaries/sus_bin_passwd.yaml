@@ -1,15 +1,24 @@
 title: Suspicious Usage of passwd
 id: 1583e3f2-8fc1-4874-94d3-b893202a2700
 status: experimental
-description: Detects execution of potentially suspicious binary passwd.
+description: Detects execution of passwd with automated password change or removal.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: passwd
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - --stdin
+    - '-d '
+    - chpasswd
+level: high
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate passwd usage by system administrators
+- Automated system scripts

@@ -1,9 +1,10 @@
 title: Sysmon Suspicious Named Pipe Pattern
 id: a1b2c3d4-7002-4000-8000-000000000004
 status: stable
-description: >
-  Detects named pipe creation matching common C2 framework patterns
-  including Metasploit, Covenant, and other post-exploitation tools.
+description: 'Detects named pipe creation matching common C2 framework patterns including
+  Metasploit, Covenant, and other post-exploitation tools.
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -37,3 +38,4 @@ tags:
 falsepositives:
 - Security assessment tools
 - Penetration testing frameworks
+version: 1

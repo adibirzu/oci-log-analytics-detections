@@ -8,8 +8,19 @@ logsource:
 detection:
   selection:
     process_name: crontab
-  condition: selection
+  suspicious_args:
+    command_line|contains:
+    - -e
+    - -r
+    - /tmp/
+    - /var/tmp/
+    - /dev/shm/
+  condition: selection and suspicious_args
 level: medium
 tags:
 - attack.persistence
 - attack.t1053.003
+version: 1
+falsepositives:
+- Legitimate scheduled maintenance tasks
+- Automated system updates

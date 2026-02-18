@@ -1,0 +1,28 @@
+title: Suspicious Scheduled Task Creation
+id: aeaf33f6-7947-4391-891f-75ac4c3067ec
+status: stable
+description: Detects schtasks.exe creating tasks that execute scripts or binaries
+  from user-writable paths.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \schtasks.exe
+    CommandLine|contains|all:
+    - /create
+    - /sc
+  suspicious:
+    CommandLine|contains:
+    - \Temp\
+    - \AppData\
+    - powershell
+    - cmd.exe
+  condition: selection and suspicious
+level: high
+tags:
+- attack.execution
+- attack.t1053.005
+falsepositives:
+- Legitimate task scheduling by administrators
+version: 1

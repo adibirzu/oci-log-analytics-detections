@@ -1,0 +1,23 @@
+title: Template Injection via Microsoft Office
+id: 05481d56-9a0e-430b-8efb-ebbf52c1d2b6
+status: stable
+description: Detects Office applications loading remote templates, a technique to
+  deliver malicious macros.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    ParentImage|endswith:
+    - \WINWORD.EXE
+    - \EXCEL.EXE
+    - \POWERPNT.EXE
+    CommandLine|contains: http
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1221
+falsepositives:
+- Documents with legitimate remote templates
+version: 1

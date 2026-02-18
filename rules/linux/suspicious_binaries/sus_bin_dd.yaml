@@ -1,15 +1,25 @@
 title: Suspicious Usage of dd
 id: 2fe382db-f191-4c01-af3e-3dff8ab380cb
 status: experimental
-description: Detects execution of potentially suspicious binary dd.
+description: Detects execution of dd accessing raw devices or memory.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: dd
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - if=/dev/sd
+    - if=/dev/mem
+    - of=/dev/sd
+    - if=/proc/
+level: high
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate dd usage by system administrators
+- Automated system scripts

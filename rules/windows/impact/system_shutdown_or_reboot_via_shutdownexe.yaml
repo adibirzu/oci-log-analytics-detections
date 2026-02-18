@@ -1,0 +1,23 @@
+title: System Shutdown or Reboot via shutdown.exe
+id: c93d093d-c5e0-43b5-aaba-e3ddcb3cb105
+status: stable
+description: Detects forced system shutdown or reboot commands that may be part of
+  destructive operations.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \shutdown.exe
+    CommandLine|contains:
+    - /s
+    - /r
+    - /f
+  condition: selection
+level: medium
+tags:
+- attack.impact
+- attack.t1529
+falsepositives:
+- Legitimate system maintenance
+version: 1

@@ -29,5 +29,38 @@
   "falsepositives": [
     "Authorized penetration testing",
     "Legitimate use of runas /netonly for cross-domain authentication"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 3,
+    "techniques_with_tests": [
+      "T1550.002"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1550.002",
+        "test_name": "Mimikatz Pass the Hash",
+        "test_guid": "ec23cef9-27d9-46e4-a68d-6f75f7b86908",
+        "executor": "command_prompt",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1550.002/T1550.002.md"
+      },
+      {
+        "technique_id": "T1550.002",
+        "test_name": "crackmapexec Pass the Hash",
+        "test_guid": "eb05b028-16c8-4ad8-adea-6f5b219da9a9",
+        "executor": "command_prompt",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1550.002/T1550.002.md"
+      },
+      {
+        "technique_id": "T1550.002",
+        "test_name": "Invoke-WMIExec Pass the Hash",
+        "test_guid": "f8757545-b00a-4e4e-8cfb-8cfb961ee713",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1550.002/T1550.002.md"
+      }
+    ]
+  }
 }

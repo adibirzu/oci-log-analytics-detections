@@ -1,0 +1,24 @@
+title: Potato Privilege Escalation Tool
+id: 9f764e26-4013-4ea3-8b9f-3c92dd63e610
+status: stable
+description: Detects execution of various Potato family privilege escalation tools
+  (JuicyPotato, SweetPotato, etc.).
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - JuicyPotato
+    - SweetPotato
+    - RottenPotato
+    - PrintSpoofer
+    - GodPotato
+  condition: selection
+level: critical
+tags:
+- attack.privilege_escalation
+- attack.t1134.001
+falsepositives:
+- Authorized penetration testing
+version: 1

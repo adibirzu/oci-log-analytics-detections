@@ -16,3 +16,8 @@ detection:
 level: high
 tags:
 - attack.defense_evasion
+- attack.t1562.007
+version: 1
+falsepositives:
+- Network infrastructure changes during maintenance windows
+- Automated IaC deployments

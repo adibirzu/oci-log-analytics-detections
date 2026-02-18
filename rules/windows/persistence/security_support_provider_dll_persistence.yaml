@@ -1,0 +1,22 @@
+title: Security Support Provider DLL Persistence
+id: 64d3e2a4-8411-4633-9348-a4e7e6602dec
+status: stable
+description: Detects registration of Security Support Provider DLLs for credential
+  interception.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - Security Packages
+    - reg
+    - add
+  condition: selection
+level: critical
+tags:
+- attack.persistence
+- attack.t1547.005
+falsepositives:
+- Legitimate SSP registration
+version: 1

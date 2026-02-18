@@ -1,10 +1,11 @@
 title: Sysmon Lateral Movement via WinRM
 id: a1b2c3d4-7001-4000-8000-000000000003
 status: stable
-description: >
-  Detects WinRM/PSRemoting connections (ports 5985/5986) from suspicious
-  processes. Attackers use PowerShell Remoting for lateral movement and
-  remote command execution.
+description: 'Detects WinRM/PSRemoting connections (ports 5985/5986) from suspicious
+  processes. Attackers use PowerShell Remoting for lateral movement and remote command
+  execution.
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -33,3 +34,4 @@ tags:
 falsepositives:
 - Legitimate PowerShell Remoting for administration
 - Configuration management tools
+version: 1

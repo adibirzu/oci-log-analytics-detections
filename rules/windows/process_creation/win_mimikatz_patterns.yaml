@@ -1,7 +1,8 @@
 title: Windows Mimikatz Execution Patterns
 id: e1f2a3b4-4015-4000-8000-000000000015
 status: stable
-description: Detects execution of Mimikatz or tools with Mimikatz-like command line patterns used for credential harvesting from Windows systems.
+description: Detects execution of Mimikatz or tools with Mimikatz-like command line
+  patterns used for credential harvesting from Windows systems.
 logsource:
   product: windows
   service: process_creation
@@ -23,3 +24,4 @@ tags:
 - attack.t1003.001
 falsepositives:
 - Authorized penetration testing with documented scope
+version: 1

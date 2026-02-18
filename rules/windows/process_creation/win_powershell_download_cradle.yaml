@@ -1,7 +1,8 @@
 title: Windows PowerShell Download Cradle
 id: e1f2a3b4-4019-4000-8000-000000000019
 status: stable
-description: Detects PowerShell download cradle patterns commonly used to fetch and execute remote payloads including Invoke-WebRequest, Net.WebClient, and Start-BitsTransfer.
+description: Detects PowerShell download cradle patterns commonly used to fetch and
+  execute remote payloads including Invoke-WebRequest, Net.WebClient, and Start-BitsTransfer.
 logsource:
   product: windows
   service: process_creation
@@ -28,3 +29,4 @@ tags:
 falsepositives:
 - Legitimate PowerShell scripts downloading modules
 - System administration automation
+version: 1

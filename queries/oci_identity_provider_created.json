@@ -27,5 +27,8 @@
   },
   "stig_ids": [
     "IA-8"
+  ],
+  "falsepositives": [
+    "Planned identity federation changes"
   ]
 }

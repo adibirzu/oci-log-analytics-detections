@@ -1,0 +1,26 @@
+title: PowerShell Script Block with Suspicious Keywords
+id: 00dc4fac-589e-43de-a0b8-0b9e5bb1f612
+status: stable
+description: Detects PowerShell commands containing keywords commonly associated with
+  offensive techniques.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \powershell.exe
+    CommandLine|contains:
+    - Invoke-Expression
+    - IEX
+    - Invoke-Command
+    - New-Object Net.WebClient
+    - DownloadString
+    - DownloadFile
+  condition: selection
+level: high
+tags:
+- attack.execution
+- attack.t1059.001
+falsepositives:
+- Legitimate automation and deployment scripts
+version: 1

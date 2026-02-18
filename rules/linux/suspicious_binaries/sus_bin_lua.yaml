@@ -1,15 +1,24 @@
 title: Suspicious Usage of lua
 id: 1f1a868f-1f24-4435-b934-a82c58918b1b
 status: experimental
-description: Detects execution of potentially suspicious binary lua.
+description: Detects execution of lua with command execution capabilities.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: lua
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - os.execute
+    - io.popen
+    - '-e '
+level: medium
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate lua usage by system administrators
+- Automated system scripts

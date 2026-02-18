@@ -23,5 +23,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Routine policy changes by authorized administrators",
+    "Automated IaC deployments (Terraform, Pulumi)"
+  ]
 }

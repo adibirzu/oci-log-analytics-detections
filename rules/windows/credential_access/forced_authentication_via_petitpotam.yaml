@@ -1,0 +1,22 @@
+title: Forced Authentication via PetitPotam
+id: 4d2f1f57-fade-4957-a5d6-313efbb687f4
+status: stable
+description: Detects PetitPotam and related NTLM relay tools that force authentication
+  to attacker-controlled servers.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - PetitPotam
+    - petitpotam
+    - EfsRpcOpenFileRaw
+  condition: selection
+level: critical
+tags:
+- attack.credential_access
+- attack.t1187
+falsepositives:
+- Security testing
+version: 1

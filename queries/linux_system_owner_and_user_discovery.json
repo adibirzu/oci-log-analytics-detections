@@ -30,5 +30,70 @@
   "falsepositives": [
     "System administrators checking active sessions",
     "Monitoring scripts"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 7,
+    "techniques_with_tests": [
+      "T1033"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1033",
+        "test_name": "System Owner/User Discovery",
+        "test_guid": "4c4959bf-addf-4b4a-be86-8d09cc1857aa",
+        "executor": "command_prompt",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1033/T1033.md"
+      },
+      {
+        "technique_id": "T1033",
+        "test_name": "System Owner/User Discovery",
+        "test_guid": "2a9b677d-a230-44f4-ad86-782df1ef108c",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1033/T1033.md"
+      },
+      {
+        "technique_id": "T1033",
+        "test_name": "Find computers where user has session - Stealth mode (PowerView)",
+        "test_guid": "29857f27-a36f-4f7e-8084-4557cd6207ca",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1033/T1033.md"
+      },
+      {
+        "technique_id": "T1033",
+        "test_name": "User Discovery With Env Vars PowerShell Script",
+        "test_guid": "dcb6cdee-1fb0-4087-8bf8-88cfd136ba51",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1033/T1033.md"
+      },
+      {
+        "technique_id": "T1033",
+        "test_name": "GetCurrent User with PowerShell Script",
+        "test_guid": "1392bd0f-5d5a-429e-81d9-eb9d4d4d5b3b",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1033/T1033.md"
+      },
+      {
+        "technique_id": "T1033",
+        "test_name": "System Discovery - SocGholish whoami",
+        "test_guid": "3d257a03-eb80-41c5-b744-bb37ac7f65c7",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1033/T1033.md"
+      },
+      {
+        "technique_id": "T1033",
+        "test_name": "System Owner/User Discovery Using Command Prompt",
+        "test_guid": "ba38e193-37a6-4c41-b214-61b33277fe36",
+        "executor": "command_prompt",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1033/T1033.md"
+      }
+    ]
+  }
 }

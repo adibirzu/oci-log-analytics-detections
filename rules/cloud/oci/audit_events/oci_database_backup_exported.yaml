@@ -1,0 +1,21 @@
+title: OCI Database Backup Exported
+id: ef6043f4-a5f6-4ef9-96ae-59bc84fd2d53
+status: stable
+description: Detects database backup creation that could be used to extract sensitive
+  data.
+references:
+- https://attack.mitre.org/techniques/T1537/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.databaseservice.createbackup
+  condition: selection
+level: medium
+tags:
+- attack.exfiltration
+- attack.t1537
+falsepositives:
+- Scheduled database backups
+version: 1

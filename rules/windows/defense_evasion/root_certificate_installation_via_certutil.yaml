@@ -1,0 +1,22 @@
+title: Root Certificate Installation via Certutil
+id: c97059bf-3064-41f0-a889-22535878e1de
+status: stable
+description: Detects installation of root certificates which could enable MitM attacks
+  or trust arbitrary code.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \certutil.exe
+    CommandLine|contains|all:
+    - -addstore
+    - Root
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1553.004
+falsepositives:
+- Enterprise PKI deployment
+version: 1

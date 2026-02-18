@@ -1,0 +1,21 @@
+title: Image File Execution Options Debugger
+id: 335d90de-64dd-4ef3-9cf1-742c7bb2568f
+status: stable
+description: Detects setting of Image File Execution Options debugger for persistence
+  or tampering.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - Image File Execution Options
+    - Debugger
+  condition: selection
+level: high
+tags:
+- attack.persistence
+- attack.t1546.012
+falsepositives:
+- Debugging configurations by developers
+version: 1

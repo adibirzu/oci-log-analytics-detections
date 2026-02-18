@@ -1,10 +1,10 @@
 title: Sysmon DNS Query to Known C2 Framework Domains
 id: a1b2c3d4-7003-4000-8000-000000000002
 status: stable
-description: >
-  Detects DNS queries to domains associated with known C2 frameworks
-  and dynamic DNS services commonly used by attackers for C2
-  infrastructure.
+description: 'Detects DNS queries to domains associated with known C2 frameworks and
+  dynamic DNS services commonly used by attackers for C2 infrastructure.
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -43,3 +43,4 @@ tags:
 falsepositives:
 - Legitimate use of dynamic DNS services
 - Development/staging environments
+version: 1

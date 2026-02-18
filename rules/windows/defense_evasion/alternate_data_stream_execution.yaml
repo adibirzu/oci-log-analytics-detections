@@ -1,0 +1,18 @@
+title: Alternate Data Stream Execution
+id: a2ffd565-aa4f-4a2f-9b9c-d69df97fe67b
+status: stable
+description: Detects execution of payloads hidden in NTFS Alternate Data Streams.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|re: .*:\w+\.\w+:.*
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1564.004
+falsepositives:
+- Legitimate use of alternate data streams by backup software
+version: 1

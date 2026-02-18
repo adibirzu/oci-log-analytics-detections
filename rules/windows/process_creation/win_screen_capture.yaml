@@ -1,10 +1,11 @@
 title: Windows Screen Capture Activity
 id: a1b2c3d4-6014-4000-8000-000000000014
 status: stable
-description: >
-  Detects screen capture tools and commands used by attackers to collect visual
-  intelligence from victim systems. Screen captures can reveal sensitive data
+description: 'Detects screen capture tools and commands used by attackers to collect
+  visual intelligence from victim systems. Screen captures can reveal sensitive data
   displayed on screen, credentials in open windows, and security posture.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -22,7 +23,7 @@ detection:
   sel_powershell_capture:
     CommandLine|contains:
     - '[System.Drawing.Graphics]::CopyFromScreen'
-    - 'System.Windows.Forms.Screen'
+    - System.Windows.Forms.Screen
     - Screenshot
     - CopyFromScreen
   sel_tools:
@@ -38,3 +39,4 @@ tags:
 falsepositives:
 - Legitimate screen capture for documentation
 - Remote support tools taking screenshots
+version: 1

@@ -1,0 +1,18 @@
+title: AD Enumeration via ADFind
+id: 7d05303a-c6ee-4f72-9c0b-1ecd1d5ba819
+status: stable
+description: Detects usage of AdFind.exe for Active Directory enumeration and reconnaissance.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \AdFind.exe
+  condition: selection
+level: high
+tags:
+- attack.discovery
+- attack.t1087.002
+falsepositives:
+- Legitimate AD administration
+version: 1

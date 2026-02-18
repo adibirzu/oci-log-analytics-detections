@@ -1,0 +1,22 @@
+title: PowerShell Execution via Alternate Shell
+id: d1f2eff0-b1dd-4b7f-a4f4-aefeff9ca52a
+status: stable
+description: Detects PowerShell execution using alternate host processes (pwsh, powershell_ise)
+  that may bypass logging.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \pwsh.exe
+    - \powershell_ise.exe
+  condition: selection
+level: low
+tags:
+- attack.execution
+- attack.t1059.001
+falsepositives:
+- PowerShell Core usage by developers
+- ISE usage by administrators
+version: 1

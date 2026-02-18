@@ -1,15 +1,24 @@
 title: Suspicious Usage of tshark
 id: 7cb57d24-6134-4a81-9b60-9689ff9cde29
 status: experimental
-description: Detects execution of potentially suspicious binary tshark.
+description: Detects execution of tshark capturing network traffic.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: tshark
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - '-i '
+    - '-w '
+    - '-f '
+level: medium
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate tshark usage by system administrators
+- Automated system scripts

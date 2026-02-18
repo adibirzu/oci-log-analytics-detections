@@ -1,7 +1,8 @@
 title: Linux DNS Tunneling Detected
 id: f1e2d3c4-5001-4000-8000-000000000001
 status: stable
-description: Detects execution of DNS tunneling tools such as iodine, dns2tcp, or dnscat2 used to exfiltrate data or establish covert C2 channels over DNS.
+description: Detects execution of DNS tunneling tools such as iodine, dns2tcp, or
+  dnscat2 used to exfiltrate data or establish covert C2 channels over DNS.
 logsource:
   product: linux
   service: audit
@@ -21,3 +22,4 @@ tags:
 falsepositives:
 - Legitimate DNS privacy tools (dnscrypt-proxy)
 - Network testing by administrators
+version: 1

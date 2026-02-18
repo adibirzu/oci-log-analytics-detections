@@ -1,0 +1,21 @@
+title: Visual Basic Script Compilation via vbc.exe
+id: bfad19ea-74b4-4bab-89c3-acdb22668a9f
+status: stable
+description: Detects compilation of Visual Basic code using vbc.exe from non-standard
+  locations.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \vbc.exe
+  filter:
+    ParentImage|contains: Visual Studio
+  condition: selection and not filter
+level: medium
+tags:
+- attack.execution
+- attack.t1059.005
+falsepositives:
+- .NET development processes
+version: 1

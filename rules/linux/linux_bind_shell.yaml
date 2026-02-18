@@ -1,7 +1,9 @@
 title: Linux Bind Shell Listener
 id: f1e2d3c4-5008-4000-8000-000000000008
 status: stable
-description: Detects creation of bind shell listeners using netcat, socat, or ncat. Bind shells open a listening port that allows remote attackers to connect and execute commands.
+description: Detects creation of bind shell listeners using netcat, socat, or ncat.
+  Bind shells open a listening port that allows remote attackers to connect and execute
+  commands.
 logsource:
   product: linux
   service: audit
@@ -22,3 +24,4 @@ tags:
 - attack.t1059.004
 falsepositives:
 - Network troubleshooting using netcat in listen mode
+version: 1

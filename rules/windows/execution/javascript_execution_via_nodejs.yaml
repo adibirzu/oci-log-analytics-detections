@@ -1,0 +1,22 @@
+title: JavaScript Execution via Node.js
+id: d8f01b12-1319-4ce5-904e-02a19a81dd0e
+status: stable
+description: Detects Node.js executing inline JavaScript or scripts from suspicious
+  locations.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \node.exe
+    CommandLine|contains:
+    - '-e '
+    - --eval
+  condition: selection
+level: medium
+tags:
+- attack.execution
+- attack.t1059.007
+falsepositives:
+- Node.js development workflows
+version: 1

@@ -1,10 +1,11 @@
 title: Windows Account Discovery Commands
 id: a1b2c3d4-6002-4000-8000-000000000002
 status: stable
-description: >
-  Detects commands used to enumerate user accounts and groups in Active Directory.
-  Attackers perform account discovery to identify privileged accounts, service accounts,
-  and domain administrators for targeting.
+description: 'Detects commands used to enumerate user accounts and groups in Active
+  Directory. Attackers perform account discovery to identify privileged accounts,
+  service accounts, and domain administrators for targeting.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -40,3 +41,4 @@ tags:
 falsepositives:
 - Help desk account management
 - IT administrators auditing group memberships
+version: 1

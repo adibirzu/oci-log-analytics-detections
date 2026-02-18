@@ -77,6 +77,28 @@ field_mappings:
   # ─── Sysmon Named Pipe Fields (Event ID 17/18) ────────────
   PipeName: "'Pipe Name'"
 
+  # ─── Windows Security / Event Log Fields ─────────────────
+  SubjectUserName: "'Subject User Name'"
+  TargetUserName: "'Target User Name'"
+  TargetDomainName: "'Target Domain Name'"
+  LogonType: "'Logon Type'"
+  ObjectName: "'Object Name'"
+  NewProcessName: "'New Process Name'"
+  ServiceName: "'Service Name'"
+  ServiceFileName: "'Service File Name'"
+  TargetServerName: "'Target Server Name'"
+  ShareName: "'Share Name'"
+  RelativeTargetName: "'Relative Target Name'"
+  AccessMask: "'Access Mask'"
+  ObjectType: "'Object Type'"
+  Properties: Properties
+  TargetObject: "'Target Object'"
+  Details: Details
+
+  # ─── Sysmon Registry Fields (Event ID 12/13/14) ─────────
+  EventType: "'Event Type'"
+  TargetImage: "'Target Process'"
+
   # ─── MITRE ATT&CK Metadata ────────────────────────────────
   RuleName: RuleName
   TechniqueName: "'Technique Name'"
@@ -161,3 +183,22 @@ logsource_mappings:
     - Windows Sysmon Events
     - Windows Sysmon Operational Logs
     - SOC Windows Sysmon Logs
+
+  # Sysmon Registry Event (Event ID 12/13/14)
+  windows_registry_event:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs
+
+  # Sysmon Image Loaded (Event ID 7)
+  windows_image_load:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs
+
+  # Linux process creation (maps to syslog-based detection)
+  linux_process_creation:
+    - SOC Linux Syslog Logs
+    - Linux Secure Logs
+    - Linux Syslog Logs
+    - Linux Audit Logs

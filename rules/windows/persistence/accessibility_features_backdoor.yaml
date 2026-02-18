@@ -1,0 +1,30 @@
+title: Accessibility Features Backdoor
+id: dd3797d5-ea02-4d89-926a-e40cfbd660bc
+status: stable
+description: Detects replacement of accessibility programs (sethc, utilman, osk) with
+  cmd.exe for pre-login access.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - sethc.exe
+    - utilman.exe
+    - osk.exe
+    - narrator.exe
+    - magnify.exe
+  suspicious:
+    CommandLine|contains:
+    - copy
+    - move
+    - ren
+    - reg
+  condition: selection and suspicious
+level: critical
+tags:
+- attack.persistence
+- attack.t1546.008
+falsepositives:
+- Accessibility tool configuration changes
+version: 1

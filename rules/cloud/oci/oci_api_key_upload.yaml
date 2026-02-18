@@ -12,3 +12,8 @@ detection:
 level: medium
 tags:
 - attack.persistence
+- attack.t1098.001
+version: 1
+falsepositives:
+- Scheduled key rotation
+- Authorized cryptographic operations

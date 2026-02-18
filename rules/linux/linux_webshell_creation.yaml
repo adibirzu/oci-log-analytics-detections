@@ -1,7 +1,8 @@
 title: Linux Web Shell File Creation
 id: f1e2d3c4-5004-4000-8000-000000000004
 status: stable
-description: Detects file creation or modification in common web directories that may indicate web shell deployment for persistent remote access.
+description: Detects file creation or modification in common web directories that
+  may indicate web shell deployment for persistent remote access.
 logsource:
   product: linux
   service: audit
@@ -27,3 +28,4 @@ tags:
 falsepositives:
 - Legitimate web application deployments
 - CMS plugin installations
+version: 1

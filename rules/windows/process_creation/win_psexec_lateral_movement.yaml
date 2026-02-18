@@ -1,7 +1,8 @@
 title: Windows PsExec Remote Execution
 id: f1e2d3c4-5012-4000-8000-000000000012
 status: stable
-description: Detects use of PsExec or similar Sysinternals tools for remote command execution, commonly used for lateral movement in compromised networks.
+description: Detects use of PsExec or similar Sysinternals tools for remote command
+  execution, commonly used for lateral movement in compromised networks.
 logsource:
   product: windows
   service: process_creation
@@ -14,7 +15,7 @@ detection:
   sel_cmdline:
     CommandLine|contains:
     - psexec
-    - '\\\\'
+    - \\\\
   sel_accepteula:
     CommandLine|contains: -accepteula
   condition: sel_psexec or (sel_cmdline and sel_accepteula)
@@ -26,3 +27,4 @@ tags:
 falsepositives:
 - Legitimate IT administration using PsExec
 - Software deployment tools
+version: 1

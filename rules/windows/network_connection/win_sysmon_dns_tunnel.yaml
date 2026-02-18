@@ -1,9 +1,10 @@
 title: Sysmon DNS Tunneling via Network Connection
 id: a1b2c3d4-7001-4000-8000-000000000005
 status: stable
-description: >
-  Detects suspicious processes making DNS connections (port 53) that
-  could indicate DNS tunneling for data exfiltration or C2 communication.
+description: 'Detects suspicious processes making DNS connections (port 53) that could
+  indicate DNS tunneling for data exfiltration or C2 communication.
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -36,3 +37,4 @@ tags:
 falsepositives:
 - Legitimate DNS diagnostic tools
 - nslookup for troubleshooting
+version: 1

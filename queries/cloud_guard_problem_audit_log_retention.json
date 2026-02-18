@@ -6,11 +6,17 @@
   "level": "high",
   "stig_category": "CAT I",
   "tags": [
-    "oci.cloud_guard"
+    "oci.cloud_guard",
+    "attack.defense_evasion",
+    "attack.t1562.008"
   ],
   "mitre_attack": {
-    "tactics": [],
-    "techniques": []
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1562.008"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -20,5 +26,8 @@
       "OCI Cloud Guard Logs",
       "SOC Cloud Guard Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Authorized administrative operations"
+  ]
 }

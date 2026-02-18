@@ -1,0 +1,21 @@
+title: Network Share Enumeration via Net View
+id: 9c1850cf-5f24-4129-82ec-78cf2e08cc5a
+status: stable
+description: Detects network share enumeration using net view command.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \net.exe
+    - \net1.exe
+    CommandLine|contains: view
+  condition: selection
+level: low
+tags:
+- attack.discovery
+- attack.t1135
+falsepositives:
+- Legitimate network browsing
+version: 1

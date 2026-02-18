@@ -31,5 +31,30 @@
   "falsepositives": [
     "Legitimate software development build processes",
     "CI/CD build agents using MSBuild"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 2,
+    "techniques_with_tests": [
+      "T1127.001"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1127.001",
+        "test_name": "MSBuild Bypass Using Inline Tasks (C#)",
+        "test_guid": "58742c0f-cb01-44cd-a60b-fb26e8871c93",
+        "executor": "command_prompt",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1127.001/T1127.001.md"
+      },
+      {
+        "technique_id": "T1127.001",
+        "test_name": "MSBuild Bypass Using Inline Tasks (VB)",
+        "test_guid": "ab042179-c0c5-402f-9bc8-42741f5ce359",
+        "executor": "command_prompt",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1127.001/T1127.001.md"
+      }
+    ]
+  }
 }

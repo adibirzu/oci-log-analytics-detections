@@ -13,3 +13,7 @@ level: high
 tags:
 - attack.impact
 - attack.t1485
+version: 1
+falsepositives:
+- Authorized database lifecycle operations
+- Test environment cleanup

@@ -1,0 +1,23 @@
+title: New Local Account Created via Net.exe
+id: 5a112cb9-5ece-4cbc-8a66-2aff255e274d
+status: stable
+description: Detects creation of local accounts using net.exe or net1.exe.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \net.exe
+    - \net1.exe
+    CommandLine|contains|all:
+    - user
+    - /add
+  condition: selection
+level: high
+tags:
+- attack.persistence
+- attack.t1136.001
+falsepositives:
+- Legitimate user account creation by administrators
+version: 1

@@ -1,0 +1,20 @@
+title: InstallUtil Application Whitelisting Bypass
+id: 05a4c9bc-ed99-46f3-af55-d7ede444a1aa
+status: stable
+description: Detects usage of InstallUtil.exe to execute code through .NET assemblies,
+  bypassing application controls.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \InstallUtil.exe
+    CommandLine|contains: /U
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1218.004
+falsepositives:
+- Legitimate .NET assembly installation
+version: 1

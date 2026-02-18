@@ -12,3 +12,9 @@ detection:
 level: informational
 tags:
 - oci.audit
+- attack.defense_evasion
+- attack.t1562.007
+version: 1
+falsepositives:
+- Network infrastructure changes during maintenance windows
+- Automated IaC deployments

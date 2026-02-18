@@ -1,7 +1,8 @@
 title: OCI User MFA Not Enabled
 id: d1a2b3c4-1001-4000-8000-000000000001
 status: stable
-description: Detects OCI user accounts where multi-factor authentication has been disabled or not configured, violating STIG requirement for strong authentication.
+description: Detects OCI user accounts where multi-factor authentication has been disabled or not configured, violating STIG
+  requirement for strong authentication.
 logsource:
   product: oci
   service: audit
@@ -17,3 +18,7 @@ tags:
 - attack.t1556
 - stig.IA-2
 - compliance.cis_oci_1.2
+version: 1
+falsepositives:
+- Routine IAM administration
+- Automated provisioning systems

@@ -1,0 +1,21 @@
+title: AS-REP Roasting via Rubeus
+id: 07b03613-7861-4182-82d1-b07a741573b9
+status: stable
+description: Detects AS-REP Roasting attempts using Rubeus or similar tools targeting
+  accounts without Kerberos pre-authentication.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - asreproast
+    - GetNPUsers
+  condition: selection
+level: high
+tags:
+- attack.credential_access
+- attack.t1558.004
+falsepositives:
+- Authorized penetration testing
+version: 1

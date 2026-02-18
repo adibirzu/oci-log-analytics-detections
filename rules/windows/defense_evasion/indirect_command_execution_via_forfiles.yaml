@@ -1,0 +1,20 @@
+title: Indirect Command Execution via Forfiles
+id: f168fc5d-9126-4ef9-852b-638775d2929f
+status: stable
+description: Detects usage of forfiles.exe for indirect command execution to bypass
+  application controls.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \forfiles.exe
+    CommandLine|contains: /c
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1202
+falsepositives:
+- Legitimate batch file operations
+version: 1

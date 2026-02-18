@@ -1,9 +1,10 @@
 title: Sysmon DNS Query to Suspicious TLDs
 id: a1b2c3d4-7003-4000-8000-000000000003
 status: stable
-description: >
-  Detects DNS queries to top-level domains frequently associated with
+description: 'Detects DNS queries to top-level domains frequently associated with
   malicious infrastructure, phishing, and C2 operations.
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -38,3 +39,4 @@ tags:
 falsepositives:
 - Legitimate websites using these TLDs
 - Marketing/promotional domains
+version: 1

@@ -1,0 +1,21 @@
+title: OCI VCN Flow Log Disabled
+id: 7864f30e-1007-4ce7-aeed-89ed8d53a375
+status: stable
+description: Detects deletion or disabling of VCN flow logs which may indicate an
+  attempt to hide network activity.
+references:
+- https://attack.mitre.org/techniques/T1562/008/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.deleteflowlog
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1562.008
+falsepositives:
+- VCN cleanup during decommissioning
+version: 1

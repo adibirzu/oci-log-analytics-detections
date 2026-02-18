@@ -1,10 +1,11 @@
 title: Sysmon C2 Beacon - Periodic Outbound HTTPS
 id: a1b2c3d4-7001-4000-8000-000000000001
 status: stable
-description: >
-  Detects periodic outbound HTTPS connections to non-standard destinations
-  that may indicate C2 beaconing activity. Suspicious processes making
-  repeated connections to external IPs on port 443 are flagged.
+description: 'Detects periodic outbound HTTPS connections to non-standard destinations
+  that may indicate C2 beaconing activity. Suspicious processes making repeated connections
+  to external IPs on port 443 are flagged.
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -34,8 +35,8 @@ detection:
   filter_internal:
     DestinationIp|startswith:
     - '10.'
-    - '172.16.'
-    - '192.168.'
+    - 172.16.
+    - 192.168.
     - '127.'
   condition: sel_port and sel_suspicious_process and sel_external and not filter_internal
 level: high
@@ -46,3 +47,4 @@ tags:
 falsepositives:
 - Legitimate software update processes
 - System management tools
+version: 1

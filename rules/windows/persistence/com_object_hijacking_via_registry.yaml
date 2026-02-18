@@ -1,0 +1,22 @@
+title: COM Object Hijacking via Registry
+id: 30de24d1-7812-4846-9eca-ab9ff7e1c88a
+status: stable
+description: Detects modification of COM object registry entries to hijack execution
+  flow.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - reg
+    - add
+    - InprocServer32
+  condition: selection
+level: high
+tags:
+- attack.persistence
+- attack.t1546.015
+falsepositives:
+- COM component registration during software installation
+version: 1

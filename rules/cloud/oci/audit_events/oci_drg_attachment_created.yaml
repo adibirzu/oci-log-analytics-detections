@@ -1,0 +1,21 @@
+title: OCI DRG Attachment Created
+id: 967c7462-bf3a-414f-aaa5-80b987ce46af
+status: stable
+description: Detects creation of Dynamic Routing Gateway attachment, enabling network
+  connectivity between VCNs or on-premises.
+references:
+- https://attack.mitre.org/techniques/T1599/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.createdrgattachment
+  condition: selection
+level: medium
+tags:
+- attack.lateral_movement
+- attack.t1599
+falsepositives:
+- Network architecture changes
+version: 1

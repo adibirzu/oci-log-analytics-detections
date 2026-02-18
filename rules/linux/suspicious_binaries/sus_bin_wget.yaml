@@ -1,15 +1,27 @@
 title: Suspicious Usage of wget
 id: 141358f7-27c7-4b9c-a4f3-0cdc490e7c9b
 status: experimental
-description: Detects execution of potentially suspicious binary wget.
+description: Detects execution of wget downloading to temp directories or bypassing
+  cert checks.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: wget
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - -O /tmp
+    - -O /dev/shm
+    - pastebin
+    - --no-check-certificate
+    - '| bash'
+level: high
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate wget usage by system administrators
+- Automated system scripts

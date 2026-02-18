@@ -1,15 +1,27 @@
 title: Suspicious Usage of python
 id: 177ee6a5-cca9-4604-8765-b6983f0ad54c
 status: experimental
-description: Detects execution of potentially suspicious binary python.
+description: Detects execution of python with inline execution or suspicious imports.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: python
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - '-c '
+    - import socket
+    - import os
+    - subprocess
+    - exec(
+    - eval(
+level: medium
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate python usage by system administrators
+- Automated system scripts

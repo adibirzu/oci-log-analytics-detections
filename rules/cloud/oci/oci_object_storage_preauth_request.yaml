@@ -1,7 +1,8 @@
 title: OCI Object Storage Pre-Authenticated Request Created
 id: d1a2b3c4-1015-4000-8000-000000000015
 status: stable
-description: Detects creation of pre-authenticated requests (PARs) for OCI Object Storage. PARs bypass IAM authentication and can be used for data exfiltration via shareable URLs.
+description: Detects creation of pre-authenticated requests (PARs) for OCI Object Storage. PARs bypass IAM authentication
+  and can be used for data exfiltration via shareable URLs.
 logsource:
   product: oci
   service: audit
@@ -14,3 +15,6 @@ tags:
 - attack.exfiltration
 - attack.t1567
 - stig.AC-3
+version: 1
+falsepositives:
+- Authorized data sharing workflows

@@ -1,0 +1,21 @@
+title: OCI Service Gateway Created
+id: c9992aa9-8d34-4429-9b48-58911f8fd079
+status: stable
+description: Detects creation of a service gateway that bypasses internet to access
+  OCI services, a potential lateral movement path.
+references:
+- https://attack.mitre.org/techniques/T1599/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.virtualnetwork.createservicegateway
+  condition: selection
+level: low
+tags:
+- attack.lateral_movement
+- attack.t1599
+falsepositives:
+- Standard VCN architecture setup
+version: 1

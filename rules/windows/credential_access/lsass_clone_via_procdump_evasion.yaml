@@ -1,0 +1,21 @@
+title: LSASS Clone via ProcDump Evasion
+id: b4adc189-de2b-485b-98d6-de79fb219acf
+status: stable
+description: Detects LSASS cloning techniques that create a clone of the LSASS process
+  to dump credentials without directly accessing the original.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - lsass
+    - -accepteula
+  condition: selection
+level: critical
+tags:
+- attack.credential_access
+- attack.t1003.001
+falsepositives:
+- System diagnostics by IT staff
+version: 1

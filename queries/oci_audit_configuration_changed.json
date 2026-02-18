@@ -31,5 +31,8 @@
   ],
   "compliance_frameworks": [
     "cis_oci_3.14"
+  ],
+  "falsepositives": [
+    "Compliance-driven audit configuration changes"
   ]
 }

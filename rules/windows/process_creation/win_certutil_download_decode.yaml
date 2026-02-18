@@ -12,8 +12,8 @@ detection:
     - urlcache
     - decode
     - encode
-    - '-urlcache'
-    - '-decode'
+    - -urlcache
+    - -decode
   condition: selection
 level: high
 tags:
@@ -21,3 +21,6 @@ tags:
 - attack.t1140
 - attack.command_and_control
 - attack.t1105
+version: 1
+falsepositives:
+- Authorized file downloads by administrators

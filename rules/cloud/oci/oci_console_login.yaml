@@ -1,21 +1,23 @@
 title: OCI Console Login from Unusual IP
 id: 56d4458d-7890-4abc-8890-1234567890ab
 status: experimental
-description: Detects a successful login to the OCI Console from an IP address not typically associated with the user.
+description: Detects a successful login to the OCI Console from an IP address not
+  typically associated with the user.
 author: OCI Detection Project
 date: 2023-10-27
 logsource:
-    product: oci
-    service: audit
+  product: oci
+  service: audit
 detection:
-    selection:
-        event_type: 'com.oraclecloud.consolesignon.login'
-        status: 'Success'
-    condition: selection
+  selection:
+    event_type: com.oraclecloud.consolesignon.login
+    status: Success
+  condition: selection
 falsepositives:
-    - Legitimate user travel
-    - New VPN endpoint
+- Legitimate user travel
+- New VPN endpoint
 level: medium
 tags:
-    - attack.initial_access
-    - attack.t1078
+- attack.initial_access
+- attack.t1078
+version: 1

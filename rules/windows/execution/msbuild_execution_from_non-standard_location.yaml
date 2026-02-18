@@ -1,0 +1,22 @@
+title: MSBuild Execution from Non-Standard Location
+id: d01b332d-8065-43d2-a705-9053a53a2fec
+status: stable
+description: Detects MSBuild.exe executing project files from user-writable directories.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \MSBuild.exe
+  filter:
+    CommandLine|contains:
+    - Visual Studio
+    - dotnet
+  condition: selection and not filter
+level: high
+tags:
+- attack.execution
+- attack.t1127.001
+falsepositives:
+- Developer build processes
+version: 1

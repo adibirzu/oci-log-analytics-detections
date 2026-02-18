@@ -1,0 +1,21 @@
+title: AppInit DLLs Persistence
+id: e0d404a0-c47f-410d-b816-c91c570fe68c
+status: stable
+description: Detects modification of AppInit_DLLs registry value to inject DLLs into
+  every process that loads User32.dll.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - AppInit_DLLs
+    - reg
+  condition: selection
+level: critical
+tags:
+- attack.persistence
+- attack.t1546.010
+falsepositives:
+- Legitimate AppInit DLL registration
+version: 1

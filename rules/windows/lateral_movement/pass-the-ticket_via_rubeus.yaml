@@ -1,0 +1,22 @@
+title: Pass-the-Ticket via Rubeus
+id: 8545e5e2-b3c6-40c5-9b10-a8d22ca2428a
+status: stable
+description: Detects Rubeus commands for pass-the-ticket lateral movement using Kerberos
+  tickets.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - rubeus
+    - ptt
+    - createnetonly
+  condition: selection
+level: critical
+tags:
+- attack.lateral_movement
+- attack.t1550.003
+falsepositives:
+- Authorized security testing
+version: 1

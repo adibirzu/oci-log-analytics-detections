@@ -1,10 +1,10 @@
 title: Sysmon Mimikatz Named Pipe
 id: a1b2c3d4-7002-4000-8000-000000000003
 status: stable
-description: >
-  Detects named pipe creation matching known Mimikatz pipe patterns.
-  Mimikatz uses named pipes for credential extraction and token
-  manipulation operations.
+description: 'Detects named pipe creation matching known Mimikatz pipe patterns. Mimikatz
+  uses named pipes for credential extraction and token manipulation operations.
+
+  '
 author: SOC Detection Team
 date: 2026/02/16
 logsource:
@@ -29,3 +29,4 @@ tags:
 - attack.t1134
 falsepositives:
 - Very unlikely in production environments
+version: 1

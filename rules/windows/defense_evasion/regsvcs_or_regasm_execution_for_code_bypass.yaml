@@ -1,0 +1,23 @@
+title: Regsvcs or Regasm Execution for Code Bypass
+id: 0d1f0c20-5600-4948-8120-ce4184542246
+status: stable
+description: Detects execution of Regsvcs.exe or Regasm.exe to register COM objects
+  from untrusted locations.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \RegSvcs.exe
+    - \RegAsm.exe
+  filter:
+    CommandLine|contains: Microsoft.NET
+  condition: selection and not filter
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1218.009
+falsepositives:
+- .NET COM component registration
+version: 1

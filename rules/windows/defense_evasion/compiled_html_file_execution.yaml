@@ -1,0 +1,20 @@
+title: Compiled HTML File Execution
+id: 4e820998-8bfb-4244-91e5-15add0d0f9ec
+status: stable
+description: Detects execution of compiled HTML (.chm) files via hh.exe, which can
+  execute embedded scripts.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \hh.exe
+    CommandLine|contains: .chm
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1218.001
+falsepositives:
+- Legitimate help file viewing
+version: 1

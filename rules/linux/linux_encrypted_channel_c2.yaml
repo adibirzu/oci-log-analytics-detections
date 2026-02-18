@@ -1,10 +1,11 @@
 title: Linux Encrypted Channel C2 Communication
 id: a1b2c3d4-6018-4000-8000-000000000018
 status: stable
-description: >
-  Detects establishment of encrypted communication channels that may indicate
-  C2 activity. Attackers use OpenSSL, stunnel, and encrypted reverse shells
-  to establish covert command and control over TLS/SSL.
+description: 'Detects establishment of encrypted communication channels that may indicate
+  C2 activity. Attackers use OpenSSL, stunnel, and encrypted reverse shells to establish
+  covert command and control over TLS/SSL.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -37,3 +38,4 @@ tags:
 falsepositives:
 - Legitimate SSL/TLS debugging
 - Authorized SSH tunnels
+version: 1

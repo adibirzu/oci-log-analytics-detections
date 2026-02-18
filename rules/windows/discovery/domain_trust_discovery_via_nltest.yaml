@@ -1,0 +1,22 @@
+title: Domain Trust Discovery via Nltest
+id: 152fec77-1574-4ded-a36d-ec9656a8f371
+status: stable
+description: Detects domain trust enumeration using nltest.exe.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \nltest.exe
+    CommandLine|contains:
+    - /domain_trusts
+    - /dclist
+    - /dsgetdc
+  condition: selection
+level: medium
+tags:
+- attack.discovery
+- attack.t1482
+falsepositives:
+- Legitimate AD troubleshooting
+version: 1

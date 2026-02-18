@@ -1,10 +1,11 @@
 title: Windows Remote System Discovery
 id: a1b2c3d4-6004-4000-8000-000000000004
 status: stable
-description: >
-  Detects commands and tools used to discover remote systems on the network.
-  Attackers perform network sweeps, ARP scans, and DNS lookups to identify
-  targets for lateral movement.
+description: 'Detects commands and tools used to discover remote systems on the network.
+  Attackers perform network sweeps, ARP scans, and DNS lookups to identify targets
+  for lateral movement.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -13,10 +14,10 @@ logsource:
 detection:
   sel_arp:
     process_name|endswith: arp.exe
-    CommandLine|contains: '-a'
+    CommandLine|contains: -a
   sel_ping_sweep:
     CommandLine|contains:
-    - 'for /l'
+    - for /l
     - ping -n 1
   sel_nslookup:
     process_name|endswith: nslookup.exe
@@ -38,3 +39,4 @@ tags:
 falsepositives:
 - Network troubleshooting
 - IT monitoring scripts
+version: 1

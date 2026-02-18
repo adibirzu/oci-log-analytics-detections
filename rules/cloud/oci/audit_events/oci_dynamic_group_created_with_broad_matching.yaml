@@ -1,0 +1,26 @@
+title: OCI Dynamic Group Created with Broad Matching
+id: f69e2986-8587-4bbf-a7a6-9afa429d7234
+status: stable
+description: Detects creation of dynamic groups with instance principal matching that
+  may grant excessive permissions.
+references:
+- https://attack.mitre.org/techniques/T1098/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identitycontrolplane.createdynamicgroup
+  broad_match:
+    response_payload|contains:
+    - Any {
+    - compartment.id
+    - instance.compartment.id
+  condition: selection and broad_match
+level: high
+tags:
+- attack.privilege_escalation
+- attack.t1098
+falsepositives:
+- Legitimate dynamic group creation for instance principals
+version: 1

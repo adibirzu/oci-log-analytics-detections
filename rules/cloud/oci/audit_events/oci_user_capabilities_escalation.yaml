@@ -1,0 +1,21 @@
+title: OCI User Capabilities Escalation
+id: 7035aee8-209a-42f5-aad9-9d2c5286bff0
+status: stable
+description: Detects enabling console password for a user, potentially escalating
+  a service account to interactive access.
+references:
+- https://attack.mitre.org/techniques/T1098/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identitycontrolplane.createorupdateusercapabilities
+  condition: selection
+level: high
+tags:
+- attack.privilege_escalation
+- attack.t1098
+falsepositives:
+- User onboarding by IAM administrators
+version: 1

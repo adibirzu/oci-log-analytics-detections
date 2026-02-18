@@ -1,7 +1,9 @@
 title: Windows UAC Bypass Attempt
 id: f1e2d3c4-5013-4000-8000-000000000013
 status: stable
-description: Detects common UAC bypass techniques including fodhelper, eventvwr, and sdclt abuse. These auto-elevate binaries can be hijacked via registry to execute arbitrary code with elevated privileges.
+description: Detects common UAC bypass techniques including fodhelper, eventvwr, and
+  sdclt abuse. These auto-elevate binaries can be hijacked via registry to execute
+  arbitrary code with elevated privileges.
 logsource:
   product: windows
   service: process_creation
@@ -25,3 +27,4 @@ tags:
 falsepositives:
 - Legitimate use of fodhelper for language settings
 - Event Viewer launched by administrators
+version: 1

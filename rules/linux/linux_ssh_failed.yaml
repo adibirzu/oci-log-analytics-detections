@@ -13,3 +13,9 @@ detection:
 level: low
 tags:
 - attack.initial_access
+- attack.credential_access
+- attack.t1110.001
+version: 1
+falsepositives:
+- Authorized remote administration
+- Automated SSH-based deployments

@@ -1,0 +1,14 @@
+{
+  "title": "OCI Privilege Escalation Chain Detection",
+  "description": "Identifies sequences where a user creates a policy, group, or dynamic group followed by role assignment — a common privilege escalation pattern.",
+  "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like '*createpolicy*' or 'Event Type' like '*creategroup*' or 'Event Type' like '*createdynamicgroup*' or 'Event Type' like '*addusertogroup*') | stats count as actions, distinctcount('Event Type') as distinct_actions, earliest(Time) as first_action, latest(Time) as last_action by 'Principal Name' | where distinct_actions >= 2 | sort -distinct_actions",
+  "type": "hunting",
+  "category": "privilege_escalation",
+  "mitre_attack": {
+    "tactics": ["privilege_escalation", "persistence"],
+    "techniques": ["T1098", "T1136"]
+  },
+  "data_source": "OCI Audit Logs",
+  "frequency": "weekly",
+  "notes": "Look for users performing multiple IAM changes in sequence. A single user creating a group AND a policy AND adding themselves is highly suspicious."
+}

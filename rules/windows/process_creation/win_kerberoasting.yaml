@@ -1,7 +1,8 @@
 title: Windows Kerberoasting Attack
 id: f1e2d3c4-5014-4000-8000-000000000014
 status: stable
-description: Detects Kerberoasting techniques using tools or PowerShell commands that request TGS tickets for service accounts to crack offline.
+description: Detects Kerberoasting techniques using tools or PowerShell commands that
+  request TGS tickets for service accounts to crack offline.
 logsource:
   product: windows
   service: process_creation
@@ -17,7 +18,7 @@ detection:
     - Request-SPNTicket
   sel_setspn:
     process_name|endswith: setspn.exe
-    CommandLine|contains: '-Q */*'
+    CommandLine|contains: -Q */*
   condition: sel_rubeus or sel_invoke or sel_setspn
 level: critical
 tags:
@@ -26,3 +27,4 @@ tags:
 falsepositives:
 - Authorized security assessment
 - SPN enumeration by service account management tools
+version: 1

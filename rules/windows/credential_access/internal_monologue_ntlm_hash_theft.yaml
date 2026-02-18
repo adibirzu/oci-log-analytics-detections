@@ -1,0 +1,21 @@
+title: Internal Monologue NTLM Hash Theft
+id: cff37019-d23b-44b7-b691-3c9dce79ca90
+status: stable
+description: Detects Internal Monologue attack which retrieves NTLM hashes without
+  touching LSASS.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - InternalMonologue
+    - internal_monologue
+  condition: selection
+level: high
+tags:
+- attack.credential_access
+- attack.t1003
+falsepositives:
+- Authorized red team operations
+version: 1

@@ -1,7 +1,8 @@
 title: Linux Log File Tampering
 id: f1e2d3c4-5006-4000-8000-000000000006
 status: stable
-description: Detects deletion, truncation, or clearing of system log files. Attackers tamper with logs to cover their tracks and hinder incident response.
+description: Detects deletion, truncation, or clearing of system log files. Attackers
+  tamper with logs to cover their tracks and hinder incident response.
 logsource:
   product: linux
   service: audit
@@ -11,7 +12,7 @@ detection:
     - rm -f /var/log
     - rm -rf /var/log
     - truncate -s 0 /var/log
-    - 'cat /dev/null > /var/log'
+    - cat /dev/null > /var/log
     - shred /var/log
     - journalctl --vacuum
   condition: selection
@@ -22,3 +23,4 @@ tags:
 falsepositives:
 - Legitimate log rotation by logrotate
 - Disk space emergency cleanup
+version: 1

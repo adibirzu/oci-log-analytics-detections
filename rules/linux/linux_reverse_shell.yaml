@@ -18,3 +18,6 @@ level: critical
 tags:
 - attack.execution
 - attack.t1059
+version: 1
+falsepositives:
+- Authorized penetration testing

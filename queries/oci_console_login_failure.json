@@ -23,5 +23,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Users with expired passwords or MFA issues",
+    "Scheduled password rotation"
+  ]
 }

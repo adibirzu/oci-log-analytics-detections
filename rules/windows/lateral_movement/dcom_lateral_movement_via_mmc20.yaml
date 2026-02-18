@@ -1,0 +1,22 @@
+title: DCOM Lateral Movement via MMC20
+id: adea89ca-950a-44c2-9b0b-6e7c923a296f
+status: stable
+description: Detects lateral movement using DCOM MMC20.Application object to execute
+  commands remotely.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    ParentImage|endswith: \mmc.exe
+    Image|endswith:
+    - \cmd.exe
+    - \powershell.exe
+  condition: selection
+level: high
+tags:
+- attack.lateral_movement
+- attack.t1021.003
+falsepositives:
+- Legitimate MMC snap-in operations
+version: 1

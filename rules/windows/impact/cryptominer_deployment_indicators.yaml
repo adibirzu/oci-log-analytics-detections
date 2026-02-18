@@ -1,0 +1,24 @@
+title: Cryptominer Deployment Indicators
+id: 0f757d5c-07b1-4183-95a8-856119449a55
+status: stable
+description: Detects indicators of cryptocurrency mining software deployment on Windows
+  systems.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - stratum+tcp
+    - xmrig
+    - minergate
+    - nicehash
+    - hashrate
+  condition: selection
+level: high
+tags:
+- attack.impact
+- attack.t1496
+falsepositives:
+- Authorized cryptocurrency mining
+version: 1

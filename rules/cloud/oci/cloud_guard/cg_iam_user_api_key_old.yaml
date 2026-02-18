@@ -12,3 +12,8 @@ detection:
 level: high
 tags:
 - oci.cloud_guard
+- attack.credential_access
+- attack.t1552.004
+version: 1
+falsepositives:
+- Authorized administrative operations

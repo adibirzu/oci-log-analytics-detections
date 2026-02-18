@@ -31,5 +31,9 @@
   ],
   "compliance_frameworks": [
     "cis_oci_3.1"
+  ],
+  "falsepositives": [
+    "Scheduled key rotation",
+    "Authorized cryptographic operations"
   ]
 }

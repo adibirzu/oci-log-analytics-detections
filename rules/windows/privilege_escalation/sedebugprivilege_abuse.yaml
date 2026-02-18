@@ -1,0 +1,22 @@
+title: SeDebugPrivilege Abuse
+id: 58750b84-6d51-4571-bd35-a2100c1737f0
+status: stable
+description: Detects tools attempting to enable or abuse SeDebugPrivilege for process
+  manipulation.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - SeDebugPrivilege
+    - AdjustTokenPrivileges
+    - privilege::debug
+  condition: selection
+level: high
+tags:
+- attack.privilege_escalation
+- attack.t1134
+falsepositives:
+- Debugging tools used by developers
+version: 1

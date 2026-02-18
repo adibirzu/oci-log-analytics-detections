@@ -1,0 +1,23 @@
+title: AppLocker Policy Bypass via MSHTML
+id: 432c6b61-1fad-438a-89e3-39a7d3067147
+status: stable
+description: Detects MSHTA or similar MSHTML-based execution paths used to bypass
+  AppLocker policies.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \mshta.exe
+    CommandLine|contains:
+    - 'javascript:'
+    - 'vbscript:'
+    - http
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1218.005
+falsepositives:
+- Legacy HTA applications
+version: 1

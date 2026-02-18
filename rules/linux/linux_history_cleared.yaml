@@ -1,7 +1,8 @@
 title: Linux History File Cleared
 id: 29d0e1f2-def0-1234-5678-901234567089
 status: stable
-description: Detects clearing of command history files or unsetting of history environment variable, a common anti-forensics technique.
+description: Detects clearing of command history files or unsetting of history environment variable, a common anti-forensics
+  technique.
 logsource:
   product: linux
   service: audit
@@ -15,3 +16,6 @@ level: medium
 tags:
 - attack.defense_evasion
 - attack.t1070.003
+version: 1
+falsepositives:
+- Users clearing personal shell history

@@ -6,13 +6,16 @@
   "level": "medium",
   "stig_category": "CAT II",
   "tags": [
-    "attack.persistence"
+    "attack.persistence",
+    "attack.t1098.001"
   ],
   "mitre_attack": {
     "tactics": [
       "persistence"
     ],
-    "techniques": []
+    "techniques": [
+      "T1098.001"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -20,5 +23,9 @@
     "candidates": [
       "OCI Audit Logs"
     ]
-  }
+  },
+  "falsepositives": [
+    "Scheduled key rotation",
+    "Authorized cryptographic operations"
+  ]
 }

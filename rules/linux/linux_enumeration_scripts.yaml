@@ -1,7 +1,8 @@
 title: Linux Post-Exploitation Enumeration Script
 id: f1e2d3c4-5007-4000-8000-000000000007
 status: stable
-description: Detects execution of common Linux post-exploitation enumeration scripts such as LinPEAS, LinEnum, or linux-exploit-suggester used during privilege escalation.
+description: Detects execution of common Linux post-exploitation enumeration scripts
+  such as LinPEAS, LinEnum, or linux-exploit-suggester used during privilege escalation.
 logsource:
   product: linux
   service: audit
@@ -21,3 +22,4 @@ tags:
 - attack.t1082
 falsepositives:
 - Authorized security assessments and penetration testing
+version: 1

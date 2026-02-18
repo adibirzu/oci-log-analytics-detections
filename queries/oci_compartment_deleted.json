@@ -27,5 +27,9 @@
   },
   "stig_ids": [
     "AC-6"
+  ],
+  "falsepositives": [
+    "Organizational restructuring",
+    "Automated IaC cleanup"
   ]
 }

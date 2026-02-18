@@ -1,0 +1,23 @@
+title: OCI Federated Identity Provider Modified
+id: dcc34b02-d75f-4228-9529-e93fdd87ffcf
+status: stable
+description: Detects modification of SAML/OIDC identity provider configuration which
+  could enable unauthorized access.
+references:
+- https://attack.mitre.org/techniques/T1606/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type:
+    - com.oraclecloud.identitycontrolplane.updateidentityprovider
+    - com.oraclecloud.identitycontrolplane.createidentityprovider
+  condition: selection
+level: critical
+tags:
+- attack.initial_access
+- attack.t1606
+falsepositives:
+- Federation configuration changes by IAM admins
+version: 1

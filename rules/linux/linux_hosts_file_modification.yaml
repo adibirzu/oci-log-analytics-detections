@@ -1,7 +1,8 @@
 title: Linux Hosts File Modification
 id: f1e2d3c4-5002-4000-8000-000000000002
 status: stable
-description: Detects modification of /etc/hosts or /etc/resolv.conf. Attackers modify these to redirect traffic, bypass security controls, or perform DNS hijacking.
+description: Detects modification of /etc/hosts or /etc/resolv.conf. Attackers modify
+  these to redirect traffic, bypass security controls, or perform DNS hijacking.
 logsource:
   product: linux
   service: audit
@@ -18,3 +19,4 @@ tags:
 falsepositives:
 - Network configuration management
 - Container orchestration updating DNS resolution
+version: 1

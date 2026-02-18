@@ -1,7 +1,8 @@
 title: Windows RDP Lateral Movement
 id: e1f2a3b4-4017-4000-8000-000000000017
 status: stable
-description: Detects use of mstsc.exe (Remote Desktop client) or enabling RDP via registry, indicating potential lateral movement between systems.
+description: Detects use of mstsc.exe (Remote Desktop client) or enabling RDP via
+  registry, indicating potential lateral movement between systems.
 logsource:
   product: windows
   service: process_creation
@@ -20,3 +21,4 @@ tags:
 falsepositives:
 - IT administrators using RDP for legitimate remote management
 - Help desk remote support sessions
+version: 1

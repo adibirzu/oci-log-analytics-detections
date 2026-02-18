@@ -1,15 +1,25 @@
 title: Suspicious Usage of nc
 id: fa45e5b0-0ab3-45c3-9a73-0c65b10108e7
 status: experimental
-description: Detects execution of potentially suspicious binary nc.
+description: Detects execution of nc with listen or execute flags.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: nc
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - '-e '
+    - '-c '
+    - -l
+    - -v
+level: high
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate nc usage by system administrators
+- Automated system scripts

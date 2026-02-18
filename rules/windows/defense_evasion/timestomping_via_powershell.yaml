@@ -1,0 +1,21 @@
+title: Timestomping via PowerShell
+id: c3d28121-f2bc-46d3-9e15-ed7fbb9c4863
+status: stable
+description: Detects PowerShell commands modifying file timestamps to blend malicious
+  files with legitimate ones.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - CreationTime
+    - LastWriteTime
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1070.006
+falsepositives:
+- Deployment scripts setting consistent timestamps
+version: 1

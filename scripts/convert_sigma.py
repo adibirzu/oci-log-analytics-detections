@@ -2,8 +2,10 @@
 Convert Sigma YAML detection rules to OCI Log Analytics Query Language (OCL) JSON.
 
 Supports:
-  - Field modifiers: |contains, |startswith, |endswith, |re (all with lists)
+  - Field modifiers: |contains, |startswith, |endswith, |re, |contains|all
+  - Wildcard selection references: ``1 of selection*``, ``all of filter*``
   - Complex conditions: sel1 and sel2, sel1 or sel2, not, parenthesized groups
+  - Graceful degradation for count()/timeframe conditions
   - STIG metadata extraction from tags
   - MITRE ATT&CK technique mapping
   - Integration-ready JSON output for multicloudoperations
@@ -19,6 +21,7 @@ import os
 import json
 import re
 import sys
+import fnmatch
 
 CONFIG_PATH = 'config/sigma_oci_mapping.yaml'
 RULES_DIR = 'rules'
@@ -102,15 +105,24 @@ def parse_selection(selection, field_map):
         return f"({' or '.join(list_parts)})"
 
     for key, value in selection.items():
-        # Handle field modifiers (e.g., field|contains, field|endswith)
+        # Handle field modifiers (e.g., field|contains, field|endswith, field|contains|all)
         modifier = None
         key_base = key
         if '|' in key:
-            key_base, modifier = key.split('|', 1)
+            parts = key.split('|')
+            key_base = parts[0]
+            modifier = '|'.join(parts[1:])
 
         oci_field = map_field(key_base, field_map)
 
-        if modifier == 'contains':
+        if modifier == 'contains|all':
+            # AND together all values — field must contain every value
+            if isinstance(value, list):
+                and_parts = [f"{oci_field} like '*{v}*'" for v in value]
+                query_parts.append(f"({' and '.join(and_parts)})")
+            else:
+                query_parts.append(f"{oci_field} like '*{value}*'")
+        elif modifier == 'contains':
             if isinstance(value, list):
                 or_parts = [f"{oci_field} like '*{v}*'" for v in value]
                 query_parts.append(f"({' or '.join(or_parts)})")
@@ -153,6 +165,30 @@ def parse_selection(selection, field_map):
     return " and ".join(query_parts)
 
 
+def _expand_wildcard_selections(condition_str, detection):
+    """Expand ``1 of sel*`` / ``all of filter*`` wildcards in condition strings.
+
+    Returns the condition string with wildcard patterns replaced by explicit
+    boolean combinations of matching detection keys.
+    """
+    detection_keys = [k for k in detection if k != 'condition']
+    wildcard_re = re.compile(r'\b(1|all|\d+)\s+of\s+(\w+\*)')
+
+    def _replace(m):
+        quantifier = m.group(1)
+        pattern = m.group(2)
+        matching = [k for k in detection_keys if fnmatch.fnmatch(k, pattern)]
+        if not matching:
+            return m.group(0)  # leave as-is if nothing matches
+        if quantifier == 'all':
+            return '(' + ' and '.join(matching) + ')'
+        else:
+            # "1 of" or any numeric quantifier → OR (true if any match)
+            return '(' + ' or '.join(matching) + ')'
+
+    return wildcard_re.sub(_replace, condition_str)
+
+
 def parse_condition(condition_str, detection, field_map):
     """Parse a Sigma condition string, replacing selection references with OCL.
 
@@ -163,15 +199,22 @@ def parse_condition(condition_str, detection, field_map):
       - sel_target and sel_path
       - (sel1 or sel2) and sel3
       - not sel1
+      - 1 of selection*
+      - all of filter*
     """
     if not isinstance(condition_str, str):
         return ""
+
+    # Expand wildcard selection references before tokenizing
+    condition_str = _expand_wildcard_selections(condition_str, detection)
 
     # Tokenize: split on whitespace but preserve parentheses
     tokens = re.findall(r'\(|\)|[^\s()]+', condition_str)
 
     result_parts = []
-    for token in tokens:
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
         lower = token.lower()
         if lower in ('and', 'or', 'not'):
             result_parts.append(lower)
@@ -180,8 +223,12 @@ def parse_condition(condition_str, detection, field_map):
         elif token in detection and token != 'condition':
             result_parts.append(f"({parse_selection(detection[token], field_map)})")
         else:
-            # Try as a selection name (may have been lowered)
+            # Skip leftover quantifier keywords from unexpanded patterns
+            if lower in ('1', 'all', 'of') or (lower.isdigit()):
+                i += 1
+                continue
             result_parts.append(token)
+        i += 1
 
     return " ".join(result_parts)
 
@@ -230,16 +277,32 @@ def convert_rule(rule_path, field_map, logsource_map):
 
     raw_source_mapping = (
         logsource_map.get(f"{product}_{service}")
+        or logsource_map.get(f"{product}_{category}")
         or logsource_map.get(category)
         or logsource_map.get(product)
     )
     source_candidates = normalize_log_source_candidates(raw_source_mapping)
+    logsource_fallback = False
     if not source_candidates:
         source_candidates = ["OCI Audit Logs"]
+        logsource_key = f"{product}_{service}" if service else (f"{product}_{category}" if category else product)
+        if logsource_key and logsource_key != '_':
+            print(f"WARN: No logsource mapping for '{logsource_key}' in {rule_path}, "
+                  f"falling back to OCI Audit Logs", file=sys.stderr)
+        logsource_fallback = True
     source_filter = build_log_source_filter(source_candidates)
 
     detection = rule.get('detection', {})
     condition = detection.get('condition', '')
+
+    # Detect aggregation conditions (count(), timeframe)
+    requires_aggregation = False
+    if 'count(' in str(condition) or rule.get('detection', {}).get('timeframe'):
+        requires_aggregation = True
+        # Strip aggregation parts — emit only the base filter query
+        condition = re.sub(r'\|\s*count\([^)]*\)\s*(by\s+\w+)?\s*(>|<|>=|<=|==|!=)\s*\d+', '', str(condition)).strip()
+        if not condition:
+            condition = 'selection'
 
     # Parse condition using the improved tokenizer
     query_body = parse_condition(condition, detection, field_map)
@@ -282,6 +345,10 @@ def convert_rule(rule_path, field_map, logsource_map):
         result['compliance_frameworks'] = metadata['compliance_frameworks']
     if rule.get('falsepositives'):
         result['falsepositives'] = rule['falsepositives']
+    if logsource_fallback:
+        result['logsource_fallback'] = True
+    if requires_aggregation:
+        result['requires_aggregation'] = True
 
     return result
 
@@ -409,6 +476,22 @@ def main():
                     safe_title = re.sub(r'[^a-z0-9_\-]', '', safe_title)
                     out_filename = f"{safe_title}.json"
                     out_full_path = os.path.join(output_path, out_filename)
+
+                    # Preserve hand-edited fields from existing file
+                    if os.path.exists(out_full_path):
+                        try:
+                            with open(out_full_path) as ef:
+                                existing = json.load(ef)
+                            existing_query = existing.get('query', '')
+                            if '| stats' in existing_query or '| where' in existing_query or '| eventstats' in existing_query:
+                                # Extract the aggregation suffix from the existing query
+                                pipe_idx = existing_query.index('|')
+                                result['query'] = result['query'] + ' ' + existing_query[pipe_idx:].strip()
+                            # Preserve ART test mappings added by map_atomic_tests.py
+                            if 'atomic_red_team' in existing:
+                                result['atomic_red_team'] = existing['atomic_red_team']
+                        except (json.JSONDecodeError, KeyError):
+                            pass
 
                     with open(out_full_path, 'w') as f:
                         json.dump(result, f, indent=2)

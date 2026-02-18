@@ -1,0 +1,21 @@
+title: OCI Console Login from Suspicious IP Range
+id: 8310207f-1ba4-4c10-8cb4-0c8105336c62
+status: stable
+description: Detects console login events that may indicate unauthorized access from
+  unusual sources.
+references:
+- https://attack.mitre.org/techniques/T1078/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.identitycontrolplane.interactivelogin
+  condition: selection
+level: low
+tags:
+- attack.initial_access
+- attack.t1078
+falsepositives:
+- Normal console access
+version: 1

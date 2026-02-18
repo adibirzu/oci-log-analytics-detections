@@ -31,5 +31,9 @@
   ],
   "compliance_frameworks": [
     "cis_oci_2.4"
+  ],
+  "falsepositives": [
+    "Network infrastructure changes during maintenance windows",
+    "Automated IaC deployments"
   ]
 }

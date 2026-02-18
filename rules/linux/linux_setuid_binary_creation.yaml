@@ -1,10 +1,11 @@
 title: Linux Setuid Binary Creation
 id: a1b2c3d4-6019-4000-8000-000000000019
 status: stable
-description: >
-  Detects creation of setuid/setgid binaries. Attackers set the SUID bit on
-  binaries to maintain root-level access even when running as unprivileged
-  users. This is a classic privilege escalation persistence technique.
+description: 'Detects creation of setuid/setgid binaries. Attackers set the SUID bit
+  on binaries to maintain root-level access even when running as unprivileged users.
+  This is a classic privilege escalation persistence technique.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -29,3 +30,4 @@ tags:
 falsepositives:
 - Package installation setting legitimate SUID bits
 - Application requiring elevated permissions
+version: 1

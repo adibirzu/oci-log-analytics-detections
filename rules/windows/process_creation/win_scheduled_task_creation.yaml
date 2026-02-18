@@ -1,7 +1,8 @@
 title: Windows Scheduled Task Creation via Schtasks
 id: e1f2a3b4-4018-4000-8000-000000000018
 status: stable
-description: Detects creation of scheduled tasks via schtasks.exe with suspicious patterns. Scheduled tasks are a common persistence and execution mechanism.
+description: Detects creation of scheduled tasks via schtasks.exe with suspicious
+  patterns. Scheduled tasks are a common persistence and execution mechanism.
 logsource:
   product: windows
   service: process_creation
@@ -19,3 +20,4 @@ tags:
 falsepositives:
 - Legitimate task scheduling by system administrators
 - Software installation creating maintenance tasks
+version: 1

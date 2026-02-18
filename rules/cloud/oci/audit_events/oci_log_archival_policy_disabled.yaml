@@ -1,0 +1,21 @@
+title: OCI Log Archival Policy Disabled
+id: b32514c4-be0c-4ebc-9f83-1cb09fc57a4d
+status: stable
+description: Detects modification of logging configuration that may reduce log retention
+  or disable archival.
+references:
+- https://attack.mitre.org/techniques/T1562/008/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.logging.updatelog
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1562.008
+falsepositives:
+- Logging configuration updates by administrators
+version: 1

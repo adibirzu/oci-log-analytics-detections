@@ -13,3 +13,8 @@ detection:
 level: low
 tags:
 - attack.privilege_escalation
+- attack.t1548.003
+version: 1
+falsepositives:
+- Authorized system administration
+- Automated maintenance scripts

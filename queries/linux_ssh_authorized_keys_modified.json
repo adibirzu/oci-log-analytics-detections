@@ -26,5 +26,26 @@
       "Linux Syslog Logs",
       "Linux Audit Logs"
     ]
+  },
+  "falsepositives": [
+    "Authorized remote administration",
+    "Automated SSH-based deployments"
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 1,
+    "techniques_with_tests": [
+      "T1098.004"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1098.004",
+        "test_name": "Modify SSH Authorized Keys",
+        "test_guid": "342cc723-127c-4d3a-8292-9c0c6b4ecadc",
+        "executor": "sh",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1098.004/T1098.004.md"
+      }
+    ]
   }
 }

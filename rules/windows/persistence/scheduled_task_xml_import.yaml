@@ -1,0 +1,22 @@
+title: Scheduled Task XML Import
+id: 7014db16-fcef-4bc5-a0aa-f6acdbef192a
+status: stable
+description: Detects importing scheduled tasks from XML files, which may bypass task
+  creation monitoring.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \schtasks.exe
+    CommandLine|contains|all:
+    - /create
+    - /xml
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1053.005
+falsepositives:
+- Task deployment via Group Policy
+version: 1

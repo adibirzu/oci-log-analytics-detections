@@ -1,0 +1,30 @@
+title: DLL Side-Loading from Suspicious Directory
+id: 33350827-b2b5-4553-8286-07aa08b70157
+status: stable
+description: Detects execution of legitimate signed binaries from temp or user-writable
+  directories, suggesting DLL side-loading.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - .exe
+    Image|contains:
+    - \Temp\
+    - \AppData\Local\Temp\
+    - \Downloads\
+    - \Desktop\
+  filter:
+    Image|contains:
+    - \Windows\Temp\setup
+    - \Microsoft\
+  condition: selection and not filter
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1574.002
+falsepositives:
+- Software installers running from Downloads
+- Portable applications
+version: 1

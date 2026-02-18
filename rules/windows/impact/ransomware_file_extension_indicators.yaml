@@ -1,0 +1,24 @@
+title: Ransomware File Extension Indicators
+id: d6ce5832-a4a0-4a95-a27e-f1f49fba2887
+status: stable
+description: Detects commands associated with ransomware encryption activities based
+  on known file extension patterns.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - .encrypted
+    - .locked
+    - .crypted
+    - .enc
+    - .crypt
+  condition: selection
+level: critical
+tags:
+- attack.impact
+- attack.t1486
+falsepositives:
+- Legitimate encryption tools
+version: 1

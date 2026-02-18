@@ -1,10 +1,11 @@
 title: OCI Cloud Infrastructure Discovery
 id: a1b2c3d4-6005-4000-8000-000000000005
 status: stable
-description: >
-  Detects excessive cloud infrastructure enumeration via OCI API calls.
-  Attackers with compromised credentials perform reconnaissance by listing
-  instances, networks, buckets, and databases to map the cloud environment.
+description: 'Detects excessive cloud infrastructure enumeration via OCI API calls.
+  Attackers with compromised credentials perform reconnaissance by listing instances,
+  networks, buckets, and databases to map the cloud environment.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -31,3 +32,4 @@ falsepositives:
 - Cloud management consoles
 - Infrastructure-as-code tools
 - Monitoring and compliance scanners
+version: 1

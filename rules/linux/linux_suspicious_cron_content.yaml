@@ -1,7 +1,8 @@
 title: Linux Suspicious Cron Job Content
 id: f1e2d3c4-5009-4000-8000-000000000009
 status: stable
-description: Detects cron job entries containing suspicious patterns such as downloading payloads, piping to shell, or encoding commands typically used for persistence.
+description: Detects cron job entries containing suspicious patterns such as downloading
+  payloads, piping to shell, or encoding commands typically used for persistence.
 logsource:
   product: linux
   service: audit
@@ -24,3 +25,4 @@ tags:
 - attack.t1053.003
 falsepositives:
 - Legitimate automation scripts using curl piped to shell
+version: 1

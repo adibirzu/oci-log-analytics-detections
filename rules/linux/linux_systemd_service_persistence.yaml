@@ -1,7 +1,8 @@
 title: Linux Systemd Service Persistence
 id: e1f2a3b4-4008-4000-8000-000000000008
 status: stable
-description: Detects creation or enabling of systemd services, a common persistence mechanism where attackers install malicious services that survive reboots.
+description: Detects creation or enabling of systemd services, a common persistence
+  mechanism where attackers install malicious services that survive reboots.
 logsource:
   product: linux
   service: audit
@@ -21,3 +22,4 @@ tags:
 falsepositives:
 - Legitimate software installation
 - System administration tasks
+version: 1

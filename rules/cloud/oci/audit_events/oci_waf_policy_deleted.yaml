@@ -1,0 +1,21 @@
+title: OCI WAF Policy Deleted
+id: 50000bcb-481b-4425-8a46-aa6b2406c3d3
+status: stable
+description: Detects deletion of Web Application Firewall policies which may expose
+  applications to attacks.
+references:
+- https://attack.mitre.org/techniques/T1562/001/
+logsource:
+  product: oci
+  service: audit
+detection:
+  selection:
+    event_type: com.oraclecloud.waf.deletewebappfirewallpolicy
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1562.001
+falsepositives:
+- WAF policy replacement during updates
+version: 1

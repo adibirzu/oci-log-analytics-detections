@@ -1,15 +1,24 @@
 title: Suspicious Usage of tcpdump
 id: 1d693344-8013-4129-a8e9-2cabb094b9ae
 status: experimental
-description: Detects execution of potentially suspicious binary tcpdump.
+description: Detects execution of tcpdump capturing network traffic.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: tcpdump
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - '-w '
+    - '-i '
+    - not port 22
+level: medium
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate tcpdump usage by system administrators
+- Automated system scripts

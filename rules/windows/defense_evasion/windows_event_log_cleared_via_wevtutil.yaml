@@ -1,0 +1,22 @@
+title: Windows Event Log Cleared via Wevtutil
+id: 18612c42-7c30-4b64-827b-482531f7c2f9
+status: stable
+description: Detects clearing of Windows Event Logs using wevtutil.exe to remove forensic
+  evidence.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \wevtutil.exe
+    CommandLine|contains:
+    - 'cl '
+    - clear-log
+  condition: selection
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1070.001
+falsepositives:
+- Scheduled log maintenance by administrators
+version: 1

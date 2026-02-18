@@ -1,0 +1,22 @@
+title: Process Doppelganging via TxF
+id: 8b8dbb14-885a-4d97-9c9b-e065cb90096a
+status: stable
+description: Detects indicators of process doppelganging using transactional NTFS
+  to replace process memory.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - NtCreateTransaction
+    - NtRollbackTransaction
+    - doppelganging
+  condition: selection
+level: critical
+tags:
+- attack.defense_evasion
+- attack.t1055.013
+falsepositives:
+- Development or debugging tools using TxF
+version: 1

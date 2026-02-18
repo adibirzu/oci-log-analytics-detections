@@ -31,7 +31,7 @@ import argparse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oci_config import (
     TENANCY_ID, COMPARTMENT_ID, PROJECT_DIR, TEST_DATA_DIR,
-    LOG_GROUP_NAME,
+    LOG_GROUP_NAME, LOG_GROUP_ID,
     get_oci_config, get_la_client, get_namespace, ensure_log_group,
     validate_oci_setup,
     SOURCE_CANDIDATE_GROUPS,
@@ -239,6 +239,15 @@ def run_streaming_mode():
 
     with open(STREAMING_CONFIG_PATH, 'r') as f:
         streaming_config = json.load(f)
+
+    # Warn if streaming_config.json log group doesn't match env
+    cfg_lg = streaming_config.get("_metadata", {}).get("log_group_id", "")
+    if LOG_GROUP_ID and cfg_lg and cfg_lg != LOG_GROUP_ID:
+        print(f"\n  WARNING: Log group mismatch detected!")
+        print(f"    streaming_config.json: {cfg_lg}")
+        print(f"    env LOG_GROUP_ID:      {LOG_GROUP_ID}")
+        print(f"    Data may route to the wrong log group.")
+        print(f"    Re-run: python3 scripts/setup_streaming_pipeline.py\n")
 
     config = get_oci_config()
     results = {}

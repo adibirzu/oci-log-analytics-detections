@@ -1,0 +1,22 @@
+title: XSL Script Processing via WMIC or Msxsl
+id: 7f6896f0-17fe-48be-89a6-a6052ab6499e
+status: stable
+description: Detects execution of XSL scripts through WMIC /format or msxsl.exe for
+  code execution.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_wmic:
+    Image|endswith: \wmic.exe
+    CommandLine|contains: '/format:'
+  selection_msxsl:
+    Image|endswith: \msxsl.exe
+  condition: 1 of selection*
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1220
+falsepositives:
+- Legitimate WMIC format output
+version: 1

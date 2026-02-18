@@ -27,5 +27,9 @@
   },
   "stig_ids": [
     "AC-6"
+  ],
+  "falsepositives": [
+    "Routine IAM group management",
+    "Automated provisioning systems"
   ]
 }

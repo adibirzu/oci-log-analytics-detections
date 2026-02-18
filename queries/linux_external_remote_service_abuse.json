@@ -30,5 +30,22 @@
   "falsepositives": [
     "Legitimate remote access",
     "VPN connections from authorized users"
-  ]
+  ],
+  "atomic_red_team": {
+    "has_tests": true,
+    "test_count": 1,
+    "techniques_with_tests": [
+      "T1133"
+    ],
+    "tests": [
+      {
+        "technique_id": "T1133",
+        "test_name": "Running Chrome VPN Extensions via the Registry 2 vpn extension",
+        "test_guid": "4c8db261-a58b-42a6-a866-0a294deedde4",
+        "executor": "powershell",
+        "match_type": "exact",
+        "url": "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1133/T1133.md"
+      }
+    ]
+  }
 }

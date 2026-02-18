@@ -1,15 +1,25 @@
 title: Suspicious Usage of shadow
 id: 262ec507-79bb-43b0-a641-3bb9cf69a4b4
 status: experimental
-description: Detects execution of potentially suspicious binary shadow.
+description: Detects execution of shadow with direct access to shadow password file.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: shadow
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - 'cat '
+    - 'less '
+    - 'cp '
+    - 'scp '
+level: critical
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate shadow usage by system administrators
+- Automated system scripts

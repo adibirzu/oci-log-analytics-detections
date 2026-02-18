@@ -1,10 +1,11 @@
 title: Linux Archive Data Collected for Exfiltration
 id: a1b2c3d4-6012-4000-8000-000000000012
 status: stable
-description: >
-  Detects creation of compressed archives from sensitive directories. Attackers
-  archive collected data (credentials, source code, configs) before exfiltrating
+description: 'Detects creation of compressed archives from sensitive directories.
+  Attackers archive collected data (credentials, source code, configs) before exfiltrating
   to reduce transfer size and avoid detection.
+
+  '
 author: SOC Detection Team
 date: 2026/02/11
 logsource:
@@ -38,3 +39,4 @@ tags:
 falsepositives:
 - System backup scripts
 - Application deployment archives
+version: 1

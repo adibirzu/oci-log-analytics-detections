@@ -1,15 +1,28 @@
 title: Suspicious Usage of curl
 id: f9cba04d-c56b-45bb-8ece-c664e79bb94e
 status: experimental
-description: Detects execution of potentially suspicious binary curl.
+description: Detects execution of curl downloading to temp directories or piping to
+  shell.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: curl
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - -o /tmp
+    - -o /dev/shm
+    - pastebin
+    - '-k '
+    - '| bash'
+    - '| sh'
+level: high
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate curl usage by system administrators
+- Automated system scripts

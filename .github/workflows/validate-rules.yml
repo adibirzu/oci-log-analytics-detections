@@ -4,15 +4,23 @@ on:
   push:
     paths:
       - 'rules/**'
+      - 'hunting/**'
       - 'config/**'
       - 'scripts/convert_sigma.py'
       - 'scripts/generate_catalog.py'
+      - 'scripts/audit_rule_quality.py'
+      - 'scripts/map_atomic_tests.py'
+      - 'config/art_index.csv'
   pull_request:
     paths:
       - 'rules/**'
+      - 'hunting/**'
       - 'config/**'
       - 'scripts/convert_sigma.py'
       - 'scripts/generate_catalog.py'
+      - 'scripts/audit_rule_quality.py'
+      - 'scripts/map_atomic_tests.py'
+      - 'config/art_index.csv'
 
 jobs:
   validate:
@@ -87,3 +95,63 @@ jobs:
             exit 1
           fi
           echo "No deprecated event types found"
+
+      - name: Run quality audit
+        run: python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md
+
+      - name: Verify zero quality issues
+        run: |
+          if grep -q 'Total.*\*\*0\*\*' docs/RULE_QUALITY_REPORT.md; then
+            echo "Quality audit: PASS (0 issues)"
+          else
+            echo "Quality audit: FAIL — see docs/RULE_QUALITY_REPORT.md"
+            cat docs/RULE_QUALITY_REPORT.md
+            exit 1
+          fi
+
+      - name: Download ART index
+        run: python3 scripts/map_atomic_tests.py --download
+
+      - name: Enrich queries with ART mappings
+        run: python3 scripts/map_atomic_tests.py --enrich
+
+      - name: Validate ART mappings
+        run: python3 scripts/map_atomic_tests.py --validate
+
+      - name: ART coverage report and stats
+        run: python3 scripts/map_atomic_tests.py --report --stats
+
+      - name: Validate hunting queries JSON
+        run: |
+          python3 -c "
+          import json, os, sys
+          errors = 0
+          hunting_dir = 'hunting'
+          if not os.path.isdir(hunting_dir):
+              print('No hunting directory found, skipping')
+              sys.exit(0)
+          for f in sorted(os.listdir(hunting_dir)):
+              if not f.endswith('.json'):
+                  continue
+              path = os.path.join(hunting_dir, f)
+              try:
+                  with open(path) as fh:
+                      data = json.load(fh)
+                  if not data.get('title'):
+                      print(f'WARN: {path} missing title')
+                      errors += 1
+                  if not data.get('query'):
+                      print(f'WARN: {path} missing query')
+                      errors += 1
+                  if data.get('type') != 'hunting':
+                      print(f'WARN: {path} missing type=hunting')
+                      errors += 1
+              except Exception as e:
+                  print(f'ERROR: {path}: {e}')
+                  errors += 1
+          count = len([f for f in os.listdir(hunting_dir) if f.endswith('.json')])
+          if errors:
+              print(f'{errors} issues in {count} hunting queries')
+              sys.exit(1)
+          print(f'All {count} hunting queries valid')
+          "

@@ -12,3 +12,9 @@ detection:
 level: informational
 tags:
 - oci.audit
+- attack.execution
+- attack.t1204
+version: 1
+falsepositives:
+- Authorized scaling operations
+- Automated IaC deployments

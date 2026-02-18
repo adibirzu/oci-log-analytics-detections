@@ -1,0 +1,21 @@
+title: Shortcut Modification for Persistence
+id: 2f33f481-f882-43bf-8207-24d697c1da7a
+status: stable
+description: Detects creation of suspicious .lnk shortcut files using PowerShell COM
+  objects.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+    - WScript.Shell
+    - CreateShortcut
+  condition: selection
+level: medium
+tags:
+- attack.persistence
+- attack.t1547.009
+falsepositives:
+- Legitimate shortcut creation by scripts
+version: 1

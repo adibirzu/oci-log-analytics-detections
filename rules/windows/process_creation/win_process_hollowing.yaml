@@ -1,7 +1,9 @@
 title: Windows Process Hollowing Indicators
 id: f1e2d3c4-5018-4000-8000-000000000018
 status: stable
-description: Detects suspicious process creation patterns indicative of process hollowing where a legitimate process is spawned in a suspended state and its memory replaced with malicious code.
+description: Detects suspicious process creation patterns indicative of process hollowing
+  where a legitimate process is spawned in a suspended state and its memory replaced
+  with malicious code.
 logsource:
   product: windows
   service: process_creation
@@ -21,3 +23,4 @@ tags:
 falsepositives:
 - Debugging and development tools
 - Security products inspecting process memory
+version: 1

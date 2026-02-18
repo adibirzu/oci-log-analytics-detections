@@ -1,0 +1,22 @@
+title: Service Execution via sc.exe Create
+id: 68ebf392-a59c-4720-9d6a-68e0c79724c1
+status: stable
+description: Detects creation of new Windows services via sc.exe, which can be used
+  for persistence or privilege escalation.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \sc.exe
+    CommandLine|contains|all:
+    - create
+    - binpath
+  condition: selection
+level: high
+tags:
+- attack.execution
+- attack.t1569.002
+falsepositives:
+- Legitimate service installation by administrators
+version: 1

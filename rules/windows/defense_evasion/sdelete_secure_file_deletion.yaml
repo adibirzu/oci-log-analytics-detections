@@ -1,0 +1,19 @@
+title: SDelete Secure File Deletion
+id: 5bdecf42-d1ba-483f-91c7-dbccb5c58c31
+status: stable
+description: Detects usage of Sysinternals SDelete for secure file deletion to destroy
+  forensic evidence.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \sdelete.exe
+  condition: selection
+level: medium
+tags:
+- attack.defense_evasion
+- attack.t1070.004
+falsepositives:
+- Legitimate secure file disposal procedures
+version: 1

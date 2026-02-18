@@ -27,5 +27,9 @@
   },
   "stig_ids": [
     "AU-12"
+  ],
+  "falsepositives": [
+    "Legitimate serverless operations",
+    "Automated CI/CD pipelines"
   ]
 }

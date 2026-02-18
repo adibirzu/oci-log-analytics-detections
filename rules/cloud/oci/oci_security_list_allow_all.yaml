@@ -1,7 +1,8 @@
 title: OCI Security List Allows All Protocols
 id: d1a2b3c4-1007-4000-8000-000000000007
 status: stable
-description: Detects security list updates that allow all protocols (protocol=all) from any source, creating an overly permissive network configuration that violates STIG network segmentation requirements.
+description: Detects security list updates that allow all protocols (protocol=all) from any source, creating an overly permissive
+  network configuration that violates STIG network segmentation requirements.
 logsource:
   product: oci
   service: audit
@@ -18,3 +19,7 @@ tags:
 - attack.t1562.007
 - stig.SC-7
 - compliance.cis_oci_2.4
+version: 1
+falsepositives:
+- Network infrastructure changes during maintenance windows
+- Automated IaC deployments

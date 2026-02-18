@@ -1,0 +1,22 @@
+title: Netsh Helper DLL Persistence
+id: d4fd5f18-0639-4280-9093-57d9e51ad06f
+status: stable
+description: Detects registration of netsh helper DLLs which execute every time netsh.exe
+  is invoked.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith: \netsh.exe
+    CommandLine|contains|all:
+    - add
+    - helper
+  condition: selection
+level: high
+tags:
+- attack.persistence
+- attack.t1546.007
+falsepositives:
+- Legitimate network extension DLLs
+version: 1

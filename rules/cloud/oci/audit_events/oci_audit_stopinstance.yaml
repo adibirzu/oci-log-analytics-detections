@@ -12,3 +12,9 @@ detection:
 level: informational
 tags:
 - oci.audit
+- attack.impact
+- attack.t1489
+version: 1
+falsepositives:
+- Authorized scaling operations
+- Automated IaC deployments

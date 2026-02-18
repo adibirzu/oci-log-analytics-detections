@@ -1,15 +1,28 @@
 title: Suspicious Usage of wireshark
 id: bc8616ca-d018-4517-8781-902d64e106ac
 status: experimental
-description: Detects execution of potentially suspicious binary wireshark.
+description: Detects execution of wireshark potentially capturing network traffic.
 logsource:
   product: linux
   service: audit
 detection:
-  selection:
+  selection_cli:
+    process_name:
+    - tshark
+    - dumpcap
+  selection_gui:
     process_name: wireshark
-  condition: selection
-level: low
+    command_line|contains:
+    - '-i'
+    - '-w'
+    - '-k'
+    - '-f'
+  condition: selection_cli or selection_gui
+level: medium
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate wireshark usage by system administrators
+- Automated system scripts

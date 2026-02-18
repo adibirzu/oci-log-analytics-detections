@@ -1,7 +1,8 @@
 title: Linux SSH Tunneling Detected
 id: e1f2a3b4-4009-4000-8000-000000000009
 status: stable
-description: Detects SSH tunneling and port forwarding commands used for pivoting, data exfiltration, or bypassing network security controls.
+description: Detects SSH tunneling and port forwarding commands used for pivoting,
+  data exfiltration, or bypassing network security controls.
 logsource:
   product: linux
   service: audit
@@ -21,3 +22,4 @@ tags:
 falsepositives:
 - Legitimate development tunnels
 - Bastion host port forwarding
+version: 1

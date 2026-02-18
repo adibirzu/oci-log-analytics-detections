@@ -1,0 +1,29 @@
+title: Service Stop via Net Stop
+id: 66798f95-6a7c-4db0-8bf8-a3dfb282cb0f
+status: stable
+description: Detects stopping of critical services that may indicate pre-ransomware
+  activity.
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    Image|endswith:
+    - \net.exe
+    - \net1.exe
+    CommandLine|contains: stop
+  critical_svc:
+    CommandLine|contains:
+    - vss
+    - sql
+    - exchange
+    - backup
+    - veeam
+  condition: selection and critical_svc
+level: high
+tags:
+- attack.impact
+- attack.t1489
+falsepositives:
+- Service maintenance windows
+version: 1

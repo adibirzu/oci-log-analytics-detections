@@ -1,15 +1,25 @@
 title: Suspicious Usage of whoami
 id: a0746565-dc95-4fe5-aebb-b98c6ec523ee
 status: experimental
-description: Detects execution of potentially suspicious binary whoami.
+description: Detects execution of whoami in command chain suggesting post-exploitation
+  enumeration.
 logsource:
   product: linux
   service: audit
 detection:
   selection:
     process_name: whoami
-  condition: selection
-level: low
+  condition: selection and suspicious_context
+  suspicious_context:
+    message|contains:
+    - '&&'
+    - ; id
+    - ; cat
+level: medium
 tags:
 - attack.execution
 - attack.t1204
+version: 1
+falsepositives:
+- Legitimate whoami usage by system administrators
+- Automated system scripts

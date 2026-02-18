@@ -1,0 +1,33 @@
+{
+  "title": "Sysmon DNS Query to Suspicious TLDs",
+  "description": "Detects DNS queries to top-level domains frequently associated with malicious infrastructure, phishing, and C2 operations.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Query Name' like '*.xyz' or 'Query Name' like '*.top' or 'Query Name' like '*.tk' or 'Query Name' like '*.ml' or 'Query Name' like '*.ga' or 'Query Name' like '*.cf' or 'Query Name' like '*.gq' or 'Query Name' like '*.buzz' or 'Query Name' like '*.club' or 'Query Name' like '*.work' or 'Query Name' like '*.surf' or 'Query Name' like '*.monster' or 'Query Name' like '*.cyou')) and not (('Query Name' like '*google.xyz' or 'Query Name' like '*microsoft.xyz')))",
+  "sigma_id": "a1b2c3d4-7003-4000-8000-000000000003",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.command_and_control",
+    "attack.t1071.004"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1071.004"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate websites using these TLDs",
+    "Marketing/promotional domains"
+  ]
+}

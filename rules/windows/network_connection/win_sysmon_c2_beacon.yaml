@@ -1,0 +1,48 @@
+title: Sysmon C2 Beacon - Periodic Outbound HTTPS
+id: a1b2c3d4-7001-4000-8000-000000000001
+status: stable
+description: >
+  Detects periodic outbound HTTPS connections to non-standard destinations
+  that may indicate C2 beaconing activity. Suspicious processes making
+  repeated connections to external IPs on port 443 are flagged.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_port:
+    DestinationPort:
+    - 443
+    - 8443
+    - 4443
+  sel_suspicious_process:
+    Image|endswith:
+    - \rundll32.exe
+    - \regsvr32.exe
+    - \mshta.exe
+    - \powershell.exe
+    - \cmd.exe
+    - \wscript.exe
+    - \cscript.exe
+    - \certutil.exe
+    - \bitsadmin.exe
+    - \msiexec.exe
+  sel_external:
+    Initiated: 'true'
+  filter_internal:
+    DestinationIp|startswith:
+    - '10.'
+    - '172.16.'
+    - '192.168.'
+    - '127.'
+  condition: sel_port and sel_suspicious_process and sel_external and not filter_internal
+level: high
+tags:
+- attack.command_and_control
+- attack.t1071.001
+- attack.t1573
+falsepositives:
+- Legitimate software update processes
+- System management tools

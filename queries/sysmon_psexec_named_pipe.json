@@ -1,0 +1,37 @@
+{
+  "title": "Sysmon PsExec Named Pipe",
+  "description": "Detects named pipe creation matching PsExec default pipe names. PsExec creates named pipes for remote command execution and is commonly used for lateral movement.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Pipe Name' like '\\PSEXESVC*' or 'Pipe Name' like '\\psexec*' or 'Pipe Name' like '\\csexec*' or 'Pipe Name' like '\\remcom*' or 'Pipe Name' like '\\PAExec*')))",
+  "sigma_id": "a1b2c3d4-7002-4000-8000-000000000002",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.lateral_movement",
+    "attack.t1021.002",
+    "attack.execution",
+    "attack.t1569.002"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "lateral_movement",
+      "execution"
+    ],
+    "techniques": [
+      "T1021.002",
+      "T1569.002"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate PsExec usage by administrators",
+    "Authorized remote management"
+  ]
+}

@@ -1,0 +1,31 @@
+title: Sysmon Mimikatz Named Pipe
+id: a1b2c3d4-7002-4000-8000-000000000003
+status: stable
+description: >
+  Detects named pipe creation matching known Mimikatz pipe patterns.
+  Mimikatz uses named pipes for credential extraction and token
+  manipulation operations.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: pipe_created
+detection:
+  sel_mimikatz:
+    PipeName|contains:
+    - mimikatz
+    - mimilib
+    - mimidrv
+  sel_known_pipes:
+    PipeName:
+    - \HID_CTRL
+    - \Win32Pipes.
+  condition: sel_mimikatz or sel_known_pipes
+level: critical
+tags:
+- attack.credential_access
+- attack.t1003.001
+- attack.t1134
+falsepositives:
+- Very unlikely in production environments

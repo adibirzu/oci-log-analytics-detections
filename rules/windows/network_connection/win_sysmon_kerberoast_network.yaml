@@ -1,0 +1,33 @@
+title: Sysmon Kerberoasting Network Indicator
+id: a1b2c3d4-7001-4000-8000-000000000007
+status: stable
+description: >
+  Detects Kerberos ticket requests (port 88) from anomalous processes.
+  Kerberoasting attacks request service tickets (TGS) to crack service
+  account passwords offline.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_kerberos:
+    DestinationPort: 88
+    Initiated: 'true'
+  sel_suspicious:
+    Image|endswith:
+    - \rubeus.exe
+    - \powershell.exe
+    - \mimikatz.exe
+    - \GetUserSPNs.py
+    - \python.exe
+    - \python3.exe
+  condition: sel_kerberos and sel_suspicious
+level: high
+tags:
+- attack.credential_access
+- attack.t1558.003
+falsepositives:
+- Legitimate Kerberos authentication
+- Security assessment tools

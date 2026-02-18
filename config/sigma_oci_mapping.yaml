@@ -59,6 +59,29 @@ field_mappings:
   Provider: "'Provider'"
   Channel: "'Channel'"
 
+  # ─── Sysmon Network Connection Fields (Event ID 3) ─────────
+  SourceImage: "'Source Process'"
+  TargetImage: "'Target Process'"
+  DestinationHostname: "'Destination Hostname'"
+  DestinationIp: "'Destination IP'"
+  DestinationPort: "'Destination Port'"
+  SourceIp: "'Source IP'"
+  SourcePort: "'Source Port'"
+  Protocol: Protocol
+  Initiated: Initiated
+
+  # ─── Sysmon DNS Query Fields (Event ID 22) ────────────────
+  QueryName: "'Query Name'"
+  QueryResults: "'Query Results'"
+
+  # ─── Sysmon Named Pipe Fields (Event ID 17/18) ────────────
+  PipeName: "'Pipe Name'"
+
+  # ─── MITRE ATT&CK Metadata ────────────────────────────────
+  RuleName: RuleName
+  TechniqueName: "'Technique Name'"
+  TechniqueId: "'Technique ID'"
+
 logsource_mappings:
   # Sigma Category/Product -> ordered OCI Log Source candidates.
   # Converter emits a query filter that matches any listed source.
@@ -110,6 +133,31 @@ logsource_mappings:
     - Windows Sysmon Operational Logs
     - SOC Windows Sysmon Logs
   windows_security:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs
+
+  # Sysmon Network Connection (Event ID 3)
+  windows_network_connection:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Sysmon Network Logs
+    - SOC Windows Sysmon Logs
+
+  # Sysmon DNS Query (Event ID 22)
+  windows_dns_query:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs
+
+  # Sysmon Named Pipe (Event ID 17/18)
+  windows_pipe_created:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs
+
+  # Sysmon File Creation (Event ID 11)
+  windows_file_creation:
     - Windows Sysmon Events
     - Windows Sysmon Operational Logs
     - SOC Windows Sysmon Logs

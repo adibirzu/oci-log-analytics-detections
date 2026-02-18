@@ -1,0 +1,33 @@
+{
+  "title": "Sysmon RDP Lateral Movement",
+  "description": "Detects outbound RDP connections (port 3389) from unusual processes. While RDP is commonly used for administration, connections from non-standard processes may indicate lateral movement.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Destination Port' = 3389 and Initiated = 'true') and (('Process Name' like '*\\cmd.exe' or 'Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\wscript.exe' or 'Process Name' like '*\\mstsc.exe' or 'Process Name' like '*\\tscon.exe')))",
+  "sigma_id": "a1b2c3d4-7001-4000-8000-000000000004",
+  "level": "medium",
+  "stig_category": "CAT II",
+  "tags": [
+    "attack.lateral_movement",
+    "attack.t1021.001"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "lateral_movement"
+    ],
+    "techniques": [
+      "T1021.001"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate RDP client usage",
+    "Help desk remote support"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "title": "Sysmon Mimikatz Network Activity",
+  "description": "Detects network connections from mimikatz or known credential theft tools accessing domain controller services (LDAP, Kerberos, SMB).\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\mimikatz.exe' or 'Process Name' like '*\\sekurlsa.exe' or 'Process Name' like '*\\procdump.exe' or 'Process Name' like '*\\lsass_dump.exe') and Initiated = 'true') or ( (('Process Name' like '*\\mimikatz.exe' or 'Process Name' like '*\\sekurlsa.exe' or 'Process Name' like '*\\procdump.exe' or 'Process Name' like '*\\lsass_dump.exe') and Initiated = 'true') and (('Destination Port' = 88 or 'Destination Port' = 389 or 'Destination Port' = 445 or 'Destination Port' = 636 or 'Destination Port' = 3268)) ))",
+  "sigma_id": "a1b2c3d4-7001-4000-8000-000000000010",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.credential_access",
+    "attack.t1003.001",
+    "attack.t1558.003"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "credential_access"
+    ],
+    "techniques": [
+      "T1003.001",
+      "T1558.003"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Authorized penetration testing",
+    "Security assessment tools"
+  ]
+}

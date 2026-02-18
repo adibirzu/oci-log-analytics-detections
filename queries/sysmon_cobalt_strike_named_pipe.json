@@ -1,0 +1,36 @@
+{
+  "title": "Sysmon Cobalt Strike Named Pipe",
+  "description": "Detects named pipe creation matching known Cobalt Strike default patterns. Cobalt Strike uses named pipes for inter-process communication and lateral movement via SMB beacon.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Pipe Name' like '\\MSSE-*' or 'Pipe Name' like '\\postex_*' or 'Pipe Name' like '\\postex_ssh_*' or 'Pipe Name' like '\\status_*' or 'Pipe Name' like '\\msagent_*')) or (('Pipe Name' = '\\interprocess_' or 'Pipe Name' = '\\mojo.' or 'Pipe Name' = '\\chrome.' or 'Pipe Name' = '\\DserNamePipe' or 'Pipe Name' = '\\winsock' or 'Pipe Name' = '\\UIA_PIPE')))",
+  "sigma_id": "a1b2c3d4-7002-4000-8000-000000000001",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.command_and_control",
+    "attack.t1071",
+    "attack.defense_evasion",
+    "attack.t1055"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control",
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1071",
+      "T1055"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Some legitimate software may use similar pipe naming patterns"
+  ]
+}

@@ -1,0 +1,35 @@
+title: Sysmon Lateral Movement via WinRM
+id: a1b2c3d4-7001-4000-8000-000000000003
+status: stable
+description: >
+  Detects WinRM/PSRemoting connections (ports 5985/5986) from suspicious
+  processes. Attackers use PowerShell Remoting for lateral movement and
+  remote command execution.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_winrm:
+    DestinationPort:
+    - 5985
+    - 5986
+    Initiated: 'true'
+  sel_process:
+    Image|endswith:
+    - \powershell.exe
+    - \wsmprovhost.exe
+    - \cmd.exe
+    - \evil-winrm.exe
+  condition: sel_winrm and sel_process
+level: high
+tags:
+- attack.lateral_movement
+- attack.t1021.006
+- attack.execution
+- attack.t1059.001
+falsepositives:
+- Legitimate PowerShell Remoting for administration
+- Configuration management tools

@@ -1,0 +1,32 @@
+title: Sysmon RDP Lateral Movement
+id: a1b2c3d4-7001-4000-8000-000000000004
+status: stable
+description: >
+  Detects outbound RDP connections (port 3389) from unusual processes.
+  While RDP is commonly used for administration, connections from
+  non-standard processes may indicate lateral movement.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_rdp:
+    DestinationPort: 3389
+    Initiated: 'true'
+  sel_unusual_process:
+    Image|endswith:
+    - \cmd.exe
+    - \powershell.exe
+    - \wscript.exe
+    - \mstsc.exe
+    - \tscon.exe
+  condition: sel_rdp and sel_unusual_process
+level: medium
+tags:
+- attack.lateral_movement
+- attack.t1021.001
+falsepositives:
+- Legitimate RDP client usage
+- Help desk remote support

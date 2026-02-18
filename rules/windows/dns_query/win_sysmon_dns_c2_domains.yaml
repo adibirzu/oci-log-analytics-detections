@@ -1,0 +1,45 @@
+title: Sysmon DNS Query to Known C2 Framework Domains
+id: a1b2c3d4-7003-4000-8000-000000000002
+status: stable
+description: >
+  Detects DNS queries to domains associated with known C2 frameworks
+  and dynamic DNS services commonly used by attackers for C2
+  infrastructure.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: dns_query
+detection:
+  sel_dyndns:
+    QueryName|endswith:
+    - .duckdns.org
+    - .no-ip.com
+    - .no-ip.org
+    - .no-ip.biz
+    - .ddns.net
+    - .zapto.org
+    - .hopto.org
+    - .serveftp.com
+    - .sytes.net
+    - .ngrok.io
+    - .ngrok-free.app
+    - .portmap.io
+    - .serveo.net
+  sel_c2_infra:
+    QueryName|endswith:
+    - .onion.ws
+    - .tor2web.io
+    - .cloudfront-distro.net
+    - .azurewebsites.net
+    - .herokuapp.com
+  condition: sel_dyndns or sel_c2_infra
+level: high
+tags:
+- attack.command_and_control
+- attack.t1071.004
+- attack.t1568.002
+falsepositives:
+- Legitimate use of dynamic DNS services
+- Development/staging environments

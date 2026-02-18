@@ -1,0 +1,38 @@
+title: Sysmon DNS Tunneling via Network Connection
+id: a1b2c3d4-7001-4000-8000-000000000005
+status: stable
+description: >
+  Detects suspicious processes making DNS connections (port 53) that
+  could indicate DNS tunneling for data exfiltration or C2 communication.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_dns:
+    DestinationPort: 53
+    Initiated: 'true'
+  sel_suspicious:
+    Image|endswith:
+    - \powershell.exe
+    - \cmd.exe
+    - \nslookup.exe
+    - \iodine.exe
+    - \dnscat2.exe
+    - \dns2tcp.exe
+  filter_system:
+    Image|endswith:
+    - \svchost.exe
+    - \dns.exe
+  condition: sel_dns and sel_suspicious and not filter_system
+level: high
+tags:
+- attack.command_and_control
+- attack.t1071.004
+- attack.exfiltration
+- attack.t1048.003
+falsepositives:
+- Legitimate DNS diagnostic tools
+- nslookup for troubleshooting

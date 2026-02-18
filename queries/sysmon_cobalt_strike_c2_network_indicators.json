@@ -1,0 +1,35 @@
+{
+  "title": "Sysmon Cobalt Strike C2 Network Indicators",
+  "description": "Detects network connections from processes commonly associated with Cobalt Strike beacon activity. Includes default Cobalt Strike process injection targets and malleable C2 patterns.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Process Name' like '*\\beacon.exe' or 'Process Name' like '*\\cobaltstrike.exe') and Initiated = 'true') or (('Process Name' like '*\\rundll32.exe' or 'Process Name' like '*\\dllhost.exe' or 'Process Name' like '*\\svchost.exe' or 'Process Name' like '*\\explorer.exe') and Initiated = 'true' and ('Destination Port' = 80 or 'Destination Port' = 443 or 'Destination Port' = 8080 or 'Destination Port' = 8443 or 'Destination Port' = 50050)) ) and not (('Destination IP' like '10.*' or 'Destination IP' like '172.16.*' or 'Destination IP' like '192.168.*' or 'Destination IP' like '127.*')))",
+  "sigma_id": "a1b2c3d4-7001-4000-8000-000000000009",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.command_and_control",
+    "attack.t1071.001",
+    "attack.t1095"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1071.001",
+      "T1095"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate DLL host operations",
+    "Windows service communication"
+  ]
+}

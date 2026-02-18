@@ -1,0 +1,27 @@
+{
+  "soc-detection-oci-audit": {
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyaehb46bhoqri5yh3r4xhbzjixio7xeqrdkug2x2duxoka",
+    "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
+    "log_source": "OCI Audit Logs"
+  },
+  "soc-detection-cloud-guard": {
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyauiaf2e7ygynfqrteubpnhivqhkngkgufs4qkd3n7rw7a",
+    "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
+    "log_source": "OCI Cloud Guard Problems"
+  },
+  "soc-detection-linux-audit": {
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyacfqhwitonu657j6c7rkn6bgojmtwifcnapso5c7vcsgq",
+    "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
+    "log_source": "SOC Linux Syslog Logs"
+  },
+  "soc-detection-windows-sysmon": {
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyai7turvbzaa42hpvri4kw6s3g72qqyeqpzrc2pghkgp7a",
+    "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
+    "log_source": "Windows Sysmon Operational Logs"
+  },
+  "_metadata": {
+    "log_group_id": "ocid1.loganalyticsloggroup.oc1.eu-frankfurt-1.amaaaaaai4inmnyayhkk2j2qebmblicgdtwxh37favwoolswiumpf6zv5suq",
+    "la_namespace": "frxfopzec0yq",
+    "compartment_id": "ocid1.compartment.oc1..aaaaaaaaf2s6pn6vpu5xqmyfadhcn4cxgn7y3rxbckkt6cdpzzbkc4cb73kq"
+  }
+}

@@ -1,0 +1,40 @@
+title: Sysmon LDAP Reconnaissance
+id: a1b2c3d4-7001-4000-8000-000000000008
+status: stable
+description: >
+  Detects LDAP enumeration patterns (port 389/636) from suspicious
+  processes. Attackers use LDAP queries to enumerate Active Directory
+  users, groups, computers, and service accounts.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_ldap:
+    DestinationPort:
+    - 389
+    - 636
+    - 3268
+    - 3269
+    Initiated: 'true'
+  sel_tools:
+    Image|endswith:
+    - \powershell.exe
+    - \ldapsearch.exe
+    - \adfind.exe
+    - \bloodhound.exe
+    - \sharphound.exe
+    - \python.exe
+    - \python3.exe
+    - \cmd.exe
+  condition: sel_ldap and sel_tools
+level: medium
+tags:
+- attack.discovery
+- attack.t1087.002
+- attack.t1069.002
+falsepositives:
+- Legitimate LDAP admin tools
+- Directory management applications

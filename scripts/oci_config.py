@@ -47,15 +47,16 @@ def _cfg(env_key, default):
 
 # ─── Configuration constants ──────────────────────────────────
 
-TENANCY_ID = _cfg(
-    "OCI_TENANCY_ID",
-    "ocid1.tenancy.oc1..example",
+TENANCY_ID = (
+    _cfg("OCI_TENANCY_ID", "")
+    or _cfg("OCI_TENANCY_OCID", "")
+    or "ocid1.tenancy.oc1..example"
 )
 COMPARTMENT_ID = _cfg(
     "OCI_COMPARTMENT_ID",
     "ocid1.compartment.oc1..example",
 )
-OCI_PROFILE = _cfg("OCI_PROFILE", "DEFAULT")
+OCI_PROFILE = _cfg("OCI_PROFILE", "") or _cfg("OCI_CONFIG_PROFILE", "DEFAULT")
 OCI_REGION = _cfg("OCI_REGION", "")
 
 QUERIES_DIR = os.path.join(PROJECT_DIR, 'queries')
@@ -298,7 +299,7 @@ def validate_query_files():
     json_files = []
     for root, _, files in os.walk(QUERIES_DIR):
         for f in files:
-            if f.endswith('.json') and f != 'manifest.json':
+            if f.endswith('.json') and f not in ('manifest.json', 'catalog.json'):
                 json_files.append(os.path.join(root, f))
 
     if not json_files:

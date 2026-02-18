@@ -1,0 +1,36 @@
+title: Sysmon Mimikatz Network Activity
+id: a1b2c3d4-7001-4000-8000-000000000010
+status: stable
+description: >
+  Detects network connections from mimikatz or known credential theft
+  tools accessing domain controller services (LDAP, Kerberos, SMB).
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_mimikatz:
+    Image|endswith:
+    - \mimikatz.exe
+    - \sekurlsa.exe
+    - \procdump.exe
+    - \lsass_dump.exe
+    Initiated: 'true'
+  sel_dc_ports:
+    DestinationPort:
+    - 88
+    - 389
+    - 445
+    - 636
+    - 3268
+  condition: sel_mimikatz or (sel_mimikatz and sel_dc_ports)
+level: critical
+tags:
+- attack.credential_access
+- attack.t1003.001
+- attack.t1558.003
+falsepositives:
+- Authorized penetration testing
+- Security assessment tools

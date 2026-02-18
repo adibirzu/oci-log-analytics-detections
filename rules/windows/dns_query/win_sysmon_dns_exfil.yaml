@@ -1,0 +1,34 @@
+title: Sysmon DNS Data Exfiltration
+id: a1b2c3d4-7003-4000-8000-000000000001
+status: stable
+description: >
+  Detects DNS queries with high-entropy subdomains that may indicate
+  data exfiltration via DNS tunneling. Encoded data in subdomain labels
+  is a common technique for covert data transfer.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: dns_query
+detection:
+  sel_long_subdomain:
+    QueryName|re: '^[a-zA-Z0-9]{30,}\.'
+  sel_encoded_pattern:
+    QueryName|contains:
+    - .dnscat.
+    - .dns2tcp.
+    - .iodine.
+    - .dnsexfil.
+  sel_hex_encoded:
+    QueryName|re: '^[0-9a-f]{20,}\.'
+  condition: sel_long_subdomain or sel_encoded_pattern or sel_hex_encoded
+level: high
+tags:
+- attack.exfiltration
+- attack.t1048.003
+- attack.command_and_control
+- attack.t1071.004
+falsepositives:
+- CDN hostnames with long hashes
+- Legitimate DKIM DNS records

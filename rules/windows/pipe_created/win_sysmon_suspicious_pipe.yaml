@@ -1,0 +1,39 @@
+title: Sysmon Suspicious Named Pipe Pattern
+id: a1b2c3d4-7002-4000-8000-000000000004
+status: stable
+description: >
+  Detects named pipe creation matching common C2 framework patterns
+  including Metasploit, Covenant, and other post-exploitation tools.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: pipe_created
+detection:
+  sel_metasploit:
+    PipeName|startswith:
+    - \msf-pipe
+    - \meterpreter
+  sel_covenant:
+    PipeName|startswith:
+    - \gruntsvc
+    - \Covenant
+  sel_generic_c2:
+    PipeName|contains:
+    - \evil
+    - \implant
+    - \beacon
+    - \c2pipe
+    - \shell_pipe
+    - \payload
+  condition: sel_metasploit or sel_covenant or sel_generic_c2
+level: critical
+tags:
+- attack.command_and_control
+- attack.t1071
+- attack.execution
+- attack.t1059
+falsepositives:
+- Security assessment tools
+- Penetration testing frameworks

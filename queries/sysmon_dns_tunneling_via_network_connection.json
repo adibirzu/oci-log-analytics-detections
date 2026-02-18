@@ -1,0 +1,37 @@
+{
+  "title": "Sysmon DNS Tunneling via Network Connection",
+  "description": "Detects suspicious processes making DNS connections (port 53) that could indicate DNS tunneling for data exfiltration or C2 communication.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Destination Port' = 53 and Initiated = 'true') and (('Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\cmd.exe' or 'Process Name' like '*\\nslookup.exe' or 'Process Name' like '*\\iodine.exe' or 'Process Name' like '*\\dnscat2.exe' or 'Process Name' like '*\\dns2tcp.exe')) and not (('Process Name' like '*\\svchost.exe' or 'Process Name' like '*\\dns.exe')))",
+  "sigma_id": "a1b2c3d4-7001-4000-8000-000000000005",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.command_and_control",
+    "attack.t1071.004",
+    "attack.exfiltration",
+    "attack.t1048.003"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control",
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1071.004",
+      "T1048.003"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate DNS diagnostic tools",
+    "nslookup for troubleshooting"
+  ]
+}

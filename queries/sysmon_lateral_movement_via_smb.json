@@ -1,0 +1,35 @@
+{
+  "title": "Sysmon Lateral Movement via SMB",
+  "description": "Detects SMB connections (port 445) from processes commonly used for lateral movement. Attackers use PsExec, WMI, and other tools to move laterally through SMB/Windows Admin Shares.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Destination Port' = 445 and Initiated = 'true') and (('Process Name' like '*\\psexec.exe' or 'Process Name' like '*\\psexesvc.exe' or 'Process Name' like '*\\PSEXESVC.exe' or 'Process Name' like '*\\cmd.exe' or 'Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\wmic.exe' or 'Process Name' like '*\\net.exe' or 'Process Name' like '*\\net1.exe' or 'Process Name' like '*\\xcopy.exe' or 'Process Name' like '*\\robocopy.exe')))",
+  "sigma_id": "a1b2c3d4-7001-4000-8000-000000000002",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.lateral_movement",
+    "attack.t1021.002",
+    "attack.t1570"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "lateral_movement"
+    ],
+    "techniques": [
+      "T1021.002",
+      "T1570"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate admin file copy operations",
+    "Backup software using SMB"
+  ]
+}

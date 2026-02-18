@@ -32,7 +32,7 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oci_config import (
-    TENANCY_ID, COMPARTMENT_ID,
+    TENANCY_ID, COMPARTMENT_ID, OCI_PROFILE,
     get_la_client, get_namespace, validate_oci_setup,
     list_available_log_sources,
 )
@@ -94,10 +94,22 @@ CUSTOM_FIELDS = [
     "Target Filename",
     "Granted Access",
     "Source IP",
+    "Source Port",
     "Auth Method",
     "Session Type",
     "Service Name",
     "Process",
+    # Sysmon Network / MITRE fields
+    "Account Name",
+    "RuleName",
+    "Technique Name",
+    "Technique ID",
+    "Protocol",
+    "Initiated",
+    "Event Channel",
+    # Sysmon process / Cloud Guard fields
+    "Hashes",
+    "Detector ID",
 ]
 
 
@@ -438,6 +450,64 @@ SYSMON_SOURCE_DESC = (
     "Windows Sysmon operational events in JSON format for SOC and multicloud widgets."
 )
 
+
+# ─── Sysmon Network Connection Parser (Event ID 3) ───────────
+
+SYSNET_PARSER_NAME = "socSysmonNetworkJsonParser"
+SYSNET_PARSER_DISPLAY = "SOC Sysmon Network JSON Parser"
+SYSNET_PARSER_DESC = (
+    "Parses Windows Sysmon Event ID 3 (network connection) JSON. "
+    "Maps Protocol, SourceIp, SourcePort, DestinationIp, DestinationPort, Image."
+)
+SYSNET_FIELD_MAPPINGS = [
+    ("msg",                  "$.msg",               1),
+    ("time",                 "$.@timestamp",         2),
+    ("Event ID",             "$.EventID",            3),
+    ("Host Name",            "$.Computer",           4),
+    ("Process Name",         "$.Image",              5),
+    ("Protocol",             "$.Protocol",           6),
+    ("Destination IP",       "$.DestinationIp",      7),
+    ("Destination Port",     "$.DestinationPort",    8),
+    ("Source IP",            "$.SourceIp",           9),
+    ("Source Port",          "$.SourcePort",        10),
+    ("Initiated",            "$.Initiated",         11),
+    ("Destination Hostname", "$.DestinationHostname", 12),
+    ("User",                 "$.User",              13),
+    ("Source Process",       "$.Image",             14),
+    ("RuleName",             "$.RuleName",          15),
+    ("Technique Name",       "$.TechniqueName",     16),
+    ("Technique ID",         "$.TechniqueId",       17),
+    ("Account Name",         "$.AccountName",       18),
+    ("Event Channel",        "$.Channel",           19),
+]
+SYSNET_EXAMPLE = {
+    "@timestamp": "2026-02-11T10:30:00.000Z",
+    "EventID": 3,
+    "Computer": "WS01.corp.local",
+    "Channel": "Microsoft-Windows-Sysmon/Operational",
+    "User": "CORP\\admin",
+    "Image": "C:\\Windows\\System32\\cmd.exe",
+    "Protocol": "tcp",
+    "DestinationIp": "185.220.101.1",
+    "DestinationPort": 443,
+    "DestinationHostname": "evil-c2.example.com",
+    "SourceIp": "10.0.1.50",
+    "SourcePort": 54321,
+    "Initiated": "true",
+    "RuleName": "technique_id=T1071,technique_name=Application Layer Protocol",
+    "TechniqueName": "Application Layer Protocol",
+    "TechniqueId": "T1071",
+    "AccountName": "admin",
+    "msg": "Network connection detected: cmd.exe -> 185.220.101.1:443",
+}
+
+SYSNET_SOURCE_INTERNAL = "socSysmonNetworkSource"
+SYSNET_SOURCE_DISPLAY = "SOC Sysmon Network Logs"
+SYSNET_SOURCE_DESC = (
+    "Windows Sysmon Event ID 3 (network connection) events in JSON format for SOC network detections."
+)
+
+
 # Native source alternatives used to avoid creating unnecessary SOC sources.
 # If a SOC source already exists, it is still retained/updated for compatibility.
 NATIVE_SOURCE_ALTERNATIVES = {
@@ -448,13 +518,18 @@ NATIVE_SOURCE_ALTERNATIVES = {
     WINSYS_SOURCE_DISPLAY: [],
     LINSEC_SOURCE_DISPLAY: [],
     SYSMON_SOURCE_DISPLAY: [],
+    SYSNET_SOURCE_DISPLAY: [],
 }
 
 
 # ─── Helper Functions ────────────────────────────────────────────
 
 def build_existing_field_map(client, namespace):
-    """Fetch all existing fields and return display_name -> internal_name map."""
+    """Fetch all existing fields and return name -> internal_name map.
+
+    Supports lookup by both display_name and internal_name, so parser
+    field mappings can reference either (e.g., built-in 'msg' and 'time').
+    """
     result = {}
     page = None
     while True:
@@ -465,6 +540,8 @@ def build_existing_field_map(client, namespace):
         for f in resp.data.items:
             if f.display_name:
                 result[f.display_name] = f.name
+            if f.name:
+                result[f.name] = f.name
         page = resp.headers.get("opc-next-page")
         if not page:
             break
@@ -501,7 +578,10 @@ def create_parser(client, namespace, parser_name, display_name, description,
     """Create or upsert a JSON parser with field mappings."""
     parser_field_maps = []
     for name_or_display, json_path, seq in field_mappings:
-        internal = field_map.get(name_or_display, name_or_display)
+        internal = field_map.get(name_or_display)
+        if not internal:
+            print(f"  WARNING: Field '{name_or_display}' not found in field_map, skipping from parser")
+            continue
         parser_field_maps.append(
             LogAnalyticsParserField(
                 field=LogAnalyticsField(name=internal),
@@ -584,6 +664,8 @@ def create_source(client, namespace, compartment_id, source_internal_name,
             "--parsers", f"file://{parsers_path}",
             "--entity-types", f"file://{entity_path}",
         ]
+        if OCI_PROFILE:
+            cmd.extend(["--profile", OCI_PROFILE])
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
             print(f"  Source OK: {source_display_name}")
@@ -626,8 +708,8 @@ def main():
     if args.dry_run:
         print("DRY RUN - would create:")
         print(f"  {len(CUSTOM_FIELDS)} custom fields")
-        print(f"  7 JSON parsers")
-        print(f"  up to 7 log sources (SOC sources skipped when native equivalent exists):")
+        print(f"  8 JSON parsers")
+        print(f"  up to 8 log sources (SOC sources skipped when native equivalent exists):")
         print(f"    - {LINUX_SOURCE_DISPLAY} ({LINUX_SOURCE_INTERNAL})")
         print(f"    - {WINDOWS_SOURCE_DISPLAY} ({WINDOWS_SOURCE_INTERNAL})")
         print(f"    - {CG_SOURCE_DISPLAY} ({CG_SOURCE_INTERNAL})")
@@ -635,6 +717,7 @@ def main():
         print(f"    - {WINSYS_SOURCE_DISPLAY} ({WINSYS_SOURCE_INTERNAL})")
         print(f"    - {LINSEC_SOURCE_DISPLAY} ({LINSEC_SOURCE_INTERNAL})")
         print(f"    - {SYSMON_SOURCE_DISPLAY} ({SYSMON_SOURCE_INTERNAL})")
+        print(f"    - {SYSNET_SOURCE_DISPLAY} ({SYSNET_SOURCE_INTERNAL})")
         return
 
     la_client = get_la_client()
@@ -696,6 +779,11 @@ def main():
                   SYSMON_PARSER_NAME, SYSMON_PARSER_DISPLAY, SYSMON_PARSER_DESC,
                   SYSMON_FIELD_MAPPINGS, field_map, SYSMON_EXAMPLE)
 
+    print("\n--- Sysmon Network Parser ---")
+    create_parser(la_client, namespace,
+                  SYSNET_PARSER_NAME, SYSNET_PARSER_DISPLAY, SYSNET_PARSER_DESC,
+                  SYSNET_FIELD_MAPPINGS, field_map, SYSNET_EXAMPLE)
+
     # Step 3: Create log sources
     print("\n" + "=" * 60)
     print("STEP 3: CREATE LOG SOURCES")
@@ -747,6 +835,11 @@ def main():
         SYSMON_SOURCE_INTERNAL, SYSMON_SOURCE_DISPLAY, SYSMON_SOURCE_DESC, SYSMON_PARSER_NAME
     )
 
+    print("\n--- Sysmon Network Source ---")
+    create_source_if_needed(
+        SYSNET_SOURCE_INTERNAL, SYSNET_SOURCE_DISPLAY, SYSNET_SOURCE_DESC, SYSNET_PARSER_NAME
+    )
+
     print("\n" + "=" * 60)
     print("SETUP COMPLETE")
     print("=" * 60)
@@ -758,6 +851,7 @@ def main():
     print(f"  - {WINSYS_SOURCE_DISPLAY}")
     print(f"  - {LINSEC_SOURCE_DISPLAY}")
     print(f"  - {SYSMON_SOURCE_DISPLAY}")
+    print(f"  - {SYSNET_SOURCE_DISPLAY}")
     print(f"  - OCI Audit Logs (built-in)")
     print(f"  - OCI Cloud Guard Problems (native, preferred when available)")
     print(f"  - Windows Sysmon Events (native, preferred when available)")

@@ -1,0 +1,37 @@
+{
+  "title": "Sysmon Suspicious Outbound Connection from LOLBin",
+  "description": "Detects outbound network connections from Living-off-the-Land binaries (LOLBins) to external IP addresses. These binaries are commonly abused by attackers for downloading payloads and establishing C2.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\certutil.exe' or 'Process Name' like '*\\bitsadmin.exe' or 'Process Name' like '*\\mshta.exe' or 'Process Name' like '*\\regsvr32.exe' or 'Process Name' like '*\\rundll32.exe' or 'Process Name' like '*\\wscript.exe' or 'Process Name' like '*\\cscript.exe' or 'Process Name' like '*\\msiexec.exe' or 'Process Name' like '*\\installutil.exe' or 'Process Name' like '*\\msdt.exe') and Initiated = 'true') and not (('Destination IP' like '10.*' or 'Destination IP' like '172.16.*' or 'Destination IP' like '192.168.*' or 'Destination IP' like '127.*')))",
+  "sigma_id": "a1b2c3d4-7001-4000-8000-000000000006",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.defense_evasion",
+    "attack.t1218",
+    "attack.command_and_control",
+    "attack.t1105"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion",
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1218",
+      "T1105"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate use of certutil for certificate operations",
+    "Software deployment via msiexec"
+  ]
+}

@@ -1,0 +1,38 @@
+title: Sysmon Lateral Movement via SMB
+id: a1b2c3d4-7001-4000-8000-000000000002
+status: stable
+description: >
+  Detects SMB connections (port 445) from processes commonly used for
+  lateral movement. Attackers use PsExec, WMI, and other tools to move
+  laterally through SMB/Windows Admin Shares.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_smb:
+    DestinationPort: 445
+    Initiated: 'true'
+  sel_tools:
+    Image|endswith:
+    - \psexec.exe
+    - \psexesvc.exe
+    - \PSEXESVC.exe
+    - \cmd.exe
+    - \powershell.exe
+    - \wmic.exe
+    - \net.exe
+    - \net1.exe
+    - \xcopy.exe
+    - \robocopy.exe
+  condition: sel_smb and sel_tools
+level: high
+tags:
+- attack.lateral_movement
+- attack.t1021.002
+- attack.t1570
+falsepositives:
+- Legitimate admin file copy operations
+- Backup software using SMB

@@ -1,0 +1,43 @@
+title: Sysmon Suspicious Outbound Connection from LOLBin
+id: a1b2c3d4-7001-4000-8000-000000000006
+status: stable
+description: >
+  Detects outbound network connections from Living-off-the-Land binaries
+  (LOLBins) to external IP addresses. These binaries are commonly abused
+  by attackers for downloading payloads and establishing C2.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_lolbin:
+    Image|endswith:
+    - \certutil.exe
+    - \bitsadmin.exe
+    - \mshta.exe
+    - \regsvr32.exe
+    - \rundll32.exe
+    - \wscript.exe
+    - \cscript.exe
+    - \msiexec.exe
+    - \installutil.exe
+    - \msdt.exe
+    Initiated: 'true'
+  filter_internal:
+    DestinationIp|startswith:
+    - '10.'
+    - '172.16.'
+    - '192.168.'
+    - '127.'
+  condition: sel_lolbin and not filter_internal
+level: high
+tags:
+- attack.defense_evasion
+- attack.t1218
+- attack.command_and_control
+- attack.t1105
+falsepositives:
+- Legitimate use of certutil for certificate operations
+- Software deployment via msiexec

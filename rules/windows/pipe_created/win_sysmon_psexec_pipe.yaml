@@ -1,0 +1,31 @@
+title: Sysmon PsExec Named Pipe
+id: a1b2c3d4-7002-4000-8000-000000000002
+status: stable
+description: >
+  Detects named pipe creation matching PsExec default pipe names.
+  PsExec creates named pipes for remote command execution and is
+  commonly used for lateral movement.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: pipe_created
+detection:
+  sel_psexec:
+    PipeName|startswith:
+    - \PSEXESVC
+    - \psexec
+    - \csexec
+    - \remcom
+    - \PAExec
+  condition: sel_psexec
+level: high
+tags:
+- attack.lateral_movement
+- attack.t1021.002
+- attack.execution
+- attack.t1569.002
+falsepositives:
+- Legitimate PsExec usage by administrators
+- Authorized remote management

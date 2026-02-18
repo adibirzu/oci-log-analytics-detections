@@ -1,0 +1,40 @@
+title: Sysmon DNS Query to Suspicious TLDs
+id: a1b2c3d4-7003-4000-8000-000000000003
+status: stable
+description: >
+  Detects DNS queries to top-level domains frequently associated with
+  malicious infrastructure, phishing, and C2 operations.
+author: SOC Detection Team
+date: 2026/02/16
+logsource:
+  product: windows
+  service: sysmon
+  category: dns_query
+detection:
+  sel_suspicious_tld:
+    QueryName|endswith:
+    - .xyz
+    - .top
+    - .tk
+    - .ml
+    - .ga
+    - .cf
+    - .gq
+    - .buzz
+    - .club
+    - .work
+    - .surf
+    - .monster
+    - .cyou
+  filter_known_good:
+    QueryName|endswith:
+    - google.xyz
+    - microsoft.xyz
+  condition: sel_suspicious_tld and not filter_known_good
+level: medium
+tags:
+- attack.command_and_control
+- attack.t1071.004
+falsepositives:
+- Legitimate websites using these TLDs
+- Marketing/promotional domains

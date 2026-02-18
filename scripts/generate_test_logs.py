@@ -2798,6 +2798,222 @@ def write_jsonl(filepath, events):
     return len(events)
 
 
+# ═══════════════════════════════════════════════════════════════════
+#  Sysmon Network Events (Event ID 3 — dedicated network parser)
+# ═══════════════════════════════════════════════════════════════════
+
+def sysmon_network_event(host=None, user=None, image=None, protocol="tcp",
+                         src_ip=None, src_port=None, dst_ip=None, dst_port=None,
+                         dst_hostname=None, initiated="true", rule_name=None,
+                         technique_name=None, technique_id=None, msg=None, offset=0):
+    """Generate a Sysmon Event ID 3 (Network Connection) for the network parser."""
+    if host is None:
+        host = random.choice(SEVEN_KINGDOMS_HOSTS)
+    if user is None:
+        user = random.choice(THREAT_ACTORS)
+    if src_ip is None:
+        src_ip = random.choice(CORPORATE_IPS)
+    if src_port is None:
+        src_port = random.randint(49152, 65535)
+    return {
+        "@timestamp": ts(offset),
+        "EventID": 3,
+        "Computer": host,
+        "Channel": "Microsoft-Windows-Sysmon/Operational",
+        "User": user,
+        "Image": image or "C:\\Windows\\System32\\cmd.exe",
+        "Protocol": protocol,
+        "SourceIp": src_ip,
+        "SourcePort": src_port,
+        "DestinationIp": dst_ip or "",
+        "DestinationPort": dst_port or 443,
+        "DestinationHostname": dst_hostname or "",
+        "Initiated": initiated,
+        "RuleName": rule_name or "",
+        "TechniqueName": technique_name or "",
+        "TechniqueId": technique_id or "",
+        "AccountName": user.split("\\")[-1] if "\\" in user else user,
+        "msg": msg or f"Network connection: {image or 'cmd.exe'} -> {dst_ip}:{dst_port}",
+    }
+
+
+def generate_sysmon_network_events():
+    """Generate Sysmon Event ID 3 (network connection) events for all attack scenarios."""
+    events = []
+    c2_ips = ["185.215.113.206", "103.253.41.45", "89.34.111.113", "5.252.178.48"]
+
+    # ── Lateral Movement: SMB (port 445) ──
+    smb_tools = [
+        "C:\\Windows\\System32\\psexec.exe",
+        "C:\\Windows\\System32\\net.exe",
+        "C:\\Windows\\System32\\cmd.exe",
+        "C:\\Windows\\System32\\powershell.exe",
+        "C:\\Windows\\System32\\robocopy.exe",
+    ]
+    for i, tool in enumerate(smb_tools):
+        for j in range(4):
+            events.append(sysmon_network_event(
+                image=tool, dst_ip=random.choice(CORPORATE_IPS), dst_port=445,
+                protocol="tcp", technique_name="SMB/Windows Admin Shares",
+                technique_id="T1021.002",
+                msg=f"SMB lateral movement: {tool.split(chr(92))[-1]} -> 445",
+                offset=i * 5 + j,
+            ))
+
+    # ── Lateral Movement: WinRM (port 5985/5986) ──
+    for i in range(8):
+        events.append(sysmon_network_event(
+            image=random.choice([
+                "C:\\Windows\\System32\\powershell.exe",
+                "C:\\Windows\\System32\\wsmprovhost.exe",
+            ]),
+            dst_ip=random.choice(CORPORATE_IPS), dst_port=random.choice([5985, 5986]),
+            technique_name="Windows Remote Management", technique_id="T1021.006",
+            msg="WinRM lateral movement",
+            offset=50 + i,
+        ))
+
+    # ── Lateral Movement: RDP (port 3389) ──
+    for i in range(6):
+        events.append(sysmon_network_event(
+            image=random.choice([
+                "C:\\Windows\\System32\\mstsc.exe",
+                "C:\\Windows\\System32\\cmd.exe",
+            ]),
+            dst_ip=random.choice(CORPORATE_IPS), dst_port=3389,
+            technique_name="Remote Desktop Protocol", technique_id="T1021.001",
+            msg="RDP lateral movement",
+            offset=70 + i,
+        ))
+
+    # ── C2 Beacon: HTTPS to suspicious IPs ──
+    beacon_procs = [
+        "C:\\Windows\\System32\\rundll32.exe",
+        "C:\\Windows\\System32\\regsvr32.exe",
+        "C:\\Windows\\System32\\powershell.exe",
+        "C:\\Windows\\System32\\cmd.exe",
+        "C:\\Windows\\System32\\certutil.exe",
+        "C:\\Windows\\System32\\mshta.exe",
+    ]
+    for i, proc in enumerate(beacon_procs):
+        for j in range(5):
+            events.append(sysmon_network_event(
+                image=proc, dst_ip=random.choice(c2_ips),
+                dst_port=random.choice([443, 8443, 4443, 8080]),
+                dst_hostname=random.choice([
+                    "evil-c2.duckdns.org", "beacon.malware.xyz",
+                    "update.evil.cc", "cdn-static.attacker.top",
+                ]),
+                technique_name="Application Layer Protocol", technique_id="T1071.001",
+                msg=f"C2 beacon: {proc.split(chr(92))[-1]} -> HTTPS",
+                offset=100 + i * 6 + j,
+            ))
+
+    # ── DNS Tunneling: port 53 from suspicious processes ──
+    for i in range(8):
+        events.append(sysmon_network_event(
+            image=random.choice([
+                "C:\\Windows\\System32\\powershell.exe",
+                "C:\\Windows\\System32\\nslookup.exe",
+                "C:\\Windows\\System32\\cmd.exe",
+            ]),
+            dst_ip="8.8.8.8", dst_port=53, protocol="udp",
+            technique_name="DNS", technique_id="T1071.004",
+            msg="DNS tunnel via suspicious process",
+            offset=170 + i,
+        ))
+
+    # ── Kerberoasting: Kerberos (port 88) ──
+    for i in range(6):
+        events.append(sysmon_network_event(
+            image=random.choice([
+                "C:\\Tools\\rubeus.exe",
+                "C:\\Windows\\System32\\powershell.exe",
+                "C:\\Temp\\mimikatz.exe",
+            ]),
+            dst_ip=random.choice(CORPORATE_IPS), dst_port=88,
+            technique_name="Kerberoasting", technique_id="T1558.003",
+            msg="Kerberos ticket request from suspicious process",
+            offset=190 + i,
+        ))
+
+    # ── LDAP Reconnaissance: port 389/636 ──
+    for i in range(6):
+        events.append(sysmon_network_event(
+            image=random.choice([
+                "C:\\Tools\\sharphound.exe",
+                "C:\\Windows\\System32\\powershell.exe",
+                "C:\\Tools\\adfind.exe",
+            ]),
+            dst_ip=random.choice(CORPORATE_IPS),
+            dst_port=random.choice([389, 636, 3268]),
+            technique_name="Account Discovery", technique_id="T1087.002",
+            msg="LDAP enumeration",
+            offset=210 + i,
+        ))
+
+    # ── Cobalt Strike C2 patterns ──
+    for i in range(6):
+        events.append(sysmon_network_event(
+            image=random.choice([
+                "C:\\Windows\\System32\\rundll32.exe",
+                "C:\\Windows\\System32\\dllhost.exe",
+            ]),
+            dst_ip=random.choice(c2_ips),
+            dst_port=random.choice([80, 443, 50050]),
+            dst_hostname="cdn-update.cobalt.example.com",
+            technique_name="Application Layer Protocol", technique_id="T1071.001",
+            msg="Cobalt Strike beacon communication",
+            offset=230 + i,
+        ))
+
+    # ── Mimikatz network activity ──
+    for i in range(4):
+        events.append(sysmon_network_event(
+            image="C:\\Temp\\mimikatz.exe",
+            dst_ip=random.choice(CORPORATE_IPS),
+            dst_port=random.choice([88, 389, 445]),
+            technique_name="OS Credential Dumping", technique_id="T1003.001",
+            msg="Mimikatz accessing DC services",
+            offset=250 + i,
+        ))
+
+    # ── LOLBin outbound connections ──
+    lolbins = [
+        "C:\\Windows\\System32\\certutil.exe",
+        "C:\\Windows\\System32\\bitsadmin.exe",
+        "C:\\Windows\\System32\\mshta.exe",
+        "C:\\Windows\\System32\\regsvr32.exe",
+    ]
+    for i, lolbin in enumerate(lolbins):
+        for j in range(3):
+            events.append(sysmon_network_event(
+                image=lolbin, dst_ip=random.choice(c2_ips),
+                dst_port=random.choice([80, 443]),
+                technique_name="Signed Binary Proxy Execution", technique_id="T1218",
+                msg=f"LOLBin outbound: {lolbin.split(chr(92))[-1]}",
+                offset=270 + i * 4 + j,
+            ))
+
+    # ── Normal traffic (for contrast) ──
+    normal_procs = [
+        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        "C:\\Windows\\System32\\svchost.exe",
+        "C:\\Program Files\\Microsoft Office\\Office16\\OUTLOOK.EXE",
+    ]
+    for i, proc in enumerate(normal_procs):
+        for j in range(5):
+            events.append(sysmon_network_event(
+                image=proc, dst_ip="142.250.80.46", dst_port=443,
+                dst_hostname="www.google.com",
+                user="SYSTEM" if "svchost" in proc else random.choice(THREAT_ACTORS),
+                msg=f"Normal HTTPS: {proc.split(chr(92))[-1]}",
+                offset=300 + i * 6 + j,
+            ))
+
+    return events
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate test detection logs")
     parser.add_argument("--validate", action="store_true",
@@ -2822,6 +3038,9 @@ def main():
     linsec_events = generate_linux_secure()
     sysmon_events = generate_sysmon_operational()
 
+    # Generate events — Sysmon network connection (dedicated parser)
+    sysmon_net_events = generate_sysmon_network_events()
+
     # Write NDJSON files
     results = {}
     files = [
@@ -2833,6 +3052,7 @@ def main():
         ("windows_event_system.jsonl", winsys_events),
         ("linux_secure.jsonl", linsec_events),
         ("sysmon_operational.jsonl", sysmon_events),
+        ("sysmon_network.jsonl", sysmon_net_events),
     ]
 
     for filename, events in files:

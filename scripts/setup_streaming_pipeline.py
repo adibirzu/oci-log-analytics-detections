@@ -70,6 +70,50 @@ LOG_GROUP_NAME = "soc-detection-test-logs"
 LOG_GROUP_DESC = "Log group for SOC detection rule test data ingested via Streaming"
 
 
+def _clean(value):
+    """Trim quotes/whitespace from env-derived values."""
+    if value is None:
+        return ""
+    return str(value).strip().strip('"').strip("'")
+
+
+TARGET_STREAM_POOL_ID = _clean(
+    os.environ.get("OCI_STREAM_POOL_OCID")
+    or os.environ.get("C3_STREAM_POOL_OCID")
+    or os.environ.get("OCI_KAFKA_CONNECT_STREAM_POOL_OCID")
+)
+
+
+def _wait_for_connector_deleted(sch_client, connector_id, timeout_seconds=180, poll_seconds=5):
+    """Wait until a connector no longer exists (404) or is marked DELETED."""
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        try:
+            data = sch_client.get_service_connector(connector_id).data
+            if getattr(data, "lifecycle_state", "") == "DELETED":
+                return True
+        except oci.exceptions.ServiceError as e:
+            if e.status == 404:
+                return True
+        time.sleep(poll_seconds)
+    return False
+
+
+def _wait_for_active_connector_by_name(sch_client, connector_name, timeout_seconds=300, poll_seconds=10):
+    """Wait for a connector with display name to become ACTIVE and return its ID."""
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        items = sch_client.list_service_connectors(
+            compartment_id=COMPARTMENT_ID,
+            display_name=connector_name
+        ).data.items
+        for item in items:
+            if getattr(item, "lifecycle_state", "") == "ACTIVE":
+                return item.id
+        time.sleep(poll_seconds)
+    return None
+
+
 def find_or_create_stream(stream_admin_client, stream_config):
     """Find an existing stream by name or create a new one."""
     # Search for existing stream
@@ -80,18 +124,33 @@ def find_or_create_stream(stream_admin_client, stream_config):
     ).data
 
     if streams:
-        stream = streams[0]
-        print(f"  Stream exists: {stream.name} ({stream.id})")
-        return stream.id, stream.messages_endpoint
+        if TARGET_STREAM_POOL_ID:
+            for stream in streams:
+                if getattr(stream, "stream_pool_id", None) == TARGET_STREAM_POOL_ID:
+                    print(f"  Stream exists in target pool: {stream.name} ({stream.id})")
+                    return stream.id, stream.messages_endpoint
+            print(
+                f"  Stream '{stream_config['name']}' exists outside target pool; "
+                f"creating/using one in target pool {TARGET_STREAM_POOL_ID}."
+            )
+        else:
+            stream = streams[0]
+            print(f"  Stream exists: {stream.name} ({stream.id})")
+            return stream.id, stream.messages_endpoint
 
     # Create new stream
     print(f"  Creating Stream: {stream_config['name']}")
-    details = oci.streaming.models.CreateStreamDetails(
+    details_kwargs = dict(
         name=stream_config['name'],
-        compartment_id=COMPARTMENT_ID,
         partitions=stream_config['partitions'],
         retention_in_hours=stream_config['retention_hours']
     )
+    if TARGET_STREAM_POOL_ID:
+        # OCI Streaming API rejects create requests that include BOTH compartment_id and stream_pool_id.
+        details_kwargs["stream_pool_id"] = TARGET_STREAM_POOL_ID
+    else:
+        details_kwargs["compartment_id"] = COMPARTMENT_ID
+    details = oci.streaming.models.CreateStreamDetails(**details_kwargs)
     new_stream = stream_admin_client.create_stream(details).data
     print(f"  Created Stream: {new_stream.id} (waiting for ACTIVE state...)")
 
@@ -120,8 +179,30 @@ def create_service_connector(sch_client, stream_id, stream_name, log_source,
     ).data.items
 
     if existing:
-        print(f"  Connector exists: {connector_name} ({existing[0].id})")
-        return existing[0].id
+        for connector in existing:
+            connector_id = connector.id
+            full = sch_client.get_service_connector(connector_id).data
+            source = getattr(full, "source", None)
+            target = getattr(full, "target", None)
+            existing_stream_id = getattr(source, "stream_id", None) if source else None
+            existing_log_group = getattr(target, "log_group_id", None) if target else None
+            existing_log_source = getattr(target, "log_source_identifier", None) if target else None
+            if (
+                getattr(source, "kind", "") == "streaming"
+                and getattr(target, "kind", "") == "loggingAnalytics"
+                and existing_stream_id == stream_id
+                and existing_log_group == log_group_id
+                and existing_log_source == log_source
+            ):
+                print(f"  Connector exists and is aligned: {connector_name} ({connector_id})")
+                return connector_id
+
+            print(f"  Connector drift detected: {connector_name} ({connector_id})")
+            print(f"    Current stream: {existing_stream_id}")
+            print(f"    Desired stream: {stream_id}")
+            print("    Recreating connector with correct source stream...")
+            sch_client.delete_service_connector(connector_id)
+            _wait_for_connector_deleted(sch_client, connector_id)
 
     print(f"  Creating Service Connector: {connector_name}")
     print(f"    Source: Streaming ({stream_name})")
@@ -132,9 +213,8 @@ def create_service_connector(sch_client, stream_id, stream_name, log_source,
         stream_id=stream_id
     )
 
-    target = oci.sch.models.LogAnalyticsTargetDetails(
-        kind="logAnalytics",
-        compartment_id=COMPARTMENT_ID,
+    target = oci.sch.models.LoggingAnalyticsTargetDetails(
+        kind="loggingAnalytics",
         log_group_id=log_group_id,
         log_source_identifier=log_source
     )
@@ -149,10 +229,14 @@ def create_service_connector(sch_client, stream_id, stream_name, log_source,
 
     try:
         response = sch_client.create_service_connector(details)
-        connector_id = response.headers.get('opc-work-request-id', 'pending')
-        print(f"  Connector creation initiated (work request: {connector_id})")
-        # The connector takes a minute to become active
-        return connector_id
+        work_request_id = response.headers.get('opc-work-request-id', 'pending')
+        print(f"  Connector creation initiated (work request: {work_request_id})")
+        connector_id = _wait_for_active_connector_by_name(sch_client, connector_name)
+        if connector_id:
+            print(f"  Connector is ACTIVE: {connector_id}")
+            return connector_id
+        print(f"  WARNING: connector '{connector_name}' not ACTIVE yet; work request: {work_request_id}")
+        return work_request_id
     except oci.exceptions.ServiceError as e:
         print(f"  ERROR creating connector: {e.message}")
         return None
@@ -188,6 +272,10 @@ def main():
     if args.dry_run:
         print("\n  [DRY RUN] No changes will be made.\n")
         print(f"  Compartment: {COMPARTMENT_ID}")
+        if TARGET_STREAM_POOL_ID:
+            print(f"  Target stream pool: {TARGET_STREAM_POOL_ID}")
+        else:
+            print("  Target stream pool: <not set, OCI default placement>")
         print(f"  Streams to create: {len(STREAMS)}")
         for sc in STREAMS:
             print(f"    - {sc['name']} ({sc['partitions']} partitions, {sc['retention_hours']}h retention)")

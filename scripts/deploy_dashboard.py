@@ -1,7 +1,7 @@
 """
 Deploy SOC detection dashboards to OCI Log Analytics.
 
-Creates saved searches and organizes them into 7 SOC dashboards:
+Creates saved searches and organizes them into 8 SOC dashboards:
   1. SOC Overview Dashboard         - Cross-domain security summary
   2. SOC: OCI STIG Compliance       - STIG compliance: MFA, key rotation, audit, network
   3. SOC: OCI Audit Security        - IAM, Network, Compute, Storage, KMS, DB
@@ -9,6 +9,7 @@ Creates saved searches and organizes them into 7 SOC dashboards:
   5. SOC: Linux Security            - SSH, sudo, GTFOBins, reverse shells, persistence
   6. SOC: Windows Security          - LOLBins, encoded PowerShell, credential dumping
   7. SOC: Threat Hunting Dashboard  - Cookbook-inspired analytics (frequency, anomaly, scoring)
+  8. SOC: Sysmon Network & Lateral  - Network connections, C2 beacons, DNS, named pipes
 
 Usage:
   python3 scripts/deploy_dashboard.py              # Deploy all
@@ -20,6 +21,7 @@ import json
 import os
 import sys
 import argparse
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oci_config import (
@@ -220,6 +222,28 @@ DASHBOARDS = {
             {"title": "Hunt: After-Hours IAM Activity", "query_file": "hunting/oci_after_hours_iam_activity.json"},
             {"title": "Hunt: Defense Evasion Score", "query_file": "hunting/windows_defense_evasion_score.json"},
         ]
+    },
+    "SOC: Sysmon Network and Lateral Movement Dashboard": {
+        "description": "Sysmon network connection analysis: lateral movement detection, C2 beacon identification, DNS tunneling, named pipe activity, and MITRE ATT&CK technique mapping.",
+        "widgets": [
+            {"title": "Net: C2 Beacon Candidates", "query_file": "sysmon_c2_beacon_-_periodic_outbound_https.json"},
+            {"title": "Net: Lateral Movement - SMB", "query_file": "sysmon_lateral_movement_via_smb.json"},
+            {"title": "Net: Lateral Movement - WinRM", "query_file": "sysmon_lateral_movement_via_winrm.json"},
+            {"title": "Net: RDP Lateral Movement", "query_file": "sysmon_rdp_lateral_movement.json"},
+            {"title": "Net: DNS Tunnel Indicators", "query_file": "sysmon_dns_tunneling_via_network_connection.json"},
+            {"title": "Net: LOLBin Outbound Traffic", "query_file": "sysmon_suspicious_outbound_connection_from_lolbin.json"},
+            {"title": "Net: Kerberoasting Network", "query_file": "sysmon_kerberoasting_network_indicator.json"},
+            {"title": "Net: LDAP Reconnaissance", "query_file": "sysmon_ldap_reconnaissance.json"},
+            {"title": "Net: Cobalt Strike C2", "query_file": "sysmon_cobalt_strike_c2_network_indicators.json"},
+            {"title": "Net: Mimikatz Network", "query_file": "sysmon_mimikatz_network_activity.json"},
+            {"title": "Pipe: Cobalt Strike Pipes", "query_file": "sysmon_cobalt_strike_named_pipe.json"},
+            {"title": "Pipe: PsExec Pipes", "query_file": "sysmon_psexec_named_pipe.json"},
+            {"title": "Pipe: Mimikatz Pipes", "query_file": "sysmon_mimikatz_named_pipe.json"},
+            {"title": "Pipe: Suspicious C2 Pipes", "query_file": "sysmon_suspicious_named_pipe_pattern.json"},
+            {"title": "DNS: Data Exfiltration", "query_file": "sysmon_dns_data_exfiltration.json"},
+            {"title": "DNS: C2 Framework Domains", "query_file": "sysmon_dns_query_to_known_c2_framework_domains.json"},
+            {"title": "DNS: Suspicious TLDs", "query_file": "sysmon_dns_query_to_suspicious_tlds.json"},
+        ]
     }
 }
 
@@ -403,17 +427,24 @@ def build_dashboard_json(dashboard_id, name, description, widgets, widget_querie
 
 
 def delete_existing_dashboard(md_client, display_name):
-    """Delete any existing dashboard with the given name (dedup-safe)."""
+    """Delete any existing dashboard with the given name (dedup-safe).
+
+    Uses OCID from list results for deletion (short dashboardId won't work
+    for delete after OCI's soft-delete window).
+    """
     try:
         dashboards = md_client.list_management_dashboards(
             compartment_id=COMPARTMENT_ID,
             display_name=display_name
         ).data.items
         for d in dashboards:
-            md_client.delete_management_dashboard(d.id)
-            print(f"    - Deleted old dashboard: {display_name}")
-    except Exception:
-        pass
+            try:
+                md_client.delete_management_dashboard(d.dashboard_id)
+                print(f"    - Deleted old dashboard: {display_name} ({d.dashboard_id})")
+            except Exception as del_err:
+                print(f"    - Could not delete dashboard {display_name}: {del_err}")
+    except Exception as e:
+        print(f"    - Could not list dashboards for '{display_name}': {e}")
 
 
 def import_dashboard(md_client, dashboard_json):
@@ -445,8 +476,11 @@ def cleanup_soc_content(md_client):
                 display_name=dashboard_name
             ).data.items
             for d in dashboards:
-                md_client.delete_management_dashboard(d.id)
-                print(f"    - Deleted dashboard: {dashboard_name}")
+                try:
+                    md_client.delete_management_dashboard(d.dashboard_id)
+                    print(f"    - Deleted dashboard: {dashboard_name}")
+                except Exception:
+                    pass
         except Exception:
             pass
 
@@ -542,10 +576,13 @@ def deploy(cleanup=False, dry_run=False):
         # Build and import dashboard with embedded saved searches
         valid_queries = [q for q in widget_queries if q is not None]
         if valid_queries:
-            dashboard_id = f"soc-{dashboard_name.lower().replace(' ', '-').replace(':', '')}"
-
-            # Delete existing dashboard to avoid duplicates
+            # Delete existing dashboard BEFORE generating new ID
             delete_existing_dashboard(md_client, dashboard_name)
+
+            # Use timestamp suffix to avoid OCI soft-delete ID collisions
+            ts = int(time.time())
+            slug = dashboard_name.lower().replace(' ', '-').replace(':', '').replace('&', 'and')
+            dashboard_id = f"soc-{slug}-{ts}"
 
             dashboard_json = build_dashboard_json(
                 dashboard_id=dashboard_id,

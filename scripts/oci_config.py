@@ -365,10 +365,23 @@ def validate_ocid_format():
 
 
 def validate_oci_cli_config():
-    """Check that ~/.oci/config exists and the configured profile is present."""
+    """Check that OCI auth is available (signer-based or config file)."""
+    # Signer-based auth doesn't need ~/.oci/config
+    if os.environ.get("OCI_RESOURCE_PRINCIPAL_VERSION"):
+        return [("OCI Auth", True, "Resource Principal")]
+
+    auth_mode = os.environ.get("OCI_AUTH_MODE", "").lower().replace("-", "_")
+    if auth_mode in ("instance_principal", "instanceprincipal"):
+        return [("OCI Auth", True, "Instance Principal")]
+
+    # Check for env var auth
+    if os.environ.get("OCI_KEY_FILE") or os.environ.get("OCI_KEY_CONTENT"):
+        return [("OCI Auth", True, "Environment variables (OCI_KEY_FILE/OCI_KEY_CONTENT)")]
+
+    # Fall back to config file check
     config_path = os.path.expanduser("~/.oci/config")
     if not os.path.exists(config_path):
-        return [("~/.oci/config", False, "file not found")]
+        return [("~/.oci/config", False, "file not found (set OCI_AUTH_MODE=instance_principal for VM/Docker)")]
 
     profile_header = f"[{OCI_PROFILE}]"
     with open(config_path, 'r') as f:

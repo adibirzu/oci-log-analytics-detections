@@ -144,6 +144,66 @@ def require_oci_config():
 
 # ─── OCI client factories (deferred import) ──────────────────
 
+def _get_client(client_class, **extra_kwargs):
+    """Create OCI SDK client with 4-tier auth fallback.
+
+    1. Resource Principal (OCI_RESOURCE_PRINCIPAL_VERSION set)
+    2. Instance Principal (OCI_AUTH_MODE=instance_principal)
+    3. OCI config file (~/.oci/config)
+    4. Environment variables (OCI_KEY_FILE/OCI_KEY_CONTENT)
+    """
+    import oci
+    client_name = client_class.__name__
+    auth_mode = os.environ.get("OCI_AUTH_MODE", "").lower().replace("-", "_")
+
+    # 1. Resource Principal
+    if os.environ.get("OCI_RESOURCE_PRINCIPAL_VERSION"):
+        try:
+            signer = oci.auth.signers.get_resource_principals_signer()
+            return client_class({}, signer=signer, **extra_kwargs)
+        except Exception:
+            pass
+
+    # 2. Instance Principal
+    if auth_mode in ("instance_principal", "instanceprincipal", "auto"):
+        try:
+            signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
+            return client_class({}, signer=signer, **extra_kwargs)
+        except Exception:
+            pass
+
+    # 3. OCI config file
+    try:
+        config = get_oci_config()
+        return client_class(config, **extra_kwargs)
+    except Exception:
+        pass
+
+    # 4. Environment variables
+    key_file = os.environ.get("OCI_KEY_FILE")
+    key_content = os.environ.get("OCI_KEY_CONTENT")
+    if key_file or key_content:
+        try:
+            if key_file:
+                with open(os.path.expanduser(key_file)) as f:
+                    key_pem = f.read()
+            else:
+                key_pem = key_content.replace("\\n", "\n")
+            config = {
+                "user": os.environ["OCI_USER_OCID"],
+                "key_content": key_pem,
+                "fingerprint": os.environ["OCI_FINGERPRINT"],
+                "tenancy": os.environ["OCI_TENANCY_OCID"],
+                "region": os.environ.get("OCI_REGION", ""),
+                "pass_phrase": os.environ.get("OCI_KEY_PASSPHRASE", ""),
+            }
+            return client_class(config, **extra_kwargs)
+        except Exception:
+            pass
+
+    raise RuntimeError(f"No OCI auth method succeeded for {client_name}")
+
+
 def get_oci_config():
     """Load and return the OCI SDK config dict."""
     import oci
@@ -159,25 +219,25 @@ def get_oci_config():
 def get_la_client():
     """Return an OCI Log Analytics client."""
     import oci
-    return oci.log_analytics.LogAnalyticsClient(get_oci_config())
+    return _get_client(oci.log_analytics.LogAnalyticsClient)
 
 
 def get_dashboard_client():
     """Return an OCI Management Dashboard client."""
     import oci
-    return oci.management_dashboard.DashxApisClient(get_oci_config())
+    return _get_client(oci.management_dashboard.DashxApisClient)
 
 
 def get_streaming_admin_client():
     """Return an OCI Streaming Admin client."""
     import oci
-    return oci.streaming.StreamAdminClient(get_oci_config())
+    return _get_client(oci.streaming.StreamAdminClient)
 
 
 def get_sch_client():
     """Return an OCI Service Connector Hub client."""
     import oci
-    return oci.sch.ServiceConnectorClient(get_oci_config())
+    return _get_client(oci.sch.ServiceConnectorClient)
 
 
 # ─── Shared utilities ─────────────────────────────────────────
@@ -335,7 +395,7 @@ def validate_compartment():
     """Check that the compartment is accessible via the Identity API (online)."""
     try:
         import oci
-        identity = oci.identity.IdentityClient(get_oci_config())
+        identity = _get_client(oci.identity.IdentityClient)
         comp = identity.get_compartment(COMPARTMENT_ID).data
         return [("Compartment", True, comp.name)]
     except Exception as e:

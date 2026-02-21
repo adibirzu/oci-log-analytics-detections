@@ -1,26 +1,26 @@
 {
   "soc-detection-oci-audit": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyayl3tkaiufofnlwkzis5jec4l3ykh3nm3ul4nnlji2tuq",
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyaxjomelhrroylsj2rlucve7jawx3rxrmganqhnxncig4a",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "OCI Audit Logs"
   },
   "soc-detection-cloud-guard": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyajm4ttvr7msak2bi4ppkcbrkyzbp2tmmvhygs3g3wg5za",
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyal5d4wpc2wnihwbqba3qgjw6vvv6c7umwbzeejckc6qna",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "OCI Cloud Guard Problems"
   },
   "soc-detection-linux-audit": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyajm4hw2fzgmrwwgme2cboazovae64pe4c4knbyajmdeya",
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyagwac5lzsokrybp453ye7w23f6kewvlvgfxvtnggomuaq",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "SOC Linux Syslog Logs"
   },
   "soc-detection-windows-sysmon": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyar7tscafedxhu3tuuehenrqrgoh42fepsdzcacch3e3ra",
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyani67erefzogiyllykdlobowvtiplae3yqbtlg6pxzy4a",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "Windows Sysmon Operational Logs"
   },
   "_metadata": {
-    "log_group_id": "ocid1.loganalyticsloggroup.oc1.eu-frankfurt-1.amaaaaaai4inmnya72agt6g5pj56ui66wgleemgmydh4qo44ppfhxxahaqrq",
+    "log_group_id": "ocid1.loganalyticsloggroup.oc1.eu-frankfurt-1.amaaaaaai4inmnya7hlzkukkve7oqo4zkq5h7tu3h5eczmvkos5ybhbifntq",
     "la_namespace": "frxfopzec0yq",
     "compartment_id": "ocid1.compartment.oc1..aaaaaaaaf2s6pn6vpu5xqmyfadhcn4cxgn7y3rxbckkt6cdpzzbkc4cb73kq"
   }

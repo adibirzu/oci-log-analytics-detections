@@ -1,7 +1,7 @@
 {
   "title": "OCI Multiple Users from Same IP (Grouping)",
   "description": "Detects a single IP address being used to authenticate as multiple different OCI users. This pattern may indicate credential stuffing, shared compromised infrastructure, or an attacker testing multiple stolen credentials from the same origin. Uses distinct count grouping (Threat Hunter's Cookbook: Grouping method).",
-  "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' | stats distinct_count('Principal Name') as unique_users, count as total_logins by 'Client Host' | where unique_users > 2 | sort -unique_users",
+  "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' | stats distinctcount('User Name') as unique_users, count as total_logins by 'Source IP' | where unique_users > 2 | sort -unique_users",
   "hunting_type": "grouping",
   "cookbook_method": "grouping",
   "level": "high",
@@ -13,14 +13,21 @@
     "stig.IA-2"
   ],
   "mitre_attack": {
-    "tactics": ["initial_access"],
-    "techniques": ["T1078", "T1110.004"]
+    "tactics": [
+      "initial_access"
+    ],
+    "techniques": [
+      "T1078",
+      "T1110.004"
+    ]
   },
   "logsource": {
     "product": "oci",
     "service": "audit"
   },
-  "stig_ids": ["IA-2"],
+  "stig_ids": [
+    "IA-2"
+  ],
   "falsepositives": [
     "Corporate VPN or NAT where multiple users share an egress IP",
     "Shared workstations"

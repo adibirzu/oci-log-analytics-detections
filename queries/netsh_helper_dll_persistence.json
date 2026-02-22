@@ -1,7 +1,7 @@
 {
   "title": "Netsh Helper DLL Persistence",
   "description": "Detects registration of netsh helper DLLs which execute every time netsh.exe is invoked.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\netsh.exe' and ('Command Line' like '*add*' and 'Command Line' like '*helper*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*netsh.exe' and ('Command Line' like '*add*' and 'Command Line' like '*helper*')))",
   "sigma_id": "d4fd5f18-0639-4280-9093-57d9e51ad06f",
   "level": "high",
   "stig_category": "CAT I",

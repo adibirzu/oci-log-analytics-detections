@@ -1,7 +1,7 @@
 {
   "title": "Scripting Engine Spawning Network Utility",
   "description": "Detects scripting engines spawning network utilities like curl, wget, or net.exe.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Parent Process Name' like '*\\wscript.exe' or 'Parent Process Name' like '*\\cscript.exe' or 'Parent Process Name' like '*\\mshta.exe') and ('Process Name' like '*\\cmd.exe' or 'Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\net.exe' or 'Process Name' like '*\\net1.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Parent Process Name' like '*wscript.exe' or 'Parent Process Name' like '*cscript.exe' or 'Parent Process Name' like '*mshta.exe') and ('Process Name' like '*cmd.exe' or 'Process Name' like '*powershell.exe' or 'Process Name' like '*net.exe' or 'Process Name' like '*net1.exe')))",
   "sigma_id": "dd93ff28-0930-4cba-9f95-2efff6d8bc28",
   "level": "high",
   "stig_category": "CAT I",

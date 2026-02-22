@@ -1,7 +1,7 @@
 {
   "title": "DLL Execution via Rundll32 from User Path",
   "description": "Detects rundll32.exe loading DLLs from user-writable directories.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\rundll32.exe' and ('Command Line' like '*\\Users\\*' or 'Command Line' like '*\\Temp\\*' or 'Command Line' like '*\\Downloads\\*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*rundll32.exe' and ('Command Line' like '*Users*' or 'Command Line' like '*Temp*' or 'Command Line' like '*Downloads*')))",
   "sigma_id": "7687c4d3-827b-4101-ba2a-2308c98af11b",
   "level": "high",
   "stig_category": "CAT I",

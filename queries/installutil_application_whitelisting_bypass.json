@@ -1,7 +1,7 @@
 {
   "title": "InstallUtil Application Whitelisting Bypass",
   "description": "Detects usage of InstallUtil.exe to execute code through .NET assemblies, bypassing application controls.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\InstallUtil.exe' and 'Command Line' like '*/U*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*InstallUtil.exe' and 'Command Line' like '*/U*'))",
   "sigma_id": "05a4c9bc-ed99-46f3-af55-d7ede444a1aa",
   "level": "high",
   "stig_category": "CAT I",

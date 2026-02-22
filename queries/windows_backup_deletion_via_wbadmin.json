@@ -1,7 +1,7 @@
 {
   "title": "Windows Backup Deletion via wbadmin",
   "description": "Detects deletion of Windows backup catalog using wbadmin, preventing backup-based recovery.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\wbadmin.exe' and 'Command Line' like '*delete*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*wbadmin.exe' and 'Command Line' like '*delete*'))",
   "sigma_id": "47f72096-be3c-4a41-9f76-8972cd26c824",
   "level": "high",
   "stig_category": "CAT I",

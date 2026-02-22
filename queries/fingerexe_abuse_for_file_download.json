@@ -1,7 +1,7 @@
 {
   "title": "Finger.exe Abuse for File Download",
   "description": "Detects abuse of finger.exe to download files or exfiltrate data via the finger protocol.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\finger.exe'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*finger.exe'))",
   "sigma_id": "78d3ae3b-3fec-4e6b-afa9-b4bf228f59a7",
   "level": "medium",
   "stig_category": "CAT II",

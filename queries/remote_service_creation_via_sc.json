@@ -1,7 +1,7 @@
 {
   "title": "Remote Service Creation via SC",
   "description": "Detects remote service creation using sc.exe with the \\\\hostname syntax.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\sc.exe' and ('Command Line' like '*\\\\*' and 'Command Line' like '*create*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*sc.exe' and ('Command Line' like '*\\\\*' and 'Command Line' like '*create*')))",
   "sigma_id": "493fb48f-296b-4dff-9fa4-f8933b11ba81",
   "level": "high",
   "stig_category": "CAT I",

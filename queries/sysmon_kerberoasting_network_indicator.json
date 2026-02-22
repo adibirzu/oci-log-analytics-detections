@@ -1,7 +1,7 @@
 {
   "title": "Sysmon Kerberoasting Network Indicator",
   "description": "Detects Kerberos ticket requests (port 88) from anomalous processes. Kerberoasting attacks request service tickets (TGS) to crack service account passwords offline.\n",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Destination Port' = 88 and Initiated = 'true') and (('Process Name' like '*\\rubeus.exe' or 'Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\mimikatz.exe' or 'Process Name' like '*\\GetUserSPNs.py' or 'Process Name' like '*\\python.exe' or 'Process Name' like '*\\python3.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Destination Port' = 88 and Initiated = 'true') and (('Process Name' like '*rubeus.exe' or 'Process Name' like '*powershell.exe' or 'Process Name' like '*mimikatz.exe' or 'Process Name' like '*GetUserSPNs.py' or 'Process Name' like '*python.exe' or 'Process Name' like '*python3.exe')))",
   "sigma_id": "a1b2c3d4-7001-4000-8000-000000000007",
   "level": "high",
   "stig_category": "CAT I",

@@ -1,7 +1,7 @@
 {
   "title": "Domain Trust Discovery via Nltest",
   "description": "Detects domain trust enumeration using nltest.exe.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\nltest.exe' and ('Command Line' like '*/domain_trusts*' or 'Command Line' like '*/dclist*' or 'Command Line' like '*/dsgetdc*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*nltest.exe' and ('Command Line' like '*/domain_trusts*' or 'Command Line' like '*/dclist*' or 'Command Line' like '*/dsgetdc*')))",
   "sigma_id": "152fec77-1574-4ded-a36d-ec9656a8f371",
   "level": "medium",
   "stig_category": "CAT II",

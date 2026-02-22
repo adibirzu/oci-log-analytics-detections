@@ -1,7 +1,7 @@
 {
   "title": "Cloud Guard Problem: Policy Too Permissive",
   "description": "Detects Cloud Guard reporting problem: Policy_Too_Permissive.",
-  "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Policy_Too_Permissive'))",
+  "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'Policy_Too_Permissive'))",
   "sigma_id": "b41e83fc-910d-473d-befb-9475109aa4a7",
   "level": "high",
   "stig_category": "CAT I",

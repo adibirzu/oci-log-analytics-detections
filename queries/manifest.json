@@ -136,7 +136,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Audit_Log_Retention'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'Audit_Log_Retention'))"
     },
     {
       "filename": "cloud_guard_problem_bucket_public_read.json",
@@ -148,7 +148,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Bucket_Public_Read'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'Bucket_Public_Read'))"
     },
     {
       "filename": "cloud_guard_problem_bucket_public_write.json",
@@ -160,7 +160,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Bucket_Public_Write'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'Bucket_Public_Write'))"
     },
     {
       "filename": "cloud_guard_problem_group_has_too_many_admins.json",
@@ -172,7 +172,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Group_Has_Too_Many_Admins'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'Group_Has_Too_Many_Admins'))"
     },
     {
       "filename": "cloud_guard_problem_iam_user_api_key_old.json",
@@ -184,7 +184,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'IAM_User_API_Key_Old'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'IAM_User_API_Key_Old'))"
     },
     {
       "filename": "cloud_guard_problem_iam_user_console_password_old.json",
@@ -196,7 +196,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'IAM_User_Console_Password_Old'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'IAM_User_Console_Password_Old'))"
     },
     {
       "filename": "cloud_guard_problem_instance_principals_enabled.json",
@@ -208,7 +208,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Instance_Principals_Enabled'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'Instance_Principals_Enabled'))"
     },
     {
       "filename": "cloud_guard_problem_instance_public_ip.json",
@@ -220,7 +220,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'INSTANCE_PUBLIC_IP'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'INSTANCE_PUBLIC_IP'))"
     },
     {
       "filename": "cloud_guard_problem_policy_too_permissive.json",
@@ -232,7 +232,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'Policy_Too_Permissive'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'Policy_Too_Permissive'))"
     },
     {
       "filename": "cloud_guard_problem_vcn_flow_log_disabled.json",
@@ -244,7 +244,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'VCN_Flow_Log_Disabled'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'VCN_Flow_Log_Disabled'))"
     },
     {
       "filename": "cloud_guard_problem_vcn_security_list_port_rdp.json",
@@ -256,7 +256,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'VCN_Security_List_Port_RDP'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'VCN_Security_List_Port_RDP'))"
     },
     {
       "filename": "cloud_guard_problem_vcn_security_list_port_ssh.json",
@@ -268,7 +268,7 @@
       "service": "cloud_guard",
       "mitre_techniques": [],
       "mitre_tactics": [],
-      "query": "('Log Source' = 'OCI Cloud Guard Problems' or 'Log Source' = 'OCI Cloud Guard Logs' or 'Log Source' = 'SOC Cloud Guard Logs') and (('Problem Name' = 'VCN_Security_List_Port_SSH'))"
+      "query": "'Log Source' = 'OCI Cloud Guard Problems' and (('Problem Name' = 'VCN_Security_List_Port_SSH'))"
     },
     {
       "filename": "linux_archive_data_collected_for_exfiltration.json",
@@ -349,7 +349,7 @@
       "mitre_tactics": [
         "persistence"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'crontab'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'crontab') and (('Command Line' like '*-e*' or 'Command Line' like '*-r*' or 'Command Line' like '*/tmp/*' or 'Command Line' like '*/var/tmp/*' or 'Command Line' like '*/dev/shm/*')))"
     },
     {
       "filename": "linux_cryptominer_activity_detected.json",
@@ -558,7 +558,7 @@
       "mitre_tactics": [
         "persistence"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*>> /etc/passwd*' or msg like '*> /etc/passwd*' or msg like '*>> /etc/shadow*' or msg like '*> /etc/shadow*')) or ((msg like '*tee /etc/passwd*' or msg like '*tee -a /etc/passwd*' or msg like '*sed -i.*\\/etc\\/passwd*' or msg like '*sed -i.*\\/etc\\/shadow*')))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*>> /etc/passwd*' or msg like '*> /etc/passwd*' or msg like '*>> /etc/shadow*' or msg like '*> /etc/shadow*')) or ((msg like '*tee /etc/passwd*' or msg like '*tee -a /etc/passwd*' or msg like '*sed -i*/etc/passwd*' or msg like '*sed -i*/etc/shadow*')))"
     },
     {
       "filename": "linux_post-exploitation_enumeration_script.json",
@@ -1398,7 +1398,7 @@
       "mitre_tactics": [
         "impact"
       ],
-      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.computeapi.terminateinstance'))"
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.computeapi.terminateinstance' and Status = 'Success'))"
     },
     {
       "filename": "oci_console_login_failure.json",
@@ -1746,7 +1746,7 @@
         "initial_access",
         "credential_access"
       ],
-      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.consolesignon.login' and Status = 'Failure'))",
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.consolesignon.login' and Status = 'Failure')) | stats distinctcount('User Name') as distinct_users by 'Source IP' | where distinct_users > 5",
       "stig_ids": [
         "IA-2"
       ]
@@ -1900,7 +1900,7 @@
       "mitre_tactics": [
         "defense_evasion"
       ],
-      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.virtualnetwork.createsecuritylist' or 'Event Type' = 'com.oraclecloud.virtualnetwork.updatesecuritylist') and 'Request Action Type' = 'POST' and 'Original Log Content' like '*0.0.0.0/0*'))"
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.virtualnetwork.createsecuritylist' or 'Event Type' = 'com.oraclecloud.virtualnetwork.updatesecuritylist') and 'Original Log Content' like '*0.0.0.0/0*'))"
     },
     {
       "filename": "oci_waf_configuration_updated.json",
@@ -1930,7 +1930,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'base64'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'base64') and ((msg like '*-d *' or msg like '*--decode*' or msg like '*/etc/shadow*' or msg like '*/etc/passwd*')))"
     },
     {
       "filename": "suspicious_usage_of_chmod.json",
@@ -1946,7 +1946,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'chmod'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'chmod') and ((msg like '*+s *' or msg like '*4755*' or msg like '*777*' or msg like '*+x /tmp*' or msg like '*+x /dev/shm*')))"
     },
     {
       "filename": "suspicious_usage_of_chown.json",
@@ -1962,7 +1962,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'chown'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'chown') and ((msg like '*root:*' or msg like '*:root*' or msg like '*/etc/*' or msg like '*/usr/*')))"
     },
     {
       "filename": "suspicious_usage_of_curl.json",
@@ -1978,7 +1978,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'curl'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'curl') and ((msg like '*-o /tmp*' or msg like '*-o /dev/shm*' or msg like '*pastebin*' or msg like '*-k *' or msg like '*| bash*' or msg like '*| sh*')))"
     },
     {
       "filename": "suspicious_usage_of_dd.json",
@@ -1994,7 +1994,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'dd'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'dd') and ((msg like '*if=/dev/sd*' or msg like '*if=/dev/mem*' or msg like '*of=/dev/sd*' or msg like '*if=/proc/*')))"
     },
     {
       "filename": "suspicious_usage_of_gdb.json",
@@ -2010,7 +2010,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'gdb'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'gdb') and ((msg like '*-p *' or msg like '*--pid*' or msg like '*attach*' or msg like '*dump memory*')))"
     },
     {
       "filename": "suspicious_usage_of_id.json",
@@ -2026,7 +2026,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'id'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'id') and ((msg like '*| grep*' or msg like '*&&*' or msg like '*; whoami*' or msg like '*root*')))"
     },
     {
       "filename": "suspicious_usage_of_insmod.json",
@@ -2042,7 +2042,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'insmod'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'insmod') and ((msg like '*/tmp/*' or msg like '*/dev/shm/*' or msg like '*/home/*')))"
     },
     {
       "filename": "suspicious_usage_of_lua.json",
@@ -2058,7 +2058,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'lua'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'lua') and ((msg like '*os.execute*' or msg like '*io.popen*' or msg like '*-e *')))"
     },
     {
       "filename": "suspicious_usage_of_modprobe.json",
@@ -2074,7 +2074,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'modprobe'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'modprobe') and ((msg like '*/tmp/*' or msg like '*/home/*' or msg like '*force*')))"
     },
     {
       "filename": "suspicious_usage_of_nc.json",
@@ -2090,7 +2090,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'nc'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'nc') and ((msg like '*-e *' or msg like '*-c *' or msg like '*-l*' or msg like '*-v*')))"
     },
     {
       "filename": "suspicious_usage_of_ncat.json",
@@ -2106,7 +2106,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'ncat'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'ncat') and ((msg like '*-e *' or msg like '*-c *' or msg like '*--sh-exec*' or msg like '*-l*')))"
     },
     {
       "filename": "suspicious_usage_of_netcat.json",
@@ -2122,7 +2122,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'netcat'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'netcat') and ((msg like '*-e *' or msg like '*-c *' or msg like '*-l*')))"
     },
     {
       "filename": "suspicious_usage_of_nmap.json",
@@ -2138,7 +2138,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'nmap'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'nmap') and ((msg like '*-sS*' or msg like '*-sV*' or msg like '*-O*' or msg like '*--script*' or msg like '*-A*')))"
     },
     {
       "filename": "suspicious_usage_of_passwd.json",
@@ -2154,7 +2154,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'passwd'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'passwd') and ((msg like '*--stdin*' or msg like '*-d *' or msg like '*chpasswd*')))"
     },
     {
       "filename": "suspicious_usage_of_perl.json",
@@ -2170,7 +2170,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'perl'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'perl') and ((msg like '*-e *' or msg like '*socket*' or msg like '*exec*' or msg like '*system(*')))"
     },
     {
       "filename": "suspicious_usage_of_python.json",
@@ -2186,7 +2186,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'python'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'python') and ((msg like '*-c *' or msg like '*import socket*' or msg like '*import os*' or msg like '*subprocess*' or msg like '*exec(*' or msg like '*eval(*')))"
     },
     {
       "filename": "suspicious_usage_of_rmmod.json",
@@ -2202,7 +2202,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'rmmod'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'rmmod') and ( (('Command Line' like '*--force*' or 'Command Line' like '*-f*')) or ((parent_process_name like '*bash*' or parent_process_name like '*sh*' or parent_process_name like '*python*' or parent_process_name like '*perl*')) ))"
     },
     {
       "filename": "suspicious_usage_of_ruby.json",
@@ -2218,7 +2218,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'ruby'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'ruby') and ((msg like '*-e *' or msg like '*TCPSocket*' or msg like '*system(*' or msg like '*exec(*')))"
     },
     {
       "filename": "suspicious_usage_of_shadow.json",
@@ -2234,7 +2234,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'shadow'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'shadow') and ((msg like '*cat *' or msg like '*less *' or msg like '*cp *' or msg like '*scp *')))"
     },
     {
       "filename": "suspicious_usage_of_socat.json",
@@ -2250,7 +2250,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'socat'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'socat') and ((msg like '*TCP:*' or msg like '*EXEC:*' or msg like '*SYSTEM:*' or msg like '*PTY*')))"
     },
     {
       "filename": "suspicious_usage_of_strace.json",
@@ -2266,7 +2266,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'strace'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'strace') and ((msg like '*-p *' or msg like '*-f *' or msg like '*-e trace=*')))"
     },
     {
       "filename": "suspicious_usage_of_tcpdump.json",
@@ -2282,7 +2282,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'tcpdump'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'tcpdump') and ((msg like '*-w *' or msg like '*-i *' or msg like '*not port 22*')))"
     },
     {
       "filename": "suspicious_usage_of_tshark.json",
@@ -2298,7 +2298,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'tshark'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'tshark') and ((msg like '*-i *' or msg like '*-w *' or msg like '*-f *')))"
     },
     {
       "filename": "suspicious_usage_of_wget.json",
@@ -2314,7 +2314,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'wget'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'wget') and ((msg like '*-O /tmp*' or msg like '*-O /dev/shm*' or msg like '*pastebin*' or msg like '*--no-check-certificate*' or msg like '*| bash*')))"
     },
     {
       "filename": "suspicious_usage_of_whoami.json",
@@ -2330,7 +2330,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'whoami'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'whoami') and ((msg like '*&&*' or msg like '*; id*' or msg like '*; cat*')))"
     },
     {
       "filename": "suspicious_usage_of_wireshark.json",
@@ -2346,7 +2346,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'wireshark'))"
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((('Process Name' = 'tshark' or 'Process Name' = 'dumpcap')) or ('Process Name' = 'wireshark' and ('Command Line' like '*-i*' or 'Command Line' like '*-w*' or 'Command Line' like '*-k*' or 'Command Line' like '*-f*')))"
     },
     {
       "filename": "windows_access_token_manipulation.json",
@@ -2480,7 +2480,7 @@
         "collection",
         "exfiltration"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*robocopy.exe' and ('Command Line' like '*/MIR*' or 'Command Line' like '*/E*' or 'Command Line' like '*/S*')) or ('Process Name' like '*xcopy.exe' and ('Command Line' like '*/S*' or 'Command Line' like '*/E*')) or (('Command Line' like '*C:\\Temp\\staging*' or 'Command Line' like '*C:\\Users\\Public\\*' or 'Command Line' like '*C:\\ProgramData\\staging*')) or (('Command Line' like '*compact /c*' or 'Command Line' like '*makecab*')))"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*robocopy.exe' and ('Command Line' like '*/MIR*' or 'Command Line' like '*/E*' or 'Command Line' like '*/S*')) or ('Process Name' like '*xcopy.exe' and ('Command Line' like '*/S*' or 'Command Line' like '*/E*')) or (('Command Line' like '*C:*Temp*staging*' or 'Command Line' like '*C:*Users*Public*' or 'Command Line' like '*C:*ProgramData*staging*')) or (('Command Line' like '*compact /c*' or 'Command Line' like '*makecab*')))"
     },
     {
       "filename": "windows_dll_side-loading_via_suspicious_path.json",
@@ -2496,7 +2496,7 @@
       "mitre_tactics": [
         "defense_evasion"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*rundll32.exe' or 'Process Name' like '*regsvr32.exe' or 'Process Name' like '*msiexec.exe')) and (('Command Line' like '*\\AppData\\Local\\Temp\\*' or 'Command Line' like '*\\Users\\Public\\*' or 'Command Line' like '*\\ProgramData\\*' or 'Command Line' like '*\\Downloads\\*')))"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*rundll32.exe' or 'Process Name' like '*regsvr32.exe' or 'Process Name' like '*msiexec.exe')) and (('Command Line' like '*AppData*Local*Temp*' or 'Command Line' like '*Users*Public*' or 'Command Line' like '*ProgramData*' or 'Command Line' like '*Downloads*')))"
     },
     {
       "filename": "windows_encoded_powershell_execution.json",
@@ -2562,7 +2562,7 @@
       "mitre_tactics": [
         "credential_access"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Rubeus*' or 'Command Line' like '*kerberoast*')) or (('Command Line' like '*Invoke-Kerberoast*' or 'Command Line' like '*Get-SPNUsers*' or 'Command Line' like '*Request-SPNTicket*')) or ('Process Name' like '*setspn.exe' and 'Command Line' like '*-Q */**'))"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Rubeus*' or 'Command Line' like '*kerberoast*')) or (('Command Line' like '*Invoke-Kerberoast*' or 'Command Line' like '*Get-SPNUsers*' or 'Command Line' like '*Request-SPNTicket*')) or ('Process Name' like '*setspn.exe' and 'Command Line' like '*-Q */*'))"
     },
     {
       "filename": "windows_keylogger_indicators.json",
@@ -3079,7 +3079,7 @@
       "mitre_tactics": [
         "persistence"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*CurrentVersion\\Run*' or 'Command Line' like '*CurrentVersion\\RunOnce*' or 'Command Line' like '*CurrentVersion\\RunServices*' or 'Command Line' like '*CurrentVersion\\Policies\\Explorer\\Run*')))"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*CurrentVersion*Run*' or 'Command Line' like '*CurrentVersion*RunOnce*' or 'Command Line' like '*CurrentVersion*RunServices*' or 'Command Line' like '*CurrentVersion*Policies*Explorer*Run*')))"
     },
     {
       "filename": "windows_remote_access_tool_detected.json",

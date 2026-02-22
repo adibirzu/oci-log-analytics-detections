@@ -1,7 +1,7 @@
 {
   "title": "AD Enumeration via ADFind",
   "description": "Detects usage of AdFind.exe for Active Directory enumeration and reconnaissance.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\AdFind.exe'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*AdFind.exe'))",
   "sigma_id": "7d05303a-c6ee-4f72-9c0b-1ecd1d5ba819",
   "level": "high",
   "stig_category": "CAT I",

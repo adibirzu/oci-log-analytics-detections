@@ -1,7 +1,7 @@
 {
   "title": "DCOM Lateral Movement via MMC20",
   "description": "Detects lateral movement using DCOM MMC20.Application object to execute commands remotely.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*\\mmc.exe' and ('Process Name' like '*\\cmd.exe' or 'Process Name' like '*\\powershell.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*mmc.exe' and ('Process Name' like '*cmd.exe' or 'Process Name' like '*powershell.exe')))",
   "sigma_id": "adea89ca-950a-44c2-9b0b-6e7c923a296f",
   "level": "high",
   "stig_category": "CAT I",

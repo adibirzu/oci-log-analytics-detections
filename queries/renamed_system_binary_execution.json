@@ -1,7 +1,7 @@
 {
   "title": "Renamed System Binary Execution",
   "description": "Detects execution of renamed system utilities where the original filename does not match the current image name.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Original File Name' = 'powershell.exe') and not (('Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\pwsh.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Original File Name' = 'powershell.exe') and not (('Process Name' like '*powershell.exe' or 'Process Name' like '*pwsh.exe')))",
   "sigma_id": "18687462-bae5-4113-a1bc-9a1c8eb34528",
   "level": "high",
   "stig_category": "CAT I",

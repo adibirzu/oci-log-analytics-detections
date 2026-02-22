@@ -1,7 +1,7 @@
 {
   "title": "Sysmon Suspicious Named Pipe Pattern",
   "description": "Detects named pipe creation matching common C2 framework patterns including Metasploit, Covenant, and other post-exploitation tools.\n",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Pipe Name' like '\\msf-pipe*' or 'Pipe Name' like '\\meterpreter*')) or (('Pipe Name' like '\\gruntsvc*' or 'Pipe Name' like '\\Covenant*')) or (('Pipe Name' like '*\\evil*' or 'Pipe Name' like '*\\implant*' or 'Pipe Name' like '*\\beacon*' or 'Pipe Name' like '*\\c2pipe*' or 'Pipe Name' like '*\\shell_pipe*' or 'Pipe Name' like '*\\payload*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Pipe Name' like '*msf-pipe*' or 'Pipe Name' like '*meterpreter*')) or (('Pipe Name' like '*gruntsvc*' or 'Pipe Name' like '*Covenant*')) or (('Pipe Name' like '*evil*' or 'Pipe Name' like '*implant*' or 'Pipe Name' like '*beacon*' or 'Pipe Name' like '*c2pipe*' or 'Pipe Name' like '*shell_pipe*' or 'Pipe Name' like '*payload*')))",
   "sigma_id": "a1b2c3d4-7002-4000-8000-000000000004",
   "level": "critical",
   "stig_category": "CAT I",

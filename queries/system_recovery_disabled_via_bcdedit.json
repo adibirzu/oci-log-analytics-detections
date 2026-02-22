@@ -1,7 +1,7 @@
 {
   "title": "System Recovery Disabled via BCDEdit",
   "description": "Detects BCDEdit commands disabling system recovery, commonly seen in ransomware attacks.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\bcdedit.exe' and ('Command Line' like '*recoveryenabled*' or 'Command Line' like '*No*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*bcdedit.exe' and ('Command Line' like '*recoveryenabled*' or 'Command Line' like '*No*')))",
   "sigma_id": "e0dfde69-53e6-4f14-a664-d865be504ae4",
   "level": "critical",
   "stig_category": "CAT I",

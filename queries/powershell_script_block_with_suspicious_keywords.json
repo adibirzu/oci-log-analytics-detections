@@ -1,7 +1,7 @@
 {
   "title": "PowerShell Script Block with Suspicious Keywords",
   "description": "Detects PowerShell commands containing keywords commonly associated with offensive techniques.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\powershell.exe' and ('Command Line' like '*Invoke-Expression*' or 'Command Line' like '*IEX*' or 'Command Line' like '*Invoke-Command*' or 'Command Line' like '*New-Object Net.WebClient*' or 'Command Line' like '*DownloadString*' or 'Command Line' like '*DownloadFile*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*powershell.exe' and ('Command Line' like '*Invoke-Expression*' or 'Command Line' like '*IEX*' or 'Command Line' like '*Invoke-Command*' or 'Command Line' like '*New-Object Net.WebClient*' or 'Command Line' like '*DownloadString*' or 'Command Line' like '*DownloadFile*')))",
   "sigma_id": "00dc4fac-589e-43de-a0b8-0b9e5bb1f612",
   "level": "high",
   "stig_category": "CAT I",

@@ -1,7 +1,7 @@
 {
   "title": "Windows Service Created with Suspicious Binary Path",
   "description": "Detects creation of Windows services pointing to executables in user-writable paths.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\sc.exe' and 'Command Line' like '*create*') and (('Command Line' like '*\\Temp\\*' or 'Command Line' like '*\\AppData\\*' or 'Command Line' like '*\\Users\\*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*sc.exe' and 'Command Line' like '*create*') and (('Command Line' like '*Temp*' or 'Command Line' like '*AppData*' or 'Command Line' like '*Users*')))",
   "sigma_id": "624b2ce3-6fe8-47ab-a74e-2862cbc49e24",
   "level": "high",
   "stig_category": "CAT I",

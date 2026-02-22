@@ -1,7 +1,7 @@
 {
   "title": "UAC Bypass via ComputerDefaults",
   "description": "Detects UAC bypass using computerdefaults.exe auto-elevation.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*\\computerdefaults.exe' and ('Process Name' like '*\\cmd.exe' or 'Process Name' like '*\\powershell.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*computerdefaults.exe' and ('Process Name' like '*cmd.exe' or 'Process Name' like '*powershell.exe')))",
   "sigma_id": "c7759f01-9c95-45f5-ba6f-16fb3a9f3c5a",
   "level": "high",
   "stig_category": "CAT I",

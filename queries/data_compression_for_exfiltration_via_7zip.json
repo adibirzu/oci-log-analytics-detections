@@ -1,7 +1,7 @@
 {
   "title": "Data Compression for Exfiltration via 7zip",
   "description": "Detects data compression using 7-Zip or WinRAR with password protection, often used before exfiltration.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\7z.exe' or 'Process Name' like '*\\7za.exe' or 'Process Name' like '*\\rar.exe' or 'Process Name' like '*\\WinRAR.exe') and ('Command Line' like '*-p*' or 'Command Line' like '*-hp*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*7z.exe' or 'Process Name' like '*7za.exe' or 'Process Name' like '*rar.exe' or 'Process Name' like '*WinRAR.exe') and ('Command Line' like '*-p*' or 'Command Line' like '*-hp*')))",
   "sigma_id": "916c4602-12f1-4ee9-8f82-be1609a891c0",
   "level": "medium",
   "stig_category": "CAT II",

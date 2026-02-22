@@ -1,7 +1,7 @@
 {
   "title": "Application Shimming for Persistence",
   "description": "Detects creation of application compatibility shims using sdbinst.exe.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\sdbinst.exe'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*sdbinst.exe'))",
   "sigma_id": "d1ddde6e-fc36-494e-b9c6-30430981156f",
   "level": "medium",
   "stig_category": "CAT II",

@@ -74,6 +74,48 @@ TARGET_STREAM_POOL_ID = (
 )
 
 
+def _validate_and_reset_stream_pool_id():
+    """Check TARGET_STREAM_POOL_ID lifecycle state; clear it if DELETED/gone.
+
+    Called at the start of main() so that a stale pool OCID from a previous
+    deployment does not cause create_stream() to fail with 400 InvalidParameter.
+    Falls back to compartment-level stream creation (no stream_pool_id).
+    """
+    global TARGET_STREAM_POOL_ID
+    if not TARGET_STREAM_POOL_ID:
+        return
+    try:
+        admin = get_streaming_admin_client()
+        pool = admin.get_stream_pool(TARGET_STREAM_POOL_ID).data
+        state = getattr(pool, "lifecycle_state", "UNKNOWN")
+        if state == "ACTIVE":
+            print(f"  Stream pool verified ACTIVE: {TARGET_STREAM_POOL_ID}")
+        else:
+            print(
+                f"  WARN: Stream pool {TARGET_STREAM_POOL_ID} is {state} — "
+                f"clearing pool ID; streams will be created at compartment level."
+            )
+            TARGET_STREAM_POOL_ID = ""
+    except oci.exceptions.ServiceError as e:
+        if e.status == 404:
+            print(
+                f"  WARN: Stream pool {TARGET_STREAM_POOL_ID} not found (404) — "
+                f"clearing pool ID; streams will be created at compartment level."
+            )
+        else:
+            print(
+                f"  WARN: Could not verify stream pool state (HTTP {e.status}: {e.message[:80]}) — "
+                f"clearing pool ID to avoid create_stream failures."
+            )
+        TARGET_STREAM_POOL_ID = ""
+    except Exception as e:
+        print(
+            f"  WARN: Could not verify stream pool state ({e}) — "
+            f"clearing pool ID to avoid create_stream failures."
+        )
+        TARGET_STREAM_POOL_ID = ""
+
+
 def _wait_for_connector_deleted(sch_client, connector_id, timeout_seconds=180, poll_seconds=5):
     """Wait until a connector no longer exists (404) or is marked DELETED."""
     deadline = time.time() + timeout_seconds
@@ -276,6 +318,7 @@ def main():
         return
 
     require_oci_config()
+    _validate_and_reset_stream_pool_id()
     stream_admin_client = get_streaming_admin_client()
     la_client = get_la_client()
     sch_client = get_sch_client()

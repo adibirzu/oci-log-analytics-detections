@@ -3,9 +3,9 @@
 A comprehensive STIG-compliant detection rules library for Oracle Cloud Infrastructure (OCI) Log Analytics. Converts industry-standard [Sigma](https://github.com/SigmaHQ/sigma) rules into OCI Log Analytics Query Language (OCL) with MITRE ATT&CK and STIG compliance mapping. Enhanced with advanced threat hunting queries inspired by the Threat Hunter's Cookbook.
 
 ## Current Status
-- **Total Rules:** 201 Sigma detection rules + 15 advanced hunting queries
-- **Categories:** OCI Audit (68), Cloud Guard (12), Linux Security (65), Windows Security (55)
-- **Hunting Queries:** 15 analytics-based queries (frequency analysis, anomaly detection, scoring)
+- **Total Rules:** 387 Sigma detection rules + 20 advanced hunting queries
+- **Categories:** Windows Security (220), Cloud/OCI (100), Linux Security (67)
+- **Hunting Queries:** 20 analytics-based queries (frequency analysis, anomaly detection, scoring)
 - **STIG Coverage:** 22 rules with DoD STIG control mappings (IA-2, IA-5, SC-7, SC-28, AU-11, AC-17, etc.)
 - **MITRE ATT&CK:** 90 techniques across 12 tactics (full MITRE coverage)
 - **Deployed:** 153 saved searches across 7 dashboards
@@ -125,6 +125,14 @@ Advanced hunting queries using OCL analytics operators (`| stats`, `| eval`, `| 
 | WDigest Credential Harvesting | T1003.001 | high |
 | NTDS.dit Database Extraction | T1003.003 | critical |
 
+### Web Application Attack Detection (4 rules)
+| Rule | Platform | MITRE Technique | Severity |
+| :--- | :--- | :--- | :--- |
+| SSRF to Cloud Metadata Endpoint (169.254.169.254) | Windows | T1552.005, T1190 | critical |
+| Web Server Process Spawning Command Shell | Windows | T1059, T1190 | critical |
+| SSRF to Cloud Instance Metadata Service | Linux | T1552.005, T1190 | critical |
+| Web Server Process Spawning Shell with Injection Characters | Linux | T1059, T1190 | critical |
+
 ### MITRE ATT&CK Expansion (20 rules)
 | Rule | Tactic | MITRE Technique | Severity |
 | :--- | :--- | :--- | :--- |
@@ -153,14 +161,27 @@ Advanced hunting queries using OCL analytics operators (`| stats`, `| eval`, `| 
 
 ```
 rules/                          # Source detection rules (Sigma YAML)
-  cloud/oci/                    # 38 OCI Audit rules (STIG + security + discovery)
-    audit_events/               # 30 audit action tracking rules
+  cloud/oci/                    # 100 OCI rules (STIG + security + discovery)
+    audit_events/               # 50 audit action tracking rules
     cloud_guard/                # 12 Cloud Guard problem rules
-  linux/                        # 38 Linux rules (advanced attacks + hunting)
+  linux/                        # 67 Linux rules (advanced attacks + hunting)
     suspicious_binaries/        # 27 suspicious binary detection rules
-  windows/process_creation/     # 55 Windows rules (LOLBins + advanced + discovery)
+  windows/                      # 220 Windows rules (13 subdirectories)
+    process_creation/           # 56 process creation rules
+    defense_evasion/            # 29 defense evasion rules
+    credential_access/          # 25 credential access rules
+    persistence/                # 24 persistence rules
+    execution/                  # 19 execution rules
+    privilege_escalation/       # 14 privilege escalation rules
+    network_connection/         # 11 network connection rules
+    lateral_movement/           # 10 lateral movement rules
+    impact/                     # 10 impact rules
+    discovery/                  # 10 discovery rules
+    collection/                 # 5 collection rules
+    pipe_created/               # 4 pipe created rules
+    dns_query/                  # 3 DNS query rules
 queries/                        # Generated OCL queries (JSON)
-  hunting/                      # 15 advanced hunting queries (cookbook-inspired)
+  hunting/                      # 20 advanced hunting queries (cookbook-inspired)
   manifest.json                 # Cross-project integration manifest
 config/
   sigma_oci_mapping.yaml        # Field & log source mappings
@@ -238,7 +259,7 @@ python3 scripts/setup_log_sources.py --validate  # Check OCIDs, CLI config, name
 
 ### Generating Queries
 ```bash
-python3 scripts/convert_sigma.py                # Convert all 201 rules
+python3 scripts/convert_sigma.py                # Convert all 387 rules
 python3 scripts/convert_sigma.py --validate     # Validate OCL syntax
 python3 scripts/convert_sigma.py --stats        # Print rule statistics
 ```

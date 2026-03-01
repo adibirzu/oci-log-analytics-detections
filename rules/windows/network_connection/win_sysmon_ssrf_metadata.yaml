@@ -1,0 +1,46 @@
+title: SSRF to Cloud Metadata Endpoint (169.254.169.254)
+id: a1b2c3d4-8001-4000-8000-000000000001
+status: stable
+description: |
+  Detects outbound network connections to the cloud instance metadata service
+  (169.254.169.254) from web application or scripting processes. This indicates
+  Server-Side Request Forgery (SSRF) where an attacker exploits a web app to
+  access the OCI/AWS/GCP/Azure IMDS endpoint and steal credentials, instance
+  identity tokens, or configuration data.
+  Covers MITRE ATT&CK T1552.005 (Cloud Instance Metadata API).
+author: SOC Detection Team
+date: 2026/03/01
+logsource:
+  product: windows
+  service: sysmon
+  category: network_connection
+detection:
+  sel_metadata_ip:
+    DestinationIp: '169.254.169.254'
+    Initiated: 'true'
+  sel_web_process:
+    Image|endswith:
+    - \python.exe
+    - \pythonw.exe
+    - \python3.exe
+    - \node.exe
+    - \java.exe
+    - \javaw.exe
+    - \php.exe
+    - \ruby.exe
+    - \dotnet.exe
+    - \httpd.exe
+    - \nginx.exe
+    - \w3wp.exe
+    - \curl.exe
+    - \wget.exe
+  condition: sel_metadata_ip and sel_web_process
+level: critical
+tags:
+- attack.credential_access
+- attack.t1552.005
+- attack.initial_access
+- attack.t1190
+falsepositives:
+- Legitimate cloud SDK calls from web applications (rare — most use SDKs, not direct IMDS)
+version: 1

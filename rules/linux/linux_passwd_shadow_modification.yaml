@@ -17,8 +17,8 @@ detection:
     message|contains:
     - tee /etc/passwd
     - tee -a /etc/passwd
-    - sed -i.*\/etc\/passwd
-    - sed -i.*\/etc\/shadow
+    - sed -i.*/etc/passwd
+    - sed -i.*/etc/shadow
   condition: sel1 or sel2
 level: critical
 tags:

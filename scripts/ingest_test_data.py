@@ -109,6 +109,30 @@ UPLOAD_MANIFEST = [
         "content_type": "application/octet-stream",
         "description": "Windows Sysmon Operational (process, network, DNS, file, injection)"
     },
+    {
+        "filename": "waf_security.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["waf_security"],
+        "upload_name": "soc-test-waf",
+        "stream_key": "soc-detection-waf",
+        "content_type": "application/octet-stream",
+        "description": "WAF security events (SQL injection, XSS, SSRF, path traversal, OWASP attacks)"
+    },
+    {
+        "filename": "lb_access.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["lb_access"],
+        "upload_name": "soc-test-lb-access",
+        "stream_key": "soc-detection-lb-access",
+        "content_type": "application/octet-stream",
+        "description": "Load Balancer access logs (scanner detection, brute force, directory enum)"
+    },
+    {
+        "filename": "webapp_security.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["webapp_security"],
+        "upload_name": "soc-test-webapp",
+        "stream_key": "soc-detection-webapp",
+        "content_type": "application/octet-stream",
+        "description": "Web application attacks (IDOR, privilege escalation, auth bypass, deserialization)"
+    },
 ]
 
 

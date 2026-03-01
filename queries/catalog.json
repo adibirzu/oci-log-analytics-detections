@@ -6086,7 +6086,8 @@
         "T1048",
         "T1071.004"
       ],
-      "file": "hunting/dns_exfiltration_entropy.json"
+      "file": "hunting/dns_exfiltration_entropy.json",
+      "query": "'Log Source' = 'Windows Sysmon Operational Logs' and 'Event ID' = 22 | eval domain_length = length('Query Name') | where domain_length > 50 | stats count as long_dns_queries, unique('Query Name') as unique_domains by 'Host Name' | sort -long_dns_queries | where long_dns_queries > 10"
     },
     {
       "title": "Linux Data Staging and Exfiltration Indicators",
@@ -6098,7 +6099,8 @@
         "T1560.001",
         "T1074.001"
       ],
-      "file": "hunting/linux_data_staging_exfil.json"
+      "file": "hunting/linux_data_staging_exfil.json",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (msg like '*tar *' or msg like '*zip *' or msg like '*gzip *' or msg like '*curl *' or msg like '*wget *' or msg like '*scp *' or msg like '*nc *') | stats count as staging_commands, distinctcount('Process Name') as tools_used by 'Host Name' | sort -staging_commands | where staging_commands > 4 and tools_used > 2"
     },
     {
       "title": "Linux Multi-Stage Attack Indicators (Combined Methods)",
@@ -6110,7 +6112,8 @@
         "T1110",
         "T1059.004"
       ],
-      "file": "hunting/linux_multi_stage_attack.json"
+      "file": "hunting/linux_multi_stage_attack.json",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (msg like '*Failed password*' or msg like '*authorized_keys*' or msg like '*/dev/tcp/*' or msg like '*curl*http*' or msg like '*wget*http*' or msg like '*crontab*' or msg like '*systemctl enable*' or msg like '*/etc/passwd*' or msg like '*/etc/shadow*') | stats count as total_indicators, distinctcount(msg) as unique_patterns by 'Host Name' | where unique_patterns > 3 | sort -total_indicators"
     },
     {
       "title": "Linux Persistence Indicator Score (Combined Methods)",
@@ -6123,7 +6126,8 @@
         "T1543.002",
         "T1098.004"
       ],
-      "file": "hunting/linux_persistence_score.json"
+      "file": "hunting/linux_persistence_score.json",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (msg like '*crontab*' or msg like '*systemctl enable*' or msg like '*systemctl daemon-reload*' or msg like '*authorized_keys*' or msg like '*.bashrc*' or msg like '*.bash_profile*' or msg like '*.service*' or msg like '*at -f*' or msg like '*visudo*' or msg like '*/etc/sudoers*') | stats count as total_events, distinctcount(msg) as unique_mechanisms by 'Host Name' | where unique_mechanisms > 2 | sort -unique_mechanisms"
     },
     {
       "title": "Linux Rare Process Detection (Stacking)",
@@ -6134,7 +6138,8 @@
       "mitre_techniques": [
         "T1059.004"
       ],
-      "file": "hunting/linux_rare_process.json"
+      "file": "hunting/linux_rare_process.json",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') | stats count as executions by 'Process Name' | sort executions | where executions < 3"
     },
     {
       "title": "C2 Beaconing Detection (Periodic Connection Analysis)",
@@ -6146,7 +6151,8 @@
         "T1071",
         "T1573"
       ],
-      "file": "hunting/network_c2_beaconing.json"
+      "file": "hunting/network_c2_beaconing.json",
+      "query": "'Log Source' = 'Windows Sysmon Operational Logs' and 'Event ID' = 3 and 'Destination Port' != 80 and 'Destination Port' != 443 | stats count as connection_count by 'Host Name', 'Destination IP', 'Destination Port' | sort -connection_count | where connection_count > 15"
     },
     {
       "title": "OCI After-Hours IAM Activity (Time-Based Anomaly)",
@@ -6157,7 +6163,8 @@
       "mitre_techniques": [
         "T1098"
       ],
-      "file": "hunting/oci_after_hours_iam_activity.json"
+      "file": "hunting/oci_after_hours_iam_activity.json",
+      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' like 'com.oraclecloud.identitycontrolplane.*' | eval hour = toNumber(formatDate(Time, 'HH')) | where hour < 6 or hour > 22 | stats count as after_hours_changes by 'User Name', 'Event Type' | sort -after_hours_changes"
     },
     {
       "title": "OCI Console Login Brute Force (Frequency Analysis)",
@@ -6169,7 +6176,8 @@
         "T1078",
         "T1110"
       ],
-      "file": "hunting/oci_console_brute_force.json"
+      "file": "hunting/oci_console_brute_force.json",
+      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' and Status = 'Failure' | stats count as failed_attempts by 'User Name' | sort -failed_attempts | where failed_attempts > 3"
     },
     {
       "title": "OCI IAM Rapid Configuration Changes (Anomaly Detection)",
@@ -6181,7 +6189,8 @@
         "T1098",
         "T1078"
       ],
-      "file": "hunting/oci_iam_rapid_changes.json"
+      "file": "hunting/oci_iam_rapid_changes.json",
+      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' like 'com.oraclecloud.identitycontrolplane.*' | stats count as iam_changes by 'User Name', 'Source IP' | sort -iam_changes | where iam_changes > 10"
     },
     {
       "title": "OCI Multiple Users from Same IP (Grouping)",
@@ -6193,7 +6202,8 @@
         "T1078",
         "T1110.004"
       ],
-      "file": "hunting/oci_multi_user_same_ip.json"
+      "file": "hunting/oci_multi_user_same_ip.json",
+      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' | stats distinctcount('User Name') as unique_users, count as total_logins by 'Source IP' | where unique_users > 2 | sort -unique_users"
     },
     {
       "title": "OCI Privilege Escalation Chain Detection",
@@ -6205,7 +6215,8 @@
         "T1098",
         "T1078"
       ],
-      "file": "hunting/oci_privilege_escalation_chain.json"
+      "file": "hunting/oci_privilege_escalation_chain.json",
+      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' like 'com.oraclecloud.identitycontrolplane.*' | stats count as iam_ops, distinctcount('Event Type') as unique_actions by 'User Name' | sort -iam_ops | where iam_ops > 5 and unique_actions > 3"
     },
     {
       "title": "OCI Resource Destruction Spike (Anomaly Detection)",
@@ -6217,7 +6228,8 @@
         "T1485",
         "T1489"
       ],
-      "file": "hunting/oci_resource_destruction_spike.json"
+      "file": "hunting/oci_resource_destruction_spike.json",
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like '*delete*' or 'Event Type' like '*terminate*' or 'Event Type' like '*remove*') | stats count as destructive_actions, distinctcount('Event Type') as unique_action_types by 'User Name', 'Source IP' | where destructive_actions > 5 | sort -destructive_actions"
     },
     {
       "title": "SSH Brute Force Detection (Frequency Analysis)",
@@ -6228,7 +6240,8 @@
       "mitre_techniques": [
         "T1110.001"
       ],
-      "file": "hunting/ssh_brute_force_frequency.json"
+      "file": "hunting/ssh_brute_force_frequency.json",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and msg like '*Failed password*' | stats count as failed_attempts by 'Client IP' | sort -failed_attempts | where failed_attempts > 5"
     },
     {
       "title": "Login Activity Time-Series Anomaly",
@@ -6240,7 +6253,8 @@
         "T1078",
         "T1110"
       ],
-      "file": "hunting/timeseries_login_anomaly.json"
+      "file": "hunting/timeseries_login_anomaly.json",
+      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' | timecluster span = 1hour | stats count as login_count by 'Start Time' | sort -login_count | where login_count > 20"
     },
     {
       "title": "Windows Credential Access Tool Cluster (Grouping)",
@@ -6252,7 +6266,8 @@
         "T1003",
         "T1558.003"
       ],
-      "file": "hunting/windows_credential_access_cluster.json"
+      "file": "hunting/windows_credential_access_cluster.json",
+      "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (('Command Line' like '*sekurlsa*') or ('Command Line' like '*lsass*') or ('Command Line' like '*mimikatz*') or ('Command Line' like '*procdump*lsass*') or ('Command Line' like '*comsvcs*MiniDump*') or ('Command Line' like '*kerberoast*') or ('Command Line' like '*ntds*') or ('Command Line' like '*WDigest*')) | stats count as cred_events, distinctcount('Command Line') as unique_techniques by 'Host Name', User | sort -cred_events"
     },
     {
       "title": "Windows Defense Evasion Score (Combined Methods)",
@@ -6265,7 +6280,8 @@
         "T1548.002",
         "T1070"
       ],
-      "file": "hunting/windows_defense_evasion_score.json"
+      "file": "hunting/windows_defense_evasion_score.json",
+      "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (('Command Line' like '*wevtutil*cl*') or ('Command Line' like '*Clear-EventLog*') or ('Command Line' like '*AmsiUtils*') or ('Command Line' like '*amsiInitFailed*') or ('Command Line' like '*netsh*firewall*') or ('Command Line' like '*advfirewall*set*off*') or ('Command Line' like '*fodhelper*') or ('Command Line' like '*eventvwr*') or ('Command Line' like '*NtUnmapViewOfSection*') or ('Command Line' like '*CREATE_SUSPENDED*')) | stats count as evasion_events, distinctcount('Command Line') as unique_techniques by 'Host Name' | where unique_techniques > 1 | sort -unique_techniques"
     },
     {
       "title": "Windows Lateral Movement Tool Cluster (Grouping)",
@@ -6277,7 +6293,8 @@
         "T1021",
         "T1570"
       ],
-      "file": "hunting/windows_lateral_movement_cluster.json"
+      "file": "hunting/windows_lateral_movement_cluster.json",
+      "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (('Process Name' like '*psexec*') or ('Process Name' like '*mstsc*') or ('Command Line' like '*Enter-PSSession*') or ('Command Line' like '*Invoke-Command*') or ('Command Line' like '*wmic*node*')) | stats count as lateral_events, distinctcount('Process Name') as unique_tools by 'Host Name' | where unique_tools > 1 | sort -lateral_events"
     },
     {
       "title": "Windows Suspiciously Long Command Line (Field Analysis)",
@@ -6289,7 +6306,8 @@
         "T1059.001",
         "T1027"
       ],
-      "file": "hunting/windows_long_command_line.json"
+      "file": "hunting/windows_long_command_line.json",
+      "query": "'Log Source' = 'SOC Windows Sysmon Logs' | eval cmd_len = length('Command Line') | where cmd_len > 500 | sort -cmd_len | fields 'Process Name', 'Command Line', cmd_len, 'Host Name', User"
     },
     {
       "title": "Windows Process from Unusual Path (Rare Value Analysis)",
@@ -6301,7 +6319,8 @@
         "T1204",
         "T1036"
       ],
-      "file": "hunting/windows_process_unusual_path.json"
+      "file": "hunting/windows_process_unusual_path.json",
+      "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (('Process Name' like '*Temp*') or ('Process Name' like '*Users*Public*') or ('Process Name' like '*AppData*Local*Temp*') or ('Process Name' like '*Downloads*') or ('Process Name' like '*ProgramData*')) | stats count as executions by 'Process Name', 'Host Name' | sort -executions"
     },
     {
       "title": "Windows Rare Process Detection (Stacking)",
@@ -6312,7 +6331,8 @@
       "mitre_techniques": [
         "T1059"
       ],
-      "file": "hunting/windows_rare_process.json"
+      "file": "hunting/windows_rare_process.json",
+      "query": "'Log Source' = 'SOC Windows Sysmon Logs' | stats count as executions by 'Process Name' | sort executions | where executions < 3"
     }
   ],
   "art_coverage": {

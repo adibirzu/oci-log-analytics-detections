@@ -1,7 +1,7 @@
 {
   "title": "JavaScript Execution via Node.js",
   "description": "Detects Node.js executing inline JavaScript or scripts from suspicious locations.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\node.exe' and ('Command Line' like '*-e *' or 'Command Line' like '*--eval*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\node.exe' and ('Command Line' like '*-e *' or 'Command Line' like '*--eval*')))",
   "sigma_id": "d8f01b12-1319-4ce5-904e-02a19a81dd0e",
   "level": "medium",
   "stig_category": "CAT II",

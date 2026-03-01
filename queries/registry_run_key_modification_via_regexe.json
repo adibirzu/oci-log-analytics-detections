@@ -1,7 +1,7 @@
 {
   "title": "Registry Run Key Modification via Reg.exe",
   "description": "Detects registry run key modifications using reg.exe for persistence.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\reg.exe' and ('Command Line' like '*add*' and 'Command Line' like '*CurrentVersion\\Run*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\reg.exe' and ('Command Line' like '*add*' and 'Command Line' like '*CurrentVersion\\\\Run*')))",
   "sigma_id": "02ef8d90-08ae-447f-9b35-6807634d16ac",
   "level": "high",
   "stig_category": "CAT I",

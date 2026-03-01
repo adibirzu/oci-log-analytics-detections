@@ -1,7 +1,7 @@
 {
   "title": "XSL Script Processing via WMIC or Msxsl",
   "description": "Detects execution of XSL scripts through WMIC /format or msxsl.exe for code execution.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\wmic.exe' and 'Command Line' like '*/format:*') or ('Process Name' like '*\\msxsl.exe') ))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*/format:*') or ('Process Name' like '*\\\\msxsl.exe') ))",
   "sigma_id": "7f6896f0-17fe-48be-89a6-a6052ab6499e",
   "level": "high",
   "stig_category": "CAT I",

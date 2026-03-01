@@ -1,7 +1,7 @@
 {
   "title": "WAF Protocol Attack Blocked",
   "description": "Detects HTTP protocol violation attacks blocked by WAF (request smuggling, header injection, HTTP splitting). OWASP A05:2021 Security Misconfiguration.",
-  "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Rule Key' like '*920*' or 'Rule Key' like '*921*')) or (('Request Headers' like '*%0d%0a*' or 'Request Headers' like '*%0D%0A*' or 'Request Headers' like '*\\r\\n*' or 'Request Headers' like '*Transfer-Encoding: chunked*' or 'Request Headers' like '*Content-Length: 0*')) ))",
+  "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Rule Key' like '*920*' or 'Rule Key' like '*921*')) or (('Request Headers' like '*%0d%0a*' or 'Request Headers' like '*%0D%0A*' or 'Request Headers' like '*Transfer-Encoding: chunked*' or 'Request Headers' like '*Content-Length: 0*')) ))",
   "sigma_id": "a1010025-owasp-a05-protocol-001",
   "level": "high",
   "stig_category": "CAT I",

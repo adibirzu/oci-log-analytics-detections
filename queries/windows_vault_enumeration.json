@@ -1,7 +1,7 @@
 {
   "title": "Windows Vault Enumeration",
   "description": "Detects enumeration of Windows Vault credentials using cmdkey or rundll32 with keymgr.dll.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\cmdkey.exe' and 'Command Line' like '*/list*') or ('Process Name' like '*\\rundll32.exe' and 'Command Line' like '*keymgr.dll*') ))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\cmdkey.exe' and 'Command Line' like '*/list*') or ('Process Name' like '*\\\\rundll32.exe' and 'Command Line' like '*keymgr.dll*') ))",
   "sigma_id": "99dee989-fe2b-4097-8838-f1c2f43f1f36",
   "level": "medium",
   "stig_category": "CAT II",

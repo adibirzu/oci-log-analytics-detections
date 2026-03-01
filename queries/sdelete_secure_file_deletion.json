@@ -1,7 +1,7 @@
 {
   "title": "SDelete Secure File Deletion",
   "description": "Detects usage of Sysinternals SDelete for secure file deletion to destroy forensic evidence.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\sdelete.exe'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\sdelete.exe'))",
   "sigma_id": "5bdecf42-d1ba-483f-91c7-dbccb5c58c31",
   "level": "medium",
   "stig_category": "CAT II",

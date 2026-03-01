@@ -1,7 +1,7 @@
 {
   "title": "Volume Shadow Copy Deletion via WMIC",
   "description": "Detects deletion of volume shadow copies using WMIC, a common ransomware preparation step.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\wmic.exe' and ('Command Line' like '*shadowcopy*' and 'Command Line' like '*delete*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\wmic.exe' and ('Command Line' like '*shadowcopy*' and 'Command Line' like '*delete*')))",
   "sigma_id": "790cfaca-a0bb-4647-bbfb-08a41c82db4e",
   "level": "critical",
   "stig_category": "CAT I",

@@ -1,7 +1,7 @@
 {
   "title": "Boot Configuration Change for Persistence",
   "description": "Detects BCDEdit commands that modify boot configuration for safe mode persistence.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\bcdedit.exe' and ('Command Line' like '*safeboot*' or 'Command Line' like '*bootstatuspolicy*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\bcdedit.exe' and ('Command Line' like '*safeboot*' or 'Command Line' like '*bootstatuspolicy*')))",
   "sigma_id": "90b3d3ec-1650-4bd3-9284-c18eebe9cf6d",
   "level": "high",
   "stig_category": "CAT I",

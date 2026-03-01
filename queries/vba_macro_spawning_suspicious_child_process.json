@@ -1,7 +1,7 @@
 {
   "title": "VBA Macro Spawning Suspicious Child Process",
   "description": "Detects Office applications spawning command shells or scripting engines, indicating macro execution.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Parent Process Name' like '*WINWORD.EXE' or 'Parent Process Name' like '*EXCEL.EXE' or 'Parent Process Name' like '*POWERPNT.EXE' or 'Parent Process Name' like '*OUTLOOK.EXE') and ('Process Name' like '*cmd.exe' or 'Process Name' like '*powershell.exe' or 'Process Name' like '*wscript.exe' or 'Process Name' like '*cscript.exe' or 'Process Name' like '*mshta.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Parent Process Name' like '*\\WINWORD.EXE' or 'Parent Process Name' like '*\\EXCEL.EXE' or 'Parent Process Name' like '*\\POWERPNT.EXE' or 'Parent Process Name' like '*\\OUTLOOK.EXE') and ('Process Name' like '*\\cmd.exe' or 'Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\wscript.exe' or 'Process Name' like '*\\cscript.exe' or 'Process Name' like '*\\mshta.exe')))",
   "sigma_id": "8eb3f12c-434b-42d2-bb2f-655d8a5c869f",
   "level": "high",
   "stig_category": "CAT I",

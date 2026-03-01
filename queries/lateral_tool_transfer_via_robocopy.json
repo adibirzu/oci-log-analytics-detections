@@ -1,7 +1,7 @@
 {
   "title": "Lateral Tool Transfer via Robocopy",
   "description": "Detects usage of robocopy to transfer tools or files to remote systems.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*robocopy.exe' and 'Command Line' like '*\\\\*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\robocopy.exe' and 'Command Line' like '*\\\\*'))",
   "sigma_id": "f298059c-0e62-46c1-ab63-e3fd9bea8d19",
   "level": "low",
   "stig_category": "CAT III",

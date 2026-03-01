@@ -1,7 +1,7 @@
 {
   "title": "DLL Side-Loading from Suspicious Directory",
   "description": "Detects execution of legitimate signed binaries from temp or user-writable directories, suggesting DLL side-loading.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*.exe') and ('Process Name' like '*Temp*' or 'Process Name' like '*AppData*Local*Temp*' or 'Process Name' like '*Downloads*' or 'Process Name' like '*Desktop*')) and not (('Process Name' like '*Windows*Temp*setup*' or 'Process Name' like '*Microsoft*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*.exe') and ('Process Name' like '*\\Temp\\*' or 'Process Name' like '*\\AppData\\Local\\Temp\\*' or 'Process Name' like '*\\Downloads\\*' or 'Process Name' like '*\\Desktop\\*')) and not (('Process Name' like '*\\Windows\\Temp\\setup*' or 'Process Name' like '*\\Microsoft\\*')))",
   "sigma_id": "33350827-b2b5-4553-8286-07aa08b70157",
   "level": "medium",
   "stig_category": "CAT II",

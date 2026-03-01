@@ -1,7 +1,7 @@
 {
   "title": "Visual Basic Script Compilation via vbc.exe",
   "description": "Detects compilation of Visual Basic code using vbc.exe from non-standard locations.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*vbc.exe') and not ('Parent Process Name' like '*Visual Studio*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\vbc.exe') and not ('Parent Process Name' like '*Visual Studio*'))",
   "sigma_id": "bfad19ea-74b4-4bab-89c3-acdb22668a9f",
   "level": "medium",
   "stig_category": "CAT II",

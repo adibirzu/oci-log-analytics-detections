@@ -1,7 +1,7 @@
 {
   "title": "CMSTP UAC Bypass",
   "description": "Detects usage of CMSTP.exe to bypass UAC and execute arbitrary commands through .inf files.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*cmstp.exe' and 'Command Line' like '*/s*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\cmstp.exe' and 'Command Line' like '*/s*'))",
   "sigma_id": "f4a27819-5417-4450-b894-b6cdb9ed3e85",
   "level": "high",
   "stig_category": "CAT I",

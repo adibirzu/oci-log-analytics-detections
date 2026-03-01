@@ -1,7 +1,7 @@
 {
   "title": "NTDS.dit Database Copy Attempt",
   "description": "Detects attempts to copy the NTDS.dit Active Directory database file using ntdsutil, vssadmin, or esentutl.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*ntdsutil.exe' and 'Command Line' like '*ifm*') or ('Process Name' like '*esentutl.exe' and 'Command Line' like '*ntds*') ))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\ntdsutil.exe' and 'Command Line' like '*ifm*') or ('Process Name' like '*\\esentutl.exe' and 'Command Line' like '*ntds*') ))",
   "sigma_id": "e0910e9e-f01e-40c1-9055-d3bc0f403125",
   "level": "critical",
   "stig_category": "CAT I",

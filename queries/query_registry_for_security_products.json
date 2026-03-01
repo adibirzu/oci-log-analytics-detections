@@ -1,7 +1,7 @@
 {
   "title": "Query Registry for Security Products",
   "description": "Detects registry queries checking for installed security products.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*reg.exe' and ('Command Line' like '*AntiVirusProduct*' or 'Command Line' like '*FirewallProduct*' or 'Command Line' like '*SecurityCenter*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\reg.exe' and ('Command Line' like '*AntiVirusProduct*' or 'Command Line' like '*FirewallProduct*' or 'Command Line' like '*SecurityCenter*')))",
   "sigma_id": "8f3a5796-f848-4b01-9ff6-a9c1a3ae6a57",
   "level": "medium",
   "stig_category": "CAT II",

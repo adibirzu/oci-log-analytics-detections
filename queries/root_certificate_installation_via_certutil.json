@@ -1,7 +1,7 @@
 {
   "title": "Root Certificate Installation via Certutil",
   "description": "Detects installation of root certificates which could enable MitM attacks or trust arbitrary code.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*certutil.exe' and ('Command Line' like '*-addstore*' and 'Command Line' like '*Root*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\certutil.exe' and ('Command Line' like '*-addstore*' and 'Command Line' like '*Root*')))",
   "sigma_id": "c97059bf-3064-41f0-a889-22535878e1de",
   "level": "high",
   "stig_category": "CAT I",

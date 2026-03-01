@@ -1,7 +1,7 @@
 {
   "title": "Python Execution as Child of System Process",
   "description": "Detects Python being executed as a child of system services or common LOLBins.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*python.exe' and ('Parent Process Name' like '*cmd.exe' or 'Parent Process Name' like '*powershell.exe' or 'Parent Process Name' like '*services.exe' or 'Parent Process Name' like '*svchost.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\python.exe' and ('Parent Process Name' like '*\\cmd.exe' or 'Parent Process Name' like '*\\powershell.exe' or 'Parent Process Name' like '*\\services.exe' or 'Parent Process Name' like '*\\svchost.exe')))",
   "sigma_id": "8261c2a6-2044-469a-81c0-d898624b9cc2",
   "level": "medium",
   "stig_category": "CAT II",

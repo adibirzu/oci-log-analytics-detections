@@ -1,7 +1,7 @@
 {
   "title": "New Local Account Created via Net.exe",
   "description": "Detects creation of local accounts using net.exe or net1.exe.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*net.exe' or 'Process Name' like '*net1.exe') and ('Command Line' like '*user*' and 'Command Line' like '*/add*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\net.exe' or 'Process Name' like '*\\net1.exe') and ('Command Line' like '*user*' and 'Command Line' like '*/add*')))",
   "sigma_id": "5a112cb9-5ece-4cbc-8a66-2aff255e274d",
   "level": "high",
   "stig_category": "CAT I",

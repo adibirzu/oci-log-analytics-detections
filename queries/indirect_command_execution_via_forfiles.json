@@ -1,7 +1,7 @@
 {
   "title": "Indirect Command Execution via Forfiles",
   "description": "Detects usage of forfiles.exe for indirect command execution to bypass application controls.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*forfiles.exe' and 'Command Line' like '*/c*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\forfiles.exe' and 'Command Line' like '*/c*'))",
   "sigma_id": "f168fc5d-9126-4ef9-852b-638775d2929f",
   "level": "medium",
   "stig_category": "CAT II",

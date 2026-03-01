@@ -1,15 +1,17 @@
 """
 Deploy SOC detection dashboards to OCI Log Analytics.
 
-Creates saved searches and organizes them into 8 SOC dashboards:
-  1. SOC Overview Dashboard         - Cross-domain security summary
-  2. SOC: OCI STIG Compliance       - STIG compliance: MFA, key rotation, audit, network
-  3. SOC: OCI Audit Security        - IAM, Network, Compute, Storage, KMS, DB
-  4. SOC: Cloud Guard Security      - Cloud Guard problem detection
-  5. SOC: Linux Security            - SSH, sudo, GTFOBins, reverse shells, persistence
-  6. SOC: Windows Security          - LOLBins, encoded PowerShell, credential dumping
-  7. SOC: Threat Hunting Dashboard  - Cookbook-inspired analytics (frequency, anomaly, scoring)
-  8. SOC: Sysmon Network & Lateral  - Network connections, C2 beacons, DNS, named pipes
+Creates saved searches and organizes them into 10 SOC dashboards:
+  1. SOC Overview Dashboard              - Cross-domain security summary
+  2. SOC: OCI STIG Compliance            - STIG compliance: MFA, key rotation, audit, network
+  3. SOC: OCI Audit Security             - IAM, Network, Compute, Storage, KMS, DB
+  4. SOC: Cloud Guard Security           - Cloud Guard problem detection
+  5. SOC: Linux Security                 - SSH, sudo, GTFOBins, reverse shells, persistence
+  6. SOC: Windows Security               - LOLBins, encoded PowerShell, credential dumping
+  7. SOC: Threat Hunting Dashboard       - Cookbook-inspired analytics (frequency, anomaly, scoring)
+  8. SOC: Sysmon Network & Lateral       - Network connections, C2 beacons, DNS, named pipes
+  9. SOC: Web Application Security       - OWASP Top 10 attack detection via WAF/LB/App logs
+ 10. SOC: Web Threat Hunting Dashboard   - Web attack hunting: frequency, stacking, scoring
 
 Usage:
   python3 scripts/deploy_dashboard.py              # Deploy all
@@ -50,6 +52,8 @@ DASHBOARDS = {
             {"title": "SOC: Compartment Deleted", "query_file": "oci_compartment_deleted.json"},
             {"title": "Hunt: SSH Brute Force", "query_file": "hunting/ssh_brute_force_frequency.json"},
             {"title": "Hunt: OCI Destruction Spike", "query_file": "hunting/oci_resource_destruction_spike.json"},
+            {"title": "Hunt: Web Multi-Stage Attack", "query_file": "hunting/web_owasp_multi_stage_attack.json"},
+            {"title": "Hunt: WAF Multi-Attack Score", "query_file": "hunting/waf_multi_attack_scoring.json"},
         ]
     },
     "SOC: OCI STIG Compliance Dashboard": {
@@ -243,6 +247,54 @@ DASHBOARDS = {
             {"title": "DNS: Data Exfiltration", "query_file": "sysmon_dns_data_exfiltration.json"},
             {"title": "DNS: C2 Framework Domains", "query_file": "sysmon_dns_query_to_known_c2_framework_domains.json"},
             {"title": "DNS: Suspicious TLDs", "query_file": "sysmon_dns_query_to_suspicious_tlds.json"},
+        ]
+    },
+    "SOC: Web Application Security Dashboard": {
+        "description": "OWASP Top 10 web attack detection via WAF, Load Balancer, and application logs. SQL injection, XSS, path traversal, SSRF, command injection, and more.",
+        "widgets": [
+            {"title": "WAF: SQL Injection Blocked", "query_file": "waf_sql_injection_attack_blocked.json"},
+            {"title": "WAF: SQL Injection Allowed", "query_file": "waf_sql_injection_attack_allowed_through.json"},
+            {"title": "WAF: XSS Attack Blocked", "query_file": "waf_cross-site_scripting_attack_blocked.json"},
+            {"title": "WAF: Path Traversal Blocked", "query_file": "waf_path_traversal_attack_blocked.json"},
+            {"title": "WAF: Command Injection Blocked", "query_file": "waf_command_injection_attack_blocked.json"},
+            {"title": "WAF: SSRF Attack Blocked", "query_file": "waf_server-side_request_forgery_blocked.json"},
+            {"title": "WAF: XXE Attack Blocked", "query_file": "waf_xml_external_entity_attack_blocked.json"},
+            {"title": "WAF: SSTI Attack Blocked", "query_file": "waf_server-side_template_injection_blocked.json"},
+            {"title": "WAF: Log4Shell Blocked", "query_file": "waf_log4shell_cve-2021-44228_attack_blocked.json"},
+            {"title": "WAF: NoSQL Injection Blocked", "query_file": "waf_nosql_injection_attack_blocked.json"},
+            {"title": "WAF: LDAP Injection Blocked", "query_file": "waf_ldap_injection_attack_blocked.json"},
+            {"title": "WAF: Web Shell Upload Blocked", "query_file": "waf_web_shell_upload_attempt_blocked.json"},
+            {"title": "WAF: Protocol Attack Blocked", "query_file": "waf_protocol_attack_blocked.json"},
+            {"title": "WAF: Rate Limiting Triggered", "query_file": "waf_rate_limiting_triggered.json"},
+            {"title": "WAF: CORS Bypass Blocked", "query_file": "waf_cors_bypass_attempt_blocked.json"},
+            {"title": "LB: Vulnerability Scanner", "query_file": "web_vulnerability_scanner_detected.json"},
+            {"title": "LB: Brute Force Login", "query_file": "web_application_brute_force_login_attempt.json"},
+            {"title": "LB: Directory Enumeration", "query_file": "web_directory_enumeration_detected.json"},
+            {"title": "LB: Sensitive Data Access", "query_file": "sensitive_data_endpoint_access.json"},
+            {"title": "LB: HTTP Method Abuse", "query_file": "suspicious_http_method_usage.json"},
+            {"title": "LB: Large Response Exfil", "query_file": "unusually_large_http_response_data_exfiltration.json"},
+            {"title": "LB: Server Errors", "query_file": "web_application_server_error_spike.json"},
+            {"title": "LB: API Unauthorized", "query_file": "api_endpoint_unauthorized_access_attempts.json"},
+            {"title": "LB: Suspicious User Agent", "query_file": "suspicious_or_empty_user_agent_detected.json"},
+            {"title": "App: IDOR Detected", "query_file": "insecure_direct_object_reference_detected.json"},
+            {"title": "App: Privilege Escalation", "query_file": "web_application_privilege_escalation.json"},
+            {"title": "App: Auth Bypass", "query_file": "web_application_authentication_bypass.json"},
+            {"title": "App: Insecure Deserialization", "query_file": "insecure_deserialization_attack_detected.json"},
+            {"title": "App: Session Hijacking", "query_file": "web_application_session_hijacking_indicators.json"},
+            {"title": "App: Mass Assignment", "query_file": "mass_assignment_attack_detected.json"},
+        ]
+    },
+    "SOC: Web Threat Hunting Dashboard": {
+        "description": "Advanced web application threat hunting analytics. WAF attack frequency, SQL injection stacking, multi-vector scoring, geographic anomalies, and multi-stage attack chain correlation.",
+        "widgets": [
+            {"title": "Hunt: WAF Attack by Source IP", "query_file": "hunting/waf_attack_frequency_by_source.json"},
+            {"title": "Hunt: SQLi Pattern Stacking", "query_file": "hunting/waf_sqli_pattern_stacking.json"},
+            {"title": "Hunt: Web Brute Force", "query_file": "hunting/web_brute_force_frequency.json"},
+            {"title": "Hunt: Directory Scan Cluster", "query_file": "hunting/web_directory_scan_clustering.json"},
+            {"title": "Hunt: Multi-Attack Scoring", "query_file": "hunting/waf_multi_attack_scoring.json"},
+            {"title": "Hunt: Attack Geo Anomaly", "query_file": "hunting/web_attack_geo_anomaly.json"},
+            {"title": "Hunt: OWASP Multi-Stage", "query_file": "hunting/web_owasp_multi_stage_attack.json"},
+            {"title": "Hunt: Scanner Tool Stacking", "query_file": "hunting/web_scanner_tool_stacking.json"},
         ]
     }
 }

@@ -1,7 +1,7 @@
 {
   "title": "Hidden PowerShell Window Execution",
   "description": "Detects PowerShell execution with hidden window style, commonly used to avoid user visibility.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*powershell.exe' and 'Command Line' like '*-WindowStyle Hidden*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\powershell.exe' and 'Command Line' like '*-WindowStyle Hidden*'))",
   "sigma_id": "b8710dd4-273a-4e97-8b35-e22f0b47ffb1",
   "level": "medium",
   "stig_category": "CAT II",

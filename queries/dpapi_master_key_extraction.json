@@ -1,7 +1,7 @@
 {
   "title": "DPAPI Master Key Extraction",
   "description": "Detects extraction of DPAPI master keys which protect user credentials, browser passwords, and other secrets.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*dpapi::masterkey*' or 'Command Line' like '*sekurlsa::dpapi*' or 'Command Line' like '*Protect*S-1-*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*dpapi::masterkey*' or 'Command Line' like '*sekurlsa::dpapi*' or 'Command Line' like '*Protect\\S-1-*')))",
   "sigma_id": "f71e4a84-2baa-41b8-908c-c9875a06c6a9",
   "level": "high",
   "stig_category": "CAT I",

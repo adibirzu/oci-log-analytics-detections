@@ -1,7 +1,7 @@
 {
   "title": "Disable Windows Firewall via Netsh",
   "description": "Detects commands to disable the Windows firewall using netsh, enabling network-based attacks.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*netsh.exe' and ('Command Line' like '*firewall*' and 'Command Line' like '*disable*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\netsh.exe' and ('Command Line' like '*firewall*' and 'Command Line' like '*disable*')))",
   "sigma_id": "63e2dcf3-3530-4837-9f3f-0b62acfd07dd",
   "level": "high",
   "stig_category": "CAT I",

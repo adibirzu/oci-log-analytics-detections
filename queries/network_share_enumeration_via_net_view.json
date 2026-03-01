@@ -1,7 +1,7 @@
 {
   "title": "Network Share Enumeration via Net View",
   "description": "Detects network share enumeration using net view command.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*net.exe' or 'Process Name' like '*net1.exe') and 'Command Line' like '*view*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\net.exe' or 'Process Name' like '*\\net1.exe') and 'Command Line' like '*view*'))",
   "sigma_id": "9c1850cf-5f24-4129-82ec-78cf2e08cc5a",
   "level": "low",
   "stig_category": "CAT III",

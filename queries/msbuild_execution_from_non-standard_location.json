@@ -1,7 +1,7 @@
 {
   "title": "MSBuild Execution from Non-Standard Location",
   "description": "Detects MSBuild.exe executing project files from user-writable directories.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*MSBuild.exe') and not (('Command Line' like '*Visual Studio*' or 'Command Line' like '*dotnet*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\MSBuild.exe') and not (('Command Line' like '*Visual Studio*' or 'Command Line' like '*dotnet*')))",
   "sigma_id": "d01b332d-8065-43d2-a705-9053a53a2fec",
   "level": "high",
   "stig_category": "CAT I",

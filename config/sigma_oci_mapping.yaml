@@ -104,6 +104,47 @@ field_mappings:
   TechniqueName: "'Technique Name'"
   TechniqueId: "'Technique ID'"
 
+  # ─── WAF / Web Application Fields ──────────────────────────────
+  # OCI WAF log fields (from OCI Logging → Log Analytics)
+  waf_action: "'Action'"
+  http_method: "'HTTP Method'"
+  request_url: "'Request URL'"
+  uri_path: "'URI Path'"
+  query_string: "'Query String'"
+  client_address: "'Client IP'"
+  country_code: "'Country Code'"
+  user_agent: "'User Agent'"
+  response_code: "'Response Code'"
+  rule_type: "'Rule Type'"
+  rule_key: "'Rule Key'"
+  rule_action: "'Rule Action'"
+  request_body: "'Request Body'"
+  content_type: "'Content Type'"
+  referrer: "'Referrer'"
+  request_headers: "'Request Headers'"
+  waf_policy: "'WAF Policy'"
+  threat_feeds: "'Threat Feeds'"
+  fingerprint: "'Fingerprint'"
+
+  # ─── Load Balancer Access Log Fields ────────────────────────────
+  backend_address: "'Backend Address'"
+  backend_status_code: "'Backend Status Code'"
+  bytes_received: "'Bytes Received'"
+  bytes_sent: "'Bytes Sent'"
+  request_processing_time: "'Request Processing Time'"
+  lb_name: "'Load Balancer Name'"
+  listener_name: "'Listener Name'"
+  backend_name: "'Backend Name'"
+
+  # ─── Web Application Log Fields ────────────────────────────────
+  app_name: "'Application Name'"
+  attack_type: "'Attack Type'"
+  attack_payload: "'Attack Payload'"
+  vulnerability_id: "'Vulnerability ID'"
+  session_id: "'Session ID'"
+  owasp_category: "'OWASP Category'"
+  request_id: "'Request ID'"
+
 logsource_mappings:
   # Sigma Category/Product -> ordered OCI Log Source candidates.
   # Converter emits a query filter that matches any listed source.
@@ -202,3 +243,28 @@ logsource_mappings:
     - Linux Secure Logs
     - Linux Syslog Logs
     - Linux Audit Logs
+
+  # ─── OCI WAF Security Logs ─────────────────────────────────────
+  # WAF logs from OCI WAF → OCI Logging → Log Analytics
+  oci_waf:
+    - OCI WAF Logs
+    - SOC WAF Security Logs
+  webserver_waf:
+    - OCI WAF Logs
+    - SOC WAF Security Logs
+
+  # ─── Load Balancer Access Logs ──────────────────────────────────
+  oci_loadbalancer:
+    - OCI Load Balancer Access Logs
+    - SOC Load Balancer Access Logs
+  webserver_access:
+    - OCI Load Balancer Access Logs
+    - SOC Load Balancer Access Logs
+
+  # ─── Web Application Logs ──────────────────────────────────────
+  oci_webapp:
+    - SOC Web Application Logs
+    - OCI Load Balancer Access Logs
+  webserver:
+    - OCI Load Balancer Access Logs
+    - SOC Web Application Logs

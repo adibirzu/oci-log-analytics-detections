@@ -1,0 +1,45 @@
+title: WAF SQL Injection Attack Blocked
+id: a1010001-owasp-a03-sqli-block-001
+status: stable
+description: Detects SQL injection attempts blocked by OCI WAF. Indicates active exploitation of OWASP A03:2021 Injection vulnerabilities against the web application.
+logsource:
+  product: oci
+  service: waf
+detection:
+  selection:
+    waf_action: BLOCK
+  sqli_patterns:
+    request_url|contains:
+    - " OR 1=1"
+    - " or 1=1"
+    - "1=1"
+    - UNION SELECT
+    - union select
+    - UNION%20SELECT
+    - "DROP TABLE"
+    - "drop table"
+    - "--"
+    - "/*"
+    - "ORDER BY 1"
+    - "order by 1"
+    - INFORMATION_SCHEMA
+    - information_schema
+    - WAITFOR DELAY
+    - BENCHMARK(
+    - SLEEP(
+    - EXTRACTVALUE(
+    - UPDATEXML(
+  sqli_rules:
+    rule_key|contains:
+    - "941"
+    - "942"
+  condition: selection and (sqli_patterns or sqli_rules)
+level: high
+tags:
+- attack.initial_access
+- attack.t1190
+- attack.t1059.007
+- owasp.a03
+falsepositives:
+- Legitimate queries containing SQL keywords in search fields
+- Security scanning tools during authorized testing

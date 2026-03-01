@@ -1,7 +1,7 @@
 {
   "title": "Local Group Membership Discovery",
   "description": "Detects commands enumerating local group membership, especially administrators.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*net.exe' or 'Process Name' like '*net1.exe') and ('Command Line' like '*localgroup*' or 'Command Line' like '*administrators*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\net.exe' or 'Process Name' like '*\\net1.exe') and ('Command Line' like '*localgroup*' or 'Command Line' like '*administrators*')))",
   "sigma_id": "78f4e05c-3b8d-4330-8b17-1096fd8a6cf3",
   "level": "low",
   "stig_category": "CAT III",

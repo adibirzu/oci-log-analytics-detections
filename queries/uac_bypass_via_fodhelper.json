@@ -1,7 +1,7 @@
 {
   "title": "UAC Bypass via Fodhelper",
   "description": "Detects UAC bypass using fodhelper.exe to execute commands with elevated privileges.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*fodhelper.exe') and not ('Process Name' like '*fodhelper.exe'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*\\fodhelper.exe') and not ('Process Name' like '*\\fodhelper.exe'))",
   "sigma_id": "cb7113a7-8158-4b7e-8b5b-a305d675aaac",
   "level": "high",
   "stig_category": "CAT I",

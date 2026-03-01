@@ -1,7 +1,7 @@
 {
   "title": "PowerShell Execution via Alternate Shell",
   "description": "Detects PowerShell execution using alternate host processes (pwsh, powershell_ise) that may bypass logging.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*pwsh.exe' or 'Process Name' like '*powershell_ise.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\pwsh.exe' or 'Process Name' like '*\\powershell_ise.exe')))",
   "sigma_id": "d1f2eff0-b1dd-4b7f-a4f4-aefeff9ca52a",
   "level": "low",
   "stig_category": "CAT III",

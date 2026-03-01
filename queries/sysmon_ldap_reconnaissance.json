@@ -1,7 +1,7 @@
 {
   "title": "Sysmon LDAP Reconnaissance",
   "description": "Detects LDAP enumeration patterns (port 389/636) from suspicious processes. Attackers use LDAP queries to enumerate Active Directory users, groups, computers, and service accounts.\n",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Destination Port' = 389 or 'Destination Port' = 636 or 'Destination Port' = 3268 or 'Destination Port' = 3269) and Initiated = 'true') and (('Process Name' like '*powershell.exe' or 'Process Name' like '*ldapsearch.exe' or 'Process Name' like '*adfind.exe' or 'Process Name' like '*bloodhound.exe' or 'Process Name' like '*sharphound.exe' or 'Process Name' like '*python.exe' or 'Process Name' like '*python3.exe' or 'Process Name' like '*cmd.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Destination Port' = 389 or 'Destination Port' = 636 or 'Destination Port' = 3268 or 'Destination Port' = 3269) and Initiated = 'true') and (('Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\ldapsearch.exe' or 'Process Name' like '*\\adfind.exe' or 'Process Name' like '*\\bloodhound.exe' or 'Process Name' like '*\\sharphound.exe' or 'Process Name' like '*\\python.exe' or 'Process Name' like '*\\python3.exe' or 'Process Name' like '*\\cmd.exe')))",
   "sigma_id": "a1b2c3d4-7001-4000-8000-000000000008",
   "level": "medium",
   "stig_category": "CAT II",

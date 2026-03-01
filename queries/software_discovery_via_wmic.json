@@ -1,7 +1,7 @@
 {
   "title": "Software Discovery via WMIC",
   "description": "Detects software enumeration using WMIC to identify installed applications.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*wmic.exe' and ('Command Line' like '*product get*' or 'Command Line' like '*qfe list*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\wmic.exe' and ('Command Line' like '*product get*' or 'Command Line' like '*qfe list*')))",
   "sigma_id": "d7e23910-3d80-4a54-9e23-77c6898da091",
   "level": "low",
   "stig_category": "CAT III",

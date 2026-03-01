@@ -1,7 +1,7 @@
 {
   "title": "Regsvcs or Regasm Execution for Code Bypass",
   "description": "Detects execution of Regsvcs.exe or Regasm.exe to register COM objects from untrusted locations.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*RegSvcs.exe' or 'Process Name' like '*RegAsm.exe')) and not ('Command Line' like '*Microsoft.NET*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\RegSvcs.exe' or 'Process Name' like '*\\RegAsm.exe')) and not ('Command Line' like '*Microsoft.NET*'))",
   "sigma_id": "0d1f0c20-5600-4948-8120-ce4184542246",
   "level": "high",
   "stig_category": "CAT I",

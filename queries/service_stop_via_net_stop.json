@@ -1,7 +1,7 @@
 {
   "title": "Service Stop via Net Stop",
   "description": "Detects stopping of critical services that may indicate pre-ransomware activity.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*net.exe' or 'Process Name' like '*net1.exe') and 'Command Line' like '*stop*') and (('Command Line' like '*vss*' or 'Command Line' like '*sql*' or 'Command Line' like '*exchange*' or 'Command Line' like '*backup*' or 'Command Line' like '*veeam*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\net.exe' or 'Process Name' like '*\\net1.exe') and 'Command Line' like '*stop*') and (('Command Line' like '*vss*' or 'Command Line' like '*sql*' or 'Command Line' like '*exchange*' or 'Command Line' like '*backup*' or 'Command Line' like '*veeam*')))",
   "sigma_id": "66798f95-6a7c-4db0-8bf8-a3dfb282cb0f",
   "level": "high",
   "stig_category": "CAT I",

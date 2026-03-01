@@ -1,7 +1,7 @@
 {
   "title": "Sysmon Lateral Movement via WinRM",
   "description": "Detects WinRM/PSRemoting connections (ports 5985/5986) from suspicious processes. Attackers use PowerShell Remoting for lateral movement and remote command execution.\n",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Destination Port' = 5985 or 'Destination Port' = 5986) and Initiated = 'true') and (('Process Name' like '*powershell.exe' or 'Process Name' like '*wsmprovhost.exe' or 'Process Name' like '*cmd.exe' or 'Process Name' like '*evil-winrm.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Destination Port' = 5985 or 'Destination Port' = 5986) and Initiated = 'true') and (('Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\wsmprovhost.exe' or 'Process Name' like '*\\cmd.exe' or 'Process Name' like '*\\evil-winrm.exe')))",
   "sigma_id": "a1b2c3d4-7001-4000-8000-000000000003",
   "level": "high",
   "stig_category": "CAT I",

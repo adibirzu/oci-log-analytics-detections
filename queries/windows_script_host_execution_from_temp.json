@@ -1,7 +1,7 @@
 {
   "title": "Windows Script Host Execution from Temp",
   "description": "Detects cscript or wscript executing scripts from temporary directories.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*cscript.exe' or 'Process Name' like '*wscript.exe') and ('Command Line' like '*Temp*' or 'Command Line' like '*tmp*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\cscript.exe' or 'Process Name' like '*\\wscript.exe') and ('Command Line' like '*\\Temp\\*' or 'Command Line' like '*\\tmp\\*')))",
   "sigma_id": "0f7c1fa1-2983-4c83-8ebd-eb9a475a8e18",
   "level": "high",
   "stig_category": "CAT I",

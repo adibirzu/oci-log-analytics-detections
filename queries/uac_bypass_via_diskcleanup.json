@@ -1,7 +1,7 @@
 {
   "title": "UAC Bypass via DiskCleanup",
   "description": "Detects UAC bypass using environment variable manipulation with DiskCleanup.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*svchost.exe' and 'Process Name' like '*DismHost.exe'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*\\svchost.exe' and 'Process Name' like '*\\DismHost.exe'))",
   "sigma_id": "6e95243b-abd8-4bfe-9590-2296b2d4a161",
   "level": "medium",
   "stig_category": "CAT II",

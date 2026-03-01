@@ -1,7 +1,7 @@
 {
   "title": "Service Execution via sc.exe Create",
   "description": "Detects creation of new Windows services via sc.exe, which can be used for persistence or privilege escalation.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\sc.exe' and ('Command Line' like '*create*' and 'Command Line' like '*binpath*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\sc.exe' and ('Command Line' like '*create*' and 'Command Line' like '*binpath*')))",
   "sigma_id": "68ebf392-a59c-4720-9d6a-68e0c79724c1",
   "level": "high",
   "stig_category": "CAT I",

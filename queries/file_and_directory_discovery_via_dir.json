@@ -1,7 +1,7 @@
 {
   "title": "File and Directory Discovery via dir",
   "description": "Detects recursive directory listings often used during post-exploitation to find sensitive files.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\cmd.exe' and ('Command Line' like '*dir*' and 'Command Line' like '*/s*' and 'Command Line' like '*/b*')) and (('Command Line' like '*.doc*' or 'Command Line' like '*.xls*' or 'Command Line' like '*.pdf*' or 'Command Line' like '*.pst*' or 'Command Line' like '*.kdbx*' or 'Command Line' like '*.config*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\cmd.exe' and ('Command Line' like '*dir*' and 'Command Line' like '*/s*' and 'Command Line' like '*/b*')) and (('Command Line' like '*.doc*' or 'Command Line' like '*.xls*' or 'Command Line' like '*.pdf*' or 'Command Line' like '*.pst*' or 'Command Line' like '*.kdbx*' or 'Command Line' like '*.config*')))",
   "sigma_id": "8bcc9557-7d63-42f0-bfd2-33e341989859",
   "level": "medium",
   "stig_category": "CAT II",

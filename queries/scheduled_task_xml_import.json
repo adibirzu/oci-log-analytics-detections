@@ -1,7 +1,7 @@
 {
   "title": "Scheduled Task XML Import",
   "description": "Detects importing scheduled tasks from XML files, which may bypass task creation monitoring.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\schtasks.exe' and ('Command Line' like '*/create*' and 'Command Line' like '*/xml*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\schtasks.exe' and ('Command Line' like '*/create*' and 'Command Line' like '*/xml*')))",
   "sigma_id": "7014db16-fcef-4bc5-a0aa-f6acdbef192a",
   "level": "medium",
   "stig_category": "CAT II",

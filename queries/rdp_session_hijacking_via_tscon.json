@@ -1,7 +1,7 @@
 {
   "title": "RDP Session Hijacking via tscon",
   "description": "Detects RDP session hijacking using tscon.exe to connect to disconnected sessions.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\tscon.exe'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\tscon.exe'))",
   "sigma_id": "c739684d-c886-4084-af23-3385ddde9cae",
   "level": "high",
   "stig_category": "CAT I",

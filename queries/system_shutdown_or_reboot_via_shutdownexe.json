@@ -1,7 +1,7 @@
 {
   "title": "System Shutdown or Reboot via shutdown.exe",
   "description": "Detects forced system shutdown or reboot commands that may be part of destructive operations.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\shutdown.exe' and ('Command Line' like '*/s*' or 'Command Line' like '*/r*' or 'Command Line' like '*/f*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\shutdown.exe' and ('Command Line' like '*/s*' or 'Command Line' like '*/r*' or 'Command Line' like '*/f*')))",
   "sigma_id": "c93d093d-c5e0-43b5-aaba-e3ddcb3cb105",
   "level": "medium",
   "stig_category": "CAT II",

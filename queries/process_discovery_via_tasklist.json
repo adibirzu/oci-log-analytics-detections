@@ -1,7 +1,7 @@
 {
   "title": "Process Discovery via Tasklist",
   "description": "Detects tasklist.exe with verbose or SVC flags often used during post-exploitation reconnaissance.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\tasklist.exe' and ('Command Line' like '*/v*' or 'Command Line' like '*/svc*' or 'Command Line' like '*/fi*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\tasklist.exe' and ('Command Line' like '*/v*' or 'Command Line' like '*/svc*' or 'Command Line' like '*/fi*')))",
   "sigma_id": "b079f5ba-7de4-4e62-9517-4b45805a6942",
   "level": "low",
   "stig_category": "CAT III",

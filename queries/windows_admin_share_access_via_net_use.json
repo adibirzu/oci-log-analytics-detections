@@ -1,7 +1,7 @@
 {
   "title": "Windows Admin Share Access via Net Use",
   "description": "Detects access to admin shares (C$, ADMIN$, IPC$) for lateral movement.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\net.exe' or 'Process Name' like '*\\net1.exe') and ('Command Line' like '*\\\\*' or 'Command Line' like '*$*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\\\net.exe' or 'Process Name' like '*\\\\net1.exe') and ('Command Line' like '*\\\\\\\\*' or 'Command Line' like '*$*')))",
   "sigma_id": "a810df3e-0caf-4546-a72c-84e415f5efe7",
   "level": "medium",
   "stig_category": "CAT II",

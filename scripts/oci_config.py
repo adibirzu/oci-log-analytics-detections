@@ -109,6 +109,17 @@ SOURCE_CANDIDATE_GROUPS = {
         "Windows Sysmon Events",
         "SOC Windows Sysmon Logs",
     ],
+    "waf_security": [
+        "OCI WAF Logs",
+        "SOC WAF Security Logs",
+    ],
+    "lb_access": [
+        "OCI Load Balancer Access Logs",
+        "SOC Load Balancer Access Logs",
+    ],
+    "webapp_security": [
+        "SOC Web Application Logs",
+    ],
 }
 
 TEST_DATA_FILES = [
@@ -120,6 +131,9 @@ TEST_DATA_FILES = [
     "windows_event_system.jsonl",
     "linux_secure.jsonl",
     "sysmon_operational.jsonl",
+    "waf_security.jsonl",
+    "lb_access.jsonl",
+    "webapp_security.jsonl",
 ]
 
 

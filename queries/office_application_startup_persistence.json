@@ -1,7 +1,7 @@
 {
   "title": "Office Application Startup Persistence",
   "description": "Detects modification of Office startup locations for add-in persistence.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*\\Microsoft\\Word\\STARTUP*' or 'Command Line' like '*\\Microsoft\\Excel\\XLSTART*' or 'Command Line' like '*AddIns*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*\\\\Microsoft\\\\Word\\\\STARTUP*' or 'Command Line' like '*\\\\Microsoft\\\\Excel\\\\XLSTART*' or 'Command Line' like '*AddIns*')))",
   "sigma_id": "bcad9305-2e01-4bce-a177-e00dd645db66",
   "level": "medium",
   "stig_category": "CAT II",

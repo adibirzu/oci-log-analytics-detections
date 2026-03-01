@@ -1,7 +1,7 @@
 {
   "title": "Compiled HTML File Execution",
   "description": "Detects execution of compiled HTML (.chm) files via hh.exe, which can execute embedded scripts.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\hh.exe' and 'Command Line' like '*.chm*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\hh.exe' and 'Command Line' like '*.chm*'))",
   "sigma_id": "4e820998-8bfb-4244-91e5-15add0d0f9ec",
   "level": "medium",
   "stig_category": "CAT II",

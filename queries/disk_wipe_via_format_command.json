@@ -1,7 +1,7 @@
 {
   "title": "Disk Wipe via Format Command",
   "description": "Detects format command execution that could indicate destructive disk wiping.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\format.com' and 'Command Line' like '*/y*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\format.com' and 'Command Line' like '*/y*'))",
   "sigma_id": "94777073-9b92-463b-9b6d-48ff833121df",
   "level": "critical",
   "stig_category": "CAT I",

@@ -1,7 +1,7 @@
 {
   "title": "File Deletion of Security Tools",
   "description": "Detects deletion of security-related files and configurations that could impair defenses.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*del*' and 'Command Line' like '*/f*')) and not ('Process Name' like 'C:\\Windows\\System32\\*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*del*' and 'Command Line' like '*/f*')) and not ('Process Name' like 'C:\\\\Windows\\\\System32\\\\*'))",
   "sigma_id": "41743b31-7eae-4253-a4a1-230c295990e2",
   "level": "medium",
   "stig_category": "CAT II",

@@ -59,6 +59,17 @@ def _strip_outer_single_quotes(value):
     return value
 
 
+def _escape_like_value(value):
+    """Escape backslashes in LIKE pattern values for OCL.
+
+    OCL interprets \\r, \\n, \\t etc. as escape sequences inside LIKE strings.
+    Double the backslashes so they are treated as literal characters.
+    """
+    if isinstance(value, str):
+        return value.replace('\\', '\\\\')
+    return value
+
+
 def normalize_log_source_candidates(raw_value):
     """Convert a mapping value to an ordered list of log source display names."""
     if raw_value is None:
@@ -118,28 +129,28 @@ def parse_selection(selection, field_map):
         if modifier == 'contains|all':
             # AND together all values — field must contain every value
             if isinstance(value, list):
-                and_parts = [f"{oci_field} like '*{v}*'" for v in value]
+                and_parts = [f"{oci_field} like '*{_escape_like_value(v)}*'" for v in value]
                 query_parts.append(f"({' and '.join(and_parts)})")
             else:
-                query_parts.append(f"{oci_field} like '*{value}*'")
+                query_parts.append(f"{oci_field} like '*{_escape_like_value(value)}*'")
         elif modifier == 'contains':
             if isinstance(value, list):
-                or_parts = [f"{oci_field} like '*{v}*'" for v in value]
+                or_parts = [f"{oci_field} like '*{_escape_like_value(v)}*'" for v in value]
                 query_parts.append(f"({' or '.join(or_parts)})")
             else:
-                query_parts.append(f"{oci_field} like '*{value}*'")
+                query_parts.append(f"{oci_field} like '*{_escape_like_value(value)}*'")
         elif modifier == 'startswith':
             if isinstance(value, list):
-                or_parts = [f"{oci_field} like '{v}*'" for v in value]
+                or_parts = [f"{oci_field} like '{_escape_like_value(v)}*'" for v in value]
                 query_parts.append(f"({' or '.join(or_parts)})")
             else:
-                query_parts.append(f"{oci_field} like '{value}*'")
+                query_parts.append(f"{oci_field} like '{_escape_like_value(value)}*'")
         elif modifier == 'endswith':
             if isinstance(value, list):
-                or_parts = [f"{oci_field} like '*{v}'" for v in value]
+                or_parts = [f"{oci_field} like '*{_escape_like_value(v)}'" for v in value]
                 query_parts.append(f"({' or '.join(or_parts)})")
             else:
-                query_parts.append(f"{oci_field} like '*{value}'")
+                query_parts.append(f"{oci_field} like '*{_escape_like_value(value)}'")
         elif modifier == 're':
             if isinstance(value, list):
                 or_parts = [f"{oci_field} REGEX MATCH '{v}'" for v in value]

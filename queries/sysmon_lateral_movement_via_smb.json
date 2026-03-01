@@ -1,7 +1,7 @@
 {
   "title": "Sysmon Lateral Movement via SMB",
   "description": "Detects SMB connections (port 445) from processes commonly used for lateral movement. Attackers use PsExec, WMI, and other tools to move laterally through SMB/Windows Admin Shares.\n",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Destination Port' = 445 and Initiated = 'true') and (('Process Name' like '*\\psexec.exe' or 'Process Name' like '*\\psexesvc.exe' or 'Process Name' like '*\\PSEXESVC.exe' or 'Process Name' like '*\\cmd.exe' or 'Process Name' like '*\\powershell.exe' or 'Process Name' like '*\\wmic.exe' or 'Process Name' like '*\\net.exe' or 'Process Name' like '*\\net1.exe' or 'Process Name' like '*\\xcopy.exe' or 'Process Name' like '*\\robocopy.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Destination Port' = 445 and Initiated = 'true') and (('Process Name' like '*\\\\psexec.exe' or 'Process Name' like '*\\\\psexesvc.exe' or 'Process Name' like '*\\\\PSEXESVC.exe' or 'Process Name' like '*\\\\cmd.exe' or 'Process Name' like '*\\\\powershell.exe' or 'Process Name' like '*\\\\wmic.exe' or 'Process Name' like '*\\\\net.exe' or 'Process Name' like '*\\\\net1.exe' or 'Process Name' like '*\\\\xcopy.exe' or 'Process Name' like '*\\\\robocopy.exe')))",
   "sigma_id": "a1b2c3d4-7001-4000-8000-000000000002",
   "level": "high",
   "stig_category": "CAT I",

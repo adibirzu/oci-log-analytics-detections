@@ -1,7 +1,7 @@
 {
   "title": "Default File Association Hijack",
   "description": "Detects modification of default file associations for persistence.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\assoc.exe' or 'Process Name' like '*\\ftype.exe')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\\\assoc.exe' or 'Process Name' like '*\\\\ftype.exe')))",
   "sigma_id": "b4e4b0b5-7ea5-42b4-8558-d7d5d4b972f1",
   "level": "medium",
   "stig_category": "CAT II",

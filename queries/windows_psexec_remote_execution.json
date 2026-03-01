@@ -1,7 +1,7 @@
 {
   "title": "Windows PsExec Remote Execution",
   "description": "Detects use of PsExec or similar Sysinternals tools for remote command execution, commonly used for lateral movement in compromised networks.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*psexec.exe' or 'Process Name' like '*psexec64.exe' or 'Process Name' like '*PsExec.exe')) or ( (('Command Line' like '*psexec*' or 'Command Line' like '*\\\\\\\\*')) and ('Command Line' like '*-accepteula*') ))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*psexec.exe' or 'Process Name' like '*psexec64.exe' or 'Process Name' like '*PsExec.exe')) or ( (('Command Line' like '*psexec*' or 'Command Line' like '*\\\\\\\\\\\\\\\\*')) and ('Command Line' like '*-accepteula*') ))",
   "sigma_id": "f1e2d3c4-5012-4000-8000-000000000012",
   "level": "high",
   "stig_category": "CAT I",

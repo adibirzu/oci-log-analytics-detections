@@ -1,7 +1,7 @@
 {
   "title": "WMI Process Execution via Wmic",
   "description": "Detects WMI-based process execution using wmic process call create.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\wmic.exe' and ('Command Line' like '*process*' and 'Command Line' like '*call*' and 'Command Line' like '*create*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\wmic.exe' and ('Command Line' like '*process*' and 'Command Line' like '*call*' and 'Command Line' like '*create*')))",
   "sigma_id": "10f74b67-be01-45f1-b908-e95d309617fe",
   "level": "high",
   "stig_category": "CAT I",

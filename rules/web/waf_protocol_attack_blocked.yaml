@@ -16,7 +16,6 @@ detection:
     request_headers|contains:
     - "%0d%0a"
     - "%0D%0A"
-    - "\\r\\n"
     - "Transfer-Encoding: chunked"
     - "Content-Length: 0"
   condition: selection and (protocol_rules or protocol_patterns)

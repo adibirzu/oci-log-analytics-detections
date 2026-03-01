@@ -1,7 +1,7 @@
 {
   "title": "SyncAppvPublishingServer Abuse",
   "description": "Detects abuse of SyncAppvPublishingServer.exe for code execution through PowerShell.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\SyncAppvPublishingServer.exe'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\SyncAppvPublishingServer.exe'))",
   "sigma_id": "4aa766aa-722c-46f7-aae9-f499375da0f1",
   "level": "high",
   "stig_category": "CAT I",

@@ -1,7 +1,7 @@
 {
   "title": "BITS Job Persistence",
   "description": "Detects BITS jobs created for persistent execution or file download.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\bitsadmin.exe' and ('Command Line' like '*/create*' or 'Command Line' like '*/addfile*' or 'Command Line' like '*/setnotifycmdline*')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\bitsadmin.exe' and ('Command Line' like '*/create*' or 'Command Line' like '*/addfile*' or 'Command Line' like '*/setnotifycmdline*')))",
   "sigma_id": "3fc4f8ba-f80b-4154-b7b9-3fd6734f14c5",
   "level": "medium",
   "stig_category": "CAT II",

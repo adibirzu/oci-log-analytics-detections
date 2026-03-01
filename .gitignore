@@ -5,6 +5,12 @@
 __pycache__/
 *.pyc
 *.pyo
+.venv/
+venv/
+
+# Secrets
+*.pem
+.env
 
 # Generated test data
 test_data/

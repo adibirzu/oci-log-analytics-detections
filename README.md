@@ -3,9 +3,9 @@
 A comprehensive STIG-compliant detection rules library for Oracle Cloud Infrastructure (OCI) Log Analytics. Converts industry-standard [Sigma](https://github.com/SigmaHQ/sigma) rules into OCI Log Analytics Query Language (OCL) with MITRE ATT&CK and STIG compliance mapping. Enhanced with advanced threat hunting queries inspired by the Threat Hunter's Cookbook.
 
 ## Current Status
-- **Total Rules:** 387 Sigma detection rules + 20 advanced hunting queries
-- **Categories:** Windows Security (220), Cloud/OCI (100), Linux Security (67)
-- **Hunting Queries:** 20 analytics-based queries (frequency analysis, anomaly detection, scoring)
+- **Total Rules:** 417 Sigma detection rules + 28 advanced hunting queries
+- **Categories:** Windows Security (220), Cloud/OCI (100), Linux Security (67), Web/WAF (30)
+- **Hunting Queries:** 28 analytics-based queries (frequency analysis, anomaly detection, scoring, WAF analytics)
 - **STIG Coverage:** 22 rules with DoD STIG control mappings (IA-2, IA-5, SC-7, SC-28, AU-11, AC-17, etc.)
 - **MITRE ATT&CK:** 90 techniques across 12 tactics (full MITRE coverage)
 - **Deployed:** 153 saved searches across 7 dashboards
@@ -180,8 +180,9 @@ rules/                          # Source detection rules (Sigma YAML)
     collection/                 # 5 collection rules
     pipe_created/               # 4 pipe created rules
     dns_query/                  # 3 DNS query rules
+  web/                          # 30 Web/WAF rules (SQLi, XSS, SSRF, path traversal, etc.)
 queries/                        # Generated OCL queries (JSON)
-  hunting/                      # 20 advanced hunting queries (cookbook-inspired)
+  hunting/                      # 28 advanced hunting queries (cookbook-inspired, WAF analytics)
   manifest.json                 # Cross-project integration manifest
 config/
   sigma_oci_mapping.yaml        # Field & log source mappings
@@ -259,7 +260,7 @@ python3 scripts/setup_log_sources.py --validate  # Check OCIDs, CLI config, name
 
 ### Generating Queries
 ```bash
-python3 scripts/convert_sigma.py                # Convert all 387 rules
+python3 scripts/convert_sigma.py                # Convert all 417 rules
 python3 scripts/convert_sigma.py --validate     # Validate OCL syntax
 python3 scripts/convert_sigma.py --stats        # Print rule statistics
 ```

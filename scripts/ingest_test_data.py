@@ -133,6 +133,14 @@ UPLOAD_MANIFEST = [
         "content_type": "application/octet-stream",
         "description": "Web application attacks (IDOR, privilege escalation, auth bypass, deserialization)"
     },
+    {
+        "filename": "multicloud_health.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["multicloud_health"],
+        "upload_name": "soc-test-multicloud-health",
+        "stream_key": "soc-detection-multicloud-health",
+        "content_type": "application/octet-stream",
+        "description": "Multicloud health heartbeats (OCI, Azure, GCP — geographic map visualization)"
+    },
 ]
 
 

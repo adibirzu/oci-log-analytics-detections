@@ -61,6 +61,7 @@ LA_NAMESPACE = _cfg("LA_NAMESPACE", "")
 
 QUERIES_DIR = os.path.join(PROJECT_DIR, 'queries')
 HUNTING_DIR = os.path.join(QUERIES_DIR, 'hunting')
+APPS_DIR = os.path.join(QUERIES_DIR, 'apps')
 TEST_DATA_DIR = os.path.join(PROJECT_DIR, 'test_data')
 
 LOG_GROUP_NAME = "soc-detection-test-logs"
@@ -120,6 +121,9 @@ SOURCE_CANDIDATE_GROUPS = {
     "webapp_security": [
         "SOC Web Application Logs",
     ],
+    "multicloud_health": [
+        "SOC Multicloud Health Logs",
+    ],
 }
 
 TEST_DATA_FILES = [
@@ -134,6 +138,7 @@ TEST_DATA_FILES = [
     "waf_security.jsonl",
     "lb_access.jsonl",
     "webapp_security.jsonl",
+    "multicloud_health.jsonl",
 ]
 
 

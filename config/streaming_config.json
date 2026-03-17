@@ -1,27 +1,34 @@
 {
   "soc-detection-oci-audit": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyaxjomelhrroylsj2rlucve7jawx3rxrmganqhnxncig4a",
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaaug3df2ia6eiyjgm2rkzjmniuj6gg26ggbeqbcqjmfbr6fxn2gllq",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "OCI Audit Logs"
   },
   "soc-detection-cloud-guard": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyal5d4wpc2wnihwbqba3qgjw6vvv6c7umwbzeejckc6qna",
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaaug3df2ianpgc7ka3pneritg7jhdhp6i6gj5eintvu7phc6b567bq",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "OCI Cloud Guard Problems"
   },
   "soc-detection-linux-audit": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyagwac5lzsokrybp453ye7w23f6kewvlvgfxvtnggomuaq",
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaaug3df2iaj3qdz3p5oc3enh3mubyv7wdde4z5ete3zg6ieqtjcmua",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "SOC Linux Syslog Logs"
   },
   "soc-detection-windows-sysmon": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaai4inmnyani67erefzogiyllykdlobowvtiplae3yqbtlg6pxzy4a",
+    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaaug3df2ia73xzyyckziqjfzz2oik4ca2eiwuzjx3dqsexuo2sfliq",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
-    "log_source": "Windows Sysmon Operational Logs"
+    "log_source": "Windows Sysmon Events"
   },
   "_metadata": {
-    "log_group_id": "ocid1.loganalyticsloggroup.oc1.eu-frankfurt-1.amaaaaaai4inmnya7hlzkukkve7oqo4zkq5h7tu3h5eczmvkos5ybhbifntq",
-    "la_namespace": "frxfopzec0yq",
-    "compartment_id": "ocid1.compartment.oc1..aaaaaaaaf2s6pn6vpu5xqmyfadhcn4cxgn7y3rxbckkt6cdpzzbkc4cb73kq"
+    "log_group_id": "ocid1.loganalyticsloggroup.oc1.eu-frankfurt-1.amaaaaaaug3df2iav45humldsmnicww3thsygbw75xjlqktbecemt3zehrfa",
+    "la_namespace": "fr4zqfimuxtr",
+    "compartment_id": "ocid1.compartment.oc1..aaaaaaaal3nnhsqe3b3phstdzgfz7wlmf76xbfecsot5nvhrczq4uaqqspka",
+    "connector_summary": {
+      "expected": 4,
+      "active": 2,
+      "pending": 0,
+      "degraded": 2,
+      "failed": 0
+    }
   }
 }

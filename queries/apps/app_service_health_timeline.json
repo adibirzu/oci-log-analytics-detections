@@ -1,0 +1,16 @@
+{
+  "title": "Application Service Health Timeline",
+  "description": "Tracks application lifecycle events (startup, shutdown, errors) and request throughput across CRM and Drone Shop. Use for availability monitoring and deployment impact analysis.",
+  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and (message like '%started%' or message like '%shutting down%' or level = 'ERROR') | stats count as Events by 'service.name', level, message | sort -Events",
+  "level": "informational",
+  "tags": ["app.availability", "sli.uptime", "deployment.impact"],
+  "mitre_attack": {
+    "tactics": [],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "application"
+  },
+  "falsepositives": []
+}

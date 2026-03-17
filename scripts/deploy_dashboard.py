@@ -12,6 +12,7 @@ Creates saved searches and organizes them into 10 SOC dashboards:
   8. SOC: Sysmon Network & Lateral       - Network connections, C2 beacons, DNS, named pipes
   9. SOC: Web Application Security       - OWASP Top 10 attack detection via WAF/LB/App logs
  10. SOC: Web Threat Hunting Dashboard   - Web attack hunting: frequency, stacking, scoring
+ 11. OCI-DEMO: Application 360 Monitoring - CRM + Drone Shop 360 observability (APM, logs, WAF, DB, security)
 
 Usage:
   python3 scripts/deploy_dashboard.py              # Deploy all
@@ -216,6 +217,7 @@ DASHBOARDS = {
             {"title": "Hunt: Linux Rare Processes", "query_file": "hunting/linux_rare_process.json"},
             {"title": "Hunt: Long Command Lines", "query_file": "hunting/windows_long_command_line.json"},
             {"title": "Hunt: OCI IAM Rapid Changes", "query_file": "hunting/oci_iam_rapid_changes.json"},
+            {"title": "Hunt: OCI IAM + Fusion Correlation", "query_file": "hunting/oci_iam_fusion_activity_correlation.json"},
             {"title": "Hunt: Lateral Movement Cluster", "query_file": "hunting/windows_lateral_movement_cluster.json"},
             {"title": "Hunt: Linux Multi-Stage Attack", "query_file": "hunting/linux_multi_stage_attack.json"},
             {"title": "Hunt: OCI Destruction Spike", "query_file": "hunting/oci_resource_destruction_spike.json"},
@@ -296,7 +298,34 @@ DASHBOARDS = {
             {"title": "Hunt: OWASP Multi-Stage", "query_file": "hunting/web_owasp_multi_stage_attack.json"},
             {"title": "Hunt: Scanner Tool Stacking", "query_file": "hunting/web_scanner_tool_stacking.json"},
         ]
-    }
+    },
+    "OCI-DEMO: Application 360 Monitoring Dashboard": {
+        "description": "360-degree observability for OCI-DEMO applications (CRM Portal + Drone Shop). Correlates APM traces, application logs, WAF signals, database performance (OPSI/DB Management), and security events using trace_id as the universal join key.",
+        "widgets": [
+            {"title": "App: Error Rate by Service", "query_file": "apps/app_error_rate_by_service.json"},
+            {"title": "App: Slow Requests (>2s)", "query_file": "apps/app_slow_requests.json"},
+            {"title": "App: Request Rate by Endpoint", "query_file": "apps/app_request_rate_by_endpoint.json"},
+            {"title": "App: Service Health Timeline", "query_file": "apps/app_service_health_timeline.json"},
+            {"title": "App: OWASP Attack Detection", "query_file": "apps/app_owasp_attack_detection.json"},
+            {"title": "App: WAF Signal Correlation", "query_file": "apps/app_waf_signal_correlation.json"},
+            {"title": "App: SQLi + XSS Detection", "query_file": "apps/app_sqli_xss_detection.json"},
+            {"title": "App: Auth Brute Force", "query_file": "apps/app_auth_brute_force.json"},
+            {"title": "App: Security Attack by IP", "query_file": "apps/app_security_attack_by_ip.json"},
+            {"title": "App: Cross-Service Trace Correlation", "query_file": "apps/app_cross_service_trace_correlation.json"},
+            {"title": "App: Order Sync Pipeline", "query_file": "apps/app_order_sync_pipeline.json"},
+            {"title": "App: DB Performance Correlation", "query_file": "apps/app_db_performance_correlation.json"},
+        ]
+    },
+    "SOC: Geographic Health Dashboard": {
+        "description": "Multicloud geographic health visualization. Regional instance health status across OCI, Azure, and GCP on a global map with provider summaries, tier breakdowns, and unhealthy region alerts.",
+        "widgets": [
+            {"title": "Geo: Regional Health Map", "query_file": "hunting/multicloud_geo_health_regional_map.json"},
+            {"title": "Geo: Cloud Provider Summary", "query_file": "hunting/multicloud_geo_health_by_provider.json"},
+            {"title": "Geo: Instance Detail", "query_file": "hunting/multicloud_geo_health_instance_detail.json"},
+            {"title": "Geo: Unhealthy Regions", "query_file": "hunting/multicloud_geo_health_unhealthy_regions.json"},
+            {"title": "Geo: Service Tier Status", "query_file": "hunting/multicloud_geo_health_tier_status.json"},
+        ]
+    },
 }
 
 

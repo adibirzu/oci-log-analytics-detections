@@ -64,7 +64,13 @@ STREAMS = [
         "partitions": 1,
         "retention_hours": 24,
         "source_candidates": SOURCE_CANDIDATE_GROUPS["windows_sysmon"],
-    }
+    },
+    {
+        "name": "soc-detection-multicloud-health",
+        "partitions": 1,
+        "retention_hours": 24,
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["multicloud_health"],
+    },
 ]
 
 TARGET_STREAM_POOL_ID = (
@@ -144,6 +150,16 @@ def _wait_for_active_connector_by_name(sch_client, connector_name, timeout_secon
                 return item.id
         time.sleep(poll_seconds)
     return None
+
+
+def _is_service_connector_limit_error(error):
+    message = ((getattr(error, "message", "") or "") + " " + (getattr(error, "code", "") or "")).lower()
+    return (
+        "service-connector-count" in message
+        or "service connector count" in message
+        or (getattr(error, "status", None) == 400 and "limit" in message and "connector" in message)
+        or (getattr(error, "status", None) == 409 and "limit" in message and "connector" in message)
+    )
 
 
 def find_or_create_stream(stream_admin_client, stream_config):
@@ -229,7 +245,12 @@ def create_service_connector(sch_client, stream_id, stream_name, log_source,
                 and existing_log_source == log_source
             ):
                 print(f"  Connector exists and is aligned: {connector_name} ({connector_id})")
-                return connector_id
+                return {
+                    "name": connector_name,
+                    "status": "aligned",
+                    "connector_id": connector_id,
+                    "message": "connector already active and aligned",
+                }
 
             print(f"  Connector drift detected: {connector_name} ({connector_id})")
             print(f"    Current stream: {existing_stream_id}")
@@ -268,12 +289,34 @@ def create_service_connector(sch_client, stream_id, stream_name, log_source,
         connector_id = _wait_for_active_connector_by_name(sch_client, connector_name)
         if connector_id:
             print(f"  Connector is ACTIVE: {connector_id}")
-            return connector_id
+            return {
+                "name": connector_name,
+                "status": "active",
+                "connector_id": connector_id,
+                "work_request_id": work_request_id,
+                "message": "connector created and active",
+            }
         print(f"  WARNING: connector '{connector_name}' not ACTIVE yet; work request: {work_request_id}")
-        return work_request_id
+        return {
+            "name": connector_name,
+            "status": "pending",
+            "work_request_id": work_request_id,
+            "message": "connector creation started but is not active yet",
+        }
     except oci.exceptions.ServiceError as e:
+        if _is_service_connector_limit_error(e):
+            print(f"  WARN: connector skipped due to OCI service limit exhaustion: {e.message}")
+            return {
+                "name": connector_name,
+                "status": "limit_exhausted",
+                "message": e.message,
+            }
         print(f"  ERROR creating connector: {e.message}")
-        return None
+        return {
+            "name": connector_name,
+            "status": "error",
+            "message": e.message,
+        }
 
 
 def save_pipeline_config(stream_configs):
@@ -356,9 +399,10 @@ def main():
 
     # Step 3: Create Service Connector Hub connectors
     print("\n[3/4] Setting up Service Connector Hub...")
+    connector_results = {}
     for sc in STREAMS:
         cfg = stream_configs[sc['name']]
-        create_service_connector(
+        connector_results[sc['name']] = create_service_connector(
             sch_client,
             stream_id=cfg['stream_id'],
             stream_name=sc['name'],
@@ -369,28 +413,55 @@ def main():
 
     # Step 4: Post-creation validation
     print("\n[4/4] Verifying connector states...")
-    all_active = True
+    active_count = 0
+    pending_count = 0
+    degraded_count = 0
+    failed_count = 0
     for sc in STREAMS:
         connector_name = f"sch-{sc['name']}-to-la"
         connectors = sch_client.list_service_connectors(
             compartment_id=COMPARTMENT_ID, display_name=connector_name
         ).data.items
         active = [c for c in connectors if getattr(c, "lifecycle_state", "") == "ACTIVE"]
+        result = connector_results.get(sc['name'], {}) or {}
         if active:
             print(f"  [OK  ] {connector_name}")
+            active_count += 1
+            continue
+
+        states = [getattr(c, "lifecycle_state", "?") for c in connectors]
+        if result.get("status") == "limit_exhausted":
+            print(f"  [DEG ] {connector_name} — skipped because OCI service limit 'service-connector-count' is exhausted")
+            degraded_count += 1
+        elif result.get("status") == "error":
+            print(f"  [FAIL] {connector_name} — {result.get('message', 'connector creation failed')}")
+            failed_count += 1
         else:
-            states = [getattr(c, "lifecycle_state", "?") for c in connectors]
             print(f"  [WAIT] {connector_name} — state(s): {states or 'not found'}")
-            all_active = False
-    if not all_active:
+            pending_count += 1
+
+    if degraded_count:
+        print("\n  Some connectors were skipped because the compartment hit the OCI Service Connector Hub limit.")
+        print("  Increase 'service-connector-count' headroom, then re-run: python3 scripts/setup_streaming_pipeline.py")
+    if pending_count:
         print("\n  Some connectors are not yet ACTIVE. They may still be provisioning.")
         print("  Re-run: python3 scripts/validate_pipeline.py")
+    if failed_count:
+        print("\n  Some connectors failed to create for reasons other than service limits.")
+        print("  Review the errors above before re-running the pipeline.")
 
     # Save config for ingest script
     stream_configs['_metadata'] = {
         'log_group_id': log_group_id,
         'la_namespace': la_namespace,
-        'compartment_id': COMPARTMENT_ID
+        'compartment_id': COMPARTMENT_ID,
+        'connector_summary': {
+            'expected': len(STREAMS),
+            'active': active_count,
+            'pending': pending_count,
+            'degraded': degraded_count,
+            'failed': failed_count,
+        },
     }
     save_pipeline_config(stream_configs)
 
@@ -400,10 +471,19 @@ def main():
     print("\n  Architecture:")
     print("  Test Logs → OCI Streaming → Service Connector Hub → Log Analytics")
     print(f"\n  Streams created: {len(STREAMS)}")
-    print(f"  Service Connectors: {len(STREAMS)}")
+    print(
+        f"  Service Connectors: {active_count}/{len(STREAMS)} active"
+        + (f", {pending_count} pending" if pending_count else "")
+        + (f", {degraded_count} skipped by service limits" if degraded_count else "")
+        + (f", {failed_count} failed" if failed_count else "")
+    )
     print(f"  Log Group: {LOG_GROUP_NAME}")
-    print("\n  Wait 2-3 minutes for Service Connectors to become ACTIVE,")
-    print("  then run: python3 scripts/ingest_test_data.py")
+    if degraded_count:
+        print("\n  Streaming is partially degraded until Service Connector Hub limits are increased.")
+        print("  After a limit increase, re-run: python3 scripts/setup_streaming_pipeline.py")
+    else:
+        print("\n  Wait 2-3 minutes for Service Connectors to become ACTIVE,")
+        print("  then run: python3 scripts/ingest_test_data.py")
 
 
 if __name__ == "__main__":

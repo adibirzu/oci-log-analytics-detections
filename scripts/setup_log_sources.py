@@ -147,6 +147,29 @@ CUSTOM_FIELDS = [
     "Session ID",
     "OWASP Category",
     "Request ID",
+    # Multicloud Health / Geographic fields
+    "Cloud Provider",
+    "Region Display",
+    "Country",
+    "Latitude",
+    "Longitude",
+    "Instance ID",
+    "Instance Role",
+    "Tier",
+    "Operating System",
+    "Instance Type",
+    "Status",
+    "Status Code",
+    "CPU Percent",
+    "Memory Percent",
+    "Disk Percent",
+    "Network In Mbps",
+    "Network Out Mbps",
+    "Uptime Hours",
+    "Open Connections",
+    "Response Time Ms",
+    "Heartbeat Sequence",
+    "IP Address",
 ]
 
 
@@ -724,6 +747,82 @@ WEBAPP_SOURCE_DESC = (
 )
 
 
+# ─── Multicloud Health Parser ──────────────────────────────────
+
+HEALTH_PARSER_NAME = "socMulticloudHealthJsonParser"
+HEALTH_PARSER_DISPLAY = "SOC Multicloud Health JSON Parser"
+HEALTH_PARSER_DESC = (
+    "Parses multicloud health heartbeat JSON for geographic map visualization. "
+    "Maps cloud provider, region, lat/lon coordinates, instance metadata, and health metrics."
+)
+HEALTH_FIELD_MAPPINGS = [
+    ("msg",                  "$.msg",                1),
+    ("time",                 "$.Timestamp",           2),
+    ("Cloud Provider",       "$.Cloud Provider",      3),
+    ("Region",               "$.Region",              4),
+    ("Region Display",       "$.Region Display",      5),
+    ("Country",              "$.Country",             6),
+    ("Latitude",             "$.Latitude",            7),
+    ("Longitude",            "$.Longitude",           8),
+    ("Instance ID",          "$.Instance ID",         9),
+    ("Host Name",            "$.Host Name",          10),
+    ("IP Address",           "$.IP Address",         11),
+    ("Instance Role",        "$.Instance Role",      12),
+    ("Service Name",         "$.Service",            13),
+    ("Tier",                 "$.Tier",               14),
+    ("Operating System",     "$.Operating System",   15),
+    ("Instance Type",        "$.Instance Type",      16),
+    ("Status",               "$.Status",             17),
+    ("Status Code",          "$.Status Code",        18),
+    ("CPU Percent",          "$.CPU Percent",        19),
+    ("Memory Percent",       "$.Memory Percent",     20),
+    ("Disk Percent",         "$.Disk Percent",       21),
+    ("Network In Mbps",      "$.Network In Mbps",    22),
+    ("Network Out Mbps",     "$.Network Out Mbps",   23),
+    ("Uptime Hours",         "$.Uptime Hours",       24),
+    ("Open Connections",     "$.Open Connections",   25),
+    ("Response Time Ms",     "$.Response Time Ms",   26),
+    ("Heartbeat Sequence",   "$.Heartbeat Sequence", 27),
+]
+HEALTH_EXAMPLE = {
+    "Timestamp": "2026-03-10T09:00:00.000Z",
+    "Cloud Provider": "OCI",
+    "Region": "eu-frankfurt-1",
+    "Region Display": "Germany Central (Frankfurt)",
+    "Country": "DE",
+    "Latitude": 50.1109,
+    "Longitude": 8.6821,
+    "Instance ID": "ocid1.instance.oc1.eu-frankfurt-1.example",
+    "Host Name": "web-server-eu-001",
+    "IP Address": "10.0.1.10",
+    "Instance Role": "web-server",
+    "Service": "nginx",
+    "Tier": "frontend",
+    "Operating System": "Oracle Linux 9",
+    "Instance Type": "VM.Standard.E4.Flex",
+    "Status": "healthy",
+    "Status Code": 200,
+    "CPU Percent": 35.2,
+    "Memory Percent": 48.7,
+    "Disk Percent": 42.1,
+    "Network In Mbps": 15.3,
+    "Network Out Mbps": 8.7,
+    "Uptime Hours": 720,
+    "Open Connections": 142,
+    "Response Time Ms": 12,
+    "Heartbeat Sequence": 1,
+    "Log Source": "SOC Multicloud Health Logs",
+    "msg": "HEARTBEAT OK: web-server-eu-001 (OCI/eu-frankfurt-1) cpu=35.2% mem=48.7% uptime=720h status=healthy",
+}
+
+HEALTH_SOURCE_INTERNAL = "socMulticloudHealthSource"
+HEALTH_SOURCE_DISPLAY = "SOC Multicloud Health Logs"
+HEALTH_SOURCE_DESC = (
+    "Multicloud health heartbeat logs from OCI, Azure, and GCP instances "
+    "with geographic coordinates for global map visualization."
+)
+
+
 # Native source alternatives used to avoid creating unnecessary SOC sources.
 # If a SOC source already exists, it is still retained/updated for compatibility.
 NATIVE_SOURCE_ALTERNATIVES = {
@@ -738,6 +837,7 @@ NATIVE_SOURCE_ALTERNATIVES = {
     WAF_SOURCE_DISPLAY: ["OCI WAF Logs"],
     LB_SOURCE_DISPLAY: ["OCI Load Balancer Access Logs"],
     WEBAPP_SOURCE_DISPLAY: [],
+    HEALTH_SOURCE_DISPLAY: [],
 }
 
 
@@ -927,8 +1027,8 @@ def main():
     if args.dry_run:
         print("DRY RUN - would create:")
         print(f"  {len(CUSTOM_FIELDS)} custom fields")
-        print(f"  11 JSON parsers")
-        print(f"  up to 11 log sources (SOC sources skipped when native equivalent exists):")
+        print(f"  12 JSON parsers")
+        print(f"  up to 12 log sources (SOC sources skipped when native equivalent exists):")
         print(f"    - {LINUX_SOURCE_DISPLAY} ({LINUX_SOURCE_INTERNAL})")
         print(f"    - {WINDOWS_SOURCE_DISPLAY} ({WINDOWS_SOURCE_INTERNAL})")
         print(f"    - {CG_SOURCE_DISPLAY} ({CG_SOURCE_INTERNAL})")
@@ -940,6 +1040,7 @@ def main():
         print(f"    - {WAF_SOURCE_DISPLAY} ({WAF_SOURCE_INTERNAL})")
         print(f"    - {LB_SOURCE_DISPLAY} ({LB_SOURCE_INTERNAL})")
         print(f"    - {WEBAPP_SOURCE_DISPLAY} ({WEBAPP_SOURCE_INTERNAL})")
+        print(f"    - {HEALTH_SOURCE_DISPLAY} ({HEALTH_SOURCE_INTERNAL})")
         return
 
     la_client = get_la_client()
@@ -1021,6 +1122,11 @@ def main():
                   WEBAPP_PARSER_NAME, WEBAPP_PARSER_DISPLAY, WEBAPP_PARSER_DESC,
                   WEBAPP_FIELD_MAPPINGS, field_map, WEBAPP_EXAMPLE)
 
+    print("\n--- Multicloud Health Parser ---")
+    create_parser(la_client, namespace,
+                  HEALTH_PARSER_NAME, HEALTH_PARSER_DISPLAY, HEALTH_PARSER_DESC,
+                  HEALTH_FIELD_MAPPINGS, field_map, HEALTH_EXAMPLE)
+
     # Step 3: Create log sources
     print("\n" + "=" * 60)
     print("STEP 3: CREATE LOG SOURCES")
@@ -1092,6 +1198,11 @@ def main():
         WEBAPP_SOURCE_INTERNAL, WEBAPP_SOURCE_DISPLAY, WEBAPP_SOURCE_DESC, WEBAPP_PARSER_NAME
     )
 
+    print("\n--- Multicloud Health Source ---")
+    create_source_if_needed(
+        HEALTH_SOURCE_INTERNAL, HEALTH_SOURCE_DISPLAY, HEALTH_SOURCE_DESC, HEALTH_PARSER_NAME
+    )
+
     print("\n" + "=" * 60)
     print("SETUP COMPLETE")
     print("=" * 60)
@@ -1107,6 +1218,7 @@ def main():
     print(f"  - {WAF_SOURCE_DISPLAY}")
     print(f"  - {LB_SOURCE_DISPLAY}")
     print(f"  - {WEBAPP_SOURCE_DISPLAY}")
+    print(f"  - {HEALTH_SOURCE_DISPLAY}")
     print(f"  - OCI Audit Logs (built-in)")
     print(f"  - OCI Cloud Guard Problems (native, preferred when available)")
     print(f"  - Windows Sysmon Events (native, preferred when available)")

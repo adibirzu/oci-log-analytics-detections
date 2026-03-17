@@ -1,0 +1,16 @@
+{
+  "title": "Security Attack Source IP Analysis",
+  "description": "Top attacking IPs across both applications with attack type distribution and severity breakdown. Enables IP-based threat intelligence correlation and firewall rule recommendations.",
+  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and 'security.attack.detected' = true | stats count as Attacks, distinctcount('security.attack.type') as UniqueAttackTypes, unique('security.attack.type') as AttackTypes, distinctcount('service.name') as TargetedServices by 'security.source_ip' | sort -Attacks | head 25",
+  "level": "high",
+  "tags": ["threat.intelligence", "security.source_ip", "attack.correlation"],
+  "mitre_attack": {
+    "tactics": ["initial_access", "credential_access"],
+    "techniques": ["T1190", "T1110"]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "application"
+  },
+  "falsepositives": ["Internal security testing IPs", "Shared NAT addresses"]
+}

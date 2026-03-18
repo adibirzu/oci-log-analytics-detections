@@ -1,0 +1,16 @@
+{
+  "title": "APM: CSRF Token Missing on State-Changing Request",
+  "description": "Detects HTTP POST/PUT/DELETE requests to state-changing endpoints lacking proper Referer or Origin headers, indicating potential Cross-Site Request Forgery attacks captured by APM.",
+  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and 'HTTP Method' in ('POST', 'PUT', 'DELETE', 'PATCH') and 'security.attack.type' = 'csrf' | stats count as Violations by 'HTTP URL', 'HTTP Method', 'Client IP', 'User Agent', 'service.name' | sort -Violations",
+  "level": "medium",
+  "tags": ["attack.initial_access", "attack.t1185", "owasp.a01", "browser_attack"],
+  "mitre_attack": {
+    "tactics": ["initial_access"],
+    "techniques": ["T1185"]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "apm"
+  },
+  "falsepositives": ["API-to-API calls without browser context", "Mobile app requests", "Webhook callbacks"]
+}

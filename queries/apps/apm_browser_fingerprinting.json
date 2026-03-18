@@ -1,0 +1,16 @@
+{
+  "title": "APM: Browser Fingerprinting via Canvas/WebGL/AudioContext",
+  "description": "Detects browser fingerprinting techniques using Canvas API, WebGL parameters, and AudioContext observed in OpenTelemetry browser spans. Excessive fingerprinting API calls indicate tracking or reconnaissance.",
+  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and ('HTTP URL' like '%canvas.toDataURL%' or 'HTTP URL' like '%webgl.getParameter%' or 'HTTP URL' like '%WEBGL_debug_renderer_info%' or 'HTTP URL' like '%AudioContext%' or 'HTTP URL' like '%OfflineAudioContext%' or 'HTTP URL' like '%navigator.plugins%' or 'HTTP URL' like '%navigator.hardwareConcurrency%') | stats count as FingerprintAttempts by 'Client IP', 'User Agent', 'service.name' | sort -FingerprintAttempts",
+  "level": "medium",
+  "tags": ["attack.reconnaissance", "attack.t1592.004", "owasp.a07", "browser_attack"],
+  "mitre_attack": {
+    "tactics": ["reconnaissance"],
+    "techniques": ["T1592.004"]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "apm"
+  },
+  "falsepositives": ["Legitimate WebGL applications and games", "Audio processing web applications"]
+}

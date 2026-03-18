@@ -1,0 +1,17 @@
+{
+  "title": "APM: SQL Injection Attack Detection",
+  "description": "Detects SQL injection payloads in HTTP URLs captured by OCI APM. Covers UNION-based, boolean-based, time-based blind, and error-based injection techniques in request parameters.",
+  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and ('HTTP URL' like '%UNION SELECT%' or 'HTTP URL' like '%UNION%20SELECT%' or 'HTTP URL' like '%union select%' or 'HTTP URL' like '%27%20OR%201%3D1%' or 'HTTP URL' like '%OR+1=1%' or 'HTTP URL' like '%DROP TABLE%' or 'HTTP URL' like '%DROP%20TABLE%' or 'HTTP URL' like '%WAITFOR DELAY%' or 'HTTP URL' like '%SLEEP(%' or 'HTTP URL' like '%BENCHMARK(%' or 'HTTP URL' like '%INFORMATION_SCHEMA%' or 'HTTP URL' like '%information_schema%') | stats count as Attacks by 'HTTP URL', 'HTTP Method', 'Client IP', 'service.name' | sort -Attacks",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": ["attack.initial_access", "attack.t1190", "owasp.a03", "browser_attack"],
+  "mitre_attack": {
+    "tactics": ["initial_access"],
+    "techniques": ["T1190"]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "apm"
+  },
+  "falsepositives": ["Legitimate search queries containing SQL keywords", "DAST scanner activity"]
+}

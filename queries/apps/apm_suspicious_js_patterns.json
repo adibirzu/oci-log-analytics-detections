@@ -1,0 +1,16 @@
+{
+  "title": "APM: Suspicious JavaScript Execution Patterns",
+  "description": "Detects suspicious JavaScript patterns in browser telemetry indicating crypto mining, keylogging, formjacking, or other malicious client-side scripts captured by OpenTelemetry.",
+  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and ('HTTP URL' like '%coinhive%' or 'HTTP URL' like '%cryptonight%' or 'HTTP URL' like '%coin-hive%' or 'HTTP URL' like '%minero.cc%' or 'HTTP URL' like '%jsecoin%' or 'HTTP URL' like '%cryptoloot%') | stats count as Detections by 'HTTP URL', 'Client IP', 'User Agent', 'service.name' | sort -Detections",
+  "level": "high",
+  "tags": ["attack.execution", "attack.t1059.007", "attack.t1496", "browser_attack"],
+  "mitre_attack": {
+    "tactics": ["execution", "impact"],
+    "techniques": ["T1059.007", "T1496"]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "apm"
+  },
+  "falsepositives": ["Legitimate cryptocurrency applications", "Security research tools"]
+}

@@ -145,6 +145,31 @@ field_mappings:
   owasp_category: "'OWASP Category'"
   request_id: "'Request ID'"
 
+  # ─── APM / OpenTelemetry Fields ───────────────────────────────────
+  SpanName: "'Span Name'"
+  SpanKind: "'Span Kind'"
+  HttpUrl: "'HTTP URL'"
+  HTTP_URL: "'HTTP URL'"
+  HttpMethod: "'HTTP Method'"
+  HTTP_Method: "'HTTP Method'"
+  HttpStatusCode: "'HTTP Status Code'"
+  HTTP_Status_Code: "'HTTP Status Code'"
+  UserAgent: "'User Agent'"
+  trace_id: "'trace_id'"
+  span_id: "'span_id'"
+  Duration: Duration
+  Error: Error
+  Span_Name: "'Span Name'"
+  Span_Attributes: "'Span Attributes'"
+  Session_ID: "'Session ID'"
+  Source_IP: "'Client IP'"
+  Content_Type: "'Content Type'"
+  Response_Headers: "'Response Headers'"
+
+  # ─── Sysmon Process Access Fields (Event ID 10) ───────────────────
+  GrantedAccess: "'Granted Access'"
+  CallTrace: "'Call Trace'"
+
 logsource_mappings:
   # Sigma Category/Product -> ordered OCI Log Source candidates.
   # Converter emits a query filter that matches any listed source.
@@ -268,3 +293,19 @@ logsource_mappings:
   webserver:
     - OCI Load Balancer Access Logs
     - SOC Web Application Logs
+
+  # ─── APM / OpenTelemetry Application Logs ────────────────────
+  oci_apm:
+    - enterprise-crm-portal
+    - octo-drone-shop
+    - SOC Application Logs
+  opentelemetry_apm:
+    - enterprise-crm-portal
+    - octo-drone-shop
+    - SOC Application Logs
+
+  # ─── Sysmon Process Access (Event ID 10) ─────────────────────
+  windows_process_access:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs

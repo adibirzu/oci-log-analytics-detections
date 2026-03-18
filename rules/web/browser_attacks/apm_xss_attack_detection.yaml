@@ -1,0 +1,56 @@
+title: "APM: Cross-Site Scripting (XSS) Attack in Request"
+id: apm-browser-xss-001
+status: stable
+description: >
+  Detects XSS attack payloads in HTTP URLs, query parameters, and request bodies
+  captured by OCI APM and OpenTelemetry instrumentation. Covers reflected, stored,
+  and DOM-based XSS vectors including script injection, event handlers, and javascript: URIs.
+references:
+  - https://owasp.org/www-community/attacks/xss/
+  - https://attack.mitre.org/techniques/T1059/007/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: oci
+  service: apm
+detection:
+  selection_xss_tags:
+    HTTP_URL|contains:
+      - '%3Cscript'
+      - '%3C/script'
+      - '%3Csvg'
+      - '%3Cimg'
+      - '%3Ciframe'
+  selection_xss_handlers:
+    HTTP_URL|contains:
+      - 'onerror='
+      - 'onload='
+      - 'onmouseover='
+      - 'onfocus='
+      - 'onclick='
+  selection_xss_uri:
+    HTTP_URL|contains:
+      - 'javascript:'
+      - 'javascript%3A'
+      - 'vbscript:'
+      - 'data:text/html'
+  selection_xss_dom:
+    HTTP_URL|contains:
+      - 'document.cookie'
+      - 'document.write'
+      - 'document.location'
+      - '.innerHTML'
+      - 'eval('
+      - 'String.fromCharCode'
+  condition: selection_xss_tags or selection_xss_handlers or selection_xss_uri or selection_xss_dom
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1189
+  - attack.t1059.007
+  - owasp.a03
+  - owasp.a07
+falsepositives:
+  - Security scanning tools during authorized testing
+  - Developer tools sending debug payloads
+version: 1

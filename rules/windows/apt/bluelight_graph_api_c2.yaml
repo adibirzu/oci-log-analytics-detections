@@ -1,0 +1,41 @@
+title: "BLUELIGHT RAT: C2 via Microsoft Graph API"
+id: bl-s0657-t1071-001
+status: stable
+description: >
+  Detects non-standard processes connecting to Microsoft Graph API endpoints.
+  BLUELIGHT uses Microsoft Graph API and OneDrive for command-and-control,
+  blending with legitimate Microsoft traffic to evade network detection.
+references:
+  - https://attack.mitre.org/techniques/T1071/001/
+  - https://attack.mitre.org/software/S0657/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: windows
+  category: network_connection
+  service: sysmon
+detection:
+  selection:
+    EventID: 3
+    DestinationHostname|contains:
+      - 'graph.microsoft.com'
+      - 'login.microsoftonline.com'
+  filter_legitimate:
+    Image|endswith:
+      - '\OneDrive.exe'
+      - '\Teams.exe'
+      - '\OUTLOOK.EXE'
+      - '\msedge.exe'
+      - '\chrome.exe'
+      - '\firefox.exe'
+  condition: selection and not filter_legitimate
+level: medium
+tags:
+  - attack.command_and_control
+  - attack.t1071.001
+  - apt.apt37
+  - malware.bluelight
+falsepositives:
+  - Custom applications legitimately using Microsoft Graph API
+  - PowerShell scripts using Graph API for administration
+version: 1

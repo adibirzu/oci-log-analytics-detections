@@ -1,0 +1,16 @@
+{
+  "title": "APM: Session Hijacking - Rapid Session Changes",
+  "description": "Detects rapid session ID changes from a single source IP within a short window, indicating potential session hijacking, session fixation, or stolen session cookies.",
+  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and 'Span Name' like '%HTTP%' | stats distinctcount('Session ID') as SessionCount, count as Requests by 'Client IP', 'User Agent', 'service.name' | where SessionCount > 5 | sort -SessionCount",
+  "level": "high",
+  "tags": ["attack.credential_access", "attack.t1539", "attack.t1550.004", "owasp.a07", "browser_attack"],
+  "mitre_attack": {
+    "tactics": ["credential_access", "lateral_movement"],
+    "techniques": ["T1539", "T1550.004"]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "apm"
+  },
+  "falsepositives": ["Load testing tools cycling sessions", "Shared NAT/proxy IP addresses"]
+}

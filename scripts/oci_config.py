@@ -49,8 +49,8 @@ def _cfg(env_key, default):
 
 TENANCY_ID = _cfg("OCI_TENANCY_ID", "") or _cfg("OCI_TENANCY_OCID", "")
 COMPARTMENT_ID = (
-    _cfg("COMP_OBSERVABILITY", "")  # SOC dashboards/searches go to demo-observability
-    or _cfg("OCI_COMPARTMENT_ID", "")  # fallback: root scope compartment
+    _cfg("OCI_COMPARTMENT_ID", "")  # MAIN demo-observability (set in .env.local)
+    or _cfg("COMP_OBSERVABILITY", "")  # fallback
 )
 OCI_PROFILE = _cfg("OCI_PROFILE", "") or _cfg("OCI_CONFIG_PROFILE", "DEFAULT")
 OCI_REGION = _cfg("OCI_REGION", "")

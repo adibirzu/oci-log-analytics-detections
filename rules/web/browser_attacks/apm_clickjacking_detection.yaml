@@ -1,0 +1,33 @@
+title: "APM: Clickjacking - Missing Frame Protection Headers"
+id: apm-browser-clickjack-001
+status: stable
+description: >
+  Detects HTTP responses missing X-Frame-Options or Content-Security-Policy
+  frame-ancestors directives, indicating vulnerability to clickjacking attacks.
+  Monitors APM response headers for missing security controls.
+references:
+  - https://owasp.org/www-community/attacks/Clickjacking
+  - https://attack.mitre.org/techniques/T1185/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: oci
+  service: apm
+detection:
+  selection_html:
+    HTTP_Status_Code: 200
+    Content_Type|contains: 'text/html'
+  filter_has_protection:
+    Response_Headers|contains:
+      - 'X-Frame-Options'
+      - 'frame-ancestors'
+  condition: selection_html and not filter_has_protection
+level: medium
+tags:
+  - attack.initial_access
+  - attack.t1185
+  - owasp.a05
+falsepositives:
+  - Public pages intentionally designed to be embeddable
+  - CDN-served static content
+version: 1

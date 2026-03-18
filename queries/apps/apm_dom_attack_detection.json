@@ -1,0 +1,16 @@
+{
+  "title": "APM: DOM-Based Attack via Dangerous JavaScript APIs",
+  "description": "Detects DOM-based attacks using dangerous JavaScript APIs in browser telemetry spans. Monitors for document.cookie access, eval() calls, innerHTML manipulation captured by OpenTelemetry browser instrumentation.",
+  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and ('HTTP URL' like '%document.cookie%' or 'HTTP URL' like '%document.write%' or 'HTTP URL' like '%eval(%' or 'HTTP URL' like '%.innerHTML%' or 'HTTP URL' like '%location.hash%' or 'HTTP URL' like '%String.fromCharCode%') | stats count as Attacks by 'HTTP URL', 'Client IP', 'User Agent', 'service.name' | sort -Attacks",
+  "level": "high",
+  "tags": ["attack.execution", "attack.t1059.007", "owasp.a03", "owasp.a07", "browser_attack"],
+  "mitre_attack": {
+    "tactics": ["execution"],
+    "techniques": ["T1059.007"]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "apm"
+  },
+  "falsepositives": ["Legitimate SPA frameworks using innerHTML for rendering", "Analytics scripts accessing document.referrer"]
+}

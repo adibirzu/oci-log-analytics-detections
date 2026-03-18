@@ -1,0 +1,47 @@
+title: "BLUELIGHT RAT: Registry Enumeration of Security Products"
+id: bl-s0657-t1012-001
+status: stable
+description: >
+  Detects registry access targeting security product and installed software keys.
+  BLUELIGHT enumerates SecurityCenter2, Uninstall keys, and AV service registrations
+  to identify defensive tools before attempting further payload delivery.
+references:
+  - https://attack.mitre.org/techniques/T1012/
+  - https://attack.mitre.org/software/S0657/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: windows
+  category: registry_event
+  service: sysmon
+detection:
+  selection:
+    EventID:
+      - 12
+      - 13
+      - 14
+    TargetObject|contains:
+      - '\CurrentVersion\Uninstall'
+      - '\CurrentControlSet\Services'
+      - 'SecurityCenter2'
+      - '\Windows Defender'
+      - '\AVAST Software'
+      - '\ESET'
+      - '\KasperskyLab'
+  filter_legitimate:
+    Image|endswith:
+      - '\MsMpEng.exe'
+      - '\svchost.exe'
+      - '\TrustedInstaller.exe'
+      - '\msiexec.exe'
+  condition: selection and not filter_legitimate
+level: medium
+tags:
+  - attack.discovery
+  - attack.t1012
+  - apt.apt37
+  - malware.bluelight
+falsepositives:
+  - Software inventory tools
+  - Antivirus self-update routines
+version: 1

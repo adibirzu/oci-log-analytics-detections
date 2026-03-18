@@ -1,0 +1,53 @@
+title: "APM: Suspicious JavaScript Execution Patterns"
+id: apm-browser-js-001
+status: stable
+description: >
+  Detects suspicious JavaScript execution patterns in browser telemetry indicating
+  crypto mining, keylogging, formjacking, or other malicious client-side scripts.
+  Uses OpenTelemetry browser instrumentation to monitor JS execution context.
+references:
+  - https://attack.mitre.org/techniques/T1059/007/
+  - https://attack.mitre.org/techniques/T1056/001/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: oci
+  service: apm
+detection:
+  selection_cryptomining:
+    HTTP_URL|contains:
+      - 'coinhive'
+      - 'cryptonight'
+      - 'coin-hive'
+      - 'minero.cc'
+      - 'jsecoin'
+      - 'cryptoloot'
+  selection_keylogger:
+    Span_Attributes|contains:
+      - 'keydown'
+      - 'keypress'
+      - 'keyup'
+      - 'addEventListener'
+  selection_formjack:
+    Span_Attributes|contains:
+      - 'creditcard'
+      - 'credit-card'
+      - 'payment'
+      - 'checkout'
+  selection_exfil:
+    HTTP_URL|contains:
+      - 'btoa('
+      - 'atob('
+      - 'XMLHttpRequest'
+      - 'sendBeacon'
+  condition: selection_cryptomining or (selection_keylogger and selection_formjack) or selection_exfil
+level: high
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - attack.t1056.001
+  - attack.collection
+falsepositives:
+  - Legitimate analytics scripts
+  - Payment processing libraries
+version: 1

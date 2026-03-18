@@ -1,0 +1,41 @@
+title: "BLUELIGHT RAT: WMI System Enumeration from Browser Child"
+id: bl-s0657-t1082-001
+status: stable
+description: >
+  Detects WMI-based system enumeration spawned by browser processes. After initial
+  exploitation, BLUELIGHT queries Win32_ComputerSystem, Win32_OperatingSystem, and
+  Win32_Processor to profile the target system before establishing full C2.
+references:
+  - https://attack.mitre.org/techniques/T1082/
+  - https://attack.mitre.org/software/S0657/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: windows
+  category: process_creation
+  service: sysmon
+detection:
+  selection_parent:
+    EventID: 1
+    ParentImage|endswith:
+      - '\iexplore.exe'
+      - '\wscript.exe'
+      - '\mshta.exe'
+  selection_wmi:
+    CommandLine|contains:
+      - Win32_ComputerSystem
+      - Win32_OperatingSystem
+      - Win32_Processor
+      - Win32_NetworkAdapterConfiguration
+      - Get-WmiObject
+      - Get-CimInstance
+  condition: selection_parent and selection_wmi
+level: high
+tags:
+  - attack.discovery
+  - attack.t1082
+  - apt.apt37
+  - malware.bluelight
+falsepositives:
+  - System management scripts launched via browser-based admin portals
+version: 1

@@ -1,49 +1,57 @@
 # Detection Rule Catalog
 
-> **383 detection rules** + **20 hunting queries** | Auto-generated from Sigma YAML sources
+> **428 detection rules** + **34 hunting queries** | Auto-generated from Sigma YAML sources
 
 ## Summary
 
 | Platform | Rules |
 |----------|-------|
-| OCI Cloud | 100 |
-| Linux | 65 |
-| Windows | 218 |
+| OCI Cloud | 130 |
+| Linux | 67 |
+| Windows | 231 |
 
 | Severity | Count |
 |----------|-------|
-| 🔴 Critical | 60 |
-| 🟠 High | 167 |
-| 🟡 Medium | 110 |
-| 🔵 Low | 16 |
+| 🔴 Critical | 75 |
+| 🟠 High | 183 |
+| 🟡 Medium | 122 |
+| 🔵 Low | 18 |
 | ⚪ Informational | 30 |
 
-**Atomic Red Team Coverage:** 278/283 testable rules have ART tests (98%) | 3217 total test mappings
+**Atomic Red Team Coverage:** 278/298 testable rules have ART tests (93%) | 3217 total test mappings
 
 **STIG Coverage:** 24 rules covering 12 controls (AC-17, AC-3, AC-6, AU-11, AU-12, CP-9, IA-2, IA-5, IA-8, SC-12, SC-28, SC-7)
 
 ## MITRE ATT&CK Coverage
 
-**192 techniques** across **13 tactics**
+**203 techniques** across **14 tactics**
 
-### Initial Access (12 techniques)
+### Initial Access (20 techniques)
 
 | Technique | Rules |
 |-----------|-------|
+| T1059 | WAF Log4Shell (CVE-2021-44228) Attack Blocked, Web Server Process Spawning Command Shell, +3 more |
+| T1059.001 | Web Server Process Spawning Command Shell |
 | T1059.004 | Linux Multi-Stage Attack Indicators (Combined Methods) |
-| T1078 | OCI Console Login Failure, OCI Console Login from Suspicious IP Range, +4 more |
-| T1110 | Linux Multi-Stage Attack Indicators (Combined Methods), OCI Console Login Brute Force (Frequency Analysis), Login Activity Time-Series Anomaly |
+| T1059.007 | WAF SQL Injection Attack Allowed Through, WAF SQL Injection Attack Blocked |
+| T1078 | API Endpoint Unauthorized Access Attempts, OCI Console Login Failure, +7 more |
+| T1083 | WAF Path Traversal Attack Blocked |
+| T1098 | OCI IAM and Fusion Activity Correlation |
+| T1110 | Linux Multi-Stage Attack Indicators (Combined Methods), OCI Console Login Brute Force (Frequency Analysis), +2 more |
 | T1110.001 | Linux SSH Failed Login, SSH Brute Force Detection (Frequency Analysis) |
 | T1110.003 | OCI Password Spraying Attack |
 | T1110.004 | OCI Multiple Users from Same IP (Grouping) |
 | T1133 | Cloud Guard Problem: VCN Security List Port RDP, Cloud Guard Problem: VCN Security List Port SSH, Linux External Remote Service Abuse |
-| T1190 | Cloud Guard Problem: Bucket Public Write, Cloud Guard Problem: INSTANCE PUBLIC IP |
+| T1189 | BLUELIGHT RAT: Internet Explorer Drive-by Compromise, WAF CORS Bypass Attempt Blocked, WAF Cross-Site Scripting Attack Blocked |
+| T1190 | API Endpoint Unauthorized Access Attempts, Cloud Guard Problem: Bucket Public Write, +21 more |
 | T1204.002 | Windows Spearphishing Attachment Execution |
+| T1550 | Web Application Authentication Bypass |
+| T1552.005 | SSRF to Cloud Instance Metadata Service (Linux), SSRF to Cloud Metadata Endpoint (169.254.169.254), WAF Server-Side Request Forgery Blocked |
 | T1566.001 | Windows Spearphishing Attachment Execution |
 | T1606 | OCI Federated Identity Provider Modified |
 | T1621 | OCI MFA Fatigue Attack Indicators |
 
-### Execution (24 techniques)
+### Execution (26 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -53,16 +61,18 @@
 | T1036 | Windows Process from Unusual Path (Rare Value Analysis) |
 | T1047 | Windows Management Instrumentation Event Subscription, WMI Process Execution via Wmic |
 | T1053.005 | Suspicious Scheduled Task Creation |
-| T1059 | Linux Process Execution from /dev/shm, Linux Reverse Shell Detected, +2 more |
-| T1059.001 | PowerShell Execution via Alternate Shell, PowerShell Script Block with Suspicious Keywords, +4 more |
+| T1059 | Insecure Deserialization Attack Detected, Linux Process Execution from /dev/shm, +9 more |
+| T1059.001 | PowerShell Execution via Alternate Shell, PowerShell Script Block with Suspicious Keywords, +5 more |
 | T1059.004 | Linux Bind Shell Listener, OCI Cloud Shell Session Started, +2 more |
 | T1059.005 | Scripting Engine Spawning Network Utility, Visual Basic Script Compilation via vbc.exe, +2 more |
 | T1059.006 | Python Execution as Child of System Process |
 | T1059.007 | JavaScript Execution via Node.js |
 | T1071 | Sysmon Suspicious Named Pipe Pattern |
 | T1105 | Finger.exe Abuse for File Download, Windows PowerShell Download Cradle |
-| T1110 | Linux Multi-Stage Attack Indicators (Combined Methods) |
+| T1110 | Linux Multi-Stage Attack Indicators (Combined Methods), OWASP Multi-Stage Web Attack Chain (Combined Methods) |
 | T1127.001 | MSBuild Execution from Non-Standard Location, Windows MSBuild Execution for Code Bypass |
+| T1190 | Insecure Deserialization Attack Detected, WAF Command Injection Attack Blocked, +5 more |
+| T1203 | BLUELIGHT RAT: Browser Spawning Suspicious Child Process |
 | T1204 | OCI Action: StartInstance, Suspicious Usage of base64, +27 more |
 | T1204.002 | VBA Macro Spawning Suspicious Child Process, Windows Spearphishing Attachment Execution |
 | T1218 | Control Panel Item Execution, SyncAppvPublishingServer Abuse |
@@ -72,7 +82,7 @@
 | T1569.002 | Service Execution via sc.exe Create, Sysmon PsExec Named Pipe |
 | T1648 | OCI Function Invoked |
 
-### Persistence (43 techniques)
+### Persistence (44 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -81,17 +91,18 @@
 | T1053.003 | Linux Crontab Modification, Linux Suspicious Cron Job Content |
 | T1053.005 | Scheduled Task XML Import, Windows Scheduled Task Creation via Schtasks |
 | T1059.004 | Linux Multi-Stage Attack Indicators (Combined Methods) |
-| T1078 | OCI IAM Rapid Configuration Changes (Anomaly Detection), OCI Privilege Escalation Chain Detection |
-| T1098 | OCI IAM Policy Modified, OCI User Password Reset by Admin, +3 more |
+| T1078 | OCI IAM and Fusion Activity Correlation, OCI IAM Rapid Configuration Changes (Anomaly Detection), OCI Privilege Escalation Chain Detection |
+| T1098 | OCI IAM Policy Modified, OCI User Password Reset by Admin, +4 more |
 | T1098.001 | OCI Action: AddUserToGroup, OCI API Key Uploaded, OCI Dynamic Group Created |
 | T1098.004 | Linux SSH Authorized Keys Modified, Linux Persistence Indicator Score (Combined Methods) |
 | T1110 | Linux Multi-Stage Attack Indicators (Combined Methods) |
 | T1136.001 | Linux Password File Direct Modification, New Local Account Created via Net.exe |
 | T1136.003 | OCI Action: CreateGroup, OCI Action: CreateUser |
 | T1137 | Office Application Startup Persistence |
+| T1190 | WAF Web Shell Upload Attempt Blocked |
 | T1197 | BITS Job Persistence, Windows BITS Job Abuse for Persistence |
 | T1219 | Windows Remote Access Tool Detected |
-| T1505.003 | Linux Web Shell File Creation |
+| T1505.003 | Linux Web Shell File Creation, WAF Web Shell Upload Attempt Blocked |
 | T1542 | Boot Configuration Change for Persistence |
 | T1543.002 | Linux Systemd Service Persistence, Linux Persistence Indicator Score (Combined Methods) |
 | T1543.003 | Windows Service Created with Suspicious Binary Path, Windows Service Creation via SC |
@@ -125,8 +136,8 @@
 | Technique | Rules |
 |-----------|-------|
 | T1068 | PrintNightmare Exploitation Attempt |
-| T1078 | OCI IAM Rapid Configuration Changes (Anomaly Detection), OCI Privilege Escalation Chain Detection |
-| T1098 | Cloud Guard Problem: Group Has Too Many Admins, Cloud Guard Problem: Policy Too Permissive, +9 more |
+| T1078 | Mass Assignment Attack Detected, Web Application Privilege Escalation, +3 more |
+| T1098 | Cloud Guard Problem: Group Has Too Many Admins, Cloud Guard Problem: Policy Too Permissive, +10 more |
 | T1098.001 | Cloud Guard Problem: Instance Principals Enabled |
 | T1134 | SeDebugPrivilege Abuse, Windows Access Token Manipulation |
 | T1134.001 | Named Pipe Impersonation via PowerShell, Potato Privilege Escalation Tool |
@@ -144,7 +155,7 @@
 | Technique | Rules |
 |-----------|-------|
 | T1003.001 | Windows WDigest Authentication Enabled for Credential Harvesting |
-| T1027 | Windows Encoded PowerShell Execution, Windows Suspiciously Long Command Line (Field Analysis) |
+| T1027 | BLUELIGHT RAT: Obfuscated Script Execution, Windows Encoded PowerShell Execution, Windows Suspiciously Long Command Line (Field Analysis) |
 | T1036 | Windows Process from Unusual Path (Rare Value Analysis) |
 | T1036.003 | Renamed System Binary Execution |
 | T1036.005 | Masquerading System Binary in Non-Standard Path |
@@ -197,7 +208,7 @@
 | T1600 | OCI Vault Key Rotation Overdue |
 | T1620 | Reflective DLL Loading Indicators |
 
-### Credential Access (28 techniques)
+### Credential Access (32 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -210,38 +221,43 @@
 | T1003.007 | Linux Process Memory Access via /proc |
 | T1005 | Linux Sensitive Data Collection from Local System |
 | T1056.001 | Windows Keylogger Indicators |
+| T1059 | OWASP Multi-Stage Web Attack Chain (Combined Methods) |
 | T1078 | OCI Console Login Brute Force (Frequency Analysis), Login Activity Time-Series Anomaly |
 | T1098.001 | OCI Customer Secret Key Created |
-| T1110 | Cloud Guard Problem: IAM User Console Password Old, OCI Console Login Brute Force (Frequency Analysis), Login Activity Time-Series Anomaly |
-| T1110.001 | Linux SSH Failed Login, SSH Brute Force Detection (Frequency Analysis) |
-| T1110.003 | OCI Password Spraying Attack |
+| T1110 | Cloud Guard Problem: IAM User Console Password Old, WAF Rate Limiting Triggered, +3 more |
+| T1110.001 | Linux SSH Failed Login, Web Application Brute Force Login Attempt, +2 more |
+| T1110.003 | OCI Password Spraying Attack, Web Application Brute Force Login Attempt, Web Application Brute Force Detection (Frequency Analysis) |
 | T1134 | Sysmon Mimikatz Named Pipe, Token Impersonation via Incognito |
 | T1187 | Forced Authentication via PetitPotam |
+| T1190 | SSRF to Cloud Instance Metadata Service (Linux), SSRF to Cloud Metadata Endpoint (169.254.169.254), OWASP Multi-Stage Web Attack Chain (Combined Methods) |
 | T1528 | OCI Auth Token Created |
+| T1539 | Web Application Session Hijacking Indicators |
+| T1550.004 | Web Application Session Hijacking Indicators |
 | T1552.001 | Credential File Discovery, WiFi Password Extraction via Netsh |
 | T1552.004 | Cloud Guard Problem: IAM User API Key Old |
-| T1552.005 | OCI Instance Metadata Service Accessed |
+| T1552.005 | OCI Instance Metadata Service Accessed, SSRF to Cloud Instance Metadata Service (Linux), SSRF to Cloud Metadata Endpoint (169.254.169.254) |
 | T1552.006 | Group Policy Preferences Password Extraction |
 | T1555 | DPAPI Master Key Extraction, LaZagne Credential Harvester, +2 more |
-| T1555.003 | Browser Credential Store Access |
+| T1555.003 | BLUELIGHT RAT: Browser Credential Memory Access, Browser Credential Store Access |
 | T1556 | NPPSpy Credential Interception, OCI User MFA Not Enabled, Shadow Credentials Attack via Whisker |
 | T1558 | Kerberos Ticket Export via Mimikatz |
 | T1558.003 | Sysmon Kerberoasting Network Indicator, Sysmon Mimikatz Network Activity, +2 more |
 | T1558.004 | AS-REP Roasting via Rubeus |
 | T1649 | Credential Access via Certutil Certificate Export |
 
-### Discovery (16 techniques)
+### Discovery (17 techniques)
 
 | Technique | Rules |
 |-----------|-------|
+| T1012 | BLUELIGHT RAT: Registry Enumeration of Security Products |
 | T1018 | Windows Remote System Discovery |
 | T1033 | Linux System Owner and User Discovery |
 | T1046 | Linux Network Service Scanning |
 | T1057 | Process Discovery via Tasklist |
 | T1069.001 | Local Group Membership Discovery |
 | T1069.002 | Sysmon LDAP Reconnaissance |
-| T1082 | Linux Post-Exploitation Enumeration Script |
-| T1083 | File and Directory Discovery via dir |
+| T1082 | BLUELIGHT RAT: WMI System Enumeration from Browser Child, Linux Post-Exploitation Enumeration Script |
+| T1083 | BLUELIGHT RAT: File Discovery from Browser Process, File and Directory Discovery via dir |
 | T1087.001 | Windows Account Discovery Commands |
 | T1087.002 | AD Enumeration via ADFind, BloodHound AD Enumeration, +2 more |
 | T1135 | Network Share Enumeration via Net View, Windows Network Share Discovery |
@@ -267,17 +283,18 @@
 | T1570 | Lateral Tool Transfer via Robocopy, Sysmon Lateral Movement via SMB, Windows Lateral Movement Tool Cluster (Grouping) |
 | T1599 | OCI DRG Attachment Created, OCI Local Peering Gateway Created, OCI Service Gateway Created |
 
-### Collection (9 techniques)
+### Collection (10 techniques)
 
 | Technique | Rules |
 |-----------|-------|
-| T1005 | Linux Sensitive Data Collection from Local System |
+| T1005 | Linux Sensitive Data Collection from Local System, Sensitive Data Endpoint Access |
 | T1056.001 | Keylogging via PowerShell Get-Keystrokes, Windows Keylogger Indicators |
 | T1074.001 | Windows Data Staging for Exfiltration, Linux Data Staging and Exfiltration Indicators |
-| T1113 | Screen Capture via PowerShell, Windows Screen Capture Activity |
+| T1113 | BLUELIGHT RAT: Periodic Screen Capture, Screen Capture via PowerShell, Windows Screen Capture Activity |
 | T1114 | Email Collection via PowerShell, OCI Notification Subscription Created |
 | T1115 | Clipboard Data Collection |
 | T1530 | OCI Action: CreateBucket |
+| T1552.001 | Sensitive Data Endpoint Access |
 | T1557 | Linux Suspicious Network Traffic Redirect |
 | T1560.001 | Data Compression for Exfiltration via 7zip, Linux Archive Data Collected for Exfiltration, Linux Data Staging and Exfiltration Indicators |
 
@@ -291,12 +308,12 @@
 | T1059 | Sysmon Suspicious Named Pipe Pattern |
 | T1059.001 | Windows PowerShell Download Cradle |
 | T1071 | Sysmon Cobalt Strike Named Pipe, Sysmon Suspicious Named Pipe Pattern, C2 Beaconing Detection (Periodic Connection Analysis) |
-| T1071.001 | Sysmon C2 Beacon - Periodic Outbound HTTPS, Sysmon Cobalt Strike C2 Network Indicators |
+| T1071.001 | BLUELIGHT RAT: C2 via Microsoft Graph API, Sysmon C2 Beacon - Periodic Outbound HTTPS, Sysmon Cobalt Strike C2 Network Indicators |
 | T1071.004 | Linux DNS Tunneling Detected, Sysmon DNS Data Exfiltration, +4 more |
 | T1090 | Linux Proxy and Tunneling Tool Detected |
 | T1090.001 | Linux Proxy and Tunneling Tool Detected |
 | T1095 | Sysmon Cobalt Strike C2 Network Indicators |
-| T1105 | Linux Suspicious Download to /tmp, Sysmon Suspicious Outbound Connection from LOLBin, +2 more |
+| T1105 | BLUELIGHT RAT: Executable Download via Graph API, Linux Suspicious Download to /tmp, +3 more |
 | T1140 | Windows Certutil Download or Decode |
 | T1218 | Sysmon Suspicious Outbound Connection from LOLBin |
 | T1219 | Windows Remote Access Tool Detected |
@@ -305,19 +322,21 @@
 | T1573 | Linux Encrypted Channel C2 Communication, Sysmon C2 Beacon - Periodic Outbound HTTPS, C2 Beaconing Detection (Periodic Connection Analysis) |
 | T1573.002 | Linux Encrypted Channel C2 Communication |
 
-### Exfiltration (7 techniques)
+### Exfiltration (9 techniques)
 
 | Technique | Rules |
 |-----------|-------|
-| T1048 | Linux Exfiltration Over Alternative Protocol, DNS Exfiltration Detection (Entropy Analysis) |
+| T1041 | Unusually Large HTTP Response (Data Exfiltration) |
+| T1048 | Linux Exfiltration Over Alternative Protocol, Unusually Large HTTP Response (Data Exfiltration), DNS Exfiltration Detection (Entropy Analysis) |
 | T1048.003 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection |
 | T1071.004 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection, DNS Exfiltration Detection (Entropy Analysis) |
 | T1074.001 | Windows Data Staging for Exfiltration, Linux Data Staging and Exfiltration Indicators |
 | T1537 | Cloud Guard Problem: Bucket Public Read, OCI Boot Volume Backup Created by Non-Admin, +4 more |
 | T1560.001 | Linux Archive Data Collected for Exfiltration, Linux Data Staging and Exfiltration Indicators |
 | T1567 | OCI Object Storage Pre-Authenticated Request Created |
+| T1567.002 | BLUELIGHT RAT: Data Exfiltration via OneDrive/Graph API |
 
-### Impact (10 techniques)
+### Impact (11 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -327,6 +346,7 @@
 | T1490 | OCI KMS Key Scheduled for Deletion, System Recovery Disabled via BCDEdit, +4 more |
 | T1491.001 | Defacement via Desktop Wallpaper Change |
 | T1496 | Cryptominer Deployment Indicators, Linux Cryptominer Activity Detected |
+| T1499 | Web Application Server Error Spike |
 | T1529 | System Shutdown or Reboot via shutdown.exe |
 | T1531 | Account Access Removal, OCI Action: DeleteGroup, +3 more |
 | T1561 | Disk Wipe via Format Command |
@@ -334,112 +354,142 @@
 
 ## All Detection Rules
 
-### OCI Cloud (100 rules)
+### OCI Cloud (130 rules)
 
 | # | Title | Severity | MITRE | STIG |
 |---|-------|----------|-------|------|
-| 1 | OCI Audit Configuration Retention Reduced | 🔴 critical | T1562.008 | - |
-| 2 | OCI Compartment Deleted | 🔴 critical | T1485 | AC-6 |
-| 3 | OCI Database System Terminated | 🔴 critical | T1485 | CP-9 |
-| 4 | OCI Federated Identity Provider Modified | 🔴 critical | T1606 | - |
-| 5 | OCI KMS Key Scheduled for Deletion | 🔴 critical | T1490 | - |
-| 6 | OCI Log Group Deleted | 🔴 critical | T1562.001 | AU-11 |
-| 7 | OCI Policy Allows Manage All Resources | 🔴 critical | T1098 | - |
-| 8 | Cloud Guard Problem: Audit Log Retention | 🟠 high | T1562.008 | - |
-| 9 | Cloud Guard Problem: Bucket Public Read | 🟠 high | T1537 | - |
-| 10 | Cloud Guard Problem: Bucket Public Write | 🟠 high | T1190 | - |
-| 11 | Cloud Guard Problem: Group Has Too Many Admins | 🟠 high | T1098 | - |
-| 12 | Cloud Guard Problem: IAM User API Key Old | 🟠 high | T1552.004 | - |
-| 13 | Cloud Guard Problem: IAM User Console Password Old | 🟠 high | T1110 | - |
-| 14 | Cloud Guard Problem: INSTANCE PUBLIC IP | 🟠 high | T1190 | - |
-| 15 | Cloud Guard Problem: Instance Principals Enabled | 🟠 high | T1098.001 | - |
-| 16 | Cloud Guard Problem: Policy Too Permissive | 🟠 high | T1098 | - |
-| 17 | Cloud Guard Problem: VCN Flow Log Disabled | 🟠 high | T1562.008 | - |
-| 18 | Cloud Guard Problem: VCN Security List Port RDP | 🟠 high | T1133 | - |
-| 19 | Cloud Guard Problem: VCN Security List Port SSH | 🟠 high | T1133 | - |
-| 20 | OCI Audit Configuration Changed | 🟠 high | T1562.008 | AU-11 |
-| 21 | OCI Autonomous Database Terminated | 🟠 high | T1485 | - |
-| 22 | OCI Cross-Region Data Copy | 🟠 high | T1537 | SC-28 |
-| 23 | OCI Customer Secret Key Created | 🟠 high | T1098.001 | IA-5 |
-| 24 | OCI Dynamic Group Created with Broad Matching | 🟠 high | T1098 | - |
-| 25 | OCI IAM Admin Policy Created with Manage All | 🟠 high | T1098 | - |
-| 26 | OCI Identity Provider Created | 🟠 high | T1556.007 | IA-8 |
-| 27 | OCI Instance Console Connection Created | 🟠 high | T1021 | AC-17 |
-| 28 | OCI KMS Key Version Disabled | 🟠 high | T1600 | - |
-| 29 | OCI Log Archival Policy Disabled | 🟠 high | T1562.008 | - |
-| 30 | OCI MFA Fatigue Attack Indicators | 🟠 high | T1621 | - |
-| 31 | OCI Network Firewall Policy Modified | 🟠 high | T1562.004 | SC-7 |
-| 32 | OCI Network Load Balancer Deleted | 🟠 high | T1489 | - |
-| 33 | OCI Object Storage Bucket Made Public | 🟠 high | T1537 | - |
-| 34 | OCI Object Storage Pre-Authenticated Request Created | 🟠 high | T1567 | AC-3 |
-| 35 | OCI Object Storage Replication Policy Created | 🟠 high | T1537 | - |
-| 36 | OCI Password Spraying Attack | 🟠 high | T1110.003 | IA-2 |
-| 37 | OCI Security List Allows All Protocols | 🟠 high | T1562.007 | SC-7 |
-| 38 | OCI User Capabilities Escalation | 🟠 high | T1098 | - |
-| 39 | OCI User MFA Not Enabled | 🟠 high | T1556 | IA-2 |
-| 40 | OCI User Password Reset by Admin | 🟠 high | T1098 | IA-5 |
-| 41 | OCI VCN Flow Log Disabled | 🟠 high | T1562.008 | - |
-| 42 | OCI VCN Security List Open to World | 🟠 high | T1562.007 | - |
-| 43 | OCI Vault Secret Deleted | 🟠 high | T1485 | SC-28 |
-| 44 | OCI WAF Policy Deleted | 🟠 high | T1562.001 | - |
-| 45 | OCI API Key Uploaded | 🟡 medium | T1098.001 | - |
-| 46 | OCI Auth Token Created | 🟡 medium | T1528 | IA-5 |
-| 47 | OCI Bastion Session Created | 🟡 medium | T1021 | AC-17 |
-| 48 | OCI Boot Volume Backup Created by Non-Admin | 🟡 medium | T1537 | - |
-| 49 | OCI Compute Instance Terminated | 🟡 medium | T1485 | - |
-| 50 | OCI Console Login Failure | 🟡 medium | T1078 | - |
-| 51 | OCI Console Login from Unusual IP | 🟡 medium | T1078 | - |
-| 52 | OCI DRG Attachment Created | 🟡 medium | T1599 | - |
-| 53 | OCI Database Backup Exported | 🟡 medium | T1537 | - |
-| 54 | OCI Dynamic Group Created | 🟡 medium | T1098.001 | AC-6 |
-| 55 | OCI IAM Policy Modified | 🟡 medium | T1098 | - |
-| 56 | OCI Instance Metadata Service Accessed | 🟡 medium | T1552.005 | - |
-| 57 | OCI Local Peering Gateway Created | 🟡 medium | T1599 | - |
-| 58 | OCI Network Security Group Rule Added for All Protocols | 🟡 medium | T1562.004 | - |
-| 59 | OCI Network Security Group Updated | 🟡 medium | T1562.007 | - |
-| 60 | OCI Notification Subscription Created | 🟡 medium | T1114 | AU-12 |
-| 61 | OCI Route Table Update | 🟡 medium | T1562.007 | - |
-| 62 | OCI VCN Peering Connection Created | 🟡 medium | T1021 | SC-7 |
-| 63 | OCI Vault Key Rotation Overdue | 🟡 medium | T1600 | SC-12 |
-| 64 | OCI Vault Secret Version Deprecated | 🟡 medium | T1600 | - |
-| 65 | OCI WAF Configuration Updated | 🟡 medium | T1562.007 | - |
-| 66 | OCI Cloud Infrastructure Discovery | 🔵 low | T1580 | AU-12 |
-| 67 | OCI Cloud Shell Session Started | 🔵 low | T1059.004 | AU-12 |
-| 68 | OCI Console Login from Suspicious IP Range | 🔵 low | T1078 | - |
-| 69 | OCI Function Invoked | 🔵 low | T1648 | AU-12 |
-| 70 | OCI Service Gateway Created | 🔵 low | T1599 | - |
-| 71 | OCI Action: AddUserToGroup | ⚪ informational | T1098.001 | - |
-| 72 | OCI Action: AttachInternetGateway | ⚪ informational | T1583 | - |
-| 73 | OCI Action: CreateBucket | ⚪ informational | T1530 | - |
-| 74 | OCI Action: CreateGroup | ⚪ informational | T1136.003 | - |
-| 75 | OCI Action: CreateInstance | ⚪ informational | T1583.003 | - |
-| 76 | OCI Action: CreateInternetGateway | ⚪ informational | T1583 | - |
-| 77 | OCI Action: CreateKey | ⚪ informational | T1553 | - |
-| 78 | OCI Action: CreatePolicy | ⚪ informational | T1098 | - |
-| 79 | OCI Action: CreateRouteTable | ⚪ informational | T1583 | - |
-| 80 | OCI Action: CreateSecurityList | ⚪ informational | T1562.007 | - |
-| 81 | OCI Action: CreateSubnet | ⚪ informational | T1583 | - |
-| 82 | OCI Action: CreateUser | ⚪ informational | T1136.003 | - |
-| 83 | OCI Action: CreateVcn | ⚪ informational | T1583 | - |
-| 84 | OCI Action: DeleteBucket | ⚪ informational | T1485 | - |
-| 85 | OCI Action: DeleteGroup | ⚪ informational | T1531 | - |
-| 86 | OCI Action: DeleteInternetGateway | ⚪ informational | T1489 | - |
-| 87 | OCI Action: DeleteKey | ⚪ informational | T1485 | - |
-| 88 | OCI Action: DeletePolicy | ⚪ informational | T1531 | - |
-| 89 | OCI Action: DeleteSubnet | ⚪ informational | T1489 | - |
-| 90 | OCI Action: DeleteUser | ⚪ informational | T1531 | - |
-| 91 | OCI Action: DeleteVcn | ⚪ informational | T1489 | - |
-| 92 | OCI Action: DetachInternetGateway | ⚪ informational | T1489 | - |
-| 93 | OCI Action: RemoveUserFromGroup | ⚪ informational | T1531 | - |
-| 94 | OCI Action: StartInstance | ⚪ informational | T1204 | - |
-| 95 | OCI Action: StopInstance | ⚪ informational | T1489 | - |
-| 96 | OCI Action: TerminateInstance | ⚪ informational | T1485 | - |
-| 97 | OCI Action: UpdateBucket | ⚪ informational | T1562.007 | - |
-| 98 | OCI Action: UpdatePolicy | ⚪ informational | T1098 | - |
-| 99 | OCI Action: UpdateRouteTable | ⚪ informational | T1562.007 | - |
-| 100 | OCI Action: UpdateSecurityList | ⚪ informational | T1562.007 | - |
+| 1 | Insecure Deserialization Attack Detected | 🔴 critical | T1059, T1190 | - |
+| 2 | OCI Audit Configuration Retention Reduced | 🔴 critical | T1562.008 | - |
+| 3 | OCI Compartment Deleted | 🔴 critical | T1485 | AC-6 |
+| 4 | OCI Database System Terminated | 🔴 critical | T1485 | CP-9 |
+| 5 | OCI Federated Identity Provider Modified | 🔴 critical | T1606 | - |
+| 6 | OCI KMS Key Scheduled for Deletion | 🔴 critical | T1490 | - |
+| 7 | OCI Log Group Deleted | 🔴 critical | T1562.001 | AU-11 |
+| 8 | OCI Policy Allows Manage All Resources | 🔴 critical | T1098 | - |
+| 9 | WAF Command Injection Attack Blocked | 🔴 critical | T1059, T1190 | - |
+| 10 | WAF Log4Shell (CVE-2021-44228) Attack Blocked | 🔴 critical | T1190, T1059 | - |
+| 11 | WAF SQL Injection Attack Allowed Through | 🔴 critical | T1190, T1059.007 | - |
+| 12 | WAF Server-Side Request Forgery Blocked | 🔴 critical | T1190, T1552.005 | - |
+| 13 | WAF Server-Side Template Injection Blocked | 🔴 critical | T1059, T1190 | - |
+| 14 | WAF Web Shell Upload Attempt Blocked | 🔴 critical | T1505.003, T1190 | - |
+| 15 | Web Application Authentication Bypass | 🔴 critical | T1078, T1550 | - |
+| 16 | Web Application Privilege Escalation | 🔴 critical | T1078 | - |
+| 17 | Web Application Session Hijacking Indicators | 🔴 critical | T1539, T1550.004 | - |
+| 18 | Cloud Guard Problem: Audit Log Retention | 🟠 high | T1562.008 | - |
+| 19 | Cloud Guard Problem: Bucket Public Read | 🟠 high | T1537 | - |
+| 20 | Cloud Guard Problem: Bucket Public Write | 🟠 high | T1190 | - |
+| 21 | Cloud Guard Problem: Group Has Too Many Admins | 🟠 high | T1098 | - |
+| 22 | Cloud Guard Problem: IAM User API Key Old | 🟠 high | T1552.004 | - |
+| 23 | Cloud Guard Problem: IAM User Console Password Old | 🟠 high | T1110 | - |
+| 24 | Cloud Guard Problem: INSTANCE PUBLIC IP | 🟠 high | T1190 | - |
+| 25 | Cloud Guard Problem: Instance Principals Enabled | 🟠 high | T1098.001 | - |
+| 26 | Cloud Guard Problem: Policy Too Permissive | 🟠 high | T1098 | - |
+| 27 | Cloud Guard Problem: VCN Flow Log Disabled | 🟠 high | T1562.008 | - |
+| 28 | Cloud Guard Problem: VCN Security List Port RDP | 🟠 high | T1133 | - |
+| 29 | Cloud Guard Problem: VCN Security List Port SSH | 🟠 high | T1133 | - |
+| 30 | Insecure Direct Object Reference Detected | 🟠 high | T1190 | - |
+| 31 | Mass Assignment Attack Detected | 🟠 high | T1078 | - |
+| 32 | OCI Audit Configuration Changed | 🟠 high | T1562.008 | AU-11 |
+| 33 | OCI Autonomous Database Terminated | 🟠 high | T1485 | - |
+| 34 | OCI Cross-Region Data Copy | 🟠 high | T1537 | SC-28 |
+| 35 | OCI Customer Secret Key Created | 🟠 high | T1098.001 | IA-5 |
+| 36 | OCI Dynamic Group Created with Broad Matching | 🟠 high | T1098 | - |
+| 37 | OCI IAM Admin Policy Created with Manage All | 🟠 high | T1098 | - |
+| 38 | OCI Identity Provider Created | 🟠 high | T1556.007 | IA-8 |
+| 39 | OCI Instance Console Connection Created | 🟠 high | T1021 | AC-17 |
+| 40 | OCI KMS Key Version Disabled | 🟠 high | T1600 | - |
+| 41 | OCI Log Archival Policy Disabled | 🟠 high | T1562.008 | - |
+| 42 | OCI MFA Fatigue Attack Indicators | 🟠 high | T1621 | - |
+| 43 | OCI Network Firewall Policy Modified | 🟠 high | T1562.004 | SC-7 |
+| 44 | OCI Network Load Balancer Deleted | 🟠 high | T1489 | - |
+| 45 | OCI Object Storage Bucket Made Public | 🟠 high | T1537 | - |
+| 46 | OCI Object Storage Pre-Authenticated Request Created | 🟠 high | T1567 | AC-3 |
+| 47 | OCI Object Storage Replication Policy Created | 🟠 high | T1537 | - |
+| 48 | OCI Password Spraying Attack | 🟠 high | T1110.003 | IA-2 |
+| 49 | OCI Security List Allows All Protocols | 🟠 high | T1562.007 | SC-7 |
+| 50 | OCI User Capabilities Escalation | 🟠 high | T1098 | - |
+| 51 | OCI User MFA Not Enabled | 🟠 high | T1556 | IA-2 |
+| 52 | OCI User Password Reset by Admin | 🟠 high | T1098 | IA-5 |
+| 53 | OCI VCN Flow Log Disabled | 🟠 high | T1562.008 | - |
+| 54 | OCI VCN Security List Open to World | 🟠 high | T1562.007 | - |
+| 55 | OCI Vault Secret Deleted | 🟠 high | T1485 | SC-28 |
+| 56 | OCI WAF Policy Deleted | 🟠 high | T1562.001 | - |
+| 57 | Sensitive Data Endpoint Access | 🟠 high | T1005, T1552.001 | - |
+| 58 | WAF Cross-Site Scripting Attack Blocked | 🟠 high | T1189 | - |
+| 59 | WAF LDAP Injection Attack Blocked | 🟠 high | T1190 | - |
+| 60 | WAF NoSQL Injection Attack Blocked | 🟠 high | T1190 | - |
+| 61 | WAF Path Traversal Attack Blocked | 🟠 high | T1083, T1190 | - |
+| 62 | WAF Protocol Attack Blocked | 🟠 high | T1190 | - |
+| 63 | WAF SQL Injection Attack Blocked | 🟠 high | T1190, T1059.007 | - |
+| 64 | WAF XML External Entity Attack Blocked | 🟠 high | T1190 | - |
+| 65 | API Endpoint Unauthorized Access Attempts | 🟡 medium | T1190, T1078 | - |
+| 66 | OCI API Key Uploaded | 🟡 medium | T1098.001 | - |
+| 67 | OCI Auth Token Created | 🟡 medium | T1528 | IA-5 |
+| 68 | OCI Bastion Session Created | 🟡 medium | T1021 | AC-17 |
+| 69 | OCI Boot Volume Backup Created by Non-Admin | 🟡 medium | T1537 | - |
+| 70 | OCI Compute Instance Terminated | 🟡 medium | T1485 | - |
+| 71 | OCI Console Login Failure | 🟡 medium | T1078 | - |
+| 72 | OCI Console Login from Unusual IP | 🟡 medium | T1078 | - |
+| 73 | OCI DRG Attachment Created | 🟡 medium | T1599 | - |
+| 74 | OCI Database Backup Exported | 🟡 medium | T1537 | - |
+| 75 | OCI Dynamic Group Created | 🟡 medium | T1098.001 | AC-6 |
+| 76 | OCI IAM Policy Modified | 🟡 medium | T1098 | - |
+| 77 | OCI Instance Metadata Service Accessed | 🟡 medium | T1552.005 | - |
+| 78 | OCI Local Peering Gateway Created | 🟡 medium | T1599 | - |
+| 79 | OCI Network Security Group Rule Added for All Protocols | 🟡 medium | T1562.004 | - |
+| 80 | OCI Network Security Group Updated | 🟡 medium | T1562.007 | - |
+| 81 | OCI Notification Subscription Created | 🟡 medium | T1114 | AU-12 |
+| 82 | OCI Route Table Update | 🟡 medium | T1562.007 | - |
+| 83 | OCI VCN Peering Connection Created | 🟡 medium | T1021 | SC-7 |
+| 84 | OCI Vault Key Rotation Overdue | 🟡 medium | T1600 | SC-12 |
+| 85 | OCI Vault Secret Version Deprecated | 🟡 medium | T1600 | - |
+| 86 | OCI WAF Configuration Updated | 🟡 medium | T1562.007 | - |
+| 87 | Suspicious or Empty User Agent Detected | 🟡 medium | T1595 | - |
+| 88 | Unusually Large HTTP Response (Data Exfiltration) | 🟡 medium | T1041, T1048 | - |
+| 89 | WAF CORS Bypass Attempt Blocked | 🟡 medium | T1189 | - |
+| 90 | WAF Rate Limiting Triggered | 🟡 medium | T1110 | - |
+| 91 | Web Application Brute Force Login Attempt | 🟡 medium | T1110.001, T1110.003 | - |
+| 92 | Web Application Server Error Spike | 🟡 medium | T1499 | - |
+| 93 | Web Vulnerability Scanner Detected | 🟡 medium | T1595.002 | - |
+| 94 | OCI Cloud Infrastructure Discovery | 🔵 low | T1580 | AU-12 |
+| 95 | OCI Cloud Shell Session Started | 🔵 low | T1059.004 | AU-12 |
+| 96 | OCI Console Login from Suspicious IP Range | 🔵 low | T1078 | - |
+| 97 | OCI Function Invoked | 🔵 low | T1648 | AU-12 |
+| 98 | OCI Service Gateway Created | 🔵 low | T1599 | - |
+| 99 | Suspicious HTTP Method Usage | 🔵 low | T1190 | - |
+| 100 | Web Directory Enumeration Detected | 🔵 low | T1083, T1595.002 | - |
+| 101 | OCI Action: AddUserToGroup | ⚪ informational | T1098.001 | - |
+| 102 | OCI Action: AttachInternetGateway | ⚪ informational | T1583 | - |
+| 103 | OCI Action: CreateBucket | ⚪ informational | T1530 | - |
+| 104 | OCI Action: CreateGroup | ⚪ informational | T1136.003 | - |
+| 105 | OCI Action: CreateInstance | ⚪ informational | T1583.003 | - |
+| 106 | OCI Action: CreateInternetGateway | ⚪ informational | T1583 | - |
+| 107 | OCI Action: CreateKey | ⚪ informational | T1553 | - |
+| 108 | OCI Action: CreatePolicy | ⚪ informational | T1098 | - |
+| 109 | OCI Action: CreateRouteTable | ⚪ informational | T1583 | - |
+| 110 | OCI Action: CreateSecurityList | ⚪ informational | T1562.007 | - |
+| 111 | OCI Action: CreateSubnet | ⚪ informational | T1583 | - |
+| 112 | OCI Action: CreateUser | ⚪ informational | T1136.003 | - |
+| 113 | OCI Action: CreateVcn | ⚪ informational | T1583 | - |
+| 114 | OCI Action: DeleteBucket | ⚪ informational | T1485 | - |
+| 115 | OCI Action: DeleteGroup | ⚪ informational | T1531 | - |
+| 116 | OCI Action: DeleteInternetGateway | ⚪ informational | T1489 | - |
+| 117 | OCI Action: DeleteKey | ⚪ informational | T1485 | - |
+| 118 | OCI Action: DeletePolicy | ⚪ informational | T1531 | - |
+| 119 | OCI Action: DeleteSubnet | ⚪ informational | T1489 | - |
+| 120 | OCI Action: DeleteUser | ⚪ informational | T1531 | - |
+| 121 | OCI Action: DeleteVcn | ⚪ informational | T1489 | - |
+| 122 | OCI Action: DetachInternetGateway | ⚪ informational | T1489 | - |
+| 123 | OCI Action: RemoveUserFromGroup | ⚪ informational | T1531 | - |
+| 124 | OCI Action: StartInstance | ⚪ informational | T1204 | - |
+| 125 | OCI Action: StopInstance | ⚪ informational | T1489 | - |
+| 126 | OCI Action: TerminateInstance | ⚪ informational | T1485 | - |
+| 127 | OCI Action: UpdateBucket | ⚪ informational | T1562.007 | - |
+| 128 | OCI Action: UpdatePolicy | ⚪ informational | T1098 | - |
+| 129 | OCI Action: UpdateRouteTable | ⚪ informational | T1562.007 | - |
+| 130 | OCI Action: UpdateSecurityList | ⚪ informational | T1562.007 | - |
 
-### Linux (65 rules)
+### Linux (67 rules)
 
 | # | Title | Severity | MITRE | ART Tests | STIG |
 |---|-------|----------|-------|-----------|------|
@@ -450,287 +500,302 @@
 | 5 | Linux Process Execution from /dev/shm | 🔴 critical | T1059 | 1 | - |
 | 6 | Linux Reverse Shell Detected | 🔴 critical | T1059 | 1 | - |
 | 7 | Linux Web Shell File Creation | 🔴 critical | T1505.003 | 1 | - |
-| 8 | Suspicious Usage of insmod | 🔴 critical | T1204 | 14 | - |
-| 9 | Suspicious Usage of shadow | 🔴 critical | T1204 | 14 | - |
-| 10 | Linux Archive Data Collected for Exfiltration | 🟠 high | T1560.001 | 12 | - |
-| 11 | Linux Cryptominer Activity Detected | 🟠 high | T1496 | 2 | - |
-| 12 | Linux DNS Tunneling Detected | 🟠 high | T1071.004 | 4 | - |
-| 13 | Linux Encrypted Channel C2 Communication | 🟠 high | T1573, T1573.002 | 1 | - |
-| 14 | Linux Exfiltration Over Alternative Protocol | 🟠 high | T1048 | 4 | - |
-| 15 | Linux LD_PRELOAD Library Hijacking | 🟠 high | T1574.006 | 3 | - |
-| 16 | Linux Log File Tampering | 🟠 high | T1070.002 | 20 | - |
-| 17 | Linux Network Service Scanning | 🟠 high | T1046 | 12 | - |
-| 18 | Linux Post-Exploitation Enumeration Script | 🟠 high | T1082 | 40 | - |
-| 19 | Linux Process Injection via Ptrace | 🟠 high | T1055.008 | 13 | - |
-| 20 | Linux Process Memory Access via /proc | 🟠 high | T1003.007 | 4 | - |
-| 21 | Linux Proxy and Tunneling Tool Detected | 🟠 high | T1090, T1090.001 | 7 | - |
-| 22 | Linux SSH Authorized Keys Modified | 🟠 high | T1098.004 | 1 | - |
-| 23 | Linux SSH Tunneling Detected | 🟠 high | T1572 | 7 | - |
-| 24 | Linux Sensitive Data Collection from Local System | 🟠 high | T1005 | 3 | - |
-| 25 | Linux Setuid Binary Creation | 🟠 high | T1548.001 | 10 | - |
-| 26 | Linux Sudoers File Modification | 🟠 high | T1548.003 | 6 | - |
-| 27 | Linux Suspicious Cron Job Content | 🟠 high | T1053.003 | 4 | - |
-| 28 | Linux Suspicious Download to /tmp | 🟠 high | T1105 | 39 | - |
-| 29 | Linux Suspicious Network Traffic Redirect | 🟠 high | T1557 | 1 | - |
-| 30 | Suspicious Usage of chmod | 🟠 high | T1204 | 14 | - |
-| 31 | Suspicious Usage of curl | 🟠 high | T1204 | 14 | - |
-| 32 | Suspicious Usage of dd | 🟠 high | T1204 | 14 | - |
-| 33 | Suspicious Usage of gdb | 🟠 high | T1204 | 14 | - |
-| 34 | Suspicious Usage of modprobe | 🟠 high | T1204 | 14 | - |
-| 35 | Suspicious Usage of nc | 🟠 high | T1204 | 14 | - |
-| 36 | Suspicious Usage of ncat | 🟠 high | T1204 | 14 | - |
-| 37 | Suspicious Usage of netcat | 🟠 high | T1204 | 14 | - |
-| 38 | Suspicious Usage of nmap | 🟠 high | T1204 | 14 | - |
-| 39 | Suspicious Usage of passwd | 🟠 high | T1204 | 14 | - |
-| 40 | Suspicious Usage of rmmod | 🟠 high | T1204 | 14 | - |
-| 41 | Suspicious Usage of socat | 🟠 high | T1204 | 14 | - |
-| 42 | Suspicious Usage of wget | 🟠 high | T1204 | 14 | - |
-| 43 | Linux At Job Scheduled | 🟡 medium | T1053.002 | 3 | - |
-| 44 | Linux Crontab Modification | 🟡 medium | T1053.003 | 4 | - |
-| 45 | Linux Hidden File or Directory Creation in Suspicious Location | 🟡 medium | T1564.001 | 10 | - |
-| 46 | Linux History File Cleared | 🟡 medium | T1070.003 | 14 | - |
-| 47 | Linux Hosts File Modification | 🟡 medium | T1565.001 | - | - |
-| 48 | Linux Shell Profile Persistence | 🟡 medium | T1546.004 | 7 | - |
-| 49 | Linux Systemd Service Persistence | 🟡 medium | T1543.002 | 3 | - |
-| 50 | Suspicious Usage of base64 | 🟡 medium | T1204 | 14 | - |
-| 51 | Suspicious Usage of chown | 🟡 medium | T1204 | 14 | - |
-| 52 | Suspicious Usage of id | 🟡 medium | T1204 | 14 | - |
-| 53 | Suspicious Usage of lua | 🟡 medium | T1204 | 14 | - |
-| 54 | Suspicious Usage of perl | 🟡 medium | T1204 | 14 | - |
-| 55 | Suspicious Usage of python | 🟡 medium | T1204 | 14 | - |
-| 56 | Suspicious Usage of ruby | 🟡 medium | T1204 | 14 | - |
-| 57 | Suspicious Usage of strace | 🟡 medium | T1204 | 14 | - |
-| 58 | Suspicious Usage of tcpdump | 🟡 medium | T1204 | 14 | - |
-| 59 | Suspicious Usage of tshark | 🟡 medium | T1204 | 14 | - |
-| 60 | Suspicious Usage of whoami | 🟡 medium | T1204 | 14 | - |
-| 61 | Suspicious Usage of wireshark | 🟡 medium | T1204 | 14 | - |
-| 62 | Linux External Remote Service Abuse | 🔵 low | T1133 | 1 | - |
-| 63 | Linux SSH Failed Login | 🔵 low | T1110.001 | 8 | - |
-| 64 | Linux Sudo Usage | 🔵 low | T1548.003 | 6 | - |
-| 65 | Linux System Owner and User Discovery | 🔵 low | T1033 | 7 | - |
+| 8 | SSRF to Cloud Instance Metadata Service (Linux) | 🔴 critical | T1552.005, T1190 | - | - |
+| 9 | Suspicious Usage of insmod | 🔴 critical | T1204 | 14 | - |
+| 10 | Suspicious Usage of shadow | 🔴 critical | T1204 | 14 | - |
+| 11 | Web Server Process Spawning Shell with Injection Characters (Linux) | 🔴 critical | T1059, T1190 | - | - |
+| 12 | Linux Archive Data Collected for Exfiltration | 🟠 high | T1560.001 | 12 | - |
+| 13 | Linux Cryptominer Activity Detected | 🟠 high | T1496 | 2 | - |
+| 14 | Linux DNS Tunneling Detected | 🟠 high | T1071.004 | 4 | - |
+| 15 | Linux Encrypted Channel C2 Communication | 🟠 high | T1573, T1573.002 | 1 | - |
+| 16 | Linux Exfiltration Over Alternative Protocol | 🟠 high | T1048 | 4 | - |
+| 17 | Linux LD_PRELOAD Library Hijacking | 🟠 high | T1574.006 | 3 | - |
+| 18 | Linux Log File Tampering | 🟠 high | T1070.002 | 20 | - |
+| 19 | Linux Network Service Scanning | 🟠 high | T1046 | 12 | - |
+| 20 | Linux Post-Exploitation Enumeration Script | 🟠 high | T1082 | 40 | - |
+| 21 | Linux Process Injection via Ptrace | 🟠 high | T1055.008 | 13 | - |
+| 22 | Linux Process Memory Access via /proc | 🟠 high | T1003.007 | 4 | - |
+| 23 | Linux Proxy and Tunneling Tool Detected | 🟠 high | T1090, T1090.001 | 7 | - |
+| 24 | Linux SSH Authorized Keys Modified | 🟠 high | T1098.004 | 1 | - |
+| 25 | Linux SSH Tunneling Detected | 🟠 high | T1572 | 7 | - |
+| 26 | Linux Sensitive Data Collection from Local System | 🟠 high | T1005 | 3 | - |
+| 27 | Linux Setuid Binary Creation | 🟠 high | T1548.001 | 10 | - |
+| 28 | Linux Sudoers File Modification | 🟠 high | T1548.003 | 6 | - |
+| 29 | Linux Suspicious Cron Job Content | 🟠 high | T1053.003 | 4 | - |
+| 30 | Linux Suspicious Download to /tmp | 🟠 high | T1105 | 39 | - |
+| 31 | Linux Suspicious Network Traffic Redirect | 🟠 high | T1557 | 1 | - |
+| 32 | Suspicious Usage of chmod | 🟠 high | T1204 | 14 | - |
+| 33 | Suspicious Usage of curl | 🟠 high | T1204 | 14 | - |
+| 34 | Suspicious Usage of dd | 🟠 high | T1204 | 14 | - |
+| 35 | Suspicious Usage of gdb | 🟠 high | T1204 | 14 | - |
+| 36 | Suspicious Usage of modprobe | 🟠 high | T1204 | 14 | - |
+| 37 | Suspicious Usage of nc | 🟠 high | T1204 | 14 | - |
+| 38 | Suspicious Usage of ncat | 🟠 high | T1204 | 14 | - |
+| 39 | Suspicious Usage of netcat | 🟠 high | T1204 | 14 | - |
+| 40 | Suspicious Usage of nmap | 🟠 high | T1204 | 14 | - |
+| 41 | Suspicious Usage of passwd | 🟠 high | T1204 | 14 | - |
+| 42 | Suspicious Usage of rmmod | 🟠 high | T1204 | 14 | - |
+| 43 | Suspicious Usage of socat | 🟠 high | T1204 | 14 | - |
+| 44 | Suspicious Usage of wget | 🟠 high | T1204 | 14 | - |
+| 45 | Linux At Job Scheduled | 🟡 medium | T1053.002 | 3 | - |
+| 46 | Linux Crontab Modification | 🟡 medium | T1053.003 | 4 | - |
+| 47 | Linux Hidden File or Directory Creation in Suspicious Location | 🟡 medium | T1564.001 | 10 | - |
+| 48 | Linux History File Cleared | 🟡 medium | T1070.003 | 14 | - |
+| 49 | Linux Hosts File Modification | 🟡 medium | T1565.001 | - | - |
+| 50 | Linux Shell Profile Persistence | 🟡 medium | T1546.004 | 7 | - |
+| 51 | Linux Systemd Service Persistence | 🟡 medium | T1543.002 | 3 | - |
+| 52 | Suspicious Usage of base64 | 🟡 medium | T1204 | 14 | - |
+| 53 | Suspicious Usage of chown | 🟡 medium | T1204 | 14 | - |
+| 54 | Suspicious Usage of id | 🟡 medium | T1204 | 14 | - |
+| 55 | Suspicious Usage of lua | 🟡 medium | T1204 | 14 | - |
+| 56 | Suspicious Usage of perl | 🟡 medium | T1204 | 14 | - |
+| 57 | Suspicious Usage of python | 🟡 medium | T1204 | 14 | - |
+| 58 | Suspicious Usage of ruby | 🟡 medium | T1204 | 14 | - |
+| 59 | Suspicious Usage of strace | 🟡 medium | T1204 | 14 | - |
+| 60 | Suspicious Usage of tcpdump | 🟡 medium | T1204 | 14 | - |
+| 61 | Suspicious Usage of tshark | 🟡 medium | T1204 | 14 | - |
+| 62 | Suspicious Usage of whoami | 🟡 medium | T1204 | 14 | - |
+| 63 | Suspicious Usage of wireshark | 🟡 medium | T1204 | 14 | - |
+| 64 | Linux External Remote Service Abuse | 🔵 low | T1133 | 1 | - |
+| 65 | Linux SSH Failed Login | 🔵 low | T1110.001 | 8 | - |
+| 66 | Linux Sudo Usage | 🔵 low | T1548.003 | 6 | - |
+| 67 | Linux System Owner and User Discovery | 🔵 low | T1033 | 7 | - |
 
-### Windows (218 rules)
+### Windows (231 rules)
 
 | # | Title | Severity | MITRE | ART Tests | STIG |
 |---|-------|----------|-------|-----------|------|
 | 1 | Accessibility Features Backdoor | 🔴 critical | T1546.008 | 10 | - |
 | 2 | AppInit DLLs Persistence | 🔴 critical | T1546.010 | 1 | - |
-| 3 | BloodHound AD Enumeration | 🔴 critical | T1087.002 | 24 | - |
-| 4 | Credential Dumping via Comsvcs with Rundll32 | 🔴 critical | T1003.001 | 14 | - |
-| 5 | DCSync Attack via Replication Request | 🔴 critical | T1003.006 | 2 | - |
-| 6 | Disk Wipe via Format Command | 🔴 critical | T1561 | - | - |
-| 7 | Forced Authentication via PetitPotam | 🔴 critical | T1187 | 3 | - |
-| 8 | Kerberos Ticket Export via Mimikatz | 🔴 critical | T1558 | 13 | - |
-| 9 | Keylogging via PowerShell Get-Keystrokes | 🔴 critical | T1056.001 | 8 | - |
-| 10 | LSASS Clone via ProcDump Evasion | 🔴 critical | T1003.001 | 14 | - |
-| 11 | LSASS Memory Dump via Comsvcs DLL | 🔴 critical | T1003.001 | 14 | - |
-| 12 | LaZagne Credential Harvester | 🔴 critical | T1555 | 8 | - |
-| 13 | NTDS.dit Database Copy Attempt | 🔴 critical | T1003.003 | 11 | - |
-| 14 | Named Pipe Impersonation via PowerShell | 🔴 critical | T1134.001 | 5 | - |
-| 15 | Pass-the-Ticket via Rubeus | 🔴 critical | T1550.003 | 2 | - |
-| 16 | Potato Privilege Escalation Tool | 🔴 critical | T1134.001 | 5 | - |
-| 17 | PrintNightmare Exploitation Attempt | 🔴 critical | T1068 | - | - |
-| 18 | Process Doppelganging via TxF | 🔴 critical | T1055.013 | 13 | - |
-| 19 | Ransomware File Extension Indicators | 🔴 critical | T1486 | 10 | - |
-| 20 | Reflective DLL Loading Indicators | 🔴 critical | T1620 | 1 | - |
-| 21 | Security Support Provider DLL Persistence | 🔴 critical | T1547.005 | 2 | - |
-| 22 | Shadow Credentials Attack via Whisker | 🔴 critical | T1556 | 5 | - |
-| 23 | Sysmon Cobalt Strike C2 Network Indicators | 🔴 critical | T1071.001, T1095 | 7 | - |
-| 24 | Sysmon Cobalt Strike Named Pipe | 🔴 critical | T1071, T1055 | 14 | - |
-| 25 | Sysmon Configuration Tampering | 🔴 critical | T1562.001 | 59 | - |
-| 26 | Sysmon Mimikatz Named Pipe | 🔴 critical | T1003.001, T1134 | 27 | - |
-| 27 | Sysmon Mimikatz Network Activity | 🔴 critical | T1003.001, T1558.003 | 21 | - |
-| 28 | Sysmon Suspicious Named Pipe Pattern | 🔴 critical | T1071, T1059 | 2 | - |
-| 29 | System Recovery Disabled via BCDEdit | 🔴 critical | T1490 | 13 | - |
-| 30 | Volume Shadow Copy Deletion via WMIC | 🔴 critical | T1490 | 13 | - |
-| 31 | Windows Access Token Manipulation | 🔴 critical | T1134 | 13 | - |
-| 32 | Windows Boot Configuration Modified | 🔴 critical | T1490 | 13 | - |
-| 33 | Windows Credential Dumping via Procdump | 🔴 critical | T1003.001 | 14 | - |
-| 34 | Windows Credential Dumping via Secretsdump | 🔴 critical | T1003 | 7 | - |
-| 35 | Windows Defender Real-Time Protection Disabled | 🔴 critical | T1562.001 | 59 | - |
-| 36 | Windows Kerberoasting Attack | 🔴 critical | T1558.003 | 7 | - |
-| 37 | Windows Keylogger Indicators | 🔴 critical | T1056.001 | 8 | - |
-| 38 | Windows LSASS Memory Access | 🔴 critical | T1003.001 | 14 | - |
-| 39 | Windows Mimikatz Execution Patterns | 🔴 critical | T1003.001 | 14 | - |
-| 40 | Windows NTDS.dit Database Extraction | 🔴 critical | T1003.003 | 11 | - |
-| 41 | Windows Pass-the-Hash Attack Indicators | 🔴 critical | T1550.002 | 3 | - |
-| 42 | Windows Process Hollowing Indicators | 🔴 critical | T1055.012 | 4 | - |
-| 43 | Windows Shadow Copy Deletion | 🔴 critical | T1490 | 13 | - |
-| 44 | Windows Spearphishing Attachment Execution | 🔴 critical | T1566.001, T1204.002 | 15 | - |
-| 45 | AD Enumeration via ADFind | 🟠 high | T1087.002 | 24 | - |
-| 46 | AMSI Bypass via PowerShell Reflection | 🟠 high | T1562.001 | 59 | - |
-| 47 | AS-REP Roasting via Rubeus | 🟠 high | T1558.004 | 3 | - |
-| 48 | Account Access Removal | 🟠 high | T1531 | 8 | - |
-| 49 | Active Setup Persistence | 🟠 high | T1547.014 | 3 | - |
-| 50 | Alternate Data Stream Execution | 🟠 high | T1564.004 | 5 | - |
-| 51 | AppLocker Policy Bypass via MSHTML | 🟠 high | T1218.005 | 10 | - |
-| 52 | Boot Configuration Change for Persistence | 🟠 high | T1542 | 1 | - |
-| 53 | Browser Credential Store Access | 🟠 high | T1555.003 | 17 | - |
-| 54 | CMSTP UAC Bypass | 🟠 high | T1218.003 | 2 | - |
-| 55 | COM Object Hijacking via Registry | 🟠 high | T1546.015 | 4 | - |
-| 56 | Credential Access via Certutil Certificate Export | 🟠 high | T1649 | 1 | - |
-| 57 | Credential Dumping via Windows Task Manager | 🟠 high | T1003.001 | 14 | - |
-| 58 | Cryptominer Deployment Indicators | 🟠 high | T1496 | 2 | - |
-| 59 | DCOM Lateral Movement via MMC20 | 🟠 high | T1021.003 | 2 | - |
-| 60 | DLL Execution via Rundll32 from User Path | 🟠 high | T1218.011 | 16 | - |
-| 61 | DLL Hijacking via Service Registry Permission | 🟠 high | T1574.011 | 2 | - |
-| 62 | DPAPI Master Key Extraction | 🟠 high | T1555 | 8 | - |
-| 63 | Disable Windows Firewall via Netsh | 🟠 high | T1562.004 | 25 | - |
-| 64 | ETW Provider Disabled | 🟠 high | T1562.002 | 10 | - |
-| 65 | Email Collection via PowerShell | 🟠 high | T1114 | 3 | - |
-| 66 | Group Policy Preferences Password Extraction | 🟠 high | T1552.006 | 2 | - |
-| 67 | Image File Execution Options Debugger | 🟠 high | T1546.012 | 3 | - |
-| 68 | InstallUtil Application Whitelisting Bypass | 🟠 high | T1218.004 | 8 | - |
-| 69 | Internal Monologue NTLM Hash Theft | 🟠 high | T1003 | 7 | - |
-| 70 | LSA Secrets Registry Extraction | 🟠 high | T1003.004 | 2 | - |
-| 71 | MSBuild Execution from Non-Standard Location | 🟠 high | T1127.001 | 2 | - |
-| 72 | MSHTA JavaScript Execution | 🟠 high | T1218.005 | 10 | - |
-| 73 | Masquerading System Binary in Non-Standard Path | 🟠 high | T1036.005 | 3 | - |
-| 74 | NPPSpy Credential Interception | 🟠 high | T1556 | 5 | - |
-| 75 | Netsh Helper DLL Persistence | 🟠 high | T1546.007 | 1 | - |
-| 76 | New Local Account Created via Net.exe | 🟠 high | T1136.001 | 10 | - |
-| 77 | Parent PID Spoofing | 🟠 high | T1134.004 | 5 | - |
-| 78 | Port Monitor DLL Persistence | 🟠 high | T1547.010 | 1 | - |
-| 79 | PowerShell Script Block with Suspicious Keywords | 🟠 high | T1059.001 | 22 | - |
-| 80 | Print Processor Persistence | 🟠 high | T1547.012 | 1 | - |
-| 81 | Process Ghosting or Herpaderping | 🟠 high | T1055 | 13 | - |
-| 82 | Process Injection via CreateRemoteThread | 🟠 high | T1055.001 | 2 | - |
-| 83 | PsExec Service Installation | 🟠 high | T1021.002 | 4 | - |
-| 84 | RDP Session Hijacking via tscon | 🟠 high | T1021.001 | 4 | - |
-| 85 | Registry Run Key Modification via Reg.exe | 🟠 high | T1547.001 | 20 | - |
-| 86 | Regsvcs or Regasm Execution for Code Bypass | 🟠 high | T1218.009 | 2 | - |
-| 87 | Remote Service Creation via SC | 🟠 high | T1021.002 | 4 | - |
-| 88 | Renamed System Binary Execution | 🟠 high | T1036.003 | 8 | - |
-| 89 | Root Certificate Installation via Certutil | 🟠 high | T1553.004 | 7 | - |
-| 90 | SAM Database Extraction via Reg Save | 🟠 high | T1003.002 | 8 | - |
-| 91 | Screen Capture via PowerShell | 🟠 high | T1113 | 10 | - |
-| 92 | Scripting Engine Spawning Network Utility | 🟠 high | T1059.005 | 3 | - |
-| 93 | SeDebugPrivilege Abuse | 🟠 high | T1134 | 13 | - |
-| 94 | Service Execution via sc.exe Create | 🟠 high | T1569.002 | 8 | - |
-| 95 | Service Stop via Net Stop | 🟠 high | T1489 | 8 | - |
-| 96 | SharpRDP Lateral Movement | 🟠 high | T1021.001 | 4 | - |
-| 97 | Suspicious Scheduled Task Creation | 🟠 high | T1053.005 | 12 | - |
-| 98 | SyncAppvPublishingServer Abuse | 🟠 high | T1218 | 16 | - |
-| 99 | Sysmon C2 Beacon - Periodic Outbound HTTPS | 🟠 high | T1071.001, T1573 | 4 | - |
-| 100 | Sysmon DNS Data Exfiltration | 🟠 high | T1048.003, T1071.004 | 12 | - |
-| 101 | Sysmon DNS Query to Known C2 Framework Domains | 🟠 high | T1071.004, T1568.002 | 4 | - |
-| 102 | Sysmon DNS Tunneling via Network Connection | 🟠 high | T1071.004, T1048.003 | 12 | - |
-| 103 | Sysmon Kerberoasting Network Indicator | 🟠 high | T1558.003 | 7 | - |
-| 104 | Sysmon Lateral Movement via SMB | 🟠 high | T1021.002, T1570 | 6 | - |
-| 105 | Sysmon Lateral Movement via WinRM | 🟠 high | T1021.006, T1059.001 | 25 | - |
-| 106 | Sysmon PsExec Named Pipe | 🟠 high | T1021.002, T1569.002 | 12 | - |
-| 107 | Sysmon Suspicious Outbound Connection from LOLBin | 🟠 high | T1218, T1105 | 55 | - |
-| 108 | Template Injection via Microsoft Office | 🟠 high | T1221 | 1 | - |
-| 109 | Time Provider DLL Persistence | 🟠 high | T1547.003 | 2 | - |
-| 110 | Timestomping via PowerShell | 🟠 high | T1070.006 | 10 | - |
-| 111 | Token Impersonation via Incognito | 🟠 high | T1134 | 13 | - |
-| 112 | UAC Bypass via ComputerDefaults | 🟠 high | T1548.002 | 27 | - |
-| 113 | UAC Bypass via Eventvwr | 🟠 high | T1548.002 | 27 | - |
-| 114 | UAC Bypass via Fodhelper | 🟠 high | T1548.002 | 27 | - |
-| 115 | VBA Macro Spawning Suspicious Child Process | 🟠 high | T1204.002 | 13 | - |
-| 116 | WMI Event Subscription Persistence | 🟠 high | T1546.003 | 3 | - |
-| 117 | WMI Process Execution via Wmic | 🟠 high | T1047 | 10 | - |
-| 118 | Windows AMSI Bypass Attempt | 🟠 high | T1562.001 | 59 | - |
-| 119 | Windows BITS Job Abuse for Persistence | 🟠 high | T1197 | 4 | - |
-| 120 | Windows Backup Deletion via wbadmin | 🟠 high | T1490 | 13 | - |
-| 121 | Windows Certutil Download or Decode | 🟠 high | T1140, T1105 | 50 | - |
-| 122 | Windows DLL Side-Loading via Suspicious Path | 🟠 high | T1574.002 | - | - |
-| 123 | Windows Defender Exclusion Added via PowerShell | 🟠 high | T1562.001 | 59 | - |
-| 124 | Windows Encoded PowerShell Execution | 🟠 high | T1059.001, T1027 | 32 | - |
-| 125 | Windows Event Log Cleared via Wevtutil | 🟠 high | T1070.001 | 3 | - |
-| 126 | Windows Event Log Clearing | 🟠 high | T1070.001 | 3 | - |
-| 127 | Windows Firewall Rule Modification | 🟠 high | T1562.004 | 25 | - |
-| 128 | Windows Management Instrumentation Event Subscription | 🟠 high | T1047 | 10 | - |
-| 129 | Windows PowerShell Download Cradle | 🟠 high | T1059.001, T1105 | 61 | - |
-| 130 | Windows PsExec Remote Execution | 🟠 high | T1021.002, T1569.002 | 12 | - |
-| 131 | Windows Registry Run Key Modification | 🟠 high | T1547.001 | 20 | - |
-| 132 | Windows Remote Access Tool Detected | 🟠 high | T1219 | 15 | - |
-| 133 | Windows Remote Management Shell via Winrs | 🟠 high | T1021.006 | 3 | - |
-| 134 | Windows Script Host Execution from Temp | 🟠 high | T1059.005 | 3 | - |
-| 135 | Windows Service Created with Suspicious Binary Path | 🟠 high | T1543.003 | 6 | - |
-| 136 | Windows UAC Bypass Attempt | 🟠 high | T1548.002 | 27 | - |
-| 137 | Windows WDigest Authentication Enabled for Credential Harvesting | 🟠 high | T1003.001 | 14 | - |
-| 138 | Windows WMI Event Subscription Persistence | 🟠 high | T1546.003 | 3 | - |
-| 139 | Winlogon Helper DLL Modification | 🟠 high | T1547.004 | 5 | - |
-| 140 | Wscript Running Encoded Script | 🟠 high | T1059.005 | 3 | - |
-| 141 | XSL Script Processing via WMIC or Msxsl | 🟠 high | T1220 | 4 | - |
-| 142 | AlwaysInstallElevated Exploitation | 🟡 medium | T1548.002 | 27 | - |
-| 143 | Application Shimming for Persistence | 🟡 medium | T1546.011 | 3 | - |
-| 144 | BITS Job Persistence | 🟡 medium | T1197 | 4 | - |
-| 145 | Clipboard Data Collection | 🟡 medium | T1115 | 5 | - |
-| 146 | Compiled HTML File Execution | 🟡 medium | T1218.001 | 8 | - |
-| 147 | Control Panel Item Execution | 🟡 medium | T1218 | 16 | - |
-| 148 | Credential File Discovery | 🟡 medium | T1552.001 | 17 | - |
-| 149 | DLL Side-Loading from Suspicious Directory | 🟡 medium | T1574.002 | - | - |
-| 150 | Data Compression for Exfiltration via 7zip | 🟡 medium | T1560.001 | 12 | - |
-| 151 | Defacement via Desktop Wallpaper Change | 🟡 medium | T1491.001 | 4 | - |
-| 152 | Default File Association Hijack | 🟡 medium | T1546.001 | 1 | - |
-| 153 | Domain Trust Discovery via Nltest | 🟡 medium | T1482 | 8 | - |
-| 154 | File Deletion of Security Tools | 🟡 medium | T1070.004 | 11 | - |
-| 155 | File and Directory Discovery via dir | 🟡 medium | T1083 | 9 | - |
-| 156 | Finger.exe Abuse for File Download | 🟡 medium | T1105 | 39 | - |
-| 157 | Hidden PowerShell Window Execution | 🟡 medium | T1564.003 | 3 | - |
-| 158 | Indirect Command Execution via Forfiles | 🟡 medium | T1202 | 5 | - |
-| 159 | JavaScript Execution via Node.js | 🟡 medium | T1059.007 | 2 | - |
-| 160 | Office Application Startup Persistence | 🟡 medium | T1137 | 1 | - |
-| 161 | Python Execution as Child of System Process | 🟡 medium | T1059.006 | 4 | - |
-| 162 | Query Registry for Security Products | 🟡 medium | T1518.001 | 11 | - |
-| 163 | SDelete Secure File Deletion | 🟡 medium | T1070.004 | 11 | - |
-| 164 | Scheduled Task XML Import | 🟡 medium | T1053.005 | 12 | - |
-| 165 | ScreenSaver Hijacking Persistence | 🟡 medium | T1546.002 | 1 | - |
-| 166 | Service Permissions Weakness Discovery | 🟡 medium | T1574.011 | 2 | - |
-| 167 | Shortcut Modification for Persistence | 🟡 medium | T1547.009 | 2 | - |
-| 168 | Startup Folder Modification | 🟡 medium | T1547.001 | 20 | - |
-| 169 | Sysmon DNS Query to Suspicious TLDs | 🟡 medium | T1071.004 | 4 | - |
-| 170 | Sysmon LDAP Reconnaissance | 🟡 medium | T1087.002, T1069.002 | 39 | - |
-| 171 | Sysmon RDP Lateral Movement | 🟡 medium | T1021.001 | 4 | - |
-| 172 | System Shutdown or Reboot via shutdown.exe | 🟡 medium | T1529 | 16 | - |
-| 173 | Token Manipulation via RunAs | 🟡 medium | T1134.002 | 2 | - |
-| 174 | UAC Bypass via DiskCleanup | 🟡 medium | T1548.002 | 27 | - |
-| 175 | Unquoted Service Path Exploitation | 🟡 medium | T1574.009 | 1 | - |
-| 176 | Virtualization Sandbox Evasion Check | 🟡 medium | T1497 | 9 | - |
-| 177 | Visual Basic Script Compilation via vbc.exe | 🟡 medium | T1059.005 | 3 | - |
-| 178 | WiFi Password Extraction via Netsh | 🟡 medium | T1552.001 | 17 | - |
-| 179 | WinRM Lateral Movement via PowerShell | 🟡 medium | T1021.006 | 3 | - |
-| 180 | Windows Account Discovery Commands | 🟡 medium | T1087.001, T1087.002 | 35 | - |
-| 181 | Windows Admin Share Access via Net Use | 🟡 medium | T1021.002 | 4 | - |
-| 182 | Windows Credential Manager Access via VaultCmd | 🟡 medium | T1555 | 8 | - |
-| 183 | Windows Data Staging for Exfiltration | 🟡 medium | T1074.001 | 3 | - |
-| 184 | Windows LOLBin Usage: at | 🟡 medium | T1218 | 16 | - |
-| 185 | Windows LOLBin Usage: bitsadmin | 🟡 medium | T1218 | 16 | - |
-| 186 | Windows LOLBin Usage: certutil | 🟡 medium | T1218 | 16 | - |
-| 187 | Windows LOLBin Usage: cmd | 🟡 medium | T1218 | 16 | - |
-| 188 | Windows LOLBin Usage: cscript | 🟡 medium | T1218 | 16 | - |
-| 189 | Windows LOLBin Usage: ipconfig | 🟡 medium | T1218 | 16 | - |
-| 190 | Windows LOLBin Usage: mshta | 🟡 medium | T1218 | 16 | - |
-| 191 | Windows LOLBin Usage: net | 🟡 medium | T1218 | 16 | - |
-| 192 | Windows LOLBin Usage: net1 | 🟡 medium | T1218 | 16 | - |
-| 193 | Windows LOLBin Usage: powershell | 🟡 medium | T1218 | 16 | - |
-| 194 | Windows LOLBin Usage: regsvr32 | 🟡 medium | T1218 | 16 | - |
-| 195 | Windows LOLBin Usage: rundll32 | 🟡 medium | T1218 | 16 | - |
-| 196 | Windows LOLBin Usage: sc | 🟡 medium | T1218 | 16 | - |
-| 197 | Windows LOLBin Usage: schtasks | 🟡 medium | T1218 | 16 | - |
-| 198 | Windows LOLBin Usage: systeminfo | 🟡 medium | T1218 | 16 | - |
-| 199 | Windows LOLBin Usage: taskkill | 🟡 medium | T1218 | 16 | - |
-| 200 | Windows LOLBin Usage: tasklist | 🟡 medium | T1218 | 16 | - |
-| 201 | Windows LOLBin Usage: whoami | 🟡 medium | T1218 | 16 | - |
-| 202 | Windows LOLBin Usage: wmic | 🟡 medium | T1218 | 16 | - |
-| 203 | Windows LOLBin Usage: wscript | 🟡 medium | T1218 | 16 | - |
-| 204 | Windows MSBuild Execution for Code Bypass | 🟡 medium | T1127.001 | 2 | - |
-| 205 | Windows Network Share Discovery | 🟡 medium | T1135 | 12 | - |
-| 206 | Windows RDP Lateral Movement | 🟡 medium | T1021.001 | 4 | - |
-| 207 | Windows Remote System Discovery | 🟡 medium | T1018 | 22 | - |
-| 208 | Windows Scheduled Task Creation via Schtasks | 🟡 medium | T1053.005 | 12 | - |
-| 209 | Windows Screen Capture Activity | 🟡 medium | T1113 | 10 | - |
-| 210 | Windows Service Creation via SC | 🟡 medium | T1543.003 | 6 | - |
-| 211 | Windows Vault Enumeration | 🟡 medium | T1555 | 8 | - |
-| 212 | Lateral Tool Transfer via Robocopy | 🔵 low | T1570 | 2 | - |
-| 213 | Local Group Membership Discovery | 🔵 low | T1069.001 | 7 | - |
-| 214 | Network Share Enumeration via Net View | 🔵 low | T1135 | 12 | - |
-| 215 | Password Policy Discovery | 🔵 low | T1201 | 12 | - |
-| 216 | PowerShell Execution via Alternate Shell | 🔵 low | T1059.001 | 22 | - |
-| 217 | Process Discovery via Tasklist | 🔵 low | T1057 | 9 | - |
-| 218 | Software Discovery via WMIC | 🔵 low | T1518 | 6 | - |
+| 3 | BLUELIGHT RAT: Browser Credential Memory Access | 🔴 critical | T1555.003 | - | - |
+| 4 | BloodHound AD Enumeration | 🔴 critical | T1087.002 | 24 | - |
+| 5 | Credential Dumping via Comsvcs with Rundll32 | 🔴 critical | T1003.001 | 14 | - |
+| 6 | DCSync Attack via Replication Request | 🔴 critical | T1003.006 | 2 | - |
+| 7 | Disk Wipe via Format Command | 🔴 critical | T1561 | - | - |
+| 8 | Forced Authentication via PetitPotam | 🔴 critical | T1187 | 3 | - |
+| 9 | Kerberos Ticket Export via Mimikatz | 🔴 critical | T1558 | 13 | - |
+| 10 | Keylogging via PowerShell Get-Keystrokes | 🔴 critical | T1056.001 | 8 | - |
+| 11 | LSASS Clone via ProcDump Evasion | 🔴 critical | T1003.001 | 14 | - |
+| 12 | LSASS Memory Dump via Comsvcs DLL | 🔴 critical | T1003.001 | 14 | - |
+| 13 | LaZagne Credential Harvester | 🔴 critical | T1555 | 8 | - |
+| 14 | NTDS.dit Database Copy Attempt | 🔴 critical | T1003.003 | 11 | - |
+| 15 | Named Pipe Impersonation via PowerShell | 🔴 critical | T1134.001 | 5 | - |
+| 16 | Pass-the-Ticket via Rubeus | 🔴 critical | T1550.003 | 2 | - |
+| 17 | Potato Privilege Escalation Tool | 🔴 critical | T1134.001 | 5 | - |
+| 18 | PrintNightmare Exploitation Attempt | 🔴 critical | T1068 | - | - |
+| 19 | Process Doppelganging via TxF | 🔴 critical | T1055.013 | 13 | - |
+| 20 | Ransomware File Extension Indicators | 🔴 critical | T1486 | 10 | - |
+| 21 | Reflective DLL Loading Indicators | 🔴 critical | T1620 | 1 | - |
+| 22 | SSRF to Cloud Metadata Endpoint (169.254.169.254) | 🔴 critical | T1552.005, T1190 | - | - |
+| 23 | Security Support Provider DLL Persistence | 🔴 critical | T1547.005 | 2 | - |
+| 24 | Shadow Credentials Attack via Whisker | 🔴 critical | T1556 | 5 | - |
+| 25 | Sysmon Cobalt Strike C2 Network Indicators | 🔴 critical | T1071.001, T1095 | 7 | - |
+| 26 | Sysmon Cobalt Strike Named Pipe | 🔴 critical | T1071, T1055 | 14 | - |
+| 27 | Sysmon Configuration Tampering | 🔴 critical | T1562.001 | 59 | - |
+| 28 | Sysmon Mimikatz Named Pipe | 🔴 critical | T1003.001, T1134 | 27 | - |
+| 29 | Sysmon Mimikatz Network Activity | 🔴 critical | T1003.001, T1558.003 | 21 | - |
+| 30 | Sysmon Suspicious Named Pipe Pattern | 🔴 critical | T1071, T1059 | 2 | - |
+| 31 | System Recovery Disabled via BCDEdit | 🔴 critical | T1490 | 13 | - |
+| 32 | Volume Shadow Copy Deletion via WMIC | 🔴 critical | T1490 | 13 | - |
+| 33 | Web Server Process Spawning Command Shell | 🔴 critical | T1059, T1059.001, T1190 | - | - |
+| 34 | Windows Access Token Manipulation | 🔴 critical | T1134 | 13 | - |
+| 35 | Windows Boot Configuration Modified | 🔴 critical | T1490 | 13 | - |
+| 36 | Windows Credential Dumping via Procdump | 🔴 critical | T1003.001 | 14 | - |
+| 37 | Windows Credential Dumping via Secretsdump | 🔴 critical | T1003 | 7 | - |
+| 38 | Windows Defender Real-Time Protection Disabled | 🔴 critical | T1562.001 | 59 | - |
+| 39 | Windows Kerberoasting Attack | 🔴 critical | T1558.003 | 7 | - |
+| 40 | Windows Keylogger Indicators | 🔴 critical | T1056.001 | 8 | - |
+| 41 | Windows LSASS Memory Access | 🔴 critical | T1003.001 | 14 | - |
+| 42 | Windows Mimikatz Execution Patterns | 🔴 critical | T1003.001 | 14 | - |
+| 43 | Windows NTDS.dit Database Extraction | 🔴 critical | T1003.003 | 11 | - |
+| 44 | Windows Pass-the-Hash Attack Indicators | 🔴 critical | T1550.002 | 3 | - |
+| 45 | Windows Process Hollowing Indicators | 🔴 critical | T1055.012 | 4 | - |
+| 46 | Windows Shadow Copy Deletion | 🔴 critical | T1490 | 13 | - |
+| 47 | Windows Spearphishing Attachment Execution | 🔴 critical | T1566.001, T1204.002 | 15 | - |
+| 48 | AD Enumeration via ADFind | 🟠 high | T1087.002 | 24 | - |
+| 49 | AMSI Bypass via PowerShell Reflection | 🟠 high | T1562.001 | 59 | - |
+| 50 | AS-REP Roasting via Rubeus | 🟠 high | T1558.004 | 3 | - |
+| 51 | Account Access Removal | 🟠 high | T1531 | 8 | - |
+| 52 | Active Setup Persistence | 🟠 high | T1547.014 | 3 | - |
+| 53 | Alternate Data Stream Execution | 🟠 high | T1564.004 | 5 | - |
+| 54 | AppLocker Policy Bypass via MSHTML | 🟠 high | T1218.005 | 10 | - |
+| 55 | BLUELIGHT RAT: Browser Spawning Suspicious Child Process | 🟠 high | T1203 | - | - |
+| 56 | BLUELIGHT RAT: Data Exfiltration via OneDrive/Graph API | 🟠 high | T1567.002 | - | - |
+| 57 | BLUELIGHT RAT: Executable Download via Graph API | 🟠 high | T1105 | - | - |
+| 58 | BLUELIGHT RAT: Obfuscated Script Execution | 🟠 high | T1027 | - | - |
+| 59 | BLUELIGHT RAT: Periodic Screen Capture | 🟠 high | T1113 | - | - |
+| 60 | BLUELIGHT RAT: WMI System Enumeration from Browser Child | 🟠 high | T1082 | - | - |
+| 61 | Boot Configuration Change for Persistence | 🟠 high | T1542 | 1 | - |
+| 62 | Browser Credential Store Access | 🟠 high | T1555.003 | 17 | - |
+| 63 | CMSTP UAC Bypass | 🟠 high | T1218.003 | 2 | - |
+| 64 | COM Object Hijacking via Registry | 🟠 high | T1546.015 | 4 | - |
+| 65 | Credential Access via Certutil Certificate Export | 🟠 high | T1649 | 1 | - |
+| 66 | Credential Dumping via Windows Task Manager | 🟠 high | T1003.001 | 14 | - |
+| 67 | Cryptominer Deployment Indicators | 🟠 high | T1496 | 2 | - |
+| 68 | DCOM Lateral Movement via MMC20 | 🟠 high | T1021.003 | 2 | - |
+| 69 | DLL Execution via Rundll32 from User Path | 🟠 high | T1218.011 | 16 | - |
+| 70 | DLL Hijacking via Service Registry Permission | 🟠 high | T1574.011 | 2 | - |
+| 71 | DPAPI Master Key Extraction | 🟠 high | T1555 | 8 | - |
+| 72 | Disable Windows Firewall via Netsh | 🟠 high | T1562.004 | 25 | - |
+| 73 | ETW Provider Disabled | 🟠 high | T1562.002 | 10 | - |
+| 74 | Email Collection via PowerShell | 🟠 high | T1114 | 3 | - |
+| 75 | Group Policy Preferences Password Extraction | 🟠 high | T1552.006 | 2 | - |
+| 76 | Image File Execution Options Debugger | 🟠 high | T1546.012 | 3 | - |
+| 77 | InstallUtil Application Whitelisting Bypass | 🟠 high | T1218.004 | 8 | - |
+| 78 | Internal Monologue NTLM Hash Theft | 🟠 high | T1003 | 7 | - |
+| 79 | LSA Secrets Registry Extraction | 🟠 high | T1003.004 | 2 | - |
+| 80 | MSBuild Execution from Non-Standard Location | 🟠 high | T1127.001 | 2 | - |
+| 81 | MSHTA JavaScript Execution | 🟠 high | T1218.005 | 10 | - |
+| 82 | Masquerading System Binary in Non-Standard Path | 🟠 high | T1036.005 | 3 | - |
+| 83 | NPPSpy Credential Interception | 🟠 high | T1556 | 5 | - |
+| 84 | Netsh Helper DLL Persistence | 🟠 high | T1546.007 | 1 | - |
+| 85 | New Local Account Created via Net.exe | 🟠 high | T1136.001 | 10 | - |
+| 86 | Parent PID Spoofing | 🟠 high | T1134.004 | 5 | - |
+| 87 | Port Monitor DLL Persistence | 🟠 high | T1547.010 | 1 | - |
+| 88 | PowerShell Script Block with Suspicious Keywords | 🟠 high | T1059.001 | 22 | - |
+| 89 | Print Processor Persistence | 🟠 high | T1547.012 | 1 | - |
+| 90 | Process Ghosting or Herpaderping | 🟠 high | T1055 | 13 | - |
+| 91 | Process Injection via CreateRemoteThread | 🟠 high | T1055.001 | 2 | - |
+| 92 | PsExec Service Installation | 🟠 high | T1021.002 | 4 | - |
+| 93 | RDP Session Hijacking via tscon | 🟠 high | T1021.001 | 4 | - |
+| 94 | Registry Run Key Modification via Reg.exe | 🟠 high | T1547.001 | 20 | - |
+| 95 | Regsvcs or Regasm Execution for Code Bypass | 🟠 high | T1218.009 | 2 | - |
+| 96 | Remote Service Creation via SC | 🟠 high | T1021.002 | 4 | - |
+| 97 | Renamed System Binary Execution | 🟠 high | T1036.003 | 8 | - |
+| 98 | Root Certificate Installation via Certutil | 🟠 high | T1553.004 | 7 | - |
+| 99 | SAM Database Extraction via Reg Save | 🟠 high | T1003.002 | 8 | - |
+| 100 | Screen Capture via PowerShell | 🟠 high | T1113 | 10 | - |
+| 101 | Scripting Engine Spawning Network Utility | 🟠 high | T1059.005 | 3 | - |
+| 102 | SeDebugPrivilege Abuse | 🟠 high | T1134 | 13 | - |
+| 103 | Service Execution via sc.exe Create | 🟠 high | T1569.002 | 8 | - |
+| 104 | Service Stop via Net Stop | 🟠 high | T1489 | 8 | - |
+| 105 | SharpRDP Lateral Movement | 🟠 high | T1021.001 | 4 | - |
+| 106 | Suspicious Scheduled Task Creation | 🟠 high | T1053.005 | 12 | - |
+| 107 | SyncAppvPublishingServer Abuse | 🟠 high | T1218 | 16 | - |
+| 108 | Sysmon C2 Beacon - Periodic Outbound HTTPS | 🟠 high | T1071.001, T1573 | 4 | - |
+| 109 | Sysmon DNS Data Exfiltration | 🟠 high | T1048.003, T1071.004 | 12 | - |
+| 110 | Sysmon DNS Query to Known C2 Framework Domains | 🟠 high | T1071.004, T1568.002 | 4 | - |
+| 111 | Sysmon DNS Tunneling via Network Connection | 🟠 high | T1071.004, T1048.003 | 12 | - |
+| 112 | Sysmon Kerberoasting Network Indicator | 🟠 high | T1558.003 | 7 | - |
+| 113 | Sysmon Lateral Movement via SMB | 🟠 high | T1021.002, T1570 | 6 | - |
+| 114 | Sysmon Lateral Movement via WinRM | 🟠 high | T1021.006, T1059.001 | 25 | - |
+| 115 | Sysmon PsExec Named Pipe | 🟠 high | T1021.002, T1569.002 | 12 | - |
+| 116 | Sysmon Suspicious Outbound Connection from LOLBin | 🟠 high | T1218, T1105 | 55 | - |
+| 117 | Template Injection via Microsoft Office | 🟠 high | T1221 | 1 | - |
+| 118 | Time Provider DLL Persistence | 🟠 high | T1547.003 | 2 | - |
+| 119 | Timestomping via PowerShell | 🟠 high | T1070.006 | 10 | - |
+| 120 | Token Impersonation via Incognito | 🟠 high | T1134 | 13 | - |
+| 121 | UAC Bypass via ComputerDefaults | 🟠 high | T1548.002 | 27 | - |
+| 122 | UAC Bypass via Eventvwr | 🟠 high | T1548.002 | 27 | - |
+| 123 | UAC Bypass via Fodhelper | 🟠 high | T1548.002 | 27 | - |
+| 124 | VBA Macro Spawning Suspicious Child Process | 🟠 high | T1204.002 | 13 | - |
+| 125 | WMI Event Subscription Persistence | 🟠 high | T1546.003 | 3 | - |
+| 126 | WMI Process Execution via Wmic | 🟠 high | T1047 | 10 | - |
+| 127 | Windows AMSI Bypass Attempt | 🟠 high | T1562.001 | 59 | - |
+| 128 | Windows BITS Job Abuse for Persistence | 🟠 high | T1197 | 4 | - |
+| 129 | Windows Backup Deletion via wbadmin | 🟠 high | T1490 | 13 | - |
+| 130 | Windows Certutil Download or Decode | 🟠 high | T1140, T1105 | 50 | - |
+| 131 | Windows DLL Side-Loading via Suspicious Path | 🟠 high | T1574.002 | - | - |
+| 132 | Windows Defender Exclusion Added via PowerShell | 🟠 high | T1562.001 | 59 | - |
+| 133 | Windows Encoded PowerShell Execution | 🟠 high | T1059.001, T1027 | 32 | - |
+| 134 | Windows Event Log Cleared via Wevtutil | 🟠 high | T1070.001 | 3 | - |
+| 135 | Windows Event Log Clearing | 🟠 high | T1070.001 | 3 | - |
+| 136 | Windows Firewall Rule Modification | 🟠 high | T1562.004 | 25 | - |
+| 137 | Windows Management Instrumentation Event Subscription | 🟠 high | T1047 | 10 | - |
+| 138 | Windows PowerShell Download Cradle | 🟠 high | T1059.001, T1105 | 61 | - |
+| 139 | Windows PsExec Remote Execution | 🟠 high | T1021.002, T1569.002 | 12 | - |
+| 140 | Windows Registry Run Key Modification | 🟠 high | T1547.001 | 20 | - |
+| 141 | Windows Remote Access Tool Detected | 🟠 high | T1219 | 15 | - |
+| 142 | Windows Remote Management Shell via Winrs | 🟠 high | T1021.006 | 3 | - |
+| 143 | Windows Script Host Execution from Temp | 🟠 high | T1059.005 | 3 | - |
+| 144 | Windows Service Created with Suspicious Binary Path | 🟠 high | T1543.003 | 6 | - |
+| 145 | Windows UAC Bypass Attempt | 🟠 high | T1548.002 | 27 | - |
+| 146 | Windows WDigest Authentication Enabled for Credential Harvesting | 🟠 high | T1003.001 | 14 | - |
+| 147 | Windows WMI Event Subscription Persistence | 🟠 high | T1546.003 | 3 | - |
+| 148 | Winlogon Helper DLL Modification | 🟠 high | T1547.004 | 5 | - |
+| 149 | Wscript Running Encoded Script | 🟠 high | T1059.005 | 3 | - |
+| 150 | XSL Script Processing via WMIC or Msxsl | 🟠 high | T1220 | 4 | - |
+| 151 | AlwaysInstallElevated Exploitation | 🟡 medium | T1548.002 | 27 | - |
+| 152 | Application Shimming for Persistence | 🟡 medium | T1546.011 | 3 | - |
+| 153 | BITS Job Persistence | 🟡 medium | T1197 | 4 | - |
+| 154 | BLUELIGHT RAT: C2 via Microsoft Graph API | 🟡 medium | T1071.001 | - | - |
+| 155 | BLUELIGHT RAT: File Discovery from Browser Process | 🟡 medium | T1083 | - | - |
+| 156 | BLUELIGHT RAT: Internet Explorer Drive-by Compromise | 🟡 medium | T1189 | - | - |
+| 157 | BLUELIGHT RAT: Registry Enumeration of Security Products | 🟡 medium | T1012 | - | - |
+| 158 | Clipboard Data Collection | 🟡 medium | T1115 | 5 | - |
+| 159 | Compiled HTML File Execution | 🟡 medium | T1218.001 | 8 | - |
+| 160 | Control Panel Item Execution | 🟡 medium | T1218 | 16 | - |
+| 161 | Credential File Discovery | 🟡 medium | T1552.001 | 17 | - |
+| 162 | DLL Side-Loading from Suspicious Directory | 🟡 medium | T1574.002 | - | - |
+| 163 | Data Compression for Exfiltration via 7zip | 🟡 medium | T1560.001 | 12 | - |
+| 164 | Defacement via Desktop Wallpaper Change | 🟡 medium | T1491.001 | 4 | - |
+| 165 | Default File Association Hijack | 🟡 medium | T1546.001 | 1 | - |
+| 166 | Domain Trust Discovery via Nltest | 🟡 medium | T1482 | 8 | - |
+| 167 | File Deletion of Security Tools | 🟡 medium | T1070.004 | 11 | - |
+| 168 | File and Directory Discovery via dir | 🟡 medium | T1083 | 9 | - |
+| 169 | Finger.exe Abuse for File Download | 🟡 medium | T1105 | 39 | - |
+| 170 | Hidden PowerShell Window Execution | 🟡 medium | T1564.003 | 3 | - |
+| 171 | Indirect Command Execution via Forfiles | 🟡 medium | T1202 | 5 | - |
+| 172 | JavaScript Execution via Node.js | 🟡 medium | T1059.007 | 2 | - |
+| 173 | Office Application Startup Persistence | 🟡 medium | T1137 | 1 | - |
+| 174 | Python Execution as Child of System Process | 🟡 medium | T1059.006 | 4 | - |
+| 175 | Query Registry for Security Products | 🟡 medium | T1518.001 | 11 | - |
+| 176 | SDelete Secure File Deletion | 🟡 medium | T1070.004 | 11 | - |
+| 177 | Scheduled Task XML Import | 🟡 medium | T1053.005 | 12 | - |
+| 178 | ScreenSaver Hijacking Persistence | 🟡 medium | T1546.002 | 1 | - |
+| 179 | Service Permissions Weakness Discovery | 🟡 medium | T1574.011 | 2 | - |
+| 180 | Shortcut Modification for Persistence | 🟡 medium | T1547.009 | 2 | - |
+| 181 | Startup Folder Modification | 🟡 medium | T1547.001 | 20 | - |
+| 182 | Sysmon DNS Query to Suspicious TLDs | 🟡 medium | T1071.004 | 4 | - |
+| 183 | Sysmon LDAP Reconnaissance | 🟡 medium | T1087.002, T1069.002 | 39 | - |
+| 184 | Sysmon RDP Lateral Movement | 🟡 medium | T1021.001 | 4 | - |
+| 185 | System Shutdown or Reboot via shutdown.exe | 🟡 medium | T1529 | 16 | - |
+| 186 | Token Manipulation via RunAs | 🟡 medium | T1134.002 | 2 | - |
+| 187 | UAC Bypass via DiskCleanup | 🟡 medium | T1548.002 | 27 | - |
+| 188 | Unquoted Service Path Exploitation | 🟡 medium | T1574.009 | 1 | - |
+| 189 | Virtualization Sandbox Evasion Check | 🟡 medium | T1497 | 9 | - |
+| 190 | Visual Basic Script Compilation via vbc.exe | 🟡 medium | T1059.005 | 3 | - |
+| 191 | WiFi Password Extraction via Netsh | 🟡 medium | T1552.001 | 17 | - |
+| 192 | WinRM Lateral Movement via PowerShell | 🟡 medium | T1021.006 | 3 | - |
+| 193 | Windows Account Discovery Commands | 🟡 medium | T1087.001, T1087.002 | 35 | - |
+| 194 | Windows Admin Share Access via Net Use | 🟡 medium | T1021.002 | 4 | - |
+| 195 | Windows Credential Manager Access via VaultCmd | 🟡 medium | T1555 | 8 | - |
+| 196 | Windows Data Staging for Exfiltration | 🟡 medium | T1074.001 | 3 | - |
+| 197 | Windows LOLBin Usage: at | 🟡 medium | T1218 | 16 | - |
+| 198 | Windows LOLBin Usage: bitsadmin | 🟡 medium | T1218 | 16 | - |
+| 199 | Windows LOLBin Usage: certutil | 🟡 medium | T1218 | 16 | - |
+| 200 | Windows LOLBin Usage: cmd | 🟡 medium | T1218 | 16 | - |
+| 201 | Windows LOLBin Usage: cscript | 🟡 medium | T1218 | 16 | - |
+| 202 | Windows LOLBin Usage: ipconfig | 🟡 medium | T1218 | 16 | - |
+| 203 | Windows LOLBin Usage: mshta | 🟡 medium | T1218 | 16 | - |
+| 204 | Windows LOLBin Usage: net | 🟡 medium | T1218 | 16 | - |
+| 205 | Windows LOLBin Usage: net1 | 🟡 medium | T1218 | 16 | - |
+| 206 | Windows LOLBin Usage: powershell | 🟡 medium | T1218 | 16 | - |
+| 207 | Windows LOLBin Usage: regsvr32 | 🟡 medium | T1218 | 16 | - |
+| 208 | Windows LOLBin Usage: rundll32 | 🟡 medium | T1218 | 16 | - |
+| 209 | Windows LOLBin Usage: sc | 🟡 medium | T1218 | 16 | - |
+| 210 | Windows LOLBin Usage: schtasks | 🟡 medium | T1218 | 16 | - |
+| 211 | Windows LOLBin Usage: systeminfo | 🟡 medium | T1218 | 16 | - |
+| 212 | Windows LOLBin Usage: taskkill | 🟡 medium | T1218 | 16 | - |
+| 213 | Windows LOLBin Usage: tasklist | 🟡 medium | T1218 | 16 | - |
+| 214 | Windows LOLBin Usage: whoami | 🟡 medium | T1218 | 16 | - |
+| 215 | Windows LOLBin Usage: wmic | 🟡 medium | T1218 | 16 | - |
+| 216 | Windows LOLBin Usage: wscript | 🟡 medium | T1218 | 16 | - |
+| 217 | Windows MSBuild Execution for Code Bypass | 🟡 medium | T1127.001 | 2 | - |
+| 218 | Windows Network Share Discovery | 🟡 medium | T1135 | 12 | - |
+| 219 | Windows RDP Lateral Movement | 🟡 medium | T1021.001 | 4 | - |
+| 220 | Windows Remote System Discovery | 🟡 medium | T1018 | 22 | - |
+| 221 | Windows Scheduled Task Creation via Schtasks | 🟡 medium | T1053.005 | 12 | - |
+| 222 | Windows Screen Capture Activity | 🟡 medium | T1113 | 10 | - |
+| 223 | Windows Service Creation via SC | 🟡 medium | T1543.003 | 6 | - |
+| 224 | Windows Vault Enumeration | 🟡 medium | T1555 | 8 | - |
+| 225 | Lateral Tool Transfer via Robocopy | 🔵 low | T1570 | 2 | - |
+| 226 | Local Group Membership Discovery | 🔵 low | T1069.001 | 7 | - |
+| 227 | Network Share Enumeration via Net View | 🔵 low | T1135 | 12 | - |
+| 228 | Password Policy Discovery | 🔵 low | T1201 | 12 | - |
+| 229 | PowerShell Execution via Alternate Shell | 🔵 low | T1059.001 | 22 | - |
+| 230 | Process Discovery via Tasklist | 🔵 low | T1057 | 9 | - |
+| 231 | Software Discovery via WMIC | 🔵 low | T1518 | 6 | - |
 
 ## Hunting Queries
 
@@ -741,21 +806,35 @@
 | 3 | Linux Multi-Stage Attack Indicators (Combined Methods) | multi_stage | 🔴 critical | T1110, T1059.004 |
 | 4 | Linux Persistence Indicator Score (Combined Methods) | scoring | 🟠 high | T1053, T1543.002, T1098.004 |
 | 5 | Linux Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059.004 |
-| 6 | C2 Beaconing Detection (Periodic Connection Analysis) | frequency_analysis | 🟠 high | T1071, T1573 |
-| 7 | OCI After-Hours IAM Activity (Time-Based Anomaly) | time_anomaly | 🟡 medium | T1098 |
-| 8 | OCI Console Login Brute Force (Frequency Analysis) | frequency_analysis | 🟠 high | T1078, T1110 |
-| 9 | OCI IAM Rapid Configuration Changes (Anomaly Detection) | anomaly_detection | 🟠 high | T1098, T1078 |
-| 10 | OCI Multiple Users from Same IP (Grouping) | grouping | 🟠 high | T1078, T1110.004 |
-| 11 | OCI Privilege Escalation Chain Detection | combined_scoring | 🔴 critical | T1098, T1078 |
-| 12 | OCI Resource Destruction Spike (Anomaly Detection) | anomaly_detection | 🔴 critical | T1485, T1489 |
-| 13 | SSH Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001 |
-| 14 | Login Activity Time-Series Anomaly | time_series_anomaly | 🟠 high | T1078, T1110 |
-| 15 | Windows Credential Access Tool Cluster (Grouping) | grouping | 🔴 critical | T1003, T1558.003 |
-| 16 | Windows Defense Evasion Score (Combined Methods) | scoring | 🔴 critical | T1562, T1548.002, T1070 |
-| 17 | Windows Lateral Movement Tool Cluster (Grouping) | grouping | 🔴 critical | T1021, T1570 |
-| 18 | Windows Suspiciously Long Command Line (Field Analysis) | field_analysis | 🟠 high | T1059.001, T1027 |
-| 19 | Windows Process from Unusual Path (Rare Value Analysis) | rare_value | 🟠 high | T1204, T1036 |
-| 20 | Windows Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059 |
+| 6 | Geographic Health: Cloud Provider Summary | aggregation | ⚪ informational | - |
+| 7 | Geographic Health: Instance Detail with Coordinates | detail_view | ⚪ informational | - |
+| 8 | Geographic Health: Regional Status on Global Map | geographic_analysis | ⚪ informational | - |
+| 9 | Geographic Health: Service Tier Status | aggregation | ⚪ informational | - |
+| 10 | Geographic Health: Unhealthy Regions Alert | alerting | 🟠 high | - |
+| 11 | C2 Beaconing Detection (Periodic Connection Analysis) | frequency_analysis | 🟠 high | T1071, T1573 |
+| 12 | OCI After-Hours IAM Activity (Time-Based Anomaly) | time_anomaly | 🟡 medium | T1098 |
+| 13 | OCI Console Login Brute Force (Frequency Analysis) | frequency_analysis | 🟠 high | T1078, T1110 |
+| 14 | OCI IAM and Fusion Activity Correlation | grouping_correlation | 🟠 high | T1078, T1098 |
+| 15 | OCI IAM Rapid Configuration Changes (Anomaly Detection) | anomaly_detection | 🟠 high | T1098, T1078 |
+| 16 | OCI Multiple Users from Same IP (Grouping) | grouping | 🟠 high | T1078, T1110.004 |
+| 17 | OCI Privilege Escalation Chain Detection | combined_scoring | 🔴 critical | T1098, T1078 |
+| 18 | OCI Resource Destruction Spike (Anomaly Detection) | anomaly_detection | 🔴 critical | T1485, T1489 |
+| 19 | SSH Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001 |
+| 20 | Login Activity Time-Series Anomaly | time_series_anomaly | 🟠 high | T1078, T1110 |
+| 21 | WAF Attack Frequency by Source IP (Frequency Analysis) | frequency_analysis | 🟠 high | T1190 |
+| 22 | WAF Multi-Attack Vector Scoring (Combined Methods) | scoring | 🔴 critical | T1190, T1059 |
+| 23 | SQL Injection Pattern Stacking (Rare Value Detection) | rare_value | 🟠 high | T1190 |
+| 24 | Web Attack Geographic Anomaly (Rare Country Detection) | rare_value | 🟡 medium | T1190 |
+| 25 | Web Application Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001, T1110.003 |
+| 26 | Web Directory Scanning IP Clustering (Anomaly Detection) | anomaly_detection | 🟡 medium | T1595.002 |
+| 27 | OWASP Multi-Stage Web Attack Chain (Combined Methods) | multi_stage | 🔴 critical | T1190, T1110, T1059 |
+| 28 | Web Scanner Tool Identification (User Agent Stacking) | rare_value | 🟡 medium | T1595.002 |
+| 29 | Windows Credential Access Tool Cluster (Grouping) | grouping | 🔴 critical | T1003, T1558.003 |
+| 30 | Windows Defense Evasion Score (Combined Methods) | scoring | 🔴 critical | T1562, T1548.002, T1070 |
+| 31 | Windows Lateral Movement Tool Cluster (Grouping) | grouping | 🔴 critical | T1021, T1570 |
+| 32 | Windows Suspiciously Long Command Line (Field Analysis) | field_analysis | 🟠 high | T1059.001, T1027 |
+| 33 | Windows Process from Unusual Path (Rare Value Analysis) | rare_value | 🟠 high | T1204, T1036 |
+| 34 | Windows Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059 |
 
 ## STIG Compliance Rules
 
@@ -787,4 +866,4 @@
 | OCI VCN Peering Connection Created | SC-7 | CAT II | medium |
 
 ---
-*Generated from 383 Sigma rules + 20 hunting queries*
+*Generated from 428 Sigma rules + 34 hunting queries*

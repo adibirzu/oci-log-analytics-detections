@@ -1,0 +1,44 @@
+title: "BLUELIGHT RAT: Periodic Screen Capture"
+id: bl-s0657-t1113-001
+status: stable
+description: >
+  Detects rapid JPEG file creation by non-image processes. BLUELIGHT captures
+  screenshots at regular intervals and saves them as .jpg files before staging
+  for exfiltration via OneDrive. High frequency (>3 per minute) indicates automated capture.
+references:
+  - https://attack.mitre.org/techniques/T1113/
+  - https://attack.mitre.org/software/S0657/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: windows
+  category: file_event
+  service: sysmon
+detection:
+  selection:
+    EventID: 11
+    TargetFilename|endswith: '.jpg'
+  filter_legitimate:
+    Image|endswith:
+      - '\chrome.exe'
+      - '\msedge.exe'
+      - '\firefox.exe'
+      - '\Photos.exe'
+      - '\SnippingTool.exe'
+      - '\mspaint.exe'
+      - '\Photoshop.exe'
+  condition: selection and not filter_legitimate
+  timeframe: 1m
+  threshold:
+    count: 3
+    field: TargetFilename
+level: high
+tags:
+  - attack.collection
+  - attack.t1113
+  - apt.apt37
+  - malware.bluelight
+falsepositives:
+  - Camera or scanning software saving rapid captures
+  - Automated testing frameworks generating screenshots
+version: 1

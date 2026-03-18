@@ -1,0 +1,36 @@
+title: "BLUELIGHT RAT: Data Exfiltration via OneDrive/Graph API"
+id: bl-s0657-t1567-001
+status: stable
+description: >
+  Detects large data uploads to Microsoft Graph API from non-OneDrive processes.
+  BLUELIGHT exfiltrates collected screenshots, credentials, and system data by
+  uploading to OneDrive via Graph API, blending with legitimate cloud storage traffic.
+references:
+  - https://attack.mitre.org/techniques/T1567/002/
+  - https://attack.mitre.org/software/S0657/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: windows
+  category: network_connection
+  service: sysmon
+detection:
+  selection:
+    EventID: 3
+    DestinationHostname|contains: 'graph.microsoft.com'
+  filter_legitimate:
+    Image|endswith:
+      - '\OneDrive.exe'
+      - '\Teams.exe'
+      - '\OUTLOOK.EXE'
+  condition: selection and not filter_legitimate
+level: high
+tags:
+  - attack.exfiltration
+  - attack.t1567.002
+  - apt.apt37
+  - malware.bluelight
+falsepositives:
+  - Custom applications using Microsoft Graph API for file uploads
+  - PowerShell scripts managing OneDrive content
+version: 1

@@ -1,0 +1,42 @@
+title: "APM: CSRF Token Missing or Invalid on State-Changing Request"
+id: apm-browser-csrf-001
+status: stable
+description: >
+  Detects HTTP POST/PUT/DELETE requests to state-changing endpoints that lack
+  CSRF tokens or have invalid tokens, indicating potential Cross-Site Request Forgery.
+  Uses APM span attributes to detect missing security headers.
+references:
+  - https://owasp.org/www-community/attacks/csrf
+  - https://attack.mitre.org/techniques/T1185/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: oci
+  service: apm
+detection:
+  selection_method:
+    HTTP_Method:
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+  selection_missing_header:
+    Referer: null
+  filter_safe_endpoints:
+    HTTP_URL|contains:
+      - '/api/health'
+      - '/api/status'
+      - '/login'
+      - '/oauth'
+      - '/webhook'
+  condition: selection_method and selection_missing_header and not filter_safe_endpoints
+level: medium
+tags:
+  - attack.initial_access
+  - attack.t1185
+  - owasp.a01
+falsepositives:
+  - API-to-API calls without browser context
+  - Mobile app requests
+  - Webhook callbacks
+version: 1

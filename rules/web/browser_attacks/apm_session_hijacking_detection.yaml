@@ -1,0 +1,35 @@
+title: "APM: Session Hijacking - Rapid Session Changes"
+id: apm-browser-session-001
+status: stable
+description: >
+  Detects rapid session ID changes within a single trace or from a single IP,
+  indicating potential session hijacking, session fixation, or cookie theft.
+  Multiple distinct session IDs per source within a short window is anomalous.
+references:
+  - https://owasp.org/www-community/attacks/Session_hijacking_attack
+  - https://attack.mitre.org/techniques/T1539/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: oci
+  service: apm
+detection:
+  selection:
+    Span_Name|contains: 'HTTP'
+  aggregation:
+    distinctcount_session_id:
+      field: Session_ID
+      by: Source_IP
+      threshold: 5
+  timeframe: 5m
+  condition: selection
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1539
+  - attack.t1550.004
+  - owasp.a07
+falsepositives:
+  - Load testing tools cycling sessions
+  - Shared NAT/proxy IP addresses
+version: 1

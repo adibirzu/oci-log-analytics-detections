@@ -1,0 +1,40 @@
+title: "BLUELIGHT RAT: Internet Explorer Drive-by Compromise"
+id: bl-s0657-t1189-001
+status: stable
+description: >
+  Detects Internet Explorer making network connections to non-Microsoft domains.
+  BLUELIGHT (S0657) uses browser exploits (CVE-2020-1380, CVE-2021-26411) for initial
+  compromise via watering hole attacks. APT37/InkySquid abuses IE vulnerabilities to
+  deliver the BLUELIGHT payload through malicious JavaScript on compromised sites.
+references:
+  - https://attack.mitre.org/software/S0657/
+  - https://www.volexity.com/blog/2021/08/17/north-korean-apt-inkysquid-infects-victims-using-browser-exploits/
+  - https://github.com/markBH1510/Threat-Hunting-Reports/blob/main/BLUELIGHT-S0657/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: windows
+  category: network_connection
+  service: sysmon
+detection:
+  selection:
+    EventID: 3
+    Image|endswith: '\iexplore.exe'
+  filter_microsoft:
+    DestinationHostname|endswith:
+      - '.microsoft.com'
+      - '.windows.com'
+      - '.bing.com'
+      - '.live.com'
+      - '.msn.com'
+  condition: selection and not filter_microsoft
+level: medium
+tags:
+  - attack.initial_access
+  - attack.t1189
+  - apt.apt37
+  - malware.bluelight
+falsepositives:
+  - Legitimate Internet Explorer browsing to non-Microsoft sites
+  - Windows Update checks via IE components
+version: 1

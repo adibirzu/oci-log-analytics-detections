@@ -1,17 +1,17 @@
 {
   "version": "1.0",
-  "total_rules": 383,
-  "total_hunting": 20,
+  "total_rules": 428,
+  "total_hunting": 34,
   "platforms": {
-    "windows": 218,
-    "oci": 100,
-    "linux": 65
+    "windows": 231,
+    "oci": 130,
+    "linux": 67
   },
   "severities": {
-    "critical": 60,
-    "high": 167,
-    "medium": 110,
-    "low": 16,
+    "critical": 75,
+    "high": 183,
+    "medium": 122,
+    "low": 18,
     "informational": 30
   },
   "mitre_techniques": [
@@ -23,6 +23,7 @@
     "T1003.006",
     "T1003.007",
     "T1005",
+    "T1012",
     "T1018",
     "T1021",
     "T1021.001",
@@ -33,6 +34,7 @@
     "T1033",
     "T1036.003",
     "T1036.005",
+    "T1041",
     "T1046",
     "T1047",
     "T1048",
@@ -95,10 +97,12 @@
     "T1137",
     "T1140",
     "T1187",
+    "T1189",
     "T1190",
     "T1197",
     "T1201",
     "T1202",
+    "T1203",
     "T1204",
     "T1204.002",
     "T1218",
@@ -119,6 +123,7 @@
     "T1491.001",
     "T1496",
     "T1497",
+    "T1499",
     "T1505.003",
     "T1518",
     "T1518.001",
@@ -127,6 +132,7 @@
     "T1530",
     "T1531",
     "T1537",
+    "T1539",
     "T1542",
     "T1543.002",
     "T1543.003",
@@ -152,8 +158,10 @@
     "T1548.001",
     "T1548.002",
     "T1548.003",
+    "T1550",
     "T1550.002",
     "T1550.003",
+    "T1550.004",
     "T1552.001",
     "T1552.004",
     "T1552.005",
@@ -181,6 +189,7 @@
     "T1565.001",
     "T1566.001",
     "T1567",
+    "T1567.002",
     "T1568.002",
     "T1569.002",
     "T1570",
@@ -194,6 +203,8 @@
     "T1580",
     "T1583",
     "T1583.003",
+    "T1595",
+    "T1595.002",
     "T1599",
     "T1600",
     "T1606",
@@ -216,6 +227,7 @@
     "lateral_movement",
     "persistence",
     "privilege_escalation",
+    "reconnaissance",
     "resource_development"
   ],
   "stig_controls": [
@@ -339,6 +351,22 @@
       "file": "amsi_bypass_via_powershell_reflection.json"
     },
     {
+      "title": "API Endpoint Unauthorized Access Attempts",
+      "description": "Detects unauthorized access attempts to API endpoints (401/403 responses). May indicate API key brute force, token manipulation, or broken access control. OWASP A01:2021 Broken Access Control.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190",
+        "T1078"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "api_endpoint_unauthorized_access_attempts.json"
+    },
+    {
       "title": "AppInit DLLs Persistence",
       "description": "Detects modification of AppInit_DLLs registry value to inject DLLs into every process that loads User32.dll.",
       "level": "critical",
@@ -427,6 +455,171 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "bloodhound_ad_enumeration.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: Browser Spawning Suspicious Child Process",
+      "description": "Detects Internet Explorer spawning command interpreters or script hosts after exploiting CVE-2020-1380 or CVE-2021-26411 for second-stage payload execution.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1203"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_browser_child_process.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: Browser Credential Memory Access",
+      "description": "Detects non-browser processes accessing browser process memory with PROCESS_ALL_ACCESS (0x1fffff). BLUELIGHT reads browser memory to extract stored credentials, session tokens, and cookies.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1555.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "bluelight_browser_credential_theft.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: Internet Explorer Drive-by Compromise",
+      "description": "Detects Internet Explorer making network connections to non-Microsoft domains. BLUELIGHT (S0657/APT37) uses browser exploits (CVE-2020-1380, CVE-2021-26411) for initial compromise via watering hole attacks.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1189"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_drive_by_compromise.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: File Discovery from Browser Process",
+      "description": "Detects recursive directory enumeration spawned by browser or script host processes. BLUELIGHT performs file discovery to locate sensitive documents for later collection.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1083"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_file_discovery.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: C2 via Microsoft Graph API",
+      "description": "Detects non-standard processes connecting to Microsoft Graph API endpoints. BLUELIGHT uses Graph API and OneDrive for C2, blending with legitimate Microsoft traffic.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1071.001"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_graph_api_c2.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: Executable Download via Graph API",
+      "description": "Detects executable or DLL files dropped in temporary directories by processes connected to Microsoft Graph API. BLUELIGHT downloads tools from OneDrive and stages them in Temp/AppData.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1105"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_ingress_tool_transfer.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: Obfuscated Script Execution",
+      "description": "Detects obfuscation techniques (XOR key 0xCF, Base64, SVG-embedded JS) in command lines indicative of BLUELIGHT payload delivery and defense evasion.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1027"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_obfuscated_commandline.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: Data Exfiltration via OneDrive/Graph API",
+      "description": "Detects non-OneDrive processes uploading data to Microsoft Graph API. BLUELIGHT exfiltrates screenshots, credentials, and system data via OneDrive uploads.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1567.002"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_onedrive_exfiltration.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: Registry Enumeration of Security Products",
+      "description": "Detects registry access targeting security product and installed software keys. BLUELIGHT enumerates SecurityCenter2, Uninstall keys, and AV registrations to identify defensive tools.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1012"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_registry_enumeration.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: Periodic Screen Capture",
+      "description": "Detects rapid JPEG file creation by non-image processes. BLUELIGHT captures screenshots at regular intervals and stages them for exfiltration via OneDrive.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1113"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_screen_capture.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: WMI System Enumeration from Browser Child",
+      "description": "Detects WMI-based system enumeration spawned by browser processes. BLUELIGHT queries Win32_ComputerSystem and Win32_OperatingSystem to profile targets before full C2.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1082"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_system_discovery.json"
     },
     {
       "title": "Boot Configuration Change for Persistence",
@@ -1117,6 +1310,37 @@
       "stig_ids": [],
       "stig_category": "CAT II",
       "file": "indirect_command_execution_via_forfiles.json"
+    },
+    {
+      "title": "Insecure Deserialization Attack Detected",
+      "description": "Detects insecure deserialization attacks where malicious serialized objects are sent to achieve remote code execution. OWASP A08:2021 Software and Data Integrity Failures.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1059",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "insecure_deserialization_attack_detected.json"
+    },
+    {
+      "title": "Insecure Direct Object Reference Detected",
+      "description": "Detects IDOR (Insecure Direct Object Reference) attacks where users access resources belonging to other users by manipulating object IDs in URLs. OWASP A01:2021 Broken Access Control.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "insecure_direct_object_reference_detected.json"
     },
     {
       "title": "InstallUtil Application Whitelisting Bypass",
@@ -1873,6 +2097,21 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "masquerading_system_binary_in_non-standard_path.json"
+    },
+    {
+      "title": "Mass Assignment Attack Detected",
+      "description": "Detects mass assignment attacks where extra parameters are injected into API requests to modify protected fields (isAdmin, role, price). OWASP A04:2021 Insecure Design.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1078"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "mass_assignment_attack_detected.json"
     },
     {
       "title": "MSBuild Execution from Non-Standard Location",
@@ -3861,6 +4100,22 @@
       "file": "sedebugprivilege_abuse.json"
     },
     {
+      "title": "Sensitive Data Endpoint Access",
+      "description": "Detects access to endpoints that may expose sensitive data (database exports, configuration files, backup files). OWASP A02:2021 Cryptographic Failures / A01 Broken Access Control.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1005",
+        "T1552.001"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "sensitive_data_endpoint_access.json"
+    },
+    {
       "title": "Service Execution via sc.exe Create",
       "description": "Detects creation of new Windows services via sc.exe, which can be used for persistence or privilege escalation.",
       "level": "high",
@@ -3966,6 +4221,40 @@
       "file": "software_discovery_via_wmic.json"
     },
     {
+      "title": "SSRF to Cloud Instance Metadata Service (Linux)",
+      "description": "Detects outbound HTTP requests to the cloud instance metadata endpoint\n(169.254.169.254) from web application processes on Linux. This indicates\nServer-Side Request Forgery (SSRF) exploitation targeting OCI/AWS/GCP/Azure\nIMDS to extract instance credentials or configuration.\nCovers MITRE ATT&CK T1552.005 (Cloud Instance Metadata API).\n",
+      "level": "critical",
+      "platform": "linux",
+      "mitre_techniques": [
+        "T1552.005",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "ssrf_to_cloud_instance_metadata_service_linux.json"
+    },
+    {
+      "title": "SSRF to Cloud Metadata Endpoint (169.254.169.254)",
+      "description": "Detects outbound network connections to the cloud instance metadata service\n(169.254.169.254) from web application or scripting processes. This indicates\nServer-Side Request Forgery (SSRF) where an attacker exploits a web app to\naccess the OCI/AWS/GCP/Azure IMDS endpoint and steal credentials, instance\nidentity tokens, or configuration data.\nCovers MITRE ATT&CK T1552.005 (Cloud Instance Metadata API).\n",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1552.005",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "ssrf_to_cloud_metadata_endpoint_169254169254.json"
+    },
+    {
       "title": "Startup Folder Modification",
       "description": "Detects commands copying or creating files in the Windows startup folder.",
       "level": "medium",
@@ -3979,6 +4268,36 @@
       "stig_ids": [],
       "stig_category": "CAT II",
       "file": "startup_folder_modification.json"
+    },
+    {
+      "title": "Suspicious HTTP Method Usage",
+      "description": "Detects use of unusual or dangerous HTTP methods (PUT, DELETE, TRACE, OPTIONS, PATCH) that may indicate API abuse or security misconfiguration. OWASP A05:2021 Security Misconfiguration.",
+      "level": "low",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "suspicious_http_method_usage.json"
+    },
+    {
+      "title": "Suspicious or Empty User Agent Detected",
+      "description": "Detects requests with empty, missing, or known-malicious user agents. Automated attack tools often use non-standard user agents or omit them entirely.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1595"
+      ],
+      "mitre_tactics": [
+        "reconnaissance"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "suspicious_or_empty_user_agent_detected.json"
     },
     {
       "title": "Suspicious Scheduled Task Creation",
@@ -4887,6 +5206,22 @@
       "file": "unquoted_service_path_exploitation.json"
     },
     {
+      "title": "Unusually Large HTTP Response (Data Exfiltration)",
+      "description": "Detects unusually large HTTP responses that may indicate successful data exfiltration (database dumps, bulk user data extraction). OWASP A01:2021 Broken Access Control.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1041",
+        "T1048"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "unusually_large_http_response_data_exfiltration.json"
+    },
+    {
       "title": "VBA Macro Spawning Suspicious Child Process",
       "description": "Detects Office applications spawning command shells or scripting engines, indicating macro execution.",
       "level": "high",
@@ -4945,6 +5280,383 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "volume_shadow_copy_deletion_via_wmic.json"
+    },
+    {
+      "title": "WAF Command Injection Attack Blocked",
+      "description": "Detects OS command injection attempts blocked by OCI WAF. Attackers inject system commands through web parameters. OWASP A03:2021 Injection.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1059",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_command_injection_attack_blocked.json"
+    },
+    {
+      "title": "WAF CORS Bypass Attempt Blocked",
+      "description": "Detects CORS misconfiguration exploitation attempts where attackers try to bypass cross-origin restrictions. OWASP A05:2021 Security Misconfiguration.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1189"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "waf_cors_bypass_attempt_blocked.json"
+    },
+    {
+      "title": "WAF Cross-Site Scripting Attack Blocked",
+      "description": "Detects XSS (Cross-Site Scripting) attempts blocked by OCI WAF. Part of OWASP A03:2021 Injection category.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1189"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_cross-site_scripting_attack_blocked.json"
+    },
+    {
+      "title": "WAF LDAP Injection Attack Blocked",
+      "description": "Detects LDAP injection attempts blocked by WAF. Attackers manipulate LDAP queries to bypass authentication or extract directory information. OWASP A03:2021 Injection.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_ldap_injection_attack_blocked.json"
+    },
+    {
+      "title": "WAF Log4Shell (CVE-2021-44228) Attack Blocked",
+      "description": "Detects Log4Shell (Log4j RCE) exploitation attempts blocked by WAF. Attackers use JNDI lookup strings to achieve remote code execution. OWASP A06:2021 Vulnerable and Outdated Components.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190",
+        "T1059"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_log4shell_cve-2021-44228_attack_blocked.json"
+    },
+    {
+      "title": "WAF NoSQL Injection Attack Blocked",
+      "description": "Detects NoSQL injection attempts (MongoDB, CouchDB) blocked by WAF. Attackers inject NoSQL query operators to bypass authentication or extract data. OWASP A03:2021 Injection.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_nosql_injection_attack_blocked.json"
+    },
+    {
+      "title": "WAF Path Traversal Attack Blocked",
+      "description": "Detects directory traversal (path traversal) attacks blocked by WAF. Attackers attempt to access files outside the web root using ../ sequences. OWASP A01:2021 Broken Access Control.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1083",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_path_traversal_attack_blocked.json"
+    },
+    {
+      "title": "WAF Protocol Attack Blocked",
+      "description": "Detects HTTP protocol violation attacks blocked by WAF (request smuggling, header injection, HTTP splitting). OWASP A05:2021 Security Misconfiguration.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_protocol_attack_blocked.json"
+    },
+    {
+      "title": "WAF Rate Limiting Triggered",
+      "description": "Detects WAF rate limiting events indicating automated attack tools or brute force attempts. Rate limiting is configured at 100 requests per minute for Seven Kingdoms Portal.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1110"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "waf_rate_limiting_triggered.json"
+    },
+    {
+      "title": "WAF Server-Side Request Forgery Blocked",
+      "description": "Detects SSRF attempts blocked by WAF where attackers try to make the server fetch internal resources. OWASP A10:2021 Server-Side Request Forgery.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190",
+        "T1552.005"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_server-side_request_forgery_blocked.json"
+    },
+    {
+      "title": "WAF Server-Side Template Injection Blocked",
+      "description": "Detects Server-Side Template Injection (SSTI) attempts blocked by WAF. Attackers inject template syntax to achieve remote code execution via template engines (Jinja2, Twig, Freemarker).",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1059",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_server-side_template_injection_blocked.json"
+    },
+    {
+      "title": "WAF SQL Injection Attack Allowed Through",
+      "description": "Detects SQL injection attempts that were ALLOWED through WAF (detection-only mode or rule bypass). Critical alert indicating potential successful exploitation.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190",
+        "T1059.007"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_sql_injection_attack_allowed_through.json"
+    },
+    {
+      "title": "WAF SQL Injection Attack Blocked",
+      "description": "Detects SQL injection attempts blocked by OCI WAF. Indicates active exploitation of OWASP A03:2021 Injection vulnerabilities against the web application.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190",
+        "T1059.007"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_sql_injection_attack_blocked.json"
+    },
+    {
+      "title": "WAF Web Shell Upload Attempt Blocked",
+      "description": "Detects attempts to upload web shell files blocked by WAF. Web shells provide persistent remote access through the web server. OWASP A03:2021 Injection.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1505.003",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_web_shell_upload_attempt_blocked.json"
+    },
+    {
+      "title": "WAF XML External Entity Attack Blocked",
+      "description": "Detects XXE (XML External Entity) injection attempts blocked by WAF. Attackers exploit XML parsers to read files, perform SSRF, or execute denial of service.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "waf_xml_external_entity_attack_blocked.json"
+    },
+    {
+      "title": "Web Application Authentication Bypass",
+      "description": "Detects authentication bypass attempts including JWT manipulation, session fixation, and forced browsing to protected endpoints. OWASP A07:2021 Identification and Authentication Failures.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1078",
+        "T1550"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "web_application_authentication_bypass.json"
+    },
+    {
+      "title": "Web Application Brute Force Login Attempt",
+      "description": "Detects repeated failed login attempts via HTTP 401/403 responses to authentication endpoints. Indicates brute force or credential stuffing attacks. OWASP A07:2021 Identification and Authentication Failures.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1110.001",
+        "T1110.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "web_application_brute_force_login_attempt.json"
+    },
+    {
+      "title": "Web Application Privilege Escalation",
+      "description": "Detects privilege escalation attempts where users try to modify their role or access admin-only endpoints. OWASP A01:2021 Broken Access Control.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1078"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "web_application_privilege_escalation.json"
+    },
+    {
+      "title": "Web Application Server Error Spike",
+      "description": "Detects HTTP 500 Internal Server Error responses which may indicate successful injection attacks causing application errors, or application instability from attack traffic.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1499"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "web_application_server_error_spike.json"
+    },
+    {
+      "title": "Web Application Session Hijacking Indicators",
+      "description": "Detects indicators of session hijacking or session fixation attacks where an attacker steals or manipulates session tokens. OWASP A07:2021 Identification and Authentication Failures.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1539",
+        "T1550.004"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "web_application_session_hijacking_indicators.json"
+    },
+    {
+      "title": "Web Directory Enumeration Detected",
+      "description": "Detects directory and file enumeration attempts via high volume of 404 responses to common admin/config paths. OWASP A01:2021 Broken Access Control.",
+      "level": "low",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1083",
+        "T1595.002"
+      ],
+      "mitre_tactics": [
+        "reconnaissance"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT III",
+      "file": "web_directory_enumeration_detected.json"
+    },
+    {
+      "title": "Web Server Process Spawning Command Shell",
+      "description": "Detects a web server or scripting engine process spawning a command shell\n(cmd.exe, powershell.exe, bash) with suspicious command-line arguments\ncontaining pipe, semicolon, or other command injection characters.\nThis indicates successful Remote Code Execution (RCE) via the web application\n(e.g., OS command injection in a FastAPI/Django/Express endpoint).\nCovers MITRE ATT&CK T1059 (Command and Scripting Interpreter).\n",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059",
+        "T1059.001",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "web_server_process_spawning_command_shell.json"
+    },
+    {
+      "title": "Web Server Process Spawning Shell with Injection Characters (Linux)",
+      "description": "Detects a web application runtime (Python, Node, Java, PHP) spawning a shell\nprocess (bash, sh, dash) with command-line arguments containing injection\ncharacters (semicolons, pipes, backticks). This indicates successful Remote\nCode Execution (RCE) via a command injection vulnerability in the web app.\nCovers MITRE ATT&CK T1059 (Command and Scripting Interpreter) and\nT1190 (Exploit Public-Facing Application).\n",
+      "level": "critical",
+      "platform": "linux",
+      "mitre_techniques": [
+        "T1059",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "web_server_process_spawning_shell_with_injection_characters_linux.json"
+    },
+    {
+      "title": "Web Vulnerability Scanner Detected",
+      "description": "Detects known web vulnerability scanner user agents in Load Balancer access logs. Indicates active reconnaissance against the web application.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1595.002"
+      ],
+      "mitre_tactics": [
+        "reconnaissance"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "file": "web_vulnerability_scanner_detected.json"
     },
     {
       "title": "WiFi Password Extraction via Netsh",
@@ -6086,8 +6798,7 @@
         "T1048",
         "T1071.004"
       ],
-      "file": "hunting/dns_exfiltration_entropy.json",
-      "query": "'Log Source' = 'Windows Sysmon Operational Logs' and 'Event ID' = 22 | eval domain_length = length('Query Name') | where domain_length > 50 | stats count as long_dns_queries, unique('Query Name') as unique_domains by 'Host Name' | sort -long_dns_queries | where long_dns_queries > 10"
+      "file": "hunting/dns_exfiltration_entropy.json"
     },
     {
       "title": "Linux Data Staging and Exfiltration Indicators",
@@ -6099,8 +6810,7 @@
         "T1560.001",
         "T1074.001"
       ],
-      "file": "hunting/linux_data_staging_exfil.json",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (msg like '*tar *' or msg like '*zip *' or msg like '*gzip *' or msg like '*curl *' or msg like '*wget *' or msg like '*scp *' or msg like '*nc *') | stats count as staging_commands, distinctcount('Process Name') as tools_used by 'Host Name' | sort -staging_commands | where staging_commands > 4 and tools_used > 2"
+      "file": "hunting/linux_data_staging_exfil.json"
     },
     {
       "title": "Linux Multi-Stage Attack Indicators (Combined Methods)",
@@ -6112,8 +6822,7 @@
         "T1110",
         "T1059.004"
       ],
-      "file": "hunting/linux_multi_stage_attack.json",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (msg like '*Failed password*' or msg like '*authorized_keys*' or msg like '*/dev/tcp/*' or msg like '*curl*http*' or msg like '*wget*http*' or msg like '*crontab*' or msg like '*systemctl enable*' or msg like '*/etc/passwd*' or msg like '*/etc/shadow*') | stats count as total_indicators, distinctcount(msg) as unique_patterns by 'Host Name' | where unique_patterns > 3 | sort -total_indicators"
+      "file": "hunting/linux_multi_stage_attack.json"
     },
     {
       "title": "Linux Persistence Indicator Score (Combined Methods)",
@@ -6126,8 +6835,7 @@
         "T1543.002",
         "T1098.004"
       ],
-      "file": "hunting/linux_persistence_score.json",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (msg like '*crontab*' or msg like '*systemctl enable*' or msg like '*systemctl daemon-reload*' or msg like '*authorized_keys*' or msg like '*.bashrc*' or msg like '*.bash_profile*' or msg like '*.service*' or msg like '*at -f*' or msg like '*visudo*' or msg like '*/etc/sudoers*') | stats count as total_events, distinctcount(msg) as unique_mechanisms by 'Host Name' | where unique_mechanisms > 2 | sort -unique_mechanisms"
+      "file": "hunting/linux_persistence_score.json"
     },
     {
       "title": "Linux Rare Process Detection (Stacking)",
@@ -6138,8 +6846,52 @@
       "mitre_techniques": [
         "T1059.004"
       ],
-      "file": "hunting/linux_rare_process.json",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') | stats count as executions by 'Process Name' | sort executions | where executions < 3"
+      "file": "hunting/linux_rare_process.json"
+    },
+    {
+      "title": "Geographic Health: Cloud Provider Summary",
+      "description": "Summarizes instance health by cloud provider (OCI, Azure, GCP) showing total instances, healthy/degraded/unreachable counts, and average CPU/memory utilization per provider.",
+      "level": "informational",
+      "hunting_type": "aggregation",
+      "cookbook_method": "sorting_stacking",
+      "mitre_techniques": [],
+      "file": "hunting/multicloud_geo_health_by_provider.json"
+    },
+    {
+      "title": "Geographic Health: Instance Detail with Coordinates",
+      "description": "Shows individual instance health status with geographic coordinates, cloud provider, region, role, and key metrics. Each row represents the latest heartbeat from an instance \u2014 suitable for map pin placement.",
+      "level": "informational",
+      "hunting_type": "detail_view",
+      "cookbook_method": "entity_profiling",
+      "mitre_techniques": [],
+      "file": "hunting/multicloud_geo_health_instance_detail.json"
+    },
+    {
+      "title": "Geographic Health: Regional Status on Global Map",
+      "description": "Displays multicloud instance health status by region with geographic coordinates for global map visualization. Shows healthy, degraded, and unreachable instances across OCI, Azure, and GCP regions. Use with the Map visualization type in OCI Log Analytics.",
+      "level": "informational",
+      "hunting_type": "geographic_analysis",
+      "cookbook_method": "geographic_correlation",
+      "mitre_techniques": [],
+      "file": "hunting/multicloud_geo_health_regional_map.json"
+    },
+    {
+      "title": "Geographic Health: Service Tier Status",
+      "description": "Shows health status grouped by service tier (frontend, application, database, cache, compute, orchestration, observability) across all cloud providers and regions.",
+      "level": "informational",
+      "hunting_type": "aggregation",
+      "cookbook_method": "sorting_stacking",
+      "mitre_techniques": [],
+      "file": "hunting/multicloud_geo_health_tier_status.json"
+    },
+    {
+      "title": "Geographic Health: Unhealthy Regions Alert",
+      "description": "Identifies regions with degraded or unreachable instances across all cloud providers. Highlights regions needing immediate attention for operational response.",
+      "level": "high",
+      "hunting_type": "alerting",
+      "cookbook_method": "threshold_analysis",
+      "mitre_techniques": [],
+      "file": "hunting/multicloud_geo_health_unhealthy_regions.json"
     },
     {
       "title": "C2 Beaconing Detection (Periodic Connection Analysis)",
@@ -6151,8 +6903,7 @@
         "T1071",
         "T1573"
       ],
-      "file": "hunting/network_c2_beaconing.json",
-      "query": "'Log Source' = 'Windows Sysmon Operational Logs' and 'Event ID' = 3 and 'Destination Port' != 80 and 'Destination Port' != 443 | stats count as connection_count by 'Host Name', 'Destination IP', 'Destination Port' | sort -connection_count | where connection_count > 15"
+      "file": "hunting/network_c2_beaconing.json"
     },
     {
       "title": "OCI After-Hours IAM Activity (Time-Based Anomaly)",
@@ -6163,8 +6914,7 @@
       "mitre_techniques": [
         "T1098"
       ],
-      "file": "hunting/oci_after_hours_iam_activity.json",
-      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' like 'com.oraclecloud.identitycontrolplane.*' | eval hour = toNumber(formatDate(Time, 'HH')) | where hour < 6 or hour > 22 | stats count as after_hours_changes by 'User Name', 'Event Type' | sort -after_hours_changes"
+      "file": "hunting/oci_after_hours_iam_activity.json"
     },
     {
       "title": "OCI Console Login Brute Force (Frequency Analysis)",
@@ -6176,8 +6926,19 @@
         "T1078",
         "T1110"
       ],
-      "file": "hunting/oci_console_brute_force.json",
-      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' and Status = 'Failure' | stats count as failed_attempts by 'User Name' | sort -failed_attempts | where failed_attempts > 3"
+      "file": "hunting/oci_console_brute_force.json"
+    },
+    {
+      "title": "OCI IAM and Fusion Activity Correlation",
+      "description": "Correlates OCI IAM identity events with Fusion Apps sign-in/sign-out and ESS audit activity. Flags identities or source IPs seen in both OCI and Fusion during the search window, which may indicate account misuse or suspicious cross-platform identity activity.",
+      "level": "high",
+      "hunting_type": "grouping_correlation",
+      "cookbook_method": "grouping_correlation",
+      "mitre_techniques": [
+        "T1078",
+        "T1098"
+      ],
+      "file": "hunting/oci_iam_fusion_activity_correlation.json"
     },
     {
       "title": "OCI IAM Rapid Configuration Changes (Anomaly Detection)",
@@ -6189,8 +6950,7 @@
         "T1098",
         "T1078"
       ],
-      "file": "hunting/oci_iam_rapid_changes.json",
-      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' like 'com.oraclecloud.identitycontrolplane.*' | stats count as iam_changes by 'User Name', 'Source IP' | sort -iam_changes | where iam_changes > 10"
+      "file": "hunting/oci_iam_rapid_changes.json"
     },
     {
       "title": "OCI Multiple Users from Same IP (Grouping)",
@@ -6202,8 +6962,7 @@
         "T1078",
         "T1110.004"
       ],
-      "file": "hunting/oci_multi_user_same_ip.json",
-      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' | stats distinctcount('User Name') as unique_users, count as total_logins by 'Source IP' | where unique_users > 2 | sort -unique_users"
+      "file": "hunting/oci_multi_user_same_ip.json"
     },
     {
       "title": "OCI Privilege Escalation Chain Detection",
@@ -6215,8 +6974,7 @@
         "T1098",
         "T1078"
       ],
-      "file": "hunting/oci_privilege_escalation_chain.json",
-      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' like 'com.oraclecloud.identitycontrolplane.*' | stats count as iam_ops, distinctcount('Event Type') as unique_actions by 'User Name' | sort -iam_ops | where iam_ops > 5 and unique_actions > 3"
+      "file": "hunting/oci_privilege_escalation_chain.json"
     },
     {
       "title": "OCI Resource Destruction Spike (Anomaly Detection)",
@@ -6228,8 +6986,7 @@
         "T1485",
         "T1489"
       ],
-      "file": "hunting/oci_resource_destruction_spike.json",
-      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like '*delete*' or 'Event Type' like '*terminate*' or 'Event Type' like '*remove*') | stats count as destructive_actions, distinctcount('Event Type') as unique_action_types by 'User Name', 'Source IP' | where destructive_actions > 5 | sort -destructive_actions"
+      "file": "hunting/oci_resource_destruction_spike.json"
     },
     {
       "title": "SSH Brute Force Detection (Frequency Analysis)",
@@ -6240,8 +6997,7 @@
       "mitre_techniques": [
         "T1110.001"
       ],
-      "file": "hunting/ssh_brute_force_frequency.json",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and msg like '*Failed password*' | stats count as failed_attempts by 'Client IP' | sort -failed_attempts | where failed_attempts > 5"
+      "file": "hunting/ssh_brute_force_frequency.json"
     },
     {
       "title": "Login Activity Time-Series Anomaly",
@@ -6253,8 +7009,99 @@
         "T1078",
         "T1110"
       ],
-      "file": "hunting/timeseries_login_anomaly.json",
-      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' | timecluster span = 1hour | stats count as login_count by 'Start Time' | sort -login_count | where login_count > 20"
+      "file": "hunting/timeseries_login_anomaly.json"
+    },
+    {
+      "title": "WAF Attack Frequency by Source IP (Frequency Analysis)",
+      "description": "Identifies source IPs generating the most WAF block events. Uses frequency analysis (Threat Hunter's Cookbook: Sorting/Stacking) to surface prolific attackers targeting the web application. IPs with high block counts indicate automated attack tools.",
+      "level": "high",
+      "hunting_type": "frequency_analysis",
+      "cookbook_method": "sorting_stacking",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "file": "hunting/waf_attack_frequency_by_source.json"
+    },
+    {
+      "title": "WAF Multi-Attack Vector Scoring (Combined Methods)",
+      "description": "Calculates a threat score per source IP based on the diversity of attack types (SQL injection, XSS, path traversal, command injection, SSRF). An IP triggering multiple different CRS rule categories indicates a sophisticated attacker using multiple techniques. Uses combined scoring (Threat Hunter's Cookbook: Combined Methods).",
+      "level": "critical",
+      "hunting_type": "scoring",
+      "cookbook_method": "combined",
+      "mitre_techniques": [
+        "T1190",
+        "T1059"
+      ],
+      "file": "hunting/waf_multi_attack_scoring.json"
+    },
+    {
+      "title": "SQL Injection Pattern Stacking (Rare Value Detection)",
+      "description": "Stacks unique SQL injection payloads observed in WAF events to identify attack tool signatures and novel injection techniques. Rare payloads may indicate custom exploits or new attack vectors. Uses rare value stacking (Threat Hunter's Cookbook: Sorting/Stacking).",
+      "level": "high",
+      "hunting_type": "rare_value",
+      "cookbook_method": "sorting_stacking",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "file": "hunting/waf_sqli_pattern_stacking.json"
+    },
+    {
+      "title": "Web Attack Geographic Anomaly (Rare Country Detection)",
+      "description": "Identifies attack traffic originating from unusual countries by stacking WAF events by country code. Rare countries with high attack volumes may indicate targeted campaigns from specific threat actor regions.",
+      "level": "medium",
+      "hunting_type": "rare_value",
+      "cookbook_method": "sorting_stacking",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "file": "hunting/web_attack_geo_anomaly.json"
+    },
+    {
+      "title": "Web Application Brute Force Detection (Frequency Analysis)",
+      "description": "Identifies IPs performing brute force attacks against web login endpoints by counting 401/403 responses. Uses frequency analysis (Threat Hunter's Cookbook: Sorting/Stacking) to surface credential stuffing and brute force campaigns.",
+      "level": "high",
+      "hunting_type": "frequency_analysis",
+      "cookbook_method": "sorting_stacking",
+      "mitre_techniques": [
+        "T1110.001",
+        "T1110.003"
+      ],
+      "file": "hunting/web_brute_force_frequency.json"
+    },
+    {
+      "title": "Web Directory Scanning IP Clustering (Anomaly Detection)",
+      "description": "Clusters IPs performing directory enumeration by counting distinct 404-generating paths. A high number of unique 404 paths from a single IP indicates systematic directory/file scanning using tools like dirb, gobuster, or ffuf.",
+      "level": "medium",
+      "hunting_type": "anomaly_detection",
+      "cookbook_method": "clustering",
+      "mitre_techniques": [
+        "T1595.002"
+      ],
+      "file": "hunting/web_directory_scan_clustering.json"
+    },
+    {
+      "title": "OWASP Multi-Stage Web Attack Chain (Combined Methods)",
+      "description": "Correlates web attack indicators across WAF, Load Balancer, and application logs to identify multi-stage attack chains. An IP that triggers WAF blocks, generates auth failures, and accesses sensitive endpoints is likely executing a coordinated attack campaign. Uses combined methods (Threat Hunter's Cookbook: Combined Methods - multi-stage grouping).",
+      "level": "critical",
+      "hunting_type": "multi_stage",
+      "cookbook_method": "combined",
+      "mitre_techniques": [
+        "T1190",
+        "T1110",
+        "T1059"
+      ],
+      "file": "hunting/web_owasp_multi_stage_attack.json"
+    },
+    {
+      "title": "Web Scanner Tool Identification (User Agent Stacking)",
+      "description": "Stacks user agents across all web traffic to identify automated scanning tools, attack frameworks, and bot traffic. Non-browser user agents generating high request volumes indicate active reconnaissance or automated exploitation.",
+      "level": "medium",
+      "hunting_type": "rare_value",
+      "cookbook_method": "sorting_stacking",
+      "mitre_techniques": [
+        "T1595.002"
+      ],
+      "file": "hunting/web_scanner_tool_stacking.json"
     },
     {
       "title": "Windows Credential Access Tool Cluster (Grouping)",
@@ -6266,8 +7113,7 @@
         "T1003",
         "T1558.003"
       ],
-      "file": "hunting/windows_credential_access_cluster.json",
-      "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (('Command Line' like '*sekurlsa*') or ('Command Line' like '*lsass*') or ('Command Line' like '*mimikatz*') or ('Command Line' like '*procdump*lsass*') or ('Command Line' like '*comsvcs*MiniDump*') or ('Command Line' like '*kerberoast*') or ('Command Line' like '*ntds*') or ('Command Line' like '*WDigest*')) | stats count as cred_events, distinctcount('Command Line') as unique_techniques by 'Host Name', User | sort -cred_events"
+      "file": "hunting/windows_credential_access_cluster.json"
     },
     {
       "title": "Windows Defense Evasion Score (Combined Methods)",
@@ -6280,8 +7126,7 @@
         "T1548.002",
         "T1070"
       ],
-      "file": "hunting/windows_defense_evasion_score.json",
-      "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (('Command Line' like '*wevtutil*cl*') or ('Command Line' like '*Clear-EventLog*') or ('Command Line' like '*AmsiUtils*') or ('Command Line' like '*amsiInitFailed*') or ('Command Line' like '*netsh*firewall*') or ('Command Line' like '*advfirewall*set*off*') or ('Command Line' like '*fodhelper*') or ('Command Line' like '*eventvwr*') or ('Command Line' like '*NtUnmapViewOfSection*') or ('Command Line' like '*CREATE_SUSPENDED*')) | stats count as evasion_events, distinctcount('Command Line') as unique_techniques by 'Host Name' | where unique_techniques > 1 | sort -unique_techniques"
+      "file": "hunting/windows_defense_evasion_score.json"
     },
     {
       "title": "Windows Lateral Movement Tool Cluster (Grouping)",
@@ -6293,8 +7138,7 @@
         "T1021",
         "T1570"
       ],
-      "file": "hunting/windows_lateral_movement_cluster.json",
-      "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (('Process Name' like '*psexec*') or ('Process Name' like '*mstsc*') or ('Command Line' like '*Enter-PSSession*') or ('Command Line' like '*Invoke-Command*') or ('Command Line' like '*wmic*node*')) | stats count as lateral_events, distinctcount('Process Name') as unique_tools by 'Host Name' | where unique_tools > 1 | sort -lateral_events"
+      "file": "hunting/windows_lateral_movement_cluster.json"
     },
     {
       "title": "Windows Suspiciously Long Command Line (Field Analysis)",
@@ -6306,8 +7150,7 @@
         "T1059.001",
         "T1027"
       ],
-      "file": "hunting/windows_long_command_line.json",
-      "query": "'Log Source' = 'SOC Windows Sysmon Logs' | eval cmd_len = length('Command Line') | where cmd_len > 500 | sort -cmd_len | fields 'Process Name', 'Command Line', cmd_len, 'Host Name', User"
+      "file": "hunting/windows_long_command_line.json"
     },
     {
       "title": "Windows Process from Unusual Path (Rare Value Analysis)",
@@ -6319,8 +7162,7 @@
         "T1204",
         "T1036"
       ],
-      "file": "hunting/windows_process_unusual_path.json",
-      "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (('Process Name' like '*Temp*') or ('Process Name' like '*Users*Public*') or ('Process Name' like '*AppData*Local*Temp*') or ('Process Name' like '*Downloads*') or ('Process Name' like '*ProgramData*')) | stats count as executions by 'Process Name', 'Host Name' | sort -executions"
+      "file": "hunting/windows_process_unusual_path.json"
     },
     {
       "title": "Windows Rare Process Detection (Stacking)",
@@ -6331,14 +7173,13 @@
       "mitre_techniques": [
         "T1059"
       ],
-      "file": "hunting/windows_rare_process.json",
-      "query": "'Log Source' = 'SOC Windows Sysmon Logs' | stats count as executions by 'Process Name' | sort executions | where executions < 3"
+      "file": "hunting/windows_rare_process.json"
     }
   ],
   "art_coverage": {
-    "testable_rules": 283,
+    "testable_rules": 298,
     "rules_with_tests": 278,
-    "coverage_percent": 98.2,
+    "coverage_percent": 93.3,
     "total_test_mappings": 3217
   }
 }

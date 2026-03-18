@@ -1000,14 +1000,17 @@ def create_source(client, namespace, compartment_id, source_internal_name,
 
 
 def should_skip_custom_source_creation(available_sources, source_display_name):
-    """Return (bool, reason) when a custom source should not be created."""
+    """Return (bool, reason) when a custom source should not be created.
+
+    Note: We always create SOC custom sources even when native equivalents exist,
+    because native sources use XML/built-in parsers that cannot parse our JSON
+    test data. The SOC sources use JSON parsers for field extraction.
+    """
     if source_display_name in available_sources:
         return False, ""
 
-    alternatives = NATIVE_SOURCE_ALTERNATIVES.get(source_display_name, [])
-    for native_name in alternatives:
-        if native_name in available_sources:
-            return True, f"native source '{native_name}' already exists"
+    # Do NOT skip — always create SOC sources alongside native ones.
+    # Native XML parsers can't parse our JSON uploads; SOC JSON parsers can.
     return False, ""
 
 

@@ -146,6 +146,11 @@ DASHBOARDS = {
             {"title": "Linux: Shell Profile Persist", "query_file": "linux_shell_profile_persistence.json"},
             {"title": "Linux: At Job Scheduled", "query_file": "linux_at_job_scheduled.json"},
             {"title": "Linux: DNS Tunneling", "query_file": "linux_dns_tunneling_detected.json"},
+        ]
+    },
+    "SOC: Linux Advanced Threats Dashboard": {
+        "description": "Linux advanced threat detection: C2, exfiltration, discovery, web shells, cryptomining, and post-exploitation.",
+        "widgets": [
             {"title": "Linux: Hosts File Modified", "query_file": "linux_hosts_file_modification.json"},
             {"title": "Linux: /proc Memory Access", "query_file": "linux_process_memory_access_via_proc.json"},
             {"title": "Linux: Web Shell Created", "query_file": "linux_web_shell_file_creation.json"},
@@ -189,6 +194,11 @@ DASHBOARDS = {
             {"title": "Win: LSASS Memory Access", "query_file": "windows_lsass_memory_access.json"},
             {"title": "Win: Event Log Clearing", "query_file": "windows_event_log_clearing.json"},
             {"title": "Win: PsExec Lateral Move", "query_file": "windows_psexec_remote_execution.json"},
+        ]
+    },
+    "SOC: Windows Advanced Threats Dashboard": {
+        "description": "Windows advanced threat detection: UAC bypass, Kerberoasting, pass-the-hash, process hollowing, credential harvesting, lateral movement, and exfiltration.",
+        "widgets": [
             {"title": "Win: UAC Bypass", "query_file": "windows_uac_bypass_attempt.json"},
             {"title": "Win: Kerberoasting", "query_file": "windows_kerberoasting_attack.json"},
             {"title": "Win: BITS Persistence", "query_file": "windows_bits_job_abuse_for_persistence.json"},

@@ -326,6 +326,37 @@ DASHBOARDS = {
             {"title": "Geo: Service Tier Status", "query_file": "hunting/multicloud_geo_health_tier_status.json"},
         ]
     },
+    "SOC: APT Detection Dashboard": {
+        "description": "APT threat detection: BLUELIGHT RAT (S0657/APT37) full kill chain detection from browser exploitation through C2 and exfiltration via Microsoft Graph API/OneDrive.",
+        "widgets": [
+            {"title": "APT37: Drive-by Compromise", "query_file": "bluelight_drive_by_compromise.json"},
+            {"title": "APT37: Browser Child Process", "query_file": "bluelight_browser_child_process.json"},
+            {"title": "APT37: Obfuscated Commandline", "query_file": "bluelight_obfuscated_commandline.json"},
+            {"title": "APT37: Graph API C2", "query_file": "bluelight_graph_api_c2.json"},
+            {"title": "APT37: WMI System Discovery", "query_file": "bluelight_system_discovery.json"},
+            {"title": "APT37: Registry Enumeration", "query_file": "bluelight_registry_enumeration.json"},
+            {"title": "APT37: File Discovery", "query_file": "bluelight_file_discovery.json"},
+            {"title": "APT37: Screen Capture", "query_file": "bluelight_screen_capture.json"},
+            {"title": "APT37: Browser Credential Theft", "query_file": "bluelight_browser_credential_theft.json"},
+            {"title": "APT37: Ingress Tool Transfer", "query_file": "bluelight_ingress_tool_transfer.json"},
+            {"title": "APT37: OneDrive Exfiltration", "query_file": "bluelight_onedrive_exfiltration.json"},
+            {"title": "Hunt: BLUELIGHT Kill Chain", "query_file": "hunting/bluelight_apt37_kill_chain.json"},
+        ]
+    },
+    "SOC: Browser Attack Detection Dashboard": {
+        "description": "Browser-side attack detection via OCI APM and OpenTelemetry. XSS, SQLi, CSRF, session hijacking, clickjacking, DOM attacks, cryptomining, and fingerprinting across monitored applications.",
+        "widgets": [
+            {"title": "Browser: XSS Attack Detection", "query_file": "apps/apm_xss_attack_detection.json"},
+            {"title": "Browser: SQL Injection Detection", "query_file": "apps/apm_sqli_attack_detection.json"},
+            {"title": "Browser: CSRF Violation", "query_file": "apps/apm_csrf_violation_detection.json"},
+            {"title": "Browser: Session Hijacking", "query_file": "apps/apm_session_hijacking_detection.json"},
+            {"title": "Browser: Clickjacking Detection", "query_file": "apps/apm_clickjacking_detection.json"},
+            {"title": "Browser: DOM-Based Attacks", "query_file": "apps/apm_dom_attack_detection.json"},
+            {"title": "Browser: Suspicious JS Patterns", "query_file": "apps/apm_suspicious_js_patterns.json"},
+            {"title": "Browser: Fingerprinting Detection", "query_file": "apps/apm_browser_fingerprinting.json"},
+            {"title": "Hunt: Browser Attack Frequency", "query_file": "hunting/browser_attack_frequency_analysis.json"},
+        ]
+    },
 }
 
 

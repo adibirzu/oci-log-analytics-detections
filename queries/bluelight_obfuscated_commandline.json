@@ -1,0 +1,24 @@
+{
+  "title": "BLUELIGHT RAT: Obfuscated Script Execution",
+  "description": "Detects obfuscation techniques (XOR key 0xCF, Base64, SVG-embedded JS) in command lines indicative of BLUELIGHT payload delivery and defense evasion.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' like '%powershell.exe' or 'Process Name' like '%wscript.exe' or 'Process Name' like '%cscript.exe' or 'Process Name' like '%mshta.exe') and ('Command Line' like '%FromBase64String%' or 'Command Line' like '%ToBase64String%' or 'Command Line' like '%-enc %' or 'Command Line' like '%-encodedcommand%' or 'Command Line' like '%XOR%' or 'Command Line' like '%-bxor%' or 'Command Line' like '%Invoke-Expression%') | stats count by 'Host Name (Server)', 'Process Name', 'Command Line'",
+  "sigma_id": "bl-s0657-t1027-001",
+  "level": "high",
+  "tags": ["attack.defense_evasion", "attack.t1027", "apt.apt37", "malware.bluelight"],
+  "mitre_attack": {
+    "tactics": ["defense_evasion"],
+    "techniques": ["T1027"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": ["Windows Sysmon Events", "Windows Sysmon Operational Logs", "SOC Windows Sysmon Logs"]
+  },
+  "falsepositives": ["Legitimate encoded PowerShell scripts used by IT automation", "Software deployment tools using encoded parameters"],
+  "splunk_original": "index=wineventlog EventCode=4688 NewProcessName IN (\"*powershell.exe\",\"*wscript.exe\",\"*iexplore.exe\") CommandLine IN (\"*FromBase64String*\",\"*SVG*\",\"*XOR*\",\"*char*\") | table _time, NewProcessName, CommandLine, SubjectUserName",
+  "threat_intel": {
+    "malware_family": "BLUELIGHT",
+    "mitre_software_id": "S0657",
+    "threat_actor": "APT37 (InkySquid)"
+  }
+}

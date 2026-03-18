@@ -1,0 +1,47 @@
+title: "APM: Browser Fingerprinting via Canvas/WebGL/AudioContext"
+id: apm-browser-fingerprint-001
+status: stable
+description: >
+  Detects browser fingerprinting techniques using Canvas API, WebGL parameters,
+  AudioContext, and other APIs commonly used to uniquely identify browsers.
+  Excessive fingerprinting API calls indicate tracking scripts or reconnaissance.
+references:
+  - https://attack.mitre.org/techniques/T1592/004/
+  - https://owasp.org/www-project-web-security-testing-guide/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: oci
+  service: apm
+detection:
+  selection_canvas:
+    Span_Attributes|contains:
+      - 'canvas.toDataURL'
+      - 'toBlob'
+      - 'getImageData'
+  selection_webgl:
+    Span_Attributes|contains:
+      - 'webgl.getParameter'
+      - 'WEBGL_debug_renderer_info'
+      - 'getExtension'
+  selection_audio:
+    Span_Attributes|contains:
+      - 'AudioContext'
+      - 'OfflineAudioContext'
+      - 'createOscillator'
+  selection_enumerate:
+    Span_Attributes|contains:
+      - 'navigator.plugins'
+      - 'navigator.languages'
+      - 'screen.colorDepth'
+      - 'navigator.hardwareConcurrency'
+  condition: (selection_canvas and selection_webgl) or (selection_audio and selection_enumerate) or (selection_canvas and selection_audio)
+level: medium
+tags:
+  - attack.reconnaissance
+  - attack.t1592.004
+  - owasp.a07
+falsepositives:
+  - Legitimate WebGL applications and games
+  - Audio processing web applications
+version: 1

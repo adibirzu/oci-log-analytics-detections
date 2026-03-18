@@ -1,0 +1,45 @@
+title: "BLUELIGHT RAT: Obfuscated Script Execution"
+id: bl-s0657-t1027-001
+status: stable
+description: >
+  Detects obfuscation techniques in command lines indicative of BLUELIGHT payload
+  delivery. The RAT uses XOR encryption (key 0xCF), Base64 encoding, and SVG-embedded
+  JavaScript for defense evasion during initial exploitation.
+references:
+  - https://attack.mitre.org/techniques/T1027/
+  - https://attack.mitre.org/software/S0657/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: windows
+  service: security
+detection:
+  selection_process:
+    EventID: 4688
+    NewProcessName|endswith:
+      - '\powershell.exe'
+      - '\wscript.exe'
+      - '\cscript.exe'
+      - '\mshta.exe'
+  selection_obfuscation:
+    CommandLine|contains:
+      - FromBase64String
+      - ToBase64String
+      - '-enc '
+      - '-encodedcommand'
+      - XOR
+      - 'char('
+      - '-bxor'
+      - 'iex('
+      - 'Invoke-Expression'
+  condition: selection_process and selection_obfuscation
+level: high
+tags:
+  - attack.defense_evasion
+  - attack.t1027
+  - apt.apt37
+  - malware.bluelight
+falsepositives:
+  - Legitimate encoded PowerShell scripts used by IT automation
+  - Software deployment tools using encoded parameters
+version: 1

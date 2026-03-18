@@ -1,0 +1,49 @@
+title: "APM: DOM-Based Attack via Dangerous JavaScript APIs"
+id: apm-browser-dom-001
+status: stable
+description: >
+  Detects DOM-based attacks using dangerous JavaScript APIs observed in browser
+  telemetry spans. Monitors for document.cookie access, eval() calls, innerHTML
+  manipulation, and location/hash-based injection in OpenTelemetry browser spans.
+references:
+  - https://owasp.org/www-community/attacks/DOM_Based_XSS
+  - https://attack.mitre.org/techniques/T1059/007/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: oci
+  service: apm
+detection:
+  selection_cookie_theft:
+    Span_Attributes|contains:
+      - 'document.cookie'
+      - 'document.domain'
+  selection_code_injection:
+    Span_Attributes|contains:
+      - 'eval('
+      - 'Function('
+      - 'setTimeout('
+      - 'setInterval('
+  selection_dom_manipulation:
+    Span_Attributes|contains:
+      - '.innerHTML'
+      - '.outerHTML'
+      - 'document.write'
+      - 'insertAdjacentHTML'
+  selection_url_injection:
+    Span_Attributes|contains:
+      - 'location.hash'
+      - 'location.search'
+      - 'window.name'
+      - 'document.referrer'
+  condition: selection_cookie_theft or selection_code_injection or selection_dom_manipulation or selection_url_injection
+level: high
+tags:
+  - attack.execution
+  - attack.t1059.007
+  - owasp.a03
+  - owasp.a07
+falsepositives:
+  - Legitimate SPA frameworks using innerHTML for rendering
+  - Analytics scripts accessing document.referrer
+version: 1

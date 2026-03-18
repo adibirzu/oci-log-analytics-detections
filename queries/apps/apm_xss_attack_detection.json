@@ -1,0 +1,16 @@
+{
+  "title": "APM: Cross-Site Scripting (XSS) Attack Detection",
+  "description": "Detects XSS attack payloads in HTTP URLs and query parameters captured by OCI APM and OpenTelemetry. Covers reflected, stored, and DOM-based XSS including script injection, event handlers, and javascript: URIs.",
+  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and ('HTTP URL' like '%3Cscript%' or 'HTTP URL' like '%3C/script%' or 'HTTP URL' like '%3Csvg%' or 'HTTP URL' like '%3Ciframe%' or 'HTTP URL' like '%onerror=%' or 'HTTP URL' like '%onload=%' or 'HTTP URL' like '%onmouseover=%' or 'HTTP URL' like '%javascript:%' or 'HTTP URL' like '%javascript%3A%' or 'HTTP URL' like '%document.cookie%' or 'HTTP URL' like '%document.write%' or 'HTTP URL' like '%eval(%') | stats count as Attacks by 'HTTP URL', 'HTTP Method', 'User Agent', 'Client IP', 'service.name' | sort -Attacks",
+  "level": "high",
+  "tags": ["attack.initial_access", "attack.t1189", "attack.t1059.007", "owasp.a03", "owasp.a07", "browser_attack"],
+  "mitre_attack": {
+    "tactics": ["initial_access", "execution"],
+    "techniques": ["T1189", "T1059.007"]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "apm"
+  },
+  "falsepositives": ["Security scanning tools during authorized testing", "Developer tools sending debug payloads"]
+}

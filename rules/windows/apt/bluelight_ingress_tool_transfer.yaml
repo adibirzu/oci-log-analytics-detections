@@ -1,0 +1,39 @@
+title: "BLUELIGHT RAT: Executable Download via Graph API"
+id: bl-s0657-t1105-001
+status: stable
+description: >
+  Detects executable or DLL files dropped in temporary directories by processes
+  that also connect to Microsoft Graph API. BLUELIGHT downloads additional tools
+  from OneDrive via Graph API and stages them in Temp or AppData for execution.
+references:
+  - https://attack.mitre.org/techniques/T1105/
+  - https://attack.mitre.org/software/S0657/
+author: SOC Detection Engineering
+date: 2026/03/17
+logsource:
+  product: windows
+  category: file_event
+  service: sysmon
+detection:
+  selection_file:
+    EventID: 11
+    TargetFilename|contains:
+      - '\Temp\'
+      - '\AppData\'
+    TargetFilename|endswith:
+      - '.exe'
+      - '.dll'
+      - '.scr'
+      - '.bat'
+      - '.ps1'
+  condition: selection_file
+level: high
+tags:
+  - attack.command_and_control
+  - attack.t1105
+  - apt.apt37
+  - malware.bluelight
+falsepositives:
+  - Legitimate software installers downloading updates
+  - Browser downloads to Temp directory
+version: 1

@@ -1,6 +1,6 @@
 # Detection Rule Catalog
 
-> **428 detection rules** + **34 hunting queries** | Auto-generated from Sigma YAML sources
+> **428 detection rules** + **36 hunting queries** | Auto-generated from Sigma YAML sources
 
 ## Summary
 
@@ -26,38 +26,49 @@
 
 **203 techniques** across **14 tactics**
 
-### Initial Access (20 techniques)
+### Initial Access (30 techniques)
 
 | Technique | Rules |
 |-----------|-------|
+| T1012 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1027 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1059 | WAF Log4Shell (CVE-2021-44228) Attack Blocked, Web Server Process Spawning Command Shell, +3 more |
 | T1059.001 | Web Server Process Spawning Command Shell |
 | T1059.004 | Linux Multi-Stage Attack Indicators (Combined Methods) |
-| T1059.007 | WAF SQL Injection Attack Allowed Through, WAF SQL Injection Attack Blocked |
+| T1059.007 | WAF SQL Injection Attack Allowed Through, WAF SQL Injection Attack Blocked, Browser Attack Frequency Analysis (APM/OpenTelemetry) |
+| T1071.001 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1078 | API Endpoint Unauthorized Access Attempts, OCI Console Login Failure, +7 more |
-| T1083 | WAF Path Traversal Attack Blocked |
+| T1082 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1083 | WAF Path Traversal Attack Blocked, BLUELIGHT APT37 Kill Chain Correlation |
 | T1098 | OCI IAM and Fusion Activity Correlation |
+| T1105 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1110 | Linux Multi-Stage Attack Indicators (Combined Methods), OCI Console Login Brute Force (Frequency Analysis), +2 more |
 | T1110.001 | Linux SSH Failed Login, SSH Brute Force Detection (Frequency Analysis) |
 | T1110.003 | OCI Password Spraying Attack |
 | T1110.004 | OCI Multiple Users from Same IP (Grouping) |
+| T1113 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1133 | Cloud Guard Problem: VCN Security List Port RDP, Cloud Guard Problem: VCN Security List Port SSH, Linux External Remote Service Abuse |
-| T1189 | BLUELIGHT RAT: Internet Explorer Drive-by Compromise, WAF CORS Bypass Attempt Blocked, WAF Cross-Site Scripting Attack Blocked |
-| T1190 | API Endpoint Unauthorized Access Attempts, Cloud Guard Problem: Bucket Public Write, +21 more |
+| T1189 | BLUELIGHT RAT: Internet Explorer Drive-by Compromise, WAF CORS Bypass Attempt Blocked, +3 more |
+| T1190 | API Endpoint Unauthorized Access Attempts, Cloud Guard Problem: Bucket Public Write, +22 more |
+| T1203 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1204.002 | Windows Spearphishing Attachment Execution |
+| T1496 | Browser Attack Frequency Analysis (APM/OpenTelemetry) |
 | T1550 | Web Application Authentication Bypass |
 | T1552.005 | SSRF to Cloud Instance Metadata Service (Linux), SSRF to Cloud Metadata Endpoint (169.254.169.254), WAF Server-Side Request Forgery Blocked |
+| T1555.003 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1566.001 | Windows Spearphishing Attachment Execution |
+| T1567.002 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1606 | OCI Federated Identity Provider Modified |
 | T1621 | OCI MFA Fatigue Attack Indicators |
 
-### Execution (26 techniques)
+### Execution (35 techniques)
 
 | Technique | Rules |
 |-----------|-------|
+| T1012 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1021.002 | Sysmon PsExec Named Pipe |
 | T1021.006 | Sysmon Lateral Movement via WinRM |
-| T1027 | Windows Encoded PowerShell Execution, Windows Suspiciously Long Command Line (Field Analysis) |
+| T1027 | Windows Encoded PowerShell Execution, BLUELIGHT APT37 Kill Chain Correlation, Windows Suspiciously Long Command Line (Field Analysis) |
 | T1036 | Windows Process from Unusual Path (Rare Value Analysis) |
 | T1047 | Windows Management Instrumentation Event Subscription, WMI Process Execution via Wmic |
 | T1053.005 | Suspicious Scheduled Task Creation |
@@ -66,19 +77,27 @@
 | T1059.004 | Linux Bind Shell Listener, OCI Cloud Shell Session Started, +2 more |
 | T1059.005 | Scripting Engine Spawning Network Utility, Visual Basic Script Compilation via vbc.exe, +2 more |
 | T1059.006 | Python Execution as Child of System Process |
-| T1059.007 | JavaScript Execution via Node.js |
+| T1059.007 | JavaScript Execution via Node.js, Browser Attack Frequency Analysis (APM/OpenTelemetry) |
 | T1071 | Sysmon Suspicious Named Pipe Pattern |
-| T1105 | Finger.exe Abuse for File Download, Windows PowerShell Download Cradle |
+| T1071.001 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1082 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1083 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1105 | Finger.exe Abuse for File Download, Windows PowerShell Download Cradle, BLUELIGHT APT37 Kill Chain Correlation |
 | T1110 | Linux Multi-Stage Attack Indicators (Combined Methods), OWASP Multi-Stage Web Attack Chain (Combined Methods) |
+| T1113 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1127.001 | MSBuild Execution from Non-Standard Location, Windows MSBuild Execution for Code Bypass |
-| T1190 | Insecure Deserialization Attack Detected, WAF Command Injection Attack Blocked, +5 more |
-| T1203 | BLUELIGHT RAT: Browser Spawning Suspicious Child Process |
+| T1189 | BLUELIGHT APT37 Kill Chain Correlation, Browser Attack Frequency Analysis (APM/OpenTelemetry) |
+| T1190 | Insecure Deserialization Attack Detected, WAF Command Injection Attack Blocked, +6 more |
+| T1203 | BLUELIGHT RAT: Browser Spawning Suspicious Child Process, BLUELIGHT APT37 Kill Chain Correlation |
 | T1204 | OCI Action: StartInstance, Suspicious Usage of base64, +27 more |
 | T1204.002 | VBA Macro Spawning Suspicious Child Process, Windows Spearphishing Attachment Execution |
 | T1218 | Control Panel Item Execution, SyncAppvPublishingServer Abuse |
 | T1218.005 | MSHTA JavaScript Execution |
 | T1218.011 | DLL Execution via Rundll32 from User Path |
+| T1496 | Browser Attack Frequency Analysis (APM/OpenTelemetry) |
+| T1555.003 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1566.001 | Windows Spearphishing Attachment Execution |
+| T1567.002 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1569.002 | Service Execution via sc.exe Create, Sysmon PsExec Named Pipe |
 | T1648 | OCI Function Invoked |
 
@@ -150,12 +169,13 @@
 | T1574.011 | DLL Hijacking via Service Registry Permission, Service Permissions Weakness Discovery |
 | T1611 | Linux Container Escape Attempt |
 
-### Defense Evasion (53 techniques)
+### Defense Evasion (62 techniques)
 
 | Technique | Rules |
 |-----------|-------|
 | T1003.001 | Windows WDigest Authentication Enabled for Credential Harvesting |
-| T1027 | BLUELIGHT RAT: Obfuscated Script Execution, Windows Encoded PowerShell Execution, Windows Suspiciously Long Command Line (Field Analysis) |
+| T1012 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1027 | BLUELIGHT RAT: Obfuscated Script Execution, Windows Encoded PowerShell Execution, +2 more |
 | T1036 | Windows Process from Unusual Path (Rare Value Analysis) |
 | T1036.003 | Renamed System Binary Execution |
 | T1036.005 | Masquerading System Binary in Non-Standard Path |
@@ -174,13 +194,19 @@
 | T1070.004 | File Deletion of Security Tools, SDelete Secure File Deletion |
 | T1070.006 | Timestomping via PowerShell |
 | T1071 | Sysmon Cobalt Strike Named Pipe |
+| T1071.001 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1082 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1083 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1098 | OCI After-Hours IAM Activity (Time-Based Anomaly) |
-| T1105 | Sysmon Suspicious Outbound Connection from LOLBin, Windows Certutil Download or Decode |
+| T1105 | Sysmon Suspicious Outbound Connection from LOLBin, Windows Certutil Download or Decode, BLUELIGHT APT37 Kill Chain Correlation |
+| T1113 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1127.001 | Windows MSBuild Execution for Code Bypass |
 | T1134 | Windows Access Token Manipulation |
 | T1140 | Windows Certutil Download or Decode |
+| T1189 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1197 | Windows BITS Job Abuse for Persistence |
 | T1202 | Indirect Command Execution via Forfiles |
+| T1203 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1204 | Windows Process from Unusual Path (Rare Value Analysis) |
 | T1218 | Sysmon Suspicious Outbound Connection from LOLBin, Windows LOLBin Usage: at, +19 more |
 | T1218.001 | Compiled HTML File Execution |
@@ -194,6 +220,7 @@
 | T1548.002 | Windows UAC Bypass Attempt, Windows Defense Evasion Score (Combined Methods) |
 | T1553 | OCI Action: CreateKey |
 | T1553.004 | Root Certificate Installation via Certutil |
+| T1555.003 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1562 | Windows Defense Evasion Score (Combined Methods) |
 | T1562.001 | AMSI Bypass via PowerShell Reflection, OCI Log Group Deleted, +5 more |
 | T1562.002 | ETW Provider Disabled |
@@ -204,11 +231,12 @@
 | T1564.003 | Hidden PowerShell Window Execution |
 | T1564.004 | Alternate Data Stream Execution |
 | T1565.001 | Linux Hosts File Modification |
+| T1567.002 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1574.002 | DLL Side-Loading from Suspicious Directory, Windows DLL Side-Loading via Suspicious Path |
 | T1600 | OCI Vault Key Rotation Overdue |
 | T1620 | Reflective DLL Loading Indicators |
 
-### Credential Access (32 techniques)
+### Credential Access (42 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -220,16 +248,25 @@
 | T1003.006 | DCSync Attack via Replication Request |
 | T1003.007 | Linux Process Memory Access via /proc |
 | T1005 | Linux Sensitive Data Collection from Local System |
+| T1012 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1027 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1056.001 | Windows Keylogger Indicators |
 | T1059 | OWASP Multi-Stage Web Attack Chain (Combined Methods) |
+| T1071.001 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1078 | OCI Console Login Brute Force (Frequency Analysis), Login Activity Time-Series Anomaly |
+| T1082 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1083 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1098.001 | OCI Customer Secret Key Created |
+| T1105 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1110 | Cloud Guard Problem: IAM User Console Password Old, WAF Rate Limiting Triggered, +3 more |
 | T1110.001 | Linux SSH Failed Login, Web Application Brute Force Login Attempt, +2 more |
 | T1110.003 | OCI Password Spraying Attack, Web Application Brute Force Login Attempt, Web Application Brute Force Detection (Frequency Analysis) |
+| T1113 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1134 | Sysmon Mimikatz Named Pipe, Token Impersonation via Incognito |
 | T1187 | Forced Authentication via PetitPotam |
+| T1189 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1190 | SSRF to Cloud Instance Metadata Service (Linux), SSRF to Cloud Metadata Endpoint (169.254.169.254), OWASP Multi-Stage Web Attack Chain (Combined Methods) |
+| T1203 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1528 | OCI Auth Token Created |
 | T1539 | Web Application Session Hijacking Indicators |
 | T1550.004 | Web Application Session Hijacking Indicators |
@@ -238,33 +275,42 @@
 | T1552.005 | OCI Instance Metadata Service Accessed, SSRF to Cloud Instance Metadata Service (Linux), SSRF to Cloud Metadata Endpoint (169.254.169.254) |
 | T1552.006 | Group Policy Preferences Password Extraction |
 | T1555 | DPAPI Master Key Extraction, LaZagne Credential Harvester, +2 more |
-| T1555.003 | BLUELIGHT RAT: Browser Credential Memory Access, Browser Credential Store Access |
+| T1555.003 | BLUELIGHT RAT: Browser Credential Memory Access, Browser Credential Store Access, BLUELIGHT APT37 Kill Chain Correlation |
 | T1556 | NPPSpy Credential Interception, OCI User MFA Not Enabled, Shadow Credentials Attack via Whisker |
 | T1558 | Kerberos Ticket Export via Mimikatz |
 | T1558.003 | Sysmon Kerberoasting Network Indicator, Sysmon Mimikatz Network Activity, +2 more |
 | T1558.004 | AS-REP Roasting via Rubeus |
+| T1567.002 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1649 | Credential Access via Certutil Certificate Export |
 
-### Discovery (17 techniques)
+### Discovery (25 techniques)
 
 | Technique | Rules |
 |-----------|-------|
-| T1012 | BLUELIGHT RAT: Registry Enumeration of Security Products |
+| T1012 | BLUELIGHT RAT: Registry Enumeration of Security Products, BLUELIGHT APT37 Kill Chain Correlation |
 | T1018 | Windows Remote System Discovery |
+| T1027 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1033 | Linux System Owner and User Discovery |
 | T1046 | Linux Network Service Scanning |
 | T1057 | Process Discovery via Tasklist |
 | T1069.001 | Local Group Membership Discovery |
 | T1069.002 | Sysmon LDAP Reconnaissance |
-| T1082 | BLUELIGHT RAT: WMI System Enumeration from Browser Child, Linux Post-Exploitation Enumeration Script |
-| T1083 | BLUELIGHT RAT: File Discovery from Browser Process, File and Directory Discovery via dir |
+| T1071.001 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1082 | BLUELIGHT RAT: WMI System Enumeration from Browser Child, Linux Post-Exploitation Enumeration Script, BLUELIGHT APT37 Kill Chain Correlation |
+| T1083 | BLUELIGHT RAT: File Discovery from Browser Process, File and Directory Discovery via dir, BLUELIGHT APT37 Kill Chain Correlation |
 | T1087.001 | Windows Account Discovery Commands |
 | T1087.002 | AD Enumeration via ADFind, BloodHound AD Enumeration, +2 more |
+| T1105 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1113 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1135 | Network Share Enumeration via Net View, Windows Network Share Discovery |
+| T1189 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1201 | Password Policy Discovery |
+| T1203 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1482 | Domain Trust Discovery via Nltest |
 | T1518 | Software Discovery via WMIC |
 | T1518.001 | Query Registry for Security Products |
+| T1555.003 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1567.002 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1580 | OCI Cloud Infrastructure Discovery |
 
 ### Lateral Movement (11 techniques)
@@ -283,69 +329,101 @@
 | T1570 | Lateral Tool Transfer via Robocopy, Sysmon Lateral Movement via SMB, Windows Lateral Movement Tool Cluster (Grouping) |
 | T1599 | OCI DRG Attachment Created, OCI Local Peering Gateway Created, OCI Service Gateway Created |
 
-### Collection (10 techniques)
+### Collection (20 techniques)
 
 | Technique | Rules |
 |-----------|-------|
 | T1005 | Linux Sensitive Data Collection from Local System, Sensitive Data Endpoint Access |
+| T1012 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1027 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1056.001 | Keylogging via PowerShell Get-Keystrokes, Windows Keylogger Indicators |
+| T1071.001 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1074.001 | Windows Data Staging for Exfiltration, Linux Data Staging and Exfiltration Indicators |
-| T1113 | BLUELIGHT RAT: Periodic Screen Capture, Screen Capture via PowerShell, Windows Screen Capture Activity |
+| T1082 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1083 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1105 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1113 | BLUELIGHT RAT: Periodic Screen Capture, Screen Capture via PowerShell, +2 more |
 | T1114 | Email Collection via PowerShell, OCI Notification Subscription Created |
 | T1115 | Clipboard Data Collection |
+| T1189 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1203 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1530 | OCI Action: CreateBucket |
 | T1552.001 | Sensitive Data Endpoint Access |
+| T1555.003 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1557 | Linux Suspicious Network Traffic Redirect |
 | T1560.001 | Data Compression for Exfiltration via 7zip, Linux Archive Data Collected for Exfiltration, Linux Data Staging and Exfiltration Indicators |
+| T1567.002 | BLUELIGHT APT37 Kill Chain Correlation |
 
-### Command & Control (19 techniques)
+### Command & Control (28 techniques)
 
 | Technique | Rules |
 |-----------|-------|
+| T1012 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1027 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1048 | DNS Exfiltration Detection (Entropy Analysis) |
 | T1048.003 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection |
 | T1055 | Sysmon Cobalt Strike Named Pipe |
 | T1059 | Sysmon Suspicious Named Pipe Pattern |
 | T1059.001 | Windows PowerShell Download Cradle |
 | T1071 | Sysmon Cobalt Strike Named Pipe, Sysmon Suspicious Named Pipe Pattern, C2 Beaconing Detection (Periodic Connection Analysis) |
-| T1071.001 | BLUELIGHT RAT: C2 via Microsoft Graph API, Sysmon C2 Beacon - Periodic Outbound HTTPS, Sysmon Cobalt Strike C2 Network Indicators |
+| T1071.001 | BLUELIGHT RAT: C2 via Microsoft Graph API, Sysmon C2 Beacon - Periodic Outbound HTTPS, +2 more |
 | T1071.004 | Linux DNS Tunneling Detected, Sysmon DNS Data Exfiltration, +4 more |
+| T1082 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1083 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1090 | Linux Proxy and Tunneling Tool Detected |
 | T1090.001 | Linux Proxy and Tunneling Tool Detected |
 | T1095 | Sysmon Cobalt Strike C2 Network Indicators |
-| T1105 | BLUELIGHT RAT: Executable Download via Graph API, Linux Suspicious Download to /tmp, +3 more |
+| T1105 | BLUELIGHT RAT: Executable Download via Graph API, Linux Suspicious Download to /tmp, +4 more |
+| T1113 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1140 | Windows Certutil Download or Decode |
+| T1189 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1203 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1218 | Sysmon Suspicious Outbound Connection from LOLBin |
 | T1219 | Windows Remote Access Tool Detected |
+| T1555.003 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1567.002 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1568.002 | Sysmon DNS Query to Known C2 Framework Domains |
 | T1572 | Linux SSH Tunneling Detected |
 | T1573 | Linux Encrypted Channel C2 Communication, Sysmon C2 Beacon - Periodic Outbound HTTPS, C2 Beaconing Detection (Periodic Connection Analysis) |
 | T1573.002 | Linux Encrypted Channel C2 Communication |
 
-### Exfiltration (9 techniques)
+### Exfiltration (19 techniques)
 
 | Technique | Rules |
 |-----------|-------|
+| T1012 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1027 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1041 | Unusually Large HTTP Response (Data Exfiltration) |
 | T1048 | Linux Exfiltration Over Alternative Protocol, Unusually Large HTTP Response (Data Exfiltration), DNS Exfiltration Detection (Entropy Analysis) |
 | T1048.003 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection |
+| T1071.001 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1071.004 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection, DNS Exfiltration Detection (Entropy Analysis) |
 | T1074.001 | Windows Data Staging for Exfiltration, Linux Data Staging and Exfiltration Indicators |
+| T1082 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1083 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1105 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1113 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1189 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1203 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1537 | Cloud Guard Problem: Bucket Public Read, OCI Boot Volume Backup Created by Non-Admin, +4 more |
+| T1555.003 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1560.001 | Linux Archive Data Collected for Exfiltration, Linux Data Staging and Exfiltration Indicators |
 | T1567 | OCI Object Storage Pre-Authenticated Request Created |
-| T1567.002 | BLUELIGHT RAT: Data Exfiltration via OneDrive/Graph API |
+| T1567.002 | BLUELIGHT RAT: Data Exfiltration via OneDrive/Graph API, BLUELIGHT APT37 Kill Chain Correlation |
 
-### Impact (11 techniques)
+### Impact (14 techniques)
 
 | Technique | Rules |
 |-----------|-------|
+| T1059.007 | Browser Attack Frequency Analysis (APM/OpenTelemetry) |
+| T1189 | Browser Attack Frequency Analysis (APM/OpenTelemetry) |
+| T1190 | Browser Attack Frequency Analysis (APM/OpenTelemetry) |
 | T1485 | OCI Action: DeleteBucket, OCI Action: DeleteKey, +7 more |
 | T1486 | Ransomware File Extension Indicators |
 | T1489 | OCI Action: DeleteInternetGateway, OCI Action: DeleteSubnet, +6 more |
 | T1490 | OCI KMS Key Scheduled for Deletion, System Recovery Disabled via BCDEdit, +4 more |
 | T1491.001 | Defacement via Desktop Wallpaper Change |
-| T1496 | Cryptominer Deployment Indicators, Linux Cryptominer Activity Detected |
+| T1496 | Cryptominer Deployment Indicators, Linux Cryptominer Activity Detected, Browser Attack Frequency Analysis (APM/OpenTelemetry) |
 | T1499 | Web Application Server Error Spike |
 | T1529 | System Shutdown or Reboot via shutdown.exe |
 | T1531 | Account Access Removal, OCI Action: DeleteGroup, +3 more |
@@ -801,40 +879,42 @@
 
 | # | Title | Method | Severity | MITRE |
 |---|-------|--------|----------|-------|
-| 1 | DNS Exfiltration Detection (Entropy Analysis) | field_analysis | 🟠 high | T1048, T1071.004 |
-| 2 | Linux Data Staging and Exfiltration Indicators | combined_scoring | 🟠 high | T1560.001, T1074.001 |
-| 3 | Linux Multi-Stage Attack Indicators (Combined Methods) | multi_stage | 🔴 critical | T1110, T1059.004 |
-| 4 | Linux Persistence Indicator Score (Combined Methods) | scoring | 🟠 high | T1053, T1543.002, T1098.004 |
-| 5 | Linux Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059.004 |
-| 6 | Geographic Health: Cloud Provider Summary | aggregation | ⚪ informational | - |
-| 7 | Geographic Health: Instance Detail with Coordinates | detail_view | ⚪ informational | - |
-| 8 | Geographic Health: Regional Status on Global Map | geographic_analysis | ⚪ informational | - |
-| 9 | Geographic Health: Service Tier Status | aggregation | ⚪ informational | - |
-| 10 | Geographic Health: Unhealthy Regions Alert | alerting | 🟠 high | - |
-| 11 | C2 Beaconing Detection (Periodic Connection Analysis) | frequency_analysis | 🟠 high | T1071, T1573 |
-| 12 | OCI After-Hours IAM Activity (Time-Based Anomaly) | time_anomaly | 🟡 medium | T1098 |
-| 13 | OCI Console Login Brute Force (Frequency Analysis) | frequency_analysis | 🟠 high | T1078, T1110 |
-| 14 | OCI IAM and Fusion Activity Correlation | grouping_correlation | 🟠 high | T1078, T1098 |
-| 15 | OCI IAM Rapid Configuration Changes (Anomaly Detection) | anomaly_detection | 🟠 high | T1098, T1078 |
-| 16 | OCI Multiple Users from Same IP (Grouping) | grouping | 🟠 high | T1078, T1110.004 |
-| 17 | OCI Privilege Escalation Chain Detection | combined_scoring | 🔴 critical | T1098, T1078 |
-| 18 | OCI Resource Destruction Spike (Anomaly Detection) | anomaly_detection | 🔴 critical | T1485, T1489 |
-| 19 | SSH Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001 |
-| 20 | Login Activity Time-Series Anomaly | time_series_anomaly | 🟠 high | T1078, T1110 |
-| 21 | WAF Attack Frequency by Source IP (Frequency Analysis) | frequency_analysis | 🟠 high | T1190 |
-| 22 | WAF Multi-Attack Vector Scoring (Combined Methods) | scoring | 🔴 critical | T1190, T1059 |
-| 23 | SQL Injection Pattern Stacking (Rare Value Detection) | rare_value | 🟠 high | T1190 |
-| 24 | Web Attack Geographic Anomaly (Rare Country Detection) | rare_value | 🟡 medium | T1190 |
-| 25 | Web Application Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001, T1110.003 |
-| 26 | Web Directory Scanning IP Clustering (Anomaly Detection) | anomaly_detection | 🟡 medium | T1595.002 |
-| 27 | OWASP Multi-Stage Web Attack Chain (Combined Methods) | multi_stage | 🔴 critical | T1190, T1110, T1059 |
-| 28 | Web Scanner Tool Identification (User Agent Stacking) | rare_value | 🟡 medium | T1595.002 |
-| 29 | Windows Credential Access Tool Cluster (Grouping) | grouping | 🔴 critical | T1003, T1558.003 |
-| 30 | Windows Defense Evasion Score (Combined Methods) | scoring | 🔴 critical | T1562, T1548.002, T1070 |
-| 31 | Windows Lateral Movement Tool Cluster (Grouping) | grouping | 🔴 critical | T1021, T1570 |
-| 32 | Windows Suspiciously Long Command Line (Field Analysis) | field_analysis | 🟠 high | T1059.001, T1027 |
-| 33 | Windows Process from Unusual Path (Rare Value Analysis) | rare_value | 🟠 high | T1204, T1036 |
-| 34 | Windows Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059 |
+| 1 | BLUELIGHT APT37 Kill Chain Correlation | - | 🔴 critical | T1189, T1203, T1027, T1071.001, T1082, T1012, T1083, T1113, T1555.003, T1105, T1567.002 |
+| 2 | Browser Attack Frequency Analysis (APM/OpenTelemetry) | - | 🔴 critical | T1190, T1189, T1059.007, T1496 |
+| 3 | DNS Exfiltration Detection (Entropy Analysis) | field_analysis | 🟠 high | T1048, T1071.004 |
+| 4 | Linux Data Staging and Exfiltration Indicators | combined_scoring | 🟠 high | T1560.001, T1074.001 |
+| 5 | Linux Multi-Stage Attack Indicators (Combined Methods) | multi_stage | 🔴 critical | T1110, T1059.004 |
+| 6 | Linux Persistence Indicator Score (Combined Methods) | scoring | 🟠 high | T1053, T1543.002, T1098.004 |
+| 7 | Linux Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059.004 |
+| 8 | Geographic Health: Cloud Provider Summary | aggregation | ⚪ informational | - |
+| 9 | Geographic Health: Instance Detail with Coordinates | detail_view | ⚪ informational | - |
+| 10 | Geographic Health: Regional Status on Global Map | geographic_analysis | ⚪ informational | - |
+| 11 | Geographic Health: Service Tier Status | aggregation | ⚪ informational | - |
+| 12 | Geographic Health: Unhealthy Regions Alert | alerting | 🟠 high | - |
+| 13 | C2 Beaconing Detection (Periodic Connection Analysis) | frequency_analysis | 🟠 high | T1071, T1573 |
+| 14 | OCI After-Hours IAM Activity (Time-Based Anomaly) | time_anomaly | 🟡 medium | T1098 |
+| 15 | OCI Console Login Brute Force (Frequency Analysis) | frequency_analysis | 🟠 high | T1078, T1110 |
+| 16 | OCI IAM and Fusion Activity Correlation | grouping_correlation | 🟠 high | T1078, T1098 |
+| 17 | OCI IAM Rapid Configuration Changes (Anomaly Detection) | anomaly_detection | 🟠 high | T1098, T1078 |
+| 18 | OCI Multiple Users from Same IP (Grouping) | grouping | 🟠 high | T1078, T1110.004 |
+| 19 | OCI Privilege Escalation Chain Detection | combined_scoring | 🔴 critical | T1098, T1078 |
+| 20 | OCI Resource Destruction Spike (Anomaly Detection) | anomaly_detection | 🔴 critical | T1485, T1489 |
+| 21 | SSH Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001 |
+| 22 | Login Activity Time-Series Anomaly | time_series_anomaly | 🟠 high | T1078, T1110 |
+| 23 | WAF Attack Frequency by Source IP (Frequency Analysis) | frequency_analysis | 🟠 high | T1190 |
+| 24 | WAF Multi-Attack Vector Scoring (Combined Methods) | scoring | 🔴 critical | T1190, T1059 |
+| 25 | SQL Injection Pattern Stacking (Rare Value Detection) | rare_value | 🟠 high | T1190 |
+| 26 | Web Attack Geographic Anomaly (Rare Country Detection) | rare_value | 🟡 medium | T1190 |
+| 27 | Web Application Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001, T1110.003 |
+| 28 | Web Directory Scanning IP Clustering (Anomaly Detection) | anomaly_detection | 🟡 medium | T1595.002 |
+| 29 | OWASP Multi-Stage Web Attack Chain (Combined Methods) | multi_stage | 🔴 critical | T1190, T1110, T1059 |
+| 30 | Web Scanner Tool Identification (User Agent Stacking) | rare_value | 🟡 medium | T1595.002 |
+| 31 | Windows Credential Access Tool Cluster (Grouping) | grouping | 🔴 critical | T1003, T1558.003 |
+| 32 | Windows Defense Evasion Score (Combined Methods) | scoring | 🔴 critical | T1562, T1548.002, T1070 |
+| 33 | Windows Lateral Movement Tool Cluster (Grouping) | grouping | 🔴 critical | T1021, T1570 |
+| 34 | Windows Suspiciously Long Command Line (Field Analysis) | field_analysis | 🟠 high | T1059.001, T1027 |
+| 35 | Windows Process from Unusual Path (Rare Value Analysis) | rare_value | 🟠 high | T1204, T1036 |
+| 36 | Windows Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059 |
 
 ## STIG Compliance Rules
 
@@ -866,4 +946,4 @@
 | OCI VCN Peering Connection Created | SC-7 | CAT II | medium |
 
 ---
-*Generated from 428 Sigma rules + 34 hunting queries*
+*Generated from 428 Sigma rules + 36 hunting queries*

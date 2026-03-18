@@ -91,10 +91,11 @@ SOURCE_CANDIDATE_GROUPS = {
         "Linux Syslog Logs",
         "Linux Audit Logs",
     ],
+    # SOC source first: native sources use XML parsers that can't parse JSON uploads
     "windows_sysmon": [
+        "SOC Windows Sysmon Logs",
         "Windows Sysmon Events",
         "Windows Sysmon Operational Logs",
-        "SOC Windows Sysmon Logs",
     ],
     "windows_event_security": [
         "Windows Event Security Logs",
@@ -105,10 +106,11 @@ SOURCE_CANDIDATE_GROUPS = {
     "linux_secure": [
         "Linux Secure Logs",
     ],
+    # SOC source first: native sources use XML parsers that can't parse JSON uploads
     "sysmon_operational": [
+        "SOC Windows Sysmon Logs",
         "Windows Sysmon Operational Logs",
         "Windows Sysmon Events",
-        "SOC Windows Sysmon Logs",
     ],
     "waf_security": [
         "OCI WAF Logs",

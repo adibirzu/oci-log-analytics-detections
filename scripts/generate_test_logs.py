@@ -1255,7 +1255,12 @@ def generate_linux_events():
 
 def sysmon_event(event_id, image, command_line, host=None, user=None,
                  parent_image="C:\\Windows\\explorer.exe", offset=0, **extra):
-    """Generate a Windows Sysmon Event 1 style JSON event."""
+    """Generate a Windows Sysmon Event 1 style JSON event.
+
+    Uses OCI Log Analytics field names (e.g. 'Process Name', 'Command Line')
+    so that the Upload API auto-maps them to LA fields for query/dashboard use.
+    Also retains Sysmon-native names (Image, CommandLine) for parser compatibility.
+    """
     if host is None:
         host = random.choice(WINDOWS_HOSTS)
     if user is None:
@@ -1265,6 +1270,18 @@ def sysmon_event(event_id, image, command_line, host=None, user=None,
     original_name = ntpath.basename(image)
     parent_cmd = extra.pop("ParentCommandLine", ntpath.basename(parent_image))
     event = {
+        # OCI Log Analytics mapped fields (used by OCL queries)
+        "Event ID": event_id,
+        "Process Name": image,
+        "Command Line": command_line,
+        "Parent Process Name": parent_image,
+        "Parent Command Line": parent_cmd,
+        "Host Name (Server)": host,
+        "Original File Name": original_name,
+        "Integrity Level": random.choice(["System", "High", "Medium"]),
+        "Logon ID": hex(random.randint(0x3E4, 0xFFF)),
+        "Terminal Session ID": random.choice([0, 1, 2, 3, 10]),
+        # Sysmon-native fields (for raw reference / parser fallback)
         "EventID": event_id,
         "TimeCreated": event_time,
         "UtcTime": event_time,
@@ -2110,7 +2127,10 @@ SEVEN_KINGDOMS_LINUX = [
 
 def winsec_event(event_id, user=None, host=None, source_addr=None,
                  logon_type=None, process_name=None, msg=None, offset=0):
-    """Generate a Windows Security Event Log JSON entry."""
+    """Generate a Windows Security Event Log JSON entry.
+
+    Uses OCI Log Analytics field names for query compatibility.
+    """
     if user is None:
         user = random.choice(THREAT_ACTORS)
     if host is None:
@@ -2118,6 +2138,15 @@ def winsec_event(event_id, user=None, host=None, source_addr=None,
     if source_addr is None:
         source_addr = random.choice(SUSPICIOUS_IPS + CORPORATE_IPS)
     return {
+        # OCI Log Analytics mapped fields
+        "Event ID": int(event_id),
+        "Host Name (Server)": host,
+        "Subject User Name": user,
+        "Source IP": source_addr,
+        "Logon Type": str(logon_type) if logon_type else "",
+        "New Process Name": process_name or "",
+        "Process Name": process_name or "",
+        # Native fields
         "EventID": str(event_id),
         "TimeCreated": ts(offset),
         "Computer": host,
@@ -2261,12 +2290,20 @@ def generate_windows_event_security():
 
 def winsys_event(event_id, host=None, service_name=None, user=None,
                  msg=None, offset=0):
-    """Generate a Windows System Event Log JSON entry."""
+    """Generate a Windows System Event Log JSON entry.
+
+    Uses OCI Log Analytics field names for query compatibility.
+    """
     if host is None:
         host = random.choice(SEVEN_KINGDOMS_HOSTS)
     if user is None:
         user = random.choice(["SYSTEM", "LOCAL SERVICE"] + THREAT_ACTORS)
     return {
+        # OCI Log Analytics mapped fields
+        "Event ID": int(event_id),
+        "Host Name (Server)": host,
+        "Service Name": service_name or "",
+        # Native fields
         "EventID": str(event_id),
         "TimeCreated": ts(offset),
         "Computer": host,
@@ -2565,12 +2602,35 @@ def sysmon_op_event(event_id, host=None, user=None, source_image=None,
                     query_name=None, query_results=None,
                     pipe_name=None, target_filename=None,
                     granted_access=None, msg=None, offset=0):
-    """Generate a Windows Sysmon Operational Log JSON entry."""
+    """Generate a Windows Sysmon Operational Log JSON entry.
+
+    Uses OCI Log Analytics field names for query compatibility alongside
+    Sysmon-native field names for reference.
+    """
     if host is None:
         host = random.choice(SEVEN_KINGDOMS_HOSTS)
     if user is None:
         user = random.choice(THREAT_ACTORS)
     return {
+        # OCI Log Analytics mapped fields
+        "Event ID": int(event_id),
+        "Host Name (Server)": host,
+        "Source Process": source_image or "",
+        "Target Process": target_image or "",
+        "Process Name": source_image or target_image or "",
+        "Parent Process Name": source_image or "",
+        "Command Line": command_line or "",
+        "Destination Hostname": dest_hostname or "",
+        "Destination IP": dest_ip or "",
+        "Destination Port": str(dest_port) if dest_port else "",
+        "Source IP": "",
+        "Query Name": query_name or "",
+        "Query Results": query_results or "",
+        "Pipe Name": pipe_name or "",
+        "Target Filename": target_filename or "",
+        "Target Object": "",
+        "Granted Access": granted_access or "",
+        # Sysmon-native fields (for raw reference)
         "EndpointOS": "Windows",
         "EventID": str(event_id),
         "TimeCreated": ts(offset),
@@ -2806,7 +2866,11 @@ def sysmon_network_event(host=None, user=None, image=None, protocol="tcp",
                          src_ip=None, src_port=None, dst_ip=None, dst_port=None,
                          dst_hostname=None, initiated="true", rule_name=None,
                          technique_name=None, technique_id=None, msg=None, offset=0):
-    """Generate a Sysmon Event ID 3 (Network Connection) for the network parser."""
+    """Generate a Sysmon Event ID 3 (Network Connection) for the network parser.
+
+    Uses OCI Log Analytics field names for query compatibility alongside
+    Sysmon-native field names for reference.
+    """
     if host is None:
         host = random.choice(SEVEN_KINGDOMS_HOSTS)
     if user is None:
@@ -2815,13 +2879,26 @@ def sysmon_network_event(host=None, user=None, image=None, protocol="tcp",
         src_ip = random.choice(CORPORATE_IPS)
     if src_port is None:
         src_port = random.randint(49152, 65535)
+    proc = image or "C:\\Windows\\System32\\cmd.exe"
     return {
+        # OCI Log Analytics mapped fields
+        "Event ID": 3,
+        "Host Name (Server)": host,
+        "Process Name": proc,
+        "Source IP": src_ip,
+        "Source Port": src_port,
+        "Destination IP": dst_ip or "",
+        "Destination Port": dst_port or 443,
+        "Destination Hostname": dst_hostname or "",
+        "Technique Name": technique_name or "",
+        "Technique ID": technique_id or "",
+        # Sysmon-native fields (for raw reference)
         "@timestamp": ts(offset),
         "EventID": 3,
         "Computer": host,
         "Channel": "Microsoft-Windows-Sysmon/Operational",
         "User": user,
-        "Image": image or "C:\\Windows\\System32\\cmd.exe",
+        "Image": proc,
         "Protocol": protocol,
         "SourceIp": src_ip,
         "SourcePort": src_port,
@@ -2833,7 +2910,7 @@ def sysmon_network_event(host=None, user=None, image=None, protocol="tcp",
         "TechniqueName": technique_name or "",
         "TechniqueId": technique_id or "",
         "AccountName": user.split("\\")[-1] if "\\" in user else user,
-        "msg": msg or f"Network connection: {image or 'cmd.exe'} -> {dst_ip}:{dst_port}",
+        "msg": msg or f"Network connection: {proc} -> {dst_ip}:{dst_port}",
     }
 
 

@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "total_rules": 428,
-  "total_hunting": 34,
+  "total_hunting": 36,
   "platforms": {
     "windows": 231,
     "oci": 130,
@@ -6788,6 +6788,41 @@
     }
   ],
   "hunting_queries": [
+    {
+      "title": "BLUELIGHT APT37 Kill Chain Correlation",
+      "description": "Hunting query that correlates multiple BLUELIGHT (S0657) kill chain stages on the same host. Detects hosts exhibiting 3+ stages of the BLUELIGHT attack chain within 24 hours: browser exploitation, C2 setup, discovery, credential theft, and exfiltration.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1189",
+        "T1203",
+        "T1027",
+        "T1071.001",
+        "T1082",
+        "T1012",
+        "T1083",
+        "T1113",
+        "T1555.003",
+        "T1105",
+        "T1567.002"
+      ],
+      "file": "hunting/bluelight_apt37_kill_chain.json"
+    },
+    {
+      "title": "Browser Attack Frequency Analysis (APM/OpenTelemetry)",
+      "description": "Hunting query that performs frequency analysis on browser-based attacks detected via OCI APM. Identifies source IPs exhibiting multiple attack types against monitored applications, prioritizing multi-vector attackers.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1190",
+        "T1189",
+        "T1059.007",
+        "T1496"
+      ],
+      "file": "hunting/browser_attack_frequency_analysis.json"
+    },
     {
       "title": "DNS Exfiltration Detection (Entropy Analysis)",
       "description": "Detects potential DNS tunneling and data exfiltration by identifying DNS queries with unusually long subdomain labels. Long, random-looking subdomains (>30 chars) are indicative of encoded data being exfiltrated via DNS queries. Uses field analysis combined with frequency thresholds.",

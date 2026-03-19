@@ -1,0 +1,18 @@
+{
+  "title": "Security Group Enumeration: Rapid Group Membership Queries",
+  "description": "Detects Event 4799 rapid security-enabled group membership enumeration — indicates BloodHound, SharpHound, or net group /domain reconnaissance. Normal users query 1-2 groups; attackers enumerate all groups systematically.",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4799' | eval Account = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Process = regexextract('Original Log Content', 'CallerProcessName:([^;]+)') | stats count as Queries by Account, Process, Entity | where Queries > 50 | sort -Queries",
+  "sigma_id": "groupenum-t1069-002",
+  "level": "medium",
+  "tags": ["attack.discovery", "attack.t1069.002", "attack.t1087.002"],
+  "mitre_attack": {
+    "tactics": ["discovery"],
+    "techniques": ["T1069.002", "T1087.002"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["GPO processing enumerating groups", "SCCM client group checks"]
+}

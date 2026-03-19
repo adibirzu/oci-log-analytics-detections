@@ -1,0 +1,18 @@
+{
+  "title": "Privilege Escalation: Sensitive Privileges Assigned to Non-Admin Account",
+  "description": "Detects Event 4672 special privilege assignment with dangerous privileges (SeDebugPrivilege, SeTcbPrivilege, SeAssignPrimaryTokenPrivilege) to accounts that aren't SYSTEM or known admin accounts — indicates privilege escalation or token manipulation.",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4672' and ('Original Log Content' like '%SeDebugPrivilege%' or 'Original Log Content' like '%SeTcbPrivilege%' or 'Original Log Content' like '%SeAssignPrimaryTokenPrivilege%' or 'Original Log Content' like '%SeLoadDriverPrivilege%' or 'Original Log Content' like '%SeImpersonatePrivilege%') and not 'Original Log Content' like '%SubjectUserName:SYSTEM%' and not 'Original Log Content' like '%SubjectUserName:-$%' | eval Account = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Domain = regexextract('Original Log Content', 'SubjectDomainName:([^;]+)') | stats count as Assignments, distinctcount(Entity) as Hosts by Account, Domain | sort -Assignments",
+  "sigma_id": "privesc-t1134-001",
+  "level": "high",
+  "tags": ["attack.privilege_escalation", "attack.t1134", "attack.t1134.001"],
+  "mitre_attack": {
+    "tactics": ["privilege_escalation"],
+    "techniques": ["T1134", "T1134.001"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["Service accounts with legitimate elevated privileges"]
+}

@@ -1,0 +1,24 @@
+title: "Golden Ticket: RC4 Encrypted TGT Request"
+id: golden-t1558-001
+status: stable
+description: >
+  Detects Kerberos TGT requests (4768) or renewals (4770) using RC4 encryption.
+  Golden tickets forged with krbtgt hash use RC4; modern AD defaults to AES256.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection_tgt:
+    EventID:
+      - 4768
+      - 4770
+    TicketEncryptionType: '0x17'
+  condition: selection_tgt
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1558.001
+  - attack.persistence
+falsepositives:
+  - Legacy systems requesting RC4 TGTs
+version: 1

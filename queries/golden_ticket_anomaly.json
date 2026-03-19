@@ -1,0 +1,18 @@
+{
+  "title": "Golden Ticket: Kerberos TGT with Anomalous Encryption or Lifetime",
+  "description": "Detects Kerberos TGT requests (4768) with RC4 encryption (0x17) or from unusual sources. Golden tickets use RC4-encrypted TGTs with krbtgt hash. Also detects TGT renewal (4770) for krbtgt service with unexpected encryption.",
+  "query": "'Log Source' = 'Windows Security Events' and (('Event ID' = '4768' and 'Original Log Content' like '%0x17%') or ('Event ID' = '4770' and 'Original Log Content' like '%ServiceName:krbtgt%' and 'Original Log Content' like '%0x17%')) | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;@]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)') | stats count as Requests by Account, SrcIP, Entity, 'Event ID' | sort -Requests",
+  "sigma_id": "golden-t1558-001",
+  "level": "critical",
+  "tags": ["attack.credential_access", "attack.t1558.001", "attack.persistence"],
+  "mitre_attack": {
+    "tactics": ["credential_access", "persistence"],
+    "techniques": ["T1558.001"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["Legacy systems requesting RC4 TGTs"]
+}

@@ -1,0 +1,27 @@
+title: "Security Group Enumeration: Rapid Membership Queries"
+id: groupenum-t1069-002
+status: stable
+description: >
+  Detects Event 4799 rapid security group membership enumeration — indicates
+  BloodHound/SharpHound or net group /domain reconnaissance.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4799
+  condition: selection
+  aggregation:
+    count_by_account:
+      field: SubjectUserName
+      threshold: 50
+  timeframe: 1h
+level: medium
+tags:
+  - attack.discovery
+  - attack.t1069.002
+  - attack.t1087.002
+falsepositives:
+  - GPO processing
+  - SCCM client group checks
+version: 1

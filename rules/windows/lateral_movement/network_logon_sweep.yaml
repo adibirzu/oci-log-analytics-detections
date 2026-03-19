@@ -1,0 +1,28 @@
+title: "Lateral Movement: Account Authenticating from Multiple Sources"
+id: lateral-t1021-001
+status: stable
+description: >
+  Detects a single account performing network logons (LogonType 3) from 3+ distinct
+  source IPs — indicates lateral movement sweep or compromised credential reuse.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4624
+    LogonType: 3
+  filter_anonymous:
+    TargetUserName:
+      - 'ANONYMOUS LOGON'
+      - '-'
+  filter_machine:
+    TargetUserName|endswith: '$'
+  condition: selection and not filter_anonymous and not filter_machine
+level: high
+tags:
+  - attack.lateral_movement
+  - attack.t1021.002
+  - attack.t1021.006
+falsepositives:
+  - Domain admin accounts from multiple workstations
+version: 1

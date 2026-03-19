@@ -1,0 +1,18 @@
+{
+  "title": "Brute Force: Failed Logon Spike per Account",
+  "description": "Detects Event 4625 failed logon spikes — 5+ failures for a single account indicates password spraying or brute force. Uses the real GOAD AD lab failed authentication data.",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4625' | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)'), FailReason = regexextract('Original Log Content', 'Status:(0x[0-9a-fA-F]+)') | stats count as Failures, distinctcount(SrcIP) as UniqueSources by Account, Entity | where Failures > 3 | sort -Failures",
+  "sigma_id": "brute-t1110-001",
+  "level": "high",
+  "tags": ["attack.credential_access", "attack.t1110.001", "attack.t1110.003"],
+  "mitre_attack": {
+    "tactics": ["credential_access"],
+    "techniques": ["T1110.001", "T1110.003"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["Users with expired or forgotten passwords", "Service accounts with stale credentials"]
+}

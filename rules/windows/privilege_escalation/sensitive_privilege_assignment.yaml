@@ -1,0 +1,32 @@
+title: "Privilege Escalation: Sensitive Privileges Assigned to Non-Admin"
+id: privesc-t1134-001
+status: stable
+description: >
+  Detects Event 4672 with dangerous privileges (SeDebugPrivilege, SeTcbPrivilege)
+  assigned to non-SYSTEM accounts. Indicates token manipulation or privilege escalation.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4672
+    PrivilegeList|contains:
+      - SeDebugPrivilege
+      - SeTcbPrivilege
+      - SeAssignPrimaryTokenPrivilege
+      - SeLoadDriverPrivilege
+  filter_system:
+    SubjectUserName:
+      - 'SYSTEM'
+      - '-'
+  filter_machine:
+    SubjectUserName|endswith: '$'
+  condition: selection and not filter_system and not filter_machine
+level: high
+tags:
+  - attack.privilege_escalation
+  - attack.t1134
+  - attack.t1134.001
+falsepositives:
+  - Service accounts with legitimate elevated privileges
+version: 1

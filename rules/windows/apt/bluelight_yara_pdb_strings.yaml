@@ -1,0 +1,40 @@
+title: "BLUELIGHT RAT: YARA PDB Path Indicators (APT_MAL_Win_BlueLight)"
+id: bl-s0657-yara-pdb-001
+status: stable
+description: >
+  Detects BLUELIGHT malware PDB path strings in process memory, file content,
+  or Sysmon ImageLoaded events. Based on Volexity YARA rule APT_MAL_Win_BlueLight
+  (id: 3ec2d44c). The PDB paths 'Development\BACKDOOR\ncov\' and
+  'Release\bluelight.pdb' are unique to BLUELIGHT compilation artifacts.
+references:
+  - https://github.com/Neo23x0/signature-base/blob/master/yara/apt_apt37_bluelight.yar
+  - https://www.volexity.com/blog/2021/08/17/north-korean-apt-inkysquid-infects-victims-using-browser-exploits/
+  - https://attack.mitre.org/software/S0657/
+author: SOC Detection Engineering (YARA source: threatintel@volexity.com)
+date: 2026/03/19
+logsource:
+  product: windows
+  category: process_creation
+  service: sysmon
+detection:
+  selection_pdb:
+    CommandLine|contains:
+      - '\Development\BACKDOOR\ncov\'
+      - 'Release\bluelight.pdb'
+    OriginalFileName|contains:
+      - 'bluelight'
+  selection_file_content:
+    TargetFilename|contains:
+      - 'bluelight.pdb'
+      - 'BACKDOOR\ncov'
+  condition: selection_pdb or selection_file_content
+level: critical
+tags:
+  - attack.execution
+  - attack.t1204.002
+  - apt.apt37
+  - malware.bluelight
+  - yara.APT_MAL_Win_BlueLight
+falsepositives:
+  - None expected - PDB paths are unique compilation artifacts
+version: 1

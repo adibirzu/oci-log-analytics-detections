@@ -1,0 +1,50 @@
+title: "BLUELIGHT RAT: YARA Google App C2 Communication (APT_MAL_Win_BlueLight_B)"
+id: bl-s0657-yara-google-c2-001
+status: stable
+description: >
+  Detects BLUELIGHT C2 communication via Google services. The variant uses
+  custom Google App authentication with spoofed Firefox User-Agent and
+  Korean language Accept-Language headers (ko-KR). Accesses Gmail and Google
+  Account settings to enable IMAP for email exfiltration. Based on Volexity
+  YARA rule APT_MAL_Win_BlueLight_B $chrome strings.
+references:
+  - https://github.com/Neo23x0/signature-base/blob/master/yara/apt_apt37_bluelight.yar
+  - https://www.volexity.com/blog/2021/08/17/north-korean-apt-inkysquid-infects-victims-using-browser-exploits/
+author: SOC Detection Engineering (YARA source: threatintel@volexity.com)
+date: 2026/03/19
+logsource:
+  product: windows
+  category: network_connection
+  service: sysmon
+detection:
+  selection_korean_ua:
+    CommandLine|contains:
+      - 'ko-KR,ko;q=0.8,en-US;q=0.5'
+      - 'rv:80.0) Gecko/20100101 Firefox/80.0'
+  selection_google_c2:
+    DestinationHostname|contains:
+      - 'mail.google.com'
+      - 'myaccount.google.com'
+  filter_browsers:
+    Image|endswith:
+      - '\chrome.exe'
+      - '\msedge.exe'
+      - '\firefox.exe'
+  selection_batch_execute:
+    CommandLine|contains:
+      - 'AccountSettingsUi/data/batchexecute'
+      - 'BqLdsd'
+      - 'SNlM0e'
+  condition: selection_korean_ua or (selection_google_c2 and not filter_browsers) or selection_batch_execute
+level: critical
+tags:
+  - attack.command_and_control
+  - attack.t1071.001
+  - attack.t1102
+  - apt.apt37
+  - malware.bluelight
+  - yara.APT_MAL_Win_BlueLight_B
+falsepositives:
+  - Korean-language users browsing Google services with Firefox 80
+  - The batch execute and SNlM0e patterns are highly specific
+version: 1

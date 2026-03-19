@@ -1,0 +1,31 @@
+{
+  "title": "BLUELIGHT RAT: YARA Keylogger Staging Files",
+  "description": "Detects BLUELIGHT keylogger staging files (cheV01.dat, INTEG.RAW) and ESE database artifacts (edb.chk, edb.log, edbres*.jrs). The keylogger captures keystrokes with modifier prefixes and stages data for OneDrive exfiltration. Source: Volexity YARA rule APT_MAL_Win_BlueLight_B.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Original Log Content' like '%cheV01.dat%' or 'Original Log Content' like '%INTEG.RAW%' or ('Original Log Content' like '%edb.chk%' and 'Original Log Content' like '%edbres00001.jrs%')) | stats count by 'Host Name (Server)', Entity, 'Process Name'",
+  "sigma_id": "bl-s0657-yara-keylog-001",
+  "level": "high",
+  "tags": ["attack.collection", "attack.t1056.001", "apt.apt37", "malware.bluelight", "yara.APT_MAL_Win_BlueLight_B"],
+  "mitre_attack": {
+    "tactics": ["collection"],
+    "techniques": ["T1056.001"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": ["Windows Sysmon Events", "Windows Sysmon Operational Logs", "SOC Windows Sysmon Logs", "Windows Security Events"]
+  },
+  "falsepositives": ["Windows Exchange/ESE database operations create edb.* files legitimately", "The cheV01.dat file is unique to BLUELIGHT"],
+  "yara_source": {
+    "rule_name": "APT_MAL_Win_BlueLight_B",
+    "rule_id": "3ec2d44c-4c08-514d-a839-acef3f53f7dc",
+    "author": "threatintel@volexity.com",
+    "strings_used": ["$f1-$f7", "$keylogger_component1-$keylogger_component29"],
+    "condition_logic": "all of ($f*) and 5 of ($keylogger_component*)",
+    "repository": "https://github.com/Neo23x0/signature-base/blob/master/yara/apt_apt37_bluelight.yar"
+  },
+  "threat_intel": {
+    "malware_family": "BLUELIGHT",
+    "mitre_software_id": "S0657",
+    "threat_actor": "APT37 (InkySquid)"
+  }
+}

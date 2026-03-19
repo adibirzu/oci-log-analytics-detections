@@ -1,16 +1,16 @@
 {
   "version": "1.0",
-  "total_rules": 438,
-  "total_hunting": 38,
+  "total_rules": 446,
+  "total_hunting": 40,
   "platforms": {
-    "windows": 241,
+    "windows": 249,
     "oci": 130,
     "linux": 67
   },
   "severities": {
-    "critical": 81,
-    "high": 187,
-    "medium": 122,
+    "critical": 83,
+    "high": 191,
+    "medium": 124,
     "low": 18,
     "informational": 30
   },
@@ -173,10 +173,12 @@
     "T1553.004",
     "T1555",
     "T1555.003",
+    "T1555.004",
     "T1556",
     "T1556.007",
     "T1557",
     "T1558",
+    "T1558.001",
     "T1558.003",
     "T1558.004",
     "T1560.001",
@@ -735,6 +737,22 @@
       "file": "browser_credential_store_access.json"
     },
     {
+      "title": "Brute Force: Failed Logon Spike per Account",
+      "description": "Detects Event 4625 failed logon spikes \u2014 5+ failures for a single account indicates password spraying or brute force. Uses the real GOAD AD lab failed authentication data.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1110.001",
+        "T1110.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "brute_force_failed_logon_spike.json"
+    },
+    {
       "title": "Clipboard Data Collection",
       "description": "Detects PowerShell or command-line access to clipboard data for credential or data theft.",
       "level": "medium",
@@ -1065,6 +1083,21 @@
       "file": "credential_file_discovery.json"
     },
     {
+      "title": "Credential Manager: Suspicious Credential Read Activity",
+      "description": "Detects Event 5379 credential manager read operations at high frequency \u2014 indicates credential harvesting tools (lazagne, seatbelt, mimikatz vault::cred) systematically dumping stored credentials.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1555.004"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "credential_manager_access.json"
+    },
+    {
       "title": "Cryptominer Deployment Indicators",
       "description": "Detects indicators of cryptocurrency mining software deployment on Windows systems.",
       "level": "high",
@@ -1123,6 +1156,21 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "dcsync_attack_via_replication_request.json"
+    },
+    {
+      "title": "DCSync Attack: Directory Replication Request from Non-DC",
+      "description": "Detects Event 4662 directory access with replication GUIDs (1131f6aa/1131f6ad) requested by non-machine accounts \u2014 classic DCSync attack using mimikatz lsadump::dcsync to extract domain password hashes remotely.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.006"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "dcsync_directory_replication.json"
     },
     {
       "title": "Defacement via Desktop Wallpaper Change",
@@ -1350,6 +1398,22 @@
       "file": "forced_authentication_via_petitpotam.json"
     },
     {
+      "title": "Golden Ticket: Kerberos TGT with Anomalous Encryption or Lifetime",
+      "description": "Detects Kerberos TGT requests (4768) with RC4 encryption (0x17) or from unusual sources. Golden tickets use RC4-encrypted TGTs with krbtgt hash. Also detects TGT renewal (4770) for krbtgt service with unexpected encryption.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1558.001"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "golden_ticket_anomaly.json"
+    },
+    {
       "title": "Group Policy Preferences Password Extraction",
       "description": "Detects tools searching for cpassword in Group Policy Preferences XML files.",
       "level": "high",
@@ -1544,6 +1608,22 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "keylogging_via_powershell_get-keystrokes.json"
+    },
+    {
+      "title": "Lateral Movement: Network Logon from Multiple Hosts to Single Target",
+      "description": "Detects Event 4624 LogonType 3 (network) patterns where multiple source hosts authenticate to a single target within a short window \u2014 indicates lateral movement sweep or credential spraying across the domain.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.002",
+        "T1021.006"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "lateral_movement_logon_pattern.json"
     },
     {
       "title": "Lateral Tool Transfer via Robocopy",
@@ -3795,6 +3875,22 @@
       "file": "pass-the-ticket_via_rubeus.json"
     },
     {
+      "title": "Pass-the-Ticket: Logon with Explicit Credentials from Unusual Source",
+      "description": "Detects Event 4648 explicit credential logons where a machine account impersonates a user \u2014 common in pass-the-ticket, over-pass-the-hash, and Rubeus asktgt attacks. Correlates with source IP to identify lateral movement.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1550.003"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "lateral_movement"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "pass_the_ticket_logon.json"
+    },
+    {
       "title": "Password Policy Discovery",
       "description": "Detects commands querying password policy settings, often part of pre-brute-force recon.",
       "level": "low",
@@ -3913,6 +4009,22 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "printnightmare_exploitation_attempt.json"
+    },
+    {
+      "title": "Privilege Escalation: Sensitive Privileges Assigned to Non-Admin Account",
+      "description": "Detects Event 4672 special privilege assignment with dangerous privileges (SeDebugPrivilege, SeTcbPrivilege, SeAssignPrimaryTokenPrivilege) to accounts that aren't SYSTEM or known admin accounts \u2014 indicates privilege escalation or token manipulation.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1134",
+        "T1134.001"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "privilege_escalation_sensitive_privileges.json"
     },
     {
       "title": "Process Discovery via Tasklist",
@@ -4228,6 +4340,22 @@
       "stig_ids": [],
       "stig_category": "CAT II",
       "file": "sdelete_secure_file_deletion.json"
+    },
+    {
+      "title": "Security Group Enumeration: Rapid Group Membership Queries",
+      "description": "Detects Event 4799 rapid security-enabled group membership enumeration \u2014 indicates BloodHound, SharpHound, or net group /domain reconnaissance. Normal users query 1-2 groups; attackers enumerate all groups systematically.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1069.002",
+        "T1087.002"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "security_group_enumeration.json"
     },
     {
       "title": "Security Support Provider DLL Persistence",
@@ -6949,6 +7077,21 @@
   ],
   "hunting_queries": [
     {
+      "title": "Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain",
+      "description": "Correlates credential attack stages across Windows Security Events: failed logons (4625), explicit creds (4648), privilege escalation (4672 with SeDebug), Kerberos TGS (4769), directory replication (4662), and credential reads (5379). Identifies hosts exhibiting 3+ stages indicating an active attack chain.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1003.006",
+        "T1558.003",
+        "T1110.001",
+        "T1134",
+        "T1550.003"
+      ],
+      "file": "hunting/ad_attack_timeline.json"
+    },
+    {
       "title": "BLUELIGHT APT37 Kill Chain Correlation",
       "description": "Hunting query that correlates multiple BLUELIGHT (S0657) kill chain stages on the same host. Detects hosts exhibiting 3+ stages of the BLUELIGHT attack chain within 24 hours: browser exploitation, C2 setup, discovery, credential theft, and exfiltration.",
       "level": "critical",
@@ -7066,6 +7209,19 @@
         "T1059.004"
       ],
       "file": "hunting/linux_rare_process.json"
+    },
+    {
+      "title": "Hunting: Logon Anomaly - Account Activity Profiling",
+      "description": "Profiles user account activity across Windows Security Events: total logons, unique hosts authenticated to, explicit credential delegations, privilege assignments, and failed logon ratio. Identifies accounts with suspicious patterns: many hosts, high delegation, or privilege access.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1078",
+        "T1021",
+        "T1134"
+      ],
+      "file": "hunting/logon_anomaly_by_account.json"
     },
     {
       "title": "Geographic Health: Cloud Provider Summary",
@@ -7396,9 +7552,9 @@
     }
   ],
   "art_coverage": {
-    "testable_rules": 308,
+    "testable_rules": 316,
     "rules_with_tests": 278,
-    "coverage_percent": 90.3,
+    "coverage_percent": 88.0,
     "total_test_mappings": 3217
   }
 }

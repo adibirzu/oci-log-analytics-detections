@@ -1,0 +1,18 @@
+{
+  "title": "Pass-the-Ticket: Logon with Explicit Credentials from Unusual Source",
+  "description": "Detects Event 4648 explicit credential logons where a machine account impersonates a user — common in pass-the-ticket, over-pass-the-hash, and Rubeus asktgt attacks. Correlates with source IP to identify lateral movement.",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4648' and not 'Original Log Content' like '%TargetServerName:localhost%' | eval Subject = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Target = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), TargetServer = regexextract('Original Log Content', 'TargetServerName:([^;]+)') | stats count as Attempts by Subject, Target, TargetServer, Entity | where Attempts > 5 | sort -Attempts",
+  "sigma_id": "ptt-t1550-003",
+  "level": "high",
+  "tags": ["attack.credential_access", "attack.t1550.003", "attack.lateral_movement"],
+  "mitre_attack": {
+    "tactics": ["credential_access", "lateral_movement"],
+    "techniques": ["T1550.003"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["Service accounts delegating credentials to multiple servers"]
+}

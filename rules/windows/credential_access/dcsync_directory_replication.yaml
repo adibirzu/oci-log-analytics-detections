@@ -1,0 +1,26 @@
+title: "DCSync: Directory Replication from Non-Domain Controller"
+id: dcsync-t1003-006
+status: stable
+description: >
+  Detects directory replication requests (Event 4662) with DS-Replication-Get-Changes
+  GUIDs from non-machine accounts — classic DCSync attack via mimikatz lsadump::dcsync.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4662
+    Properties|contains:
+      - '1131f6aa-9c07-11d1-f79f-00c04fc2dcd2'
+      - '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'
+      - '89e95b76-444d-4c62-991a-0facbeda640c'
+  filter_machine:
+    SubjectUserName|endswith: '$'
+  condition: selection and not filter_machine
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1003.006
+falsepositives:
+  - Legitimate domain controller replication
+version: 1

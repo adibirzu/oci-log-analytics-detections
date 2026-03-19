@@ -1,15 +1,15 @@
 {
   "version": "1.0",
-  "total_rules": 428,
+  "total_rules": 433,
   "total_hunting": 36,
   "platforms": {
-    "windows": 231,
+    "windows": 236,
     "oci": 130,
     "linux": 67
   },
   "severities": {
-    "critical": 75,
-    "high": 183,
+    "critical": 79,
+    "high": 184,
     "medium": 122,
     "low": 18,
     "informational": 30
@@ -24,6 +24,7 @@
     "T1003.007",
     "T1005",
     "T1012",
+    "T1016",
     "T1018",
     "T1021",
     "T1021.001",
@@ -78,6 +79,7 @@
     "T1098",
     "T1098.001",
     "T1098.004",
+    "T1102",
     "T1105",
     "T1110",
     "T1110.001",
@@ -620,6 +622,86 @@
       "stig_ids": [],
       "stig_category": "",
       "file": "bluelight_system_discovery.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: YARA Chrome/Edge Cookie Theft",
+      "description": "Detects BLUELIGHT browser cookie theft targeting Google SID/OSID/__Secure-3PSID cookies for Gmail session hijacking and IMAP enablement. Source: Volexity YARA rule APT_MAL_Win_BlueLight_B $chrome and $msg strings.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1539",
+        "T1555.003",
+        "T1114"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "file": "bluelight_yara_cookie_theft.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: YARA Google App C2 Communication",
+      "description": "Detects BLUELIGHT C2 via Google services using spoofed Firefox UA with Korean language headers (ko-KR). Targets Gmail/Google Account settings to enable IMAP for persistent email exfiltration. Source: Volexity YARA rule APT_MAL_Win_BlueLight_B.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1071.001",
+        "T1102"
+      ],
+      "mitre_tactics": [
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_yara_google_c2.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: YARA Keylogger Staging Files",
+      "description": "Detects BLUELIGHT keylogger staging files (cheV01.dat, INTEG.RAW) and ESE database artifacts (edb.chk, edb.log, edbres*.jrs). The keylogger captures keystrokes with modifier prefixes and stages data for OneDrive exfiltration. Source: Volexity YARA rule APT_MAL_Win_BlueLight_B.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1056.001"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_yara_keylogger.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: YARA PDB Path Indicators",
+      "description": "Detects BLUELIGHT compilation artifacts (PDB paths) in process events or file content. Unique to BLUELIGHT: 'Development\\BACKDOOR\\ncov\\' and 'Release\\bluelight.pdb'. Source: Volexity YARA rule APT_MAL_Win_BlueLight.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1204.002"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_yara_pdb_strings.json"
+    },
+    {
+      "title": "BLUELIGHT RAT: YARA System Reconnaissance JSON",
+      "description": "Detects BLUELIGHT system profiling via ipinfo.io lookups and structured JSON recon data collection (UserName, ComName, OS, OnlineIP, AntiVirus, VM detection). Source: Volexity YARA rule APT_MAL_Win_BlueLight $msg strings.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1082",
+        "T1016"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "bluelight_yara_system_recon.json"
     },
     {
       "title": "Boot Configuration Change for Persistence",
@@ -7212,9 +7294,9 @@
     }
   ],
   "art_coverage": {
-    "testable_rules": 298,
+    "testable_rules": 303,
     "rules_with_tests": 278,
-    "coverage_percent": 93.3,
+    "coverage_percent": 91.7,
     "total_test_mappings": 3217
   }
 }

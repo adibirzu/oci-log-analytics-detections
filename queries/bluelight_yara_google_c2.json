@@ -1,0 +1,30 @@
+{
+  "title": "BLUELIGHT RAT: YARA Google App C2 Communication",
+  "description": "Detects BLUELIGHT C2 via Google services using spoofed Firefox UA with Korean language headers (ko-KR). Targets Gmail/Google Account settings to enable IMAP for persistent email exfiltration. Source: Volexity YARA rule APT_MAL_Win_BlueLight_B.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events' or 'Log Source' = 'OCI WAF Logs' or 'Log Source' = 'OCI Load Balancer Access Logs') and ('Original Log Content' like '%ko-KR,ko;q=0.8,en-US;q=0.5%' or 'Original Log Content' like '%AccountSettingsUi/data/batchexecute%' or 'Original Log Content' like '%SNlM0e%' or ('Original Log Content' like '%mail.google.com%' and 'Original Log Content' like '%GM_ACTION_TOKEN%')) | stats count by 'Host Name (Server)', Entity, 'Destination Hostname'",
+  "sigma_id": "bl-s0657-yara-google-c2-001",
+  "level": "critical",
+  "tags": ["attack.command_and_control", "attack.t1071.001", "attack.t1102", "apt.apt37", "malware.bluelight", "yara.APT_MAL_Win_BlueLight_B"],
+  "mitre_attack": {
+    "tactics": ["command_and_control"],
+    "techniques": ["T1071.001", "T1102"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": ["Windows Sysmon Events", "Windows Sysmon Operational Logs", "SOC Windows Sysmon Logs", "Windows Security Events", "OCI WAF Logs", "OCI Load Balancer Access Logs"]
+  },
+  "falsepositives": ["Korean-language users browsing Google services with Firefox 80"],
+  "yara_source": {
+    "rule_name": "APT_MAL_Win_BlueLight_B",
+    "rule_id": "3ec2d44c-4c08-514d-a839-acef3f53f7dc",
+    "author": "threatintel@volexity.com",
+    "strings_used": ["$chrome9", "$chrome19", "$chrome25", "$chrome26"],
+    "repository": "https://github.com/Neo23x0/signature-base/blob/master/yara/apt_apt37_bluelight.yar"
+  },
+  "threat_intel": {
+    "malware_family": "BLUELIGHT",
+    "mitre_software_id": "S0657",
+    "threat_actor": "APT37 (InkySquid)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Kerberoasting: RC4 Encrypted Service Ticket Request",
+  "description": "Detects Kerberos TGS requests using RC4 encryption (0x17) — a strong Kerberoasting indicator. Modern AD uses AES256 (0x12); RC4 requests indicate Rubeus, Invoke-Kerberoast, or GetUserSPNs.py. Excludes machine accounts (ending in $) which legitimately use RC4.",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4769' and 'Original Log Content' like '%TicketEncryptionType:0x17%' and not 'Original Log Content' like '%ServiceName:%$%' | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), Service = regexextract('Original Log Content', 'ServiceName:([^;]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)') | stats count as Requests by Account, Service, SrcIP, Entity | sort -Requests",
+  "sigma_id": "kerb-rc4-t1558-001",
+  "level": "high",
+  "tags": ["attack.credential_access", "attack.t1558.003"],
+  "mitre_attack": {
+    "tactics": ["credential_access"],
+    "techniques": ["T1558.003"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["Legacy applications requiring RC4 Kerberos tickets", "Misconfigured service accounts"]
+}

@@ -1,0 +1,72 @@
+title: "PowerShell: Suspicious Command Execution (Real Windows Security Events)"
+id: ps-cmd-t1059-001
+status: stable
+description: >
+  Detects suspicious PowerShell commands in Windows Security Event 4688 process
+  creation logs. Covers download cradles, encoded execution, AMSI bypass,
+  credential access, and common attack framework commands. Optimized for
+  real Windows Security Events (not Sysmon) using Original Log Content matching.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+author: SOC Detection Engineering
+date: 2026/03/19
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4688
+    NewProcessName|endswith: '\powershell.exe'
+  selection_download:
+    CommandLine|contains:
+      - 'DownloadString'
+      - 'DownloadFile'
+      - 'Invoke-WebRequest'
+      - 'iwr '
+      - 'wget '
+      - 'curl '
+      - 'Net.WebClient'
+      - 'Start-BitsTransfer'
+  selection_encoded:
+    CommandLine|contains:
+      - '-enc '
+      - '-EncodedCommand'
+      - '-e '
+      - 'FromBase64String'
+      - 'ToBase64String'
+  selection_amsi:
+    CommandLine|contains:
+      - 'AmsiUtils'
+      - 'amsiInitFailed'
+      - 'Reflection.Assembly'
+      - 'SetValue($null,$true)'
+  selection_credential:
+    CommandLine|contains:
+      - 'Get-Credential'
+      - 'Mimikatz'
+      - 'sekurlsa'
+      - 'lsadump'
+      - 'Invoke-Mimikatz'
+      - 'Get-GPPPassword'
+      - 'Find-LocalAdminAccess'
+  selection_recon:
+    CommandLine|contains:
+      - 'Get-DomainUser'
+      - 'Get-DomainGroup'
+      - 'Get-DomainComputer'
+      - 'Get-NetUser'
+      - 'Get-NetGroup'
+      - 'Get-NetComputer'
+      - 'Invoke-ShareFinder'
+      - 'Invoke-Kerberoast'
+      - 'Invoke-BloodHound'
+  condition: selection and (selection_download or selection_encoded or selection_amsi or selection_credential or selection_recon)
+level: high
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.t1086
+falsepositives:
+  - IT automation scripts using encoded PowerShell
+  - Security tools performing legitimate AD queries
+version: 1

@@ -1,0 +1,33 @@
+title: "Kerberoasting: SPN Sweep - Multiple Service Tickets from Single Account"
+id: kerb-sweep-t1558-002
+status: stable
+description: >
+  Detects a single account requesting service tickets for multiple distinct
+  services in a short window, indicating SPN sweep for offline hash cracking.
+  Rubeus kerberoast and Invoke-Kerberoast request tickets for all SPN-enabled
+  accounts rapidly. Normal users request 1-3 service tickets; attackers request 10+.
+references:
+  - https://attack.mitre.org/techniques/T1558/003/
+author: SOC Detection Engineering
+date: 2026/03/19
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4769
+  aggregation:
+    distinctcount_service:
+      field: ServiceName
+      by: TargetUserName
+      threshold: 10
+  timeframe: 1h
+  condition: selection
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1558.003
+falsepositives:
+  - Service accounts legitimately accessing many services
+  - Monitoring tools scanning Kerberos
+version: 1

@@ -1,0 +1,67 @@
+title: "Mimikatz: Command and Module Indicators in Process Logs"
+id: mimi-cmd-t1003-001
+status: stable
+description: >
+  Detects Mimikatz command and module strings in Windows Security Event 4688
+  process creation and 4624/4648 logon events. Covers sekurlsa, lsadump,
+  kerberos, dpapi, crypto modules and common Mimikatz post-exploitation patterns.
+  Works with real Windows Security Events via Original Log Content matching.
+references:
+  - https://attack.mitre.org/techniques/T1003/001/
+  - https://attack.mitre.org/software/S0002/
+author: SOC Detection Engineering
+date: 2026/03/19
+logsource:
+  product: windows
+  service: security
+detection:
+  selection_4688:
+    EventID: 4688
+  selection_mimikatz_modules:
+    CommandLine|contains:
+      - 'sekurlsa::logonpasswords'
+      - 'sekurlsa::wdigest'
+      - 'sekurlsa::kerberos'
+      - 'sekurlsa::msv'
+      - 'sekurlsa::tspkg'
+      - 'lsadump::sam'
+      - 'lsadump::lsa /patch'
+      - 'lsadump::dcsync'
+      - 'kerberos::list'
+      - 'kerberos::golden'
+      - 'kerberos::ptt'
+      - 'dpapi::cred'
+      - 'crypto::certificates'
+      - 'token::elevate'
+      - 'privilege::debug'
+      - 'misc::memssp'
+  selection_mimikatz_binary:
+    CommandLine|contains:
+      - 'mimikatz'
+      - 'mimi32'
+      - 'mimi64'
+      - 'gentilkiwi'
+      - 'benjamin DELPY'
+  selection_mimikatz_output:
+    CommandLine|contains:
+      - 'SID                :'
+      - 'User               :'
+      - '* Username :'
+      - '* Domain   :'
+      - '* NTLM     :'
+      - '* SHA1     :'
+      - 'Authentication Id :'
+      - 'wdigest :'
+      - 'tspkg :'
+      - 'kerberos :'
+  condition: selection_4688 and (selection_mimikatz_modules or selection_mimikatz_binary or selection_mimikatz_output)
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1003.001
+  - attack.t1003.006
+  - attack.t1558.003
+falsepositives:
+  - Security testing tools that emulate Mimikatz output
+  - Honeypot systems designed to attract credential dumpers
+version: 1

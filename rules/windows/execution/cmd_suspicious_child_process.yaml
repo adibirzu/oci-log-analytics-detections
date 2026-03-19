@@ -1,0 +1,65 @@
+title: "CMD: Suspicious Command Execution (Real Windows Security Events)"
+id: cmd-exec-t1059-003
+status: stable
+description: >
+  Detects suspicious cmd.exe commands in Windows Security Event 4688 process
+  creation logs. Covers reconnaissance, persistence, lateral movement, and
+  defense evasion commands commonly used by attackers after initial compromise.
+references:
+  - https://attack.mitre.org/techniques/T1059/003/
+author: SOC Detection Engineering
+date: 2026/03/19
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4688
+    NewProcessName|endswith: '\cmd.exe'
+  selection_recon:
+    CommandLine|contains:
+      - 'whoami /all'
+      - 'net user '
+      - 'net group '
+      - 'net localgroup'
+      - 'net view'
+      - 'nltest /dclist'
+      - 'nltest /domain_trusts'
+      - 'systeminfo'
+      - 'ipconfig /all'
+      - 'arp -a'
+      - 'netstat -ano'
+      - 'tasklist /svc'
+      - 'wmic process list'
+      - 'qwinsta'
+      - 'query user'
+  selection_persistence:
+    CommandLine|contains:
+      - 'schtasks /create'
+      - 'at '
+      - 'reg add '
+      - 'sc create '
+      - 'wmic /node:'
+  selection_lateral:
+    CommandLine|contains:
+      - 'psexec '
+      - 'wmic /node:'
+      - 'winrs -r:'
+      - 'net use \\\\'
+      - 'copy \\\\'
+  selection_evasion:
+    CommandLine|contains:
+      - 'vssadmin delete shadows'
+      - 'wevtutil cl '
+      - 'bcdedit /set'
+      - 'reg delete '
+      - 'wbadmin delete'
+  condition: selection and (selection_recon or selection_persistence or selection_lateral or selection_evasion)
+level: high
+tags:
+  - attack.execution
+  - attack.t1059.003
+falsepositives:
+  - System administrators running diagnostic commands
+  - Automated maintenance scripts
+version: 1

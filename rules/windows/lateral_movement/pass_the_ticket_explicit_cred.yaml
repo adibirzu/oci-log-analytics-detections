@@ -1,0 +1,30 @@
+title: "Pass-the-Ticket: Excessive Explicit Credential Logons"
+id: ptt-t1550-003
+status: stable
+description: >
+  Detects Event 4648 explicit credential delegation at high frequency from
+  a single source — indicates pass-the-ticket, over-pass-the-hash, or
+  Rubeus asktgt lateral movement across the domain.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4648
+  filter_localhost:
+    TargetServerName: 'localhost'
+  condition: selection and not filter_localhost
+  aggregation:
+    count_by_subject:
+      field: TargetServerName
+      by: SubjectUserName
+      threshold: 5
+  timeframe: 1h
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1550.003
+  - attack.lateral_movement
+falsepositives:
+  - Service accounts delegating credentials to multiple servers
+version: 1

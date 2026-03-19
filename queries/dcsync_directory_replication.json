@@ -1,0 +1,19 @@
+{
+  "title": "DCSync Attack: Directory Replication Request from Non-DC",
+  "description": "Detects Event 4662 directory access with replication GUIDs (1131f6aa/1131f6ad) requested by non-machine accounts — classic DCSync attack using mimikatz lsadump::dcsync to extract domain password hashes remotely.",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4662' and ('Original Log Content' like '%1131f6aa%' or 'Original Log Content' like '%1131f6ad%' or 'Original Log Content' like '%89e95b76%') and not 'Original Log Content' like '%SubjectUserName:%$%' | eval Account = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Domain = regexextract('Original Log Content', 'SubjectDomainName:([^;]+)') | stats count as Requests by Account, Domain, Entity | sort -Requests",
+  "sigma_id": "dcsync-t1003-006",
+  "level": "critical",
+  "stig_category": "CAT I",
+  "tags": ["attack.credential_access", "attack.t1003.006"],
+  "mitre_attack": {
+    "tactics": ["credential_access"],
+    "techniques": ["T1003.006"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["Legitimate domain controller replication"]
+}

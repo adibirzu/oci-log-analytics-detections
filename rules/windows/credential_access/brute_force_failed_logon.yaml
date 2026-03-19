@@ -1,0 +1,26 @@
+title: "Brute Force: Failed Logon Spike per Account"
+id: brute-t1110-001
+status: stable
+description: >
+  Detects 3+ failed logon attempts (4625) for a single account — indicates
+  password spraying, brute force, or credential stuffing.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4625
+  condition: selection
+  aggregation:
+    count_by_account:
+      field: TargetUserName
+      threshold: 3
+  timeframe: 1h
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1110.001
+  - attack.t1110.003
+falsepositives:
+  - Users with expired or forgotten passwords
+version: 1

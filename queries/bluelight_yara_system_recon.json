@@ -1,0 +1,30 @@
+{
+  "title": "BLUELIGHT RAT: YARA System Reconnaissance JSON",
+  "description": "Detects BLUELIGHT system profiling via ipinfo.io lookups and structured JSON recon data collection (UserName, ComName, OS, OnlineIP, AntiVirus, VM detection). Source: Volexity YARA rule APT_MAL_Win_BlueLight $msg strings.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Original Log Content' like '%ipinfo.io%' or ('Original Log Content' like '%UserName%' and 'Original Log Content' like '%ComName%' and 'Original Log Content' like '%AntiVirus%' and 'Original Log Content' like '%OnlineIP%')) | stats count by 'Host Name (Server)', Entity, 'Process Name'",
+  "sigma_id": "bl-s0657-yara-recon-001",
+  "level": "critical",
+  "tags": ["attack.discovery", "attack.t1082", "attack.t1016", "apt.apt37", "malware.bluelight", "yara.APT_MAL_Win_BlueLight"],
+  "mitre_attack": {
+    "tactics": ["discovery"],
+    "techniques": ["T1082", "T1016"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon",
+    "candidates": ["Windows Sysmon Events", "Windows Sysmon Operational Logs", "SOC Windows Sysmon Logs", "Windows Security Events"]
+  },
+  "falsepositives": ["Legitimate ipinfo.io lookups from DevOps tools"],
+  "yara_source": {
+    "rule_name": "APT_MAL_Win_BlueLight",
+    "rule_id": "3ec2d44c-4c08-514d-a839-acef3f53f7dc",
+    "author": "threatintel@volexity.com",
+    "strings_used": ["$msg0-$msg15"],
+    "repository": "https://github.com/Neo23x0/signature-base/blob/master/yara/apt_apt37_bluelight.yar"
+  },
+  "threat_intel": {
+    "malware_family": "BLUELIGHT",
+    "mitre_software_id": "S0657",
+    "threat_actor": "APT37 (InkySquid)"
+  }
+}

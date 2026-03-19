@@ -1,0 +1,51 @@
+title: "BLUELIGHT RAT: YARA Chrome/Edge Cookie Theft (APT_MAL_Win_BlueLight_B)"
+id: bl-s0657-yara-cookie-001
+status: stable
+description: >
+  Detects BLUELIGHT browser cookie theft targeting Google authentication.
+  The malware extracts SID, OSID, __Secure-3PSID cookies from Chrome/Edge
+  to hijack Gmail and Google Account sessions. Enables IMAP access on victim
+  Gmail accounts for persistent email exfiltration. Based on Volexity YARA
+  rule APT_MAL_Win_BlueLight_B $chrome strings.
+references:
+  - https://github.com/Neo23x0/signature-base/blob/master/yara/apt_apt37_bluelight.yar
+  - https://www.volexity.com/blog/2021/08/17/north-korean-apt-inkysquid-infects-victims-using-browser-exploits/
+author: SOC Detection Engineering (YARA source: threatintel@volexity.com)
+date: 2026/03/19
+logsource:
+  product: windows
+  category: process_creation
+  service: sysmon
+detection:
+  selection_cookie_format:
+    CommandLine|contains:
+      - 'cookie_name: OSID'
+      - 'cookie_name: SID,'
+      - '__Secure-3PSID'
+      - 'cookie_name: __Secure-3PSID'
+  selection_gmail_c2:
+    CommandLine|contains:
+      - 'GM_ACTION_TOKEN'
+      - 'GM_ID_KEY='
+      - 'mail/u/0/?ik='
+      - 'Success to enable imap'
+      - 'Success to enable thunder access'
+  selection_chrome_cookie_fail:
+    CommandLine|contains:
+      - 'Failed to get chrome cookie'
+      - 'Failed to get Edge cookie'
+      - 'Failed to get New Edge cookie'
+  condition: selection_cookie_format or selection_gmail_c2 or selection_chrome_cookie_fail
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1539
+  - attack.t1555.003
+  - attack.collection
+  - attack.t1114
+  - apt.apt37
+  - malware.bluelight
+  - yara.APT_MAL_Win_BlueLight_B
+falsepositives:
+  - None expected - these strings are unique to BLUELIGHT malware
+version: 1

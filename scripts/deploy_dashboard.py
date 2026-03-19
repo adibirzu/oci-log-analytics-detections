@@ -337,7 +337,7 @@ DASHBOARDS = {
         ]
     },
     "SOC: APT Detection Dashboard": {
-        "description": "APT threat detection: BLUELIGHT RAT (S0657/APT37) full kill chain detection from browser exploitation through C2 and exfiltration via Microsoft Graph API/OneDrive.",
+        "description": "APT threat detection: BLUELIGHT RAT (S0657/APT37) full kill chain + YARA-enhanced indicators from Volexity research. Covers browser exploitation, Graph API/Google C2, cookie theft, keylogging, and OneDrive exfiltration.",
         "widgets": [
             {"title": "APT37: Drive-by Compromise", "query_file": "bluelight_drive_by_compromise.json"},
             {"title": "APT37: Browser Child Process", "query_file": "bluelight_browser_child_process.json"},
@@ -350,6 +350,11 @@ DASHBOARDS = {
             {"title": "APT37: Browser Credential Theft", "query_file": "bluelight_browser_credential_theft.json"},
             {"title": "APT37: Ingress Tool Transfer", "query_file": "bluelight_ingress_tool_transfer.json"},
             {"title": "APT37: OneDrive Exfiltration", "query_file": "bluelight_onedrive_exfiltration.json"},
+            {"title": "YARA: PDB Path Indicators", "query_file": "bluelight_yara_pdb_strings.json"},
+            {"title": "YARA: System Recon JSON", "query_file": "bluelight_yara_system_recon.json"},
+            {"title": "YARA: Cookie Theft (Chrome/Edge)", "query_file": "bluelight_yara_cookie_theft.json"},
+            {"title": "YARA: Keylogger Staging", "query_file": "bluelight_yara_keylogger.json"},
+            {"title": "YARA: Google App C2", "query_file": "bluelight_yara_google_c2.json"},
             {"title": "Hunt: BLUELIGHT Kill Chain", "query_file": "hunting/bluelight_apt37_kill_chain.json"},
         ]
     },

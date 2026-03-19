@@ -1,0 +1,44 @@
+title: "BLUELIGHT RAT: YARA System Reconnaissance JSON (APT_MAL_Win_BlueLight)"
+id: bl-s0657-yara-recon-001
+status: stable
+description: >
+  Detects BLUELIGHT system reconnaissance data collection pattern. The malware
+  collects UserName, ComName, OS, OnlineIP, LocalIP, Time, Compiled, Process Level,
+  AntiVirus, and VM detection results in a specific JSON format and exfiltrates
+  via OneDrive. Based on Volexity YARA rule APT_MAL_Win_BlueLight $msg strings.
+references:
+  - https://github.com/Neo23x0/signature-base/blob/master/yara/apt_apt37_bluelight.yar
+  - https://www.volexity.com/blog/2021/08/17/north-korean-apt-inkysquid-infects-victims-using-browser-exploits/
+author: SOC Detection Engineering (YARA source: threatintel@volexity.com)
+date: 2026/03/19
+logsource:
+  product: windows
+  category: process_creation
+  service: sysmon
+detection:
+  selection_ipinfo:
+    CommandLine|contains:
+      - 'ipinfo.io'
+  selection_json_recon:
+    CommandLine|contains:
+      - '"UserName":"'
+      - '"ComName":"'
+      - '"OnlineIP":"'
+      - '"LocalIP":"'
+      - '"AntiVirus":"'
+      - '"Process Level":"'
+      - '"VM":"'
+  condition: selection_ipinfo or selection_json_recon
+level: critical
+tags:
+  - attack.discovery
+  - attack.t1082
+  - attack.t1016
+  - attack.t1057
+  - apt.apt37
+  - malware.bluelight
+  - yara.APT_MAL_Win_BlueLight
+falsepositives:
+  - Legitimate ipinfo.io lookups (common in DevOps tools)
+  - The JSON field pattern combination is highly specific to BLUELIGHT
+version: 1

@@ -1,0 +1,18 @@
+{
+  "title": "Kerberoasting: SPN Sweep - Multiple Service Tickets from Single Account",
+  "description": "Detects a single account requesting tickets for 10+ distinct services in 1 hour — classic Rubeus/Invoke-Kerberoast SPN sweep pattern. Normal users request 1-3; attackers request all SPN-enabled accounts.",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4769' | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), Service = regexextract('Original Log Content', 'ServiceName:([^;]+)') | stats distinctcount(Service) as UniqueServices, count as TotalRequests by Account, Entity | where UniqueServices > 10 | sort -UniqueServices",
+  "sigma_id": "kerb-sweep-t1558-002",
+  "level": "critical",
+  "tags": ["attack.credential_access", "attack.t1558.003"],
+  "mitre_attack": {
+    "tactics": ["credential_access"],
+    "techniques": ["T1558.003"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["Service accounts legitimately accessing many services"]
+}

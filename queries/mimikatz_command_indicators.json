@@ -1,0 +1,18 @@
+{
+  "title": "Mimikatz: Command and Module Indicators",
+  "description": "Detects Mimikatz module commands (sekurlsa, lsadump, kerberos, dpapi, crypto, token), binary name indicators, and output patterns in real Windows Security Event 4688 process creation logs. Uses Original Log Content matching against 3M+ real events.",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4688' and ('Original Log Content' like '%sekurlsa::%' or 'Original Log Content' like '%lsadump::%' or 'Original Log Content' like '%kerberos::golden%' or 'Original Log Content' like '%kerberos::ptt%' or 'Original Log Content' like '%dpapi::cred%' or 'Original Log Content' like '%token::elevate%' or 'Original Log Content' like '%privilege::debug%' or 'Original Log Content' like '%misc::memssp%' or 'Original Log Content' like '%mimikatz%' or 'Original Log Content' like '%gentilkiwi%') | stats count as Detections by Entity | sort -Detections",
+  "sigma_id": "mimi-cmd-t1003-001",
+  "level": "critical",
+  "tags": ["attack.credential_access", "attack.t1003.001", "attack.t1003.006", "attack.t1558.003"],
+  "mitre_attack": {
+    "tactics": ["credential_access"],
+    "techniques": ["T1003.001", "T1003.006", "T1558.003"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["Security testing tools that emulate Mimikatz output"]
+}

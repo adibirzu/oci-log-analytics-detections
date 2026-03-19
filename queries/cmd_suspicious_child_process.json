@@ -1,0 +1,18 @@
+{
+  "title": "CMD: Suspicious Command Execution",
+  "description": "Detects suspicious cmd.exe commands in real Windows Security Event 4688. Covers recon (whoami, net user, systeminfo, netstat), persistence (schtasks, reg add, sc create), lateral movement (psexec, wmic, net use), and defense evasion (vssadmin, wevtutil, bcdedit).",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4688' and 'Original Log Content' like '%cmd.exe%' and ('Original Log Content' like '%whoami%' or 'Original Log Content' like '%net user %' or 'Original Log Content' like '%net group %' or 'Original Log Content' like '%net localgroup%' or 'Original Log Content' like '%nltest%' or 'Original Log Content' like '%systeminfo%' or 'Original Log Content' like '%netstat -ano%' or 'Original Log Content' like '%schtasks /create%' or 'Original Log Content' like '%sc create %' or 'Original Log Content' like '%reg add %' or 'Original Log Content' like '%psexec%' or 'Original Log Content' like '%vssadmin delete%' or 'Original Log Content' like '%wevtutil cl%' or 'Original Log Content' like '%bcdedit%') | stats count as Detections by Entity | sort -Detections",
+  "sigma_id": "cmd-exec-t1059-003",
+  "level": "high",
+  "tags": ["attack.execution", "attack.t1059.003"],
+  "mitre_attack": {
+    "tactics": ["execution"],
+    "techniques": ["T1059.003"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["System administrators running diagnostic commands"]
+}

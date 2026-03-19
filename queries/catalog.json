@@ -1,15 +1,15 @@
 {
   "version": "1.0",
-  "total_rules": 433,
-  "total_hunting": 36,
+  "total_rules": 438,
+  "total_hunting": 38,
   "platforms": {
-    "windows": 236,
+    "windows": 241,
     "oci": 130,
     "linux": 67
   },
   "severities": {
-    "critical": 79,
-    "high": 184,
+    "critical": 81,
+    "high": 187,
     "medium": 122,
     "low": 18,
     "informational": 30
@@ -52,6 +52,7 @@
     "T1057",
     "T1059",
     "T1059.001",
+    "T1059.003",
     "T1059.004",
     "T1059.005",
     "T1059.006",
@@ -929,6 +930,21 @@
       "file": "cloud_guard_problem_vcn_security_list_port_ssh.json"
     },
     {
+      "title": "CMD: Suspicious Command Execution",
+      "description": "Detects suspicious cmd.exe commands in real Windows Security Event 4688. Covers recon (whoami, net user, systeminfo, netstat), persistence (schtasks, reg add, sc create), lateral movement (psexec, wmic, net use), and defense evasion (vssadmin, wevtutil, bcdedit).",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.003"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "cmd_suspicious_child_process.json"
+    },
+    {
       "title": "CMSTP UAC Bypass",
       "description": "Detects usage of CMSTP.exe to bypass UAC and execute arbitrary commands through .inf files.",
       "level": "high",
@@ -1468,6 +1484,36 @@
       "stig_ids": [],
       "stig_category": "CAT II",
       "file": "javascript_execution_via_nodejs.json"
+    },
+    {
+      "title": "Kerberoasting: RC4 Encrypted Service Ticket Request",
+      "description": "Detects Kerberos TGS requests using RC4 encryption (0x17) \u2014 a strong Kerberoasting indicator. Modern AD uses AES256 (0x12); RC4 requests indicate Rubeus, Invoke-Kerberoast, or GetUserSPNs.py. Excludes machine accounts (ending in $) which legitimately use RC4.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1558.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "kerberoasting_rc4_ticket_request.json"
+    },
+    {
+      "title": "Kerberoasting: SPN Sweep - Multiple Service Tickets from Single Account",
+      "description": "Detects a single account requesting tickets for 10+ distinct services in 1 hour \u2014 classic Rubeus/Invoke-Kerberoast SPN sweep pattern. Normal users request 1-3; attackers request all SPN-enabled accounts.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1558.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "kerberoasting_spn_sweep.json"
     },
     {
       "title": "Kerberos Ticket Export via Mimikatz",
@@ -2194,6 +2240,23 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "mass_assignment_attack_detected.json"
+    },
+    {
+      "title": "Mimikatz: Command and Module Indicators",
+      "description": "Detects Mimikatz module commands (sekurlsa, lsadump, kerberos, dpapi, crypto, token), binary name indicators, and output patterns in real Windows Security Event 4688 process creation logs. Uses Original Log Content matching against 3M+ real events.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1003.001",
+        "T1003.006",
+        "T1558.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "mimikatz_command_indicators.json"
     },
     {
       "title": "MSBuild Execution from Non-Standard Location",
@@ -3805,6 +3868,21 @@
       "stig_ids": [],
       "stig_category": "CAT I",
       "file": "powershell_script_block_with_suspicious_keywords.json"
+    },
+    {
+      "title": "PowerShell: Suspicious Command Execution",
+      "description": "Detects suspicious PowerShell in real Windows Security Event 4688 process creation. Covers download cradles (DownloadString, IWR), encoded execution (-enc, FromBase64String), AMSI bypass, credential access (Mimikatz, GPP), and AD recon (BloodHound, Kerberoast, ShareFinder).",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.001"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "",
+      "file": "powershell_suspicious_commands.json"
     },
     {
       "title": "Print Processor Persistence",
@@ -6906,6 +6984,19 @@
       "file": "hunting/browser_attack_frequency_analysis.json"
     },
     {
+      "title": "Hunting: Credential Attack Correlation (PowerShell + Mimikatz + Kerberoast)",
+      "description": "Correlates credential attack indicators across Windows Security Events. Identifies hosts/entities showing multiple attack stages: PowerShell download cradles, Mimikatz execution, and Kerberoasting activity within the same time window.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1003.001",
+        "T1558.003",
+        "T1059.001"
+      ],
+      "file": "hunting/credential_attack_correlation.json"
+    },
+    {
       "title": "DNS Exfiltration Detection (Entropy Analysis)",
       "description": "Detects potential DNS tunneling and data exfiltration by identifying DNS queries with unusually long subdomain labels. Long, random-looking subdomains (>30 chars) are indicative of encoded data being exfiltrated via DNS queries. Uses field analysis combined with frequency thresholds.",
       "level": "high",
@@ -6916,6 +7007,17 @@
         "T1071.004"
       ],
       "file": "hunting/dns_exfiltration_entropy.json"
+    },
+    {
+      "title": "Hunting: Kerberoasting Anomaly - RC4 vs AES Encryption Ratio",
+      "description": "Analyzes the ratio of RC4 (0x17) to AES256 (0x12) Kerberos service ticket requests per account. Accounts with >20% RC4 usage are anomalous in modern AD environments. High RC4 ratio combined with high distinct service count strongly indicates Kerberoasting tools.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1558.003"
+      ],
+      "file": "hunting/kerberoasting_anomaly_detection.json"
     },
     {
       "title": "Linux Data Staging and Exfiltration Indicators",
@@ -7294,9 +7396,9 @@
     }
   ],
   "art_coverage": {
-    "testable_rules": 303,
+    "testable_rules": 308,
     "rules_with_tests": 278,
-    "coverage_percent": 91.7,
+    "coverage_percent": 90.3,
     "total_test_mappings": 3217
   }
 }

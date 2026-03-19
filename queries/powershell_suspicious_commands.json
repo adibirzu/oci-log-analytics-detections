@@ -1,0 +1,18 @@
+{
+  "title": "PowerShell: Suspicious Command Execution",
+  "description": "Detects suspicious PowerShell in real Windows Security Event 4688 process creation. Covers download cradles (DownloadString, IWR), encoded execution (-enc, FromBase64String), AMSI bypass, credential access (Mimikatz, GPP), and AD recon (BloodHound, Kerberoast, ShareFinder).",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4688' and 'Original Log Content' like '%powershell%' and ('Original Log Content' like '%DownloadString%' or 'Original Log Content' like '%DownloadFile%' or 'Original Log Content' like '%Invoke-WebRequest%' or 'Original Log Content' like '%Net.WebClient%' or 'Original Log Content' like '%-enc %' or 'Original Log Content' like '%EncodedCommand%' or 'Original Log Content' like '%FromBase64String%' or 'Original Log Content' like '%AmsiUtils%' or 'Original Log Content' like '%amsiInitFailed%' or 'Original Log Content' like '%Invoke-Mimikatz%' or 'Original Log Content' like '%Invoke-Kerberoast%' or 'Original Log Content' like '%Invoke-BloodHound%' or 'Original Log Content' like '%Get-DomainUser%' or 'Original Log Content' like '%Get-NetUser%' or 'Original Log Content' like '%Find-LocalAdminAccess%' or 'Original Log Content' like '%Get-GPPPassword%') | stats count as Detections by Entity | sort -Detections",
+  "sigma_id": "ps-cmd-t1059-001",
+  "level": "high",
+  "tags": ["attack.execution", "attack.t1059.001"],
+  "mitre_attack": {
+    "tactics": ["execution"],
+    "techniques": ["T1059.001"]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": ["Windows Security Events"]
+  },
+  "falsepositives": ["IT automation scripts using encoded PowerShell"]
+}

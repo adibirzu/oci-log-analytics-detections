@@ -1,0 +1,33 @@
+title: "Kerberoasting: RC4 Encrypted Service Ticket Request"
+id: kerb-rc4-t1558-001
+status: stable
+description: >
+  Detects Kerberos service ticket requests (Event 4769) using RC4 encryption
+  (TicketEncryptionType 0x17) which is a strong indicator of Kerberoasting.
+  Modern AD environments use AES256 (0x12) by default; RC4 requests are
+  anomalous and typically indicate tools like Rubeus, Invoke-Kerberoast,
+  or GetUserSPNs.py extracting service ticket hashes for offline cracking.
+references:
+  - https://attack.mitre.org/techniques/T1558/003/
+  - https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/t1208-kerberoasting
+author: SOC Detection Engineering
+date: 2026/03/19
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4769
+  filter_rc4:
+    TicketEncryptionType: '0x17'
+  filter_normal_accounts:
+    ServiceName|endswith: '$'
+  condition: selection and filter_rc4 and not filter_normal_accounts
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1558.003
+falsepositives:
+  - Legacy applications requiring RC4 Kerberos tickets
+  - Misconfigured service accounts with RC4 only
+version: 1

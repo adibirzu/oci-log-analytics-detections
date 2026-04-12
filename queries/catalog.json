@@ -1,7 +1,26 @@
 {
   "version": "1.0",
+  "generated_at": "2026-03-20T11:51:11.511536+00:00",
   "total_rules": 446,
   "total_hunting": 40,
+  "inventory": {
+    "source_yaml_rules": 454,
+    "source_rule_breakdown": {
+      "cloud": 100,
+      "linux": 67,
+      "web": 38,
+      "windows": 249
+    },
+    "generated_detection_queries": 446,
+    "generated_hunting_queries": 40,
+    "generated_app_queries": 20,
+    "legacy_dirs": {
+      "logandetectionqueries": 0,
+      "logandetectionrules": 0
+    },
+    "combined_mitre_techniques": 208,
+    "combined_mitre_tactics": 14
+  },
   "platforms": {
     "windows": 249,
     "oci": 130,

@@ -1,0 +1,34 @@
+{
+  "title": "Privilege Escalation: Sensitive Privileges Assigned to Non-Admin",
+  "description": "Detects Event 4672 with dangerous privileges (SeDebugPrivilege, SeTcbPrivilege) assigned to non-SYSTEM accounts. Indicates token manipulation or privilege escalation.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 4672 and (PrivilegeList like '*SeDebugPrivilege*' or PrivilegeList like '*SeTcbPrivilege*' or PrivilegeList like '*SeAssignPrimaryTokenPrivilege*' or PrivilegeList like '*SeLoadDriverPrivilege*')) and not (('Subject User Name' = 'SYSTEM' or 'Subject User Name' = '-')) and not ('Subject User Name' like '*$'))",
+  "sigma_id": "privesc-t1134-001",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.privilege_escalation",
+    "attack.t1134",
+    "attack.t1134.001"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "privilege_escalation"
+    ],
+    "techniques": [
+      "T1134",
+      "T1134.001"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "Service accounts with legitimate elevated privileges"
+  ]
+}

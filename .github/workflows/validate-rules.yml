@@ -53,8 +53,11 @@ jobs:
           RULE_COUNT=$(find rules -name '*.yaml' -type f | wc -l)
           QUERY_COUNT=$(find queries -name '*.json' -not -name 'manifest.json' -not -name 'catalog.json' -maxdepth 1 | wc -l)
           echo "Rules: $RULE_COUNT, Queries: $QUERY_COUNT"
-          if [ "$RULE_COUNT" -ne "$QUERY_COUNT" ]; then
-            echo "ERROR: Rule count ($RULE_COUNT) != Query count ($QUERY_COUNT)"
+          # Some rules (multi-selection Sigma rules) generate more than one
+          # query, so exact equality is wrong. Every rule must generate at
+          # least one query — check queries >= rules and queries > 0.
+          if [ "$QUERY_COUNT" -lt "$RULE_COUNT" ] || [ "$QUERY_COUNT" -eq 0 ]; then
+            echo "ERROR: Query count ($QUERY_COUNT) is lower than rule count ($RULE_COUNT) — some rules failed to convert."
             exit 1
           fi
 

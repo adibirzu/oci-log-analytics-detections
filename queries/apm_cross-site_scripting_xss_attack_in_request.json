@@ -1,0 +1,37 @@
+{
+  "title": "APM: Cross-Site Scripting (XSS) Attack in Request",
+  "description": "Detects XSS attack payloads in HTTP URLs, query parameters, and request bodies captured by OCI APM and OpenTelemetry instrumentation. Covers reflected, stored, and DOM-based XSS vectors including script injection, event handlers, and javascript: URIs.\n",
+  "query": "('Log Source' = 'enterprise-crm-portal' or 'Log Source' = 'octo-drone-shop' or 'Log Source' = 'SOC Application Logs') and ((('HTTP URL' like '*%3Cscript*' or 'HTTP URL' like '*%3C/script*' or 'HTTP URL' like '*%3Csvg*' or 'HTTP URL' like '*%3Cimg*' or 'HTTP URL' like '*%3Ciframe*')) or (('HTTP URL' like '*onerror=*' or 'HTTP URL' like '*onload=*' or 'HTTP URL' like '*onmouseover=*' or 'HTTP URL' like '*onfocus=*' or 'HTTP URL' like '*onclick=*')) or (('HTTP URL' like '*javascript:*' or 'HTTP URL' like '*javascript%3A*' or 'HTTP URL' like '*vbscript:*' or 'HTTP URL' like '*data:text/html*')) or (('HTTP URL' like '*document.cookie*' or 'HTTP URL' like '*document.write*' or 'HTTP URL' like '*document.location*' or 'HTTP URL' like '*.innerHTML*' or 'HTTP URL' like '*eval(*' or 'HTTP URL' like '*String.fromCharCode*')))",
+  "sigma_id": "apm-browser-xss-001",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.initial_access",
+    "attack.t1189",
+    "attack.t1059.007",
+    "owasp.a03",
+    "owasp.a07"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "initial_access"
+    ],
+    "techniques": [
+      "T1189",
+      "T1059.007"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "apm",
+    "candidates": [
+      "enterprise-crm-portal",
+      "octo-drone-shop",
+      "SOC Application Logs"
+    ]
+  },
+  "falsepositives": [
+    "Security scanning tools during authorized testing",
+    "Developer tools sending debug payloads"
+  ]
+}

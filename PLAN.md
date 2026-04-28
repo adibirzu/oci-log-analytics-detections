@@ -17,7 +17,7 @@ Enhance the OCI Log Analytics project by creating a comprehensive library of det
 - [x] **OCI Specific Rules:** Implemented audit events for IAM, Network, and Compute.
 - [x] **Cloud Guard Integration:** Rules for Cloud Guard problem detection.
 - [x] **OS Level Rules:** Linux suspicious binaries and Windows LOLBins.
-- [ ] **Continuous Expansion:** Target 200+ rules by adapting AWS/GCP rules from SigmaHQ.
+- [x] **Continuous Expansion:** Surpassed 200 source rules and continued expansion through SigmaHQ adaptation and custom content.
 
 ## Phase 4: Dashboard & Visualization ✅
 - [x] **Dashboard Scripting:** `scripts/generate_dashboard_config.py` created.
@@ -28,8 +28,8 @@ Enhance the OCI Log Analytics project by creating a comprehensive library of det
 ## Phase 5: OCI Log Analytics Deployment ✅
 - [x] **Log Source Mapping Fix:** Corrected Cloud Guard, Linux, and Windows log source mappings.
 - [x] **UUID Fix:** Replaced all placeholder UUIDs with proper UUIDs.
-- [x] **Query Regeneration:** All 113 queries regenerated with correct mappings.
-- [x] **Saved Searches:** 58 saved searches deployed to OCI Log Analytics.
+- [x] **Query Regeneration:** Generated query inventory expanded far beyond the initial 113-query milestone.
+- [x] **Saved Searches:** Deployment pipeline matured from the initial 58 saved searches to the current 255-saved-search, 16-dashboard content set documented in the repo.
 - [x] **Dashboards:** 5 dashboards deployed (SOC Overview, OCI Audit, Cloud Guard, Linux, Windows).
 - [x] **Test Data Pipeline:** 279 NDJSON events generated and uploaded for all 113 rules.
 - [x] **Dashboard Widget Fix:** Rewrote saved searches with proper `ui_config`/`scopeFilters` format and embedded in dashboard JSON for `import_dashboard` API.
@@ -75,11 +75,17 @@ Enhance the OCI Log Analytics project by creating a comprehensive library of det
 - [x] **Test Data Expansion:** 360 events (up from 279) covering all 140 rules.
 - [x] **Multicloud Integration:** Export script for ~/dev/multicloudoperations with shared manifest.
 
+## Phase 9: Canonical Inventory Reconciliation ✅
+- [x] **Canonical Source Rule Count:** Verified 454 YAML rules on disk.
+- [x] **Canonical Generated Query Count:** Verified 446 base detection queries, 40 hunting queries, and 20 app/APM queries.
+- [x] **Documentation Reconciliation:** Updated README/PLAN to distinguish source rules from generated query assets.
+- [x] **Catalog Contract Hardening:** Extended `queries/catalog.json` generation with inventory metadata for downstream consumers.
+
 ## Success Criteria
-1.  100+ high-quality detection rules implemented. (Achieved: 140)
-2.  Functional conversion script from Sigma to OCL. (Achieved: Advanced version with STIG metadata)
-3.  Comprehensive documentation. (Achieved)
-4.  Functional SOC Dashboards in OCI. (Achieved: 6 dashboards, 76 saved searches)
-5.  STIG compliance mapping for OCI rules. (Achieved: 15 rules with DoD STIG IDs)
+1.  100+ high-quality detection rules implemented. (Achieved: 454 source YAML rules)
+2.  Functional conversion script from Sigma to OCL. (Achieved: Advanced version with STIG metadata and catalog generation)
+3.  Comprehensive documentation. (Achieved, with canonical inventory reconciled to disk state)
+4.  Functional SOC Dashboards in OCI. (Achieved: 16 dashboards, 255 saved searches documented in the repo)
+5.  STIG compliance mapping for OCI rules. (Achieved: 24 generated detection queries carry STIG mappings, spanning 12 controls)
 6.  Cross-project integration with multicloudoperations. (Achieved: export script + manifest)
 7.  One-click deployment via OCI Resource Manager. (Achieved: Terraform stack with ORM schema)

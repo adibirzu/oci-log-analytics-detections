@@ -17,7 +17,7 @@ This repository ships both source authoring content and generated OCI query asse
 - **Combined MITRE ATT&CK coverage:** 211 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Dashboard inventory:** 16 dashboards with 264 saved searches and 16 advanced visualization widgets
-- **Sample data in repo:** 146,693 events across 14 NDJSON files
+- **Generated demo data:** 2,837 events across 14 NDJSON files in the latest local `test_data/manifest.json`
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 
 Canonical inventory and supporting documentation:
@@ -75,7 +75,7 @@ queries/** -----------------------------------------------> scripts/deploy_dashb
   WAF/LB Access Logs ────────┤                                                    v
   App/Browser Telemetry JSON ─┘                                         SOC Dashboards (16)
                                                                         Saved Searches (264)
-  Test Data (NDJSON) ──> Upload API ──> Log Analytics ──> Dashboard Verification
+  Generated Test Data (NDJSON) ──> Upload API ──> Log Analytics ──> Dashboard Verification
 ```
 
 Browser and app dashboards currently run against `SOC Application Logs`, a custom OCI Log Analytics source created by `scripts/setup_log_sources.py`. The contract intentionally uses OCI LA display names such as `Service Name`, `Trace ID`, `Request URL`, `Response Code`, `Span Name`, `Span Attributes`, and `Referrer` so the queries remain valid against the deployed parser.
@@ -90,7 +90,7 @@ Treat the following as the canonical output contract for downstream integrations
 - `queries/apps/*.json` for mixed app telemetry content
 - `queries/hunting/*.json` for hunting queries
 - `queries/manifest.json` as the generated export/integration artifact
-- `test_data/manifest.json` for checked-in demo dataset counts
+- `test_data/manifest.json` for generated demo dataset counts
 
 Notes:
 
@@ -191,12 +191,12 @@ scripts/
   deploy_dashboard.py           # OCI LA dashboard deployment (16 dashboards / 264 saved searches)
   generate_test_logs.py         # Core security simulation datasets for OCI LA
   generate_geo_health_logs.py   # Multicloud health dataset used by Geographic Health dashboard
-  ingest_test_data.py           # Upload checked-in NDJSON test data to OCI LA
+  ingest_test_data.py           # Upload generated NDJSON test data to OCI LA
   setup_log_sources.py          # Create JSON parsers & custom OCI LA log sources
   generate_catalog.py           # Generate CATALOG.md and catalog.json
   setup_streaming_pipeline.py   # Production OCI Streaming pipeline (5 configured SOC streams in the current environment)
   export_for_multicloud.py      # Integration with multicloudoperations
-test_data/                      # 14 NDJSON demo datasets (146,632 events checked in)
+test_data/                      # 14 generated NDJSON demo datasets (ignored by git)
 stack/                          # OCI Resource Manager (Terraform) stack
 docs/                           # Additional documentation
 ```
@@ -214,10 +214,11 @@ This project deploys to the **OCI-DEMO Landing Zone** MAIN compartments:
 # 1. Set up log sources and JSON parsers
 python3 scripts/setup_log_sources.py
 
-# 2. Generate and ingest test data
-python3 scripts/generate_test_logs.py
-python3 scripts/generate_geo_health_logs.py
-python3 scripts/ingest_test_data.py
+# 2. Generate and ingest demo data
+python3 scripts/generate_test_logs.py --days 1 --validate
+python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5
+python3 scripts/ingest_test_data.py --validate
+python3 scripts/ingest_test_data.py --mode direct
 
 # 3. Optional: reconcile the Streaming -> SCH -> Log Analytics pipeline
 python3 scripts/setup_streaming_pipeline.py
@@ -226,7 +227,8 @@ python3 scripts/validate_pipeline.py --e2e
 # 4. Deploy 16 dashboards with 264 saved searches
 #    The default path validates dashboard queries in OCI Log Analytics first.
 #    Failed, slow, or timed-out query validation blocks dashboard import.
-python3 scripts/deploy_dashboard.py
+#    The dashboard default time range is l24h to match the generated demo data.
+python3 scripts/deploy_dashboard.py --cleanup
 
 # 5. Regenerate inventory artifacts
 python3 scripts/generate_catalog.py
@@ -241,6 +243,7 @@ python3 scripts/deploy_dashboard.py --dry-run
 python3 scripts/deploy_dashboard.py --export-inventory
 python3 scripts/ingest_test_data.py --validate
 python3 scripts/setup_log_sources.py --validate
+python3 scripts/smoke_test_bluelight.py --lookback 24h
 python3 scripts/validate_pipeline.py --e2e
 ```
 

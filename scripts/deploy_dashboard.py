@@ -68,6 +68,8 @@ ADVANCED_VISUALIZATION_TYPES = {
 }
 
 DASHBOARD_INVENTORY_PATH = os.path.join(QUERIES_DIR, "dashboard_inventory.json")
+DEFAULT_DASHBOARD_TIME_PERIOD = "l24h"
+DEFAULT_QUERY_VALIDATION_LOOKBACK = "24h"
 
 
 # ─── Dashboard Definitions ────────────────────────────────────────
@@ -659,7 +661,7 @@ def resolve_widget_ui_config(widget, query_info):
         "showTitle": widget.get("show_title", dashboard_meta.get("showTitle", True)),
         "timeSelection": widget.get(
             "time_selection",
-            dashboard_meta.get("timeSelection", {"timePeriod": "l60min"}),
+            dashboard_meta.get("timeSelection", {"timePeriod": DEFAULT_DASHBOARD_TIME_PERIOD}),
         ),
         "visualizationOptions": visualization_options,
         "visualizationType": visualization_type,
@@ -679,7 +681,7 @@ def build_saved_search_json(search_id, title, query, description="", tags=None, 
             "queryString": query,
             "scopeFilters": build_scope_filters(COMPARTMENT_ID),
             "showTitle": True,
-            "timeSelection": {"timePeriod": "l60min"},
+            "timeSelection": {"timePeriod": DEFAULT_DASHBOARD_TIME_PERIOD},
             "visualizationOptions": {},
             "visualizationType": "table",
             "vizType": "lxSavedSearchWidgetType",
@@ -814,7 +816,7 @@ def build_dashboard_json(dashboard_id, name, description, widgets, widget_querie
                 "paramName": "time",
                 "displayName": "Time Range",
                 "paramType": "Time",
-                "defaultValue": "l60min",
+                "defaultValue": DEFAULT_DASHBOARD_TIME_PERIOD,
                 "isRequired": False,
             },
         ],
@@ -987,7 +989,13 @@ def resolve_validation_namespace(client_timeout):
     return get_namespace(la_client)
 
 
-def validate_inventory_queries_in_oci(inventory, lookback="7d", query_timeout=60, progress=False, isolated=True):
+def validate_inventory_queries_in_oci(
+    inventory,
+    lookback=DEFAULT_QUERY_VALIDATION_LOOKBACK,
+    query_timeout=60,
+    progress=False,
+    isolated=True,
+):
     """Validate every unique inventory query in OCI before dashboard import."""
     namespace = resolve_validation_namespace(query_timeout)
     la_client = None if isolated else get_la_client(timeout=(10, query_timeout))
@@ -1064,7 +1072,13 @@ def cleanup_soc_content(md_client):
 
 # ─── Main Deploy ──────────────────────────────────────────────────
 
-def deploy(cleanup=False, dry_run=False, live_validate=True, query_lookback="7d", query_timeout=60):
+def deploy(
+    cleanup=False,
+    dry_run=False,
+    live_validate=True,
+    query_lookback=DEFAULT_QUERY_VALIDATION_LOOKBACK,
+    query_timeout=60,
+):
     print("=" * 60)
     print("OCI Log Analytics - SOC Dashboard Deployment")
     print("=" * 60)
@@ -1189,7 +1203,7 @@ if __name__ == "__main__":
                         help='Output path for --export-inventory')
     parser.add_argument('--skip-live-validation', action='store_true',
                         help='Skip live OCI query validation before dashboard import')
-    parser.add_argument('--query-lookback', default='7d',
+    parser.add_argument('--query-lookback', default=DEFAULT_QUERY_VALIDATION_LOOKBACK,
                         help='Lookback window for live OCI query validation')
     parser.add_argument('--query-timeout', type=int, default=60,
                         help='Per-query timeout in seconds for live OCI query validation')

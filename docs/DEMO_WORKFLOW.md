@@ -222,13 +222,21 @@ Use this path instead of running the individual generator, ingest, and deploy sc
 
 ### Trigger Attack Simulation (via Control Plane API)
 ```bash
-# Canonical 14-day refresh flow
+# Canonical 24-hour dashboard refresh flow
+python3 scripts/setup_log_sources.py
+python3 scripts/generate_test_logs.py --days 1 --validate
+python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5
+python3 scripts/ingest_test_data.py --validate
+python3 scripts/ingest_test_data.py --mode direct
+python3 scripts/smoke_test_bluelight.py --lookback 24h
+python3 scripts/deploy_dashboard.py --cleanup
+
+# Optional extended 14-day refresh flow
 python3 scripts/populate_dashboard_data_14d.py --validate
 
-# Or run individual steps when debugging
+# Or run individual extended-data steps when debugging
 python3 scripts/generate_dashboard_data.py --days 14 --validate
 python3 scripts/ingest_test_data.py
-python3 scripts/deploy_dashboard.py --cleanup
 python3 scripts/demo_readiness.py --lookback 14d
 
 # Or trigger via the canonical public Control Plane
@@ -240,14 +248,15 @@ curl -X POST https://cp.octodemo.cloud/api/demo-events/trigger \
 
 ### Verify Dashboard Data
 ```bash
-python3 scripts/demo_readiness.py --lookback 14d
-python3 scripts/query_audit.py --lookback 14d --eligible-only --out /tmp/eligible_query_audit_14d.json
+python3 scripts/smoke_test_bluelight.py --lookback 24h
+python3 scripts/demo_readiness.py --lookback 24h
+python3 scripts/query_audit.py --lookback 24h --eligible-only --out /tmp/eligible_query_audit_24h.json
 ```
 
 ### Refresh Dashboards
 ```bash
-python3 scripts/deploy_dashboard.py     # Redeploy all 16 dashboards
-python3 scripts/generate_catalog.py     # Regenerate catalog
+python3 scripts/deploy_dashboard.py --cleanup  # Recreate all 16 dashboards after OCI query validation
+python3 scripts/generate_catalog.py            # Regenerate catalog
 ```
 
 ---
@@ -324,17 +333,17 @@ python3 scripts/generate_catalog.py     # Regenerate catalog
 | Curated app telemetry analytics | 16 | 2 | App 360 correlation, WAF-to-trace pivots, service health, APM/WAF showcase views |
 | Hunting analytics | 45 | 4 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation |
 | STIG-mapped detections | 24 | 1 | Continuous control monitoring for IAM, network, audit, and key management |
-| Sample datasets | 14 files / 146,632 events | Demo enablement | Includes app telemetry and the 14-day multicloud geo-health data for the geographic dashboard |
+| Sample datasets | 14 generated files / 2,837 events | Demo enablement | Includes app telemetry and 60 minutes of multicloud geo-health data for the geographic dashboard |
 | **Total shipped query artifacts** | **515** | **16** | **211 MITRE techniques across 14 tactics** |
 
 ---
 
 ## Demo Tips
 
-1. **Set time range to "Last 7 days"** on all dashboards to see test data
+1. **Set time range to "Last 24 hours"** on all dashboards to see the generated demo data
 2. **Use the Ops Portal** for one-click event generation — no SSH needed
 3. **Start with Scenario 1** for executive audiences, skip to Scenario 3 for security teams
 4. **The BLUELIGHT scenario** is the strongest differentiator — show the SPL→OCL conversion
 5. **Browser attack detection** is powered by the custom `SOC Application Logs` telemetry surface, so explain the parser/source model rather than implying native OCI APM coverage
-6. **If a dashboard is empty**, run `python3 scripts/ingest_test_data.py` to refresh test data
+6. **If a dashboard is empty**, regenerate and ingest with `python3 scripts/generate_test_logs.py --days 1 --validate`, `python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5`, and `python3 scripts/ingest_test_data.py --mode direct`
 7. **Each query JSON includes** `splunk_original` for Splunk comparison during demos

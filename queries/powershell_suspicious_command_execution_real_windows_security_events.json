@@ -1,0 +1,35 @@
+{
+  "title": "PowerShell: Suspicious Command Execution (Real Windows Security Events)",
+  "description": "Detects suspicious PowerShell commands in Windows Security Event 4688 process creation logs. Covers download cradles, encoded execution, AMSI bypass, credential access, and common attack framework commands. Optimized for real Windows Security Events (not Sysmon) using Original Log Content matching.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 4688 and 'New Process Name' like '*\\\\powershell.exe') and ( (('Command Line' like '*DownloadString*' or 'Command Line' like '*DownloadFile*' or 'Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*iwr *' or 'Command Line' like '*wget *' or 'Command Line' like '*curl *' or 'Command Line' like '*Net.WebClient*' or 'Command Line' like '*Start-BitsTransfer*')) or (('Command Line' like '*-enc *' or 'Command Line' like '*-EncodedCommand*' or 'Command Line' like '*-e *' or 'Command Line' like '*FromBase64String*' or 'Command Line' like '*ToBase64String*')) or (('Command Line' like '*AmsiUtils*' or 'Command Line' like '*amsiInitFailed*' or 'Command Line' like '*Reflection.Assembly*' or 'Command Line' like '*SetValue($null,$true)*')) or (('Command Line' like '*Get-Credential*' or 'Command Line' like '*Mimikatz*' or 'Command Line' like '*sekurlsa*' or 'Command Line' like '*lsadump*' or 'Command Line' like '*Invoke-Mimikatz*' or 'Command Line' like '*Get-GPPPassword*' or 'Command Line' like '*Find-LocalAdminAccess*')) or (('Command Line' like '*Get-DomainUser*' or 'Command Line' like '*Get-DomainGroup*' or 'Command Line' like '*Get-DomainComputer*' or 'Command Line' like '*Get-NetUser*' or 'Command Line' like '*Get-NetGroup*' or 'Command Line' like '*Get-NetComputer*' or 'Command Line' like '*Invoke-ShareFinder*' or 'Command Line' like '*Invoke-Kerberoast*' or 'Command Line' like '*Invoke-BloodHound*')) ))",
+  "sigma_id": "ps-cmd-t1059-001",
+  "level": "high",
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.execution",
+    "attack.t1059.001",
+    "attack.t1086"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1059.001",
+      "T1086"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security",
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
+  },
+  "falsepositives": [
+    "IT automation scripts using encoded PowerShell",
+    "Security tools performing legitimate AD queries"
+  ]
+}

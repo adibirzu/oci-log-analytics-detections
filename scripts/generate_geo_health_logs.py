@@ -2,7 +2,7 @@
 Generate synthetic multicloud health heartbeat logs for Geographic Health visualization.
 
 Produces NDJSON logs representing health heartbeats from instances across
-OCI, Azure, and GCP regions worldwide. Each log includes lat/lon coordinates,
+OCI, Azure, AWS, and GCP regions worldwide. Each log includes lat/lon coordinates,
 cloud provider, region, instance metadata, and health metrics — suitable for
 plotting on a global map widget in OCI Log Analytics.
 
@@ -26,6 +26,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oci_config import COMPARTMENT_ID
+from test_data_manifest import rebuild_manifest
 
 PROJECT_DIR = Path(__file__).parent.parent
 OUTPUT_DIR = PROJECT_DIR / 'test_data'
@@ -81,6 +82,21 @@ GCP_REGIONS = [
     {"region": "me-west1",           "display": "Middle East (Tel Aviv)",  "lat": 32.0853, "lon": 34.7818, "country": "IL"},
 ]
 
+AWS_REGIONS = [
+    {"region": "us-east-1",          "display": "US East (N. Virginia)",   "lat": 38.9072, "lon": -77.0369, "country": "US"},
+    {"region": "us-east-2",          "display": "US East (Ohio)",          "lat": 39.9612, "lon": -82.9988, "country": "US"},
+    {"region": "us-west-2",          "display": "US West (Oregon)",        "lat": 45.5152, "lon": -122.6784, "country": "US"},
+    {"region": "eu-west-1",          "display": "Europe (Ireland)",        "lat": 53.3498, "lon": -6.2603, "country": "IE"},
+    {"region": "eu-central-1",       "display": "Europe (Frankfurt)",      "lat": 50.1109, "lon": 8.6821, "country": "DE"},
+    {"region": "eu-west-2",          "display": "Europe (London)",         "lat": 51.5074, "lon": -0.1278, "country": "GB"},
+    {"region": "ap-south-1",         "display": "Asia Pacific (Mumbai)",   "lat": 19.0760, "lon": 72.8777, "country": "IN"},
+    {"region": "ap-southeast-1",     "display": "Asia Pacific (Singapore)","lat": 1.3521,  "lon": 103.8198, "country": "SG"},
+    {"region": "ap-northeast-1",     "display": "Asia Pacific (Tokyo)",    "lat": 35.6762, "lon": 139.6503, "country": "JP"},
+    {"region": "ap-southeast-2",     "display": "Asia Pacific (Sydney)",   "lat": -33.8688,"lon": 151.2093, "country": "AU"},
+    {"region": "sa-east-1",          "display": "South America (Sao Paulo)","lat": -23.5505,"lon": -46.6333, "country": "BR"},
+    {"region": "ca-central-1",       "display": "Canada (Central)",        "lat": 45.4215, "lon": -75.6972, "country": "CA"},
+]
+
 # ─── Instance Templates ──────────────────────────────────────────
 
 INSTANCE_ROLES = [
@@ -97,9 +113,11 @@ INSTANCE_ROLES = [
 ]
 
 
-def ts(offset_minutes=0):
-    """Generate ISO8601 timestamp with optional offset from BASE_TIME."""
-    t = BASE_TIME + timedelta(minutes=offset_minutes, seconds=random.randint(0, 59))
+def ts(offset_minutes=0, base_time=None):
+    """Generate ISO8601 timestamp with optional offset from a base time."""
+    if base_time is None:
+        base_time = BASE_TIME
+    t = base_time + timedelta(minutes=offset_minutes, seconds=random.randint(0, 59))
     return t.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
 
@@ -108,10 +126,16 @@ def generate_instance_id(cloud, region_info):
     hex8 = uuid.uuid4().hex[:8]
     if cloud == "OCI":
         return f"ocid1.instance.oc1.{region_info['region']}.{uuid.uuid4().hex[:40]}"
-    elif cloud == "Azure":
+    if cloud == "Azure":
         return f"/subscriptions/{uuid.uuid4().hex[:8]}-xxxx/resourceGroups/rg-prod/providers/Microsoft.Compute/virtualMachines/vm-{hex8}"
-    else:  # GCP
-        return f"projects/prod-project/zones/{region_info['region']}-a/instances/vm-{hex8}"
+    if cloud == "AWS":
+        return f"i-{uuid.uuid4().hex[:17]}"
+    # GCP
+    if region_info["region"].count("-") == 2:
+        zone = f"{region_info['region']}-a"
+    else:
+        zone = region_info["region"]
+    return f"projects/prod-project/zones/{zone}/instances/vm-{hex8}"
 
 
 def generate_private_ip():
@@ -165,7 +189,12 @@ def build_instance_fleet():
     fleet = []
     instance_idx = 0
 
-    for cloud, regions in [("OCI", OCI_REGIONS), ("Azure", AZURE_REGIONS), ("GCP", GCP_REGIONS)]:
+    for cloud, regions in [
+        ("OCI", OCI_REGIONS),
+        ("Azure", AZURE_REGIONS),
+        ("AWS", AWS_REGIONS),
+        ("GCP", GCP_REGIONS),
+    ]:
         for region_info in regions:
             # 2-3 instances per region
             n_instances = random.choice([2, 2, 3])
@@ -190,6 +219,7 @@ def build_instance_fleet():
                     "instance_type": {
                         "OCI": random.choice(["VM.Standard.E4.Flex", "VM.Standard3.Flex", "VM.Standard.A1.Flex", "BM.Standard3.64"]),
                         "Azure": random.choice(["Standard_D4s_v5", "Standard_E4s_v5", "Standard_B2ms", "Standard_F4s_v2"]),
+                        "AWS": random.choice(["m6i.xlarge", "c6i.xlarge", "r6i.xlarge", "t3.large"]),
                         "GCP": random.choice(["e2-standard-4", "n2-standard-4", "c2-standard-4", "t2a-standard-4"]),
                     }[cloud],
                 })
@@ -198,12 +228,12 @@ def build_instance_fleet():
     return fleet
 
 
-def generate_heartbeat(instance, offset_minutes, status="healthy"):
+def generate_heartbeat(instance, offset_minutes, status="healthy", base_time=None):
     """Generate a single health heartbeat log event."""
     metrics = generate_health_metrics(status)
 
     return {
-        "Timestamp": ts(offset_minutes),
+        "Timestamp": ts(offset_minutes, base_time=base_time),
         "Cloud Provider": instance["cloud_provider"],
         "Region": instance["region"],
         "Region Display": instance["region_display"],
@@ -248,6 +278,7 @@ def generate_all_heartbeats(interval_minutes=5, duration_minutes=60,
     fleet = build_instance_fleet()
     events = []
     n_beats = duration_minutes // interval_minutes
+    window_start = datetime.now(timezone.utc) - timedelta(minutes=duration_minutes)
 
     # Pre-select a few instances that will have issues (persistent, not random)
     n_degraded_instances = max(1, int(len(fleet) * degraded_pct / 100))
@@ -267,7 +298,7 @@ def generate_all_heartbeats(interval_minutes=5, duration_minutes=60,
             else:
                 status = "healthy"
 
-            event = generate_heartbeat(instance, offset, status)
+            event = generate_heartbeat(instance, offset, status, base_time=window_start)
             event["Heartbeat Sequence"] = beat_idx + 1
 
             # Human-readable message
@@ -303,6 +334,8 @@ def write_output(events, fleet):
         for event in events:
             f.write(json.dumps(event) + '\n')
 
+    manifest = rebuild_manifest(OUTPUT_DIR)
+
     # Summary stats
     cloud_counts = {}
     region_counts = {}
@@ -317,6 +350,7 @@ def write_output(events, fleet):
     print(f"{'═' * 65}")
     print(f"  Output:     {output_file}")
     print(f"  Events:     {len(events):,}")
+    print(f"  Manifest:   {OUTPUT_DIR / 'manifest.json'} ({manifest['total_events']:,} total events)")
     print(f"  Instances:  {len(fleet)}")
     print(f"  Regions:    {len(region_counts)}")
     print(f"{'─' * 65}")

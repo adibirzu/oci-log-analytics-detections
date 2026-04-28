@@ -1,7 +1,7 @@
 {
   "title": "Security Attack Source IP Analysis",
   "description": "Top attacking IPs across both applications with attack type distribution and severity breakdown. Enables IP-based threat intelligence correlation and firewall rule recommendations.",
-  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and 'security.attack.detected' = true | stats count as Attacks, distinctcount('security.attack.type') as UniqueAttackTypes, unique('security.attack.type') as AttackTypes, distinctcount('service.name') as TargetedServices by 'security.source_ip' | sort -Attacks | head 25",
+  "query": "'Log Source' = 'SOC Application Logs' and 'Attack Type' != null | stats count as Attacks, distinctcount('Attack Type') as UniqueAttackTypes, unique('Attack Type') as AttackTypes, distinctcount('Service Name') as TargetedServices by 'Client IP' | sort -Attacks | head 25",
   "level": "high",
   "tags": ["threat.intelligence", "security.source_ip", "attack.correlation"],
   "mitre_attack": {

@@ -2,6 +2,7 @@
 """Rule quality auditor implementing the Zen of Security Rules principles.
 
 Scans all YAML rules and flags quality issues:
+0. Invalid YAML that prevents source rules from loading
 1. IOC-only rules (process name match without behavioral context)
 2. Missing falsepositives field
 3. Missing MITRE tags
@@ -27,10 +28,11 @@ RULES_DIR = PROJECT_DIR / "rules"
 QUERIES_DIR = PROJECT_DIR / "queries"
 
 
-def load_all_rules():
-    """Load all YAML rules with their paths."""
+def load_all_rules(rules_dir=RULES_DIR):
+    """Load all YAML rules with their paths and collect parse failures."""
     rules = []
-    for root, dirs, files in os.walk(RULES_DIR):
+    errors = []
+    for root, dirs, files in os.walk(rules_dir):
         for f in sorted(files):
             if f.endswith(".yaml") or f.endswith(".yml"):
                 path = os.path.join(root, f)
@@ -42,18 +44,26 @@ def load_all_rules():
                         rules.append(rule)
                 except Exception as e:
                     print(f"  Error loading {path}: {e}")
-    return rules
+                    errors.append({
+                        "rule": os.path.relpath(path, rules_dir),
+                        "path": path,
+                        "issue": f"Invalid YAML: {str(e).splitlines()[0]}",
+                        "severity": "critical",
+                    })
+    return rules, errors
 
 
-def load_all_queries():
-    """Load all generated JSON queries."""
+def load_all_queries(queries_dir=QUERIES_DIR):
+    """Load all source-derived generated JSON queries."""
     queries = []
-    for f in sorted(QUERIES_DIR.glob("*.json")):
+    for f in sorted(queries_dir.rglob("*.json")):
         if f.name in ("manifest.json", "catalog.json"):
             continue
         with open(f) as fh:
             data = json.load(fh)
-            data["_file"] = f.name
+            if not data.get("sigma_id"):
+                continue
+            data["_file"] = str(f.relative_to(queries_dir))
             queries.append(data)
     return queries
 
@@ -236,12 +246,12 @@ def main():
     print("  Rule Quality Audit")
     print("=" * 60)
 
-    rules = load_all_rules()
+    rules, load_errors = load_all_rules()
     queries = load_all_queries()
     print(f"\n  Rules: {len(rules)}")
     print(f"  Queries: {len(queries)}")
 
-    all_issues = []
+    all_issues = list(load_errors)
 
     print("\n  Running checks:")
     checks = [
@@ -259,6 +269,9 @@ def main():
         all_issues.extend(issues)
         status = f"{len(issues)} issues" if issues else "OK"
         print(f"    {name:30s} {status}")
+
+    if load_errors:
+        print(f"    {'Invalid YAML':30s} {len(load_errors)} issues")
 
     print(f"\n  Total issues: {len(all_issues)}")
 

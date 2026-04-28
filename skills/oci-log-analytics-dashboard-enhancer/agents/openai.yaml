@@ -1,0 +1,4 @@
+interface:
+  display_name: "OCI LA Dashboard Enhancer"
+  short_description: "Enhance OCI LA dashboards and visuals"
+  default_prompt: "Use $oci-log-analytics-dashboard-enhancer to improve an OCI Log Analytics dashboard, choose the right visualization, and wire any needed drilldowns or detection rules."

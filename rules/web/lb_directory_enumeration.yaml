@@ -1,6 +1,7 @@
 title: Web Directory Enumeration Detected
 id: a1010011-owasp-a01-direnum-001
 status: stable
+version: 1
 description: Detects directory and file enumeration attempts via high volume of 404 responses to common admin/config paths. OWASP A01:2021 Broken Access Control.
 logsource:
   product: oci

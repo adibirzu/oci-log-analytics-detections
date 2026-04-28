@@ -1,6 +1,7 @@
 title: WAF XML External Entity Attack Blocked
 id: a1010007-owasp-a05-xxe-block-001
 status: stable
+version: 1
 description: Detects XXE (XML External Entity) injection attempts blocked by WAF. Attackers exploit XML parsers to read files, perform SSRF, or execute denial of service.
 logsource:
   product: oci

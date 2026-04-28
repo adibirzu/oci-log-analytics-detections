@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Coverage gap analyzer: compare MITRE technique coverage against Elastic's detection rules.
 
-Reads Elastic detection-rules TOML files and cross-references against our manifest.json
-to identify MITRE techniques we're missing.
+Reads Elastic detection-rules TOML files and cross-references against our
+canonical catalog (falling back to manifest.json for older checkouts) to
+identify MITRE techniques we're missing.
 
 Usage:
   python3 scripts/analyze_elastic_coverage.py --repo /path/to/elastic/detection-rules
@@ -18,6 +19,7 @@ from collections import defaultdict
 from pathlib import Path
 
 PROJECT_DIR = Path(__file__).parent.parent
+CATALOG_PATH = PROJECT_DIR / "queries" / "catalog.json"
 MANIFEST_PATH = PROJECT_DIR / "queries" / "manifest.json"
 
 # Built-in catalog of Elastic Windows rule technique coverage (from analysis of 463 rules).
@@ -136,13 +138,19 @@ ELASTIC_WINDOWS_TECHNIQUES = {
 
 
 def load_our_techniques():
-    """Load MITRE techniques from our manifest.json."""
-    if not MANIFEST_PATH.exists():
-        print(f"  Warning: {MANIFEST_PATH} not found, running with empty set")
-        return set()
-    with open(MANIFEST_PATH) as f:
-        manifest = json.load(f)
-    return set(manifest.get("mitre_techniques", []))
+    """Load MITRE techniques from catalog.json, falling back to manifest.json."""
+    if CATALOG_PATH.exists():
+        with open(CATALOG_PATH) as f:
+            catalog = json.load(f)
+        return set(catalog.get("mitre_techniques", []))
+
+    if MANIFEST_PATH.exists():
+        with open(MANIFEST_PATH) as f:
+            manifest = json.load(f)
+        return set(manifest.get("mitre_techniques", []))
+
+    print(f"  Warning: neither {CATALOG_PATH} nor {MANIFEST_PATH} exists; running with empty set")
+    return set()
 
 
 def analyze_elastic_repo(repo_path):

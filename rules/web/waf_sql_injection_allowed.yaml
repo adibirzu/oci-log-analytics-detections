@@ -1,6 +1,7 @@
 title: WAF SQL Injection Attack Allowed Through
 id: a1010002-owasp-a03-sqli-allow-001
 status: stable
+version: 1
 description: Detects SQL injection attempts that were ALLOWED through WAF (detection-only mode or rule bypass). Critical alert indicating potential successful exploitation.
 logsource:
   product: oci

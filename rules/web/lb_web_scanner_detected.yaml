@@ -1,6 +1,7 @@
 title: Web Vulnerability Scanner Detected
 id: a1010009-owasp-recon-scanner-001
 status: stable
+version: 1
 description: Detects known web vulnerability scanner user agents in Load Balancer access logs. Indicates active reconnaissance against the web application.
 logsource:
   product: oci

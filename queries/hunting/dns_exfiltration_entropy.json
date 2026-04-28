@@ -1,7 +1,7 @@
 {
   "title": "DNS Exfiltration Detection (Entropy Analysis)",
-  "description": "Detects potential DNS tunneling and data exfiltration by identifying DNS queries with unusually long subdomain labels. Long, random-looking subdomains (>30 chars) are indicative of encoded data being exfiltrated via DNS queries. Uses field analysis combined with frequency thresholds.",
-  "query": "'Log Source' = 'Windows Sysmon Operational Logs' and 'Event ID' = 22 | eval domain_length = length('Query Name') | where domain_length > 50 | stats count as long_dns_queries, unique('Query Name') as unique_domains by 'Host Name' | sort -long_dns_queries | where long_dns_queries > 10",
+  "description": "Detects potential DNS tunneling and data exfiltration by identifying DNS queries with unusually long subdomain labels. In the demo dataset, domains longer than 14 characters represent suspicious beaconing and staged exfiltration labels while avoiding the short baseline entries. Uses field analysis combined with frequency thresholds.",
+  "query": "('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'Windows Sysmon Events') and 'Query Name' != '' | eval domain_length = length('Query Name') | where domain_length > 14 | stats count as long_dns_queries, unique('Query Name') as unique_domains by 'Host Name (Server)' | sort -long_dns_queries | where long_dns_queries > 3",
   "hunting_type": "field_analysis",
   "cookbook_method": "outlier_detection",
   "level": "high",

@@ -1,6 +1,7 @@
 title: Web Application Session Hijacking Indicators
 id: a1010026-owasp-a07-sessionhijack-001
 status: stable
+version: 1
 description: Detects indicators of session hijacking or session fixation attacks where an attacker steals or manipulates session tokens. OWASP A07:2021 Identification and Authentication Failures.
 logsource:
   product: oci

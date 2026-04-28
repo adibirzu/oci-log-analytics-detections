@@ -1,6 +1,7 @@
 title: WAF Server-Side Template Injection Blocked
 id: a1010024-owasp-a03-ssti-block-001
 status: stable
+version: 1
 description: Detects Server-Side Template Injection (SSTI) attempts blocked by WAF. Attackers inject template syntax to achieve remote code execution via template engines (Jinja2, Twig, Freemarker).
 logsource:
   product: oci

@@ -1,6 +1,7 @@
 title: WAF Web Shell Upload Attempt Blocked
 id: a1010021-owasp-a03-webshell-001
 status: stable
+version: 1
 description: Detects attempts to upload web shell files blocked by WAF. Web shells provide persistent remote access through the web server. OWASP A03:2021 Injection.
 logsource:
   product: oci

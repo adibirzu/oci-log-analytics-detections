@@ -1,6 +1,7 @@
 title: Sensitive Data Endpoint Access
 id: a1010012-owasp-a02-dataexposure-001
 status: stable
+version: 1
 description: Detects access to endpoints that may expose sensitive data (database exports, configuration files, backup files). OWASP A02:2021 Cryptographic Failures / A01 Broken Access Control.
 logsource:
   product: oci

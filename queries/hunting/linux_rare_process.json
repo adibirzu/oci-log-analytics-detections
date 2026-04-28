@@ -1,7 +1,7 @@
 {
   "title": "Linux Rare Process Detection (Stacking)",
-  "description": "Identifies rarely-seen processes on Linux endpoints. Uses the rare value hunting technique (Threat Hunter's Cookbook: Sorting/Stacking method) to surface processes that appear fewer than 3 times, which may indicate attacker tooling, post-exploitation binaries, or unauthorized software.",
-  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') | stats count as executions by 'Process Name' | sort executions | where executions < 3",
+  "description": "Identifies rarely-seen processes on Linux endpoints. Uses the rare value hunting technique (Threat Hunter's Cookbook: Sorting/Stacking method) to surface processes that appear fewer than 100 times across the active search window, which keeps the demo resilient for a 14-day dataset and repeated reingestion while still surfacing uncommon tooling.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') | stats count as executions by 'Process Name' | sort executions | where executions < 100",
   "hunting_type": "rare_value",
   "cookbook_method": "sorting_stacking",
   "level": "medium",

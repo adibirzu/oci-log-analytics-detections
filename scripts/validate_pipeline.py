@@ -4,8 +4,8 @@ Comprehensive health check for the OCI Streaming → Log Analytics pipeline.
 
 Checks:
   1. Config consistency — streaming_config.json vs env vars
-  2. Streams ACTIVE    — all 4 SOC streams exist and are ACTIVE
-  3. Connectors ACTIVE — all 4 SCH connectors exist and are ACTIVE
+  2. Streams ACTIVE    — expected SOC streams exist and are ACTIVE
+  3. Connectors ACTIVE — expected SCH connectors exist and are ACTIVE
   4. Log group exists  — target log group is accessible
   5. Connector routing — each SCH targets the correct log group + log source
   6. E2E flow test     — (optional) publish test message and verify delivery
@@ -30,20 +30,20 @@ from oci_config import (
     _cfg,
     get_la_client, get_oci_config, get_streaming_admin_client, get_sch_client,
     get_namespace, require_oci_config,
+    CORE_SOC_STREAMS, get_expected_stream_names,
 )
+from oci_time import build_time_window
 
 STREAMING_CONFIG_PATH = os.path.join(PROJECT_DIR, 'config', 'streaming_config.json')
-
-EXPECTED_STREAMS = [
-    "soc-detection-oci-audit",
-    "soc-detection-cloud-guard",
-    "soc-detection-linux-audit",
-    "soc-detection-windows-sysmon",
-]
 
 
 def _icon(ok):
     return "OK" if ok else "FAIL"
+
+
+def _expected_streams():
+    """Return the currently expected SOC streams for pipeline validation."""
+    return get_expected_stream_names()
 
 
 # ─── Check 1: Config consistency (offline) ────────────────────
@@ -98,10 +98,14 @@ def check_config_consistency():
 
     # Stream count
     stream_count = sum(1 for k in cfg if k != "_metadata")
-    if stream_count >= 4:
+    expected_streams = get_expected_stream_names(cfg)
+    if stream_count >= len(expected_streams):
         print(f"  [{_icon(True)} ] streams: {stream_count} configured")
     else:
-        print(f"  [{_icon(False)}] streams: only {stream_count} configured (expected 4)")
+        print(
+            f"  [{_icon(False)}] streams: only {stream_count} configured "
+            f"(expected {len(expected_streams)})"
+        )
         all_ok = False
 
     return all_ok
@@ -110,12 +114,12 @@ def check_config_consistency():
 # ─── Check 2: Streams ACTIVE (online) ────────────────────────
 
 def check_streams_active():
-    """Verify all 4 SOC streams are ACTIVE."""
+    """Verify the expected SOC streams are ACTIVE."""
     print("\n[2] Streams ACTIVE")
     stream_admin = get_streaming_admin_client()
     all_ok = True
 
-    for name in EXPECTED_STREAMS:
+    for name in _expected_streams():
         streams = stream_admin.list_streams(
             compartment_id=COMPARTMENT_ID, name=name, lifecycle_state="ACTIVE"
         ).data
@@ -131,12 +135,12 @@ def check_streams_active():
 # ─── Check 3: Connectors ACTIVE (online) ─────────────────────
 
 def check_connectors_active():
-    """Verify all 4 SCH connectors are ACTIVE."""
+    """Verify the expected SCH connectors are ACTIVE."""
     print("\n[3] Service Connectors ACTIVE")
     sch = get_sch_client()
     all_ok = True
 
-    for stream_name in EXPECTED_STREAMS:
+    for stream_name in _expected_streams():
         connector_name = f"sch-{stream_name}-to-la"
         connectors = sch.list_service_connectors(
             compartment_id=COMPARTMENT_ID, display_name=connector_name
@@ -198,7 +202,7 @@ def check_connector_routing(la_client, namespace):
             cfg = json.load(f)
         expected_lg = cfg.get("_metadata", {}).get("log_group_id", "")
 
-    for stream_name in EXPECTED_STREAMS:
+    for stream_name in _expected_streams():
         connector_name = f"sch-{stream_name}-to-la"
         connectors = sch.list_service_connectors(
             compartment_id=COMPARTMENT_ID, display_name=connector_name
@@ -249,7 +253,7 @@ def check_e2e_flow(la_client, namespace):
 
     # Pick the first available stream
     test_stream = None
-    for name in EXPECTED_STREAMS:
+    for name in _expected_streams():
         if name in cfg:
             test_stream = name
             break
@@ -304,6 +308,7 @@ def check_e2e_flow(la_client, namespace):
 
     # Query Log Analytics for the marker
     try:
+        time_start, time_end = build_time_window("5m")
         query = f"'{marker}' | stats count as hits"
         resp = la_client.query(
             namespace_name=namespace,
@@ -311,15 +316,9 @@ def check_e2e_flow(la_client, namespace):
                 compartment_id=COMPARTMENT_ID,
                 query_string=query,
                 time_filter=oci.log_analytics.models.TimeRange(
-                    time_start=time.strftime(
-                        "%Y-%m-%dT%H:%M:%S.000Z",
-                        time.gmtime(time.time() - 300)
-                    ),
-                    time_end=time.strftime(
-                        "%Y-%m-%dT%H:%M:%S.000Z",
-                        time.gmtime()
-                    ),
-                    type="ABSOLUTE",
+                    time_start=time_start,
+                    time_end=time_end,
+                    time_zone="UTC",
                 ),
                 sub_system="LOG",
             ),

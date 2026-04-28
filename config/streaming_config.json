@@ -17,17 +17,22 @@
   "soc-detection-windows-sysmon": {
     "stream_id": "ocid1.stream.oc1..example",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
-    "log_source": "Windows Sysmon Events"
+    "log_source": "SOC Windows Sysmon Logs"
+  },
+  "soc-detection-multicloud-health": {
+    "stream_id": "ocid1.stream.oc1..example",
+    "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
+    "log_source": "SOC Multicloud Health Logs"
   },
   "_metadata": {
     "log_group_id": "ocid1.loganalyticsloggroup.oc1..example",
     "la_namespace": "<LA_NAMESPACE>",
     "compartment_id": "ocid1.compartment.oc1..example",
     "connector_summary": {
-      "expected": 4,
-      "active": 2,
+      "expected": 5,
+      "active": 5,
       "pending": 0,
-      "degraded": 2,
+      "degraded": 0,
       "failed": 0
     }
   }

@@ -3,8 +3,9 @@ id: apm-browser-xss-001
 status: stable
 description: >
   Detects XSS attack payloads in HTTP URLs, query parameters, and request bodies
-  captured by OCI APM and OpenTelemetry instrumentation. Covers reflected, stored,
-  and DOM-based XSS vectors including script injection, event handlers, and javascript: URIs.
+  captured by the SOC Application Logs parser from OpenTelemetry-shaped
+  browser/application telemetry. Covers reflected, stored, and DOM-based XSS
+  vectors including script injection, event handlers, and javascript: URIs.
 references:
   - https://owasp.org/www-community/attacks/xss/
   - https://attack.mitre.org/techniques/T1059/007/

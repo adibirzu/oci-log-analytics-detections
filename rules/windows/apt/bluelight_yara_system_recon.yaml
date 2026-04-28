@@ -9,7 +9,7 @@ description: >
 references:
   - https://github.com/Neo23x0/signature-base/blob/master/yara/apt_apt37_bluelight.yar
   - https://www.volexity.com/blog/2021/08/17/north-korean-apt-inkysquid-infects-victims-using-browser-exploits/
-author: SOC Detection Engineering (YARA source: threatintel@volexity.com)
+author: "SOC Detection Engineering (YARA source: threatintel@volexity.com)"
 date: 2026/03/19
 logsource:
   product: windows

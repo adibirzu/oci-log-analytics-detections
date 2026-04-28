@@ -11,8 +11,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from deploy_dashboard import (
     DASHBOARDS,
     SUPPORTED_VISUALIZATION_TYPES,
+    build_dashboard_inventory,
     build_dashboard_json,
     resolve_widget_ui_config,
+    validate_dashboard_inventory,
 )
 from oci_config import QUERIES_DIR
 
@@ -84,6 +86,45 @@ class TestDashboardContract(unittest.TestCase):
         saved_search = dashboard["savedSearches"][0]
         self.assertEqual(saved_search["uiConfig"]["visualizationType"], "map")
         self.assertIn("ask_ai_prompts", saved_search["freeformTags"])
+
+    def test_dashboard_inventory_exports_query_metadata(self):
+        inventory = build_dashboard_inventory(generated_at="2026-04-28T00:00:00+00:00")
+
+        self.assertEqual(inventory["summary"]["total_dashboards"], len(DASHBOARDS))
+        self.assertEqual(
+            inventory["summary"]["total_widgets"],
+            sum(len(config["widgets"]) for config in DASHBOARDS.values()),
+        )
+        self.assertIn("visualization_types", inventory["summary"])
+
+        browser_dashboard = next(
+            dashboard for dashboard in inventory["dashboards"]
+            if dashboard["name"] == "SOC: Browser Attack Detection Dashboard"
+        )
+        total_attacks = next(
+            widget for widget in browser_dashboard["widgets"]
+            if widget["query_file"] == "apps/apm_total_attacks_kpi.json"
+        )
+
+        self.assertEqual(total_attacks["query_title"], "APM: Total Browser Attacks (24h)")
+        self.assertEqual(total_attacks["visualization_type"], "tile")
+        self.assertEqual(total_attacks["level"], "informational")
+        self.assertIn("apm", total_attacks["tags"])
+
+    def test_dashboard_inventory_validates_every_query_reference(self):
+        inventory = build_dashboard_inventory(generated_at="2026-04-28T00:00:00+00:00")
+
+        errors = validate_dashboard_inventory(inventory)
+
+        self.assertEqual(errors, [])
+
+    def test_dashboard_inventory_validation_catches_query_metadata_drift(self):
+        inventory = build_dashboard_inventory(generated_at="2026-04-28T00:00:00+00:00")
+        inventory["dashboards"][0]["widgets"][0]["query_title"] = "Wrong title"
+
+        errors = validate_dashboard_inventory(inventory)
+
+        self.assertTrue(any("query_title mismatch" in error for error in errors))
 
 
 if __name__ == "__main__":

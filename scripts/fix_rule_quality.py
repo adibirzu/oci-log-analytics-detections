@@ -269,7 +269,7 @@ def fix_json_queries(dry_run=False):
     fixed = 0
 
     for f in sorted(QUERIES_DIR.glob("*.json")):
-        if f.name in ("manifest.json", "catalog.json"):
+        if f.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
             continue
         with open(f) as fh:
             data = json.load(fh)

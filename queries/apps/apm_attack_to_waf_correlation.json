@@ -1,7 +1,7 @@
 {
   "title": "APM: Browser Attack to WAF Block Correlation",
   "description": "Summary table joining browser-side attack telemetry from SOC Application Logs with the WAF signal that flagged the same Trace ID. Hosts a count of how many traces fired both an APM detection and a WAF block, so the SOC can prove cross-tier defence-in-depth coverage.",
-  "query": "('Log Source' = 'SOC Application Logs' or 'Log Source' = 'SOC WAF Security Logs') and 'Trace ID' != '' | stats count as Events, distinctcount('Log Source') as DistinctTiers by 'Trace ID', 'Service Name', 'Client IP' | where DistinctTiers > 1 | sort -Events",
+  "query": "('Log Source' = 'SOC Application Logs' or 'Log Source' = 'SOC WAF Security Logs') and 'Trace ID' != '' | stats count as Events, distinctcount('Log Source') as DistinctTiers, distinctcount('Service Name') as Services by 'Trace ID' | where DistinctTiers > 1 | sort -Events",
   "type": "hunting",
   "level": "high",
   "tags": ["apm", "waf", "correlation", "defence_in_depth", "showcase"],

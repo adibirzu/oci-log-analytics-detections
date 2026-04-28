@@ -24,6 +24,7 @@ One important detail for the current shipping implementation: browser and applic
 | `queries/apps/*.json` | App telemetry query surface | 24 | 8 Sigma-derived browser detections + 16 curated app analytics |
 | `queries/hunting/*.json` | Curated hunting analytics | 45 | Frequency, anomaly, scoring, and correlation content |
 | `queries/catalog.json` | Canonical machine-readable inventory | 1 | Use this for published counts and downstream tooling |
+| `queries/dashboard_inventory.json` | Dashboard/widget inventory | 1 | Generated from `DASHBOARDS`; use this for dashboard UI mapping |
 | `queries/manifest.json` | Export/integration manifest | 1 | Generated artifact for multicloud export, not the canonical inventory |
 
 Important distinction:
@@ -63,6 +64,7 @@ queries/** -----------------------------------------------> scripts/export_for_m
 queries/** -----------------------------------------------> scripts/deploy_dashboard.py
                                                             - 16 dashboards
                                                             - 264 embedded saved searches
+                                                            - queries/dashboard_inventory.json
 ```
 
 ## Design Invariants
@@ -71,6 +73,7 @@ queries/** -----------------------------------------------> scripts/deploy_dashb
 - `sigma_id` is the durable identity for generated detections. Generated filenames should remain stable even if titles change.
 - Rules under `rules/web/browser_attacks/` intentionally publish into `queries/apps/` because they execute against `SOC Application Logs`, a custom app/browser telemetry surface rather than the top-level server-side detection surface.
 - `queries/catalog.json` is the canonical inventory for documentation, exports, and automation.
+- `queries/dashboard_inventory.json` is the dashboard-facing contract generated from `scripts/deploy_dashboard.py:DASHBOARDS`.
 - `queries/manifest.json` is an integration artifact. It should be regenerated from the current queries, but it is not the canonical source for published counts.
 - `logandetectionqueries/` and `logandetectionrules/` are legacy empty directories and should not be consumed by tooling.
 
@@ -102,9 +105,10 @@ This keeps the query layer stable even when the raw event producer is browser Ja
 - Dashboard layer:
   - 16 dashboards
   - 264 widget-backed saved searches
+  - 16 advanced visualization widgets (`tile`, `sunburst`, `summary_table`, `line`, `bar`, `link`, and `map`)
 - Demo/test data:
   - 14 NDJSON files
-  - 146,632 sample events checked into `test_data/`
+  - 146,693 sample events checked into `test_data/`
 - Streaming/runtime surface:
   - 5 configured SOC detection streams validated end-to-end
   - `soc-detection-multicloud-health` is active in the current environment
@@ -117,6 +121,7 @@ Use these commands as the baseline release/verification loop:
 python3 scripts/setup_log_sources.py
 python3 scripts/convert_sigma.py
 python3 scripts/generate_catalog.py
+python3 scripts/deploy_dashboard.py --export-inventory
 python3 scripts/export_for_multicloud.py --manifest-only
 python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md
 python3 scripts/deploy_dashboard.py --dry-run
@@ -165,6 +170,7 @@ Capability correlation and missing-feature references are tracked in:
 Supported dashboard-facing artifacts:
 
 - `queries/catalog.json`
+- `queries/dashboard_inventory.json`
 - `queries/manifest.json`
 - `queries/*.json`
 - `queries/apps/*.json`

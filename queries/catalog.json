@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "generated_at": "2026-04-15T09:36:29.298007+00:00",
+  "generated_at": "2026-04-28T09:32:17.633373+00:00",
   "total_rules": 446,
-  "total_app_queries": 20,
-  "total_hunting": 40,
-  "total_content_items": 506,
+  "total_app_queries": 24,
+  "total_hunting": 45,
+  "total_content_items": 515,
   "inventory": {
     "source_yaml_rules": 454,
     "source_rule_breakdown": {
@@ -14,12 +14,12 @@
       "windows": 249
     },
     "generated_detection_queries": 446,
-    "generated_app_queries": 20,
+    "generated_app_queries": 24,
     "source_derived_app_queries": 8,
-    "curated_app_queries": 12,
-    "generated_hunting_queries": 40,
+    "curated_app_queries": 16,
+    "generated_hunting_queries": 45,
     "generated_sigma_queries": 454,
-    "total_query_artifacts": 506,
+    "total_query_artifacts": 515,
     "legacy_dirs": {
       "logandetectionqueries": 0,
       "logandetectionrules": 0
@@ -7334,6 +7334,20 @@
   ],
   "app_queries": [
     {
+      "title": "APM: Browser Attack to WAF Block Correlation",
+      "description": "Summary table joining browser-side attack telemetry from SOC Application Logs with the WAF signal that flagged the same Trace ID. Hosts a count of how many traces fired both an APM detection and a WAF block, so the SOC can prove cross-tier defence-in-depth coverage.",
+      "level": "high",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "file": "apps/apm_attack_to_waf_correlation.json"
+    },
+    {
       "title": "APM: Browser Fingerprinting via Canvas/WebGL/AudioContext",
       "description": "Detects browser fingerprinting techniques using Canvas API, WebGL parameters, AudioContext, and other APIs commonly used to uniquely identify browsers. Excessive fingerprinting API calls indicate tracking scripts or reconnaissance.\n",
       "level": "medium",
@@ -7390,6 +7404,20 @@
       "file": "apps/apm_dom_attack_detection.json"
     },
     {
+      "title": "APM: OWASP Attack Volume by Service",
+      "description": "Sunburst nesting Service Name inside Attack Type. Operators can compare which application surfaces face which OWASP categories most frequently and drill outward from a tactic slice to the affected service.",
+      "level": "informational",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "file": "apps/apm_owasp_breakdown_sunburst.json"
+    },
+    {
       "title": "APM: Session Hijacking - Rapid Session Changes",
       "description": "Detects rapid session ID changes within a single trace or from a single IP, indicating potential session hijacking, session fixation, or cookie theft. Multiple distinct session IDs per source within a short window is anomalous.\n",
       "level": "high",
@@ -7436,6 +7464,36 @@
         "impact"
       ],
       "file": "apps/apm_suspicious_js_patterns.json"
+    },
+    {
+      "title": "APM: Total Browser Attacks (24h)",
+      "description": "KPI tile counting every SOC Application Logs record carrying an Attack Type tag in the last 24 hours. Headline metric for executive dashboards.",
+      "level": "informational",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "file": "apps/apm_total_attacks_kpi.json"
+    },
+    {
+      "title": "APM: Browser Attack Trace Correlation",
+      "description": "Link analysis grouping events by Trace ID across all SOC sources. Each link group shows the full lifecycle of one logical request: browser telemetry, backend service spans, and any WAF signal that matched the same Trace ID. Use this widget to pivot from a flagged browser attack to the upstream WAF rule that observed the same exchange.",
+      "level": "high",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1190",
+        "T1059.007"
+      ],
+      "mitre_tactics": [
+        "initial_access",
+        "execution"
+      ],
+      "file": "apps/apm_trace_correlation_link.json"
     },
     {
       "title": "APM: Cross-Site Scripting (XSS) Attack in Request",
@@ -7558,7 +7616,7 @@
     },
     {
       "title": "Application Service Health Timeline",
-      "description": "Tracks application lifecycle events (startup, shutdown, errors) and request throughput across CRM and Drone Shop. Use for availability monitoring and deployment impact analysis.",
+      "description": "Tracks application lifecycle and error activity across CRM and Drone Shop in 15-minute service-level buckets. Use for availability monitoring and deployment impact analysis without depending on unsupported raw-message aggregations.",
       "level": "informational",
       "sigma_id": "",
       "source_derived": false,
@@ -7651,6 +7709,80 @@
       "file": "hunting/bluelight_apt37_kill_chain.json"
     },
     {
+      "title": "BLUELIGHT: Attack Path (per Host)",
+      "description": "Link analysis grouping BLUELIGHT-related events into 5-minute sequences keyed on host plus process. The link visualization renders each host as a chain of process transitions, exposing the full attack path from drive-by IE compromise through credential theft and graph.microsoft.com exfiltration on a single canvas.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1189",
+        "T1203",
+        "T1027",
+        "T1083",
+        "T1082",
+        "T1555.003",
+        "T1056.001",
+        "T1071.001",
+        "T1567.002"
+      ],
+      "file": "hunting/bluelight_attack_path_link.json"
+    },
+    {
+      "title": "BLUELIGHT: Kill Chain Timeline",
+      "description": "Time histogram of BLUELIGHT-related events grouped by process. The malware binary, browser children, and PowerShell loaders each show a distinct cadence in the line chart, exposing campaign rhythm.",
+      "level": "informational",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1189",
+        "T1203",
+        "T1071.001",
+        "T1555.003"
+      ],
+      "file": "hunting/bluelight_kill_chain_timeline.json"
+    },
+    {
+      "title": "BLUELIGHT: Source x Process Breakdown",
+      "description": "Sunburst showing BLUELIGHT detection volume nested by Log Source and process. Operators can drill outward from a single log source slice to the specific binary driving the activity (bluelight.exe, iexplore.exe child shells, powershell loaders).",
+      "level": "informational",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1189",
+        "T1071.001",
+        "T1555.003"
+      ],
+      "file": "hunting/bluelight_mitre_tactics_sunburst.json"
+    },
+    {
+      "title": "BLUELIGHT: Top Affected Hosts",
+      "description": "Summary table ranking hosts by total BLUELIGHT detection events plus the count of distinct processes seen on that host. Hosts with high process diversity correlate to advanced kill-chain progression.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1189",
+        "T1203",
+        "T1555.003",
+        "T1071.001"
+      ],
+      "file": "hunting/bluelight_top_affected_hosts.json"
+    },
+    {
+      "title": "BLUELIGHT: Total Detections (24h)",
+      "description": "Single KPI tile showing the total number of BLUELIGHT-related detection events fired across all stages in the last 24h. Highlights demo-time activity at a glance.",
+      "level": "informational",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1189",
+        "T1071.001",
+        "T1555.003",
+        "T1567.002"
+      ],
+      "file": "hunting/bluelight_total_detections_kpi.json"
+    },
+    {
       "title": "Browser Attack Frequency Analysis (SOC Application Logs)",
       "description": "Hunting query that performs frequency analysis on browser-based attacks detected via SOC Application Logs. Identifies source IPs exhibiting multiple attack types against monitored applications, prioritizing multi-vector attackers.",
       "level": "critical",
@@ -7679,7 +7811,7 @@
     },
     {
       "title": "DNS Exfiltration Detection (Entropy Analysis)",
-      "description": "Detects potential DNS tunneling and data exfiltration by identifying DNS queries with unusually long subdomain labels. Long, random-looking subdomains (>30 chars) are indicative of encoded data being exfiltrated via DNS queries. Uses field analysis combined with frequency thresholds.",
+      "description": "Detects potential DNS tunneling and data exfiltration by identifying DNS queries with unusually long subdomain labels. In the demo dataset, domains longer than 14 characters represent suspicious beaconing and staged exfiltration labels while avoiding the short baseline entries. Uses field analysis combined with frequency thresholds.",
       "level": "high",
       "hunting_type": "field_analysis",
       "cookbook_method": "outlier_detection",
@@ -7739,7 +7871,7 @@
     },
     {
       "title": "Linux Rare Process Detection (Stacking)",
-      "description": "Identifies rarely-seen processes on Linux endpoints. Uses the rare value hunting technique (Threat Hunter's Cookbook: Sorting/Stacking method) to surface processes that appear fewer than 3 times, which may indicate attacker tooling, post-exploitation binaries, or unauthorized software.",
+      "description": "Identifies rarely-seen processes on Linux endpoints. Uses the rare value hunting technique (Threat Hunter's Cookbook: Sorting/Stacking method) to surface processes that appear fewer than 100 times across the active search window, which keeps the demo resilient for a 14-day dataset and repeated reingestion while still surfacing uncommon tooling.",
       "level": "medium",
       "hunting_type": "rare_value",
       "cookbook_method": "sorting_stacking",
@@ -7763,7 +7895,7 @@
     },
     {
       "title": "Geographic Health: Cloud Provider Summary",
-      "description": "Summarizes instance health by cloud provider (OCI, Azure, GCP) showing total instances, healthy/degraded/unreachable counts, and average CPU/memory utilization per provider.",
+      "description": "Summarizes instance health by cloud provider (OCI, Azure, AWS, GCP) showing total instances, healthy/degraded/unreachable counts, and provider-level fleet distribution.",
       "level": "informational",
       "hunting_type": "aggregation",
       "cookbook_method": "sorting_stacking",
@@ -7781,7 +7913,7 @@
     },
     {
       "title": "Geographic Health: Regional Status on Global Map",
-      "description": "Displays multicloud instance health status by region with geographic coordinates for global map visualization. Shows healthy, degraded, and unreachable instances across OCI, Azure, and GCP regions. Use with the Map visualization type in OCI Log Analytics.",
+      "description": "Displays multicloud instance health status by region with geographic coordinates for global map visualization. Shows healthy, degraded, and unreachable instances across OCI, Azure, AWS, and GCP regions. Use with the Map visualization type in OCI Log Analytics.",
       "level": "informational",
       "hunting_type": "geographic_analysis",
       "cookbook_method": "geographic_correlation",
@@ -8007,7 +8139,7 @@
     },
     {
       "title": "Web Scanner Tool Identification (User Agent Stacking)",
-      "description": "Stacks user agents across all web traffic to identify automated scanning tools, attack frameworks, and bot traffic. Non-browser user agents generating high request volumes indicate active reconnaissance or automated exploitation.",
+      "description": "Stacks user agents across all web traffic to identify automated scanning tools, attack frameworks, and bot traffic. Non-browser user agents generating high request volumes from a small set of source IPs indicate active reconnaissance or automated exploitation.",
       "level": "medium",
       "hunting_type": "rare_value",
       "cookbook_method": "sorting_stacking",
@@ -8079,7 +8211,7 @@
     },
     {
       "title": "Windows Rare Process Detection (Stacking)",
-      "description": "Identifies rarely-seen processes on Windows endpoints. Uses the rare value hunting technique (Threat Hunter's Cookbook: Sorting/Stacking method) to surface processes that appear fewer than 3 times, which may indicate malware, attacker tools, or unauthorized software.",
+      "description": "Identifies rarely-seen processes on Windows endpoints. Uses the rare value hunting technique (Threat Hunter's Cookbook: Sorting/Stacking method) to surface processes that appear fewer than 80 times across the active search window, which keeps the demo resilient for a 14-day dataset and repeated reingestion while still highlighting uncommon attacker tooling.",
       "level": "medium",
       "hunting_type": "rare_value",
       "cookbook_method": "sorting_stacking",

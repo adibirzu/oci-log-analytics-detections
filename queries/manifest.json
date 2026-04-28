@@ -1,7 +1,7 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-04-15T09:36:35.973769+00:00",
+  "generated_at": "2026-04-28T09:32:18.333640+00:00",
   "stats": {
     "total_rules": 454,
     "total_sigma_rules": 454,
@@ -517,7 +517,7 @@
       "mitre_tactics": [
         "initial_access"
       ],
-      "query": "'Log Source' = 'SOC Application Logs' and ((('Request URL' like '*UNION SELECT*' or 'Request URL' like '*UNION%20SELECT*' or 'Request URL' like '*UNION+SELECT*' or 'Request URL' like '*union select*' or 'Request URL' like '*union%20select*')) or (('Request URL' like '*' OR 1=1*' or 'Request URL' like '*' OR '1'='1*' or 'Request URL' like '*%27%20OR%201%3D1*' or 'Request URL' like '*' AND 1=1*' or 'Request URL' like '*OR+1=1*')) or (('Request URL' like '*DROP TABLE*' or 'Request URL' like '*DROP%20TABLE*' or 'Request URL' like '*DELETE FROM*' or 'Request URL' like '*INSERT INTO*' or 'Request URL' like '*UPDATE SET*')) or (('Request URL' like '*WAITFOR DELAY*' or 'Request URL' like '*BENCHMARK(*' or 'Request URL' like '*SLEEP(*' or 'Request URL' like '*pg_sleep*')) or (('Request URL' like '*INFORMATION_SCHEMA*' or 'Request URL' like '*information_schema*' or 'Request URL' like '*sysobjects*' or 'Request URL' like '*syscolumns*' or 'Request URL' like '*ORDER BY 1*'))) | stats count as Attacks by 'Request URL', 'HTTP Method', 'Client IP', 'Service Name' | sort -Attacks"
+      "query": "'Log Source' = 'SOC Application Logs' and ((('Request URL' like '*UNION SELECT*' or 'Request URL' like '*UNION%20SELECT*' or 'Request URL' like '*UNION+SELECT*' or 'Request URL' like '*union select*' or 'Request URL' like '*union%20select*')) or (('Request URL' like '*%27%20OR%201%3D1*' or 'Request URL' like '*%27%20OR%20%271%27%3D%271*' or 'Request URL' like '*OR+1=1*' or 'Request URL' like '*%27+OR+1=1*')) or (('Request URL' like '*DROP TABLE*' or 'Request URL' like '*DROP%20TABLE*' or 'Request URL' like '*DELETE FROM*' or 'Request URL' like '*INSERT INTO*' or 'Request URL' like '*UPDATE SET*')) or (('Request URL' like '*WAITFOR DELAY*' or 'Request URL' like '*BENCHMARK(*' or 'Request URL' like '*SLEEP(*' or 'Request URL' like '*pg_sleep*')) or (('Request URL' like '*INFORMATION_SCHEMA*' or 'Request URL' like '*information_schema*' or 'Request URL' like '*sysobjects*' or 'Request URL' like '*syscolumns*' or 'Request URL' like '*ORDER BY 1*'))) | stats count as Attacks by 'Request URL', 'HTTP Method', 'Client IP', 'Service Name' | sort -Attacks"
     },
     {
       "filename": "apps/apm_suspicious_js_patterns.json",
@@ -619,7 +619,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 1 and 'Parent Process Name' like '*\\\\iexplore.exe' and ('Process Name' like '*\\\\cmd.exe' or 'Process Name' like '*\\\\powershell.exe' or 'Process Name' like '*\\\\wscript.exe' or 'Process Name' like '*\\\\mshta.exe' or 'Process Name' like '*\\\\cscript.exe' or 'Process Name' like '*\\\\rundll32.exe'))) | stats count by 'Host Name (Server)', 'Parent Process Name', 'Process Name', 'Command Line'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = '1' and 'Parent Process Name' like '*\\\\iexplore.exe' and ('Process Name' like '*\\\\cmd.exe' or 'Process Name' like '*\\\\powershell.exe' or 'Process Name' like '*\\\\wscript.exe' or 'Process Name' like '*\\\\mshta.exe' or 'Process Name' like '*\\\\cscript.exe' or 'Process Name' like '*\\\\rundll32.exe'))) | stats count by 'Host Name (Server)', 'Parent Process Name', 'Process Name', 'Command Line'"
     },
     {
       "filename": "bluelight_browser_credential_theft.json",
@@ -635,7 +635,7 @@
       "mitre_tactics": [
         "credential_access"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 10 and ('Target Process' like '*\\\\chrome.exe' or 'Target Process' like '*\\\\msedge.exe' or 'Target Process' like '*\\\\iexplore.exe' or 'Target Process' like '*\\\\firefox.exe') and 'Granted Access' = '0x1fffff') and not (('Source Process' like '*\\\\chrome.exe' or 'Source Process' like '*\\\\msedge.exe' or 'Source Process' like '*\\\\iexplore.exe' or 'Source Process' like '*\\\\firefox.exe' or 'Source Process' like '*\\\\crashpad_handler.exe'))) | stats count by 'Source Process', 'Target Process', 'Host Name (Server)'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = '10' and ('Target Process' like '*\\\\chrome.exe' or 'Target Process' like '*\\\\msedge.exe' or 'Target Process' like '*\\\\iexplore.exe' or 'Target Process' like '*\\\\firefox.exe') and 'Granted Access' = '0x1fffff') and not (('Source Process' like '*\\\\chrome.exe' or 'Source Process' like '*\\\\msedge.exe' or 'Source Process' like '*\\\\iexplore.exe' or 'Source Process' like '*\\\\firefox.exe' or 'Source Process' like '*\\\\crashpad_handler.exe'))) | stats count by 'Source Process', 'Target Process', 'Host Name (Server)'"
     },
     {
       "filename": "bluelight_drive_by_compromise.json",
@@ -651,7 +651,7 @@
       "mitre_tactics": [
         "initial_access"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 3 and 'Process Name' like '*\\\\iexplore.exe') and not (('Destination Hostname' like '*.microsoft.com' or 'Destination Hostname' like '*.windows.com' or 'Destination Hostname' like '*.bing.com' or 'Destination Hostname' like '*.live.com' or 'Destination Hostname' like '*.msn.com'))) | stats count by 'Destination Hostname', 'Source IP', 'Host Name (Server)'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = '3' and 'Process Name' like '*\\\\iexplore.exe') and not (('Destination Hostname' like '*.microsoft.com' or 'Destination Hostname' like '*.windows.com' or 'Destination Hostname' like '*.bing.com' or 'Destination Hostname' like '*.live.com' or 'Destination Hostname' like '*.msn.com'))) | stats count by 'Destination Hostname', 'Source IP', 'Host Name (Server)'"
     },
     {
       "filename": "bluelight_file_discovery.json",
@@ -667,7 +667,7 @@
       "mitre_tactics": [
         "discovery"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 1 and ('Parent Process Name' like '*\\\\iexplore.exe' or 'Parent Process Name' like '*\\\\wscript.exe' or 'Parent Process Name' like '*\\\\powershell.exe' or 'Parent Process Name' like '*\\\\mshta.exe')) and (('Command Line' like '*dir /s*' or 'Command Line' like '*dir /b*' or 'Command Line' like '*tree *' or 'Command Line' like '*Get-ChildItem*' or 'Command Line' like '*-Recurse*' or 'Command Line' like '*ls -R*'))) | stats count by 'Host Name (Server)', 'Parent Process Name', 'Process Name', 'Command Line'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = '1' and ('Parent Process Name' like '*\\\\iexplore.exe' or 'Parent Process Name' like '*\\\\wscript.exe' or 'Parent Process Name' like '*\\\\powershell.exe' or 'Parent Process Name' like '*\\\\mshta.exe')) and (('Command Line' like '*dir /s*' or 'Command Line' like '*dir /b*' or 'Command Line' like '*tree *' or 'Command Line' like '*Get-ChildItem*' or 'Command Line' like '*-Recurse*' or 'Command Line' like '*ls -R*'))) | stats count by 'Host Name (Server)', 'Parent Process Name', 'Process Name', 'Command Line'"
     },
     {
       "filename": "bluelight_graph_api_c2.json",
@@ -683,7 +683,7 @@
       "mitre_tactics": [
         "command_and_control"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 3 and ('Destination Hostname' like '*graph.microsoft.com*' or 'Destination Hostname' like '*login.microsoftonline.com*')) and not (('Process Name' like '*\\\\OneDrive.exe' or 'Process Name' like '*\\\\Teams.exe' or 'Process Name' like '*\\\\OUTLOOK.EXE' or 'Process Name' like '*\\\\msedge.exe' or 'Process Name' like '*\\\\chrome.exe' or 'Process Name' like '*\\\\firefox.exe'))) | stats count by 'Process Name', 'Destination Hostname', 'Destination Port', 'Host Name (Server)'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = '3' and ('Destination Hostname' like '*graph.microsoft.com*' or 'Destination Hostname' like '*login.microsoftonline.com*')) and not (('Process Name' like '*\\\\OneDrive.exe' or 'Process Name' like '*\\\\Teams.exe' or 'Process Name' like '*\\\\OUTLOOK.EXE' or 'Process Name' like '*\\\\msedge.exe' or 'Process Name' like '*\\\\chrome.exe' or 'Process Name' like '*\\\\firefox.exe'))) | stats count by 'Process Name', 'Destination Hostname', 'Destination Port', 'Host Name (Server)'"
     },
     {
       "filename": "bluelight_ingress_tool_transfer.json",
@@ -699,7 +699,7 @@
       "mitre_tactics": [
         "command_and_control"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 11 and ('Target Filename' like '*\\\\Temp\\\\*' or 'Target Filename' like '*\\\\AppData\\\\*') and ('Target Filename' like '*.exe' or 'Target Filename' like '*.dll' or 'Target Filename' like '*.scr' or 'Target Filename' like '*.bat' or 'Target Filename' like '*.ps1'))) | stats count by 'Host Name (Server)', 'Process Name', 'Target Filename'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = '11' and ('Target Filename' like '*\\\\Temp\\\\*' or 'Target Filename' like '*\\\\AppData\\\\*') and ('Target Filename' like '*.exe' or 'Target Filename' like '*.dll' or 'Target Filename' like '*.scr' or 'Target Filename' like '*.bat' or 'Target Filename' like '*.ps1'))) | stats count by 'Host Name (Server)', 'Process Name', 'Target Filename'"
     },
     {
       "filename": "bluelight_obfuscated_commandline.json",
@@ -715,7 +715,7 @@
       "mitre_tactics": [
         "defense_evasion"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4688 and ('New Process Name' like '*\\\\powershell.exe' or 'New Process Name' like '*\\\\wscript.exe' or 'New Process Name' like '*\\\\cscript.exe' or 'New Process Name' like '*\\\\mshta.exe')) and (('Command Line' like '*FromBase64String*' or 'Command Line' like '*ToBase64String*' or 'Command Line' like '*-enc *' or 'Command Line' like '*-encodedcommand*' or 'Command Line' like '*XOR*' or 'Command Line' like '*char(*' or 'Command Line' like '*-bxor*' or 'Command Line' like '*iex(*' or 'Command Line' like '*Invoke-Expression*'))) | stats count by 'Host Name (Server)', 'Process Name', 'Command Line'"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '4688' and ('Process Name' like '*\\\\powershell.exe' or 'Process Name' like '*\\\\wscript.exe' or 'Process Name' like '*\\\\cscript.exe' or 'Process Name' like '*\\\\mshta.exe')) and (('Command Line' like '*FromBase64String*' or 'Command Line' like '*ToBase64String*' or 'Command Line' like '*-enc *' or 'Command Line' like '*-encodedcommand*' or 'Command Line' like '*XOR*' or 'Command Line' like '*char(*' or 'Command Line' like '*-bxor*' or 'Command Line' like '*iex(*' or 'Command Line' like '*Invoke-Expression*'))) | stats count by 'Host Name (Server)', 'Process Name', 'Command Line'"
     },
     {
       "filename": "bluelight_onedrive_exfiltration.json",
@@ -731,7 +731,7 @@
       "mitre_tactics": [
         "exfiltration"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 3 and 'Destination Hostname' like '*graph.microsoft.com*') and not (('Process Name' like '*\\\\OneDrive.exe' or 'Process Name' like '*\\\\Teams.exe' or 'Process Name' like '*\\\\OUTLOOK.EXE'))) | stats count as Connections, sum('Bytes Sent') as TotalUpload by 'Process Name', 'Source IP', 'Host Name (Server)' | sort -TotalUpload"
+      "query": "'Log Source' = 'SOC Sysmon Network Logs' and 'Destination Hostname' like '*graph.microsoft.com*' and not (('Process Name' like '*\\\\OneDrive.exe' or 'Process Name' like '*\\\\Teams.exe' or 'Process Name' like '*\\\\OUTLOOK.EXE')) | stats count as Connections by 'Process Name', 'Source IP', 'Host Name' | where Connections > 1 | sort -Connections"
     },
     {
       "filename": "bluelight_registry_enumeration.json",
@@ -747,7 +747,7 @@
       "mitre_tactics": [
         "discovery"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Event ID' = 12 or 'Event ID' = 13 or 'Event ID' = 14) and ('Target Object' like '*\\\\CurrentVersion\\\\Uninstall*' or 'Target Object' like '*\\\\CurrentControlSet\\\\Services*' or 'Target Object' like '*SecurityCenter2*' or 'Target Object' like '*\\\\Windows Defender*' or 'Target Object' like '*\\\\AVAST Software*' or 'Target Object' like '*\\\\ESET*' or 'Target Object' like '*\\\\KasperskyLab*')) and not (('Process Name' like '*\\\\MsMpEng.exe' or 'Process Name' like '*\\\\svchost.exe' or 'Process Name' like '*\\\\TrustedInstaller.exe' or 'Process Name' like '*\\\\msiexec.exe'))) | stats count by 'Host Name (Server)', 'Process Name', 'Target Object'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Event ID' = '12' or 'Event ID' = '13' or 'Event ID' = '14') and ('Target Object' like '*\\\\CurrentVersion\\\\Uninstall*' or 'Target Object' like '*\\\\CurrentControlSet\\\\Services*' or 'Target Object' like '*SecurityCenter2*' or 'Target Object' like '*\\\\Windows Defender*' or 'Target Object' like '*\\\\AVAST Software*' or 'Target Object' like '*\\\\ESET*' or 'Target Object' like '*\\\\KasperskyLab*')) and not (('Process Name' like '*\\\\MsMpEng.exe' or 'Process Name' like '*\\\\svchost.exe' or 'Process Name' like '*\\\\TrustedInstaller.exe' or 'Process Name' like '*\\\\msiexec.exe'))) | stats count by 'Host Name (Server)', 'Process Name', 'Target Object'"
     },
     {
       "filename": "bluelight_screen_capture.json",
@@ -763,7 +763,7 @@
       "mitre_tactics": [
         "collection"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 11 and 'Target Filename' like '*.jpg') and not (('Process Name' like '*\\\\chrome.exe' or 'Process Name' like '*\\\\msedge.exe' or 'Process Name' like '*\\\\firefox.exe' or 'Process Name' like '*\\\\Photos.exe' or 'Process Name' like '*\\\\SnippingTool.exe' or 'Process Name' like '*\\\\mspaint.exe' or 'Process Name' like '*\\\\Photoshop.exe'))) | timestats count as Screenshots by 'Process Name' span = 1minute | where Screenshots > 3"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = '11' and 'Target Filename' like '*.jpg') and not (('Process Name' like '*\\\\chrome.exe' or 'Process Name' like '*\\\\msedge.exe' or 'Process Name' like '*\\\\firefox.exe' or 'Process Name' like '*\\\\Photos.exe' or 'Process Name' like '*\\\\SnippingTool.exe' or 'Process Name' like '*\\\\mspaint.exe' or 'Process Name' like '*\\\\Photoshop.exe'))) | timestats span=1minute count as Screenshots by 'Process Name' | where Screenshots > 3"
     },
     {
       "filename": "bluelight_system_discovery.json",
@@ -779,7 +779,7 @@
       "mitre_tactics": [
         "discovery"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = 1 and ('Parent Process Name' like '*\\\\iexplore.exe' or 'Parent Process Name' like '*\\\\wscript.exe' or 'Parent Process Name' like '*\\\\mshta.exe')) and (('Command Line' like '*Win32_ComputerSystem*' or 'Command Line' like '*Win32_OperatingSystem*' or 'Command Line' like '*Win32_Processor*' or 'Command Line' like '*Win32_NetworkAdapterConfiguration*' or 'Command Line' like '*Get-WmiObject*' or 'Command Line' like '*Get-CimInstance*'))) | stats count by 'Host Name (Server)', 'Parent Process Name', 'Process Name', 'Command Line'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = '1' and ('Parent Process Name' like '*\\\\iexplore.exe' or 'Parent Process Name' like '*\\\\wscript.exe' or 'Parent Process Name' like '*\\\\mshta.exe')) and (('Command Line' like '*Win32_ComputerSystem*' or 'Command Line' like '*Win32_OperatingSystem*' or 'Command Line' like '*Win32_Processor*' or 'Command Line' like '*Win32_NetworkAdapterConfiguration*' or 'Command Line' like '*Get-WmiObject*' or 'Command Line' like '*Get-CimInstance*'))) | stats count by 'Host Name (Server)', 'Parent Process Name', 'Process Name', 'Command Line'"
     },
     {
       "filename": "bluelight_yara_cookie_theft.json",
@@ -1138,7 +1138,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4688 and 'New Process Name' like '*\\\\cmd.exe') and ( (('Command Line' like '*whoami /all*' or 'Command Line' like '*net user *' or 'Command Line' like '*net group *' or 'Command Line' like '*net localgroup*' or 'Command Line' like '*net view*' or 'Command Line' like '*nltest /dclist*' or 'Command Line' like '*nltest /domain_trusts*' or 'Command Line' like '*systeminfo*' or 'Command Line' like '*ipconfig /all*' or 'Command Line' like '*arp -a*' or 'Command Line' like '*netstat -ano*' or 'Command Line' like '*tasklist /svc*' or 'Command Line' like '*wmic process list*' or 'Command Line' like '*qwinsta*' or 'Command Line' like '*query user*')) or (('Command Line' like '*schtasks /create*' or 'Command Line' like '*at *' or 'Command Line' like '*reg add *' or 'Command Line' like '*sc create *' or 'Command Line' like '*wmic /node:*')) or (('Command Line' like '*psexec *' or 'Command Line' like '*wmic /node:*' or 'Command Line' like '*winrs -r:*' or 'Command Line' like '*net use \\\\\\\\\\\\\\\\*' or 'Command Line' like '*copy \\\\\\\\\\\\\\\\*')) or (('Command Line' like '*vssadmin delete shadows*' or 'Command Line' like '*wevtutil cl *' or 'Command Line' like '*bcdedit /set*' or 'Command Line' like '*reg delete *' or 'Command Line' like '*wbadmin delete*')) )) | stats count as Detections by Entity | sort -Detections"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ('Event ID' = '4688') and ( (('Command Line' like '*whoami /all*' or 'Command Line' like '*net user *' or 'Command Line' like '*net group *' or 'Command Line' like '*net localgroup*' or 'Command Line' like '*net view*' or 'Command Line' like '*nltest /dclist*' or 'Command Line' like '*nltest /domain_trusts*' or 'Command Line' like '*systeminfo*' or 'Command Line' like '*ipconfig /all*' or 'Command Line' like '*arp -a*' or 'Command Line' like '*netstat -ano*' or 'Command Line' like '*tasklist /svc*' or 'Command Line' like '*wmic process list*' or 'Command Line' like '*qwinsta*' or 'Command Line' like '*query user*')) or (('Command Line' like '*schtasks /create*' or 'Command Line' like '*at *' or 'Command Line' like '*reg add *' or 'Command Line' like '*sc create *' or 'Command Line' like '*wmic /node:*')) or (('Command Line' like '*psexec *' or 'Command Line' like '*wmic /node:*' or 'Command Line' like '*winrs -r:*' or 'Command Line' like '*net use \\\\\\\\\\\\\\\\*' or 'Command Line' like '*copy \\\\\\\\\\\\\\\\*')) or (('Command Line' like '*vssadmin delete shadows*' or 'Command Line' like '*wevtutil cl *' or 'Command Line' like '*bcdedit /set*' or 'Command Line' like '*reg delete *' or 'Command Line' like '*wbadmin delete*')) ) | stats count as Detections by 'Command Line' | sort -Detections"
     },
     {
       "filename": "cmstp_uac_bypass.json",
@@ -2605,7 +2605,7 @@
       "mitre_tactics": [
         "credential_access"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4688) and ( (('Command Line' like '*sekurlsa::logonpasswords*' or 'Command Line' like '*sekurlsa::wdigest*' or 'Command Line' like '*sekurlsa::kerberos*' or 'Command Line' like '*sekurlsa::msv*' or 'Command Line' like '*sekurlsa::tspkg*' or 'Command Line' like '*lsadump::sam*' or 'Command Line' like '*lsadump::lsa /patch*' or 'Command Line' like '*lsadump::dcsync*' or 'Command Line' like '*kerberos::list*' or 'Command Line' like '*kerberos::golden*' or 'Command Line' like '*kerberos::ptt*' or 'Command Line' like '*dpapi::cred*' or 'Command Line' like '*crypto::certificates*' or 'Command Line' like '*token::elevate*' or 'Command Line' like '*privilege::debug*' or 'Command Line' like '*misc::memssp*')) or (('Command Line' like '*mimikatz*' or 'Command Line' like '*mimi32*' or 'Command Line' like '*mimi64*' or 'Command Line' like '*gentilkiwi*' or 'Command Line' like '*benjamin DELPY*')) or (('Command Line' like '*SID                :*' or 'Command Line' like '*User               :*' or 'Command Line' like '** Username :*' or 'Command Line' like '** Domain   :*' or 'Command Line' like '** NTLM     :*' or 'Command Line' like '** SHA1     :*' or 'Command Line' like '*Authentication Id :*' or 'Command Line' like '*wdigest :*' or 'Command Line' like '*tspkg :*' or 'Command Line' like '*kerberos :*')) )) | stats count as Detections by Entity | sort -Detections"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '4688') and ( (('Command Line' like '*sekurlsa::logonpasswords*' or 'Command Line' like '*sekurlsa::wdigest*' or 'Command Line' like '*sekurlsa::kerberos*' or 'Command Line' like '*sekurlsa::msv*' or 'Command Line' like '*sekurlsa::tspkg*' or 'Command Line' like '*lsadump::sam*' or 'Command Line' like '*lsadump::lsa /patch*' or 'Command Line' like '*lsadump::dcsync*' or 'Command Line' like '*kerberos::list*' or 'Command Line' like '*kerberos::golden*' or 'Command Line' like '*kerberos::ptt*' or 'Command Line' like '*dpapi::cred*' or 'Command Line' like '*crypto::certificates*' or 'Command Line' like '*token::elevate*' or 'Command Line' like '*privilege::debug*' or 'Command Line' like '*misc::memssp*')) or (('Command Line' like '*mimikatz*' or 'Command Line' like '*mimi32*' or 'Command Line' like '*mimi64*' or 'Command Line' like '*gentilkiwi*' or 'Command Line' like '*benjamin DELPY*')) or (('Command Line' like '*SID                :*' or 'Command Line' like '*User               :*' or 'Command Line' like '** Username :*' or 'Command Line' like '** Domain   :*' or 'Command Line' like '** NTLM     :*' or 'Command Line' like '** SHA1     :*' or 'Command Line' like '*Authentication Id :*' or 'Command Line' like '*wdigest :*' or 'Command Line' like '*tspkg :*' or 'Command Line' like '*kerberos :*')) )) | stats count as Detections by Entity | sort -Detections"
     },
     {
       "filename": "msbuild_execution_from_non-standard_location.json",
@@ -4390,7 +4390,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4688 and 'New Process Name' like '*\\\\powershell.exe') and ( (('Command Line' like '*DownloadString*' or 'Command Line' like '*DownloadFile*' or 'Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*iwr *' or 'Command Line' like '*wget *' or 'Command Line' like '*curl *' or 'Command Line' like '*Net.WebClient*' or 'Command Line' like '*Start-BitsTransfer*')) or (('Command Line' like '*-enc *' or 'Command Line' like '*-EncodedCommand*' or 'Command Line' like '*-e *' or 'Command Line' like '*FromBase64String*' or 'Command Line' like '*ToBase64String*')) or (('Command Line' like '*AmsiUtils*' or 'Command Line' like '*amsiInitFailed*' or 'Command Line' like '*Reflection.Assembly*' or 'Command Line' like '*SetValue($null,$true)*')) or (('Command Line' like '*Get-Credential*' or 'Command Line' like '*Mimikatz*' or 'Command Line' like '*sekurlsa*' or 'Command Line' like '*lsadump*' or 'Command Line' like '*Invoke-Mimikatz*' or 'Command Line' like '*Get-GPPPassword*' or 'Command Line' like '*Find-LocalAdminAccess*')) or (('Command Line' like '*Get-DomainUser*' or 'Command Line' like '*Get-DomainGroup*' or 'Command Line' like '*Get-DomainComputer*' or 'Command Line' like '*Get-NetUser*' or 'Command Line' like '*Get-NetGroup*' or 'Command Line' like '*Get-NetComputer*' or 'Command Line' like '*Invoke-ShareFinder*' or 'Command Line' like '*Invoke-Kerberoast*' or 'Command Line' like '*Invoke-BloodHound*')) )) | stats count as Detections by Entity | sort -Detections"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ('Event ID' = '4688') and ( (('Command Line' like '*invoke-webrequest*' or 'Command Line' like '*downloadstring*' or 'Command Line' like '*downloadfile*' or 'Command Line' like '*iwr *' or 'Command Line' like '*wget *' or 'Command Line' like '*curl *' or 'Command Line' like '*net.webclient*' or 'Command Line' like '*start-bitstransfer*')) or (('Command Line' like '*-enc*' or 'Command Line' like '*-encodedcommand*' or 'Command Line' like '*frombase64string*' or 'Command Line' like '*tobase64string*')) or (('Command Line' like '*amsiutils*' or 'Command Line' like '*amsiinitfailed*' or 'Command Line' like '*reflection.assembly*' or 'Command Line' like '*setvalue($null,$true)*')) or (('Command Line' like '*get-credential*' or 'Command Line' like '*mimikatz*' or 'Command Line' like '*sekurlsa*' or 'Command Line' like '*lsadump*' or 'Command Line' like '*invoke-mimikatz*' or 'Command Line' like '*get-gpppassword*' or 'Command Line' like '*find-localadminaccess*')) or (('Command Line' like '*get-domainuser*' or 'Command Line' like '*get-domaingroup*' or 'Command Line' like '*get-domaincomputer*' or 'Command Line' like '*get-netuser*' or 'Command Line' like '*get-netgroup*' or 'Command Line' like '*get-netcomputer*' or 'Command Line' like '*invoke-sharefinder*' or 'Command Line' like '*invoke-kerberoast*' or 'Command Line' like '*invoke-bloodhound*')) ) | stats count as Detections by 'Command Line' | sort -Detections"
     },
     {
       "filename": "print_processor_persistence.json",
@@ -7691,7 +7691,7 @@
   ],
   "dashboards": {
     "total": 16,
-    "saved_searches": 255,
+    "saved_searches": 264,
     "names": [
       "SOC Overview Dashboard",
       "SOC: OCI STIG Compliance Dashboard",

@@ -618,6 +618,8 @@ WAF_FIELD_MAPPINGS = [
     ("WAF Policy",           "$.wafPolicy",         19),
     ("Fingerprint",          "$.fingerprint",       20),
     ("Host Name",            "$.hostname",          21),
+    ("Trace ID",             "$.traceId",           22),
+    ("Service Name",         "$.wafPolicy",         23),
 ]
 WAF_EXAMPLE = {
     "timeCreated": "2026-02-15T14:30:00.000Z",

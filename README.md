@@ -9,14 +9,14 @@ This repository ships both source authoring content and generated OCI query asse
 - **Sigma-derived OCI queries:** 454
   - 446 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
-- **Curated analytics:** 52
-  - 12 app telemetry analytics in `queries/apps/`
-  - 40 hunting analytics in `queries/hunting/`
-- **Total query artifacts:** 506
+- **Curated analytics:** 61
+  - 16 app telemetry analytics in `queries/apps/`
+  - 45 hunting analytics in `queries/hunting/`
+- **Total query artifacts:** 515
 - **Source rule breakdown:** Windows (249), Cloud/OCI (100), Linux (67), Web/WAF (38)
 - **Combined MITRE ATT&CK coverage:** 211 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
-- **Dashboard inventory:** 16 dashboards with 255 saved searches
+- **Dashboard inventory:** 16 dashboards with 264 saved searches
 - **Sample data in repo:** 146,632 events across 14 NDJSON files
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 
@@ -46,8 +46,8 @@ rules/** ------------------------------------------> scripts/convert_sigma.py
                                                         +--> queries/*.json
                                                         +--> queries/apps/*.json (8 Sigma-derived browser detections)
 
-queries/apps/*.json (12 curated app analytics) --------+
-queries/hunting/*.json (40 hunting analytics) ---------+--> scripts/generate_catalog.py
+queries/apps/*.json (16 curated app analytics) --------+
+queries/hunting/*.json (45 hunting analytics) ---------+--> scripts/generate_catalog.py
                                                              |
                                                              +--> CATALOG.md
                                                              +--> queries/catalog.json
@@ -58,7 +58,7 @@ queries/** -----------------------------------------------> scripts/export_for_m
 
 queries/** -----------------------------------------------> scripts/deploy_dashboard.py
                                                              |
-                                                             +--> 16 dashboards / 255 saved searches
+                                                             +--> 16 dashboards / 264 saved searches
 ```
 
 ### Data Flow
@@ -70,7 +70,7 @@ queries/** -----------------------------------------------> scripts/deploy_dashb
   Cloud Guard Problems ──────┤                                                    |
   WAF/LB Access Logs ────────┤                                                    v
   App/Browser Telemetry JSON ─┘                                         SOC Dashboards (16)
-                                                                        Saved Searches (255)
+                                                                        Saved Searches (264)
   Test Data (NDJSON) ──> Upload API ──> Log Analytics ──> Dashboard Verification
 ```
 
@@ -113,8 +113,8 @@ Notes:
 | SOC: Sysmon Network & Lateral | 17 | C2 beacons, SMB/WinRM/RDP lateral, DNS tunneling, pipes |
 | SOC: Web Application Security | 30 | OWASP Top 10: SQLi, XSS, SSRF, path traversal, CORS, IDOR |
 | SOC: Web Threat Hunting | 8 | WAF frequency, SQLi stacking, multi-attack scoring, geo anomaly |
-| SOC: APT Detection | 17 | BLUELIGHT RAT (S0657/APT37) kill chain + YARA-backed enrichment |
-| SOC: Browser Attack Detection | 9 | SOC Application Logs: XSS, SQLi, CSRF, session hijack, fingerprinting |
+| SOC: APT Detection | 22 | BLUELIGHT RAT (S0657/APT37) summary KPIs, kill chain, links, and YARA enrichment |
+| SOC: Browser Attack Detection | 13 | SOC Application Logs: APM/WAF correlation, OWASP mix, XSS, SQLi, CSRF, session hijack |
 | SOC: Geographic Health | 5 | Multicloud health visualization (OCI, Azure, AWS, GCP) |
 | OCI-DEMO: Application 360 Monitoring | 12 | CRM + Drone Shop: trace telemetry, WAF correlation, DB perf |
 
@@ -136,13 +136,15 @@ Full kill chain detection for the North Korean BLUELIGHT Remote Access Trojan:
 | Exfiltration | Data Exfiltration via OneDrive | T1567.002 | high |
 | **Hunting** | **Kill Chain Correlation** (3+ stages/host) | **Multi-technique** | **critical** |
 
-The dashboard currently exposes 17 widgets: 11 BLUELIGHT/SPL-derived detections, 5 YARA-backed confirmations, and 1 kill-chain hunting correlation.
+The dashboard currently exposes 22 widgets: 5 BLUELIGHT summary/correlation widgets, 11 BLUELIGHT/SPL-derived detections, 5 YARA-backed confirmations, and 1 kill-chain hunting correlation.
 
 Each rule includes `splunk_original` (SPL), `threat_intel` metadata, and validated OCL.
 
 ### Browser Attack Detection (`SOC Application Logs`)
 
 These searches run on `SOC Application Logs`, not on native OCI APM objects. The log source accepts OpenTelemetry-shaped JSON emitted by browser instrumentation, app services, exporters, or checked-in demo data.
+
+The browser dashboard now leads with 4 showcase widgets for total attack volume, OWASP attack mix by service, APM-to-WAF trace correlation, and link analysis across APM/WAF tiers.
 
 | Rule | MITRE | OWASP |
 | :--- | :--- | :--- |
@@ -170,8 +172,8 @@ rules/                          # Source detection rules (Sigma YAML)
   web/                          # 38 Web rules
     browser_attacks/            # 8 browser-side source rules compiled into queries/apps/
 queries/                        # Generated OCL queries (JSON)
-  apps/                         # 20 app telemetry queries (8 source-derived + 12 curated)
-  hunting/                      # 40 advanced hunting queries
+  apps/                         # 24 app telemetry queries (8 source-derived + 16 curated)
+  hunting/                      # 45 advanced hunting queries
   catalog.json                  # Full rule catalog (machine-readable)
   manifest.json                 # Export/integration manifest
 config/
@@ -179,7 +181,7 @@ config/
 scripts/
   oci_config.py                 # Centralized config, client factories, validation
   convert_sigma.py              # Sigma -> OCL converter (with STIG metadata)
-  deploy_dashboard.py           # OCI LA dashboard deployment (16 dashboards)
+  deploy_dashboard.py           # OCI LA dashboard deployment (16 dashboards / 264 saved searches)
   generate_test_logs.py         # Core security simulation datasets for OCI LA
   generate_geo_health_logs.py   # Multicloud health dataset used by Geographic Health dashboard
   ingest_test_data.py           # Upload checked-in NDJSON test data to OCI LA
@@ -214,7 +216,7 @@ python3 scripts/ingest_test_data.py
 python3 scripts/setup_streaming_pipeline.py
 python3 scripts/validate_pipeline.py --e2e
 
-# 4. Deploy 16 dashboards with 255 saved searches
+# 4. Deploy 16 dashboards with 264 saved searches
 python3 scripts/deploy_dashboard.py
 
 # 5. Regenerate inventory artifacts

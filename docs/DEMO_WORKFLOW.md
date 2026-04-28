@@ -20,9 +20,11 @@ Validated on `2026-04-23`:
 
 - trailing `14d` dataset populated
 - `164,766` synthetic events generated across `14` files
-- `16` dashboards and `255` saved searches deployed
+- `16` dashboards and `255` saved searches deployed in the last live refresh
 - live readiness checks green
 - eligible query audit green: `51/51` with rows
+
+Current repository configuration on `2026-04-28` resolves to `16` dashboards and `264` saved searches after the APM/WAF browser showcase update.
 
 Use this path instead of running the individual generator, ingest, and deploy scripts one by one unless you are debugging a specific stage.
 
@@ -35,7 +37,7 @@ Use this path instead of running the individual generator, ingest, and deploy sc
 | Control Plane | `https://cp.octodemo.cloud` |
 | Log Analytics | demo-observability compartment → Dashboards |
 | Test data ingested | 164,766 events across 14 NDJSON datasets |
-| Dashboards deployed | 16 SOC dashboards + 255 saved searches |
+| Dashboards configured | 16 SOC dashboards + 264 saved searches |
 
 ---
 
@@ -279,9 +281,9 @@ python3 scripts/generate_catalog.py     # Regenerate catalog
 │    │ ┌──────────┐ │ └───────────────┘ └────────────┘              │
 │    │ │16 SOC    │ │                                                │
 │    │ │Dashboards│ │                                                │
-│    │ │255 Saved │ │                                                │
+│    │ │264 Saved │ │                                                │
 │    │ │Searches  │ │                                                │
-│    │ │506 Assets│ │                                                │
+│    │ │515 Assets│ │                                                │
 │    │ │211 MITRE │ │                                                │
 │    │ └──────────┘ │                                                │
 │    └──────────────┘                                                │
@@ -319,11 +321,11 @@ python3 scripts/generate_catalog.py     # Regenerate catalog
 |----------------|-------|------------|-------------------|
 | Source Sigma/YAML rules | 454 | 14 | Windows, OCI, Linux, web, BLUELIGHT, and browser-side detections |
 | Sigma-derived OCI searches | 454 | 14 | 446 top-level detections + 8 browser/app telemetry detections |
-| Curated app telemetry analytics | 12 | 2 | App 360 correlation, WAF-to-trace pivots, service health |
-| Hunting analytics | 40 | 4 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation |
+| Curated app telemetry analytics | 16 | 2 | App 360 correlation, WAF-to-trace pivots, service health, APM/WAF showcase views |
+| Hunting analytics | 45 | 4 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation |
 | STIG-mapped detections | 24 | 1 | Continuous control monitoring for IAM, network, audit, and key management |
 | Sample datasets | 14 files / 146,632 events | Demo enablement | Includes app telemetry and the 14-day multicloud geo-health data for the geographic dashboard |
-| **Total shipped query artifacts** | **506** | **16** | **211 MITRE techniques across 14 tactics** |
+| **Total shipped query artifacts** | **515** | **16** | **211 MITRE techniques across 14 tactics** |
 
 ---
 

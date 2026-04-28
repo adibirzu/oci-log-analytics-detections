@@ -89,7 +89,7 @@ queries/** -----------------------------------------------> scripts/deploy_dashb
 - `Span Attributes`
 - `Referrer`
 
-This keeps the query layer stable even when the raw event producer is browser JavaScript, an application service, or a synthetic NDJSON dataset committed to `test_data/`.
+This keeps the query layer stable even when the raw event producer is browser JavaScript, an application service, or a generated synthetic NDJSON dataset under `test_data/`.
 
 ## Capability Inventory
 
@@ -108,7 +108,8 @@ This keeps the query layer stable even when the raw event producer is browser Ja
   - 16 advanced visualization widgets (`tile`, `sunburst`, `summary_table`, `line`, `bar`, `link`, and `map`)
 - Demo/test data:
   - 14 NDJSON files
-  - 146,693 sample events checked into `test_data/`
+  - 2,837 sample events in the latest generated local `test_data/manifest.json`
+  - `test_data/` is ignored by git and should be regenerated before a fresh OCI ingest
 - Streaming/runtime surface:
   - 5 configured SOC detection streams validated end-to-end
   - `soc-detection-multicloud-health` is active in the current environment
@@ -123,6 +124,9 @@ python3 scripts/convert_sigma.py
 python3 scripts/generate_catalog.py
 python3 scripts/deploy_dashboard.py --export-inventory
 python3 scripts/export_for_multicloud.py --manifest-only
+python3 scripts/generate_test_logs.py --days 1 --validate
+python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5
+python3 scripts/ingest_test_data.py --validate
 python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md
 python3 scripts/deploy_dashboard.py --dry-run
 python3 -m pytest -q
@@ -135,16 +139,18 @@ Use these live OCI checks when validating the deployed environment:
 python3 scripts/setup_streaming_pipeline.py
 python3 scripts/validate_pipeline.py --e2e
 python3 scripts/verify_caldera_detections.py --operation discovery --lookback 60d
+python3 scripts/smoke_test_bluelight.py --lookback 24h
 ```
 
 Current local verified state on 2026-04-28:
 
 - Rule quality audit: 0 issues
-- Unit tests: 81 passing
+- Unit tests: 84 passing
 - Dashboard dry-run: 16 dashboards / 264 saved searches resolved
 - Dashboard validation: 515 query files OK
 - Ingest validation: 14 datasets and log source mappings passed
 - Log-source pre-flight validation: passed
+- BLUELIGHT live smoke test: 17/17 widgets returned rows with a 24-hour lookback
 
 Previously live-verified on 2026-04-15:
 
@@ -157,6 +163,7 @@ Current runtime note:
 
 - `validate_pipeline.py` derives expected streams and connector names from `config/streaming_config.json`, so the multicloud-health path is verified alongside the core SOC streams.
 - Direct NDJSON ingestion and the SOC streaming pipeline are both operational.
+- `deploy_dashboard.py` defaults dashboard widgets to `l24h` and validates dashboard queries with a 24-hour live OCI lookback before importing saved searches.
 
 ## Companion Dashboard
 

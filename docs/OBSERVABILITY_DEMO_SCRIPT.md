@@ -9,7 +9,8 @@ Primary goal: show that OCI Log Analytics is being used as one operational surfa
 
 - Time range to use: `Last 7 days`
 - Dashboards deployed: `16`
-- Saved searches deployed: `255`
+- Saved searches configured in the current repo: `264`
+- Last live refresh on `2026-04-23`: `255` saved searches deployed
 - Demo-readiness status: green for multicloud, application, and security-correlation flows
 - Detection-rule-compatible audit status: `51/51` eligible queries return rows in OCI Log Analytics
 

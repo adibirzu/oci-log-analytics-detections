@@ -378,8 +378,12 @@ DASHBOARDS = {
         ]
     },
     "SOC: Browser Attack Detection Dashboard": {
-        "description": "Browser-side attack detection using SOC Application Logs, a custom OpenTelemetry-shaped JSON source for browser and application telemetry. Detects XSS, SQLi, CSRF, session hijacking, clickjacking, DOM attacks, cryptomining, and fingerprinting across monitored applications.",
+        "description": "Browser-side attack detection using SOC Application Logs, a custom OpenTelemetry-shaped JSON source for browser and application telemetry. Showcase row at the top renders cross-tier trace correlation with the WAF and OWASP attack-mix breakdowns. Detection widgets below cover XSS, SQLi, CSRF, session hijacking, clickjacking, DOM attacks, cryptomining, and fingerprinting across monitored applications.",
         "widgets": [
+            {"title": "APM: Total Browser Attacks (24h)", "query_file": "apps/apm_total_attacks_kpi.json"},
+            {"title": "APM: OWASP Attack Mix by Service", "query_file": "apps/apm_owasp_breakdown_sunburst.json"},
+            {"title": "APM: Browser Attack -> WAF Correlation", "query_file": "apps/apm_attack_to_waf_correlation.json"},
+            {"title": "APM: Trace Correlation (APM x WAF)", "query_file": "apps/apm_trace_correlation_link.json"},
             {"title": "Browser: XSS Attack Detection", "query_file": "apps/apm_xss_attack_detection.json"},
             {"title": "Browser: SQL Injection Detection", "query_file": "apps/apm_sqli_attack_detection.json"},
             {"title": "Browser: CSRF Violation", "query_file": "apps/apm_csrf_violation_detection.json"},

@@ -3506,7 +3506,7 @@ WAF_HOST = "sevenkingdoms.example.com"
 
 def waf_event(action, http_method, url, rule_type="PROTECTION_RULES", rule_key="",
               client_ip=None, user_agent=None, response_code="403",
-              body_data="", content_type="text/html", offset=0):
+              body_data="", content_type="text/html", trace_id=None, offset=0):
     """Generate a WAF security event."""
     if client_ip is None:
         client_ip = random.choice(ATTACKER_IPS)
@@ -3531,6 +3531,7 @@ def waf_event(action, http_method, url, rule_type="PROTECTION_RULES", rule_key="
         "requestHeaders": f"Host: {WAF_HOST}",
         "wafPolicy": "seven-kingdoms-portal-waf",
         "fingerprint": uuid.uuid4().hex[:12],
+        "traceId": trace_id or f"trace_{uuid.uuid4().hex[:16]}",
         "hostname": WAF_HOST,
         "msg": f"WAF {action}: {http_method} {url[:80]}",
     }
@@ -3782,6 +3783,26 @@ def generate_waf_events():
     # CORS bypass
     events.append(waf_event("BLOCK", "GET", "/vulnerable/api/data",
                             rule_key="920100", offset=67))
+
+    cross_tier_attacks = [
+        ("BLOCK", "GET", "/crm/search?q=%3Cscript%3Ealert(1)%3C/script%3E",
+         "trace_attack_00", "941100", 70),
+        ("BLOCK", "GET", "/shop/products?name=%3Cimg%20src=x%20onerror=alert(document.cookie)%3E",
+         "trace_attack_01", "941100", 71),
+        ("BLOCK", "GET", "/crm/search?q=1'%20OR%201=1--",
+         "trace_attack_02", "942100", 72),
+        ("BLOCK", "GET", "/shop/api/orders?sort=UNION%20SELECT%20username,password%20FROM%20users",
+         "trace_attack_03", "942270", 73),
+        ("BLOCK", "GET", "/crm/checkout?miner=coinhive",
+         "trace_attack_04", "933100", 74),
+        ("BLOCK", "GET", "/shop/profile?payload=javascript:alert(1)",
+         "trace_attack_05", "941160", 75),
+    ]
+    for action, method, url, trace_id, rule_key, off in cross_tier_attacks:
+        events.append(waf_event(action, method, url,
+                                rule_key=rule_key,
+                                trace_id=trace_id,
+                                offset=off))
 
     return events
 

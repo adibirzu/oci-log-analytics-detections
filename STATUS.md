@@ -8,12 +8,12 @@ Date: 2026-04-28
 - Sigma-derived OCI queries: 454
   - 446 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
-- Curated analytics: 52
-  - 12 app telemetry analytics
-  - 40 hunting analytics
-- Total query artifacts: 506
+- Curated analytics: 61
+  - 16 app telemetry analytics
+  - 45 hunting analytics
+- Total query artifacts: 515
 - Dashboards: 16
-- Saved searches: 255
+- Saved searches: 264
 - Sample data: 14 NDJSON files / 146,632 events
 - MITRE ATT&CK coverage: 211 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
@@ -27,6 +27,7 @@ Date: 2026-04-28
 - Generated query paths are stabilized by `sigma_id`, which avoids filename churn when titles change.
 - Catalog generation, rule quality auditing, and multicloud export now walk the full `queries/**` tree instead of assuming everything lives at the top level.
 - Browser/app dashboards now run on `SOC Application Logs`, a custom JSON source that carries OpenTelemetry-shaped fields into OCI Log Analytics.
+- Browser attack dashboards now include APM/WAF showcase widgets for attack volume, OWASP breakdown, trace correlation, and cross-tier WAF correlation.
 - `test_data/manifest.json` is rebuilt from the checked-in `*.jsonl` files rather than hand-maintained counts.
 - Streaming pipeline reconciliation refreshes `config/streaming_config.json` against the active tenancy resources.
 - `LoganSecurityDashboardv0` is documented as the companion operator UI and should consume this repo's catalog, manifest, query, and test-data artifacts instead of duplicating detection-generation logic.
@@ -45,9 +46,9 @@ Local verification on 2026-04-28:
   - passed
 - `python3 scripts/deploy_dashboard.py --dry-run`
   - 16 dashboards
-  - 255 saved searches
+  - 264 saved searches
 - `python3 scripts/deploy_dashboard.py --validate`
-  - 506 query files OK
+  - 515 query files OK
 - `python3 scripts/ingest_test_data.py --validate`
   - 14 datasets and log source mappings passed
 - `python3 scripts/setup_log_sources.py --validate`

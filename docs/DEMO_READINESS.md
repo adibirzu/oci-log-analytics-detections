@@ -31,6 +31,8 @@ Validated on `2026-04-23` in the OCI demo tenancy:
 - `demo_readiness.py --lookback 14d`: `OK`
 - `query_audit.py --lookback 14d --eligible-only`: `51/51` queries with rows, `0` empty, `0` errors
 
+Repository update on `2026-04-28`: the current dashboard configuration resolves to `16` dashboards and `264` saved searches after adding the APM/WAF browser showcase widgets. Rerun the Fast Path before presenting from a refreshed tenancy.
+
 ## Demo Story
 
 Lead with three connected views:

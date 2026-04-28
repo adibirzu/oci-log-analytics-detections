@@ -21,8 +21,8 @@ One important detail for the current shipping implementation: browser and applic
 |------|------|-------|-------|
 | `rules/**` | Source Sigma/YAML authoring layer | 454 | Source of truth for source-derived detections |
 | `queries/*.json` | Generated top-level OCI detection queries | 446 | Produced by `scripts/convert_sigma.py` |
-| `queries/apps/*.json` | App telemetry query surface | 20 | 8 Sigma-derived browser detections + 12 curated app analytics |
-| `queries/hunting/*.json` | Curated hunting analytics | 40 | Frequency, anomaly, scoring, and correlation content |
+| `queries/apps/*.json` | App telemetry query surface | 24 | 8 Sigma-derived browser detections + 16 curated app analytics |
+| `queries/hunting/*.json` | Curated hunting analytics | 45 | Frequency, anomaly, scoring, and correlation content |
 | `queries/catalog.json` | Canonical machine-readable inventory | 1 | Use this for published counts and downstream tooling |
 | `queries/manifest.json` | Export/integration manifest | 1 | Generated artifact for multicloud export, not the canonical inventory |
 
@@ -30,7 +30,7 @@ Important distinction:
 
 - There are **454 Sigma-derived OCI queries** in total.
 - Those 454 are split across **446 top-level detections** in `queries/` and **8 browser/app telemetry detections** in `queries/apps/`.
-- The repo also ships **52 curated analytics** that are not Sigma-derived: 12 app telemetry analytics and 40 hunting queries.
+- The repo also ships **61 curated analytics** that are not Sigma-derived: 16 app telemetry analytics and 45 hunting queries.
 
 ## Architecture Flow
 
@@ -50,8 +50,8 @@ rules/** ------------------------------------------+
                  queries/*.json                               queries/apps/*.json
            446 generated detections                    8 Sigma-derived browser queries
 
-queries/apps/*.json (12 curated app analytics) -------+
-queries/hunting/*.json (40 curated analytics) --------+----> scripts/generate_catalog.py
+queries/apps/*.json (16 curated app analytics) -------+
+queries/hunting/*.json (45 curated analytics) --------+----> scripts/generate_catalog.py
                                                             - CATALOG.md
                                                             - queries/catalog.json
                                                             - inventory/coverage summary
@@ -62,7 +62,7 @@ queries/** -----------------------------------------------> scripts/export_for_m
 
 queries/** -----------------------------------------------> scripts/deploy_dashboard.py
                                                             - 16 dashboards
-                                                            - 255 embedded saved searches
+                                                            - 264 embedded saved searches
 ```
 
 ## Design Invariants
@@ -96,12 +96,12 @@ This keeps the query layer stable even when the raw event producer is browser Ja
   - Linux: 67
   - Web/WAF: 38
 - Combined query inventory:
-  - 506 total query artifacts
+  - 515 total query artifacts
   - 211 MITRE ATT&CK techniques across 14 tactics
   - 24 STIG-mapped detections across 12 controls
 - Dashboard layer:
   - 16 dashboards
-  - 255 widget-backed saved searches
+  - 264 widget-backed saved searches
 - Demo/test data:
   - 14 NDJSON files
   - 146,632 sample events checked into `test_data/`
@@ -136,8 +136,8 @@ Current local verified state on 2026-04-28:
 
 - Rule quality audit: 0 issues
 - Unit tests: 81 passing
-- Dashboard dry-run: 16 dashboards / 255 saved searches resolved
-- Dashboard validation: 506 query files OK
+- Dashboard dry-run: 16 dashboards / 264 saved searches resolved
+- Dashboard validation: 515 query files OK
 - Ingest validation: 14 datasets and log source mappings passed
 - Log-source pre-flight validation: passed
 

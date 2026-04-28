@@ -148,7 +148,7 @@ Each rule includes `splunk_original` (SPL), `threat_intel` metadata, and validat
 
 ### Browser Attack Detection (`SOC Application Logs`)
 
-These searches run on `SOC Application Logs`, not on native OCI APM objects. The log source accepts OpenTelemetry-shaped JSON emitted by browser instrumentation, app services, exporters, or checked-in demo data.
+These searches run on `SOC Application Logs`, not on native OCI APM objects. The log source accepts OpenTelemetry-shaped JSON emitted by browser instrumentation, app services, exporters, or generated demo data.
 
 The browser dashboard now leads with 4 showcase widgets for total attack volume, OWASP attack mix by service, APM-to-WAF trace correlation, and link analysis across APM/WAF tiers.
 

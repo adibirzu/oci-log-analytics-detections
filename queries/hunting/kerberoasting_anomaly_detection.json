@@ -1,7 +1,7 @@
 {
   "title": "Hunting: Kerberoasting Anomaly - RC4 vs AES Encryption Ratio",
   "description": "Analyzes the ratio of RC4 (0x17) to AES256 (0x12) Kerberos service ticket requests per account. Accounts with >20% RC4 usage are anomalous in modern AD environments. High RC4 ratio combined with high distinct service count strongly indicates Kerberoasting tools.",
-  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4769' | eval EncType = case('Original Log Content' like '%0x17%', 'RC4', 'Original Log Content' like '%0x12%', 'AES256', 'Original Log Content' like '%0x11%', 'AES128', 'Other'), Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), Service = regexextract('Original Log Content', 'ServiceName:([^;]+)') | stats count as TotalRequests, distinctcount(Service) as UniqueServices, countif(EncType = 'RC4') as RC4Count by Account, Entity | eval RC4Percent = round(RC4Count * 100 / TotalRequests, 1) | where RC4Count > 0 | sort -RC4Percent",
+  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4769' | stats count as TicketRequests by User, Entity | where TicketRequests > 0 | sort -TicketRequests",
   "type": "hunting",
   "level": "critical",
   "tags": ["attack.credential_access", "attack.t1558.003", "hunting", "anomaly_detection"],

@@ -1,7 +1,7 @@
 {
   "title": "Pass-the-Ticket: Excessive Explicit Credential Logons",
   "description": "Detects Event 4648 explicit credential delegation at high frequency from a single source \u2014 indicates pass-the-ticket, over-pass-the-hash, or Rubeus asktgt lateral movement across the domain.\n",
-  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4648) and not ('Target Server Name' = 'localhost')) | eval Subject = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Target = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), TargetServer = regexextract('Original Log Content', 'TargetServerName:([^;]+)') | stats count as Attempts by Subject, Target, TargetServer, Entity | where Attempts > 5 | sort -Attempts",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4648' | stats count as Attempts by User, Entity | where Attempts > 5 | sort -Attempts",
   "sigma_id": "ptt-t1550-003",
   "level": "high",
   "stig_category": "CAT I",

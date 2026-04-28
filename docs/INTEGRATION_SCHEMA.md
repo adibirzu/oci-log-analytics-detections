@@ -11,7 +11,7 @@ This document defines the generated artifact contract consumed by companion proj
 | `queries/catalog.json` | Detections repo | Canonical inventory, counts, severity, MITRE/STIG coverage, app queries, and hunting queries | `scripts/generate_catalog.py` |
 | `queries/dashboard_inventory.json` | Detections repo | OCI dashboard, widget, saved-search, query-file, and visualization inventory | `scripts/deploy_dashboard.py --export-inventory` |
 | `queries/manifest.json` | Detections repo | Export/integration payload for downstream platforms | `scripts/export_for_multicloud.py --manifest-only` |
-| `test_data/manifest.json` | Detections repo | Checked-in synthetic dataset counts | `scripts/generate_test_logs.py` and dataset generators |
+| `test_data/manifest.json` | Detections repo | Generated synthetic dataset counts | `scripts/generate_test_logs.py` and dataset generators |
 
 ## `queries/dashboard_inventory.json`
 
@@ -147,12 +147,12 @@ The manifest is an export payload, not the canonical catalog. Use it when a down
 
 ## `test_data/manifest.json`
 
-The test-data manifest exposes dataset availability without requiring UI code to scan large NDJSON files:
+The test-data manifest exposes dataset availability without requiring UI code to scan large NDJSON files. `test_data/` is generated locally and ignored by git; regenerate it before ingesting fresh demo data.
 
 ```json
 {
-  "generated_at": "2026-04-28T10:31:57.137152+00:00",
-  "total_events": 146693,
+  "generated_at": "2026-04-28T12:42:47.407373+00:00",
+  "total_events": 2837,
   "files": {
     "windows_sysmon.jsonl": {
       "event_count": 218
@@ -163,7 +163,7 @@ The test-data manifest exposes dataset availability without requiring UI code to
 
 ## Deployment Gate
 
-`scripts/deploy_dashboard.py` builds the inventory from `DASHBOARDS`, validates every query reference locally, then validates every unique dashboard query against OCI Log Analytics before importing dashboards by default. Live validation runs each query in an isolated child process so a slow or hung query becomes a validation failure instead of reaching dashboard import.
+`scripts/deploy_dashboard.py` builds the inventory from `DASHBOARDS`, validates every query reference locally, then validates every unique dashboard query against OCI Log Analytics before importing dashboards by default. Live validation runs each query in an isolated child process so a slow or hung query becomes a validation failure instead of reaching dashboard import. The generated OCI dashboard time parameter and widget default are `l24h`, matching the one-day synthetic security dataset and the 60-minute geographic health generator.
 
 Default deployment behavior:
 
@@ -176,7 +176,7 @@ The default path does not import dashboards or embedded saved searches if OCI Lo
 Tune the validation window or timeout when needed:
 
 ```bash
-python3 scripts/deploy_dashboard.py --query-lookback 1h --query-timeout 60
+python3 scripts/deploy_dashboard.py --query-lookback 24h --query-timeout 60
 ```
 
 Static artifact generation:

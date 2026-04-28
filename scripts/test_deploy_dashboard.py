@@ -13,6 +13,7 @@ from deploy_dashboard import (
     SUPPORTED_VISUALIZATION_TYPES,
     build_dashboard_inventory,
     build_dashboard_json,
+    build_saved_search_json,
     resolve_widget_ui_config,
     validate_dashboard_inventory,
 )
@@ -63,6 +64,43 @@ class TestDashboardContract(unittest.TestCase):
         self.assertEqual(ui_config["visualizationType"], "map")
         self.assertEqual(ui_config["timeSelection"], {"timePeriod": "l24h"})
         self.assertEqual(ui_config["queryString"], query_info["query"])
+
+    def test_resolve_widget_ui_config_defaults_to_demo_ready_time_window(self):
+        widget = {"title": "Default time widget"}
+        query_info = {"query": "'Log Source' = 'SOC Windows Sysmon Logs' | stats count"}
+
+        ui_config = resolve_widget_ui_config(widget, query_info)
+
+        self.assertEqual(ui_config["timeSelection"], {"timePeriod": "l24h"})
+
+    def test_build_saved_search_json_defaults_to_demo_ready_time_window(self):
+        saved_search = build_saved_search_json(
+            search_id="default-time",
+            title="Default Time",
+            query="'Log Source' = 'SOC Windows Sysmon Logs' | stats count",
+        )
+
+        self.assertEqual(saved_search["uiConfig"]["timeSelection"], {"timePeriod": "l24h"})
+
+    def test_build_dashboard_json_time_parameter_matches_widget_default(self):
+        widget = {"title": "Default Time", "query_file": "default_time.json"}
+        query_info = {"query": "'Log Source' = 'SOC Windows Sysmon Logs' | stats count"}
+
+        dashboard = build_dashboard_json(
+            dashboard_id="soc-default-time",
+            name="Default Time Dashboard",
+            description="test",
+            widgets=[widget],
+            widget_queries=[query_info],
+        )
+
+        time_parameter = next(
+            parameter for parameter in dashboard["parametersConfig"]
+            if parameter["paramName"] == "time"
+        )
+        saved_search = dashboard["savedSearches"][0]
+        self.assertEqual(time_parameter["defaultValue"], "l24h")
+        self.assertEqual(saved_search["uiConfig"]["timeSelection"], {"timePeriod": "l24h"})
 
     def test_build_dashboard_json_promotes_ask_ai_prompts_to_tags(self):
         widget = {"title": "Geo map", "query_file": "hunting/multicloud_geo_health_regional_map.json"}

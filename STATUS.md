@@ -14,7 +14,7 @@ Date: 2026-04-28
 - Total query artifacts: 515
 - Dashboards: 16
 - Saved searches: 264
-- Sample data: 14 NDJSON files / 146,693 events
+- Generated demo data: 14 NDJSON files / 2,837 events in the latest local `test_data/manifest.json`
 - MITRE ATT&CK coverage: 211 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
 
@@ -31,12 +31,13 @@ Date: 2026-04-28
 - `queries/dashboard_inventory.json` is generated from `scripts/deploy_dashboard.py:DASHBOARDS` and is the dashboard-facing saved-search/widget inventory.
 - Dashboard deployment now validates the generated inventory locally and validates every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
 - Live query validation runs each query in an isolated child process so slow or hung queries become blocking validation failures instead of reaching dashboard import.
+- Dashboard saved-search widgets now default to `l24h`, and the deploy-time OCI query validation default lookback is `24h`, matching the generated one-day security dataset.
 - BLUELIGHT (S0657 / APT37) APT dashboard now leads with 5 showcase widgets (Total Detections KPI tile, Top Affected Hosts summary, MITRE Tactics × Techniques sunburst, Kill Chain Timeline line chart, Attack Path link analysis) followed by the 17 per-stage detection widgets, presenting the full attack chain on a single canvas.
 - WAF parser now extracts `Trace ID` so APM browser attacks correlate to upstream WAF blocks across `SOC Application Logs` and `SOC WAF Security Logs` via shared `traceId`.
 - BLUELIGHT kill-chain test data is mirrored into both `windows_sysmon.jsonl` (SOC Windows Sysmon parser, 35 field maps) and `sysmon_operational.jsonl` (Sysmon Operational parser) so per-widget detections match through whichever parser route propagates first.
 - All BLUELIGHT queries standardised on quoted `'Event ID' = 'N'` form — OCI LA returns HTTP 400 on unquoted numeric comparisons against String-typed fields, so the convention applies repo-wide for parser-string fields.
 - `scripts/smoke_test_bluelight.py` — live OCI LA query runner reports HIT/MISS/ERROR per widget with row counts, used as the green-light gate before deploys.
-- `test_data/manifest.json` is rebuilt from the checked-in `*.jsonl` files rather than hand-maintained counts.
+- `test_data/manifest.json` is rebuilt from generated `*.jsonl` files rather than hand-maintained counts.
 - Streaming pipeline reconciliation refreshes `config/streaming_config.json` against the active tenancy resources.
 - `LoganSecurityDashboardv0` is documented as the companion operator UI and consumes this repo's catalog, dashboard inventory, and test-data artifacts instead of duplicating detection-generation logic.
 
@@ -54,8 +55,10 @@ Local and pre-flight verification on 2026-04-28:
   - OCID, CLI profile, namespace, compartment, and 515 query files passed
 - `python3 scripts/deploy_dashboard.py --dry-run`
   - 16 dashboards / 264 saved searches resolved from generated inventory
-- `python3 scripts/generate_test_logs.py --validate`
-  - 14 datasets / 146,693 events generated and 515 query files counted across all query surfaces
+- `python3 scripts/generate_test_logs.py --days 1 --validate`
+  - 1,541 core security/app events generated and 515 query files counted across all query surfaces
+- `python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5`
+  - 1,296 multicloud health events generated
 - `python3 scripts/ingest_test_data.py --validate`
   - 14 datasets and log source mappings passed
 - Targeted live OCI validation:
@@ -63,7 +66,7 @@ Local and pre-flight verification on 2026-04-28:
 
 Previously live-verified on 2026-04-28 (eu-frankfurt-1):
 
-- `python3 scripts/smoke_test_bluelight.py --lookback 7d`
+- `python3 scripts/smoke_test_bluelight.py --lookback 24h`
   - 17/17 BLUELIGHT detection widgets HIT
   - 5/5 BLUELIGHT showcase widgets HIT
   - 13/13 APM browser-attack widgets HIT including cross-tier WAF correlation
@@ -92,7 +95,7 @@ Previously live-verified on 2026-04-15:
 
 - `validate_pipeline.py` now derives expected streams/connectors from `config/streaming_config.json`, so the multicloud-health connector is validated alongside the core SOC pipeline.
 - Redundant active connectors were removed from the compartment without affecting the SOC streaming path.
-- `test_data/manifest.json` is current as of 2026-04-28 and reports 146,693 checked-in events, dominated by the multicloud health dataset.
+- `test_data/manifest.json` is current as of 2026-04-28 and reports 2,837 generated local events. `test_data/` is ignored by git and should be regenerated before a fresh ingest.
 
 ## Documentation Map
 

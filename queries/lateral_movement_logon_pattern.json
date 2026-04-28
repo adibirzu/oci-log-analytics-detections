@@ -1,7 +1,7 @@
 {
   "title": "Lateral Movement: Account Authenticating from Multiple Sources",
   "description": "Detects a single account performing network logons (LogonType 3) from 3+ distinct source IPs \u2014 indicates lateral movement sweep or compromised credential reuse.\n",
-  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4624 and 'Logon Type' = 3) and not (('Target User Name' = 'ANONYMOUS LOGON' or 'Target User Name' = '-')) and not ('Target User Name' like '*$')) | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)') | stats distinctcount(SrcIP) as UniqueSources, count as TotalLogons by Account, Entity | where UniqueSources > 3 | sort -UniqueSources",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4624' and 'Logon Type' = '3' and not (User = 'ANONYMOUS LOGON' or User = '-') and not (User like '*$') | stats distinctcount('Source Address') as UniqueSources, count as TotalLogons by User, Entity | where UniqueSources > 3 | sort -UniqueSources",
   "sigma_id": "lateral-t1021-001",
   "level": "high",
   "stig_category": "CAT I",

@@ -1,7 +1,7 @@
 {
   "title": "Security Group Enumeration: Rapid Membership Queries",
   "description": "Detects Event 4799 rapid security group membership enumeration \u2014 indicates BloodHound/SharpHound or net group /domain reconnaissance.\n",
-  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4799)) | eval Account = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Process = regexextract('Original Log Content', 'CallerProcessName:([^;]+)') | stats count as Queries by Account, Process, Entity | where Queries > 50 | sort -Queries",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4799' | stats count as Queries by User, Process, Entity | where Queries > 50 | sort -Queries",
   "sigma_id": "groupenum-t1069-002",
   "level": "medium",
   "stig_category": "CAT II",

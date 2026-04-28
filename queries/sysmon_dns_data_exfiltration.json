@@ -1,7 +1,7 @@
 {
   "title": "Sysmon DNS Data Exfiltration",
   "description": "Detects DNS queries with high-entropy subdomains that may indicate data exfiltration via DNS tunneling. Encoded data in subdomain labels is a common technique for covert data transfer.\n",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Query Name' REGEX MATCH '^[a-zA-Z0-9]{30,}\\.') or (('Query Name' like '*.dnscat.*' or 'Query Name' like '*.dns2tcp.*' or 'Query Name' like '*.iodine.*' or 'Query Name' like '*.dnsexfil.*')) or ('Query Name' REGEX MATCH '^[0-9a-f]{20,}\\.'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and 'Query Name' != '' | eval domain_length = length('Query Name') | where domain_length > 30 | fields 'Query Name', 'Host Name (Server)', User, domain_length",
   "sigma_id": "a1b2c3d4-7003-4000-8000-000000000001",
   "level": "high",
   "stig_category": "CAT I",

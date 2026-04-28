@@ -1,7 +1,7 @@
 {
   "title": "Sysmon Mimikatz Named Pipe",
   "description": "Detects named pipe creation matching known Mimikatz pipe patterns. Mimikatz uses named pipes for credential extraction and token manipulation operations.\n",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Pipe Name' like '*mimikatz*' or 'Pipe Name' like '*mimilib*' or 'Pipe Name' like '*mimidrv*')) or (('Pipe Name' = '\\HID_CTRL' or 'Pipe Name' = '\\Win32Pipes.')))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Pipe Name' like '*mimikatz*' or 'Pipe Name' like '*mimilib*' or 'Pipe Name' like '*mimidrv*' or 'Pipe Name' like '*HID_CTRL*' or 'Pipe Name' like '*Win32Pipes*')",
   "sigma_id": "a1b2c3d4-7002-4000-8000-000000000003",
   "level": "critical",
   "stig_category": "CAT I",

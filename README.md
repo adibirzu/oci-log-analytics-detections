@@ -1,50 +1,64 @@
 # OCI Log Analytics Detection Rules
 
-A comprehensive STIG-compliant detection rules library for Oracle Cloud Infrastructure (OCI) Log Analytics. Converts industry-standard [Sigma](https://github.com/SigmaHQ/sigma) rules into OCI Log Analytics Query Language (OCL) with MITRE ATT&CK and STIG compliance mapping. Enhanced with advanced threat hunting queries, APT-specific detection (BLUELIGHT/APT37), and browser attack detection via OCI APM/OpenTelemetry.
+A comprehensive STIG-compliant detection rules library for Oracle Cloud Infrastructure (OCI) Log Analytics. Converts industry-standard [Sigma](https://github.com/SigmaHQ/sigma) rules into OCI Log Analytics Query Language (OCL) with MITRE ATT&CK and STIG compliance mapping. Enhanced with advanced threat hunting queries, APT-specific detection (BLUELIGHT/APT37), and browser/application attack detection via `SOC Application Logs`, an OpenTelemetry-shaped custom JSON telemetry surface for OCI Log Analytics.
 
-## Current Status
-- **Total Rules:** 428 Sigma detection rules + 36 advanced hunting queries
-- **Categories:** Windows Security (229), Cloud/OCI (100), Linux Security (67), Web/WAF (30), APT Detection (11), Browser Attacks (8)
-- **Hunting Queries:** 36 analytics-based queries (frequency analysis, anomaly detection, scoring, kill chain correlation, browser attack frequency)
-- **STIG Coverage:** 24 rules with DoD STIG control mappings (IA-2, IA-5, SC-7, SC-28, AU-11, AC-17, etc.)
-- **MITRE ATT&CK:** 203 techniques across 14 tactics
-- **Deployed:** 249 saved searches across 16 dashboards
-- **Test Data:** 1,315 attack simulation events across 12 NDJSON files
-- **Target Environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
+## Current Inventory
+This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
+
+- **Source Sigma/YAML rules:** 454
+- **Sigma-derived OCI queries:** 454
+  - 446 top-level detections in `queries/*.json`
+  - 8 browser/app telemetry detections in `queries/apps/*.json`
+- **Curated analytics:** 52
+  - 12 app telemetry analytics in `queries/apps/`
+  - 40 hunting analytics in `queries/hunting/`
+- **Total query artifacts:** 506
+- **Source rule breakdown:** Windows (249), Cloud/OCI (100), Linux (67), Web/WAF (38)
+- **Combined MITRE ATT&CK coverage:** 211 techniques across 14 tactics
+- **STIG coverage:** 24 detections spanning 12 controls
+- **Dashboard inventory:** 16 dashboards with 255 saved searches
+- **Sample data in repo:** 146,632 events across 14 NDJSON files
+- **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
+
+Canonical inventory and supporting documentation:
+
+- `queries/catalog.json` — canonical machine-readable inventory
+- `queries/manifest.json` — export artifact for downstream integrations
+- `docs/ARCHITECTURE.md` — source/generation/deployment architecture
+- `CATALOG.md` — human-readable catalog
+- `docs/DEMO_WORKFLOW.md` — operator/demo walkthrough
+- `docs/RULE_QUALITY_REPORT.md` — latest quality audit report
+- `CONTRIBUTING.md` — contributor workflow and validation expectations
 
 ## Architecture
 
-```
-                    +-----------------------+
-                    |   Sigma YAML Rules    |
-                    |   rules/{platform}/   |
-                    +-----------+-----------+
-                                |
-                    +-----------v-----------+
-                    |  convert_sigma.py     |
-                    |  (Sigma -> OCL)       |
-                    +-----------+-----------+
-                                |
-              +-----------------+------------------+
-              |                                    |
-   +----------v----------+            +-----------v-----------+
-   |  OCL Query JSONs    |            |  Hunting Query JSONs  |
-   |  queries/*.json     |            |  queries/hunting/*.json|
-   |  queries/apps/*.json|            +----------+------------+
-   +----------+----------+                       |
-              |                                  |
-              +----------------+-----------------+
-                               |
-                    +----------v----------+
-                    |  deploy_dashboard.py |
-                    |  (16 dashboards)     |
-                    +----------+----------+
-                               |
-                    +----------v----------+
-                    |  OCI Log Analytics   |
-                    |  demo-observability  |
-                    |  (MAIN compartment)  |
-                    +---------------------+
+The repo is intentionally split into three content surfaces:
+
+- `rules/**` — source Sigma/YAML authoring layer
+- `queries/*.json` and source-derived files in `queries/apps/` — generated OCI detections
+- `queries/apps/*.json` curated analytics and `queries/hunting/*.json` — hand-authored app and hunting content
+
+The canonical architecture contract is documented in `docs/ARCHITECTURE.md`. The short version is:
+
+```text
+rules/** ------------------------------------------> scripts/convert_sigma.py
+                                                        |
+                                                        +--> queries/*.json
+                                                        +--> queries/apps/*.json (8 Sigma-derived browser detections)
+
+queries/apps/*.json (12 curated app analytics) --------+
+queries/hunting/*.json (40 hunting analytics) ---------+--> scripts/generate_catalog.py
+                                                             |
+                                                             +--> CATALOG.md
+                                                             +--> queries/catalog.json
+
+queries/** -----------------------------------------------> scripts/export_for_multicloud.py --manifest-only
+                                                             |
+                                                             +--> queries/manifest.json
+
+queries/** -----------------------------------------------> scripts/deploy_dashboard.py
+                                                             |
+                                                             +--> 16 dashboards / 255 saved searches
 ```
 
 ### Data Flow
@@ -55,10 +69,32 @@ A comprehensive STIG-compliant detection rules library for Oracle Cloud Infrastr
   OCI Audit Events ──────────┤──> OCI Streaming ──> Service Connector Hub ──> Log Analytics
   Cloud Guard Problems ──────┤                                                    |
   WAF/LB Access Logs ────────┤                                                    v
-  APM/OpenTelemetry Spans ───┘                                          SOC Dashboards (16)
-                                                                        Saved Searches (249)
+  App/Browser Telemetry JSON ─┘                                         SOC Dashboards (16)
+                                                                        Saved Searches (255)
   Test Data (NDJSON) ──> Upload API ──> Log Analytics ──> Dashboard Verification
 ```
+
+Browser and app dashboards currently run against `SOC Application Logs`, a custom OCI Log Analytics source created by `scripts/setup_log_sources.py`. The contract intentionally uses OCI LA display names such as `Service Name`, `Trace ID`, `Request URL`, `Response Code`, `Span Name`, `Span Attributes`, and `Referrer` so the queries remain valid against the deployed parser.
+
+### Canonical Inventory Contract
+
+Treat the following as the canonical output contract for downstream integrations such as `mcp-oci-logan-server` and `LoganSecurityDashboardv0`:
+
+- `queries/catalog.json` for authoritative counts and inventory
+- `queries/*.json` for generated top-level detection queries
+- `queries/apps/*.json` for mixed app telemetry content
+- `queries/hunting/*.json` for hunting queries
+- `queries/manifest.json` as the generated export/integration artifact
+- `test_data/manifest.json` for checked-in demo dataset counts
+
+Notes:
+
+- `rules/` is the source-of-truth authoring layer
+- `sigma_id` identifies source-derived generated detections
+- `queries/catalog.json` is canonical; `queries/manifest.json` is derivative
+- `queries/apps/` contains both generated browser detections and curated app analytics
+- `LoganSecurityDashboardv0` should consume these generated artifacts rather than duplicating detection-generation logic
+- `logandetectionqueries/` and `logandetectionrules/` are legacy empty directories and should not be consumed
 
 ## OCI Log Analytics Dashboards
 
@@ -72,15 +108,15 @@ A comprehensive STIG-compliant detection rules library for Oracle Cloud Infrastr
 | SOC: Linux Security | 20 | SSH, sudo, persistence, container escape, injection, C2 |
 | SOC: Linux Advanced Threats | 18 | Web shells, cryptominers, exfiltration, scanning, hidden files |
 | SOC: Windows Security | 20 | Credential theft, encoded PS, LOLBins, lateral movement |
-| SOC: Windows Advanced Threats | 17 | Kerberoasting, pass-the-hash, process hollowing, RATs |
+| SOC: Windows Advanced Threats | 18 | Kerberoasting, pass-the-hash, process hollowing, RATs |
 | SOC: Threat Hunting | 16 | Cookbook-inspired: frequency, anomaly, scoring, multi-stage |
 | SOC: Sysmon Network & Lateral | 17 | C2 beacons, SMB/WinRM/RDP lateral, DNS tunneling, pipes |
 | SOC: Web Application Security | 30 | OWASP Top 10: SQLi, XSS, SSRF, path traversal, CORS, IDOR |
 | SOC: Web Threat Hunting | 8 | WAF frequency, SQLi stacking, multi-attack scoring, geo anomaly |
-| SOC: APT Detection | 12 | BLUELIGHT RAT (S0657/APT37) full kill chain detection |
-| SOC: Browser Attack Detection | 9 | APM/OpenTelemetry: XSS, SQLi, CSRF, session hijack, fingerprinting |
-| SOC: Geographic Health | 5 | Multicloud health visualization (OCI, Azure, GCP) |
-| OCI-DEMO: App 360 Monitoring | 12 | CRM + Drone Shop: APM traces, WAF correlation, DB perf |
+| SOC: APT Detection | 17 | BLUELIGHT RAT (S0657/APT37) kill chain + YARA-backed enrichment |
+| SOC: Browser Attack Detection | 9 | SOC Application Logs: XSS, SQLi, CSRF, session hijack, fingerprinting |
+| SOC: Geographic Health | 5 | Multicloud health visualization (OCI, Azure, AWS, GCP) |
+| OCI-DEMO: Application 360 Monitoring | 12 | CRM + Drone Shop: trace telemetry, WAF correlation, DB perf |
 
 ### APT Detection: BLUELIGHT RAT (S0657/APT37)
 Full kill chain detection for the North Korean BLUELIGHT Remote Access Trojan:
@@ -100,9 +136,14 @@ Full kill chain detection for the North Korean BLUELIGHT Remote Access Trojan:
 | Exfiltration | Data Exfiltration via OneDrive | T1567.002 | high |
 | **Hunting** | **Kill Chain Correlation** (3+ stages/host) | **Multi-technique** | **critical** |
 
+The dashboard currently exposes 17 widgets: 11 BLUELIGHT/SPL-derived detections, 5 YARA-backed confirmations, and 1 kill-chain hunting correlation.
+
 Each rule includes `splunk_original` (SPL), `threat_intel` metadata, and validated OCL.
 
-### Browser Attack Detection (APM/OpenTelemetry)
+### Browser Attack Detection (`SOC Application Logs`)
+
+These searches run on `SOC Application Logs`, not on native OCI APM objects. The log source accepts OpenTelemetry-shaped JSON emitted by browser instrumentation, app services, exporters, or checked-in demo data.
+
 | Rule | MITRE | OWASP |
 | :--- | :--- | :--- |
 | XSS Attack Detection | T1189, T1059.007 | A03, A07 |
@@ -120,31 +161,33 @@ Each rule includes `splunk_original` (SPL), `threat_intel` metadata, and validat
 rules/                          # Source detection rules (Sigma YAML)
   cloud/oci/                    # 100 OCI rules (STIG + security + discovery)
   linux/                        # 67 Linux rules (advanced attacks + hunting)
-  windows/                      # 229 Windows rules (13 subdirectories)
-    apt/                        # 11 APT-specific rules (BLUELIGHT/APT37)
+  windows/                      # 249 Windows rules (13 subdirectories)
+    apt/                        # 16 BLUELIGHT/APT37 + YARA-backed detections
     process_creation/           # 56 process creation rules
     defense_evasion/            # 29 defense evasion rules
     credential_access/          # 25 credential access rules
     ...
   web/                          # 38 Web rules
-    browser_attacks/            # 8 APM/OpenTelemetry browser attack rules
+    browser_attacks/            # 8 browser-side source rules compiled into queries/apps/
 queries/                        # Generated OCL queries (JSON)
-  apps/                         # 20 APM application queries
-  hunting/                      # 36 advanced hunting queries
+  apps/                         # 20 app telemetry queries (8 source-derived + 12 curated)
+  hunting/                      # 40 advanced hunting queries
   catalog.json                  # Full rule catalog (machine-readable)
+  manifest.json                 # Export/integration manifest
 config/
-  sigma_oci_mapping.yaml        # Field & log source mappings (incl. APM/OTel)
+  sigma_oci_mapping.yaml        # Field & log source mappings (including SOC Application Logs)
 scripts/
   oci_config.py                 # Centralized config, client factories, validation
   convert_sigma.py              # Sigma -> OCL converter (with STIG metadata)
   deploy_dashboard.py           # OCI LA dashboard deployment (16 dashboards)
-  generate_test_logs.py         # Attack simulation data (1,315 events, OCI LA field names)
-  ingest_test_data.py           # Upload test data to OCI LA (12 log sources)
+  generate_test_logs.py         # Core security simulation datasets for OCI LA
+  generate_geo_health_logs.py   # Multicloud health dataset used by Geographic Health dashboard
+  ingest_test_data.py           # Upload checked-in NDJSON test data to OCI LA
   setup_log_sources.py          # Create JSON parsers & custom OCI LA log sources
   generate_catalog.py           # Generate CATALOG.md and catalog.json
-  setup_streaming_pipeline.py   # Production OCI Streaming pipeline
+  setup_streaming_pipeline.py   # Production OCI Streaming pipeline (5 configured SOC streams in the current environment)
   export_for_multicloud.py      # Integration with multicloudoperations
-test_data/                      # Generated NDJSON test logs (12 files)
+test_data/                      # 14 NDJSON demo datasets (146,632 events checked in)
 stack/                          # OCI Resource Manager (Terraform) stack
 docs/                           # Additional documentation
 ```
@@ -164,13 +207,19 @@ python3 scripts/setup_log_sources.py
 
 # 2. Generate and ingest test data
 python3 scripts/generate_test_logs.py
+python3 scripts/generate_geo_health_logs.py
 python3 scripts/ingest_test_data.py
 
-# 3. Deploy 16 dashboards with 249 saved searches
+# 3. Optional: reconcile the Streaming -> SCH -> Log Analytics pipeline
+python3 scripts/setup_streaming_pipeline.py
+python3 scripts/validate_pipeline.py --e2e
+
+# 4. Deploy 16 dashboards with 255 saved searches
 python3 scripts/deploy_dashboard.py
 
-# 4. Regenerate catalog
+# 5. Regenerate inventory artifacts
 python3 scripts/generate_catalog.py
+python3 scripts/export_for_multicloud.py --manifest-only
 ```
 
 ### Pre-flight Validation
@@ -179,23 +228,35 @@ python3 scripts/deploy_dashboard.py --validate
 python3 scripts/deploy_dashboard.py --dry-run
 python3 scripts/ingest_test_data.py --validate
 python3 scripts/setup_log_sources.py --validate
+python3 scripts/validate_pipeline.py --e2e
 ```
+
+Current environment note: `setup_streaming_pipeline.py` now reconciles 5 configured SOC streams, including `soc-detection-multicloud-health`, and `validate_pipeline.py` validates all configured SOC connectors from `config/streaming_config.json`.
 
 ### Converting Rules
 ```bash
-python3 scripts/convert_sigma.py              # Convert all 428 rules
+python3 scripts/convert_sigma.py              # Convert all source YAML rules into generated OCI queries
 python3 scripts/convert_sigma.py --validate   # Validate OCL syntax
 python3 scripts/convert_sigma.py --stats      # Print rule statistics
+python3 scripts/generate_catalog.py           # Regenerate canonical machine-readable inventory
+python3 scripts/audit_rule_quality.py         # Audit source and generated content quality
 ```
 
 ## Adding New Rules
 
 ### Detection Rules
 1. Create a YAML file in `rules/{platform}/{tactic}/`.
-2. Follow Sigma specification. Add `stig.*` tags for STIG rules.
-3. Run `python3 scripts/convert_sigma.py --validate --stats`.
-4. Add test events to `generate_test_logs.py`.
-5. Add dashboard widgets to `deploy_dashboard.py` (max 30 per dashboard).
+2. Follow Sigma specification. Add `version` and use `stig.*` tags for STIG rules.
+3. If the rule targets browser-side telemetry, place it under `rules/web/browser_attacks/` so it publishes into `queries/apps/`.
+4. Run `python3 scripts/convert_sigma.py`, `python3 scripts/generate_catalog.py`, and `python3 scripts/audit_rule_quality.py`.
+5. Add or update sample events in `test_data/` or the generator scripts.
+6. Add dashboard widgets to `deploy_dashboard.py` (max 30 per dashboard).
+
+### Curated App Telemetry Queries
+1. Create a JSON file in `queries/apps/`.
+2. Reserve `sigma_id` for source-derived detections only.
+3. Keep metadata aligned with the generated catalog fields.
+4. Add the query reference to the appropriate dashboard in `deploy_dashboard.py`.
 
 ### Hunting Queries
 1. Create a JSON file in `queries/hunting/` with hunting query schema.
@@ -217,6 +278,9 @@ MAIN `demo-observability` compartment alongside 53 other multicloud dashboards.
 ```bash
 python3 scripts/export_for_multicloud.py    # Export to ~/dev/multicloudoperations
 ```
+
+### Logan Security Dashboard
+`../LoganSecurityDashboardv0` is the companion operator UI. This repository remains the content and deployment source of truth; the dashboard should consume `queries/catalog.json`, `queries/manifest.json`, `queries/apps/*.json`, `queries/hunting/*.json`, and `test_data/manifest.json` through a static export, API, or MCP boundary.
 
 ## License
 See [LICENSE](LICENSE) for details.

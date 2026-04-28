@@ -157,6 +157,11 @@ Current runtime note:
 
 `../LoganSecurityDashboardv0` is the companion operator UI for this content library. This repository remains the canonical content source; the dashboard should consume generated artifacts through a stable export, API, or MCP boundary.
 
+Capability correlation and missing-feature references are tracked in:
+
+- `docs/DASHBOARD_INTEGRATION_GAPS.md` for detections-owned `DET-MISS-*` export/schema/API gaps
+- `../../LoganSecurityDashboardv0/docs/CAPABILITY_CORRELATION.md` for dashboard-owned `DASH-MISS-*` UI/data-layer gaps
+
 Supported dashboard-facing artifacts:
 
 - `queries/catalog.json`

@@ -28,6 +28,7 @@ Canonical inventory and supporting documentation:
 - `CATALOG.md` — human-readable catalog
 - `docs/DEMO_WORKFLOW.md` — operator/demo walkthrough
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit report
+- `docs/DASHBOARD_INTEGRATION_GAPS.md` — detections-side gaps blocking the companion dashboard
 - `CONTRIBUTING.md` — contributor workflow and validation expectations
 
 ## Architecture
@@ -283,6 +284,8 @@ python3 scripts/export_for_multicloud.py    # Export to ~/dev/multicloudoperatio
 
 ### Logan Security Dashboard
 `../LoganSecurityDashboardv0` is the companion operator UI. This repository remains the content and deployment source of truth; the dashboard should consume `queries/catalog.json`, `queries/manifest.json`, `queries/apps/*.json`, `queries/hunting/*.json`, and `test_data/manifest.json` through a static export, API, or MCP boundary.
+
+Cross-project capability gaps are tracked in `docs/DASHBOARD_INTEGRATION_GAPS.md` and the dashboard-side report at `../LoganSecurityDashboardv0/docs/CAPABILITY_CORRELATION.md`. Use `DET-MISS-*` for detections-owned export/schema/API gaps and `DASH-MISS-*` for dashboard-owned UI/data-layer gaps.
 
 ## License
 See [LICENSE](LICENSE) for details.

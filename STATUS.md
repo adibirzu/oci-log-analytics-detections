@@ -86,10 +86,14 @@ Previously live-verified on 2026-04-15:
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit output
 - `CONTRIBUTING.md` — contributor workflow and validation expectations
 - `../LoganSecurityDashboardv0/docs/ARCHITECTURE.md` — companion dashboard integration contract
+- `docs/DASHBOARD_INTEGRATION_GAPS.md` — detections-owned export/schema/API gaps for the companion dashboard
+- `../LoganSecurityDashboardv0/docs/CAPABILITY_CORRELATION.md` — dashboard-owned capability matrix and missing UI features
 
 ## Recommended Next Work
 
+- Add `DET-MISS-001`: generate a machine-readable dashboard/widget inventory so the companion dashboard does not parse `scripts/deploy_dashboard.py`.
 - Add smoke tests around dashboard/query references so widget regressions are caught before deployment.
+- Publish `DET-MISS-002`: a versioned integration schema for catalog, dashboard inventory, saved searches, datasets, and log-source fields.
 - Expand live verification beyond Caldera discovery so credential-access, lateral-movement, collection, and exfiltration have deterministic demo data.
 - Add sample ingestion/validation checks for the `test_data/` datasets to verify schemas alongside query generation.
 - Expand source rule coverage only after log source mappings and test datasets exist for the new telemetry surface.

@@ -106,7 +106,16 @@ def expand_events_over_days(events, days):
 
 def oci_audit_event(event_type, user=None, ip=None, status="200",
                     response_payload=None, resource_name="", offset=0):
-    """Generate a standard OCI Audit log event in the official envelope format."""
+    """Generate a standard OCI Audit log event using the canonical schema builder.
+
+    Delegates to ``schemas.build_oci_audit_event`` which produces the real
+    OCI Audit CloudEvents v0.1 envelope (verified against ``oci audit event
+    list`` on 2026-04-24) plus parallel OCI Log Analytics display-name
+    columns. The Oracle ingest envelope (``oracle.ingestedtime`` etc.) is
+    layered on top so legacy detections that key on those fields still match.
+    """
+    from schemas import build_oci_audit_event
+
     if user is None:
         user = random.choice(OCI_USERS)
     else:
@@ -114,47 +123,30 @@ def oci_audit_event(event_type, user=None, ip=None, status="200",
     if ip is None:
         ip = random.choice(CORPORATE_IPS)
 
-    return {
-        "eventType": event_type,
-        "cloudEventsVersion": "0.1",
-        "eventTypeVersion": "2.0",
-        "source": event_type.rsplit(".", 1)[0] if "." in event_type else "unknown",
-        "eventId": str(uuid.uuid4()),
-        "eventTime": ts(offset),
-        "contentType": "application/json",
-        "data": {
-            "compartmentId": COMPARTMENT_ID,
-            "compartmentName": "security-test",
-            "resourceName": resource_name,
-            "resourceId": f"ocid1.resource.oc1..{uuid.uuid4().hex[:40]}",
-            "availabilityDomain": "AD-1",
-            "request": {
-                "id": str(uuid.uuid4()),
-                "action": "POST",
-                "path": f"/20160918/{event_type.split('.')[-1]}",
-            },
-            "response": {
-                "status": status,
-                "headers": {},
-                "payload": response_payload or {},
-            },
-            "stateChange": {"previous": {}, "current": {}},
-            "identity": {
-                "principalName": user[1],
-                "principalId": user[0],
-                "ipAddress": ip,
-                "userAgent": "Oracle-JavaSDK/2.0 (test-simulation)",
-                "authType": user[2],
-            },
-            "freeformTags": {},
-            "definedTags": {},
-        },
-        "oracle": {
-            "compartmentid": COMPARTMENT_ID,
-            "ingestedtime": ts(offset),
-            "tenantid": "ocid1.tenancy.oc1..example",
-        },
+    event = build_oci_audit_event(
+        event_type,
+        event_time=ts(offset),
+        principal_id=user[0],
+        principal_name=user[1],
+        auth_type=user[2],
+        ip_address=ip,
+        compartment_id=COMPARTMENT_ID,
+        compartment_name="security-test",
+        tenant_id="ocid1.tenancy.oc1..example",
+        resource_name=resource_name,
+        resource_id=f"ocid1.resource.oc1..{uuid.uuid4().hex[:40]}",
+        user_agent="Oracle-JavaSDK/2.0 (test-simulation)",
+        response_status=status,
+        response_payload=response_payload,
+    )
+    # Preserve the legacy Oracle ingest envelope so existing OCI LA parsers
+    # that key on ``oracle.compartmentid``/``oracle.ingestedtime`` keep working.
+    event["oracle"] = {
+        "compartmentid": COMPARTMENT_ID,
+        "ingestedtime": ts(offset),
+        "tenantid": "ocid1.tenancy.oc1..example",
     }
+    return event
 
 
 def generate_oci_audit_events():
@@ -2409,39 +2401,50 @@ SEVEN_KINGDOMS_LINUX = [
 def winsec_event(event_id, user=None, host=None, source_addr=None,
                  logon_type=None, process_name=None, command_line=None,
                  msg=None, offset=0):
-    """Generate a Windows Security Event Log JSON entry.
+    """Generate a Windows Security Event Log JSON entry via the canonical builder.
 
-    Uses OCI Log Analytics field names for query compatibility.
+    Delegates to ``schemas.build_windows_security_event`` so the record matches
+    the real Microsoft-Windows-Security-Auditing EVTX shape (Channel="Security",
+    Provider, EventID, TimeCreated, Computer, native PascalCase fields like
+    ``SubjectUserName``, ``SourceAddress``, ``LogonType``) plus parallel OCI Log
+    Analytics display-name columns (``Event ID``, ``Source IP``, ``Logon Type``,
+    ``Process Name``).
     """
+    from schemas import build_windows_security_event
+
     if user is None:
         user = random.choice(THREAT_ACTORS)
     if host is None:
         host = random.choice(SEVEN_KINGDOMS_HOSTS)
     if source_addr is None:
         source_addr = random.choice(SUSPICIOUS_IPS + CORPORATE_IPS)
-    return {
-        # OCI Log Analytics mapped fields
-        "Event ID": int(event_id),
-        "Host Name (Server)": host,
-        "Subject User Name": user,
-        "Source IP": source_addr,
-        "Logon Type": str(logon_type) if logon_type else "",
-        "New Process Name": process_name or "",
-        "Process Name": process_name or "",
-        "Command Line": command_line or "",
-        # Native fields
-        "EventID": str(event_id),
-        "TimeCreated": ts(offset),
-        "Computer": host,
-        "Channel": "Security",
-        "Provider": "Microsoft-Windows-Security-Auditing",
-        "User": user,
-        "SourceAddress": source_addr,
-        "LogonType": str(logon_type) if logon_type else "",
-        "ProcessName": process_name or "",
-        "CommandLine": command_line or "",
-        "msg": msg or f"Windows Security Event {event_id}",
-    }
+
+    event = build_windows_security_event(
+        int(event_id),
+        event_time=ts(offset),
+        computer=host,
+        user=user,
+        subject_user_name=user,
+        source_address=source_addr,
+        logon_type=logon_type if logon_type is not None else "",
+        process_name=process_name or "",
+        new_process_name=process_name or "",
+        command_line=command_line or "",
+    )
+    event["msg"] = msg or f"Windows Security Event {event_id}"
+    # Legacy compatibility: existing detection queries expect these alias
+    # spellings to be present even when the builder treats them as optional.
+    event.setdefault("Process Name", process_name or "")
+    event.setdefault("New Process Name", process_name or "")
+    event.setdefault("Source IP", source_addr)
+    event.setdefault("Source Address", source_addr)
+    event.setdefault("Logon Type", str(logon_type) if logon_type else "")
+    event.setdefault("Subject User Name", user)
+    event.setdefault("CommandLine", command_line or "")
+    event.setdefault("ProcessName", process_name or "")
+    event.setdefault("LogonType", str(logon_type) if logon_type else "")
+    event.setdefault("SourceAddress", source_addr)
+    return event
 
 
 def generate_windows_event_security():
@@ -2922,57 +2925,87 @@ def sysmon_op_event(event_id, host=None, user=None, source_image=None,
                     pipe_name=None, target_filename=None,
                     target_object=None, parent_image=None,
                     granted_access=None, msg=None, offset=0):
-    """Generate a Windows Sysmon Operational Log JSON entry.
+    """Generate a Sysmon Operational JSON entry via the canonical builder.
 
-    Uses OCI Log Analytics field names for query compatibility alongside
-    Sysmon-native field names for reference.
+    Delegates to ``schemas.build_windows_sysmon_event`` so the record matches
+    the real Microsoft-Windows-Sysmon/Operational EVTX shape (Channel,
+    Provider, native PascalCase fields ``Image``, ``CommandLine``,
+    ``ParentImage``, ``TargetImage``, ``PipeName``, ``QueryName``,
+    ``DestinationIp``, ``GrantedAccess``) plus the parallel OCI Log Analytics
+    display-name columns (``Process Name``, ``Source Process``, ``Target
+    Process``, ``Granted Access``, ``Target Object``).
+
+    The detections layer keeps the ``Source Process``/``Target Process``
+    aliases that the BLUELIGHT and Sysmon-Operational queries reference even
+    when the canonical builder treats them as optional.
     """
+    from schemas import build_windows_sysmon_event
+
     if host is None:
         host = random.choice(SEVEN_KINGDOMS_HOSTS)
     if user is None:
         user = random.choice(THREAT_ACTORS)
-    return {
-        # OCI Log Analytics mapped fields
-        "Event ID": int(event_id),
-        "Host Name (Server)": host,
-        "Source Process": source_image or "",
-        "Target Process": target_image or "",
-        "Process Name": source_image or target_image or "",
-        "Parent Process Name": parent_image or source_image or "",
-        "Command Line": command_line or "",
-        "Destination Hostname": dest_hostname or "",
-        "Destination IP": dest_ip or "",
-        "Destination Port": str(dest_port) if dest_port else "",
-        "Source IP": "",
-        "Query Name": query_name or "",
-        "Query Results": query_results or "",
-        "Pipe Name": pipe_name or "",
-        "Target Filename": target_filename or "",
-        "Target Object": target_object or "",
-        "Granted Access": granted_access or "",
-        # Sysmon-native fields (for raw reference)
-        "EndpointOS": "Windows",
-        "EventID": str(event_id),
-        "TimeCreated": ts(offset),
-        "Computer": host,
-        "Channel": "Microsoft-Windows-Sysmon/Operational",
-        "Provider": "Microsoft-Windows-Sysmon",
-        "User": user,
-        "SourceImage": source_image or "",
-        "TargetImage": target_image or "",
-        "CommandLine": command_line or "",
-        "DestinationHostname": dest_hostname or "",
-        "DestinationIp": dest_ip or "",
-        "DestinationPort": str(dest_port) if dest_port else "",
-        "QueryName": query_name or "",
-        "QueryResults": query_results or "",
-        "PipeName": pipe_name or "",
-        "TargetFilename": target_filename or "",
-        "TargetObject": target_object or "",
-        "ParentImage": parent_image or source_image or "",
-        "GrantedAccess": granted_access or "",
-        "msg": msg or f"Sysmon Event {event_id}",
-    }
+
+    image = source_image or target_image or ""
+    event = build_windows_sysmon_event(
+        int(event_id),
+        event_time=ts(offset),
+        computer=host,
+        user=user,
+        image=image,
+        command_line=command_line or "",
+        parent_image=parent_image or source_image or "",
+        target_image=target_image or "",
+        source_image=source_image or "",
+        pipe_name=pipe_name or "",
+        query_name=query_name or "",
+        query_results=query_results or "",
+        target_filename=target_filename or "",
+        destination_ip=dest_ip or "",
+        destination_port=dest_port or "",
+        granted_access=granted_access or "",
+    )
+    # Operational-channel override — the SOC source registered in
+    # ``setup_log_sources.py`` keys on this Channel.
+    event["Channel"] = "Microsoft-Windows-Sysmon/Operational"
+    event["log_source_identifier"] = "Windows Sysmon Operational Logs"
+    event["Log Source"] = "Windows Sysmon Operational Logs"
+    # Detection-layer aliases the BLUELIGHT widgets and Sysmon Operational
+    # parser rely on; keep them populated even when empty so projection
+    # against ``'Source Process'`` etc. resolves cleanly.
+    event["Source Process"] = source_image or ""
+    event["Target Process"] = target_image or ""
+    event["Process Name"] = image
+    event["Parent Process Name"] = parent_image or source_image or ""
+    event["Command Line"] = command_line or ""
+    event["Destination Hostname"] = dest_hostname or ""
+    event["Destination IP"] = dest_ip or ""
+    event["Destination Port"] = str(dest_port) if dest_port else ""
+    event["Source IP"] = ""
+    event["Query Name"] = query_name or ""
+    event["Query Results"] = query_results or ""
+    event["Pipe Name"] = pipe_name or ""
+    event["Target Filename"] = target_filename or ""
+    event["Target Object"] = target_object or ""
+    event["Granted Access"] = granted_access or ""
+    # Native field aliases for parser fall-back paths.
+    event["EndpointOS"] = "Windows"
+    event["EventID"] = str(event_id)
+    event["DestinationHostname"] = dest_hostname or ""
+    event["DestinationIp"] = dest_ip or ""
+    event["DestinationPort"] = str(dest_port) if dest_port else ""
+    event["QueryName"] = query_name or ""
+    event["QueryResults"] = query_results or ""
+    event["PipeName"] = pipe_name or ""
+    event["TargetFilename"] = target_filename or ""
+    event["TargetObject"] = target_object or ""
+    event["ParentImage"] = parent_image or source_image or ""
+    event["SourceImage"] = source_image or ""
+    event["TargetImage"] = target_image or ""
+    event["CommandLine"] = command_line or ""
+    event["GrantedAccess"] = granted_access or ""
+    event["msg"] = msg or f"Sysmon Event {event_id}"
+    return event
 
 
 def _bluelight_kill_chain_sysmon_op_events():

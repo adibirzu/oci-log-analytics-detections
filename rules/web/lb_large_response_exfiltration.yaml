@@ -1,6 +1,7 @@
 title: Unusually Large HTTP Response (Data Exfiltration)
 id: a1010014-owasp-a01-exfil-001
 status: stable
+version: 1
 description: Detects unusually large HTTP responses that may indicate successful data exfiltration (database dumps, bulk user data extraction). OWASP A01:2021 Broken Access Control.
 logsource:
   product: oci

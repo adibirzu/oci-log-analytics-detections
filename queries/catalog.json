@@ -1,7 +1,32 @@
 {
   "version": "1.0",
+  "generated_at": "2026-04-15T09:36:29.298007+00:00",
   "total_rules": 446,
+  "total_app_queries": 20,
   "total_hunting": 40,
+  "total_content_items": 506,
+  "inventory": {
+    "source_yaml_rules": 454,
+    "source_rule_breakdown": {
+      "cloud": 100,
+      "linux": 67,
+      "web": 38,
+      "windows": 249
+    },
+    "generated_detection_queries": 446,
+    "generated_app_queries": 20,
+    "source_derived_app_queries": 8,
+    "curated_app_queries": 12,
+    "generated_hunting_queries": 40,
+    "generated_sigma_queries": 454,
+    "total_query_artifacts": 506,
+    "legacy_dirs": {
+      "logandetectionqueries": 0,
+      "logandetectionrules": 0
+    },
+    "combined_mitre_techniques": 211,
+    "combined_mitre_tactics": 14
+  },
   "platforms": {
     "windows": 249,
     "oci": 130,
@@ -72,6 +97,7 @@
     "T1078",
     "T1082",
     "T1083",
+    "T1086",
     "T1087.001",
     "T1087.002",
     "T1090",
@@ -220,6 +246,235 @@
     "T1649"
   ],
   "mitre_tactics": [
+    "collection",
+    "command_and_control",
+    "credential_access",
+    "defense_evasion",
+    "discovery",
+    "execution",
+    "exfiltration",
+    "impact",
+    "initial_access",
+    "lateral_movement",
+    "persistence",
+    "privilege_escalation",
+    "reconnaissance",
+    "resource_development"
+  ],
+  "all_mitre_techniques": [
+    "T1003",
+    "T1003.001",
+    "T1003.002",
+    "T1003.003",
+    "T1003.004",
+    "T1003.006",
+    "T1003.007",
+    "T1005",
+    "T1012",
+    "T1016",
+    "T1018",
+    "T1021",
+    "T1021.001",
+    "T1021.002",
+    "T1021.003",
+    "T1021.006",
+    "T1027",
+    "T1033",
+    "T1036",
+    "T1036.003",
+    "T1036.005",
+    "T1041",
+    "T1046",
+    "T1047",
+    "T1048",
+    "T1048.003",
+    "T1053",
+    "T1053.002",
+    "T1053.003",
+    "T1053.005",
+    "T1055",
+    "T1055.001",
+    "T1055.008",
+    "T1055.012",
+    "T1055.013",
+    "T1056.001",
+    "T1057",
+    "T1059",
+    "T1059.001",
+    "T1059.003",
+    "T1059.004",
+    "T1059.005",
+    "T1059.006",
+    "T1059.007",
+    "T1068",
+    "T1069.001",
+    "T1069.002",
+    "T1070",
+    "T1070.001",
+    "T1070.002",
+    "T1070.003",
+    "T1070.004",
+    "T1070.006",
+    "T1071",
+    "T1071.001",
+    "T1071.004",
+    "T1074.001",
+    "T1078",
+    "T1082",
+    "T1083",
+    "T1086",
+    "T1087.001",
+    "T1087.002",
+    "T1090",
+    "T1090.001",
+    "T1095",
+    "T1098",
+    "T1098.001",
+    "T1098.004",
+    "T1102",
+    "T1105",
+    "T1110",
+    "T1110.001",
+    "T1110.003",
+    "T1110.004",
+    "T1113",
+    "T1114",
+    "T1115",
+    "T1127.001",
+    "T1133",
+    "T1134",
+    "T1134.001",
+    "T1134.002",
+    "T1134.004",
+    "T1135",
+    "T1136.001",
+    "T1136.003",
+    "T1137",
+    "T1140",
+    "T1185",
+    "T1187",
+    "T1189",
+    "T1190",
+    "T1197",
+    "T1201",
+    "T1202",
+    "T1203",
+    "T1204",
+    "T1204.002",
+    "T1218",
+    "T1218.001",
+    "T1218.003",
+    "T1218.004",
+    "T1218.005",
+    "T1218.009",
+    "T1218.011",
+    "T1219",
+    "T1220",
+    "T1221",
+    "T1482",
+    "T1485",
+    "T1486",
+    "T1489",
+    "T1490",
+    "T1491.001",
+    "T1496",
+    "T1497",
+    "T1499",
+    "T1505.003",
+    "T1518",
+    "T1518.001",
+    "T1528",
+    "T1529",
+    "T1530",
+    "T1531",
+    "T1537",
+    "T1539",
+    "T1542",
+    "T1543.002",
+    "T1543.003",
+    "T1546.001",
+    "T1546.002",
+    "T1546.003",
+    "T1546.004",
+    "T1546.007",
+    "T1546.008",
+    "T1546.010",
+    "T1546.011",
+    "T1546.012",
+    "T1546.015",
+    "T1547.001",
+    "T1547.003",
+    "T1547.004",
+    "T1547.005",
+    "T1547.006",
+    "T1547.009",
+    "T1547.010",
+    "T1547.012",
+    "T1547.014",
+    "T1548.001",
+    "T1548.002",
+    "T1548.003",
+    "T1550",
+    "T1550.002",
+    "T1550.003",
+    "T1550.004",
+    "T1552.001",
+    "T1552.004",
+    "T1552.005",
+    "T1552.006",
+    "T1553",
+    "T1553.004",
+    "T1555",
+    "T1555.003",
+    "T1555.004",
+    "T1556",
+    "T1556.007",
+    "T1557",
+    "T1558",
+    "T1558.001",
+    "T1558.003",
+    "T1558.004",
+    "T1560.001",
+    "T1561",
+    "T1562",
+    "T1562.001",
+    "T1562.002",
+    "T1562.004",
+    "T1562.007",
+    "T1562.008",
+    "T1564.001",
+    "T1564.003",
+    "T1564.004",
+    "T1565.001",
+    "T1566.001",
+    "T1567",
+    "T1567.002",
+    "T1568.002",
+    "T1569.002",
+    "T1570",
+    "T1572",
+    "T1573",
+    "T1573.002",
+    "T1574.002",
+    "T1574.006",
+    "T1574.009",
+    "T1574.011",
+    "T1580",
+    "T1583",
+    "T1583.003",
+    "T1592.004",
+    "T1595",
+    "T1595.002",
+    "T1599",
+    "T1600",
+    "T1606",
+    "T1611",
+    "T1620",
+    "T1621",
+    "T1648",
+    "T1649"
+  ],
+  "all_mitre_tactics": [
     "collection",
     "command_and_control",
     "credential_access",
@@ -463,7 +718,7 @@
     },
     {
       "title": "BLUELIGHT RAT: Browser Spawning Suspicious Child Process",
-      "description": "Detects Internet Explorer spawning command interpreters or script hosts after exploiting CVE-2020-1380 or CVE-2021-26411 for second-stage payload execution.",
+      "description": "Detects Internet Explorer spawning command interpreters or script hosts. After exploiting CVE-2020-1380 or CVE-2021-26411, BLUELIGHT uses iexplore.exe to spawn cmd.exe, powershell.exe, or wscript.exe for second-stage payload execution.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -473,12 +728,12 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_browser_child_process.json"
     },
     {
       "title": "BLUELIGHT RAT: Browser Credential Memory Access",
-      "description": "Detects non-browser processes accessing browser process memory with PROCESS_ALL_ACCESS (0x1fffff). BLUELIGHT reads browser memory to extract stored credentials, session tokens, and cookies.",
+      "description": "Detects non-browser processes accessing browser process memory with full access rights. BLUELIGHT reads browser memory (GrantedAccess 0x1fffff = PROCESS_ALL_ACCESS) to extract stored credentials, session tokens, and cookies from Chrome, Edge, Firefox.\n",
       "level": "critical",
       "platform": "windows",
       "mitre_techniques": [
@@ -493,7 +748,7 @@
     },
     {
       "title": "BLUELIGHT RAT: Internet Explorer Drive-by Compromise",
-      "description": "Detects Internet Explorer making network connections to non-Microsoft domains. BLUELIGHT (S0657/APT37) uses browser exploits (CVE-2020-1380, CVE-2021-26411) for initial compromise via watering hole attacks.",
+      "description": "Detects Internet Explorer making network connections to non-Microsoft domains. BLUELIGHT (S0657) uses browser exploits (CVE-2020-1380, CVE-2021-26411) for initial compromise via watering hole attacks. APT37/InkySquid abuses IE vulnerabilities to deliver the BLUELIGHT payload through malicious JavaScript on compromised sites.\n",
       "level": "medium",
       "platform": "windows",
       "mitre_techniques": [
@@ -503,12 +758,12 @@
         "initial_access"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT II",
       "file": "bluelight_drive_by_compromise.json"
     },
     {
       "title": "BLUELIGHT RAT: File Discovery from Browser Process",
-      "description": "Detects recursive directory enumeration spawned by browser or script host processes. BLUELIGHT performs file discovery to locate sensitive documents for later collection.",
+      "description": "Detects recursive directory enumeration spawned by browser or script host processes. BLUELIGHT performs file and directory discovery to locate sensitive documents, credentials, and system files for later collection and exfiltration.\n",
       "level": "medium",
       "platform": "windows",
       "mitre_techniques": [
@@ -518,12 +773,12 @@
         "discovery"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT II",
       "file": "bluelight_file_discovery.json"
     },
     {
       "title": "BLUELIGHT RAT: C2 via Microsoft Graph API",
-      "description": "Detects non-standard processes connecting to Microsoft Graph API endpoints. BLUELIGHT uses Graph API and OneDrive for C2, blending with legitimate Microsoft traffic.",
+      "description": "Detects non-standard processes connecting to Microsoft Graph API endpoints. BLUELIGHT uses Microsoft Graph API and OneDrive for command-and-control, blending with legitimate Microsoft traffic to evade network detection.\n",
       "level": "medium",
       "platform": "windows",
       "mitre_techniques": [
@@ -533,12 +788,12 @@
         "command_and_control"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT II",
       "file": "bluelight_graph_api_c2.json"
     },
     {
       "title": "BLUELIGHT RAT: Executable Download via Graph API",
-      "description": "Detects executable or DLL files dropped in temporary directories by processes connected to Microsoft Graph API. BLUELIGHT downloads tools from OneDrive and stages them in Temp/AppData.",
+      "description": "Detects executable or DLL files dropped in temporary directories by processes that also connect to Microsoft Graph API. BLUELIGHT downloads additional tools from OneDrive via Graph API and stages them in Temp or AppData for execution.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -548,12 +803,12 @@
         "command_and_control"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_ingress_tool_transfer.json"
     },
     {
       "title": "BLUELIGHT RAT: Obfuscated Script Execution",
-      "description": "Detects obfuscation techniques (XOR key 0xCF, Base64, SVG-embedded JS) in command lines indicative of BLUELIGHT payload delivery and defense evasion.",
+      "description": "Detects obfuscation techniques in command lines indicative of BLUELIGHT payload delivery. The RAT uses XOR encryption (key 0xCF), Base64 encoding, and SVG-embedded JavaScript for defense evasion during initial exploitation.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -563,12 +818,12 @@
         "defense_evasion"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_obfuscated_commandline.json"
     },
     {
       "title": "BLUELIGHT RAT: Data Exfiltration via OneDrive/Graph API",
-      "description": "Detects non-OneDrive processes uploading data to Microsoft Graph API. BLUELIGHT exfiltrates screenshots, credentials, and system data via OneDrive uploads.",
+      "description": "Detects large data uploads to Microsoft Graph API from non-OneDrive processes. BLUELIGHT exfiltrates collected screenshots, credentials, and system data by uploading to OneDrive via Graph API, blending with legitimate cloud storage traffic.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -578,12 +833,12 @@
         "exfiltration"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_onedrive_exfiltration.json"
     },
     {
       "title": "BLUELIGHT RAT: Registry Enumeration of Security Products",
-      "description": "Detects registry access targeting security product and installed software keys. BLUELIGHT enumerates SecurityCenter2, Uninstall keys, and AV registrations to identify defensive tools.",
+      "description": "Detects registry access targeting security product and installed software keys. BLUELIGHT enumerates SecurityCenter2, Uninstall keys, and AV service registrations to identify defensive tools before attempting further payload delivery.\n",
       "level": "medium",
       "platform": "windows",
       "mitre_techniques": [
@@ -593,12 +848,12 @@
         "discovery"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT II",
       "file": "bluelight_registry_enumeration.json"
     },
     {
       "title": "BLUELIGHT RAT: Periodic Screen Capture",
-      "description": "Detects rapid JPEG file creation by non-image processes. BLUELIGHT captures screenshots at regular intervals and stages them for exfiltration via OneDrive.",
+      "description": "Detects rapid JPEG file creation by non-image processes. BLUELIGHT captures screenshots at regular intervals and saves them as .jpg files before staging for exfiltration via OneDrive. High frequency (>3 per minute) indicates automated capture.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -608,12 +863,12 @@
         "collection"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_screen_capture.json"
     },
     {
       "title": "BLUELIGHT RAT: WMI System Enumeration from Browser Child",
-      "description": "Detects WMI-based system enumeration spawned by browser processes. BLUELIGHT queries Win32_ComputerSystem and Win32_OperatingSystem to profile targets before full C2.",
+      "description": "Detects WMI-based system enumeration spawned by browser processes. After initial exploitation, BLUELIGHT queries Win32_ComputerSystem, Win32_OperatingSystem, and Win32_Processor to profile the target system before establishing full C2.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -623,12 +878,12 @@
         "discovery"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_system_discovery.json"
     },
     {
-      "title": "BLUELIGHT RAT: YARA Chrome/Edge Cookie Theft",
-      "description": "Detects BLUELIGHT browser cookie theft targeting Google SID/OSID/__Secure-3PSID cookies for Gmail session hijacking and IMAP enablement. Source: Volexity YARA rule APT_MAL_Win_BlueLight_B $chrome and $msg strings.",
+      "title": "BLUELIGHT RAT: YARA Chrome/Edge Cookie Theft (APT_MAL_Win_BlueLight_B)",
+      "description": "Detects BLUELIGHT browser cookie theft targeting Google authentication. The malware extracts SID, OSID, __Secure-3PSID cookies from Chrome/Edge to hijack Gmail and Google Account sessions. Enables IMAP access on victim Gmail accounts for persistent email exfiltration. Based on Volexity YARA rule APT_MAL_Win_BlueLight_B $chrome strings.\n",
       "level": "critical",
       "platform": "windows",
       "mitre_techniques": [
@@ -645,8 +900,8 @@
       "file": "bluelight_yara_cookie_theft.json"
     },
     {
-      "title": "BLUELIGHT RAT: YARA Google App C2 Communication",
-      "description": "Detects BLUELIGHT C2 via Google services using spoofed Firefox UA with Korean language headers (ko-KR). Targets Gmail/Google Account settings to enable IMAP for persistent email exfiltration. Source: Volexity YARA rule APT_MAL_Win_BlueLight_B.",
+      "title": "BLUELIGHT RAT: YARA Google App C2 Communication (APT_MAL_Win_BlueLight_B)",
+      "description": "Detects BLUELIGHT C2 communication via Google services. The variant uses custom Google App authentication with spoofed Firefox User-Agent and Korean language Accept-Language headers (ko-KR). Accesses Gmail and Google Account settings to enable IMAP for email exfiltration. Based on Volexity YARA rule APT_MAL_Win_BlueLight_B $chrome strings.\n",
       "level": "critical",
       "platform": "windows",
       "mitre_techniques": [
@@ -657,12 +912,12 @@
         "command_and_control"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_yara_google_c2.json"
     },
     {
-      "title": "BLUELIGHT RAT: YARA Keylogger Staging Files",
-      "description": "Detects BLUELIGHT keylogger staging files (cheV01.dat, INTEG.RAW) and ESE database artifacts (edb.chk, edb.log, edbres*.jrs). The keylogger captures keystrokes with modifier prefixes and stages data for OneDrive exfiltration. Source: Volexity YARA rule APT_MAL_Win_BlueLight_B.",
+      "title": "BLUELIGHT RAT: YARA Keylogger Component (APT_MAL_Win_BlueLight_B)",
+      "description": "Detects BLUELIGHT keylogger component strings. The malware logs keystrokes with modifier prefixes (SHIFT+, CTRL+, CAPSLOCK+, ALT+) and special key markers ([TAB], [RETURN], [ESC], [ARROW *], [DEL], [WIN]). The keylogger output is staged for exfiltration via OneDrive. Based on Volexity YARA rule APT_MAL_Win_BlueLight_B $keylogger_component strings (27 of 29 required).\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -672,12 +927,12 @@
         "collection"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_yara_keylogger.json"
     },
     {
-      "title": "BLUELIGHT RAT: YARA PDB Path Indicators",
-      "description": "Detects BLUELIGHT compilation artifacts (PDB paths) in process events or file content. Unique to BLUELIGHT: 'Development\\BACKDOOR\\ncov\\' and 'Release\\bluelight.pdb'. Source: Volexity YARA rule APT_MAL_Win_BlueLight.",
+      "title": "BLUELIGHT RAT: YARA PDB Path Indicators (APT_MAL_Win_BlueLight)",
+      "description": "Detects BLUELIGHT malware PDB path strings in process memory, file content, or Sysmon ImageLoaded events. Based on Volexity YARA rule APT_MAL_Win_BlueLight (id: 3ec2d44c). The PDB paths 'Development\\BACKDOOR\\ncov\\' and 'Release\\bluelight.pdb' are unique to BLUELIGHT compilation artifacts.\n",
       "level": "critical",
       "platform": "windows",
       "mitre_techniques": [
@@ -687,23 +942,24 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_yara_pdb_strings.json"
     },
     {
-      "title": "BLUELIGHT RAT: YARA System Reconnaissance JSON",
-      "description": "Detects BLUELIGHT system profiling via ipinfo.io lookups and structured JSON recon data collection (UserName, ComName, OS, OnlineIP, AntiVirus, VM detection). Source: Volexity YARA rule APT_MAL_Win_BlueLight $msg strings.",
+      "title": "BLUELIGHT RAT: YARA System Reconnaissance JSON (APT_MAL_Win_BlueLight)",
+      "description": "Detects BLUELIGHT system reconnaissance data collection pattern. The malware collects UserName, ComName, OS, OnlineIP, LocalIP, Time, Compiled, Process Level, AntiVirus, and VM detection results in a specific JSON format and exfiltrates via OneDrive. Based on Volexity YARA rule APT_MAL_Win_BlueLight $msg strings.\n",
       "level": "critical",
       "platform": "windows",
       "mitre_techniques": [
         "T1082",
-        "T1016"
+        "T1016",
+        "T1057"
       ],
       "mitre_tactics": [
         "discovery"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "bluelight_yara_system_recon.json"
     },
     {
@@ -738,7 +994,7 @@
     },
     {
       "title": "Brute Force: Failed Logon Spike per Account",
-      "description": "Detects Event 4625 failed logon spikes \u2014 5+ failures for a single account indicates password spraying or brute force. Uses the real GOAD AD lab failed authentication data.",
+      "description": "Detects 3+ failed logon attempts (4625) for a single account \u2014 indicates password spraying, brute force, or credential stuffing.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -749,7 +1005,7 @@
         "credential_access"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "brute_force_failed_logon_spike.json"
     },
     {
@@ -948,8 +1204,8 @@
       "file": "cloud_guard_problem_vcn_security_list_port_ssh.json"
     },
     {
-      "title": "CMD: Suspicious Command Execution",
-      "description": "Detects suspicious cmd.exe commands in real Windows Security Event 4688. Covers recon (whoami, net user, systeminfo, netstat), persistence (schtasks, reg add, sc create), lateral movement (psexec, wmic, net use), and defense evasion (vssadmin, wevtutil, bcdedit).",
+      "title": "CMD: Suspicious Command Execution (Real Windows Security Events)",
+      "description": "Detects suspicious cmd.exe commands in Windows Security Event 4688 process creation logs. Covers reconnaissance, persistence, lateral movement, and defense evasion commands commonly used by attackers after initial compromise.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -959,7 +1215,7 @@
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "cmd_suspicious_child_process.json"
     },
     {
@@ -1083,8 +1339,8 @@
       "file": "credential_file_discovery.json"
     },
     {
-      "title": "Credential Manager: Suspicious Credential Read Activity",
-      "description": "Detects Event 5379 credential manager read operations at high frequency \u2014 indicates credential harvesting tools (lazagne, seatbelt, mimikatz vault::cred) systematically dumping stored credentials.",
+      "title": "Credential Manager: High-Frequency Credential Read",
+      "description": "Detects Event 5379 credential read operations at high frequency \u2014 indicates lazagne, seatbelt, or mimikatz vault::cred dumping stored credentials.\n",
       "level": "medium",
       "platform": "windows",
       "mitre_techniques": [
@@ -1094,7 +1350,7 @@
         "credential_access"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT II",
       "file": "credential_manager_access.json"
     },
     {
@@ -1158,8 +1414,8 @@
       "file": "dcsync_attack_via_replication_request.json"
     },
     {
-      "title": "DCSync Attack: Directory Replication Request from Non-DC",
-      "description": "Detects Event 4662 directory access with replication GUIDs (1131f6aa/1131f6ad) requested by non-machine accounts \u2014 classic DCSync attack using mimikatz lsadump::dcsync to extract domain password hashes remotely.",
+      "title": "DCSync: Directory Replication from Non-Domain Controller",
+      "description": "Detects directory replication requests (Event 4662) with DS-Replication-Get-Changes GUIDs from non-machine accounts \u2014 classic DCSync attack via mimikatz lsadump::dcsync.\n",
       "level": "critical",
       "platform": "windows",
       "mitre_techniques": [
@@ -1398,8 +1654,8 @@
       "file": "forced_authentication_via_petitpotam.json"
     },
     {
-      "title": "Golden Ticket: Kerberos TGT with Anomalous Encryption or Lifetime",
-      "description": "Detects Kerberos TGT requests (4768) with RC4 encryption (0x17) or from unusual sources. Golden tickets use RC4-encrypted TGTs with krbtgt hash. Also detects TGT renewal (4770) for krbtgt service with unexpected encryption.",
+      "title": "Golden Ticket: RC4 Encrypted TGT Request",
+      "description": "Detects Kerberos TGT requests (4768) or renewals (4770) using RC4 encryption. Golden tickets forged with krbtgt hash use RC4; modern AD defaults to AES256.\n",
       "level": "critical",
       "platform": "windows",
       "mitre_techniques": [
@@ -1410,7 +1666,7 @@
         "persistence"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "golden_ticket_anomaly.json"
     },
     {
@@ -1551,7 +1807,7 @@
     },
     {
       "title": "Kerberoasting: RC4 Encrypted Service Ticket Request",
-      "description": "Detects Kerberos TGS requests using RC4 encryption (0x17) \u2014 a strong Kerberoasting indicator. Modern AD uses AES256 (0x12); RC4 requests indicate Rubeus, Invoke-Kerberoast, or GetUserSPNs.py. Excludes machine accounts (ending in $) which legitimately use RC4.",
+      "description": "Detects Kerberos service ticket requests (Event 4769) using RC4 encryption (TicketEncryptionType 0x17) which is a strong indicator of Kerberoasting. Modern AD environments use AES256 (0x12) by default; RC4 requests are anomalous and typically indicate tools like Rubeus, Invoke-Kerberoast, or GetUserSPNs.py extracting service ticket hashes for offline cracking.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -1561,12 +1817,12 @@
         "credential_access"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "kerberoasting_rc4_ticket_request.json"
     },
     {
       "title": "Kerberoasting: SPN Sweep - Multiple Service Tickets from Single Account",
-      "description": "Detects a single account requesting tickets for 10+ distinct services in 1 hour \u2014 classic Rubeus/Invoke-Kerberoast SPN sweep pattern. Normal users request 1-3; attackers request all SPN-enabled accounts.",
+      "description": "Detects a single account requesting service tickets for multiple distinct services in a short window, indicating SPN sweep for offline hash cracking. Rubeus kerberoast and Invoke-Kerberoast request tickets for all SPN-enabled accounts rapidly. Normal users request 1-3 service tickets; attackers request 10+.\n",
       "level": "critical",
       "platform": "windows",
       "mitre_techniques": [
@@ -1576,7 +1832,7 @@
         "credential_access"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "kerberoasting_spn_sweep.json"
     },
     {
@@ -1610,8 +1866,8 @@
       "file": "keylogging_via_powershell_get-keystrokes.json"
     },
     {
-      "title": "Lateral Movement: Network Logon from Multiple Hosts to Single Target",
-      "description": "Detects Event 4624 LogonType 3 (network) patterns where multiple source hosts authenticate to a single target within a short window \u2014 indicates lateral movement sweep or credential spraying across the domain.",
+      "title": "Lateral Movement: Account Authenticating from Multiple Sources",
+      "description": "Detects a single account performing network logons (LogonType 3) from 3+ distinct source IPs \u2014 indicates lateral movement sweep or compromised credential reuse.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -1622,7 +1878,7 @@
         "lateral_movement"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "lateral_movement_logon_pattern.json"
     },
     {
@@ -2322,8 +2578,8 @@
       "file": "mass_assignment_attack_detected.json"
     },
     {
-      "title": "Mimikatz: Command and Module Indicators",
-      "description": "Detects Mimikatz module commands (sekurlsa, lsadump, kerberos, dpapi, crypto, token), binary name indicators, and output patterns in real Windows Security Event 4688 process creation logs. Uses Original Log Content matching against 3M+ real events.",
+      "title": "Mimikatz: Command and Module Indicators in Process Logs",
+      "description": "Detects Mimikatz command and module strings in Windows Security Event 4688 process creation and 4624/4648 logon events. Covers sekurlsa, lsadump, kerberos, dpapi, crypto modules and common Mimikatz post-exploitation patterns. Works with real Windows Security Events via Original Log Content matching.\n",
       "level": "critical",
       "platform": "windows",
       "mitre_techniques": [
@@ -2335,7 +2591,7 @@
         "credential_access"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "mimikatz_command_indicators.json"
     },
     {
@@ -3875,8 +4131,8 @@
       "file": "pass-the-ticket_via_rubeus.json"
     },
     {
-      "title": "Pass-the-Ticket: Logon with Explicit Credentials from Unusual Source",
-      "description": "Detects Event 4648 explicit credential logons where a machine account impersonates a user \u2014 common in pass-the-ticket, over-pass-the-hash, and Rubeus asktgt attacks. Correlates with source IP to identify lateral movement.",
+      "title": "Pass-the-Ticket: Excessive Explicit Credential Logons",
+      "description": "Detects Event 4648 explicit credential delegation at high frequency from a single source \u2014 indicates pass-the-ticket, over-pass-the-hash, or Rubeus asktgt lateral movement across the domain.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -3887,7 +4143,7 @@
         "lateral_movement"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "pass_the_ticket_logon.json"
     },
     {
@@ -3966,18 +4222,19 @@
       "file": "powershell_script_block_with_suspicious_keywords.json"
     },
     {
-      "title": "PowerShell: Suspicious Command Execution",
-      "description": "Detects suspicious PowerShell in real Windows Security Event 4688 process creation. Covers download cradles (DownloadString, IWR), encoded execution (-enc, FromBase64String), AMSI bypass, credential access (Mimikatz, GPP), and AD recon (BloodHound, Kerberoast, ShareFinder).",
+      "title": "PowerShell: Suspicious Command Execution (Real Windows Security Events)",
+      "description": "Detects suspicious PowerShell commands in Windows Security Event 4688 process creation logs. Covers download cradles, encoded execution, AMSI bypass, credential access, and common attack framework commands. Optimized for real Windows Security Events (not Sysmon) using Original Log Content matching.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
-        "T1059.001"
+        "T1059.001",
+        "T1086"
       ],
       "mitre_tactics": [
         "execution"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "powershell_suspicious_commands.json"
     },
     {
@@ -4011,8 +4268,8 @@
       "file": "printnightmare_exploitation_attempt.json"
     },
     {
-      "title": "Privilege Escalation: Sensitive Privileges Assigned to Non-Admin Account",
-      "description": "Detects Event 4672 special privilege assignment with dangerous privileges (SeDebugPrivilege, SeTcbPrivilege, SeAssignPrimaryTokenPrivilege) to accounts that aren't SYSTEM or known admin accounts \u2014 indicates privilege escalation or token manipulation.",
+      "title": "Privilege Escalation: Sensitive Privileges Assigned to Non-Admin",
+      "description": "Detects Event 4672 with dangerous privileges (SeDebugPrivilege, SeTcbPrivilege) assigned to non-SYSTEM accounts. Indicates token manipulation or privilege escalation.\n",
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
@@ -4023,7 +4280,7 @@
         "privilege_escalation"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT I",
       "file": "privilege_escalation_sensitive_privileges.json"
     },
     {
@@ -4342,8 +4599,8 @@
       "file": "sdelete_secure_file_deletion.json"
     },
     {
-      "title": "Security Group Enumeration: Rapid Group Membership Queries",
-      "description": "Detects Event 4799 rapid security-enabled group membership enumeration \u2014 indicates BloodHound, SharpHound, or net group /domain reconnaissance. Normal users query 1-2 groups; attackers enumerate all groups systematically.",
+      "title": "Security Group Enumeration: Rapid Membership Queries",
+      "description": "Detects Event 4799 rapid security group membership enumeration \u2014 indicates BloodHound/SharpHound or net group /domain reconnaissance.\n",
       "level": "medium",
       "platform": "windows",
       "mitre_techniques": [
@@ -4354,7 +4611,7 @@
         "discovery"
       ],
       "stig_ids": [],
-      "stig_category": "",
+      "stig_category": "CAT II",
       "file": "security_group_enumeration.json"
     },
     {
@@ -7075,6 +7332,287 @@
       "file": "xsl_script_processing_via_wmic_or_msxsl.json"
     }
   ],
+  "app_queries": [
+    {
+      "title": "APM: Browser Fingerprinting via Canvas/WebGL/AudioContext",
+      "description": "Detects browser fingerprinting techniques using Canvas API, WebGL parameters, AudioContext, and other APIs commonly used to uniquely identify browsers. Excessive fingerprinting API calls indicate tracking scripts or reconnaissance.\n",
+      "level": "medium",
+      "sigma_id": "apm-browser-fingerprint-001",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1592.004"
+      ],
+      "mitre_tactics": [
+        "reconnaissance"
+      ],
+      "file": "apps/apm_browser_fingerprinting.json"
+    },
+    {
+      "title": "APM: Clickjacking - Missing Frame Protection Headers",
+      "description": "Detects HTTP responses missing X-Frame-Options or Content-Security-Policy frame-ancestors directives, indicating vulnerability to clickjacking attacks. Monitors APM response headers for missing security controls.\n",
+      "level": "medium",
+      "sigma_id": "apm-browser-clickjack-001",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1185"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "file": "apps/apm_clickjacking_detection.json"
+    },
+    {
+      "title": "APM: CSRF Token Missing or Invalid on State-Changing Request",
+      "description": "Detects HTTP POST/PUT/DELETE requests to state-changing endpoints that lack CSRF tokens or have invalid tokens, indicating potential Cross-Site Request Forgery. Uses APM span attributes to detect missing security headers.\n",
+      "level": "medium",
+      "sigma_id": "apm-browser-csrf-001",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1185"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "file": "apps/apm_csrf_violation_detection.json"
+    },
+    {
+      "title": "APM: DOM-Based Attack via Dangerous JavaScript APIs",
+      "description": "Detects DOM-based attacks using dangerous JavaScript APIs observed in browser telemetry spans. Monitors for document.cookie access, eval() calls, innerHTML manipulation, and location/hash-based injection in OpenTelemetry browser spans.\n",
+      "level": "high",
+      "sigma_id": "apm-browser-dom-001",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1059.007"
+      ],
+      "mitre_tactics": [
+        "execution"
+      ],
+      "file": "apps/apm_dom_attack_detection.json"
+    },
+    {
+      "title": "APM: Session Hijacking - Rapid Session Changes",
+      "description": "Detects rapid session ID changes within a single trace or from a single IP, indicating potential session hijacking, session fixation, or cookie theft. Multiple distinct session IDs per source within a short window is anomalous.\n",
+      "level": "high",
+      "sigma_id": "apm-browser-session-001",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1539",
+        "T1550.004"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "lateral_movement"
+      ],
+      "file": "apps/apm_session_hijacking_detection.json"
+    },
+    {
+      "title": "APM: SQL Injection Attack in Request",
+      "description": "Detects SQL injection attack payloads in HTTP URLs and query parameters captured by the SOC Application Logs parser from OpenTelemetry-shaped browser/application telemetry. Covers UNION-based, boolean-based, time-based blind, and error-based injection techniques.\n",
+      "level": "critical",
+      "sigma_id": "apm-browser-sqli-001",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "file": "apps/apm_sqli_attack_detection.json"
+    },
+    {
+      "title": "APM: Suspicious JavaScript Execution Patterns",
+      "description": "Detects suspicious JavaScript execution patterns in browser telemetry indicating crypto mining, keylogging, formjacking, or other malicious client-side scripts. Uses OpenTelemetry browser instrumentation to monitor JS execution context.\n",
+      "level": "high",
+      "sigma_id": "apm-browser-js-001",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1059.007",
+        "T1056.001",
+        "T1496"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "collection",
+        "impact"
+      ],
+      "file": "apps/apm_suspicious_js_patterns.json"
+    },
+    {
+      "title": "APM: Cross-Site Scripting (XSS) Attack in Request",
+      "description": "Detects XSS attack payloads in HTTP URLs, query parameters, and request bodies captured by the SOC Application Logs parser from OpenTelemetry-shaped browser/application telemetry. Covers reflected, stored, and DOM-based XSS vectors including script injection, event handlers, and javascript: URIs.\n",
+      "level": "high",
+      "sigma_id": "apm-browser-xss-001",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1189",
+        "T1059.007"
+      ],
+      "mitre_tactics": [
+        "initial_access",
+        "execution"
+      ],
+      "file": "apps/apm_xss_attack_detection.json"
+    },
+    {
+      "title": "Application Authentication Brute Force",
+      "description": "Detects brute force login attempts against CRM Portal and Drone Shop by monitoring failed authentication events. Correlates with WAF signals and rate limiting events.",
+      "level": "high",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1110",
+        "T1110.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "file": "apps/app_auth_brute_force.json"
+    },
+    {
+      "title": "Cross-Service Trace Correlation (CRM \u2194 Drone Shop)",
+      "description": "Correlates distributed traces across CRM Portal and Drone Shop via shared trace_id. Identifies cross-service request flows, order sync operations, and integration health issues. This is the core 360 monitoring query.",
+      "level": "informational",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "file": "apps/app_cross_service_trace_correlation.json"
+    },
+    {
+      "title": "Database Performance Correlation (ATP \u2192 APM \u2192 Logs)",
+      "description": "Correlates application logs with Oracle ATP database context. Uses trace_id (set as CLIENT_IDENTIFIER in V$SESSION) to link Log Analytics entries with OPSI SQL performance and DB Management AWR reports.",
+      "level": "informational",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "file": "apps/app_db_performance_correlation.json"
+    },
+    {
+      "title": "Application Error Rate by Service",
+      "description": "Monitors ERROR-level application logs across CRM Portal and Drone Shop, grouped by service and endpoint. High error rates indicate application health issues requiring investigation.",
+      "level": "high",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1499"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "file": "apps/app_error_rate_by_service.json"
+    },
+    {
+      "title": "Order Sync Pipeline Health (Drone Shop \u2192 CRM)",
+      "description": "Monitors the cross-service order synchronization pipeline between Drone Shop and CRM Portal. Tracks sync success/failure rates, created/updated orders, and detects sync anomalies.",
+      "level": "medium",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "file": "apps/app_order_sync_pipeline.json"
+    },
+    {
+      "title": "OWASP Attack Detection (CRM + Drone Shop)",
+      "description": "Detects security attacks across both applications with MITRE ATT&CK and OWASP Top 10 classification. Correlates attack type, severity, source IP, and trace_id for full incident reconstruction.",
+      "level": "critical",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1190",
+        "T1059",
+        "T1110"
+      ],
+      "mitre_tactics": [
+        "initial_access",
+        "execution",
+        "credential_access"
+      ],
+      "file": "apps/app_owasp_attack_detection.json"
+    },
+    {
+      "title": "Request Rate by Service and Endpoint",
+      "description": "HTTP request throughput across CRM and Drone Shop grouped by route and status code. Identifies hotspots, traffic patterns, and potential DDoS indicators.",
+      "level": "informational",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "file": "apps/app_request_rate_by_endpoint.json"
+    },
+    {
+      "title": "Security Attack Source IP Analysis",
+      "description": "Top attacking IPs across both applications with attack type distribution and severity breakdown. Enables IP-based threat intelligence correlation and firewall rule recommendations.",
+      "level": "high",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1190",
+        "T1110"
+      ],
+      "mitre_tactics": [
+        "initial_access",
+        "credential_access"
+      ],
+      "file": "apps/app_security_attack_by_ip.json"
+    },
+    {
+      "title": "Application Service Health Timeline",
+      "description": "Tracks application lifecycle events (startup, shutdown, errors) and request throughput across CRM and Drone Shop. Use for availability monitoring and deployment impact analysis.",
+      "level": "informational",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "file": "apps/app_service_health_timeline.json"
+    },
+    {
+      "title": "Slow Request Detection (>2s)",
+      "description": "Detects requests exceeding 2-second latency across CRM and Drone Shop. Correlates with trace_id for APM drilldown and db.target for database performance investigation.",
+      "level": "medium",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1499"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "file": "apps/app_slow_requests.json"
+    },
+    {
+      "title": "SQL Injection and XSS Attack Detection",
+      "description": "Detects SQL injection and cross-site scripting attacks against CRM and Drone Shop applications. Captures attack payload, source IP, target endpoint, and APM trace for full forensic analysis.",
+      "level": "critical",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1190",
+        "T1059.007"
+      ],
+      "mitre_tactics": [
+        "initial_access",
+        "execution"
+      ],
+      "file": "apps/app_sqli_xss_detection.json"
+    },
+    {
+      "title": "WAF Signal Correlation with Application Traces",
+      "description": "Correlates OCI WAF signals (x-oci-waf-score, x-oci-waf-action) captured by application middleware with the full request trace. Links WAF detection to application-level security spans and database queries.",
+      "level": "high",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [
+        "T1562",
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "defense_evasion",
+        "initial_access"
+      ],
+      "file": "apps/app_waf_signal_correlation.json"
+    }
+  ],
   "hunting_queries": [
     {
       "title": "Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain",
@@ -7113,8 +7651,8 @@
       "file": "hunting/bluelight_apt37_kill_chain.json"
     },
     {
-      "title": "Browser Attack Frequency Analysis (APM/OpenTelemetry)",
-      "description": "Hunting query that performs frequency analysis on browser-based attacks detected via OCI APM. Identifies source IPs exhibiting multiple attack types against monitored applications, prioritizing multi-vector attackers.",
+      "title": "Browser Attack Frequency Analysis (SOC Application Logs)",
+      "description": "Hunting query that performs frequency analysis on browser-based attacks detected via SOC Application Logs. Identifies source IPs exhibiting multiple attack types against monitored applications, prioritizing multi-vector attackers.",
       "level": "critical",
       "hunting_type": "",
       "cookbook_method": "",

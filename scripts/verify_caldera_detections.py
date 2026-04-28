@@ -20,8 +20,9 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oci_config import (
     require_oci_config, get_la_client, get_namespace,
-    COMPARTMENT_ID, QUERIES_DIR,
+    COMPARTMENT_ID, SOURCE_CANDIDATE_GROUPS,
 )
+from oci_time import build_time_window
 
 # ─── Expected detections per Caldera operation ────────────────
 
@@ -33,10 +34,19 @@ OPERATION_DETECTIONS = {
             "windows_remote_system_discovery",
             "linux_system_owner_and_user_discovery",
         ],
-        "queries": [
-            "'Log Source' = 'Windows Sysmon Events' and 'Command Line' like '*whoami*'",
-            "'Log Source' = 'Windows Sysmon Events' and 'Command Line' like '*systeminfo*'",
-            "'Log Source' = 'Windows Sysmon Events' and 'Command Line' like '*ipconfig*'",
+        "query_specs": [
+            {
+                "source_group": "windows_sysmon",
+                "predicate": "'Command Line' like '*whoami*'",
+            },
+            {
+                "source_group": "windows_sysmon",
+                "predicate": "'Command Line' like '*systeminfo*'",
+            },
+            {
+                "source_group": "windows_sysmon",
+                "predicate": "'Command Line' like '*ipconfig*'",
+            },
         ],
     },
     "credential-access": {
@@ -46,10 +56,19 @@ OPERATION_DETECTIONS = {
             "windows_credential_dumping_via_procdump",
             "windows_kerberoasting_attack",
         ],
-        "queries": [
-            "'Log Source' = 'Windows Sysmon Events' and 'Command Line' like '*lsass*'",
-            "'Log Source' = 'Windows Sysmon Events' and 'Command Line' like '*mimikatz*'",
-            "'Log Source' = 'Windows Sysmon Events' and 'Command Line' like '*procdump*'",
+        "query_specs": [
+            {
+                "source_group": "windows_sysmon",
+                "predicate": "'Command Line' like '*lsass*'",
+            },
+            {
+                "source_group": "windows_sysmon",
+                "predicate": "'Command Line' like '*mimikatz*'",
+            },
+            {
+                "source_group": "windows_sysmon",
+                "predicate": "'Command Line' like '*procdump*'",
+            },
         ],
     },
     "lateral-movement": {
@@ -59,9 +78,15 @@ OPERATION_DETECTIONS = {
             "sysmon_lateral_movement_via_smb",
             "sysmon_lateral_movement_via_winrm",
         ],
-        "queries": [
-            "'Log Source' = 'Windows Sysmon Events' and 'Command Line' like '*PsExec*'",
-            "'Log Source' = 'Windows Sysmon Events' and 'Pipe Name' like '*psexec*'",
+        "query_specs": [
+            {
+                "source_group": "sysmon_operational",
+                "predicate": "'Command Line' like '*PsExec*'",
+            },
+            {
+                "source_group": "sysmon_operational",
+                "predicate": "'Pipe Name' like '*psexec*'",
+            },
         ],
     },
     "collection": {
@@ -70,8 +95,11 @@ OPERATION_DETECTIONS = {
             "linux_sensitive_data_collection_from_local_system",
             "windows_data_staging_for_exfiltration",
         ],
-        "queries": [
-            "'Log Source' = 'SOC Linux Syslog Logs' and msg like '*find*' and msg like '*-name*'",
+        "query_specs": [
+            {
+                "source_group": "linux_syslog",
+                "predicate": "msg like '*find*' and msg like '*-name*'",
+            },
         ],
     },
     "exfiltration": {
@@ -80,16 +108,45 @@ OPERATION_DETECTIONS = {
             "linux_exfiltration_over_alternative_protocol",
             "sysmon_dns_data_exfiltration",
         ],
-        "queries": [
-            "'Log Source' = 'Windows Sysmon Events' and 'Query Name' like '*.*.*.*.*'",
+        "query_specs": [
+            {
+                "source_group": "sysmon_network",
+                "predicate": "'Query Name' like '*.*.*.*.*'",
+            },
         ],
     },
 }
 
 
+def build_log_source_clause(source_group):
+    """Build a runtime-safe log source filter from configured candidates."""
+    candidates = SOURCE_CANDIDATE_GROUPS.get(source_group)
+    if not candidates:
+        raise KeyError(f"unknown log source group: {source_group}")
+
+    if len(candidates) == 1:
+        return f"'Log Source' = '{candidates[0]}'"
+
+    clauses = [f"'Log Source' = '{candidate}'" for candidate in candidates]
+    return "(" + " or ".join(clauses) + ")"
+
+
+def build_operation_queries(op_name):
+    """Render concrete OCL queries for an operation's source/predicate specs."""
+    config = OPERATION_DETECTIONS[op_name]
+    rendered = []
+
+    for spec in config["query_specs"]:
+        source_clause = build_log_source_clause(spec["source_group"])
+        rendered.append(f"{source_clause} and {spec['predicate']}")
+
+    return rendered
+
+
 def run_query(la_client, namespace, query, lookback="1h"):
     """Execute an OCL query against OCI Log Analytics."""
     import oci
+    time_start, time_end = build_time_window(lookback)
     try:
         result = la_client.query(
             namespace_name=namespace,
@@ -99,10 +156,9 @@ def run_query(la_client, namespace, query, lookback="1h"):
                 sub_system="LOG",
                 max_total_count=10,
                 time_filter=oci.log_analytics.models.TimeRange(
-                    time_start=None,
-                    time_end=None,
-                    time_type="RELATIVE_TIME",
-                    relative_time=f"LAST_{lookback.upper()}",
+                    time_start=time_start,
+                    time_end=time_end,
+                    time_zone="UTC",
                 ),
             ),
         )
@@ -125,8 +181,9 @@ def verify_operation(la_client, namespace, op_name, lookback):
     print(f"  Expected rules: {', '.join(config['expected_rules'])}")
 
     total_hits = 0
-    total_queries = len(config['queries'])
-    for query in config['queries']:
+    queries = build_operation_queries(op_name)
+    total_queries = len(queries)
+    for query in queries:
         count = run_query(la_client, namespace, query, lookback)
         status = "HIT" if count > 0 else ("ERROR" if count < 0 else "MISS")
         print(f"    [{status:5s}] {query[:80]}... ({count} results)")
@@ -161,7 +218,7 @@ def main():
             print(f"  Techniques: {', '.join(config['techniques'])}")
             for rule in config['expected_rules']:
                 print(f"    Expected: {rule}")
-            for query in config['queries']:
+            for query in build_operation_queries(op_name):
                 print(f"    Query: {query[:80]}...")
         print("\n  (dry run — no OCI queries executed)")
         return

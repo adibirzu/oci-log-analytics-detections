@@ -1,7 +1,7 @@
 {
   "title": "SSRF to Cloud Instance Metadata Service (Linux)",
   "description": "Detects outbound HTTP requests to the cloud instance metadata endpoint\n(169.254.169.254) from web application processes on Linux. This indicates\nServer-Side Request Forgery (SSRF) exploitation targeting OCI/AWS/GCP/Azure\nIMDS to extract instance credentials or configuration.\nCovers MITRE ATT&CK T1552.005 (Cloud Instance Metadata API).\n",
-  "query": "'Log Source' = 'OCI Audit Logs' and ((msg like '*169.254.169.254*') and ((msg like '*python*' or msg like '*python3*' or msg like '*node*' or msg like '*java*' or msg like '*ruby*' or msg like '*php*' or msg like '*httpd*' or msg like '*nginx*' or msg like '*uvicorn*' or msg like '*gunicorn*' or msg like '*curl*' or msg like '*wget*')))",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((msg like '*169.254.169.254*') and ((msg like '*python*' or msg like '*python3*' or msg like '*node*' or msg like '*java*' or msg like '*ruby*' or msg like '*php*' or msg like '*httpd*' or msg like '*nginx*' or msg like '*uvicorn*' or msg like '*gunicorn*' or msg like '*curl*' or msg like '*wget*')))",
   "sigma_id": "a1b2c3d4-8003-4000-8000-000000000001",
   "level": "critical",
   "stig_category": "CAT I",
@@ -25,12 +25,14 @@
     "product": "linux",
     "service": "auditd",
     "candidates": [
-      "OCI Audit Logs"
+      "SOC Linux Syslog Logs",
+      "Linux Secure Logs",
+      "Linux Syslog Logs",
+      "Linux Audit Logs"
     ]
   },
   "falsepositives": [
     "Cloud-init metadata access during instance bootstrapping",
     "OCI SDK calls using instance principal authentication"
-  ],
-  "logsource_fallback": true
+  ]
 }

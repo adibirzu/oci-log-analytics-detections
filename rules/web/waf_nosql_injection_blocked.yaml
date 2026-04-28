@@ -1,6 +1,7 @@
 title: WAF NoSQL Injection Attack Blocked
 id: a1010027-owasp-a03-nosqli-block-001
 status: stable
+version: 1
 description: Detects NoSQL injection attempts (MongoDB, CouchDB) blocked by WAF. Attackers inject NoSQL query operators to bypass authentication or extract data. OWASP A03:2021 Injection.
 logsource:
   product: oci

@@ -1,6 +1,7 @@
 title: Suspicious or Empty User Agent Detected
 id: a1010028-owasp-recon-ua-001
 status: stable
+version: 1
 description: Detects requests with empty, missing, or known-malicious user agents. Automated attack tools often use non-standard user agents or omit them entirely.
 logsource:
   product: oci

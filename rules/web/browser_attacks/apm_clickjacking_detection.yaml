@@ -15,7 +15,7 @@ logsource:
   service: apm
 detection:
   selection_html:
-    HTTP_Status_Code: 200
+    HTTP_Status_Code: "200"
     Content_Type|contains: 'text/html'
   filter_has_protection:
     Response_Headers|contains:

@@ -1,6 +1,7 @@
 title: WAF Cross-Site Scripting Attack Blocked
 id: a1010003-owasp-a03-xss-block-001
 status: stable
+version: 1
 description: Detects XSS (Cross-Site Scripting) attempts blocked by OCI WAF. Part of OWASP A03:2021 Injection category.
 logsource:
   product: oci

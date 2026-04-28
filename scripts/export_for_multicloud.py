@@ -23,6 +23,7 @@ import json
 import os
 import shutil
 import sys
+import ast
 import yaml
 from datetime import datetime, timezone
 from pathlib import Path
@@ -35,20 +36,42 @@ RULES_DIR = PROJECT_DIR / 'rules'
 QUERIES_DIR = PROJECT_DIR / 'queries'
 TEST_DATA_DIR = PROJECT_DIR / 'test_data'
 DEFAULT_TARGET = Path.home() / 'dev' / 'multicloudoperations'
+DEPLOY_DASHBOARD_SCRIPT = PROJECT_DIR / 'scripts' / 'deploy_dashboard.py'
 
 
 def load_all_queries():
-    """Load all generated query JSON files."""
+    """Load all source-derived generated query JSON files."""
     queries = {}
-    for f in sorted(QUERIES_DIR.glob('*.json')):
+    for f in sorted(QUERIES_DIR.rglob('*.json')):
         if f.name in ('manifest.json', 'catalog.json'):
             continue
         with open(f) as fh:
             data = json.load(fh)
-            # Skip non-rule artifacts in queries/ (for example ad-hoc catalog outputs).
+            if not data.get('sigma_id'):
+                continue
             if 'title' in data and 'query' in data:
-                queries[f.name] = data
+                queries[str(f.relative_to(QUERIES_DIR))] = data
     return queries
+
+
+def load_dashboard_inventory():
+    """Load dashboard names and saved-search totals from deploy_dashboard.py."""
+    if not DEPLOY_DASHBOARD_SCRIPT.exists():
+        return {"total": 0, "names": [], "saved_searches": 0}
+
+    module = ast.parse(DEPLOY_DASHBOARD_SCRIPT.read_text())
+    for node in module.body:
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id == 'DASHBOARDS':
+                    dashboards = ast.literal_eval(node.value)
+                    return {
+                        "total": len(dashboards),
+                        "names": list(dashboards.keys()),
+                        "saved_searches": sum(len(cfg.get('widgets', [])) for cfg in dashboards.values()),
+                    }
+
+    return {"total": 0, "names": [], "saved_searches": 0}
 
 
 def load_all_rules():
@@ -65,6 +88,7 @@ def load_all_rules():
 
 def generate_manifest(queries, rules):
     """Generate a comprehensive manifest for cross-project integration."""
+    dashboard_inventory = load_dashboard_inventory()
     manifest = {
         "project": "oci-log-analytics-detections",
         "version": "2.0.0",
@@ -80,16 +104,9 @@ def generate_manifest(queries, rules):
         },
         "rules": [],
         "dashboards": {
-            "total": 7,
-            "names": [
-                "SOC Overview Dashboard",
-                "SOC: OCI STIG Compliance Dashboard",
-                "SOC: OCI Audit Security Dashboard",
-                "SOC: Cloud Guard Security Dashboard",
-                "SOC: Linux Security Dashboard",
-                "SOC: Windows Security Dashboard",
-                "SOC: Threat Hunting Dashboard",
-            ],
+            "total": dashboard_inventory["total"],
+            "saved_searches": dashboard_inventory["saved_searches"],
+            "names": dashboard_inventory["names"],
         },
         "log_sources": {
             "oci_audit": SOURCE_CANDIDATE_GROUPS["oci_audit"],

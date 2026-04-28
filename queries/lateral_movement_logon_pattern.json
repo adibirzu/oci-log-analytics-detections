@@ -1,18 +1,33 @@
 {
-  "title": "Lateral Movement: Network Logon from Multiple Hosts to Single Target",
-  "description": "Detects Event 4624 LogonType 3 (network) patterns where multiple source hosts authenticate to a single target within a short window — indicates lateral movement sweep or credential spraying across the domain.",
-  "query": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4624' and 'Original Log Content' like '%LogonType:3%' and not 'Original Log Content' like '%TargetUserName:ANONYMOUS LOGON%' and not 'Original Log Content' like '%TargetUserName:-$%' | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)') | stats distinctcount(SrcIP) as UniqueSources, count as TotalLogons by Account, Entity | where UniqueSources > 3 | sort -UniqueSources",
+  "title": "Lateral Movement: Account Authenticating from Multiple Sources",
+  "description": "Detects a single account performing network logons (LogonType 3) from 3+ distinct source IPs \u2014 indicates lateral movement sweep or compromised credential reuse.\n",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4624 and 'Logon Type' = 3) and not (('Target User Name' = 'ANONYMOUS LOGON' or 'Target User Name' = '-')) and not ('Target User Name' like '*$')) | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)') | stats distinctcount(SrcIP) as UniqueSources, count as TotalLogons by Account, Entity | where UniqueSources > 3 | sort -UniqueSources",
   "sigma_id": "lateral-t1021-001",
   "level": "high",
-  "tags": ["attack.lateral_movement", "attack.t1021.002", "attack.t1021.006"],
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.lateral_movement",
+    "attack.t1021.002",
+    "attack.t1021.006"
+  ],
   "mitre_attack": {
-    "tactics": ["lateral_movement"],
-    "techniques": ["T1021.002", "T1021.006"]
+    "tactics": [
+      "lateral_movement"
+    ],
+    "techniques": [
+      "T1021.002",
+      "T1021.006"
+    ]
   },
   "logsource": {
     "product": "windows",
     "service": "security",
-    "candidates": ["Windows Security Events"]
+    "candidates": [
+      "Windows Security Events",
+      "Windows Event Security Logs"
+    ]
   },
-  "falsepositives": ["Domain admin accounts authenticating from multiple workstations", "Service accounts"]
+  "falsepositives": [
+    "Domain admin accounts from multiple workstations"
+  ]
 }

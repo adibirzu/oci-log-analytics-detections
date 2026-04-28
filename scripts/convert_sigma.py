@@ -6,6 +6,8 @@ Supports:
   - Wildcard selection references: ``1 of selection*``, ``all of filter*``
   - Complex conditions: sel1 and sel2, sel1 or sel2, not, parenthesized groups
   - Graceful degradation for count()/timeframe conditions
+  - Stable output filenames via existing ``sigma_id`` reuse
+  - Routing browser APM rules into ``queries/apps/``
   - STIG metadata extraction from tags
   - MITRE ATT&CK technique mapping
   - Integration-ready JSON output for multicloudoperations
@@ -22,10 +24,13 @@ import json
 import re
 import sys
 import fnmatch
+from pathlib import Path
 
 CONFIG_PATH = 'config/sigma_oci_mapping.yaml'
 RULES_DIR = 'rules'
 OUTPUT_DIR = 'queries'
+EXCLUDED_QUERY_FILENAMES = {'manifest.json', 'catalog.json'}
+NON_PRESERVED_GENERATED_FIELDS = {'logsource_fallback', 'requires_aggregation'}
 
 # ─── STIG severity mapping ──────────────────────────────────────
 
@@ -68,6 +73,120 @@ def _escape_like_value(value):
     if isinstance(value, str):
         return value.replace('\\', '\\\\')
     return value
+
+
+def slugify_title(title):
+    """Create a filesystem-safe JSON filename stem from a rule title."""
+    safe_title = title.replace(' ', '_').replace(':', '').lower()
+    return re.sub(r'[^a-z0-9_\-]', '', safe_title)
+
+
+def iter_query_files(output_root):
+    """Yield all query JSON files beneath the output root, excluding catalogs."""
+    for path in sorted(Path(output_root).rglob('*.json')):
+        if path.name in EXCLUDED_QUERY_FILENAMES:
+            continue
+        yield path
+
+
+def load_existing_query_index(output_root):
+    """Index existing generated queries by sigma_id for stable path reuse."""
+    index = {}
+    for path in iter_query_files(output_root):
+        try:
+            with open(path) as fh:
+                data = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            continue
+        sigma_id = data.get('sigma_id')
+        if sigma_id and sigma_id not in index:
+            index[sigma_id] = path.relative_to(output_root).as_posix()
+    return index
+
+
+def resolve_output_relative_path(rule_path, result, output_root, rules_root=None, existing_index=None):
+    """Resolve the generated output path for a rule relative to the output root.
+
+    Rules under ``rules/web/browser_attacks`` are routed to ``queries/apps``.
+    All other rules reuse an existing path when the same ``sigma_id`` is already
+    present on disk; otherwise they fall back to a title-derived filename.
+    """
+    rule_path = Path(rule_path)
+    if rules_root is None:
+        base_dir = Path(__file__).resolve().parent.parent
+        rules_root = base_dir / RULES_DIR
+    else:
+        rules_root = Path(rules_root)
+    rel_rule = rule_path.relative_to(rules_root)
+
+    if len(rel_rule.parts) >= 2 and rel_rule.parts[0] == 'web' and rel_rule.parts[1] == 'browser_attacks':
+        return f"apps/{rel_rule.stem}.json"
+
+    sigma_id = result.get('sigma_id')
+    if sigma_id and existing_index and sigma_id in existing_index:
+        return existing_index[sigma_id]
+
+    return f"{slugify_title(result['title'])}.json"
+
+
+def _merge_unique(primary, secondary):
+    """Return a de-duplicated list preserving the order of both inputs."""
+    merged = []
+    seen = set()
+    for items in (primary or [], secondary or []):
+        for item in items:
+            if item in seen:
+                continue
+            merged.append(item)
+            seen.add(item)
+    return merged
+
+
+def merge_preserved_fields(result, existing):
+    """Preserve curated JSON metadata from an existing generated query file."""
+    existing_query = existing.get('query', '')
+    if '|' not in result.get('query', '') and '|' in existing_query:
+        pipe_idx = existing_query.index('|')
+        result['query'] = result['query'] + ' ' + existing_query[pipe_idx:].strip()
+
+    if existing.get('atomic_red_team'):
+        result['atomic_red_team'] = existing['atomic_red_team']
+
+    if existing.get('tags'):
+        result['tags'] = _merge_unique(result.get('tags', []), existing.get('tags', []))
+
+    if existing.get('falsepositives') and not result.get('falsepositives'):
+        result['falsepositives'] = existing['falsepositives']
+
+    existing_mitre = existing.get('mitre_attack', {})
+    if existing_mitre:
+        result_mitre = result.setdefault('mitre_attack', {"tactics": [], "techniques": []})
+        result_mitre['tactics'] = _merge_unique(
+            result_mitre.get('tactics', []),
+            existing_mitre.get('tactics', []),
+        )
+        result_mitre['techniques'] = _merge_unique(
+            result_mitre.get('techniques', []),
+            existing_mitre.get('techniques', []),
+        )
+
+    for key, value in existing.items():
+        if key in result:
+            continue
+        if key in {
+            'title',
+            'description',
+            'query',
+            'sigma_id',
+            'level',
+            'logsource',
+            'mitre_attack',
+            *NON_PRESERVED_GENERATED_FIELDS,
+        }:
+            continue
+        result[key] = value
+
+    return result
 
 
 def normalize_log_source_candidates(raw_value):
@@ -171,7 +290,7 @@ def parse_selection(selection, field_map):
                         or_parts.append(f"{oci_field} = {v}")
                 query_parts.append(f"({' or '.join(or_parts)})")
             elif value is None:
-                query_parts.append(f"{oci_field} is null")
+                query_parts.append(f"not ({oci_field} like '*')")
 
     return " and ".join(query_parts)
 
@@ -287,8 +406,8 @@ def convert_rule(rule_path, field_map, logsource_map):
     category = logsource.get('category', '')
 
     raw_source_mapping = (
-        logsource_map.get(f"{product}_{service}")
-        or logsource_map.get(f"{product}_{category}")
+        logsource_map.get(f"{product}_{category}")
+        or logsource_map.get(f"{product}_{service}")
         or logsource_map.get(category)
         or logsource_map.get(product)
     )
@@ -367,10 +486,12 @@ def convert_rule(rule_path, field_map, logsource_map):
 def print_stats(output_path):
     """Print statistics about generated queries."""
     queries = []
-    for f in os.listdir(output_path):
-        if f.endswith('.json'):
-            with open(os.path.join(output_path, f)) as fh:
-                queries.append(json.load(fh))
+    for path in iter_query_files(output_path):
+        with open(path) as fh:
+            data = json.load(fh)
+        if not data.get('sigma_id'):
+            continue
+        queries.append(data)
 
     print(f"\n{'=' * 60}")
     print(f"Detection Rule Statistics")
@@ -417,17 +538,15 @@ def print_stats(output_path):
 def validate_queries(output_path):
     """Validate OCL syntax of generated queries."""
     errors = 0
-    for f in sorted(os.listdir(output_path)):
-        if not f.endswith('.json'):
-            continue
-        if f in ('manifest.json', 'catalog.json'):
-            continue
-        with open(os.path.join(output_path, f)) as fh:
+    total = 0
+    for path in iter_query_files(output_path):
+        with open(path) as fh:
             q = json.load(fh)
         query = q.get('query', '')
+        total += 1
         # Basic syntax checks
         issues = []
-        if not re.match(r"^\(?\s*'Log Source'\s*=", query):
+        if not re.match(r"^\(?\s*'Log Source'\s*(=|in)\s*", query):
             issues.append("missing Log Source prefix")
         # Count parentheses outside of quoted strings
         in_quote = False
@@ -446,12 +565,9 @@ def validate_queries(output_path):
         if "  " in query:
             issues.append("double spaces")
         if issues:
-            print(f"  WARN {f}: {', '.join(issues)}")
+            rel_path = path.relative_to(output_path).as_posix()
+            print(f"  WARN {rel_path}: {', '.join(issues)}")
             errors += 1
-    total = len([
-        f for f in os.listdir(output_path)
-        if f.endswith('.json') and f not in ('manifest.json', 'catalog.json')
-    ])
     print(f"\n  Validated {total} queries, {errors} warnings")
 
 
@@ -472,6 +588,7 @@ def main():
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
+    existing_index = load_existing_query_index(output_path)
     count = 0
     for root, dirs, files in os.walk(rules_path):
         for file in sorted(files):
@@ -482,31 +599,30 @@ def main():
                 result = convert_rule(rule_path, field_map, logsource_map)
 
                 if result:
-                    safe_title = result['title'].replace(' ', '_').replace(':', '').lower()
-                    # Remove characters that are problematic in filenames
-                    safe_title = re.sub(r'[^a-z0-9_\-]', '', safe_title)
-                    out_filename = f"{safe_title}.json"
-                    out_full_path = os.path.join(output_path, out_filename)
+                    out_rel_path = resolve_output_relative_path(
+                        rule_path=rule_path,
+                        result=result,
+                        output_root=output_path,
+                        rules_root=rules_path,
+                        existing_index=existing_index,
+                    )
+                    out_full_path = os.path.join(output_path, out_rel_path)
+                    os.makedirs(os.path.dirname(out_full_path), exist_ok=True)
 
                     # Preserve hand-edited fields from existing file
                     if os.path.exists(out_full_path):
                         try:
                             with open(out_full_path) as ef:
                                 existing = json.load(ef)
-                            existing_query = existing.get('query', '')
-                            if '| stats' in existing_query or '| where' in existing_query or '| eventstats' in existing_query:
-                                # Extract the aggregation suffix from the existing query
-                                pipe_idx = existing_query.index('|')
-                                result['query'] = result['query'] + ' ' + existing_query[pipe_idx:].strip()
-                            # Preserve ART test mappings added by map_atomic_tests.py
-                            if 'atomic_red_team' in existing:
-                                result['atomic_red_team'] = existing['atomic_red_team']
+                            result = merge_preserved_fields(result, existing)
                         except (json.JSONDecodeError, KeyError):
                             pass
 
                     with open(out_full_path, 'w') as f:
                         json.dump(result, f, indent=2)
                     print(f"Generated {out_full_path}")
+                    if result.get('sigma_id'):
+                        existing_index[result['sigma_id']] = out_rel_path
                     count += 1
 
     print(f"\nConverted {count} rules")

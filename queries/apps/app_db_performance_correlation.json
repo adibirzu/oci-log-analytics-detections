@@ -1,7 +1,7 @@
 {
   "title": "Database Performance Correlation (ATP → APM → Logs)",
   "description": "Correlates application logs with Oracle ATP database context. Uses trace_id (set as CLIENT_IDENTIFIER in V$SESSION) to link Log Analytics entries with OPSI SQL performance and DB Management AWR reports.",
-  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and 'db.target' = 'oracle_atp' or 'db.target' = 'oracle-atp' | stats count as Events, distinctcount(trace_id) as UniqueTraces by 'service.name', level | sort -Events",
+  "query": "'Log Source' = 'SOC Application Logs' and ('DB Target' = 'oracle_atp' or 'DB Target' = 'oracle-atp') | stats count as Events, distinctcount('Trace ID') as UniqueTraces by 'Service Name', 'Severity Level' | sort -Events",
   "level": "informational",
   "tags": ["db.correlation", "opsi.drilldown", "db_management.correlation", "atp"],
   "mitre_attack": {

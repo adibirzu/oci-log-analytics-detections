@@ -3,8 +3,9 @@ id: apm-browser-sqli-001
 status: stable
 description: >
   Detects SQL injection attack payloads in HTTP URLs and query parameters captured
-  by OCI APM instrumentation. Covers UNION-based, boolean-based, time-based blind,
-  and error-based injection techniques.
+  by the SOC Application Logs parser from OpenTelemetry-shaped browser/application
+  telemetry. Covers UNION-based, boolean-based, time-based blind, and error-based
+  injection techniques.
 references:
   - https://owasp.org/www-community/attacks/SQL_Injection
   - https://attack.mitre.org/techniques/T1190/

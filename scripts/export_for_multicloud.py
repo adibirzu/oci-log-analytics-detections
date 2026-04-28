@@ -37,13 +37,14 @@ QUERIES_DIR = PROJECT_DIR / 'queries'
 TEST_DATA_DIR = PROJECT_DIR / 'test_data'
 DEFAULT_TARGET = Path.home() / 'dev' / 'multicloudoperations'
 DEPLOY_DASHBOARD_SCRIPT = PROJECT_DIR / 'scripts' / 'deploy_dashboard.py'
+DASHBOARD_INVENTORY_PATH = QUERIES_DIR / 'dashboard_inventory.json'
 
 
 def load_all_queries():
     """Load all source-derived generated query JSON files."""
     queries = {}
     for f in sorted(QUERIES_DIR.rglob('*.json')):
-        if f.name in ('manifest.json', 'catalog.json'):
+        if f.name in ('manifest.json', 'catalog.json', 'dashboard_inventory.json'):
             continue
         with open(f) as fh:
             data = json.load(fh)
@@ -55,7 +56,23 @@ def load_all_queries():
 
 
 def load_dashboard_inventory():
-    """Load dashboard names and saved-search totals from deploy_dashboard.py."""
+    """Load dashboard names and saved-search totals from generated inventory."""
+    if DASHBOARD_INVENTORY_PATH.exists():
+        with open(DASHBOARD_INVENTORY_PATH) as fh:
+            inventory = json.load(fh)
+        dashboards = inventory.get("dashboards", [])
+        summary = inventory.get("summary", {})
+        return {
+            "total": summary.get("total_dashboards", len(dashboards)),
+            "names": [dashboard.get("name", "") for dashboard in dashboards],
+            "saved_searches": summary.get(
+                "total_widgets",
+                sum(dashboard.get("widget_count", 0) for dashboard in dashboards),
+            ),
+        }
+
+    # Fallback for a fresh checkout before queries/dashboard_inventory.json
+    # has been generated.
     if not DEPLOY_DASHBOARD_SCRIPT.exists():
         return {"total": 0, "names": [], "saved_searches": 0}
 

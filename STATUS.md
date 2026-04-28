@@ -14,7 +14,7 @@ Date: 2026-04-28
 - Total query artifacts: 515
 - Dashboards: 16
 - Saved searches: 264
-- Sample data: 14 NDJSON files / 146,632 events
+- Sample data: 14 NDJSON files / 146,693 events
 - MITRE ATT&CK coverage: 211 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
 
@@ -28,31 +28,49 @@ Date: 2026-04-28
 - Catalog generation, rule quality auditing, and multicloud export now walk the full `queries/**` tree instead of assuming everything lives at the top level.
 - Browser/app dashboards now run on `SOC Application Logs`, a custom JSON source that carries OpenTelemetry-shaped fields into OCI Log Analytics.
 - Browser attack dashboards now include APM/WAF showcase widgets for attack volume, OWASP breakdown, trace correlation, and cross-tier WAF correlation.
+- `queries/dashboard_inventory.json` is generated from `scripts/deploy_dashboard.py:DASHBOARDS` and is the dashboard-facing saved-search/widget inventory.
+- Dashboard deployment now validates the generated inventory locally and validates every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
+- Live query validation runs each query in an isolated child process so slow or hung queries become blocking validation failures instead of reaching dashboard import.
+- BLUELIGHT (S0657 / APT37) APT dashboard now leads with 5 showcase widgets (Total Detections KPI tile, Top Affected Hosts summary, MITRE Tactics × Techniques sunburst, Kill Chain Timeline line chart, Attack Path link analysis) followed by the 17 per-stage detection widgets, presenting the full attack chain on a single canvas.
+- WAF parser now extracts `Trace ID` so APM browser attacks correlate to upstream WAF blocks across `SOC Application Logs` and `SOC WAF Security Logs` via shared `traceId`.
+- BLUELIGHT kill-chain test data is mirrored into both `windows_sysmon.jsonl` (SOC Windows Sysmon parser, 35 field maps) and `sysmon_operational.jsonl` (Sysmon Operational parser) so per-widget detections match through whichever parser route propagates first.
+- All BLUELIGHT queries standardised on quoted `'Event ID' = 'N'` form — OCI LA returns HTTP 400 on unquoted numeric comparisons against String-typed fields, so the convention applies repo-wide for parser-string fields.
+- `scripts/smoke_test_bluelight.py` — live OCI LA query runner reports HIT/MISS/ERROR per widget with row counts, used as the green-light gate before deploys.
 - `test_data/manifest.json` is rebuilt from the checked-in `*.jsonl` files rather than hand-maintained counts.
 - Streaming pipeline reconciliation refreshes `config/streaming_config.json` against the active tenancy resources.
-- `LoganSecurityDashboardv0` is documented as the companion operator UI and should consume this repo's catalog, manifest, query, and test-data artifacts instead of duplicating detection-generation logic.
+- `LoganSecurityDashboardv0` is documented as the companion operator UI and consumes this repo's catalog, dashboard inventory, and test-data artifacts instead of duplicating detection-generation logic.
 
 ## Quality and Verification
 
-Local verification on 2026-04-28:
+Local and pre-flight verification on 2026-04-28:
 
 - `python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md`
-  - 454 rules
-  - 454 source-derived queries
-  - 0 issues
+  - 454 rules / 454 source-derived queries / 0 issues
 - `python3 -m pytest -q`
-  - 81 tests passed
+  - 84 tests passed
 - `python3 -m compileall scripts`
   - passed
-- `python3 scripts/deploy_dashboard.py --dry-run`
-  - 16 dashboards
-  - 264 saved searches
 - `python3 scripts/deploy_dashboard.py --validate`
-  - 515 query files OK
+  - OCID, CLI profile, namespace, compartment, and 515 query files passed
+- `python3 scripts/deploy_dashboard.py --dry-run`
+  - 16 dashboards / 264 saved searches resolved from generated inventory
+- `python3 scripts/generate_test_logs.py --validate`
+  - 14 datasets / 146,693 events generated and 515 query files counted across all query surfaces
 - `python3 scripts/ingest_test_data.py --validate`
   - 14 datasets and log source mappings passed
-- `python3 scripts/setup_log_sources.py --validate`
-  - pre-flight validation passed
+- Targeted live OCI validation:
+  - `hunting/linux_multi_stage_attack.json` validates after narrowing the query to the deployed `SOC Linux Syslog Logs` parser
+
+Previously live-verified on 2026-04-28 (eu-frankfurt-1):
+
+- `python3 scripts/smoke_test_bluelight.py --lookback 7d`
+  - 17/17 BLUELIGHT detection widgets HIT
+  - 5/5 BLUELIGHT showcase widgets HIT
+  - 13/13 APM browser-attack widgets HIT including cross-tier WAF correlation
+- `python3 scripts/setup_log_sources.py`
+  - 13 parsers OK
+- `python3 scripts/ingest_test_data.py --mode direct`
+  - 14/14 uploads completed
 
 Previously live-verified on 2026-04-15:
 
@@ -74,7 +92,7 @@ Previously live-verified on 2026-04-15:
 
 - `validate_pipeline.py` now derives expected streams/connectors from `config/streaming_config.json`, so the multicloud-health connector is validated alongside the core SOC pipeline.
 - Redundant active connectors were removed from the compartment without affecting the SOC streaming path.
-- `test_data/manifest.json` is current as of 2026-04-28 and reports 146,632 checked-in events, dominated by the 14-day multicloud health dataset.
+- `test_data/manifest.json` is current as of 2026-04-28 and reports 146,693 checked-in events, dominated by the multicloud health dataset.
 
 ## Documentation Map
 
@@ -82,6 +100,8 @@ Previously live-verified on 2026-04-15:
 - `docs/ARCHITECTURE.md` — source/generation/deployment architecture
 - `CATALOG.md` — human-readable content catalog
 - `queries/catalog.json` — canonical machine-readable inventory
+- `queries/dashboard_inventory.json` — dashboard/widget/saved-search inventory for companion UIs
+- `docs/INTEGRATION_SCHEMA.md` — generated artifact contract for downstream integrations
 - `docs/DEMO_WORKFLOW.md` — demo/operator walkthrough
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit output
 - `CONTRIBUTING.md` — contributor workflow and validation expectations
@@ -91,9 +111,8 @@ Previously live-verified on 2026-04-15:
 
 ## Recommended Next Work
 
-- Add `DET-MISS-001`: generate a machine-readable dashboard/widget inventory so the companion dashboard does not parse `scripts/deploy_dashboard.py`.
-- Add smoke tests around dashboard/query references so widget regressions are caught before deployment.
-- Publish `DET-MISS-002`: a versioned integration schema for catalog, dashboard inventory, saved searches, datasets, and log-source fields.
+- Keep `queries/dashboard_inventory.json` regenerated with dashboard changes.
+- Expand `DET-MISS-002` with a generated log-source field dictionary for parser fields and display labels.
 - Expand live verification beyond Caldera discovery so credential-access, lateral-movement, collection, and exfiltration have deterministic demo data.
 - Add sample ingestion/validation checks for the `test_data/` datasets to verify schemas alongside query generation.
 - Expand source rule coverage only after log source mappings and test datasets exist for the new telemetry surface.

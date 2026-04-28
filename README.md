@@ -16,15 +16,17 @@ This repository ships both source authoring content and generated OCI query asse
 - **Source rule breakdown:** Windows (249), Cloud/OCI (100), Linux (67), Web/WAF (38)
 - **Combined MITRE ATT&CK coverage:** 211 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
-- **Dashboard inventory:** 16 dashboards with 264 saved searches
-- **Sample data in repo:** 146,632 events across 14 NDJSON files
+- **Dashboard inventory:** 16 dashboards with 264 saved searches and 16 advanced visualization widgets
+- **Sample data in repo:** 146,693 events across 14 NDJSON files
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 
 Canonical inventory and supporting documentation:
 
 - `queries/catalog.json` — canonical machine-readable inventory
+- `queries/dashboard_inventory.json` — generated dashboard/widget/saved-search inventory
 - `queries/manifest.json` — export artifact for downstream integrations
 - `docs/ARCHITECTURE.md` — source/generation/deployment architecture
+- `docs/INTEGRATION_SCHEMA.md` — generated artifact schema contract
 - `CATALOG.md` — human-readable catalog
 - `docs/DEMO_WORKFLOW.md` — operator/demo walkthrough
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit report
@@ -60,6 +62,7 @@ queries/** -----------------------------------------------> scripts/export_for_m
 queries/** -----------------------------------------------> scripts/deploy_dashboard.py
                                                              |
                                                              +--> 16 dashboards / 264 saved searches
+                                                             +--> queries/dashboard_inventory.json
 ```
 
 ### Data Flow
@@ -82,6 +85,7 @@ Browser and app dashboards currently run against `SOC Application Logs`, a custo
 Treat the following as the canonical output contract for downstream integrations such as `mcp-oci-logan-server` and `LoganSecurityDashboardv0`:
 
 - `queries/catalog.json` for authoritative counts and inventory
+- `queries/dashboard_inventory.json` for dashboard, widget, saved-search, visualization, and query-file mapping
 - `queries/*.json` for generated top-level detection queries
 - `queries/apps/*.json` for mixed app telemetry content
 - `queries/hunting/*.json` for hunting queries
@@ -93,6 +97,7 @@ Notes:
 - `rules/` is the source-of-truth authoring layer
 - `sigma_id` identifies source-derived generated detections
 - `queries/catalog.json` is canonical; `queries/manifest.json` is derivative
+- `queries/dashboard_inventory.json` is generated from `scripts/deploy_dashboard.py:DASHBOARDS`
 - `queries/apps/` contains both generated browser detections and curated app analytics
 - `LoganSecurityDashboardv0` should consume these generated artifacts rather than duplicating detection-generation logic
 - `logandetectionqueries/` and `logandetectionrules/` are legacy empty directories and should not be consumed
@@ -176,6 +181,7 @@ queries/                        # Generated OCL queries (JSON)
   apps/                         # 24 app telemetry queries (8 source-derived + 16 curated)
   hunting/                      # 45 advanced hunting queries
   catalog.json                  # Full rule catalog (machine-readable)
+  dashboard_inventory.json      # Dashboard/widget/saved-search inventory for UI integrations
   manifest.json                 # Export/integration manifest
 config/
   sigma_oci_mapping.yaml        # Field & log source mappings (including SOC Application Logs)
@@ -218,10 +224,13 @@ python3 scripts/setup_streaming_pipeline.py
 python3 scripts/validate_pipeline.py --e2e
 
 # 4. Deploy 16 dashboards with 264 saved searches
+#    The default path validates dashboard queries in OCI Log Analytics first.
+#    Failed, slow, or timed-out query validation blocks dashboard import.
 python3 scripts/deploy_dashboard.py
 
 # 5. Regenerate inventory artifacts
 python3 scripts/generate_catalog.py
+python3 scripts/deploy_dashboard.py --export-inventory
 python3 scripts/export_for_multicloud.py --manifest-only
 ```
 
@@ -229,6 +238,7 @@ python3 scripts/export_for_multicloud.py --manifest-only
 ```bash
 python3 scripts/deploy_dashboard.py --validate
 python3 scripts/deploy_dashboard.py --dry-run
+python3 scripts/deploy_dashboard.py --export-inventory
 python3 scripts/ingest_test_data.py --validate
 python3 scripts/setup_log_sources.py --validate
 python3 scripts/validate_pipeline.py --e2e
@@ -283,7 +293,7 @@ python3 scripts/export_for_multicloud.py    # Export to ~/dev/multicloudoperatio
 ```
 
 ### Logan Security Dashboard
-`../LoganSecurityDashboardv0` is the companion operator UI. This repository remains the content and deployment source of truth; the dashboard should consume `queries/catalog.json`, `queries/manifest.json`, `queries/apps/*.json`, `queries/hunting/*.json`, and `test_data/manifest.json` through a static export, API, or MCP boundary.
+`../LoganSecurityDashboardv0` is the companion operator UI. This repository remains the content and deployment source of truth; the dashboard should consume `queries/catalog.json`, `queries/dashboard_inventory.json`, `queries/manifest.json`, `queries/apps/*.json`, `queries/hunting/*.json`, and `test_data/manifest.json` through a static export, API, or MCP boundary.
 
 Cross-project capability gaps are tracked in `docs/DASHBOARD_INTEGRATION_GAPS.md` and the dashboard-side report at `../LoganSecurityDashboardv0/docs/CAPABILITY_CORRELATION.md`. Use `DET-MISS-*` for detections-owned export/schema/API gaps and `DASH-MISS-*` for dashboard-owned UI/data-layer gaps.
 

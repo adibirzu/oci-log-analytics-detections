@@ -299,10 +299,11 @@ def get_oci_config():
     return config
 
 
-def get_la_client():
+def get_la_client(timeout=None):
     """Return an OCI Log Analytics client."""
     import oci
-    return _get_client(oci.log_analytics.LogAnalyticsClient)
+    kwargs = {"timeout": timeout} if timeout is not None else {}
+    return _get_client(oci.log_analytics.LogAnalyticsClient, **kwargs)
 
 
 def get_dashboard_client():
@@ -508,7 +509,7 @@ def validate_query_files():
     json_files = []
     for root, _, files in os.walk(QUERIES_DIR):
         for f in files:
-            if f.endswith('.json') and f not in ('manifest.json', 'catalog.json'):
+            if f.endswith('.json') and f not in ('manifest.json', 'catalog.json', 'dashboard_inventory.json'):
                 json_files.append(os.path.join(root, f))
 
     if not json_files:

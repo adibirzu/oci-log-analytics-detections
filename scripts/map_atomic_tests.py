@@ -215,7 +215,7 @@ def enrich_queries(art_index, dry_run=False):
     stats = {"enriched": 0, "skipped_oci": 0, "no_match": 0, "already_has": 0}
 
     for qfile in sorted(QUERIES_DIR.glob("*.json")):
-        if qfile.name in ("manifest.json", "catalog.json"):
+        if qfile.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
             continue
 
         query = load_query(qfile)
@@ -263,7 +263,7 @@ def generate_coverage_report(art_index):
 
     queries = []
     for qfile in sorted(QUERIES_DIR.glob("*.json")):
-        if qfile.name in ("manifest.json", "catalog.json"):
+        if qfile.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
             continue
         queries.append(load_query(qfile))
 
@@ -393,7 +393,7 @@ def validate_art_mapping():
     checked = 0
 
     for qfile in sorted(QUERIES_DIR.glob("*.json")):
-        if qfile.name in ("manifest.json", "catalog.json"):
+        if qfile.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
             continue
 
         query = load_query(qfile)
@@ -429,7 +429,7 @@ def print_stats():
     """Print ART mapping statistics."""
     queries = []
     for qfile in sorted(QUERIES_DIR.glob("*.json")):
-        if qfile.name in ("manifest.json", "catalog.json"):
+        if qfile.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
             continue
         queries.append(load_query(qfile))
 

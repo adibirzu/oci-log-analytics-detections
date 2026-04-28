@@ -57,7 +57,7 @@ def load_all_queries(queries_dir=QUERIES_DIR):
     """Load all source-derived generated JSON queries."""
     queries = []
     for f in sorted(queries_dir.rglob("*.json")):
-        if f.name in ("manifest.json", "catalog.json"):
+        if f.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
             continue
         with open(f) as fh:
             data = json.load(fh)

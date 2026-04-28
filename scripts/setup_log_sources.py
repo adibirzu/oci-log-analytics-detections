@@ -266,6 +266,16 @@ WINDOWS_FIELD_MAPPINGS = [
     ("User",                 "$.User",              23),
     ("Channel",              "$.Channel",           24),
     ("Provider",             "$.Provider",          25),
+    ("Source Process",       "$.SourceImage",       26),
+    ("Target Process",       "$.TargetImage",       27),
+    ("Target Filename",      "$.TargetFilename",    28),
+    ("Target Object",        "$.TargetObject",      29),
+    ("Granted Access",       "$.GrantedAccess",     30),
+    ("Pipe Name",            "$.PipeName",          31),
+    ("Destination Hostname", "$.DestinationHostname", 32),
+    ("Destination IP",       "$.DestinationIp",     33),
+    ("Destination Port",     "$.DestinationPort",   34),
+    ("Host Name (Server)",   "$.Computer",          35),
 ]
 WINDOWS_EXAMPLE = {
     "EventID": 1,

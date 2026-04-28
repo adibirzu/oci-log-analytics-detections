@@ -114,4 +114,4 @@ python3 scripts/demo_readiness.py --dry-run
 
 ## Hard limit
 
-Synthetic datasets now pass explicit schema contracts and the full 14-day eligible query audit in OCI, but perfect fidelity to every real tenant log format still requires captured raw samples from the target OCI, Azure, AWS, and GCP environments. Use `scripts/validate_synthetic_logs.py` and the live OCI audits as confidence checks, not as proof of 100 percent production parity.
+Synthetic datasets now pass explicit schema contracts and the 24-hour dashboard smoke path in OCI. The extended 14-day eligible query audit remains available when that larger dataset is intentionally generated, but perfect fidelity to every real tenant log format still requires captured raw samples from the target OCI, Azure, AWS, and GCP environments. Use `scripts/validate_synthetic_logs.py` and the live OCI audits as confidence checks, not as proof of 100 percent production parity.

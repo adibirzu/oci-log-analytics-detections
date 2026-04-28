@@ -1,7 +1,7 @@
 {
   "title": "Privilege Escalation: Sensitive Privileges Assigned to Non-Admin",
   "description": "Detects Event 4672 with dangerous privileges (SeDebugPrivilege, SeTcbPrivilege) assigned to non-SYSTEM accounts. Indicates token manipulation or privilege escalation.\n",
-  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4672 and (PrivilegeList like '*SeDebugPrivilege*' or PrivilegeList like '*SeTcbPrivilege*' or PrivilegeList like '*SeAssignPrimaryTokenPrivilege*' or PrivilegeList like '*SeLoadDriverPrivilege*')) and not (('Subject User Name' = 'SYSTEM' or 'Subject User Name' = '-')) and not ('Subject User Name' like '*$')) | eval Account = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Domain = regexextract('Original Log Content', 'SubjectDomainName:([^;]+)') | stats count as Assignments, distinctcount(Entity) as Hosts by Account, Domain | sort -Assignments",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4672' and not (User = 'SYSTEM' or User = '-') and not (User like '*$') | stats count as Assignments, distinctcount(Entity) as Hosts by User | sort -Assignments",
   "sigma_id": "privesc-t1134-001",
   "level": "high",
   "stig_category": "CAT I",

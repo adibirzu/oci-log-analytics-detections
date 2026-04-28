@@ -80,6 +80,7 @@ The dashboard report tracks UI-owned missing features with `DASH-MISS-*` IDs:
           "title": "APM: Total Browser Attacks (24h)",
           "query_file": "apps/apm_total_attacks_kpi.json",
           "visualization_type": "tile",
+          "time_selection": {"timePeriod": "l24h"},
           "level": "informational",
           "tags": ["apm", "kpi", "showcase"]
         }

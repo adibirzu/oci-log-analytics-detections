@@ -1,7 +1,7 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-04-28T11:58:45.824680+00:00",
+  "generated_at": "2026-04-28T13:27:16.154831+00:00",
   "stats": {
     "total_rules": 454,
     "total_sigma_rules": 454,
@@ -914,7 +914,7 @@
       "mitre_tactics": [
         "credential_access"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4625)) | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)'), FailReason = regexextract('Original Log Content', 'Status:(0x[0-9a-fA-F]+)') | stats count as Failures, distinctcount(SrcIP) as UniqueSources by Account, Entity | where Failures > 3 | sort -Failures"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4625' | stats count as Failures, distinctcount('Source Address') as UniqueSources by User, Entity | where Failures > 3 | sort -Failures"
     },
     {
       "filename": "clipboard_data_collection.json",
@@ -1282,7 +1282,7 @@
       "mitre_tactics": [
         "credential_access"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 5379)) | eval Account = regexextract('Original Log Content', 'SubjectUserName:([^;]+)') | stats count as Reads by Account, Entity | where Reads > 20 | sort -Reads"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '5379' | stats count as Reads by User, Entity | where Reads > 20 | sort -Reads"
     },
     {
       "filename": "cryptominer_deployment_indicators.json",
@@ -1362,7 +1362,7 @@
       "mitre_tactics": [
         "credential_access"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4662 and (Properties like '*1131f6aa-9c07-11d1-f79f-00c04fc2dcd2*' or Properties like '*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2*' or Properties like '*89e95b76-444d-4c62-991a-0facbeda640c*')) and not ('Subject User Name' like '*$')) | eval Account = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Domain = regexextract('Original Log Content', 'SubjectDomainName:([^;]+)') | stats count as Requests by Account, Domain, Entity | sort -Requests"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4662' and not (User like '*$') | stats count as Requests by User, Entity | sort -Requests"
     },
     {
       "filename": "defacement_via_desktop_wallpaper_change.json",
@@ -1619,7 +1619,7 @@
         "credential_access",
         "persistence"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ((('Event ID' = 4768 or 'Event ID' = 4770) and TicketEncryptionType = '0x17')) | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;@]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)') | stats count as Requests by Account, SrcIP, Entity, 'Event ID' | sort -Requests"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ('Event ID' = '4768' or 'Event ID' = '4770') | stats count as Requests by User, 'Source Address', Entity, 'Event ID' | sort -Requests"
     },
     {
       "filename": "group_policy_preferences_password_extraction.json",
@@ -1780,7 +1780,7 @@
       "mitre_tactics": [
         "credential_access"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4769) and (TicketEncryptionType = '0x17') and not ('Service Name' like '*$')) | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), Service = regexextract('Original Log Content', 'ServiceName:([^;]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)') | stats count as Requests by Account, Service, SrcIP, Entity | sort -Requests"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4769' and not (User like '*$') | stats count as Requests by User, Entity | sort -Requests"
     },
     {
       "filename": "kerberoasting_spn_sweep.json",
@@ -1796,7 +1796,7 @@
       "mitre_tactics": [
         "credential_access"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4769)) | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), Service = regexextract('Original Log Content', 'ServiceName:([^;]+)') | stats distinctcount(Service) as UniqueServices, count as TotalRequests by Account, Entity | where UniqueServices > 10 | sort -UniqueServices"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4769' | stats count as TotalRequests by User, Entity | where TotalRequests > 10 | sort -TotalRequests"
     },
     {
       "filename": "kerberos_ticket_export_via_mimikatz.json",
@@ -1845,7 +1845,7 @@
       "mitre_tactics": [
         "lateral_movement"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4624 and 'Logon Type' = 3) and not (('Target User Name' = 'ANONYMOUS LOGON' or 'Target User Name' = '-')) and not ('Target User Name' like '*$')) | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)') | stats distinctcount(SrcIP) as UniqueSources, count as TotalLogons by Account, Entity | where UniqueSources > 3 | sort -UniqueSources"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4624' and 'Logon Type' = '3' and not (User = 'ANONYMOUS LOGON' or User = '-') and not (User like '*$') | stats distinctcount('Source Address') as UniqueSources, count as TotalLogons by User, Entity | where UniqueSources > 3 | sort -UniqueSources"
     },
     {
       "filename": "lateral_tool_transfer_via_robocopy.json",
@@ -4196,7 +4196,7 @@
       "mitre_tactics": [
         "defense_evasion"
       ],
-      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.virtualnetwork.createsecuritylist' or 'Event Type' = 'com.oraclecloud.virtualnetwork.updatesecuritylist') and 'Request Action Type' = 'POST' and 'Original Log Content' like '*0.0.0.0/0*'))"
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' = 'com.oraclecloud.virtualnetwork.createsecuritylist' or 'Event Type' = 'com.oraclecloud.virtualnetwork.updatesecuritylist') and 'Original Log Content' like '*0.0.0.0/0*'"
     },
     {
       "filename": "oci_waf_configuration_updated.json",
@@ -4293,7 +4293,7 @@
         "credential_access",
         "lateral_movement"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4648) and not ('Target Server Name' = 'localhost')) | eval Subject = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Target = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), TargetServer = regexextract('Original Log Content', 'TargetServerName:([^;]+)') | stats count as Attempts by Subject, Target, TargetServer, Entity | where Attempts > 5 | sort -Attempts"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4648' | stats count as Attempts by User, Entity | where Attempts > 5 | sort -Attempts"
     },
     {
       "filename": "password_policy_discovery.json",
@@ -4439,7 +4439,7 @@
       "mitre_tactics": [
         "privilege_escalation"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4672 and (PrivilegeList like '*SeDebugPrivilege*' or PrivilegeList like '*SeTcbPrivilege*' or PrivilegeList like '*SeAssignPrimaryTokenPrivilege*' or PrivilegeList like '*SeLoadDriverPrivilege*')) and not (('Subject User Name' = 'SYSTEM' or 'Subject User Name' = '-')) and not ('Subject User Name' like '*$')) | eval Account = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Domain = regexextract('Original Log Content', 'SubjectDomainName:([^;]+)') | stats count as Assignments, distinctcount(Entity) as Hosts by Account, Domain | sort -Assignments"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4672' and not (User = 'SYSTEM' or User = '-') and not (User like '*$') | stats count as Assignments, distinctcount(Entity) as Hosts by User | sort -Assignments"
     },
     {
       "filename": "process_discovery_via_tasklist.json",
@@ -4792,7 +4792,7 @@
       "mitre_tactics": [
         "discovery"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4799)) | eval Account = regexextract('Original Log Content', 'SubjectUserName:([^;]+)'), Process = regexextract('Original Log Content', 'CallerProcessName:([^;]+)') | stats count as Queries by Account, Process, Entity | where Queries > 50 | sort -Queries"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4799' | stats count as Queries by User, Process, Entity | where Queries > 50 | sort -Queries"
     },
     {
       "filename": "security_support_provider_dll_persistence.json",
@@ -5553,7 +5553,7 @@
         "command_and_control",
         "defense_evasion"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Pipe Name' like '\\\\MSSE-*' or 'Pipe Name' like '\\\\postex_*' or 'Pipe Name' like '\\\\postex_ssh_*' or 'Pipe Name' like '\\\\status_*' or 'Pipe Name' like '\\\\msagent_*')) or (('Pipe Name' = '\\interprocess_' or 'Pipe Name' = '\\mojo.' or 'Pipe Name' = '\\chrome.' or 'Pipe Name' = '\\DserNamePipe' or 'Pipe Name' = '\\winsock' or 'Pipe Name' = '\\UIA_PIPE')))"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Pipe Name' like '*MSSE-*' or 'Pipe Name' like '*postex_*' or 'Pipe Name' like '*postex_ssh_*' or 'Pipe Name' like '*status_*' or 'Pipe Name' like '*msagent_*' or 'Pipe Name' like '*interprocess*' or 'Pipe Name' like '*mojo*' or 'Pipe Name' like '*chrome*' or 'Pipe Name' like '*DserNamePipe*' or 'Pipe Name' like '*winsock*' or 'Pipe Name' like '*UIA_PIPE*')"
     },
     {
       "filename": "sysmon_configuration_tampering.json",
@@ -5587,7 +5587,7 @@
         "exfiltration",
         "command_and_control"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Query Name' REGEX MATCH '^[a-zA-Z0-9]{30,}\\.') or (('Query Name' like '*.dnscat.*' or 'Query Name' like '*.dns2tcp.*' or 'Query Name' like '*.iodine.*' or 'Query Name' like '*.dnsexfil.*')) or ('Query Name' REGEX MATCH '^[0-9a-f]{20,}\\.'))"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and 'Query Name' != '' | eval domain_length = length('Query Name') | where domain_length > 30 | fields 'Query Name', 'Host Name (Server)', User, domain_length"
     },
     {
       "filename": "sysmon_dns_query_to_known_c2_framework_domains.json",
@@ -5723,7 +5723,7 @@
       "mitre_tactics": [
         "credential_access"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Pipe Name' like '*mimikatz*' or 'Pipe Name' like '*mimilib*' or 'Pipe Name' like '*mimidrv*')) or (('Pipe Name' = '\\HID_CTRL' or 'Pipe Name' = '\\Win32Pipes.')))"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Pipe Name' like '*mimikatz*' or 'Pipe Name' like '*mimilib*' or 'Pipe Name' like '*mimidrv*' or 'Pipe Name' like '*HID_CTRL*' or 'Pipe Name' like '*Win32Pipes*')"
     },
     {
       "filename": "sysmon_mimikatz_network_activity.json",

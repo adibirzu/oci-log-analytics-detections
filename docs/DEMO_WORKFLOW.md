@@ -9,24 +9,28 @@ This document provides a step-by-step demo workflow showcasing OCI Log Analytics
 
 ## Current Operator Shortcut
 
-Before the demo, refresh the tenancy with the current one-command path:
+Before the demo, refresh the tenancy with the current dashboard-first path:
 
 ```bash
-python3 scripts/populate_dashboard_data_14d.py --validate
-python3 scripts/query_audit.py --lookback 14d --eligible-only --out /tmp/eligible_query_audit_14d.json
+python3 scripts/setup_log_sources.py
+python3 scripts/generate_test_logs.py --days 1 --validate
+python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5
+python3 scripts/ingest_test_data.py --validate
+python3 scripts/ingest_test_data.py --mode direct
+python3 scripts/smoke_test_bluelight.py --lookback 24h
+python3 scripts/deploy_dashboard.py --cleanup
 ```
 
-Validated on `2026-04-23`:
+Validated on `2026-04-28`:
 
-- trailing `14d` dataset populated
-- `164,766` synthetic events generated across `14` files
-- `16` dashboards and `255` saved searches deployed in the last live refresh
-- live readiness checks green
-- eligible query audit green: `51/51` with rows
+- `2,837` synthetic events generated across `14` files
+- `14/14` files uploaded to OCI Log Analytics through direct ingest
+- `17/17` BLUELIGHT widgets returned rows with a 24-hour lookback
+- `16` dashboards and `264` saved searches resolve from generated inventory
 
 Current repository configuration on `2026-04-28` resolves to `16` dashboards and `264` saved searches after the APM/WAF browser showcase update.
 
-Use this path instead of running the individual generator, ingest, and deploy scripts one by one unless you are debugging a specific stage.
+Use this path before recreating dashboards. `deploy_dashboard.py` validates the generated inventory and every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
 
 ## Prerequisites
 
@@ -36,7 +40,7 @@ Use this path instead of running the individual generator, ingest, and deploy sc
 | Demo Controls | `https://cp.octodemo.cloud` |
 | Control Plane | `https://cp.octodemo.cloud` |
 | Log Analytics | demo-observability compartment → Dashboards |
-| Test data ingested | 164,766 events across 14 NDJSON datasets |
+| Test data ingested | 2,837 generated events across 14 NDJSON datasets |
 | Dashboards configured | 16 SOC dashboards + 264 saved searches |
 
 ---
@@ -75,7 +79,7 @@ Use this path instead of running the individual generator, ingest, and deploy sc
 ### Steps
 
 1. **Open:** `SOC: Windows Security Dashboard`
-   - Set time range to **Last 7 days**
+   - Set time range to **Last 24 hours**
    - Point out the widgets are now populated with detection data
 
 2. **Walk through detections:**

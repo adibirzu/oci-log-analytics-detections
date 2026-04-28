@@ -32,6 +32,7 @@ Date: 2026-04-28
 - Dashboard deployment now validates the generated inventory locally and validates every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
 - Live query validation runs each query in an isolated child process so slow or hung queries become blocking validation failures instead of reaching dashboard import.
 - Dashboard saved-search widgets now default to `l24h`, and the deploy-time OCI query validation default lookback is `24h`, matching the generated one-day security dataset.
+- Dashboard contract tests now block unsupported live-validation query patterns such as `regexextract`, `countif`, `case`, unmapped Windows fields, and regex-match expressions before OCI import.
 - BLUELIGHT (S0657 / APT37) APT dashboard now leads with 5 showcase widgets (Total Detections KPI tile, Top Affected Hosts summary, MITRE Tactics × Techniques sunburst, Kill Chain Timeline line chart, Attack Path link analysis) followed by the 17 per-stage detection widgets, presenting the full attack chain on a single canvas.
 - WAF parser now extracts `Trace ID` so APM browser attacks correlate to upstream WAF blocks across `SOC Application Logs` and `SOC WAF Security Logs` via shared `traceId`.
 - BLUELIGHT kill-chain test data is mirrored into both `windows_sysmon.jsonl` (SOC Windows Sysmon parser, 35 field maps) and `sysmon_operational.jsonl` (Sysmon Operational parser) so per-widget detections match through whichever parser route propagates first.
@@ -48,13 +49,17 @@ Local and pre-flight verification on 2026-04-28:
 - `python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md`
   - 454 rules / 454 source-derived queries / 0 issues
 - `python3 -m pytest -q`
-  - 84 tests passed
+  - 88 tests passed
 - `python3 -m compileall scripts`
   - passed
 - `python3 scripts/deploy_dashboard.py --validate`
   - OCID, CLI profile, namespace, compartment, and 515 query files passed
 - `python3 scripts/deploy_dashboard.py --dry-run`
   - 16 dashboards / 264 saved searches resolved from generated inventory
+- `python3 scripts/deploy_dashboard.py --cleanup`
+  - 250/250 unique dashboard queries validated in OCI Log Analytics with 24-hour lookback
+  - 67 validated query files returned no rows in that window
+  - 16 dashboards imported with 264 embedded saved searches
 - `python3 scripts/generate_test_logs.py --days 1 --validate`
   - 1,541 core security/app events generated and 515 query files counted across all query surfaces
 - `python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5`
@@ -62,7 +67,8 @@ Local and pre-flight verification on 2026-04-28:
 - `python3 scripts/ingest_test_data.py --validate`
   - 14 datasets and log source mappings passed
 - Targeted live OCI validation:
-  - `hunting/linux_multi_stage_attack.json` validates after narrowing the query to the deployed `SOC Linux Syslog Logs` parser
+  - `python3 scripts/smoke_test_bluelight.py --lookback 24h`: 17/17 BLUELIGHT detection widgets HIT
+  - Dashboard listing check: 16/16 dashboard display names found once after cleanup import
 
 Previously live-verified on 2026-04-28 (eu-frankfurt-1):
 

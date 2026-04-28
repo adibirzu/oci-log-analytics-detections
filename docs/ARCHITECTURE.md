@@ -145,9 +145,10 @@ python3 scripts/smoke_test_bluelight.py --lookback 24h
 Current local verified state on 2026-04-28:
 
 - Rule quality audit: 0 issues
-- Unit tests: 84 passing
+- Unit tests: 88 passing
 - Dashboard dry-run: 16 dashboards / 264 saved searches resolved
 - Dashboard validation: 515 query files OK
+- Dashboard cleanup deploy: 250/250 unique OCI queries validated, 16 dashboards imported, 264 embedded saved searches
 - Ingest validation: 14 datasets and log source mappings passed
 - Log-source pre-flight validation: passed
 - BLUELIGHT live smoke test: 17/17 widgets returned rows with a 24-hour lookback

@@ -1,7 +1,7 @@
 {
   "title": "Brute Force: Failed Logon Spike per Account",
   "description": "Detects 3+ failed logon attempts (4625) for a single account \u2014 indicates password spraying, brute force, or credential stuffing.\n",
-  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = 4625)) | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)'), SrcIP = regexextract('Original Log Content', 'IpAddress:([^;]+)'), FailReason = regexextract('Original Log Content', 'Status:(0x[0-9a-fA-F]+)') | stats count as Failures, distinctcount(SrcIP) as UniqueSources by Account, Entity | where Failures > 3 | sort -Failures",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4625' | stats count as Failures, distinctcount('Source Address') as UniqueSources by User, Entity | where Failures > 3 | sort -Failures",
   "sigma_id": "brute-t1110-001",
   "level": "high",
   "stig_category": "CAT I",

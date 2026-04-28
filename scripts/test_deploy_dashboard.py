@@ -20,6 +20,19 @@ from deploy_dashboard import (
 from oci_config import QUERIES_DIR
 
 
+UNSUPPORTED_DASHBOARD_QUERY_PATTERNS = (
+    "regexextract(",
+    "countif(",
+    "case(",
+    " REGEX MATCH ",
+    "TicketEncryptionType",
+    "PrivilegeList",
+    "Properties like",
+    "'Request Action Type'",
+    "'Target Server Name'",
+)
+
+
 class TestDashboardContract(unittest.TestCase):
     """Validate dashboard widgets and saved-search visualization metadata."""
 
@@ -47,6 +60,21 @@ class TestDashboardContract(unittest.TestCase):
                 for prompt in ask_ai_prompts:
                     self.assertIsInstance(prompt, str, query_path.name)
                     self.assertTrue(prompt.strip(), query_path.name)
+
+    def test_dashboard_queries_avoid_unsupported_live_validation_patterns(self):
+        for dashboard_name, config in DASHBOARDS.items():
+            for widget in config["widgets"]:
+                query_path = Path(QUERIES_DIR) / widget["query_file"]
+                with query_path.open() as f:
+                    payload = json.load(f)
+
+                query = payload["query"]
+                for pattern in UNSUPPORTED_DASHBOARD_QUERY_PATTERNS:
+                    self.assertNotIn(
+                        pattern,
+                        query,
+                        f"{dashboard_name}: {widget['query_file']} contains {pattern}",
+                    )
 
     def test_resolve_widget_ui_config_uses_query_dashboard_metadata(self):
         widget = {"title": "Geo map"}

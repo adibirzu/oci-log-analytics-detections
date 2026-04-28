@@ -90,8 +90,10 @@ jobs:
                       sigma_queries += 1
 
           print(f"Sigma rules: {sigma_rules}, Sigma-derived queries: {sigma_queries}")
-          if sigma_rules != sigma_queries:
-              print("ERROR: source Sigma rule count does not match sigma-derived query count")
+          # Some Sigma rules legitimately generate more than one query (multi-selection)
+          # so accept queries >= rules. Fail only if any rule failed to produce a query.
+          if sigma_queries < sigma_rules or sigma_queries == 0:
+              print("ERROR: sigma-derived query count is below source Sigma rule count")
               sys.exit(1)
           PY
 

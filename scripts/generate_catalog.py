@@ -72,7 +72,7 @@ def _load_query_files(directory, relative_prefix="", extra_flags=None):
         return queries
 
     for f in sorted(directory.glob("*.json")):
-        if f.name in ("manifest.json", "catalog.json"):
+        if f.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
             continue
         with open(f) as fh:
             data = json.load(fh)

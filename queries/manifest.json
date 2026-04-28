@@ -1,7 +1,7 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-04-28T09:32:18.333640+00:00",
+  "generated_at": "2026-04-28T11:58:45.824680+00:00",
   "stats": {
     "total_rules": 454,
     "total_sigma_rules": 454,
@@ -715,7 +715,7 @@
       "mitre_tactics": [
         "defense_evasion"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '4688' and ('Process Name' like '*\\\\powershell.exe' or 'Process Name' like '*\\\\wscript.exe' or 'Process Name' like '*\\\\cscript.exe' or 'Process Name' like '*\\\\mshta.exe')) and (('Command Line' like '*FromBase64String*' or 'Command Line' like '*ToBase64String*' or 'Command Line' like '*-enc *' or 'Command Line' like '*-encodedcommand*' or 'Command Line' like '*XOR*' or 'Command Line' like '*char(*' or 'Command Line' like '*-bxor*' or 'Command Line' like '*iex(*' or 'Command Line' like '*Invoke-Expression*'))) | stats count by 'Host Name (Server)', 'Process Name', 'Command Line'"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '4688' and ('Command Line' like '*powershell.exe*' or 'Command Line' like '*wscript.exe*' or 'Command Line' like '*cscript.exe*' or 'Command Line' like '*mshta.exe*')) and (('Command Line' like '*FromBase64String*' or 'Command Line' like '*ToBase64String*' or 'Command Line' like '*-enc *' or 'Command Line' like '*-encodedcommand*' or 'Command Line' like '*XOR*' or 'Command Line' like '*char(*' or 'Command Line' like '*-bxor*' or 'Command Line' like '*iex(*' or 'Command Line' like '*Invoke-Expression*'))) | stats count by 'Host Name (Server)', 'Command Line'"
     },
     {
       "filename": "bluelight_onedrive_exfiltration.json",

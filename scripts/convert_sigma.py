@@ -29,7 +29,7 @@ from pathlib import Path
 CONFIG_PATH = 'config/sigma_oci_mapping.yaml'
 RULES_DIR = 'rules'
 OUTPUT_DIR = 'queries'
-EXCLUDED_QUERY_FILENAMES = {'manifest.json', 'catalog.json'}
+EXCLUDED_QUERY_FILENAMES = {'manifest.json', 'catalog.json', 'dashboard_inventory.json'}
 NON_PRESERVED_GENERATED_FIELDS = {'logsource_fallback', 'requires_aggregation'}
 
 # ─── STIG severity mapping ──────────────────────────────────────

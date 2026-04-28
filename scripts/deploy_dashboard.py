@@ -1,7 +1,7 @@
 """
 Deploy SOC detection dashboards to OCI Log Analytics.
 
-Creates 16 dashboards backed by 255 embedded saved-search widgets covering:
+Creates 16 dashboards backed by 264 embedded saved-search widgets covering:
   - OCI audit and STIG compliance
   - Cloud Guard, Linux, Windows, Sysmon network, and web detections
   - Browser/APM detections, application analytics, APT content, and hunting
@@ -11,19 +11,26 @@ Usage:
   python3 scripts/deploy_dashboard.py              # Deploy all
   python3 scripts/deploy_dashboard.py --cleanup     # Delete existing SOC content first
   python3 scripts/deploy_dashboard.py --dry-run     # Print plan without executing
+  python3 scripts/deploy_dashboard.py --export-inventory
 """
 
 import json
 import os
 import sys
 import argparse
+import multiprocessing
+import signal
 import time
+from collections import Counter
+from contextlib import contextmanager
+from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oci_config import (
-    TENANCY_ID, COMPARTMENT_ID, QUERIES_DIR, HUNTING_DIR,
-    get_dashboard_client, validate_oci_setup,
+    TENANCY_ID, COMPARTMENT_ID, QUERIES_DIR, HUNTING_DIR, LA_NAMESPACE,
+    get_dashboard_client, get_la_client, get_namespace, validate_oci_setup,
 )
+from oci_time import build_time_window
 
 import oci
 
@@ -46,6 +53,21 @@ SUPPORTED_VISUALIZATION_TYPES = {
     "tile",
     "treemap",
 }
+
+ADVANCED_VISUALIZATION_TYPES = {
+    "bar",
+    "hbar",
+    "line",
+    "link",
+    "map",
+    "pie",
+    "summary_table",
+    "sunburst",
+    "tile",
+    "treemap",
+}
+
+DASHBOARD_INVENTORY_PATH = os.path.join(QUERIES_DIR, "dashboard_inventory.json")
 
 
 # ─── Dashboard Definitions ────────────────────────────────────────
@@ -398,6 +420,187 @@ DASHBOARDS = {
 }
 
 
+# ─── Query and Dashboard Inventory Helpers ───────────────────────
+
+def load_query_info(query_file, queries_dir=QUERIES_DIR):
+    """Load and validate one query JSON payload referenced by a dashboard widget."""
+    query_path = os.path.join(queries_dir, query_file)
+    if not os.path.exists(query_path):
+        raise FileNotFoundError(f"missing query file: {query_file}")
+
+    with open(query_path, "r") as f:
+        query_info = json.load(f)
+
+    if not isinstance(query_info, dict):
+        raise ValueError(f"{query_file}: query payload must be an object")
+    if not query_info.get("title"):
+        raise ValueError(f"{query_file}: missing title")
+    if not query_info.get("query"):
+        raise ValueError(f"{query_file}: missing query")
+
+    return query_info
+
+
+def _resolve_ask_ai_prompts(widget, query_info):
+    dashboard_meta = query_info.get("dashboard", {}) if isinstance(query_info, dict) else {}
+    return widget.get("ask_ai_prompts", dashboard_meta.get("ask_ai_prompts", []))
+
+
+def _build_widget_inventory_record(dashboard_name, dashboard_index, widget, widget_index, queries_dir):
+    query_info = load_query_info(widget["query_file"], queries_dir=queries_dir)
+    ui_config = resolve_widget_ui_config(widget, query_info)
+
+    return {
+        "dashboard_name": dashboard_name,
+        "dashboard_index": dashboard_index,
+        "widget_index": widget_index,
+        "title": widget["title"],
+        "query_file": widget["query_file"],
+        "query_title": query_info["title"],
+        "description": query_info.get("description", ""),
+        "level": query_info.get("level", ""),
+        "type": query_info.get("type", "detection" if query_info.get("sigma_id") else "curated"),
+        "sigma_id": query_info.get("sigma_id", ""),
+        "tags": query_info.get("tags", []),
+        "logsource": query_info.get("logsource", {}),
+        "mitre_attack": query_info.get("mitre_attack", {}),
+        "visualization_type": ui_config["visualizationType"],
+        "visualization_options": ui_config.get("visualizationOptions", {}),
+        "time_selection": ui_config.get("timeSelection", {}),
+        "ask_ai_prompts": _resolve_ask_ai_prompts(widget, query_info),
+        "advanced_visualization": ui_config["visualizationType"] in ADVANCED_VISUALIZATION_TYPES,
+    }
+
+
+def build_dashboard_inventory(dashboards=None, queries_dir=QUERIES_DIR, generated_at=None):
+    """Build a dashboard/widget inventory artifact from ``DASHBOARDS``.
+
+    The resulting JSON is the dashboard-facing contract. It lets downstream UI
+    code consume dashboard/widget/query metadata without importing or parsing
+    this Python deployment script at runtime.
+    """
+    dashboards = dashboards or DASHBOARDS
+    generated_at = generated_at or datetime.now(timezone.utc).isoformat()
+
+    dashboard_records = []
+    visualization_counts = Counter()
+    level_counts = Counter()
+    total_widgets = 0
+
+    for dashboard_index, (dashboard_name, config) in enumerate(dashboards.items()):
+        widget_records = []
+        for widget_index, widget in enumerate(config["widgets"]):
+            record = _build_widget_inventory_record(
+                dashboard_name=dashboard_name,
+                dashboard_index=dashboard_index,
+                widget=widget,
+                widget_index=widget_index,
+                queries_dir=queries_dir,
+            )
+            widget_records.append(record)
+            visualization_counts[record["visualization_type"]] += 1
+            if record["level"]:
+                level_counts[record["level"]] += 1
+
+        total_widgets += len(widget_records)
+        dashboard_records.append({
+            "name": dashboard_name,
+            "description": config.get("description", ""),
+            "widget_count": len(widget_records),
+            "widgets": widget_records,
+        })
+
+    return {
+        "version": "1.0",
+        "generated_at": generated_at,
+        "source": "scripts/deploy_dashboard.py:DASHBOARDS",
+        "summary": {
+            "total_dashboards": len(dashboard_records),
+            "total_widgets": total_widgets,
+            "advanced_visualization_widgets": sum(
+                count for viz, count in visualization_counts.items()
+                if viz in ADVANCED_VISUALIZATION_TYPES
+            ),
+            "visualization_types": dict(sorted(visualization_counts.items())),
+            "levels": dict(sorted(level_counts.items())),
+        },
+        "dashboards": dashboard_records,
+    }
+
+
+def validate_dashboard_inventory(inventory, queries_dir=QUERIES_DIR):
+    """Validate that an inventory artifact still matches query metadata."""
+    errors = []
+    dashboards = inventory.get("dashboards", [])
+
+    summary = inventory.get("summary", {})
+    expected_dashboard_count = len(dashboards)
+    actual_widget_count = sum(len(dashboard.get("widgets", [])) for dashboard in dashboards)
+
+    if summary.get("total_dashboards") != expected_dashboard_count:
+        errors.append(
+            f"summary.total_dashboards mismatch: "
+            f"{summary.get('total_dashboards')} != {expected_dashboard_count}"
+        )
+    if summary.get("total_widgets") != actual_widget_count:
+        errors.append(
+            f"summary.total_widgets mismatch: "
+            f"{summary.get('total_widgets')} != {actual_widget_count}"
+        )
+
+    for dashboard in dashboards:
+        dashboard_name = dashboard.get("name", "<unknown dashboard>")
+        widgets = dashboard.get("widgets", [])
+        if dashboard.get("widget_count") != len(widgets):
+            errors.append(f"{dashboard_name}: widget_count mismatch")
+
+        for widget in widgets:
+            query_file = widget.get("query_file", "")
+            label = f"{dashboard_name} / {query_file}"
+            try:
+                query_info = load_query_info(query_file, queries_dir=queries_dir)
+                ui_config = resolve_widget_ui_config(widget, query_info)
+            except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
+                errors.append(f"{label}: {exc}")
+                continue
+
+            if widget.get("query_title") != query_info.get("title"):
+                errors.append(
+                    f"{label}: query_title mismatch "
+                    f"({widget.get('query_title')!r} != {query_info.get('title')!r})"
+                )
+
+            expected_viz = ui_config["visualizationType"]
+            if widget.get("visualization_type") != expected_viz:
+                errors.append(
+                    f"{label}: visualization_type mismatch "
+                    f"({widget.get('visualization_type')!r} != {expected_viz!r})"
+                )
+
+    return errors
+
+
+def write_dashboard_inventory(path=DASHBOARD_INVENTORY_PATH, inventory=None):
+    """Write the generated dashboard inventory artifact to disk."""
+    inventory = inventory or build_dashboard_inventory()
+    errors = validate_dashboard_inventory(inventory)
+    if errors:
+        raise ValueError("dashboard inventory validation failed:\n" + "\n".join(errors))
+
+    with open(path, "w") as f:
+        json.dump(inventory, f, indent=2)
+        f.write("\n")
+
+    return path
+
+
+def iter_inventory_widgets(inventory):
+    """Yield all widget inventory records."""
+    for dashboard in inventory.get("dashboards", []):
+        for widget in dashboard.get("widgets", []):
+            yield widget
+
+
 # ─── Scope Filters (compartment-aware) ───────────────────────────
 
 def build_scope_filters(compartment_id):
@@ -658,6 +861,164 @@ def import_dashboard(md_client, dashboard_json):
         return False
 
 
+# ─── Live Query Validation ───────────────────────────────────────
+
+@contextmanager
+def query_deadline(seconds):
+    """Raise TimeoutError when one live OCI validation query runs too long."""
+    if not seconds or not hasattr(signal, "SIGALRM"):
+        yield
+        return
+
+    def _raise_timeout(_signum, _frame):
+        raise TimeoutError(f"query validation exceeded {seconds}s")
+
+    previous_handler = signal.signal(signal.SIGALRM, _raise_timeout)
+    signal.setitimer(signal.ITIMER_REAL, seconds)
+    try:
+        yield
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_handler)
+
+
+def validate_query_in_oci(la_client, namespace, query_file, query_string, lookback, timeout=None):
+    """Execute a query against OCI Log Analytics to catch parser/runtime errors."""
+    time_start, time_end = build_time_window(lookback)
+    try:
+        with query_deadline(timeout):
+            response = la_client.query(
+                namespace_name=namespace,
+                query_details=oci.log_analytics.models.QueryDetails(
+                    compartment_id=COMPARTMENT_ID,
+                    query_string=query_string,
+                    sub_system="LOG",
+                    time_filter=oci.log_analytics.models.TimeRange(
+                        time_start=time_start,
+                        time_end=time_end,
+                        time_zone="UTC",
+                    ),
+                    max_total_count=1,
+                ),
+            ).data
+        rows = len(getattr(response, "items", []) or [])
+        return {
+            "query_file": query_file,
+            "ok": True,
+            "rows": rows,
+            "empty": rows == 0,
+            "error": "",
+        }
+    except Exception as exc:
+        return {
+            "query_file": query_file,
+            "ok": False,
+            "rows": 0,
+            "empty": False,
+            "error": str(exc),
+        }
+
+
+def _validate_query_worker(queue, namespace, query_file, query_string, lookback, client_timeout):
+    """Run one OCI query validation in a child process."""
+    la_client = get_la_client(timeout=(10, client_timeout))
+    result = validate_query_in_oci(
+        la_client=la_client,
+        namespace=namespace,
+        query_file=query_file,
+        query_string=query_string,
+        lookback=lookback,
+        timeout=None,
+    )
+    queue.put(result)
+
+
+def validate_query_in_oci_isolated(namespace, query_file, query_string, lookback, query_timeout):
+    """Validate one query in a killable child process."""
+    context_name = "fork" if hasattr(os, "fork") else "spawn"
+    context = multiprocessing.get_context(context_name)
+    queue = context.Queue()
+    process = context.Process(
+        target=_validate_query_worker,
+        args=(queue, namespace, query_file, query_string, lookback, query_timeout),
+    )
+
+    process.start()
+    process.join(query_timeout + 5)
+
+    if process.is_alive():
+        process.terminate()
+        process.join(5)
+        return {
+            "query_file": query_file,
+            "ok": False,
+            "rows": 0,
+            "empty": False,
+            "error": f"query validation exceeded {query_timeout}s",
+        }
+
+    if process.exitcode != 0 and queue.empty():
+        return {
+            "query_file": query_file,
+            "ok": False,
+            "rows": 0,
+            "empty": False,
+            "error": f"query validation process exited with code {process.exitcode}",
+        }
+
+    if queue.empty():
+        return {
+            "query_file": query_file,
+            "ok": False,
+            "rows": 0,
+            "empty": False,
+            "error": "query validation process returned no result",
+        }
+
+    return queue.get()
+
+
+def resolve_validation_namespace(client_timeout):
+    """Resolve the Log Analytics namespace for live validation."""
+    if LA_NAMESPACE:
+        print(f"  Namespace (from env): {LA_NAMESPACE}")
+        return LA_NAMESPACE
+    la_client = get_la_client(timeout=(10, client_timeout))
+    return get_namespace(la_client)
+
+
+def validate_inventory_queries_in_oci(inventory, lookback="7d", query_timeout=60, progress=False, isolated=True):
+    """Validate every unique inventory query in OCI before dashboard import."""
+    namespace = resolve_validation_namespace(query_timeout)
+    la_client = None if isolated else get_la_client(timeout=(10, query_timeout))
+
+    query_files = sorted({widget["query_file"] for widget in iter_inventory_widgets(inventory)})
+    seen = {}
+    for index, query_file in enumerate(query_files, start=1):
+        if progress:
+            print(f"    [{index:03d}/{len(query_files):03d}] {query_file}", flush=True)
+        query_info = load_query_info(query_file)
+        if isolated:
+            seen[query_file] = validate_query_in_oci_isolated(
+                namespace=namespace,
+                query_file=query_file,
+                query_string=query_info["query"],
+                lookback=lookback,
+                query_timeout=query_timeout,
+            )
+        else:
+            seen[query_file] = validate_query_in_oci(
+                la_client=la_client,
+                namespace=namespace,
+                query_file=query_file,
+                query_string=query_info["query"],
+                lookback=lookback,
+                timeout=query_timeout,
+            )
+
+    return [seen[query_file] for query_file in query_files]
+
+
 # ─── Cleanup ──────────────────────────────────────────────────────
 
 def cleanup_soc_content(md_client):
@@ -703,49 +1064,63 @@ def cleanup_soc_content(md_client):
 
 # ─── Main Deploy ──────────────────────────────────────────────────
 
-def deploy(cleanup=False, dry_run=False):
+def deploy(cleanup=False, dry_run=False, live_validate=True, query_lookback="7d", query_timeout=60):
     print("=" * 60)
     print("OCI Log Analytics - SOC Dashboard Deployment")
     print("=" * 60)
 
+    inventory = build_dashboard_inventory()
+    inventory_errors = validate_dashboard_inventory(inventory)
+    if inventory_errors:
+        print("\n  Dashboard inventory validation failed:")
+        for error in inventory_errors:
+            print(f"    - {error}")
+        raise SystemExit(1)
+
     if dry_run:
         print("\n  [DRY RUN] No changes will be made.\n")
-        missing = 0
-        invalid = 0
-        for name, config in DASHBOARDS.items():
-            print(f"  Dashboard: {name}")
-            print(f"    Widgets: {len(config['widgets'])}")
-            for w in config['widgets']:
-                query_path = os.path.join(QUERIES_DIR, w['query_file'])
-                if not os.path.exists(query_path):
-                    print(f"      - {w['title']} ({w['query_file']}) [MISSING]")
-                    missing += 1
-                    continue
-                try:
-                    with open(query_path, 'r') as f:
-                        data = json.load(f)
-                    if 'query' not in data:
-                        print(f"      - {w['title']} ({w['query_file']}) [NO QUERY FIELD]")
-                        invalid += 1
-                    elif data.get("dashboard", {}).get("visualizationType") and (
-                        data["dashboard"]["visualizationType"] not in SUPPORTED_VISUALIZATION_TYPES
-                    ):
-                        print(
-                            f"      - {w['title']} ({w['query_file']}) "
-                            f"[INVALID VIZ: {data['dashboard']['visualizationType']}]"
-                        )
-                        invalid += 1
-                    else:
-                        viz = data.get("dashboard", {}).get("visualizationType", "table")
-                        print(f"      - {w['title']} ({w['query_file']}) [viz={viz}]")
-                except json.JSONDecodeError:
-                    print(f"      - {w['title']} ({w['query_file']}) [INVALID JSON]")
-                    invalid += 1
-        total_widgets = sum(len(c['widgets']) for c in DASHBOARDS.values())
-        print(f"\n  Total: {len(DASHBOARDS)} dashboards, {total_widgets} saved searches")
-        if missing or invalid:
-            print(f"  Warnings: {missing} missing files, {invalid} invalid files")
+        for dashboard in inventory["dashboards"]:
+            print(f"  Dashboard: {dashboard['name']}")
+            print(f"    Widgets: {dashboard['widget_count']}")
+            for widget in dashboard["widgets"]:
+                print(
+                    f"      - {widget['title']} ({widget['query_file']}) "
+                    f"[viz={widget['visualization_type']}]"
+                )
+        print(
+            f"\n  Total: {inventory['summary']['total_dashboards']} dashboards, "
+            f"{inventory['summary']['total_widgets']} saved searches"
+        )
         return
+
+    if live_validate:
+        print(
+            f"\n  Validating dashboard queries in OCI Log Analytics "
+            f"(lookback={query_lookback}, timeout={query_timeout}s)..."
+        )
+        live_results = validate_inventory_queries_in_oci(
+            inventory,
+            lookback=query_lookback,
+            query_timeout=query_timeout,
+            progress=True,
+        )
+        errors = [result for result in live_results if not result["ok"]]
+        empty = [result for result in live_results if result["ok"] and result["empty"]]
+
+        if errors:
+            print("  Query validation failed; no dashboards or saved searches will be imported.")
+            for result in errors:
+                print(f"    - {result['query_file']}: {result['error'][:180]}")
+            raise SystemExit(1)
+
+        print(f"  Validated {len(live_results)} unique query files in OCI Log Analytics.")
+        if empty:
+            print(f"  Note: {len(empty)} validated query files returned no rows in this window.")
+
+    # Publish the dashboard-facing artifact only after local and optional live
+    # validation pass. Dashboard import and saved-search mapping happen after this.
+    write_dashboard_inventory(inventory=inventory)
+    print(f"\n  Dashboard inventory: {DASHBOARD_INVENTORY_PATH}")
 
     md_client = get_dashboard_client()
     print(f"\n  Compartment: {COMPARTMENT_ID}")
@@ -762,43 +1137,33 @@ def deploy(cleanup=False, dry_run=False):
         print(f"  Widgets: {len(dashboard_config['widgets'])}")
         print(f"{'─' * 50}")
 
-        # Load query data for each widget
+        # Load query data only after local and optional live validation pass.
         widget_queries = []
         for widget in dashboard_config['widgets']:
-            query_path = os.path.join(QUERIES_DIR, widget['query_file'])
-            if not os.path.exists(query_path):
-                print(f"    ? Missing query file: {widget['query_file']}")
-                widget_queries.append(None)
-                continue
-
-            with open(query_path, 'r') as f:
-                rule_data = json.load(f)
-
+            rule_data = load_query_info(widget["query_file"])
             widget_queries.append(rule_data)
             print(f"    + Loaded: {widget['title']}")
             total_searches += 1
 
         # Build and import dashboard with embedded saved searches
-        valid_queries = [q for q in widget_queries if q is not None]
-        if valid_queries:
-            # Delete existing dashboard BEFORE generating new ID
-            delete_existing_dashboard(md_client, dashboard_name)
+        # Delete existing dashboard BEFORE generating new ID
+        delete_existing_dashboard(md_client, dashboard_name)
 
-            # Use timestamp suffix to avoid OCI soft-delete ID collisions
-            ts = int(time.time())
-            slug = dashboard_name.lower().replace(' ', '-').replace(':', '').replace('&', 'and')
-            dashboard_id = f"soc-{slug}-{ts}"
+        # Use timestamp suffix to avoid OCI soft-delete ID collisions
+        ts = int(time.time())
+        slug = dashboard_name.lower().replace(' ', '-').replace(':', '').replace('&', 'and')
+        dashboard_id = f"soc-{slug}-{ts}"
 
-            dashboard_json = build_dashboard_json(
-                dashboard_id=dashboard_id,
-                name=dashboard_name,
-                description=dashboard_config['description'],
-                widgets=dashboard_config['widgets'],
-                widget_queries=widget_queries,
-            )
+        dashboard_json = build_dashboard_json(
+            dashboard_id=dashboard_id,
+            name=dashboard_name,
+            description=dashboard_config['description'],
+            widgets=dashboard_config['widgets'],
+            widget_queries=widget_queries,
+        )
 
-            if import_dashboard(md_client, dashboard_json):
-                total_dashboards += 1
+        if import_dashboard(md_client, dashboard_json):
+            total_dashboards += 1
 
     # Summary
     print(f"\n{'=' * 60}")
@@ -818,10 +1183,36 @@ if __name__ == "__main__":
                         help='Print deployment plan and validate query files without executing')
     parser.add_argument('--validate', action='store_true',
                         help='Run pre-flight validation checks')
+    parser.add_argument('--export-inventory', action='store_true',
+                        help='Generate queries/dashboard_inventory.json and exit')
+    parser.add_argument('--inventory-path', default=DASHBOARD_INVENTORY_PATH,
+                        help='Output path for --export-inventory')
+    parser.add_argument('--skip-live-validation', action='store_true',
+                        help='Skip live OCI query validation before dashboard import')
+    parser.add_argument('--query-lookback', default='7d',
+                        help='Lookback window for live OCI query validation')
+    parser.add_argument('--query-timeout', type=int, default=60,
+                        help='Per-query timeout in seconds for live OCI query validation')
     args = parser.parse_args()
 
     if args.validate:
         ok = validate_oci_setup(['ocid', 'cli', 'namespace', 'compartment', 'query_files'])
+        inventory = build_dashboard_inventory()
+        inventory_errors = validate_dashboard_inventory(inventory)
+        for error in inventory_errors:
+            print(f"  [ERR ] Dashboard inventory: {error}")
+        ok = ok and not inventory_errors
         sys.exit(0 if ok else 1)
 
-    deploy(cleanup=args.cleanup, dry_run=args.dry_run)
+    if args.export_inventory:
+        path = write_dashboard_inventory(path=args.inventory_path)
+        print(f"Dashboard inventory written to: {path}")
+        sys.exit(0)
+
+    deploy(
+        cleanup=args.cleanup,
+        dry_run=args.dry_run,
+        live_validate=not args.skip_live_validation,
+        query_lookback=args.query_lookback,
+        query_timeout=args.query_timeout,
+    )

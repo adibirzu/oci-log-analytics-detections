@@ -1,6 +1,7 @@
 title: WAF Path Traversal Attack Blocked
 id: a1010004-owasp-a01-pathtraversal-001
 status: stable
+version: 1
 description: Detects directory traversal (path traversal) attacks blocked by WAF. Attackers attempt to access files outside the web root using ../ sequences. OWASP A01:2021 Broken Access Control.
 logsource:
   product: oci

@@ -1,6 +1,7 @@
 title: Web Application Brute Force Login Attempt
 id: a1010010-owasp-a07-bruteforce-001
 status: stable
+version: 1
 description: Detects repeated failed login attempts via HTTP 401/403 responses to authentication endpoints. Indicates brute force or credential stuffing attacks. OWASP A07:2021 Identification and Authentication Failures.
 logsource:
   product: oci

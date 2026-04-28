@@ -148,14 +148,14 @@ field_mappings:
   # ─── APM / OpenTelemetry Fields ───────────────────────────────────
   SpanName: "'Span Name'"
   SpanKind: "'Span Kind'"
-  HttpUrl: "'HTTP URL'"
-  HTTP_URL: "'HTTP URL'"
+  HttpUrl: "'Request URL'"
+  HTTP_URL: "'Request URL'"
   HttpMethod: "'HTTP Method'"
   HTTP_Method: "'HTTP Method'"
-  HttpStatusCode: "'HTTP Status Code'"
-  HTTP_Status_Code: "'HTTP Status Code'"
+  HttpStatusCode: "'Response Code'"
+  HTTP_Status_Code: "'Response Code'"
   UserAgent: "'User Agent'"
-  trace_id: "'trace_id'"
+  trace_id: "'Trace ID'"
   span_id: "'span_id'"
   Duration: Duration
   Error: Error
@@ -165,6 +165,7 @@ field_mappings:
   Source_IP: "'Client IP'"
   Content_Type: "'Content Type'"
   Response_Headers: "'Response Headers'"
+  Referer: "'Referrer'"
 
   # ─── Sysmon Process Access Fields (Event ID 10) ───────────────────
   GrantedAccess: "'Granted Access'"
@@ -196,6 +197,11 @@ logsource_mappings:
     - Linux Secure Logs
     - Linux Syslog Logs
     - Linux Audit Logs
+  linux_auditd:
+    - SOC Linux Syslog Logs
+    - Linux Secure Logs
+    - Linux Syslog Logs
+    - Linux Audit Logs
   linux_auth:
     - SOC Linux Syslog Logs
     - Linux Secure Logs
@@ -221,9 +227,8 @@ logsource_mappings:
     - Windows Sysmon Operational Logs
     - SOC Windows Sysmon Logs
   windows_security:
-    - Windows Sysmon Events
-    - Windows Sysmon Operational Logs
-    - SOC Windows Sysmon Logs
+    - Windows Security Events
+    - Windows Event Security Logs
 
   # Sysmon Network Connection (Event ID 3)
   windows_network_connection:
@@ -296,12 +301,8 @@ logsource_mappings:
 
   # ─── APM / OpenTelemetry Application Logs ────────────────────
   oci_apm:
-    - enterprise-crm-portal
-    - octo-drone-shop
     - SOC Application Logs
   opentelemetry_apm:
-    - enterprise-crm-portal
-    - octo-drone-shop
     - SOC Application Logs
 
   # ─── Sysmon Process Access (Event ID 10) ─────────────────────

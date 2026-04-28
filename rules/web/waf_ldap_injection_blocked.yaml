@@ -1,6 +1,7 @@
 title: WAF LDAP Injection Attack Blocked
 id: a1010016-owasp-a03-ldapi-block-001
 status: stable
+version: 1
 description: Detects LDAP injection attempts blocked by WAF. Attackers manipulate LDAP queries to bypass authentication or extract directory information. OWASP A03:2021 Injection.
 logsource:
   product: oci

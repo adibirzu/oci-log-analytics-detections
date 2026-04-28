@@ -1,0 +1,31 @@
+{
+  "title": "BLUELIGHT: Attack Path (per Host)",
+  "description": "Link analysis grouping BLUELIGHT-related events into 5-minute sequences keyed on host plus process. The link visualization renders each host as a chain of process transitions, exposing the full attack path from drive-by IE compromise through credential theft and graph.microsoft.com exfiltration on a single canvas.",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'Windows Event Security Logs') and ('Process Name' like '%bluelight.exe' or 'Source Process' like '%bluelight.exe' or 'Parent Process Name' like '%iexplore.exe' or 'Destination Hostname' like '%graph.microsoft.com%' or 'Destination Hostname' like '%mail.google.com%' or 'Destination Hostname' like '%jquery.services%' or 'Granted Access' = '0x1fffff' or 'Target Filename' like '%bluelight.pdb%' or 'Target Filename' like '%cheV01%' or 'Command Line' like '%FromBase64String%' or 'Command Line' like '%cookie_name: OSID%' or 'Command Line' like '%ipinfo.io%') | link span = 5minute 'Host Name (Server)', 'Process Name'",
+  "type": "hunting",
+  "level": "critical",
+  "tags": ["apt.apt37", "malware.bluelight", "attack_path", "showcase", "link"],
+  "dashboard": {
+    "visualizationType": "link",
+    "showTitle": true,
+    "timeSelection": {"timePeriod": "l24h"},
+    "visualizationOptions": {
+      "groupBy": ["Host Name (Server)"],
+      "linkBy": ["Process Name"],
+      "valueField": "Events"
+    },
+    "ask_ai_prompts": [
+      "Trace the BLUELIGHT attack path on the top affected host.",
+      "Which hosts show the most diverse process chain?"
+    ]
+  },
+  "mitre_attack": {
+    "tactics": ["initial_access", "execution", "defense_evasion", "discovery", "credential_access", "collection", "command_and_control", "exfiltration"],
+    "techniques": ["T1189", "T1203", "T1027", "T1083", "T1082", "T1555.003", "T1056.001", "T1071.001", "T1567.002"]
+  },
+  "threat_intel": {
+    "malware_family": "BLUELIGHT",
+    "mitre_software_id": "S0657",
+    "threat_actor": "APT37 (InkySquid)"
+  }
+}

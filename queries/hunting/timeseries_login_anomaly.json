@@ -1,7 +1,7 @@
 {
   "title": "Login Activity Time-Series Anomaly",
   "description": "Detects anomalous spikes in authentication activity using time-bucketed analysis. Groups login events into hourly buckets and flags hours with significantly more activity than the baseline. Uses timecluster-style analysis to identify burst authentication patterns that may indicate credential stuffing or compromised account usage.",
-  "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' | timecluster span = 1hour | stats count as login_count by 'Start Time' | sort -login_count | where login_count > 20",
+  "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' = 'com.oraclecloud.consolesignon.login' | timestats span = 1hour count as login_count | where login_count > 20",
   "hunting_type": "time_series_anomaly",
   "cookbook_method": "forecasting_anomaly",
   "level": "high",

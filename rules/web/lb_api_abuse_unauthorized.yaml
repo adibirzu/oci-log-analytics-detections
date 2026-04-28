@@ -1,6 +1,7 @@
 title: API Endpoint Unauthorized Access Attempts
 id: a1010023-owasp-a01-apiabuse-001
 status: stable
+version: 1
 description: Detects unauthorized access attempts to API endpoints (401/403 responses). May indicate API key brute force, token manipulation, or broken access control. OWASP A01:2021 Broken Access Control.
 logsource:
   product: oci

@@ -1,7 +1,7 @@
 {
   "title": "Slow Request Detection (>2s)",
   "description": "Detects requests exceeding 2-second latency across CRM and Drone Shop. Correlates with trace_id for APM drilldown and db.target for database performance investigation.",
-  "query": "'Log Source' in ('enterprise-crm-portal', 'octo-drone-shop', 'SOC Application Logs') and 'performance.slow_request' = true | stats avg('http.response_time_ms') as AvgLatency, max('http.response_time_ms') as MaxLatency, count as SlowRequests by 'service.name', 'http.url.path' | sort -AvgLatency",
+  "query": "'Log Source' = 'SOC Application Logs' and 'Slow Request' = 'true' | stats count as SlowRequests, distinctcount('Trace ID') as UniqueTraces by 'Service Name', 'URI Path' | sort -SlowRequests",
   "level": "medium",
   "tags": ["app.performance", "sli.latency", "apm.correlation"],
   "mitre_attack": {

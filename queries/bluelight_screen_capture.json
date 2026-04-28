@@ -1,20 +1,38 @@
 {
   "title": "BLUELIGHT RAT: Periodic Screen Capture",
-  "description": "Detects rapid JPEG file creation by non-image processes. BLUELIGHT captures screenshots at regular intervals and stages them for exfiltration via OneDrive.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and 'Event ID' = 11 and 'Target Filename' like '%.jpg' and not ('Process Name' like '%chrome.exe' or 'Process Name' like '%msedge.exe' or 'Process Name' like '%firefox.exe' or 'Process Name' like '%Photos.exe' or 'Process Name' like '%SnippingTool.exe' or 'Process Name' like '%mspaint.exe') | timestats count as Screenshots by 'Process Name' span = 1minute | where Screenshots > 3",
+  "description": "Detects rapid JPEG file creation by non-image processes. BLUELIGHT captures screenshots at regular intervals and saves them as .jpg files before staging for exfiltration via OneDrive. High frequency (>3 per minute) indicates automated capture.\n",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Event ID' = '11' and 'Target Filename' like '*.jpg') and not (('Process Name' like '*\\\\chrome.exe' or 'Process Name' like '*\\\\msedge.exe' or 'Process Name' like '*\\\\firefox.exe' or 'Process Name' like '*\\\\Photos.exe' or 'Process Name' like '*\\\\SnippingTool.exe' or 'Process Name' like '*\\\\mspaint.exe' or 'Process Name' like '*\\\\Photoshop.exe'))) | timestats span=1minute count as Screenshots by 'Process Name' | where Screenshots > 3",
   "sigma_id": "bl-s0657-t1113-001",
   "level": "high",
-  "tags": ["attack.collection", "attack.t1113", "apt.apt37", "malware.bluelight"],
+  "stig_category": "CAT I",
+  "tags": [
+    "attack.collection",
+    "attack.t1113",
+    "apt.apt37",
+    "malware.bluelight"
+  ],
   "mitre_attack": {
-    "tactics": ["collection"],
-    "techniques": ["T1113"]
+    "tactics": [
+      "collection"
+    ],
+    "techniques": [
+      "T1113"
+    ]
   },
   "logsource": {
     "product": "windows",
     "service": "sysmon",
-    "candidates": ["Windows Sysmon Events", "Windows Sysmon Operational Logs", "SOC Windows Sysmon Logs"]
+    "candidates": [
+      "Windows Sysmon Events",
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs"
+    ]
   },
-  "falsepositives": ["Camera or scanning software saving rapid captures", "Automated testing frameworks generating screenshots"],
+  "falsepositives": [
+    "Camera or scanning software saving rapid captures",
+    "Automated testing frameworks generating screenshots"
+  ],
+  "requires_aggregation": true,
   "splunk_original": "index=sysmon EventCode=11 TargetFilename=\"*.jpg\" NOT Image IN (\"*chrome.exe\",\"*msedge.exe\",\"*Photos.exe\",\"*SnippingTool.exe\") | bucket _time span=1m | stats count by _time, Image, TargetFilename | where count > 3",
   "threat_intel": {
     "malware_family": "BLUELIGHT",

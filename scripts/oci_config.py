@@ -15,6 +15,7 @@ import re
 import sys
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STREAMING_CONFIG_PATH = os.path.join(PROJECT_DIR, 'config', 'streaming_config.json')
 
 # ─── .env.local loader (no python-dotenv dependency) ──────────
 
@@ -70,7 +71,9 @@ LOG_GROUP_DESC = "Log group for SOC detection rule test data"
 CUSTOM_LOG_SOURCES = [
     "SOC Linux Syslog Logs",
     "SOC Windows Sysmon Logs",
+    "SOC Sysmon Network Logs",
     "SOC Cloud Guard Logs",
+    "SOC Application Logs",
 ]
 
 # Preferred-to-fallback source candidates by detection family.
@@ -99,6 +102,7 @@ SOURCE_CANDIDATE_GROUPS = {
     ],
     "windows_event_security": [
         "Windows Event Security Logs",
+        "Windows Security Events",
     ],
     "windows_event_system": [
         "Windows Event System Logs",
@@ -108,20 +112,29 @@ SOURCE_CANDIDATE_GROUPS = {
     ],
     # SOC source first: native sources use XML parsers that can't parse JSON uploads
     "sysmon_operational": [
+        "Windows Sysmon Operational Logs",
         "SOC Windows Sysmon Logs",
+        "Windows Sysmon Events",
+    ],
+    # Network connection events require a parser that maps Event ID 3 fields.
+    "sysmon_network": [
+        "SOC Sysmon Network Logs",
         "Windows Sysmon Operational Logs",
         "Windows Sysmon Events",
     ],
     "waf_security": [
-        "OCI WAF Logs",
         "SOC WAF Security Logs",
+        "OCI WAF Logs",
     ],
     "lb_access": [
-        "OCI Load Balancer Access Logs",
         "SOC Load Balancer Access Logs",
+        "OCI Load Balancer Access Logs",
     ],
     "webapp_security": [
         "SOC Web Application Logs",
+    ],
+    "application_logs": [
+        "SOC Application Logs",
     ],
     "multicloud_health": [
         "SOC Multicloud Health Logs",
@@ -137,11 +150,60 @@ TEST_DATA_FILES = [
     "windows_event_system.jsonl",
     "linux_secure.jsonl",
     "sysmon_operational.jsonl",
+    "sysmon_network.jsonl",
     "waf_security.jsonl",
     "lb_access.jsonl",
     "webapp_security.jsonl",
+    "application_logs.jsonl",
     "multicloud_health.jsonl",
 ]
+
+CORE_SOC_STREAMS = [
+    "soc-detection-oci-audit",
+    "soc-detection-cloud-guard",
+    "soc-detection-linux-audit",
+    "soc-detection-windows-sysmon",
+]
+
+
+def load_streaming_config(config_path=STREAMING_CONFIG_PATH):
+    """Load ``streaming_config.json`` if present, else return an empty dict."""
+    import json
+
+    if not os.path.exists(config_path):
+        return {}
+
+    try:
+        with open(config_path) as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def get_expected_stream_names(streaming_config=None, config_path=STREAMING_CONFIG_PATH):
+    """Return the core SOC streams plus any configured SOC extras.
+
+    The first four streams are the required detection pipeline. Additional
+    ``soc-detection-*`` entries in ``streaming_config.json`` are treated as
+    extra runtime expectations, for example ``soc-detection-multicloud-health``.
+    """
+    if streaming_config is None:
+        streaming_config = load_streaming_config(config_path)
+
+    configured = [
+        name for name in streaming_config
+        if name != "_metadata" and name.startswith("soc-detection-")
+    ]
+    extras = [name for name in configured if name not in CORE_SOC_STREAMS]
+    return CORE_SOC_STREAMS + extras
+
+
+def get_expected_connector_names(streaming_config=None, config_path=STREAMING_CONFIG_PATH):
+    """Return the expected SCH connector names for the SOC pipeline."""
+    return [f"sch-{stream_name}-to-la" for stream_name in get_expected_stream_names(
+        streaming_config=streaming_config,
+        config_path=config_path,
+    )]
 
 
 def require_oci_config():
@@ -491,7 +553,7 @@ def validate_log_sources():
 
 
 def validate_test_data():
-    """Check that the 4 NDJSON test data files are present."""
+    """Check that the configured NDJSON test data files are present."""
     results = []
     for filename in TEST_DATA_FILES:
         path = os.path.join(TEST_DATA_DIR, filename)
@@ -522,13 +584,8 @@ def validate_log_group():
 
 
 def validate_streams():
-    """Check that the 4 SOC detection streams are ACTIVE (online)."""
-    expected_names = [
-        "soc-detection-oci-audit",
-        "soc-detection-cloud-guard",
-        "soc-detection-linux-audit",
-        "soc-detection-windows-sysmon",
-    ]
+    """Check that the expected SOC detection streams are ACTIVE (online)."""
+    expected_names = get_expected_stream_names()
     try:
         stream_admin = get_streaming_admin_client()
         results = []
@@ -546,13 +603,8 @@ def validate_streams():
 
 
 def validate_service_connectors():
-    """Check that the 4 SCH connectors are ACTIVE (online)."""
-    expected_prefixes = [
-        "sch-soc-detection-oci-audit-to-la",
-        "sch-soc-detection-cloud-guard-to-la",
-        "sch-soc-detection-linux-audit-to-la",
-        "sch-soc-detection-windows-sysmon-to-la",
-    ]
+    """Check that the expected SCH connectors are ACTIVE (online)."""
+    expected_prefixes = get_expected_connector_names()
     try:
         sch = get_sch_client()
         results = []
@@ -614,8 +666,9 @@ def validate_streaming_config():
 
     # Check stream entries
     stream_count = sum(1 for k in cfg if k != "_metadata")
-    results.append(("streams", True if stream_count >= 4 else False,
-                     f"{stream_count} stream(s) configured"))
+    expected_stream_count = len(get_expected_stream_names(cfg))
+    results.append(("streams", True if stream_count >= expected_stream_count else False,
+                     f"{stream_count} stream(s) configured, expecting {expected_stream_count}"))
 
     return results
 

@@ -1,0 +1,305 @@
+{
+  "oci_audit.jsonl": {
+    "description": "OCI Audit events must preserve the official event envelope shape used by tenancy audit logs.",
+    "required_fields": [
+      "eventType",
+      "eventTime",
+      "data",
+      "oracle"
+    ],
+    "required_nested_fields": [
+      "data.compartmentId",
+      "data.identity.principalName",
+      "data.identity.ipAddress",
+      "data.request.action",
+      "data.response.status",
+      "oracle.compartmentid",
+      "oracle.tenantid"
+    ],
+    "field_patterns": {
+      "eventTime": "^\\d{4}-\\d{2}-\\d{2}T",
+      "data.resourceId": "^ocid1\\.",
+      "data.identity.ipAddress": "^\\d{1,3}(?:\\.\\d{1,3}){3}$"
+    },
+    "minimum_events": 50,
+    "sample_dir": "test_data/contracts/oci_audit"
+  },
+  "cloud_guard.jsonl": {
+    "description": "Cloud Guard events should expose problem metadata compatible with OCI LA problem queries.",
+    "required_fields": [
+      "problemId",
+      "problemName",
+      "resourceId",
+      "resourceName",
+      "riskLevel",
+      "timeFirstDetected"
+    ],
+    "field_patterns": {
+      "problemId": "^[0-9a-f-]{36}$",
+      "resourceId": "^ocid1\\.",
+      "timeFirstDetected": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
+    "minimum_events": 10
+  },
+  "linux_syslog.jsonl": {
+    "description": "Linux syslog events should expose the SOC parser fields used by Linux detections.",
+    "required_fields": [
+      "Timestamp",
+      "Hostname",
+      "Process",
+      "PID",
+      "Facility",
+      "Severity",
+      "msg"
+    ],
+    "field_patterns": {
+      "Timestamp": "^\\d{4}-\\d{2}-\\d{2}T",
+      "Hostname": "^[A-Za-z0-9._-]+$"
+    },
+    "minimum_events": 100
+  },
+  "windows_sysmon.jsonl": {
+    "description": "Windows Sysmon process events should expose process and parent context fields used by Sigma-derived detections.",
+    "required_fields": [
+      "EventID",
+      "TimeCreated",
+      "Image",
+      "CommandLine",
+      "ParentImage",
+      "Computer"
+    ],
+    "field_patterns": {
+      "EventID": "^\\d+$",
+      "Image": "^[A-Za-z]:\\\\"
+    },
+    "minimum_events": 50
+  },
+  "windows_event_security.jsonl": {
+    "description": "Windows Security Event logs should keep both native and OCI LA mapped fields for SOC and multicloud widgets.",
+    "required_fields": [
+      "Event ID",
+      "EventID",
+      "TimeCreated",
+      "Computer",
+      "User",
+      "msg"
+    ],
+    "field_patterns": {
+      "EventID": "^\\d+$",
+      "Computer": "^[A-Za-z0-9._-]+$"
+    },
+    "minimum_events": 50
+  },
+  "windows_event_system.jsonl": {
+    "description": "Windows System Event logs should expose service-centric fields.",
+    "required_fields": [
+      "Event ID",
+      "EventID",
+      "TimeCreated",
+      "Computer",
+      "ServiceName",
+      "msg"
+    ],
+    "field_patterns": {
+      "EventID": "^\\d+$"
+    },
+    "minimum_events": 10
+  },
+  "linux_secure.jsonl": {
+    "description": "Linux secure/auth logs should expose auth metadata and mapped OCI fields.",
+    "required_fields": [
+      "EndpointOS",
+      "Timestamp",
+      "Hostname",
+      "Process",
+      "SourceIP",
+      "User",
+      "AuthMethod",
+      "msg"
+    ],
+    "field_patterns": {
+      "EndpointOS": "^Linux$",
+      "SourceIP": "^\\d{1,3}(?:\\.\\d{1,3}){3}$"
+    },
+    "minimum_events": 50
+  },
+  "sysmon_operational.jsonl": {
+    "description": "Sysmon Operational events should include both native and mapped process/network context.",
+    "required_fields": [
+      "EndpointOS",
+      "EventID",
+      "TimeCreated",
+      "Computer",
+      "SourceImage",
+      "CommandLine",
+      "msg"
+    ],
+    "field_patterns": {
+      "EndpointOS": "^Windows$",
+      "EventID": "^\\d+$"
+    },
+    "minimum_events": 50
+  },
+  "sysmon_network.jsonl": {
+    "description": "Sysmon Event ID 3 network logs should include the network tuple used by beaconing and exfiltration detections.",
+    "required_fields": [
+      "@timestamp",
+      "EventID",
+      "Computer",
+      "Image",
+      "Protocol",
+      "DestinationIp",
+      "DestinationPort",
+      "SourceIp",
+      "SourcePort"
+    ],
+    "field_patterns": {
+      "EventID": "^3$",
+      "DestinationIp": "^\\d{1,3}(?:\\.\\d{1,3}){3}$",
+      "SourceIp": "^\\d{1,3}(?:\\.\\d{1,3}){3}$"
+    },
+    "minimum_events": 50
+  },
+  "waf_security.jsonl": {
+    "description": "WAF security logs should expose request metadata, action, and rule attributes.",
+    "required_fields": [
+      "timeCreated",
+      "action",
+      "requestUrl",
+      "clientAddress",
+      "responseCode",
+      "type",
+      "protectionRuleKey"
+    ],
+    "field_patterns": {
+      "timeCreated": "^\\d{4}-\\d{2}-\\d{2}T",
+      "clientAddress": "^\\d{1,3}(?:\\.\\d{1,3}){3}$",
+      "responseCode": "^\\d{3}$"
+    },
+    "minimum_events": 20
+  },
+  "lb_access.jsonl": {
+    "description": "Load Balancer access logs should keep request, user agent, and backend timing fields.",
+    "required_fields": [
+      "timeCreated",
+      "httpMethod",
+      "requestUrl",
+      "clientAddress",
+      "statusCode",
+      "userAgent"
+    ],
+    "field_patterns": {
+      "timeCreated": "^\\d{4}-\\d{2}-\\d{2}T",
+      "clientAddress": "^\\d{1,3}(?:\\.\\d{1,3}){3}$"
+    },
+    "minimum_events": 50
+  },
+  "webapp_security.jsonl": {
+    "description": "Web application security logs should expose the attack taxonomy used by OWASP detections.",
+    "required_fields": [
+      "timestamp",
+      "appName",
+      "attackType",
+      "owaspCategory",
+      "clientAddress",
+      "requestUrl",
+      "statusCode"
+    ],
+    "field_patterns": {
+      "timestamp": "^\\d{4}-\\d{2}-\\d{2}T",
+      "clientAddress": "^\\d{1,3}(?:\\.\\d{1,3}){3}$",
+      "statusCode": "^\\d{3}$"
+    },
+    "minimum_events": 10
+  },
+  "application_logs.jsonl": {
+    "description": "Application and browser telemetry should expose the SOC Application Logs contract used by App 360 and browser detections.",
+    "required_fields": [
+      "timestamp",
+      "serviceName",
+      "traceId",
+      "requestUrl",
+      "statusCode",
+      "clientAddress",
+      "spanName",
+      "message"
+    ],
+    "field_patterns": {
+      "timestamp": "^\\d{4}-\\d{2}-\\d{2}T",
+      "traceId": "^trace_",
+      "statusCode": "^\\d{3}$",
+      "clientAddress": "^\\d{1,3}(?:\\.\\d{1,3}){3}$"
+    },
+    "minimum_events": 25,
+    "required_values": {
+      "serviceName": [
+        "enterprise-crm-portal",
+        "octo-drone-shop"
+      ]
+    },
+    "sample_dir": "test_data/contracts/application_logs"
+  },
+  "multicloud_health.jsonl": {
+    "description": "Multicloud heartbeat logs should cover OCI, Azure, AWS, and GCP with provider-specific instance IDs and health metrics.",
+    "required_fields": [
+      "Timestamp",
+      "Cloud Provider",
+      "Region",
+      "Region Display",
+      "Latitude",
+      "Longitude",
+      "Instance ID",
+      "Host Name",
+      "Status",
+      "Heartbeat Sequence",
+      "Log Source"
+    ],
+    "field_patterns": {
+      "Timestamp": "^\\d{4}-\\d{2}-\\d{2}T",
+      "Log Source": "^SOC Multicloud Health Logs$"
+    },
+    "required_values": {
+      "Cloud Provider": [
+        "OCI",
+        "Azure",
+        "AWS",
+        "GCP"
+      ]
+    },
+    "conditional_patterns": [
+      {
+        "when": {
+          "Cloud Provider": "OCI"
+        },
+        "field_patterns": {
+          "Instance ID": "^ocid1\\.instance\\."
+        }
+      },
+      {
+        "when": {
+          "Cloud Provider": "Azure"
+        },
+        "field_patterns": {
+          "Instance ID": "^/subscriptions/.+/virtualMachines/"
+        }
+      },
+      {
+        "when": {
+          "Cloud Provider": "AWS"
+        },
+        "field_patterns": {
+          "Instance ID": "^i-[0-9a-f]{17}$"
+        }
+      },
+      {
+        "when": {
+          "Cloud Provider": "GCP"
+        },
+        "field_patterns": {
+          "Instance ID": "^projects/.+/zones/.+/instances/"
+        }
+      }
+    ],
+    "minimum_events": 100
+  }
+}

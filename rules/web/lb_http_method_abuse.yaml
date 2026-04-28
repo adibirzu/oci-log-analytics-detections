@@ -1,6 +1,7 @@
 title: Suspicious HTTP Method Usage
 id: a1010013-owasp-a05-httpmethod-001
 status: stable
+version: 1
 description: Detects use of unusual or dangerous HTTP methods (PUT, DELETE, TRACE, OPTIONS, PATCH) that may indicate API abuse or security misconfiguration. OWASP A05:2021 Security Misconfiguration.
 logsource:
   product: oci

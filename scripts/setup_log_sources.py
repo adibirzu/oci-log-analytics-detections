@@ -10,6 +10,7 @@ Log sources created:
   - SOC Linux Syslog Logs       (parses linux_syslog.jsonl)
   - SOC Windows Sysmon Logs     (parses windows_sysmon.jsonl)
   - SOC Cloud Guard Logs        (parses cloud_guard.jsonl)
+  - SOC Application Logs        (parses application_logs.jsonl)
 
 Native OCI sources are preferred when available (for example `OCI Cloud Guard Problems`
 or `Windows Sysmon Events`). SOC custom sources are created only when an equivalent
@@ -74,7 +75,9 @@ CUSTOM_FIELDS = [
     "Company",
     "Product",
     "Description",
+    "Logon ID",
     "Logon Guid",
+    "Integrity Level",
     "Facility",
     "Severity Level",
     "Process ID",
@@ -92,6 +95,7 @@ CUSTOM_FIELDS = [
     "Query Results",
     "Pipe Name",
     "Target Filename",
+    "Target Object",
     "Granted Access",
     "Source IP",
     "Source Port",
@@ -130,6 +134,8 @@ CUSTOM_FIELDS = [
     "WAF Policy",
     "Threat Feeds",
     "Fingerprint",
+    "Response Headers",
+    "WAF Score",
     # Load Balancer fields
     "Backend Address",
     "Backend Status Code",
@@ -147,6 +153,16 @@ CUSTOM_FIELDS = [
     "Session ID",
     "OWASP Category",
     "Request ID",
+    "Trace ID",
+    "Span Name",
+    "Span Attributes",
+    "DB Target",
+    "Error Type",
+    "Slow Request",
+    "Orders Sync Created",
+    "Orders Sync Updated",
+    "Orders Sync Failed",
+    "Orders Sync Source",
     # Multicloud Health / Geographic fields
     "Cloud Provider",
     "Region Display",
@@ -349,8 +365,9 @@ WINSEC_FIELD_MAPPINGS = [
     ("Source Address",       "$.SourceAddress",     6),
     ("Logon Type",           "$.LogonType",        7),
     ("Process Name",         "$.ProcessName",      8),
-    ("Host Name",            "$.Computer",         9),
-    ("Process",              "$.ProcessName",     10),
+    ("Command Line",         "$.CommandLine",      9),
+    ("Host Name",            "$.Computer",        10),
+    ("Process",              "$.ProcessName",     11),
 ]
 WINSEC_EXAMPLE = {
     "EventID": "4625",
@@ -362,6 +379,7 @@ WINSEC_EXAMPLE = {
     "SourceAddress": "192.168.1.50",
     "LogonType": "10",
     "ProcessName": "C:\\Windows\\System32\\svchost.exe",
+    "CommandLine": "svchost.exe -k netsvcs",
     "msg": "An account failed to log on.",
 }
 
@@ -481,6 +499,8 @@ SYSMON_FIELD_MAPPINGS = [
     ("Granted Access",       "$.GrantedAccess",        17),
     ("Process Name",         "$.SourceImage",          18),
     ("Command Line",         "$.CommandLine",          19),
+    ("Target Object",        "$.TargetObject",         20),
+    ("Parent Process Name",  "$.ParentImage",          21),
 ]
 SYSMON_EXAMPLE = {
     "EndpointOS": "Windows",
@@ -747,6 +767,93 @@ WEBAPP_SOURCE_DESC = (
 )
 
 
+# ─── Application Telemetry Parser ─────────────────────────────
+
+APP_PARSER_NAME = "socApplicationJsonParser"
+APP_PARSER_DISPLAY = "SOC Application JSON Parser"
+APP_PARSER_DESC = (
+    "Parses application and browser telemetry JSON for the Application 360 and "
+    "browser attack dashboards. Maps service name, request metadata, trace IDs, "
+    "security attack context, and browser span attributes."
+)
+APP_FIELD_MAPPINGS = [
+    ("msg",                  "$.message",            1),
+    ("time",                 "$.timestamp",          2),
+    ("Service Name",         "$.serviceName",        3),
+    ("Application Name",     "$.serviceName",        4),
+    ("Trace ID",             "$.traceId",            5),
+    ("HTTP Method",          "$.httpMethod",         6),
+    ("Request URL",          "$.requestUrl",         7),
+    ("URI Path",             "$.uriPath",            8),
+    ("Query String",         "$.queryString",        9),
+    ("Response Code",        "$.statusCode",        10),
+    ("Response Time Ms",     "$.responseTimeMs",    11),
+    ("Client IP",            "$.clientAddress",     12),
+    ("User Agent",           "$.userAgent",         13),
+    ("User",                 "$.user",              14),
+    ("Session ID",           "$.sessionId",         15),
+    ("Request ID",           "$.requestId",         16),
+    ("Content Type",         "$.contentType",       17),
+    ("Referrer",             "$.referrer",          18),
+    ("Response Headers",     "$.responseHeaders",   19),
+    ("Span Name",            "$.spanName",          20),
+    ("Span Attributes",      "$.spanAttributes",    21),
+    ("Attack Type",          "$.securityAttackType", 22),
+    ("Risk Level",           "$.securityAttackSeverity", 23),
+    ("WAF Score",            "$.wafScore",          24),
+    ("DB Target",            "$.dbTarget",          25),
+    ("Error Type",           "$.errorType",         26),
+    ("Slow Request",         "$.slowRequest",       27),
+    ("Orders Sync Created",  "$.ordersSyncCreated", 28),
+    ("Orders Sync Updated",  "$.ordersSyncUpdated", 29),
+    ("Orders Sync Failed",   "$.ordersSyncFailed",  30),
+    ("Orders Sync Source",   "$.ordersSyncSource",  31),
+    ("Severity Level",       "$.level",             32),
+    ("Host Name",            "$.hostname",          33),
+]
+APP_EXAMPLE = {
+    "timestamp": "2026-03-18T09:07:04.446Z",
+    "serviceName": "enterprise-crm-portal",
+    "traceId": "trace_demo_cross_service_001",
+    "httpMethod": "GET",
+    "requestUrl": "/crm/orders/42",
+    "uriPath": "/crm/orders/42",
+    "queryString": "",
+    "statusCode": "200",
+    "responseTimeMs": 842,
+    "clientAddress": "185.220.101.1",
+    "userAgent": "Mozilla/5.0 (compatible; demo-browser)",
+    "user": "cersei",
+    "sessionId": "sess_demo_001",
+    "requestId": "req_demo_001",
+    "contentType": "text/html",
+    "referrer": "",
+    "responseHeaders": "Content-Type: text/html; charset=utf-8",
+    "spanName": "HTTP GET /crm/orders/:id",
+    "spanAttributes": "document.cookie canvas.toDataURL webgl.getParameter",
+    "securityAttackType": "xss_reflected",
+    "securityAttackSeverity": "high",
+    "wafScore": "88",
+    "dbTarget": "oracle_atp",
+    "errorType": "",
+    "slowRequest": "false",
+    "ordersSyncCreated": 0,
+    "ordersSyncUpdated": 0,
+    "ordersSyncFailed": 0,
+    "ordersSyncSource": "",
+    "level": "INFO",
+    "hostname": "crm-portal-01",
+    "message": "Browser telemetry recorded suspicious request",
+}
+
+APP_SOURCE_INTERNAL = "socApplicationSource"
+APP_SOURCE_DISPLAY = "SOC Application Logs"
+APP_SOURCE_DESC = (
+    "Application and browser telemetry from OCI-DEMO services in JSON format. "
+    "Used by the Application 360 and browser attack dashboards."
+)
+
+
 # ─── Multicloud Health Parser ──────────────────────────────────
 
 HEALTH_PARSER_NAME = "socMulticloudHealthJsonParser"
@@ -837,6 +944,7 @@ NATIVE_SOURCE_ALTERNATIVES = {
     WAF_SOURCE_DISPLAY: ["OCI WAF Logs"],
     LB_SOURCE_DISPLAY: ["OCI Load Balancer Access Logs"],
     WEBAPP_SOURCE_DISPLAY: [],
+    APP_SOURCE_DISPLAY: [],
     HEALTH_SOURCE_DISPLAY: [],
 }
 
@@ -859,8 +967,10 @@ def build_existing_field_map(client, namespace):
         for f in resp.data.items:
             if f.display_name:
                 result[f.display_name] = f.name
+                result[f.display_name.lower()] = f.name
             if f.name:
                 result[f.name] = f.name
+                result[f.name.lower()] = f.name
         page = resp.headers.get("opc-next-page")
         if not page:
             break
@@ -873,9 +983,10 @@ def create_fields(client, namespace, field_display_names):
     field_map = {}
 
     for display_name in field_display_names:
-        if display_name in existing:
-            field_map[display_name] = existing[display_name]
-            print(f"  Field EXISTS {existing[display_name]:20s} -> {display_name}")
+        existing_internal = existing.get(display_name) or existing.get(display_name.lower())
+        if existing_internal:
+            field_map[display_name] = existing_internal
+            print(f"  Field EXISTS {existing_internal:20s} -> {display_name}")
             continue
 
         details = UpsertLogAnalyticsFieldDetails()
@@ -897,7 +1008,7 @@ def create_parser(client, namespace, parser_name, display_name, description,
     """Create or upsert a JSON parser with field mappings."""
     parser_field_maps = []
     for name_or_display, json_path, seq in field_mappings:
-        internal = field_map.get(name_or_display)
+        internal = field_map.get(name_or_display) or field_map.get(name_or_display.lower())
         if not internal:
             print(f"  WARNING: Field '{name_or_display}' not found in field_map, skipping from parser")
             continue
@@ -1030,8 +1141,8 @@ def main():
     if args.dry_run:
         print("DRY RUN - would create:")
         print(f"  {len(CUSTOM_FIELDS)} custom fields")
-        print(f"  12 JSON parsers")
-        print(f"  up to 12 log sources (SOC sources skipped when native equivalent exists):")
+        print(f"  13 JSON parsers")
+        print(f"  up to 13 log sources (SOC sources skipped when native equivalent exists):")
         print(f"    - {LINUX_SOURCE_DISPLAY} ({LINUX_SOURCE_INTERNAL})")
         print(f"    - {WINDOWS_SOURCE_DISPLAY} ({WINDOWS_SOURCE_INTERNAL})")
         print(f"    - {CG_SOURCE_DISPLAY} ({CG_SOURCE_INTERNAL})")
@@ -1043,6 +1154,7 @@ def main():
         print(f"    - {WAF_SOURCE_DISPLAY} ({WAF_SOURCE_INTERNAL})")
         print(f"    - {LB_SOURCE_DISPLAY} ({LB_SOURCE_INTERNAL})")
         print(f"    - {WEBAPP_SOURCE_DISPLAY} ({WEBAPP_SOURCE_INTERNAL})")
+        print(f"    - {APP_SOURCE_DISPLAY} ({APP_SOURCE_INTERNAL})")
         print(f"    - {HEALTH_SOURCE_DISPLAY} ({HEALTH_SOURCE_INTERNAL})")
         return
 
@@ -1125,6 +1237,11 @@ def main():
                   WEBAPP_PARSER_NAME, WEBAPP_PARSER_DISPLAY, WEBAPP_PARSER_DESC,
                   WEBAPP_FIELD_MAPPINGS, field_map, WEBAPP_EXAMPLE)
 
+    print("\n--- Application Telemetry Parser ---")
+    create_parser(la_client, namespace,
+                  APP_PARSER_NAME, APP_PARSER_DISPLAY, APP_PARSER_DESC,
+                  APP_FIELD_MAPPINGS, field_map, APP_EXAMPLE)
+
     print("\n--- Multicloud Health Parser ---")
     create_parser(la_client, namespace,
                   HEALTH_PARSER_NAME, HEALTH_PARSER_DISPLAY, HEALTH_PARSER_DESC,
@@ -1201,6 +1318,11 @@ def main():
         WEBAPP_SOURCE_INTERNAL, WEBAPP_SOURCE_DISPLAY, WEBAPP_SOURCE_DESC, WEBAPP_PARSER_NAME
     )
 
+    print("\n--- Application Telemetry Source ---")
+    create_source_if_needed(
+        APP_SOURCE_INTERNAL, APP_SOURCE_DISPLAY, APP_SOURCE_DESC, APP_PARSER_NAME
+    )
+
     print("\n--- Multicloud Health Source ---")
     create_source_if_needed(
         HEALTH_SOURCE_INTERNAL, HEALTH_SOURCE_DISPLAY, HEALTH_SOURCE_DESC, HEALTH_PARSER_NAME
@@ -1221,6 +1343,7 @@ def main():
     print(f"  - {WAF_SOURCE_DISPLAY}")
     print(f"  - {LB_SOURCE_DISPLAY}")
     print(f"  - {WEBAPP_SOURCE_DISPLAY}")
+    print(f"  - {APP_SOURCE_DISPLAY}")
     print(f"  - {HEALTH_SOURCE_DISPLAY}")
     print(f"  - OCI Audit Logs (built-in)")
     print(f"  - OCI Cloud Guard Problems (native, preferred when available)")

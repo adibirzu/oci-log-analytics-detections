@@ -1,6 +1,7 @@
 title: WAF Command Injection Attack Blocked
 id: a1010005-owasp-a03-cmdi-block-001
 status: stable
+version: 1
 description: Detects OS command injection attempts blocked by OCI WAF. Attackers inject system commands through web parameters. OWASP A03:2021 Injection.
 logsource:
   product: oci

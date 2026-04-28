@@ -25,7 +25,11 @@ from convert_sigma import (
     parse_condition,
     _expand_wildcard_selections,
     convert_rule,
+    build_log_source_filter,
+    load_existing_query_index,
     load_config,
+    merge_preserved_fields,
+    resolve_output_relative_path,
 )
 
 
@@ -164,6 +168,39 @@ class TestUnknownLogsourceWarning(unittest.TestCase):
             os.unlink(tmp_path)
 
 
+class TestCategorySpecificLogsourceMapping(unittest.TestCase):
+    """Ensure category mappings override generic service mappings when available."""
+
+    def test_category_mapping_takes_precedence_over_service_mapping(self):
+        rule_content = {
+            'title': 'Network Connection Rule',
+            'id': 'test-network-ls',
+            'logsource': {'product': 'windows', 'service': 'sysmon', 'category': 'network_connection'},
+            'detection': {
+                'selection': {'DestinationPort': 445},
+                'condition': 'selection',
+            },
+            'level': 'high',
+        }
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+            import yaml
+            yaml.dump(rule_content, f)
+            tmp_path = f.name
+
+        try:
+            field_map, logsource_map = load_config()
+            result = convert_rule(tmp_path, field_map, logsource_map)
+
+            self.assertIsNotNone(result)
+            self.assertIn("SOC Sysmon Network Logs", result["query"])
+            self.assertLess(
+                result["query"].index("SOC Sysmon Network Logs"),
+                result["query"].index("SOC Windows Sysmon Logs"),
+            )
+        finally:
+            os.unlink(tmp_path)
+
+
 class TestCountGracefulDegradation(unittest.TestCase):
     """Test that count()/timeframe conditions degrade gracefully."""
 
@@ -213,6 +250,103 @@ class TestNotFilter(unittest.TestCase):
         self.assertIn("'Command Line' like '*whoami*'", result)
         self.assertIn('not', result)
         self.assertIn("User = 'SYSTEM'", result)
+
+    def test_null_selection_maps_to_missing_field_check(self):
+        selection = {'Referer': None}
+        field_map = {'Referer': "'Referrer'"}
+        result = parse_selection(selection, field_map)
+        self.assertEqual(result, "not ('Referrer' like '*')")
+
+
+class TestOutputPathResolution(unittest.TestCase):
+    """Test stable output path routing for generated queries."""
+
+    def test_reuses_existing_sigma_id_path(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_root = os.path.join(tmpdir, 'queries')
+            rules_root = os.path.join(tmpdir, 'rules')
+            os.makedirs(output_root, exist_ok=True)
+            os.makedirs(os.path.join(rules_root, 'windows'), exist_ok=True)
+
+            existing_path = os.path.join(output_root, 'legacy_name.json')
+            with open(existing_path, 'w') as f:
+                json.dump({'sigma_id': 'same-id', 'query': build_log_source_filter(['OCI Audit Logs'])}, f)
+
+            index = load_existing_query_index(output_root)
+            result = {'title': 'A Brand New Title', 'sigma_id': 'same-id'}
+            rule_path = os.path.join(rules_root, 'windows', 'sample.yaml')
+
+            rel_path = resolve_output_relative_path(
+                rule_path=rule_path,
+                result=result,
+                output_root=output_root,
+                rules_root=rules_root,
+                existing_index=index,
+            )
+            self.assertEqual(rel_path, 'legacy_name.json')
+
+    def test_routes_browser_attack_rules_to_apps(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_root = os.path.join(tmpdir, 'queries')
+            rules_root = os.path.join(tmpdir, 'rules')
+            rule_dir = os.path.join(rules_root, 'web', 'browser_attacks')
+            os.makedirs(rule_dir, exist_ok=True)
+
+            result = {'title': 'APM: XSS', 'sigma_id': 'apm-browser-xss-001'}
+            rule_path = os.path.join(rule_dir, 'apm_xss_attack_detection.yaml')
+
+            rel_path = resolve_output_relative_path(
+                rule_path=rule_path,
+                result=result,
+                output_root=output_root,
+                rules_root=rules_root,
+                existing_index={},
+            )
+            self.assertEqual(rel_path, 'apps/apm_xss_attack_detection.json')
+
+
+class TestPreservedMetadata(unittest.TestCase):
+    """Test preservation of curated JSON metadata during regeneration."""
+
+    def test_preserves_pipeline_and_custom_fields(self):
+        result = {
+            'title': 'Sample Rule',
+            'query': "'Log Source' = 'OCI Audit Logs' and (Status = 'Failure')",
+            'tags': ['attack.initial_access'],
+            'mitre_attack': {'tactics': ['initial_access'], 'techniques': ['T1078']},
+        }
+        existing = {
+            'query': "'Log Source' = 'OCI Audit Logs' and (Status = 'Failure') | stats count as Hits by User",
+            'tags': ['browser_attack'],
+            'mitre_attack': {'tactics': ['execution'], 'techniques': ['T1059.007']},
+            'threat_intel': {'family': 'example'},
+        }
+
+        merged = merge_preserved_fields(result, existing)
+        self.assertIn('| stats count as Hits by User', merged['query'])
+        self.assertIn('browser_attack', merged['tags'])
+        self.assertIn('execution', merged['mitre_attack']['tactics'])
+        self.assertEqual(merged['threat_intel']['family'], 'example')
+
+    def test_does_not_preserve_ephemeral_generation_flags(self):
+        result = {
+            'title': 'Sample Rule',
+            'query': "'Log Source' = 'OCI Audit Logs'",
+            'sigma_id': 'sample-001',
+        }
+        existing = {
+            'title': 'Sample Rule',
+            'query': "'Log Source' = 'OCI Audit Logs'",
+            'sigma_id': 'sample-001',
+            'logsource_fallback': True,
+            'requires_aggregation': True,
+            'threat_intel': {'family': 'example'},
+        }
+
+        merged = merge_preserved_fields(result, existing)
+        self.assertNotIn('logsource_fallback', merged)
+        self.assertNotIn('requires_aggregation', merged)
+        self.assertEqual(merged['threat_intel']['family'], 'example')
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 title: WAF Log4Shell (CVE-2021-44228) Attack Blocked
 id: a1010022-owasp-a06-log4shell-001
 status: stable
+version: 1
 description: Detects Log4Shell (Log4j RCE) exploitation attempts blocked by WAF. Attackers use JNDI lookup strings to achieve remote code execution. OWASP A06:2021 Vulnerable and Outdated Components.
 logsource:
   product: oci

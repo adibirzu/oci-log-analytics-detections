@@ -1,28 +1,90 @@
 # Contributing to OCI Log Analytics Detection Rules
 
-We welcome contributions to expand the coverage of detection rules!
+This repository publishes detection content across multiple surfaces. Pick the right surface first, then run the full regeneration and verification loop before opening a pull request.
 
-## How to Contribute
+## Choose the Correct Surface
 
-1.  **Fork the repository** (if applicable) or create a new branch.
-2.  **Add a Rule:**
-    - Create a new YAML file in `rules/`.
-    - Follow the [Sigma Rule Specification](https://github.com/SigmaHQ/sigma-specification).
-    - Ensure you use standard field names where possible, or update `config/sigma_oci_mapping.yaml` if you introduce new specific fields.
-3.  **Validate:**
-    - Run `python3 scripts/convert_sigma.py` to ensure your rule compiles to a valid OCL query.
-    - Check the output in `queries/` to verify the logic.
-4.  **Submit a Pull Request.**
+| If you are adding... | Put it here | Notes |
+|----------------------|-------------|-------|
+| A source-derived detection rule | `rules/**` | Source of truth is Sigma/YAML |
+| A browser-side source-derived detection | `rules/web/browser_attacks/` | These compile into `queries/apps/` |
+| A curated app telemetry analytic | `queries/apps/` | Do not add a `sigma_id` unless the file is source-derived |
+| A curated hunting query | `queries/hunting/` | Use OCL analytics operators |
 
-## Style Guide
-- **Titles:** Title Case, descriptive (e.g., "Suspicious Sudo Usage", not "sudo rule").
-- **IDs:** Generate a unique UUID for new rules.
-- **Tags:** Use MITRE ATT&CK tags (e.g., `attack.initial_access`) or OCI specific tags (`oci.audit`).
+## Source Rule Requirements
+
+- Follow the Sigma rule specification where possible.
+- Use descriptive titles and stable UUID-style IDs.
+- Include `version`.
+- Add MITRE ATT&CK tags such as `attack.initial_access` and `attack.t1190`.
+- Add `falsepositives`.
+- Add `stig.*` tags when the rule maps to STIG controls.
+- Update `config/sigma_oci_mapping.yaml` if the rule needs a new OCI field mapping or log source mapping.
+
+## Contributor Workflow
+
+1. Add or update the rule/query in the correct surface.
+2. Regenerate source-derived content and catalogs:
+
+   ```bash
+   python3 scripts/convert_sigma.py
+   python3 scripts/generate_catalog.py
+   python3 scripts/export_for_multicloud.py --manifest-only
+   ```
+
+   If you changed checked-in demo datasets under `test_data/`, regenerate those files so `test_data/manifest.json` stays accurate.
+
+3. Run validation:
+
+   ```bash
+   python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md
+   python3 -m unittest discover -s scripts -p 'test_*.py'
+   python3 -m compileall scripts
+   python3 scripts/deploy_dashboard.py --dry-run
+   ```
+
+4. Inspect the generated artifacts you changed:
+   - `queries/catalog.json`
+   - `queries/manifest.json`
+   - affected files under `queries/`, `queries/apps/`, or `queries/hunting/`
+5. If the new content should appear on a dashboard, add it to `scripts/deploy_dashboard.py`.
+
+## Validation Expectations
+
+Before submitting a PR:
+
+- Rule quality audit should report 0 issues.
+- Unit tests should pass.
+- Dashboard dry-run should resolve dashboard/query references cleanly.
+- Generated inventory should match the current repo contents.
+- If you touched `test_data/*.jsonl`, `test_data/manifest.json` should reflect the new file counts and event totals.
+
+## Live OCI Validation
+
+When you have access to the target OCI tenancy, run the live validation path as well:
+
+```bash
+python3 scripts/setup_log_sources.py
+python3 scripts/setup_streaming_pipeline.py
+python3 scripts/validate_pipeline.py --e2e
+python3 scripts/verify_caldera_detections.py --operation discovery --lookback 60d
+```
+
+Notes:
+
+- `SOC Application Logs` is the supported browser/app telemetry surface for the dashboards under `queries/apps/`.
+- `setup_streaming_pipeline.py` and `validate_pipeline.py` now use `config/streaming_config.json` as the runtime contract for expected SOC streams/connectors, including multicloud-health when it is configured.
 
 ## Field Mapping
-If your rule uses a field not yet mapped to OCI Log Analytics:
+
+If a rule uses a field not yet mapped to OCI Log Analytics:
+
 1. Open `config/sigma_oci_mapping.yaml`.
-2. Add the mapping under `field_mappings`.
-   ```yaml
-   sigma_field_name: "OCI Log Analytics Field Name"
-   ```
+2. Add the field under `field_mappings` or the log source under `logsource_mappings`.
+3. Re-run `python3 scripts/convert_sigma.py` and inspect the generated query.
+
+## Review Notes
+
+- `queries/catalog.json` is the canonical inventory.
+- `queries/manifest.json` is an export artifact, not the canonical inventory.
+- `logandetectionqueries/` and `logandetectionrules/` are legacy empty directories and should not be used by new tooling.

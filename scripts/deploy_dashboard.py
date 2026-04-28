@@ -1,18 +1,11 @@
 """
 Deploy SOC detection dashboards to OCI Log Analytics.
 
-Creates saved searches and organizes them into 10 SOC dashboards:
-  1. SOC Overview Dashboard              - Cross-domain security summary
-  2. SOC: OCI STIG Compliance            - STIG compliance: MFA, key rotation, audit, network
-  3. SOC: OCI Audit Security             - IAM, Network, Compute, Storage, KMS, DB
-  4. SOC: Cloud Guard Security           - Cloud Guard problem detection
-  5. SOC: Linux Security                 - SSH, sudo, GTFOBins, reverse shells, persistence
-  6. SOC: Windows Security               - LOLBins, encoded PowerShell, credential dumping
-  7. SOC: Threat Hunting Dashboard       - Cookbook-inspired analytics (frequency, anomaly, scoring)
-  8. SOC: Sysmon Network & Lateral       - Network connections, C2 beacons, DNS, named pipes
-  9. SOC: Web Application Security       - OWASP Top 10 attack detection via WAF/LB/App logs
- 10. SOC: Web Threat Hunting Dashboard   - Web attack hunting: frequency, stacking, scoring
- 11. OCI-DEMO: Application 360 Monitoring - CRM + Drone Shop 360 observability (APM, logs, WAF, DB, security)
+Creates 16 dashboards backed by 255 embedded saved-search widgets covering:
+  - OCI audit and STIG compliance
+  - Cloud Guard, Linux, Windows, Sysmon network, and web detections
+  - Browser/APM detections, application analytics, APT content, and hunting
+  - Geographic health / multicloud operational views
 
 Usage:
   python3 scripts/deploy_dashboard.py              # Deploy all
@@ -33,6 +26,26 @@ from oci_config import (
 )
 
 import oci
+
+SUPPORTED_VISUALIZATION_TYPES = {
+    "bar",
+    "cluster",
+    "distinct",
+    "hbar",
+    "issues",
+    "line",
+    "link",
+    "map",
+    "pie",
+    "records",
+    "records_histogram",
+    "summary_table",
+    "sunburst",
+    "table",
+    "table_histogram",
+    "tile",
+    "treemap",
+}
 
 
 # ─── Dashboard Definitions ────────────────────────────────────────
@@ -311,7 +324,7 @@ DASHBOARDS = {
         ]
     },
     "OCI-DEMO: Application 360 Monitoring Dashboard": {
-        "description": "360-degree observability for OCI-DEMO applications (CRM Portal + Drone Shop). Correlates APM traces, application logs, WAF signals, database performance (OPSI/DB Management), and security events using trace_id as the universal join key.",
+        "description": "360-degree observability for OCI-DEMO applications (CRM Portal + Drone Shop). Runs on SOC Application Logs, a custom JSON telemetry source that models application, browser, and trace context with a shared Trace ID for correlation.",
         "widgets": [
             {"title": "App: Error Rate by Service", "query_file": "apps/app_error_rate_by_service.json"},
             {"title": "App: Slow Requests (>2s)", "query_file": "apps/app_slow_requests.json"},
@@ -328,7 +341,7 @@ DASHBOARDS = {
         ]
     },
     "SOC: Geographic Health Dashboard": {
-        "description": "Multicloud geographic health visualization. Regional instance health status across OCI, Azure, and GCP on a global map with provider summaries, tier breakdowns, and unhealthy region alerts.",
+        "description": "Multicloud geographic health visualization. Regional instance health status across OCI, Azure, AWS, and GCP on a global map with provider summaries, tier breakdowns, and unhealthy region alerts.",
         "widgets": [
             {"title": "Geo: Regional Health Map", "query_file": "hunting/multicloud_geo_health_regional_map.json"},
             {"title": "Geo: Cloud Provider Summary", "query_file": "hunting/multicloud_geo_health_by_provider.json"},
@@ -338,8 +351,13 @@ DASHBOARDS = {
         ]
     },
     "SOC: APT Detection Dashboard": {
-        "description": "APT threat detection: BLUELIGHT RAT (S0657/APT37) full kill chain + YARA-enhanced indicators from Volexity research. Covers browser exploitation, Graph API/Google C2, cookie theft, keylogging, and OneDrive exfiltration.",
+        "description": "APT threat detection: BLUELIGHT RAT (S0657/APT37) full kill chain + YARA-enhanced indicators from Volexity research. Covers browser exploitation, Graph API/Google C2, cookie theft, keylogging, and OneDrive exfiltration. Showcase row at the top renders the full attack path on a single canvas.",
         "widgets": [
+            {"title": "BLUELIGHT: Total Detections (24h)", "query_file": "hunting/bluelight_total_detections_kpi.json"},
+            {"title": "BLUELIGHT: Top Affected Hosts", "query_file": "hunting/bluelight_top_affected_hosts.json"},
+            {"title": "BLUELIGHT: MITRE Tactics x Techniques", "query_file": "hunting/bluelight_mitre_tactics_sunburst.json"},
+            {"title": "BLUELIGHT: Kill Chain Timeline", "query_file": "hunting/bluelight_kill_chain_timeline.json"},
+            {"title": "BLUELIGHT: Attack Path (per Host)", "query_file": "hunting/bluelight_attack_path_link.json"},
             {"title": "APT37: Drive-by Compromise", "query_file": "bluelight_drive_by_compromise.json"},
             {"title": "APT37: Browser Child Process", "query_file": "bluelight_browser_child_process.json"},
             {"title": "APT37: Obfuscated Commandline", "query_file": "bluelight_obfuscated_commandline.json"},
@@ -360,7 +378,7 @@ DASHBOARDS = {
         ]
     },
     "SOC: Browser Attack Detection Dashboard": {
-        "description": "Browser-side attack detection via OCI APM and OpenTelemetry. XSS, SQLi, CSRF, session hijacking, clickjacking, DOM attacks, cryptomining, and fingerprinting across monitored applications.",
+        "description": "Browser-side attack detection using SOC Application Logs, a custom OpenTelemetry-shaped JSON source for browser and application telemetry. Detects XSS, SQLi, CSRF, session hijacking, clickjacking, DOM attacks, cryptomining, and fingerprinting across monitored applications.",
         "widgets": [
             {"title": "Browser: XSS Attack Detection", "query_file": "apps/apm_xss_attack_detection.json"},
             {"title": "Browser: SQL Injection Detection", "query_file": "apps/apm_sqli_attack_detection.json"},
@@ -405,13 +423,60 @@ def build_scope_filters(compartment_id):
 
 # ─── Saved Search Definition Builder ─────────────────────────────
 
-def build_saved_search_json(search_id, title, query, description="", tags=None):
+def resolve_widget_ui_config(widget, query_info):
+    """Resolve visualization and investigation metadata for a widget.
+
+    Query-local dashboard metadata is the default. Explicit widget-level
+    overrides win if they are provided in ``DASHBOARDS``.
+    """
+    dashboard_meta = query_info.get("dashboard", {}) if isinstance(query_info, dict) else {}
+
+    visualization_type = widget.get(
+        "visualization_type",
+        dashboard_meta.get("visualizationType", "table"),
+    )
+    if visualization_type not in SUPPORTED_VISUALIZATION_TYPES:
+        raise ValueError(f"unsupported visualization type: {visualization_type}")
+
+    visualization_options = dashboard_meta.get("visualizationOptions", {}).copy()
+    visualization_options.update(widget.get("visualization_options", {}))
+
+    ask_ai_prompts = widget.get("ask_ai_prompts", dashboard_meta.get("ask_ai_prompts", []))
+    if ask_ai_prompts and not isinstance(ask_ai_prompts, list):
+        raise ValueError("ask_ai_prompts must be a list of strings")
+
+    return {
+        "enableWidgetInApp": True,
+        "queryString": query_info["query"],
+        "scopeFilters": build_scope_filters(COMPARTMENT_ID),
+        "showTitle": widget.get("show_title", dashboard_meta.get("showTitle", True)),
+        "timeSelection": widget.get(
+            "time_selection",
+            dashboard_meta.get("timeSelection", {"timePeriod": "l60min"}),
+        ),
+        "visualizationOptions": visualization_options,
+        "visualizationType": visualization_type,
+        "vizType": "lxSavedSearchWidgetType",
+    }
+
+
+def build_saved_search_json(search_id, title, query, description="", tags=None, ui_config=None):
     """Build a saved search JSON definition for embedding in a dashboard import.
 
     The import_dashboard API requires saved searches to be embedded in the
     dashboard JSON. Tiles reference them by their 'id' field (not OCID).
     """
-    scope_filters = build_scope_filters(COMPARTMENT_ID)
+    if ui_config is None:
+        ui_config = {
+            "enableWidgetInApp": True,
+            "queryString": query,
+            "scopeFilters": build_scope_filters(COMPARTMENT_ID),
+            "showTitle": True,
+            "timeSelection": {"timePeriod": "l60min"},
+            "visualizationOptions": {},
+            "visualizationType": "table",
+            "vizType": "lxSavedSearchWidgetType",
+        }
 
     return {
         "id": search_id,
@@ -424,16 +489,7 @@ def build_saved_search_json(search_id, title, query, description="", tags=None):
         "description": description,
         "nls": {},
         "type": "SEARCH_SHOW_IN_DASHBOARD",
-        "uiConfig": {
-            "enableWidgetInApp": True,
-            "queryString": query,
-            "scopeFilters": scope_filters,
-            "showTitle": True,
-            "timeSelection": {"timePeriod": "l60min"},
-            "visualizationOptions": {},
-            "visualizationType": "table",
-            "vizType": "lxSavedSearchWidgetType",
-        },
+        "uiConfig": ui_config,
         "dataConfig": [],
         "screenImage": " ",
         "metadataVersion": "2.0",
@@ -493,6 +549,13 @@ def build_dashboard_json(dashboard_id, name, description, widgets, widget_querie
         if query_info.get('sigma_id'):
             tags["sigma_id"] = query_info['sigma_id']
         tags["platform"] = "soc-detection-rules"
+        dashboard_meta = query_info.get("dashboard", {})
+        if dashboard_meta.get("ask_ai_prompts"):
+            tags["ask_ai_prompts"] = json.dumps(dashboard_meta["ask_ai_prompts"])
+        if dashboard_meta.get("visualizationType"):
+            tags["visualization_type"] = dashboard_meta["visualizationType"]
+
+        ui_config = resolve_widget_ui_config(widget, query_info)
 
         saved_searches.append(build_saved_search_json(
             search_id=search_id,
@@ -500,6 +563,7 @@ def build_dashboard_json(dashboard_id, name, description, widgets, widget_querie
             query=query_info['query'],
             description=query_info.get('description', ''),
             tags=tags,
+            ui_config=ui_config,
         ))
 
     dashboard = {
@@ -659,8 +723,17 @@ def deploy(cleanup=False, dry_run=False):
                     if 'query' not in data:
                         print(f"      - {w['title']} ({w['query_file']}) [NO QUERY FIELD]")
                         invalid += 1
+                    elif data.get("dashboard", {}).get("visualizationType") and (
+                        data["dashboard"]["visualizationType"] not in SUPPORTED_VISUALIZATION_TYPES
+                    ):
+                        print(
+                            f"      - {w['title']} ({w['query_file']}) "
+                            f"[INVALID VIZ: {data['dashboard']['visualizationType']}]"
+                        )
+                        invalid += 1
                     else:
-                        print(f"      - {w['title']} ({w['query_file']})")
+                        viz = data.get("dashboard", {}).get("visualizationType", "table")
+                        print(f"      - {w['title']} ({w['query_file']}) [viz={viz}]")
                 except json.JSONDecodeError:
                     print(f"      - {w['title']} ({w['query_file']}) [INVALID JSON]")
                     invalid += 1

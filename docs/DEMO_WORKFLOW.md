@@ -1,22 +1,41 @@
 # OCI Log Analytics Advanced Detection — Demo Workflow
 
-Date: 2026-03-19
+Date: 2026-04-28
 Audience: Demo operators, SOC analysts, security architects, platform engineers
 
 ## Overview
 
-This document provides a step-by-step demo workflow showcasing OCI Log Analytics advanced detection capabilities deployed as part of the OCI-DEMO platform. The demo covers four key scenarios across 30-45 minutes, progressing from foundational SOC operations to advanced APT threat hunting and real-time browser attack detection.
+This document provides a step-by-step demo workflow showcasing OCI Log Analytics advanced detection capabilities deployed as part of the OCI-DEMO platform. The demo covers five scenarios across 35-45 minutes, progressing from foundational SOC operations to advanced APT threat hunting and browser/application telemetry detection.
+
+## Current Operator Shortcut
+
+Before the demo, refresh the tenancy with the current one-command path:
+
+```bash
+python3 scripts/populate_dashboard_data_14d.py --validate
+python3 scripts/query_audit.py --lookback 14d --eligible-only --out /tmp/eligible_query_audit_14d.json
+```
+
+Validated on `2026-04-23`:
+
+- trailing `14d` dataset populated
+- `164,766` synthetic events generated across `14` files
+- `16` dashboards and `255` saved searches deployed
+- live readiness checks green
+- eligible query audit green: `51/51` with rows
+
+Use this path instead of running the individual generator, ingest, and deploy scripts one by one unless you are debugging a specific stage.
 
 ## Prerequisites
 
 | Requirement | Current State |
 |-------------|---------------|
 | OCI Console access | `https://console.eu-frankfurt-1.oraclecloud.com` |
-| Ops Portal | `https://ops.octodemo.cloud` |
+| Demo Controls | `https://cp.octodemo.cloud` |
 | Control Plane | `https://cp.octodemo.cloud` |
 | Log Analytics | demo-observability compartment → Dashboards |
-| Test data ingested | 1,315 events across 12 log sources |
-| Dashboards deployed | 16 SOC dashboards + 249 saved searches |
+| Test data ingested | 164,766 events across 14 NDJSON datasets |
+| Dashboards deployed | 16 SOC dashboards + 255 saved searches |
 
 ---
 
@@ -33,7 +52,7 @@ This document provides a step-by-step demo workflow showcasing OCI Log Analytics
 **Talking Points:**
 - "This is a unified SOC overview pulling security events from OCI Audit, Windows Sysmon, Linux, Cloud Guard, and WAF — all in one dashboard."
 - "Each widget represents a detection rule converted from industry-standard Sigma format into OCI Log Analytics Query Language."
-- "428 detection rules covering 203 MITRE ATT&CK techniques, mapped to 14 tactics."
+- "The repo currently ships 454 source rules, 454 Sigma-derived OCI searches, and 211 MITRE ATT&CK techniques across 14 tactics."
 
 4. **Click into** `SOC: Console Login Failures` — show the OCL query behind it
 5. **Show** the hunting widget: `Hunt: SSH Brute Force` — highlight the frequency analysis pattern:
@@ -43,7 +62,7 @@ This document provides a step-by-step demo workflow showcasing OCI Log Analytics
    | sort -failed_attempts
    ```
 
-**Key Message:** "Every detection rule has full MITRE ATT&CK mapping, STIG compliance tagging, and validated OCL — no manual query writing needed."
+**Key Message:** "Every detection rule has full MITRE ATT&CK mapping, STIG compliance tagging, and validated OCL, and the generated catalog keeps the published inventory in sync with the code."
 
 ---
 
@@ -83,7 +102,7 @@ This document provides a step-by-step demo workflow showcasing OCI Log Analytics
    - DNS tunneling indicators
    - Named pipe activity (CobaltStrike, PsExec, Mimikatz)
 
-**Key Message:** "Full MITRE ATT&CK coverage from initial access through lateral movement and exfiltration — 229 Windows detection rules covering LOLBins, credential theft, persistence, defense evasion, and more."
+**Key Message:** "Full MITRE ATT&CK coverage from initial access through lateral movement and exfiltration — 249 Windows source rules covering LOLBins, credential theft, persistence, defense evasion, and more."
 
 ---
 
@@ -98,7 +117,7 @@ This document provides a step-by-step demo workflow showcasing OCI Log Analytics
 ### Steps
 
 1. **Open:** `SOC: APT Detection Dashboard`
-   - This is a dedicated BLUELIGHT kill chain dashboard with 12 widgets
+   - This is a dedicated BLUELIGHT kill chain dashboard with 17 widgets
 
 2. **Walk the kill chain** (top to bottom):
 
@@ -134,20 +153,20 @@ This document provides a step-by-step demo workflow showcasing OCI Log Analytics
    - Navigate to `rules/windows/apt/bluelight_graph_api_c2.yaml`
    - "Every detection starts as a portable Sigma rule. Our converter handles field mapping, log source resolution, and OCL syntax generation automatically."
 
-**Key Message:** "We took a real APT threat hunting report, converted 11 Splunk queries to OCI Log Analytics, added kill chain correlation, and deployed it as a production-ready dashboard — complete with Sigma YAML, SPL cross-reference, and threat intelligence metadata."
+**Key Message:** "We took a real APT threat hunting report, converted the BLUELIGHT detection set into OCI Log Analytics, added YARA-backed confirmation logic and kill chain correlation, and deployed it as a production-ready dashboard — complete with Sigma YAML, SPL cross-reference, and threat intelligence metadata."
 
 ---
 
-## Demo Scenario 4: Browser Attack Detection via APM (10 min)
+## Demo Scenario 4: Browser Attack Detection via `SOC Application Logs` (10 min)
 
-**Objective:** Show client-side attack detection using OCI APM and OpenTelemetry — a capability that WAF alone cannot provide.
+**Objective:** Show client-side attack detection using the `SOC Application Logs` telemetry surface — a capability that WAF alone cannot provide.
 
 ### Steps
 
 1. **Open:** `SOC: Browser Attack Detection Dashboard`
 
 2. **Explain the architecture:**
-   > "Traditional SIEMs only see server-side logs. By instrumenting the browser with OpenTelemetry and routing spans through OCI APM to Log Analytics, we detect client-side attacks that WAF can't see — DOM-based XSS, session hijacking, crypto mining scripts, and browser fingerprinting."
+   > "Traditional SIEMs only see server-side logs. In this demo, browser and application telemetry is normalized into `SOC Application Logs`, a custom OCI Log Analytics source with OpenTelemetry-shaped fields. That lets us detect client-side attacks that WAF can't see — DOM-based XSS, session hijacking, crypto mining scripts, and browser fingerprinting."
 
 3. **Walk through detections:**
 
@@ -165,10 +184,10 @@ This document provides a step-by-step demo workflow showcasing OCI Log Analytics
    - "This finds source IPs that are attempting multiple attack types — XSS AND SQLi from the same IP indicates a coordinated attack, not a scanner."
 
 5. **Connect to App 360** — Open `OCI-DEMO: Application 360 Monitoring Dashboard`:
-   - Show how APM traces correlate with security events
-   - "The same trace_id that shows a slow request in APM also shows a WAF block in the security dashboard."
+   - Show how application trace telemetry correlates with security events
+   - "The same trace ID that shows a slow request in the app telemetry view also shows a WAF block in the security dashboard."
 
-**Key Message:** "Browser-side detection is a significant blind spot for most organizations. By combining OCI APM, OpenTelemetry, and Log Analytics, we extend detection from the server all the way to the browser — covering OWASP Top 10 attacks that WAF can't see."
+**Key Message:** "Browser-side detection is a significant blind spot for most organizations. By normalizing browser and application telemetry into `SOC Application Logs`, we extend detection from the server all the way to the browser — covering OWASP Top 10 attack patterns that WAF alone cannot see."
 
 ---
 
@@ -199,14 +218,19 @@ This document provides a step-by-step demo workflow showcasing OCI Log Analytics
 
 ## Quick Reference: Demo Commands
 
-### Trigger Attack Simulation (via Ops Portal API)
+### Trigger Attack Simulation (via Control Plane API)
 ```bash
-# Generate fresh test data and ingest
-python3 scripts/generate_test_logs.py
-python3 scripts/ingest_test_data.py
+# Canonical 14-day refresh flow
+python3 scripts/populate_dashboard_data_14d.py --validate
 
-# Or trigger via Ops Portal
-curl -X POST https://ops.octodemo.cloud/api/demo-events/trigger \
+# Or run individual steps when debugging
+python3 scripts/generate_dashboard_data.py --days 14 --validate
+python3 scripts/ingest_test_data.py
+python3 scripts/deploy_dashboard.py --cleanup
+python3 scripts/demo_readiness.py --lookback 14d
+
+# Or trigger via the canonical public Control Plane
+curl -X POST https://cp.octodemo.cloud/api/demo-events/trigger \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"preset": "security_incident"}'
@@ -214,11 +238,8 @@ curl -X POST https://ops.octodemo.cloud/api/demo-events/trigger \
 
 ### Verify Dashboard Data
 ```bash
-# Check data is flowing
-python3 scripts/deploy_dashboard.py --dry-run
-
-# Validate queries
-python3 scripts/convert_sigma.py --validate
+python3 scripts/demo_readiness.py --lookback 14d
+python3 scripts/query_audit.py --lookback 14d --eligible-only --out /tmp/eligible_query_audit_14d.json
 ```
 
 ### Refresh Dashboards
@@ -258,10 +279,10 @@ python3 scripts/generate_catalog.py     # Regenerate catalog
 │    │ ┌──────────┐ │ └───────────────┘ └────────────┘              │
 │    │ │16 SOC    │ │                                                │
 │    │ │Dashboards│ │                                                │
-│    │ │249 Saved │ │                                                │
+│    │ │255 Saved │ │                                                │
 │    │ │Searches  │ │                                                │
-│    │ │428 Rules │ │                                                │
-│    │ │203 MITRE │ │                                                │
+│    │ │506 Assets│ │                                                │
+│    │ │211 MITRE │ │                                                │
 │    │ └──────────┘ │                                                │
 │    └──────────────┘                                                │
 │                                                                      │
@@ -274,13 +295,13 @@ python3 scripts/generate_catalog.py     # Regenerate catalog
 │         └────────┬───────┘                                          │
 │                  │                                                   │
 │        ┌─────────▼──────────┐                                       │
-│        │ OCI APM +          │                                       │
-│        │ OpenTelemetry      │──▶ Browser Attack Detection           │
-│        │ (Traces + RUM)     │    (XSS, SQLi, CSRF, Fingerprinting) │
+│        │ SOC Application    │                                       │
+│        │ Logs + OTel-shaped │──▶ Browser Attack Detection           │
+│        │ telemetry JSON     │    (XSS, SQLi, CSRF, Fingerprinting) │
 │        └────────────────────┘                                       │
 │                                                                      │
 │  ┌─────────────────────────────────────────────────┐                │
-│  │ Ops Portal (ops.octodemo.cloud)                 │                │
+│  │ Control Plane (cp.octodemo.cloud)               │                │
 │  │ ┌───────────┐ ┌──────────┐ ┌─────────────────┐ │                │
 │  │ │ One-Click │ │ Stress   │ │ Event Presets   │ │                │
 │  │ │ Controls  │ │ Tests    │ │ (P1/P2/P3/P4)   │ │                │
@@ -294,16 +315,15 @@ python3 scripts/generate_catalog.py     # Regenerate catalog
 
 ## Detection Coverage Matrix
 
-| Domain | Rules | MITRE Techniques | Dashboards | Key Detections |
-|--------|-------|-----------------|------------|----------------|
-| Windows Sysmon | 229 | 95 | 4 | LOLBins, credential theft, lateral movement, ransomware |
-| OCI Audit | 100 | 30 | 3 | IAM, network, compute, storage, STIG compliance |
-| Linux | 67 | 40 | 2 | Reverse shells, persistence, container escape, C2 |
-| Web/WAF | 38 | 15 | 2 | OWASP Top 10, scanner detection, brute force |
-| APT (BLUELIGHT) | 11 | 11 | 1 | Full APT37 kill chain (drive-by → exfil) |
-| Browser (APM) | 8 | 8 | 1 | XSS, SQLi, CSRF, session hijack, fingerprinting |
-| Hunting | 36 | - | 3 | Frequency, anomaly, scoring, kill chain correlation |
-| **Total** | **428+36** | **203** | **16** | |
+| Content Surface | Count | Dashboards | What to Emphasize |
+|----------------|-------|------------|-------------------|
+| Source Sigma/YAML rules | 454 | 14 | Windows, OCI, Linux, web, BLUELIGHT, and browser-side detections |
+| Sigma-derived OCI searches | 454 | 14 | 446 top-level detections + 8 browser/app telemetry detections |
+| Curated app telemetry analytics | 12 | 2 | App 360 correlation, WAF-to-trace pivots, service health |
+| Hunting analytics | 40 | 4 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation |
+| STIG-mapped detections | 24 | 1 | Continuous control monitoring for IAM, network, audit, and key management |
+| Sample datasets | 14 files / 146,632 events | Demo enablement | Includes app telemetry and the 14-day multicloud geo-health data for the geographic dashboard |
+| **Total shipped query artifacts** | **506** | **16** | **211 MITRE techniques across 14 tactics** |
 
 ---
 
@@ -313,6 +333,6 @@ python3 scripts/generate_catalog.py     # Regenerate catalog
 2. **Use the Ops Portal** for one-click event generation — no SSH needed
 3. **Start with Scenario 1** for executive audiences, skip to Scenario 3 for security teams
 4. **The BLUELIGHT scenario** is the strongest differentiator — show the SPL→OCL conversion
-5. **Browser attack detection** is unique to OCI APM — competitors don't have this
+5. **Browser attack detection** is powered by the custom `SOC Application Logs` telemetry surface, so explain the parser/source model rather than implying native OCI APM coverage
 6. **If a dashboard is empty**, run `python3 scripts/ingest_test_data.py` to refresh test data
 7. **Each query JSON includes** `splunk_original` for Splunk comparison during demos

@@ -1,0 +1,184 @@
+# OCI Log Analytics Detections Architecture
+
+Date: 2026-04-28
+
+## Purpose
+
+This repository is organized around a simple rule-publishing pipeline:
+
+1. Author portable detections as Sigma YAML under `rules/`
+2. Convert source rules into OCI Log Analytics query JSON
+3. Publish a canonical inventory for dashboards and downstream integrations
+4. Layer curated app and hunting analytics beside the generated detections
+
+The goal is to keep source authoring, generated content, and deployment metadata separate so the project stays maintainable as the catalog grows.
+
+One important detail for the current shipping implementation: browser and application detections do not query native OCI APM entities directly. They run against `SOC Application Logs`, a custom OCI Log Analytics JSON source whose schema is intentionally shaped like OpenTelemetry/browser telemetry but expressed using OCI LA display names.
+
+## Canonical Content Surfaces
+
+| Path | Type | Count | Notes |
+|------|------|-------|-------|
+| `rules/**` | Source Sigma/YAML authoring layer | 454 | Source of truth for source-derived detections |
+| `queries/*.json` | Generated top-level OCI detection queries | 446 | Produced by `scripts/convert_sigma.py` |
+| `queries/apps/*.json` | App telemetry query surface | 20 | 8 Sigma-derived browser detections + 12 curated app analytics |
+| `queries/hunting/*.json` | Curated hunting analytics | 40 | Frequency, anomaly, scoring, and correlation content |
+| `queries/catalog.json` | Canonical machine-readable inventory | 1 | Use this for published counts and downstream tooling |
+| `queries/manifest.json` | Export/integration manifest | 1 | Generated artifact for multicloud export, not the canonical inventory |
+
+Important distinction:
+
+- There are **454 Sigma-derived OCI queries** in total.
+- Those 454 are split across **446 top-level detections** in `queries/` and **8 browser/app telemetry detections** in `queries/apps/`.
+- The repo also ships **52 curated analytics** that are not Sigma-derived: 12 app telemetry analytics and 40 hunting queries.
+
+## Architecture Flow
+
+```text
+rules/** ------------------------------------------+
+                                                   |
+                                                   v
+                                      scripts/convert_sigma.py
+                                      - field/logsource mapping
+                                      - stable filename reuse via sigma_id
+                                      - browser rule routing to queries/apps/
+                                      - metadata preservation for curated JSON
+                                                   |
+                         +-------------------------+-------------------------+
+                         |                                                   |
+                         v                                                   v
+                 queries/*.json                               queries/apps/*.json
+           446 generated detections                    8 Sigma-derived browser queries
+
+queries/apps/*.json (12 curated app analytics) -------+
+queries/hunting/*.json (40 curated analytics) --------+----> scripts/generate_catalog.py
+                                                            - CATALOG.md
+                                                            - queries/catalog.json
+                                                            - inventory/coverage summary
+
+queries/** -----------------------------------------------> scripts/export_for_multicloud.py
+                                                            - queries/manifest.json
+                                                            - downstream integration payload
+
+queries/** -----------------------------------------------> scripts/deploy_dashboard.py
+                                                            - 16 dashboards
+                                                            - 255 embedded saved searches
+```
+
+## Design Invariants
+
+- `rules/**` is the authoring layer. Do not treat generated JSON as the primary source for source-derived detections.
+- `sigma_id` is the durable identity for generated detections. Generated filenames should remain stable even if titles change.
+- Rules under `rules/web/browser_attacks/` intentionally publish into `queries/apps/` because they execute against `SOC Application Logs`, a custom app/browser telemetry surface rather than the top-level server-side detection surface.
+- `queries/catalog.json` is the canonical inventory for documentation, exports, and automation.
+- `queries/manifest.json` is an integration artifact. It should be regenerated from the current queries, but it is not the canonical source for published counts.
+- `logandetectionqueries/` and `logandetectionrules/` are legacy empty directories and should not be consumed by tooling.
+
+## Application Telemetry Surface
+
+`scripts/setup_log_sources.py` creates the `SOC Application Logs` source and parser used by the browser/app dashboards. The parser maps OpenTelemetry-shaped JSON onto OCI Log Analytics fields such as:
+
+- `Service Name`
+- `Trace ID`
+- `Request URL`
+- `Response Code`
+- `Span Name`
+- `Span Attributes`
+- `Referrer`
+
+This keeps the query layer stable even when the raw event producer is browser JavaScript, an application service, or a synthetic NDJSON dataset committed to `test_data/`.
+
+## Capability Inventory
+
+- Source rule coverage:
+  - Windows: 249
+  - Cloud/OCI: 100
+  - Linux: 67
+  - Web/WAF: 38
+- Combined query inventory:
+  - 506 total query artifacts
+  - 211 MITRE ATT&CK techniques across 14 tactics
+  - 24 STIG-mapped detections across 12 controls
+- Dashboard layer:
+  - 16 dashboards
+  - 255 widget-backed saved searches
+- Demo/test data:
+  - 14 NDJSON files
+  - 146,632 sample events checked into `test_data/`
+- Streaming/runtime surface:
+  - 5 configured SOC detection streams validated end-to-end
+  - `soc-detection-multicloud-health` is active in the current environment
+
+## Validation Pipeline
+
+Use these commands as the baseline release/verification loop:
+
+```bash
+python3 scripts/setup_log_sources.py
+python3 scripts/convert_sigma.py
+python3 scripts/generate_catalog.py
+python3 scripts/export_for_multicloud.py --manifest-only
+python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md
+python3 scripts/deploy_dashboard.py --dry-run
+python3 -m pytest -q
+python3 -m compileall scripts
+```
+
+Use these live OCI checks when validating the deployed environment:
+
+```bash
+python3 scripts/setup_streaming_pipeline.py
+python3 scripts/validate_pipeline.py --e2e
+python3 scripts/verify_caldera_detections.py --operation discovery --lookback 60d
+```
+
+Current local verified state on 2026-04-28:
+
+- Rule quality audit: 0 issues
+- Unit tests: 81 passing
+- Dashboard dry-run: 16 dashboards / 255 saved searches resolved
+- Dashboard validation: 506 query files OK
+- Ingest validation: 14 datasets and log source mappings passed
+- Log-source pre-flight validation: passed
+
+Previously live-verified on 2026-04-15:
+
+- Pipeline E2E validation: passed
+- Caldera discovery verification: 3/3 queries matched
+- Log-source setup: parsers and sources aligned with no missing Windows Sysmon fields
+- Streaming pipeline reconciliation: 5/5 SOC connectors active
+
+Current runtime note:
+
+- `validate_pipeline.py` derives expected streams and connector names from `config/streaming_config.json`, so the multicloud-health path is verified alongside the core SOC streams.
+- Direct NDJSON ingestion and the SOC streaming pipeline are both operational.
+
+## Companion Dashboard
+
+`../LoganSecurityDashboardv0` is the companion operator UI for this content library. This repository remains the canonical content source; the dashboard should consume generated artifacts through a stable export, API, or MCP boundary.
+
+Supported dashboard-facing artifacts:
+
+- `queries/catalog.json`
+- `queries/manifest.json`
+- `queries/*.json`
+- `queries/apps/*.json`
+- `queries/hunting/*.json`
+- `test_data/manifest.json`
+
+The dashboard should not duplicate Sigma conversion, dashboard deployment, or query catalog generation.
+
+## Contribution Model
+
+Use the surface that matches the content you are adding:
+
+- New source-derived detections:
+  - Add Sigma YAML under `rules/**`
+  - For browser-side detections, place the rule under `rules/web/browser_attacks/`
+- New curated app analytics:
+  - Add JSON under `queries/apps/`
+  - Do not add a `sigma_id` unless the file is source-derived
+- New hunting analytics:
+  - Add JSON under `queries/hunting/`
+
+After changes, regenerate the catalog and rerun the validation pipeline so published inventory and dashboard references stay aligned.

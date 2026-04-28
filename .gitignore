@@ -38,3 +38,8 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Health-check artifacts (timestamped JSON / banners written by
+# scripts/daily_health_check.py)
+docs/health/*.json
+!docs/health/.gitkeep

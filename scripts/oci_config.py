@@ -82,10 +82,13 @@ SOURCE_CANDIDATE_GROUPS = {
     "oci_audit": [
         "OCI Audit Logs",
     ],
+    # SOC source first: native OCI Cloud Guard Problems parser does not extract
+    # the ``problemName`` JSON field that detections queries on, so test data
+    # must land in SOC Cloud Guard Logs whose parser maps it to ``Problem Name``.
     "cloud_guard": [
+        "SOC Cloud Guard Logs",
         "OCI Cloud Guard Problems",
         "OCI Cloud Guard Logs",
-        "SOC Cloud Guard Logs",
     ],
     # No exact native equivalent covers all SOC Linux Syslog detection patterns.
     "linux_syslog": [

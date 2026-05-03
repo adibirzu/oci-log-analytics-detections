@@ -8,7 +8,9 @@ logsource:
 detection:
   selection:
     event_type: com.oraclecloud.computeapi.terminateinstance
-    status: Success
+    status:
+      - Success
+      - '200'
   condition: selection
 level: medium
 tags:

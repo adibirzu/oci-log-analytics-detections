@@ -339,10 +339,12 @@ def generate_oci_audit_events():
         ))
 
     # ── Admin Policy Created with 'manage all-resources' ──
-    # The ``manage all-resources`` keyword is also surfaced in resource_name
-    # so it lands in the top-level ``Resource Name`` parsed column AND inside
-    # the truncation window of ``Original Log Content`` for queries that LIKE
-    # the raw envelope.
+    # The ``manage all-resources`` keyword is surfaced in three places so the
+    # OCI LA truncation of ``Original Log Content`` (cuts at ~1024 chars
+    # inside ``data.identity``) cannot hide it from the LIKE filter:
+    #   - ``data.additionalDetails`` (very early in the envelope)
+    #   - ``resourceName`` (top-level ``Resource Name`` parsed column)
+    #   - ``response.payload.statements`` (the actual policy text)
     for i in range(3):
         events.append(oci_audit_event(
             "com.oraclecloud.identitycontrolplane.createpolicy",
@@ -350,8 +352,41 @@ def generate_oci_audit_events():
             response_payload={
                 "statements": ["Allow group admins to manage all-resources in tenancy"]
             },
-            offset=900+i
+            offset=900+i,
         ))
+    # Override additional_details with the manage-all keyword via the
+    # canonical schema builder. We re-emit with explicit additionalDetails
+    # so the LIKE on Original Log Content matches before truncation.
+    from schemas import build_oci_audit_event
+    for i in range(3):
+        ev = build_oci_audit_event(
+            "com.oraclecloud.identitycontrolplane.createpolicy",
+            event_time=ts(903 + i),
+            principal_id="ocid1.user.oc1..aaa1",
+            principal_name="admin@corp.example.com",
+            auth_type="natv",
+            ip_address=random.choice(SUSPICIOUS_IPS),
+            compartment_id=COMPARTMENT_ID,
+            compartment_name="security-test",
+            tenant_id="ocid1.tenancy.oc1..example",
+            resource_name="admin-policy: manage all-resources in tenancy",
+            user_agent="Oracle-JavaSDK/2.0 (test-simulation)",
+            response_status="200",
+            response_payload={
+                "statements": ["Allow group admins to manage all-resources in tenancy"]
+            },
+            additional_details={
+                "policyStatements": "manage all-resources in tenancy",
+                "auditTag": "admin-policy-manage-all-resources",
+            },
+        )
+        ev["Status"] = "Success"
+        ev["oracle"] = {
+            "compartmentid": COMPARTMENT_ID,
+            "ingestedtime": ts(903 + i),
+            "tenantid": "ocid1.tenancy.oc1..example",
+        }
+        events.append(ev)
 
     # ═══════════════════════════════════════════════════════════════
     #  NEW: STIG Compliance OCI Audit Events

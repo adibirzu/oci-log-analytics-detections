@@ -110,7 +110,12 @@ SOURCE_CANDIDATE_GROUPS = {
     "windows_event_system": [
         "Windows Event System Logs",
     ],
+    # SOC source first: native ``Linux Secure Logs`` parser does not extract
+    # ``Command Line`` from our JSON, so detection queries that LIKE on
+    # argv (crontab -e, sudo -i, etc.) never match. SOC Linux Syslog parser
+    # accepts the same JSON shape and exposes the Command Line column.
     "linux_secure": [
+        "SOC Linux Syslog Logs",
         "Linux Secure Logs",
     ],
     # SOC source first: native sources use XML parsers that can't parse JSON uploads

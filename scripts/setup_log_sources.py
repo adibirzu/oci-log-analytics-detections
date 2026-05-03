@@ -459,6 +459,7 @@ LINSEC_FIELD_MAPPINGS = [
     ("Facility",             "$.Facility",        12),
     ("Severity Level",       "$.Severity",        13),
     ("Endpoint OS",          "$.EndpointOS",      14),
+    ("Command Line",         "$.CommandLine",     15),
 ]
 LINSEC_EXAMPLE = {
     "EndpointOS": "Linux",

@@ -146,6 +146,14 @@ def oci_audit_event(event_type, user=None, ip=None, status="200",
         "ingestedtime": ts(offset),
         "tenantid": "ocid1.tenancy.oc1..example",
     }
+    # OCI LA OCI Audit native parser exposes the parsed Status field as the
+    # raw HTTP status by default ("200", "404"), but several detection queries
+    # expect the operator-friendly form ("Success" / "Failure"). Override the
+    # ``Status`` parallel column so both forms are queryable.
+    if str(status).startswith("2"):
+        event["Status"] = "Success"
+    elif str(status).startswith(("4", "5")):
+        event["Status"] = "Failure"
     return event
 
 
@@ -309,11 +317,15 @@ def generate_oci_audit_events():
         ))
 
     # ── Console Login Events ──
-    for i in range(3):
+    # Successful logins from suspicious IPs feed both the "console login from
+    # unusual IP" and "console login Success" detections. ``oci_audit_event``
+    # tags Status="Success" automatically when the HTTP status starts with 2.
+    for i in range(8):
         events.append(oci_audit_event(
             "com.oraclecloud.consolesignon.login",
             ip=random.choice(SUSPICIOUS_IPS),
-            resource_name="",
+            status="200",
+            resource_name="console-session",
             offset=800+i
         ))
     # Login failures
@@ -327,10 +339,14 @@ def generate_oci_audit_events():
         ))
 
     # ── Admin Policy Created with 'manage all-resources' ──
+    # The ``manage all-resources`` keyword is also surfaced in resource_name
+    # so it lands in the top-level ``Resource Name`` parsed column AND inside
+    # the truncation window of ``Original Log Content`` for queries that LIKE
+    # the raw envelope.
     for i in range(3):
         events.append(oci_audit_event(
             "com.oraclecloud.identitycontrolplane.createpolicy",
-            resource_name="admin-policy",
+            resource_name="admin-policy: manage all-resources in tenancy",
             response_payload={
                 "statements": ["Allow group admins to manage all-resources in tenancy"]
             },
@@ -2174,6 +2190,26 @@ def generate_windows_events():
 
     events.extend(_bluelight_kill_chain_sysmon_events())
 
+    # ── Rare processes (Hunt: Windows Rare Processes) ──
+    # The hunting query thresholds executions < 80 across the 14-day window.
+    # Emit a handful of unique binaries that appear exactly once each so the
+    # rare-process tail of the distribution is non-empty when the dataset is
+    # multiplied by ``expand_events_over_days``.
+    rare_binaries = [
+        ("C:\\Tools\\rare_recon.exe", "rare_recon.exe -enum users"),
+        ("C:\\Users\\Public\\beacon_unique.exe", "beacon_unique.exe -c attacker.example"),
+        ("C:\\Temp\\loader_x42.exe", "loader_x42.exe /quiet /payload"),
+        ("C:\\Tools\\custom_persist.exe", "custom_persist.exe install"),
+        ("C:\\Users\\Public\\anomaly_dropper.exe", "anomaly_dropper.exe stage"),
+        ("C:\\ProgramData\\unique_loader.exe", "unique_loader.exe /run"),
+    ]
+    for i, (image, cmd) in enumerate(rare_binaries):
+        events.append(sysmon_event(
+            event_id=1, image=image, command_line=cmd,
+            parent_image="C:\\Windows\\explorer.exe",
+            offset=900 + i,
+        ))
+
     return events
 
 
@@ -2688,6 +2724,12 @@ def linux_secure_event(process, message, host=None, user=None,
         "Facility": facility,
         "Severity": severity,
         "msg": message,
+        # ``Command Line`` is required by detection queries that look for
+        # specific argv shapes (crontab -e, sudo flags, etc.). Mirror the
+        # syslog message into the Command Line column so those queries
+        # match without the parser having to guess from raw msg.
+        "CommandLine": message,
+        "Command Line": message,
         "SourceIP": source_ip or random.choice(SUSPICIOUS_IPS),
         "User": user,
         "AuthMethod": auth_method or "password",
@@ -2787,6 +2829,26 @@ def generate_linux_secure():
         ))
 
     # ── Crontab modification (T1053.003) ──
+    # Detection queries also LIKE the Command Line for ``-e`` / ``-r`` /
+    # ``/tmp/`` / ``/var/tmp/`` / ``/dev/shm/`` patterns indicative of
+    # interactive editing or scripted persistence drops. Emit explicit
+    # variants so the SOC: Linux Security widget matches.
+    crontab_argv = [
+        "crontab -e",
+        "crontab -r",
+        "crontab -e /tmp/payload.cron",
+        "crontab -e /var/tmp/persist.cron",
+        "crontab -l > /dev/shm/cronbackup",
+        "crontab /tmp/.hidden-cron",
+    ]
+    for i, argv in enumerate(crontab_argv):
+        actor = random.choice(THREAT_ACTORS)
+        events.append(linux_secure_event(
+            "crontab",
+            f"({actor}) CMD ({argv})",
+            user=actor, facility="cron",
+            offset=295+i,
+        ))
     for i in range(6):
         actor = random.choice(THREAT_ACTORS)
         events.append(linux_secure_event(
@@ -3374,10 +3436,42 @@ def generate_sysmon_operational():
     events.extend(_bluelight_kill_chain_sysmon_op_events())
 
     # ── Event 17: Named Pipe Creation (C2 indicator) ──
+    # Includes pipe-name fingerprints used by:
+    #   - Cobalt Strike post-ex: MSSE-*, postex_*, postex_ssh_*, status_*,
+    #     msagent_*, interprocess, mojo, DserNamePipe, winsock, UIA_PIPE
+    #   - PsExec lateral movement: PSEXESVC, csexec, remcom, PAExec
+    #   - Mimikatz coercion / RPC: lsass, ntsvcs, scerpc, samr, evil_pipe
     pipes = [
+        # Generic / placeholders kept for backwards compatibility
         "\\\\.\\pipe\\evil_pipe", "\\\\.\\pipe\\cobaltstrike",
         "\\\\.\\pipe\\meterpreter", "\\\\.\\pipe\\msf_rpc",
         "\\\\.\\pipe\\beacon_pipe",
+        # Cobalt Strike named-pipe IOCs (T1055.011)
+        "\\\\.\\pipe\\MSSE-1234-server",
+        "\\\\.\\pipe\\MSSE-9876-secret",
+        "\\\\.\\pipe\\postex_4f3c",
+        "\\\\.\\pipe\\postex_ssh_a1b2",
+        "\\\\.\\pipe\\status_77",
+        "\\\\.\\pipe\\msagent_55",
+        "\\\\.\\pipe\\interprocess_8e",
+        "\\\\.\\pipe\\mojo.5550.7421.81",
+        "\\\\.\\pipe\\chrome.5550.7421.81",
+        "\\\\.\\pipe\\DserNamePipe22",
+        "\\\\.\\pipe\\winsock-2",
+        "\\\\.\\pipe\\UIA_PIPE_010",
+        # PsExec named-pipe IOCs (T1021.002)
+        "\\\\.\\pipe\\PSEXESVC",
+        "\\\\.\\pipe\\PSEXESVC-WS01-1234-stdin",
+        "\\\\.\\pipe\\PSEXESVC-WS02-5678-stdout",
+        "\\\\.\\pipe\\psexec",
+        "\\\\.\\pipe\\csexec",
+        "\\\\.\\pipe\\remcom_communicaton",
+        "\\\\.\\pipe\\PAExec-1234-WS01",
+        # Mimikatz / coercion named pipes (T1003)
+        "\\\\.\\pipe\\mimikatz",
+        "\\\\.\\pipe\\mimikatz_lsass",
+        "\\\\.\\pipe\\lsadump_secrets",
+        "\\\\.\\pipe\\ntsvcs_steal",
     ]
     for i, pipe in enumerate(pipes):
         for j in range(2):
@@ -3643,18 +3737,28 @@ def generate_sysmon_network_events():
         ))
 
     # ── DNS Tunneling: port 53 from suspicious processes ──
-    for i in range(8):
-        events.append(sysmon_network_event(
-            image=random.choice([
-                "C:\\Windows\\System32\\powershell.exe",
-                "C:\\Windows\\System32\\nslookup.exe",
-                "C:\\Windows\\System32\\cmd.exe",
-            ]),
-            dst_ip="8.8.8.8", dst_port=53, protocol="udp",
-            technique_name="DNS", technique_id="T1071.004",
-            msg="DNS tunnel via suspicious process",
-            offset=170 + i,
-        ))
+    # Detection ``sysmon_dns_tunneling_via_network_connection`` matches:
+    #   Destination Port = 53 AND Initiated = true AND
+    #   Process Name in (powershell.exe, cmd.exe, nslookup.exe, iodine.exe,
+    #   dnscat2.exe, dns2tcp.exe), excluding svchost.exe and dns.exe.
+    dns_tunnel_procs = [
+        "C:\\Windows\\System32\\powershell.exe",
+        "C:\\Windows\\System32\\nslookup.exe",
+        "C:\\Windows\\System32\\cmd.exe",
+        "C:\\Tools\\iodine.exe",
+        "C:\\Tools\\dnscat2.exe",
+        "C:\\Tools\\dns2tcp.exe",
+    ]
+    for i, proc in enumerate(dns_tunnel_procs):
+        for j in range(3):
+            events.append(sysmon_network_event(
+                image=proc,
+                dst_ip="8.8.8.8", dst_port=53, protocol="udp",
+                initiated="true",
+                technique_name="DNS", technique_id="T1071.004",
+                msg=f"DNS tunnel via {proc.split(chr(92))[-1]}",
+                offset=170 + i * 4 + j,
+            ))
 
     # ── Kerberoasting: Kerberos (port 88) ──
     for i in range(6):
@@ -3761,12 +3865,14 @@ WAF_HOST = "sevenkingdoms.example.com"
 
 def waf_event(action, http_method, url, rule_type="PROTECTION_RULES", rule_key="",
               client_ip=None, user_agent=None, response_code="403",
-              body_data="", content_type="text/html", trace_id=None, offset=0):
+              body_data="", content_type="text/html", trace_id=None,
+              request_headers=None, offset=0):
     """Generate a WAF security event."""
     if client_ip is None:
         client_ip = random.choice(ATTACKER_IPS)
     if user_agent is None:
         user_agent = random.choice(ATTACKER_UAS)
+    headers = request_headers if request_headers is not None else f"Host: {WAF_HOST}"
     return {
         "timeCreated": ts(offset),
         "action": action,
@@ -3783,7 +3889,7 @@ def waf_event(action, http_method, url, rule_type="PROTECTION_RULES", rule_key="
         "bodyData": body_data,
         "contentType": content_type,
         "referer": "",
-        "requestHeaders": f"Host: {WAF_HOST}",
+        "requestHeaders": headers,
         "wafPolicy": "seven-kingdoms-portal-waf",
         "fingerprint": uuid.uuid4().hex[:12],
         "traceId": trace_id or f"trace_{uuid.uuid4().hex[:16]}",
@@ -4035,9 +4141,39 @@ def generate_waf_events():
                             rule_key="920100",
                             body_data="", offset=66))
 
-    # CORS bypass
-    events.append(waf_event("BLOCK", "GET", "/vulnerable/api/data",
-                            rule_key="920100", offset=67))
+    # CORS bypass — explicit Origin header attacks blocked by WAF.
+    cors_origins = [
+        "Origin: null",
+        "Origin: http://evil.example.com",
+        "Origin: https://evil.example.com",
+        "Origin: http://attacker.local",
+        "Origin: https://attacker.local",
+        "Access-Control-Allow-Origin: *",
+    ]
+    for i, origin_hdr in enumerate(cors_origins):
+        events.append(waf_event(
+            "BLOCK", "GET", "/vulnerable/api/data",
+            rule_key="980100",
+            request_headers=f"Host: {WAF_HOST}\n{origin_hdr}",
+            offset=67 + i,
+        ))
+
+    # SQLi attack ALLOWED through (audit / alert-only mode) — separate
+    # detection widget covers cases where the rule fired without blocking.
+    sqli_allowed_payloads = [
+        "/api/orders?id=1' OR '1'='1",
+        "/api/users?email=admin'--",
+        "/api/products?cat=1 UNION SELECT password FROM users--",
+        "/api/login?u=admin'/**/OR/**/1=1--",
+        "/search?q=' OR sleep(5)--",
+    ]
+    for i, payload_url in enumerate(sqli_allowed_payloads):
+        events.append(waf_event(
+            "ALLOW", "GET", payload_url,
+            rule_key="942100",
+            response_code="200",
+            offset=80 + i,
+        ))
 
     cross_tier_attacks = [
         ("BLOCK", "GET", "/crm/search?q=%3Cscript%3Ealert(1)%3C/script%3E",

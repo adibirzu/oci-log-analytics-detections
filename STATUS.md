@@ -1,20 +1,21 @@
 # Project Status
 
-Date: 2026-04-28
+Date: 2026-05-03
 
 ## Current State
 
+- Core scope: OCI Log Analytics query generation, synthetic log generation, query/dashboard validation, and OCI dashboard creation.
 - Source Sigma/YAML rules: 454
-- Sigma-derived OCI queries: 454
-  - 446 top-level detections in `queries/`
+- Sigma-derived OCI query artifacts: 486
+  - 478 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
 - Curated analytics: 61
   - 16 app telemetry analytics
   - 45 hunting analytics
-- Total query artifacts: 515
+- Total query artifacts: 547
 - Dashboards: 16
 - Saved searches: 264
-- Generated demo data: 14 NDJSON files / 2,837 events in the latest local `test_data/manifest.json`
+- Generated demo data: 14 NDJSON files / 2,904 events in the latest local `test_data/manifest.json`
 - MITRE ATT&CK coverage: 211 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
 
@@ -38,13 +39,26 @@ Date: 2026-04-28
 - BLUELIGHT kill-chain test data is mirrored into both `windows_sysmon.jsonl` (SOC Windows Sysmon parser, 35 field maps) and `sysmon_operational.jsonl` (Sysmon Operational parser) so per-widget detections match through whichever parser route propagates first.
 - All BLUELIGHT queries standardised on quoted `'Event ID' = 'N'` form — OCI LA returns HTTP 400 on unquoted numeric comparisons against String-typed fields, so the convention applies repo-wide for parser-string fields.
 - `scripts/smoke_test_bluelight.py` — live OCI LA query runner reports HIT/MISS/ERROR per widget with row counts, used as the green-light gate before deploys.
+- Synthetic OCI audit logs now expose operator-friendly `Status` labels and policy keywords needed by dashboard searches; Windows, Sysmon, Linux, and WAF datasets now include rare processes, named-pipe IOCs, DNS tunneling tools, Linux command lines, CORS attacks, and allowed SQLi cases so matching widgets populate from generated data.
 - `test_data/manifest.json` is rebuilt from generated `*.jsonl` files rather than hand-maintained counts.
 - Streaming pipeline reconciliation refreshes `config/streaming_config.json` against the active tenancy resources.
 - `LoganSecurityDashboardv0` is documented as the companion operator UI and consumes this repo's catalog, dashboard inventory, and test-data artifacts instead of duplicating detection-generation logic.
 
+## Branch and Worktree State
+
+- Only `main`, `origin/main`, and `origin/HEAD -> origin/main` are present after `git fetch --all --prune`.
+- The worktree was clean at the start of the 2026-05-03 scope cleanup pass.
+- Optional runtime helpers remain in the repository for Log Analytics ingestion support, but the canonical surfaces are `rules/**`, `queries/**`, generated manifests, synthetic logs, and dashboard deployment scripts.
+
 ## Quality and Verification
 
-Local and pre-flight verification on 2026-04-28:
+Local scope-cleanup verification on 2026-05-03:
+
+- `python3 -m pytest -q`: 129 passed, 5 skipped
+- `python3 -m compileall -q scripts`: passed
+- `python3 scripts/generate_test_logs.py --days 1 --validate`: 2,904 events across 14 files; 547 query files counted across query surfaces
+
+Previous local and pre-flight verification on 2026-04-28 before the current catalog expansion:
 
 - `python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md`
   - 454 rules / 454 source-derived queries / 0 issues
@@ -101,7 +115,7 @@ Previously live-verified on 2026-04-15:
 
 - `validate_pipeline.py` now derives expected streams/connectors from `config/streaming_config.json`, so the multicloud-health connector is validated alongside the core SOC pipeline.
 - Redundant active connectors were removed from the compartment without affecting the SOC streaming path.
-- `test_data/manifest.json` is current as of 2026-04-28 and reports 2,837 generated local events. `test_data/` is ignored by git and should be regenerated before a fresh ingest.
+- `test_data/manifest.json` is current as of 2026-05-03 and reports 2,904 generated local events. `test_data/` is ignored by git and should be regenerated before a fresh ingest.
 
 ## Documentation Map
 

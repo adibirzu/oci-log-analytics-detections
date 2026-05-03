@@ -5758,7 +5758,7 @@
         "lateral_movement",
         "execution"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Pipe Name' like '\\\\PSEXESVC*' or 'Pipe Name' like '\\\\psexec*' or 'Pipe Name' like '\\\\csexec*' or 'Pipe Name' like '\\\\remcom*' or 'Pipe Name' like '\\\\PAExec*')))"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Pipe Name' like '*\\\\PSEXESVC*' or 'Pipe Name' like '*\\\\psexec*' or 'Pipe Name' like '*\\\\csexec*' or 'Pipe Name' like '*\\\\remcom*' or 'Pipe Name' like '*\\\\PAExec*')))"
     },
     {
       "filename": "sysmon_rdp_lateral_movement.json",

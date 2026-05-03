@@ -4158,18 +4158,21 @@ def generate_waf_events():
             offset=67 + i,
         ))
 
-    # SQLi attack ALLOWED through (audit / alert-only mode) — separate
-    # detection widget covers cases where the rule fired without blocking.
+    # SQLi attack DETECTED but allowed through (audit / log-only mode).
+    # The detection widget filters Action='DETECT' explicitly to surface
+    # WAF events where the rule fired without blocking the request.
     sqli_allowed_payloads = [
         "/api/orders?id=1' OR '1'='1",
         "/api/users?email=admin'--",
         "/api/products?cat=1 UNION SELECT password FROM users--",
-        "/api/login?u=admin'/**/OR/**/1=1--",
-        "/search?q=' OR sleep(5)--",
+        "/api/login?u=admin' OR 1=1--",
+        "/search?q=' or 1=1 SLEEP(5)--",
+        "/api/data?q=DROP TABLE users--",
+        "/api/settings?key=' UNION SELECT * FROM INFORMATION_SCHEMA.TABLES--",
     ]
     for i, payload_url in enumerate(sqli_allowed_payloads):
         events.append(waf_event(
-            "ALLOW", "GET", payload_url,
+            "DETECT", "GET", payload_url,
             rule_key="942100",
             response_code="200",
             offset=80 + i,

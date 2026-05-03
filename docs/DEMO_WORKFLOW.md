@@ -23,7 +23,7 @@ python3 scripts/deploy_dashboard.py --cleanup
 
 Validated on `2026-05-03` for local generation and on `2026-04-28` for direct OCI ingest/smoke/deploy:
 
-- `2,904` synthetic events generated across `14` files
+- `2,922` synthetic events generated across `14` files
 - `14/14` files uploaded to OCI Log Analytics through direct ingest
 - `17/17` BLUELIGHT widgets returned rows with a 24-hour lookback
 - `16` dashboards and `264` saved searches resolve from generated inventory
@@ -40,7 +40,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 | Demo Controls | `https://cp.octodemo.cloud` |
 | Control Plane | `https://cp.octodemo.cloud` |
 | Log Analytics | demo-observability compartment → Dashboards |
-| Test data ingested | 2,904 generated events across 14 NDJSON datasets |
+| Test data ingested | 2,922 generated events across 14 NDJSON datasets |
 | Dashboards configured | 16 SOC dashboards + 264 saved searches |
 
 ---
@@ -337,7 +337,7 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 | Curated app telemetry analytics | 16 | 2 | App 360 correlation, WAF-to-trace pivots, service health, APM/WAF showcase views |
 | Hunting analytics | 45 | 4 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation |
 | STIG-mapped detections | 24 | 1 | Continuous control monitoring for IAM, network, audit, and key management |
-| Sample datasets | 14 generated files / 2,904 events | Demo enablement | Includes app telemetry and 60 minutes of multicloud geo-health data for the geographic dashboard |
+| Sample datasets | 14 generated files / 2,922 events | Demo enablement | Includes app telemetry and 60 minutes of multicloud geo-health data for the geographic dashboard |
 | **Total shipped query artifacts** | **547** | **16** | **211 MITRE techniques across 14 tactics** |
 
 ---

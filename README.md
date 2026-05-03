@@ -29,7 +29,7 @@ This repository ships both source authoring content and generated OCI query asse
 - **Combined MITRE ATT&CK coverage:** 211 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Dashboard inventory:** 16 dashboards with 264 saved searches and 16 advanced visualization widgets
-- **Generated demo data:** 2,904 events across 14 NDJSON files in the latest local `test_data/manifest.json`
+- **Generated demo data:** 2,922 events across 14 NDJSON files in the latest local `test_data/manifest.json`
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 
 Canonical inventory and supporting documentation:

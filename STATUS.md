@@ -15,7 +15,7 @@ Date: 2026-05-03
 - Total query artifacts: 547
 - Dashboards: 16
 - Saved searches: 264
-- Generated demo data: 14 NDJSON files / 2,904 events in the latest local `test_data/manifest.json`
+- Generated demo data: 14 NDJSON files / 2,922 events in the latest local `test_data/manifest.json`
 - MITRE ATT&CK coverage: 211 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
 
@@ -56,7 +56,8 @@ Local scope-cleanup verification on 2026-05-03:
 
 - `python3 -m pytest -q`: 129 passed, 5 skipped
 - `python3 -m compileall -q scripts`: passed
-- `python3 scripts/generate_test_logs.py --days 1 --validate`: 2,904 events across 14 files; 547 query files counted across query surfaces
+- `python3 scripts/generate_test_logs.py --days 1 --validate`: 2,922 events across 14 files; 547 query files counted across query surfaces
+- `python3 scripts/deploy_dashboard.py --validate`: 547 query files OK
 
 Previous local and pre-flight verification on 2026-04-28 before the current catalog expansion:
 
@@ -115,7 +116,7 @@ Previously live-verified on 2026-04-15:
 
 - `validate_pipeline.py` now derives expected streams/connectors from `config/streaming_config.json`, so the multicloud-health connector is validated alongside the core SOC pipeline.
 - Redundant active connectors were removed from the compartment without affecting the SOC streaming path.
-- `test_data/manifest.json` is current as of 2026-05-03 and reports 2,904 generated local events. `test_data/` is ignored by git and should be regenerated before a fresh ingest.
+- `test_data/manifest.json` is current as of 2026-05-03 and reports 2,922 generated local events. `test_data/` is ignored by git and should be regenerated before a fresh ingest.
 
 ## Documentation Map
 

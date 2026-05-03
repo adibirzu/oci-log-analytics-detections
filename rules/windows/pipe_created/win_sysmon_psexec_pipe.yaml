@@ -14,7 +14,7 @@ logsource:
   category: pipe_created
 detection:
   sel_psexec:
-    PipeName|startswith:
+    PipeName|contains:
     - \PSEXESVC
     - \psexec
     - \csexec

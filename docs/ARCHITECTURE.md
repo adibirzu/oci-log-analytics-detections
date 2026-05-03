@@ -111,7 +111,7 @@ This keeps the query layer stable even when the raw event producer is browser Ja
   - 16 advanced visualization widgets (`tile`, `sunburst`, `summary_table`, `line`, `bar`, `link`, and `map`)
 - Demo/test data:
   - 14 NDJSON files
-  - 2,904 sample events in the latest generated local `test_data/manifest.json`
+  - 2,922 sample events in the latest generated local `test_data/manifest.json`
   - `test_data/` is ignored by git and should be regenerated before a fresh OCI ingest
 - Streaming/runtime surface:
   - 5 configured SOC detection streams validated end-to-end

@@ -210,6 +210,7 @@ LINUX_FIELD_MAPPINGS = [
     ("Source IP",        "$.SourceIP",   9),
     ("Auth Method",      "$.AuthMethod", 10),
     ("Session Type",     "$.SessionType", 11),
+    ("Command Line",     "$.CommandLine", 12),
 ]
 LINUX_EXAMPLE = {
     "Timestamp": "2026-02-10T10:30:00.000Z",

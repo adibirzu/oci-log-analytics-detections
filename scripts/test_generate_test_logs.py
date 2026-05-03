@@ -163,7 +163,7 @@ class TestGenerateTestLogs(unittest.TestCase):
         ]
         allowed_sqli = [
             event for event in events
-            if event.get("action") == "ALLOW"
+            if event.get("action") == "DETECT"
             and event.get("responseCode") == "200"
             and any(token in event.get("requestUrl", "") for token in ("UNION SELECT", "sleep(5)", "'--"))
         ]

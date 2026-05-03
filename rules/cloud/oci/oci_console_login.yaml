@@ -11,7 +11,9 @@ logsource:
 detection:
   selection:
     event_type: com.oraclecloud.consolesignon.login
-    status: Success
+    status:
+      - Success
+      - '200'
   condition: selection
 falsepositives:
 - Legitimate user travel

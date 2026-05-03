@@ -7,10 +7,13 @@ logsource:
   product: oci
   service: audit
 detection:
-  selection:
+  selection_payload:
     event_type: com.oraclecloud.identitycontrolplane.createpolicy
     response_payload|contains: manage all-resources
-  condition: selection
+  selection_resource:
+    event_type: com.oraclecloud.identitycontrolplane.createpolicy
+    resource_name|contains: manage all-resources
+  condition: selection_payload or selection_resource
 level: high
 tags:
 - attack.privilege_escalation

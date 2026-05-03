@@ -2,22 +2,34 @@
 
 A comprehensive STIG-compliant detection rules library for Oracle Cloud Infrastructure (OCI) Log Analytics. Converts industry-standard [Sigma](https://github.com/SigmaHQ/sigma) rules into OCI Log Analytics Query Language (OCL) with MITRE ATT&CK and STIG compliance mapping. Enhanced with advanced threat hunting queries, APT-specific detection (BLUELIGHT/APT37), and browser/application attack detection via `SOC Application Logs`, an OpenTelemetry-shaped custom JSON telemetry surface for OCI Log Analytics.
 
+## Core Scope
+
+This repository is scoped to OCI Log Analytics query and dashboard creation:
+
+- generate OCI Log Analytics query JSON from source Sigma/YAML rules
+- maintain curated app, WAF, geographic health, and hunting analytics
+- generate synthetic logs that populate the dashboards
+- validate query metadata, log-source mappings, and dashboard inventory
+- create OCI Log Analytics dashboards and embedded saved searches only after validation passes
+
+Companion UI, API, and cross-platform integrations must consume generated artifacts instead of duplicating query generation or dashboard deployment logic. Runtime helpers such as Streaming, Service Connector Hub, Resource Manager, and manifest export support the demo and deployment path, but the canonical product surface remains `rules/**`, `queries/**`, `test_data/manifest.json`, and `scripts/deploy_dashboard.py`.
+
 ## Current Inventory
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
 
 - **Source Sigma/YAML rules:** 454
-- **Sigma-derived OCI queries:** 454
-  - 446 top-level detections in `queries/*.json`
+- **Sigma-derived OCI query artifacts:** 486
+  - 478 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
 - **Curated analytics:** 61
   - 16 app telemetry analytics in `queries/apps/`
   - 45 hunting analytics in `queries/hunting/`
-- **Total query artifacts:** 515
+- **Total query artifacts:** 547
 - **Source rule breakdown:** Windows (249), Cloud/OCI (100), Linux (67), Web/WAF (38)
 - **Combined MITRE ATT&CK coverage:** 211 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Dashboard inventory:** 16 dashboards with 264 saved searches and 16 advanced visualization widgets
-- **Generated demo data:** 2,837 events across 14 NDJSON files in the latest local `test_data/manifest.json`
+- **Generated demo data:** 2,904 events across 14 NDJSON files in the latest local `test_data/manifest.json`
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 
 Canonical inventory and supporting documentation:
@@ -194,10 +206,10 @@ scripts/
   ingest_test_data.py           # Upload generated NDJSON test data to OCI LA
   setup_log_sources.py          # Create JSON parsers & custom OCI LA log sources
   generate_catalog.py           # Generate CATALOG.md and catalog.json
-  setup_streaming_pipeline.py   # Production OCI Streaming pipeline (5 configured SOC streams in the current environment)
-  export_for_multicloud.py      # Integration with multicloudoperations
+  setup_streaming_pipeline.py   # Optional OCI Streaming/SCH ingestion support
+  export_for_multicloud.py      # Generated manifest export for downstream readers
 test_data/                      # 14 generated NDJSON demo datasets (ignored by git)
-stack/                          # OCI Resource Manager (Terraform) stack
+stack/                          # Optional OCI Resource Manager stack for runtime ingestion support
 docs/                           # Additional documentation
 ```
 

@@ -1,6 +1,6 @@
 # OCI Log Analytics Advanced Detection — Demo Workflow
 
-Date: 2026-04-28
+Date: 2026-05-03
 Audience: Demo operators, SOC analysts, security architects, platform engineers
 
 ## Overview
@@ -21,14 +21,14 @@ python3 scripts/smoke_test_bluelight.py --lookback 24h
 python3 scripts/deploy_dashboard.py --cleanup
 ```
 
-Validated on `2026-04-28`:
+Validated on `2026-05-03` for local generation and on `2026-04-28` for direct OCI ingest/smoke/deploy:
 
-- `2,837` synthetic events generated across `14` files
+- `2,904` synthetic events generated across `14` files
 - `14/14` files uploaded to OCI Log Analytics through direct ingest
 - `17/17` BLUELIGHT widgets returned rows with a 24-hour lookback
 - `16` dashboards and `264` saved searches resolve from generated inventory
 
-Current repository configuration on `2026-04-28` resolves to `16` dashboards and `264` saved searches after the APM/WAF browser showcase update.
+Current repository configuration on `2026-05-03` resolves to `16` dashboards and `264` saved searches after the APM/WAF browser showcase update.
 
 Use this path before recreating dashboards. `deploy_dashboard.py` validates the generated inventory and every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
 
@@ -40,7 +40,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 | Demo Controls | `https://cp.octodemo.cloud` |
 | Control Plane | `https://cp.octodemo.cloud` |
 | Log Analytics | demo-observability compartment → Dashboards |
-| Test data ingested | 2,837 generated events across 14 NDJSON datasets |
+| Test data ingested | 2,904 generated events across 14 NDJSON datasets |
 | Dashboards configured | 16 SOC dashboards + 264 saved searches |
 
 ---
@@ -58,7 +58,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 **Talking Points:**
 - "This is a unified SOC overview pulling security events from OCI Audit, Windows Sysmon, Linux, Cloud Guard, and WAF — all in one dashboard."
 - "Each widget represents a detection rule converted from industry-standard Sigma format into OCI Log Analytics Query Language."
-- "The repo currently ships 454 source rules, 454 Sigma-derived OCI searches, and 211 MITRE ATT&CK techniques across 14 tactics."
+- "The repo currently ships 454 source rules, 486 Sigma-derived OCI query artifacts, and 211 MITRE ATT&CK techniques across 14 tactics."
 
 4. **Click into** `SOC: Console Login Failures` — show the OCL query behind it
 5. **Show** the hunting widget: `Hunt: SSH Brute Force` — highlight the frequency analysis pattern:
@@ -296,7 +296,7 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 │    │ │Dashboards│ │                                                │
 │    │ │264 Saved │ │                                                │
 │    │ │Searches  │ │                                                │
-│    │ │515 Assets│ │                                                │
+│    │ │547 Assets│ │                                                │
 │    │ │211 MITRE │ │                                                │
 │    │ └──────────┘ │                                                │
 │    └──────────────┘                                                │
@@ -333,12 +333,12 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 | Content Surface | Count | Dashboards | What to Emphasize |
 |----------------|-------|------------|-------------------|
 | Source Sigma/YAML rules | 454 | 14 | Windows, OCI, Linux, web, BLUELIGHT, and browser-side detections |
-| Sigma-derived OCI searches | 454 | 14 | 446 top-level detections + 8 browser/app telemetry detections |
+| Sigma-derived OCI searches | 486 | 14 | 478 top-level detections + 8 browser/app telemetry detections |
 | Curated app telemetry analytics | 16 | 2 | App 360 correlation, WAF-to-trace pivots, service health, APM/WAF showcase views |
 | Hunting analytics | 45 | 4 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation |
 | STIG-mapped detections | 24 | 1 | Continuous control monitoring for IAM, network, audit, and key management |
-| Sample datasets | 14 generated files / 2,837 events | Demo enablement | Includes app telemetry and 60 minutes of multicloud geo-health data for the geographic dashboard |
-| **Total shipped query artifacts** | **515** | **16** | **211 MITRE techniques across 14 tactics** |
+| Sample datasets | 14 generated files / 2,904 events | Demo enablement | Includes app telemetry and 60 minutes of multicloud geo-health data for the geographic dashboard |
+| **Total shipped query artifacts** | **547** | **16** | **211 MITRE techniques across 14 tactics** |
 
 ---
 

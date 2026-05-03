@@ -11,8 +11,11 @@ from datetime import timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from generate_test_logs import (
     expand_events_over_days,
+    generate_linux_secure,
+    generate_oci_audit_events,
     generate_sysmon_network_events,
     generate_sysmon_operational,
+    generate_waf_events,
     generate_windows_event_security,
     generate_windows_events,
     shift_event_window,
@@ -72,6 +75,101 @@ class TestGenerateTestLogs(unittest.TestCase):
         self.assertIn("whoami /all", command_lines)
         self.assertIn("Invoke-WebRequest", command_lines)
         self.assertIn("sekurlsa::logonpasswords", command_lines)
+
+    def test_oci_audit_events_include_dashboard_status_labels_and_policy_keywords(self):
+        random.seed(17)
+        events = generate_oci_audit_events()
+
+        console_successes = [
+            event for event in events
+            if event.get("eventType") == "com.oraclecloud.consolesignon.login"
+            and event.get("Status") == "Success"
+            and event.get("data", {}).get("response", {}).get("status") == "200"
+        ]
+        admin_policy_events = [
+            event for event in events
+            if event.get("eventType") == "com.oraclecloud.identitycontrolplane.createpolicy"
+            and "manage all-resources" in event.get("data", {}).get("resourceName", "")
+        ]
+
+        self.assertGreaterEqual(len(console_successes), 8)
+        self.assertGreaterEqual(len(admin_policy_events), 3)
+
+    def test_linux_secure_events_mirror_messages_to_command_line_fields(self):
+        random.seed(19)
+        events = generate_linux_secure()
+
+        crontab_events = [
+            event for event in events
+            if event.get("Process") == "crontab"
+            and any(pattern in event.get("Command Line", "") for pattern in ("crontab -e", "/tmp/", "/dev/shm/"))
+        ]
+
+        self.assertTrue(crontab_events)
+        for event in crontab_events:
+            self.assertEqual(event["msg"], event["CommandLine"])
+            self.assertEqual(event["msg"], event["Command Line"])
+
+    def test_windows_events_include_rare_process_hunting_tail(self):
+        random.seed(23)
+        events = generate_windows_events()
+
+        command_lines = {
+            event.get("Command Line") or event.get("CommandLine")
+            for event in events
+            if str(event.get("Event ID") or event.get("EventID")) == "1"
+        }
+
+        self.assertIn("rare_recon.exe -enum users", command_lines)
+        self.assertIn("anomaly_dropper.exe stage", command_lines)
+
+    def test_sysmon_operational_includes_named_pipe_iocs(self):
+        random.seed(29)
+        events = generate_sysmon_operational()
+
+        pipe_names = {
+            event.get("Pipe Name") or event.get("PipeName")
+            for event in events
+            if str(event.get("Event ID") or event.get("EventID")) == "17"
+        }
+
+        self.assertIn(r"\\.\pipe\PSEXESVC", pipe_names)
+        self.assertIn(r"\\.\pipe\MSSE-1234-server", pipe_names)
+        self.assertIn(r"\\.\pipe\mimikatz_lsass", pipe_names)
+
+    def test_sysmon_network_includes_dns_tunnel_processes(self):
+        random.seed(31)
+        events = generate_sysmon_network_events()
+
+        dns_processes = {
+            event.get("Process Name") or event.get("Image")
+            for event in events
+            if str(event.get("Destination Port") or event.get("DestinationPort")) == "53"
+            and str(event.get("Initiated")).lower() == "true"
+        }
+
+        self.assertIn(r"C:\Tools\iodine.exe", dns_processes)
+        self.assertIn(r"C:\Tools\dnscat2.exe", dns_processes)
+        self.assertIn(r"C:\Tools\dns2tcp.exe", dns_processes)
+
+    def test_waf_events_include_cors_and_allowed_sqli_cases(self):
+        random.seed(37)
+        events = generate_waf_events()
+
+        cors_blocks = [
+            event for event in events
+            if event.get("action") == "BLOCK"
+            and "Origin:" in event.get("requestHeaders", "")
+        ]
+        allowed_sqli = [
+            event for event in events
+            if event.get("action") == "ALLOW"
+            and event.get("responseCode") == "200"
+            and any(token in event.get("requestUrl", "") for token in ("UNION SELECT", "sleep(5)", "'--"))
+        ]
+
+        self.assertGreaterEqual(len(cors_blocks), 5)
+        self.assertGreaterEqual(len(allowed_sqli), 3)
 
     def test_sysmon_operational_includes_screen_capture_burst(self):
         random.seed(11)

@@ -25,10 +25,10 @@ Current inventory:
 | Surface | Count |
 |---------|-------|
 | Source Sigma/YAML rules | 454 |
-| Sigma-derived OCI queries | 454 |
+| Sigma-derived OCI query artifacts | 486 |
 | App/APM queries | 24 |
 | Hunting queries | 45 |
-| Total query artifacts | 515 |
+| Total query artifacts | 547 |
 | OCI dashboards | 16 |
 | Saved searches | 264 |
 | Advanced visualization widgets | 16 |

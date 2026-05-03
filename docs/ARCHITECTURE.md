@@ -1,15 +1,17 @@
 # OCI Log Analytics Detections Architecture
 
-Date: 2026-04-28
+Date: 2026-05-03
 
 ## Purpose
 
-This repository is organized around a simple rule-publishing pipeline:
+This repository is organized around OCI Log Analytics query and dashboard creation:
 
 1. Author portable detections as Sigma YAML under `rules/`
 2. Convert source rules into OCI Log Analytics query JSON
-3. Publish a canonical inventory for dashboards and downstream integrations
-4. Layer curated app and hunting analytics beside the generated detections
+3. Layer curated app, WAF, geographic health, and hunting analytics beside the generated detections
+4. Generate synthetic logs that populate the Log Analytics dashboards
+5. Validate every dashboard query before importing dashboards or embedded saved searches
+6. Publish canonical inventory artifacts for companion UIs and downstream readers
 
 The goal is to keep source authoring, generated content, and deployment metadata separate so the project stays maintainable as the catalog grows.
 
@@ -20,7 +22,7 @@ One important detail for the current shipping implementation: browser and applic
 | Path | Type | Count | Notes |
 |------|------|-------|-------|
 | `rules/**` | Source Sigma/YAML authoring layer | 454 | Source of truth for source-derived detections |
-| `queries/*.json` | Generated top-level OCI detection queries | 446 | Produced by `scripts/convert_sigma.py` |
+| `queries/*.json` | Generated top-level OCI detection queries | 478 | Produced by `scripts/convert_sigma.py` |
 | `queries/apps/*.json` | App telemetry query surface | 24 | 8 Sigma-derived browser detections + 16 curated app analytics |
 | `queries/hunting/*.json` | Curated hunting analytics | 45 | Frequency, anomaly, scoring, and correlation content |
 | `queries/catalog.json` | Canonical machine-readable inventory | 1 | Use this for published counts and downstream tooling |
@@ -29,8 +31,8 @@ One important detail for the current shipping implementation: browser and applic
 
 Important distinction:
 
-- There are **454 Sigma-derived OCI queries** in total.
-- Those 454 are split across **446 top-level detections** in `queries/` and **8 browser/app telemetry detections** in `queries/apps/`.
+- There are **486 Sigma-derived OCI query artifacts** in total.
+- Those 486 are split across **478 top-level detections** in `queries/` and **8 browser/app telemetry detections** in `queries/apps/`.
 - The repo also ships **61 curated analytics** that are not Sigma-derived: 16 app telemetry analytics and 45 hunting queries.
 
 ## Architecture Flow
@@ -49,7 +51,7 @@ rules/** ------------------------------------------+
                          |                                                   |
                          v                                                   v
                  queries/*.json                               queries/apps/*.json
-           446 generated detections                    8 Sigma-derived browser queries
+           478 generated detections                    8 Sigma-derived browser queries
 
 queries/apps/*.json (16 curated app analytics) -------+
 queries/hunting/*.json (45 curated analytics) --------+----> scripts/generate_catalog.py
@@ -75,6 +77,7 @@ queries/** -----------------------------------------------> scripts/deploy_dashb
 - `queries/catalog.json` is the canonical inventory for documentation, exports, and automation.
 - `queries/dashboard_inventory.json` is the dashboard-facing contract generated from `scripts/deploy_dashboard.py:DASHBOARDS`.
 - `queries/manifest.json` is an integration artifact. It should be regenerated from the current queries, but it is not the canonical source for published counts.
+- Streaming, Service Connector Hub, Resource Manager, and manifest export scripts are runtime support. They should not become the source of truth for query, dashboard, or catalog state.
 - `logandetectionqueries/` and `logandetectionrules/` are legacy empty directories and should not be consumed by tooling.
 
 ## Application Telemetry Surface
@@ -99,7 +102,7 @@ This keeps the query layer stable even when the raw event producer is browser Ja
   - Linux: 67
   - Web/WAF: 38
 - Combined query inventory:
-  - 515 total query artifacts
+  - 547 total query artifacts
   - 211 MITRE ATT&CK techniques across 14 tactics
   - 24 STIG-mapped detections across 12 controls
 - Dashboard layer:
@@ -108,7 +111,7 @@ This keeps the query layer stable even when the raw event producer is browser Ja
   - 16 advanced visualization widgets (`tile`, `sunburst`, `summary_table`, `line`, `bar`, `link`, and `map`)
 - Demo/test data:
   - 14 NDJSON files
-  - 2,837 sample events in the latest generated local `test_data/manifest.json`
+  - 2,904 sample events in the latest generated local `test_data/manifest.json`
   - `test_data/` is ignored by git and should be regenerated before a fresh OCI ingest
 - Streaming/runtime surface:
   - 5 configured SOC detection streams validated end-to-end
@@ -142,7 +145,7 @@ python3 scripts/verify_caldera_detections.py --operation discovery --lookback 60
 python3 scripts/smoke_test_bluelight.py --lookback 24h
 ```
 
-Current local verified state on 2026-04-28:
+Previous local verified state on 2026-04-28 before the current catalog expansion:
 
 - Rule quality audit: 0 issues
 - Unit tests: 88 passing

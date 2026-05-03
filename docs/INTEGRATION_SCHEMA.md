@@ -152,7 +152,7 @@ The test-data manifest exposes dataset availability without requiring UI code to
 ```json
 {
   "generated_at": "2026-04-28T12:42:47.407373+00:00",
-  "total_events": 2837,
+  "total_events": 2904,
   "files": {
     "windows_sysmon.jsonl": {
       "event_count": 218

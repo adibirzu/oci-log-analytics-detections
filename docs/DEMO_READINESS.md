@@ -36,7 +36,7 @@ Validated on `2026-04-23` in the OCI demo tenancy:
 - `demo_readiness.py --lookback 14d`: `OK`
 - `query_audit.py --lookback 14d --eligible-only`: `51/51` queries with rows, `0` empty, `0` errors
 
-Repository update on `2026-04-28`: the current dashboard configuration resolves to `16` dashboards and `264` saved searches after adding the APM/WAF browser showcase widgets. Dashboard widgets default to `l24h`, and the latest local generated dataset contains `2,837` events across `14` JSONL datasets. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the extended 14-day demo dataset.
+Repository update on `2026-05-03`: the current dashboard configuration resolves to `16` dashboards and `264` saved searches after adding the APM/WAF browser showcase widgets. Dashboard widgets default to `l24h`, and the latest local generated dataset contains `2,904` events across `14` JSONL datasets. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the extended 14-day demo dataset.
 
 ## Demo Story
 

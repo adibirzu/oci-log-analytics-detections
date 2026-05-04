@@ -1,6 +1,6 @@
 # Project Status
 
-Date: 2026-05-03
+Date: 2026-05-04
 
 ## Current State
 
@@ -15,6 +15,7 @@ Date: 2026-05-03
 - Total query artifacts: 547
 - Dashboards: 16
 - Saved searches: 264
+- Live dashboard health: **263 / 264 widgets HIT (99.6 %)** in `eu-frankfurt-1` with a 14-day lookback (1 environmental MISS — Fusion Apps source not provisioned in this tenancy).
 - Generated demo data: 14 NDJSON files / 2,922 events in the latest local `test_data/manifest.json`
 - MITRE ATT&CK coverage: 211 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
@@ -40,6 +41,11 @@ Date: 2026-05-03
 - All BLUELIGHT queries standardised on quoted `'Event ID' = 'N'` form — OCI LA returns HTTP 400 on unquoted numeric comparisons against String-typed fields, so the convention applies repo-wide for parser-string fields.
 - `scripts/smoke_test_bluelight.py` — live OCI LA query runner reports HIT/MISS/ERROR per widget with row counts, used as the green-light gate before deploys.
 - Synthetic OCI audit logs now expose operator-friendly `Status` labels and policy keywords needed by dashboard searches; Windows, Sysmon, Linux, and WAF datasets now include rare processes, named-pipe IOCs, DNS tunneling tools, Linux command lines, CORS attacks, and allowed SQLi cases so matching widgets populate from generated data.
+- Source-resolver routing for `linux_secure.jsonl` and `cloud_guard.jsonl` now puts SOC custom log sources first so the SOC parsers (which extract `Command Line`, `Problem Name`, etc.) win over the native parsers (which surface a narrower field set). Documented in `docs/MONITORING.md` so future contributors do not reverse the order.
+- OCI Audit detection rules that filter on `status: Success` now use Sigma list syntax `status: [Success, '200']` to match both operator-friendly Status labels and the native parser's HTTP-code projection (`com.oraclecloud.computeapi.terminateinstance`, `com.oraclecloud.consolesignon.login`).
+- LIKE-on-multi-word phrases use `*token1*token2*` wildcard form repo-wide because OCI LA's SEARCH operator tokenises on whitespace inside LIKE patterns. The `OCI: Admin Policy - Manage All` widget query is the canonical example.
+- `daily_health_check.py` chains `inventory_dashboards.py`, `smoke_test_bluelight.py`, and `verify_deployed_dashboards.py` into a single banner with a JSON report under `docs/health/`. Exit codes feed CI gates.
+- Stop-time review gate is enabled for this repository — Codex reviews every change before stop. Toggle via `node …/codex-companion.mjs setup --json --enable-review-gate`.
 - `test_data/manifest.json` is rebuilt from generated `*.jsonl` files rather than hand-maintained counts.
 - Streaming pipeline reconciliation refreshes `config/streaming_config.json` against the active tenancy resources.
 - `LoganSecurityDashboardv0` is documented as the companion operator UI and consumes this repo's catalog, dashboard inventory, and test-data artifacts instead of duplicating detection-generation logic.
@@ -51,6 +57,18 @@ Date: 2026-05-03
 - Optional runtime helpers remain in the repository for Log Analytics ingestion support, but the canonical surfaces are `rules/**`, `queries/**`, generated manifests, synthetic logs, and dashboard deployment scripts.
 
 ## Quality and Verification
+
+Live and local verification on 2026-05-04 (eu-frankfurt-1 tenancy):
+
+- `python3 scripts/verify_deployed_dashboards.py --lookback 14d`
+  - 16 / 16 dashboards present, 0 missing, 0 widget-count mismatches
+  - **263 / 264 widgets HIT, 1 MISS, 0 ERROR** — the single MISS is `Hunt: OCI IAM + Fusion Correlation` which requires a Fusion Apps source not provisioned in this tenancy
+- `python3 scripts/smoke_test_bluelight.py --lookback 14d`
+  - 17 / 17 BLUELIGHT detection widgets HIT
+- `python3 scripts/daily_health_check.py --lookback 14d`
+  - inventory + smoke + verifier banner, JSON report written to `docs/health/health-<timestamp>.json`
+- `python3 -m pytest -q`: 129 passed, 5 skipped
+- `python3 -m compileall -q scripts`: passed
 
 Local scope-cleanup verification on 2026-05-03:
 
@@ -135,8 +153,15 @@ Previously live-verified on 2026-04-15:
 
 ## Recommended Next Work
 
-- Keep `queries/dashboard_inventory.json` regenerated with dashboard changes.
-- Expand `DET-MISS-002` with a generated log-source field dictionary for parser fields and display labels.
-- Expand live verification beyond Caldera discovery so credential-access, lateral-movement, collection, and exfiltration have deterministic demo data.
-- Add sample ingestion/validation checks for the `test_data/` datasets to verify schemas alongside query generation.
-- Expand source rule coverage only after log source mappings and test datasets exist for the new telemetry surface.
+See `PLAN.md` for the prioritised forward roadmap. High-level themes:
+
+1. **Sigma converter quality** — fix the backslash-escape bug for Windows pipe patterns so `convert_sigma.py` no longer overwrites hand-edited Cobalt Strike / Mimikatz / PsExec pipe queries with unparseable LAQL. Either escape `\` properly or add a `do_not_overwrite: true` rule annotation.
+2. **Sweep the dual-Status pattern** across the remaining 12 OCI rules that filter on `status: Success` so they survive in tenancies where the native parser projects HTTP code instead.
+3. **Provision the Fusion Apps source** (or strip the Fusion correlation widget) to close the last 1 of 264 dashboard MISS.
+4. **Schedule `daily_health_check.py`** as a recurring routine that posts the banner + diff against the previous run; surface regressions before deploy.
+5. **Codex review-gate adoption** — now enabled for every stop, so include unit-test / smoke-test deltas in commit messages so the reviewer has full context.
+6. **Keep `queries/dashboard_inventory.json` regenerated** with dashboard changes (already enforced by the deploy script's `--export-inventory` mode).
+7. **Expand `DET-MISS-002`** with a generated log-source field dictionary for parser fields and display labels.
+8. **Expand live verification beyond Caldera discovery** so credential-access, lateral-movement, collection, and exfiltration have deterministic demo data.
+9. **Add ingestion/validation checks for `test_data/`** datasets to verify schemas alongside query generation.
+10. **Expand source rule coverage only after** log source mappings and test datasets exist for the new telemetry surface.

@@ -27,16 +27,17 @@ This is the canonical refresh path because it:
 
 ## Current Verified State
 
-Validated on `2026-04-23` in the OCI demo tenancy:
+Live verification on `2026-05-04` in the `eu-frankfurt-1` demo tenancy:
 
-- `164,766` total synthetic events across `14` JSONL datasets
-- `14/14` dataset uploads completed successfully
-- `16` dashboards imported
-- `255` saved searches created or found
-- `demo_readiness.py --lookback 14d`: `OK`
-- `query_audit.py --lookback 14d --eligible-only`: `51/51` queries with rows, `0` empty, `0` errors
+- `2,922` synthetic events across `14` JSONL datasets generated from `scripts/generate_test_logs.py --days 14`
+- `14/14` dataset uploads completed successfully via `scripts/ingest_test_data.py --mode direct`
+- `16` dashboards imported, `0` missing, `0` widget-count mismatches
+- `264` saved searches deployed
+- **`263 / 264` widgets HIT** with a 14-day lookback (the single MISS is `Hunt: OCI IAM + Fusion Correlation` which needs a Fusion Apps source not provisioned in this tenancy)
+- `scripts/smoke_test_bluelight.py --lookback 14d`: `17 / 17` BLUELIGHT widgets HIT
+- `scripts/daily_health_check.py --lookback 14d`: PASS — JSON report under `docs/health/health-2026-05-04T*.json`
 
-Repository update on `2026-05-03`: the current dashboard configuration resolves to `16` dashboards and `264` saved searches after adding the APM/WAF browser showcase widgets. Dashboard widgets default to `l24h`, and the latest local generated dataset contains `2,922` events across `14` JSONL datasets. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the extended 14-day demo dataset.
+Repository update on `2026-05-04`: the current dashboard configuration resolves to `16` dashboards and `264` saved searches after adding the APM/WAF browser showcase widgets. Dashboard widgets default to `l24h`, and the latest local generated dataset contains `2,922` events across `14` JSONL datasets. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the extended 14-day demo dataset.
 
 ## Demo Story
 
@@ -80,6 +81,16 @@ python3 scripts/validate_synthetic_logs.py
 python3 scripts/deploy_dashboard.py --dry-run
 python3 scripts/demo_readiness.py --dry-run
 ```
+
+After ingest, confirm widget health end-to-end:
+
+```bash
+python3 scripts/inventory_dashboards.py
+python3 scripts/verify_deployed_dashboards.py --lookback 14d
+python3 scripts/daily_health_check.py --lookback 14d
+```
+
+`daily_health_check.py` chains the inventory + smoke + verifier into one banner with a JSON report under `docs/health/`. Exit codes feed CI gates (0 = OK, 1 = MISS, 2 = ERROR, 3 = auth fail).
 
 ## What must be true for tomorrow
 

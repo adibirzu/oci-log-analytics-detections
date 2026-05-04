@@ -1,6 +1,6 @@
 # OCI Log Analytics Detections Architecture
 
-Date: 2026-05-03
+Date: 2026-05-04
 
 ## Purpose
 
@@ -94,6 +94,33 @@ queries/** -----------------------------------------------> scripts/deploy_dashb
 
 This keeps the query layer stable even when the raw event producer is browser JavaScript, an application service, or a generated synthetic NDJSON dataset under `test_data/`.
 
+## Source Routing and Parser Choice
+
+OCI Log Analytics ships native parsers for common log shapes (OCI Audit Logs, OCI Cloud Guard Problems, Linux Secure Logs, Windows Sysmon Events). These native parsers are minimalist: they project a small set of canonical fields and ignore everything else. Detection queries that filter on richer fields (`Process Name`, `Command Line`, `Problem Name`, `Granted Access`, `Pipe Name`) only match if the data was parsed by a SOC custom JSON parser whose field map declares those columns.
+
+The repository therefore maintains four parallel routing decisions in `scripts/oci_config.py:SOURCE_CANDIDATE_GROUPS`:
+
+| Dataset | First-choice source | Why |
+|---|---|---|
+| `oci_audit.jsonl` | `OCI Audit Logs` (native) | Native parser is rich enough; SOC custom parser not needed |
+| `cloud_guard.jsonl` | **`SOC Cloud Guard Logs`** (custom) | Native parser does not extract `problemName` into `Problem Name` |
+| `linux_secure.jsonl` | **`SOC Linux Syslog Logs`** (custom) | Native parser does not extract `Command Line` from custom JSON |
+| `linux_syslog.jsonl` | `SOC Linux Syslog Logs` (custom) | Same |
+| `windows_sysmon.jsonl` | `SOC Windows Sysmon Logs` (custom) | SOC parser maps Sysmon-native PascalCase + LA display names |
+
+Reversing the candidate ordering silently breaks detection queries because data lands in a source whose parser does not expose the fields they reference. `docs/MONITORING.md` documents this contract so it cannot be quietly undone.
+
+## OCI LA Query Authoring Caveats
+
+A handful of OCI LA SEARCH/LAQL behaviours have produced silent-zero MISSes during dashboard rollouts. They are pinned here so future contributors do not retrace them:
+
+1. **String-typed fields reject unquoted numeric comparisons.** `'Event ID' = 1` returns HTTP 400 against an OCI LA String field. Always quote the value: `'Event ID' = '1'`. Applies to `Event ID`, `Logon Type`, `Response Code`, `Status`, etc.
+2. **Status field projection differs by parser.** Native OCI Audit projects `Status='200'` (HTTP code); SOC custom parser may project `Status='Success'`. Sigma rules that filter `status: Success` should use list syntax `status: [Success, '200']` so they match in both worlds.
+3. **LIKE on multi-word phrases tokenises on whitespace.** `'%manage all-resources%'` returns zero against text that obviously contains `manage all-resources`. Use `'%manage*resources%'` (wildcard between the words) instead. The `OCI: Admin Policy - Manage All` widget query is the canonical example.
+4. **`Original Log Content` is truncated at ~1024 chars.** Detection keywords near the end of the raw envelope (e.g. `data.response.payload.statements`) are not searchable. Surface the keyword inside `data.additionalDetails` or `resourceName` so it falls within the truncation window.
+5. **`fields` does not project String values that the parser flagged but did not extract.** A query like `fields 'Resource Name' | head 5` may return blank Resource Name even when `'Resource Name' != ''` matches the same record — the field is registered against the parser schema but its value extraction is empty. Cross-check with the raw `msg` projection instead.
+6. **Sigma converter has a backslash-escape bug for Windows pipe patterns.** `'Pipe Name' = '\interprocess_'` (one backslash from the rule literal) reaches OCI LA unescaped and triggers `Unexpected input for SEARCH`. Affected rules currently live in hand-edited query files that should not be regenerated until the converter is fixed.
+
 ## Capability Inventory
 
 - Source rule coverage:
@@ -143,7 +170,12 @@ python3 scripts/setup_streaming_pipeline.py
 python3 scripts/validate_pipeline.py --e2e
 python3 scripts/verify_caldera_detections.py --operation discovery --lookback 60d
 python3 scripts/smoke_test_bluelight.py --lookback 24h
+python3 scripts/inventory_dashboards.py --json /tmp/dash_inventory.json
+python3 scripts/verify_deployed_dashboards.py --lookback 14d --json /tmp/dash_health.json
+python3 scripts/daily_health_check.py --lookback 14d
 ```
+
+`daily_health_check.py` chains the inventory + smoke + verifier into a single banner with an exit-coded JSON report under `docs/health/`. Recommended cadence: run weekly (or as a scheduled background routine) and on every deploy. Latest live state on 2026-05-04: 263 / 264 widgets HIT; the single MISS is `Hunt: OCI IAM + Fusion Correlation` which requires a Fusion Apps source not provisioned in this tenancy.
 
 Previous local verified state on 2026-04-28 before the current catalog expansion:
 

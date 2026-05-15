@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and (('Command Line' like '*lsass*' and ('Command Line' like '*-accepteula*' or 'Command Line' like '*-ma*')) or ('Process Name' in ('procdump.exe', 'procdump64.exe') and 'Command Line' like '*lsass*'))

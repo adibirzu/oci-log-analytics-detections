@@ -1,0 +1,1 @@
+where 'Event ID' = 4624 |  stats  count as event_count  by 'User'

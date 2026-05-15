@@ -1,0 +1,1 @@
+union ('Log Source' = 'Linux Secure'), ('Log Source' = 'Windows Security Events')

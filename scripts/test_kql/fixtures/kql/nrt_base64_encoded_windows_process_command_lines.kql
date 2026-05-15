@@ -1,0 +1,1 @@
+('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ('Event ID' = '4688') and (('Command Line' != null and 'Command Line' != '')) and ('Command Line' like '*TVqQAAMAAAAEAAA*')

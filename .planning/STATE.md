@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Sentinel KQL Parity to Logan QL
-status: Planned
-stopped_at: Phase 6 plans written (10 plans, 3 waves)
-last_updated: "2026-05-15T20:35:00.000Z"
-last_activity: 2026-05-15 — Phase 6 plans authored (10 plans covering REF-01..REF-05)
+status: Complete
+stopped_at: Phase 6 executed (10 plans across 3 waves)
+last_updated: "2026-05-16T00:00:00.000Z"
+last_activity: 2026-05-16 — Phase 6 complete (facade 678 lines; 88 tests; promoted bodies byte-identical; pipeline-dispatch rewire deferred to Phase 7)
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 10
-  completed_plans: 0
+  completed_plans: 10
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** Every committed detection, query, dashboard, parser mapping, and generated artifact must remain deployable and verifiable against OCI Log Analytics without leaking tenant-specific data.
-**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 6 (KQL subpackage extraction and canonicalizer) — planning complete
+**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 6 complete, Phase 7 (Mapping Config Sharding and Collision Lint) next.
 
 ## Current Position
 
-Phase: 6 (kql-subpackage-extraction-and-canonicalizer) - Planned, ready to execute
-Plan: 06-01 (Wave 1) is the entry point; 06-02..06-09 run in Wave 2 (parallel); 06-10 in Wave 3.
-Status: Planned
-Last activity: 2026-05-15 — 10 plans authored (planner agent stalled twice; plans authored directly using locked CONTEXT.md decisions D-01..D-16)
+Phase: 6 (kql-subpackage-extraction-and-canonicalizer) — Complete
+Plan: all 10 plans executed in sequence (06-01 Wave 1, 06-02..06-09 Wave 2 batched, 06-10 Wave 3).
+Status: Complete with one documented deferral (Plan 06-10 Task 1 — pipeline.convert registry-dispatch rewire — moved to Phase 7).
+Last activity: 2026-05-16 — Phase 6 facade cutover landed (678 lines, _legacy.py deleted, xfail removed, byte-identity verified, 14/14 release-checklist gates green)
 
 ## Performance Metrics
 

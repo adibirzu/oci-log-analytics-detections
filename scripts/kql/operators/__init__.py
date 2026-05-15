@@ -31,6 +31,16 @@ def register(name: str):
 
 
 # Adapter registration must happen after ``register`` is defined.
+# Order: legacy shims first (unsupported set), then extracted operators
+# claim their registry slots.
 from . import _legacy  # noqa: E402,F401
+from . import where_op  # noqa: E402,F401
+from . import summarize_op  # noqa: E402,F401
+from . import project_op  # noqa: E402,F401
+from . import extend_op  # noqa: E402,F401
+from . import sort_op  # noqa: E402,F401
+from . import distinct_op  # noqa: E402,F401
+from . import union_op  # noqa: E402,F401
+from . import let_op  # noqa: E402,F401
 
 __all__ = ["OPERATOR_REGISTRY", "OperatorFn", "register"]

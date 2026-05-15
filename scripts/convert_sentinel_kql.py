@@ -39,7 +39,17 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-from sync_sentinel_kql import (  # noqa: F401 — re-exported for legacy callers
+# Make every entry point work — direct script run (``python scripts/convert_sentinel_kql.py``)
+# only puts ``scripts/`` on sys.path; ``-m scripts.convert_sentinel_kql`` puts the project
+# root on sys.path. Add both so the absolute ``scripts.*`` imports below resolve in either case.
+_FACADE_PATH = Path(__file__).resolve()
+_SCRIPTS_DIR = _FACADE_PATH.parent
+_PROJECT_ROOT = _SCRIPTS_DIR.parent
+for _candidate in (_PROJECT_ROOT, _SCRIPTS_DIR):
+    if str(_candidate) not in sys.path:
+        sys.path.insert(0, str(_candidate))
+
+from scripts.sync_sentinel_kql import (  # noqa: E402,F401 — re-exported for legacy callers
     DEFAULT_CACHE_DIR,
     SENTINEL_LICENSE_URL,
     SENTINEL_WEB_URL,
@@ -49,7 +59,7 @@ from sync_sentinel_kql import (  # noqa: F401 — re-exported for legacy callers
     sync_sentinel_repo,
 )
 
-from scripts.kql._facade_impl import (  # noqa: F401
+from scripts.kql._facade_impl import (  # noqa: E402,F401
     AZURE_AUDIT_SCHEMA_FIELDS,
     CONFIG_PATH,
     ConversionResult,

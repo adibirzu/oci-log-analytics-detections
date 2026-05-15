@@ -1,0 +1,1 @@
+where 'Process Name' like '%powershell%' and 'Command Line' contains 'invoke-expression' and 'User' startswith 'admin'

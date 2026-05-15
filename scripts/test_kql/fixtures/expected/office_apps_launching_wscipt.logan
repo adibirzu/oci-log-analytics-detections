@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Parent Process Name' in ('winword.exe', 'excel.exe', 'outlook.exe')) and ('Process Name' = 'wscript.exe' and 'Command Line' like '*.jse*')

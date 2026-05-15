@@ -91,7 +91,7 @@ Output: Cleaned-up facade, deleted legacy adapters, registry-driven pipeline, re
     Replace the legacy delegation in `pipeline.convert` with a real dispatch loop:
     1. Split the input via `scripts.kql.lexer.split_kql_stages(kql)`.
     2. Pre-process let bindings (still flows through legacy `_preprocess_simple_lets` for Phase 6 per plan 06-09).
-    3. For each stage, parse the kind (first token: `where`, `summarize`, `project`, etc.) and the body (everything after).
+    3. For each stage, parse the kind from the first identifier (e.g. ``where`` / ``summarize`` / ``project``) and the body (everything after).
     4. Build `KqlStage(kind=kind, body=body)`.
     5. Look up `OPERATOR_REGISTRY[kind]`; if missing, append a Tier-3 skip reason `f"unsupported_operator:{kind}"` and continue.
     6. Call the operator with the current `ConversionContext`; collect `fragments`, accumulate `skip_reasons`, fold `new_aliases` into a fresh ConversionContext for the next stage (D-08 immutability).

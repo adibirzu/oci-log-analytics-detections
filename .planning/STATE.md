@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Sentinel KQL Parity to Logan QL
-status: Not started
-stopped_at: Phase 6 context gathered
-last_updated: "2026-05-15T10:34:04.982Z"
-last_activity: 2026-05-15 — Milestone v2.0 roadmap created (Phases 6–11)
+status: Planned
+stopped_at: Phase 6 plans written (10 plans, 3 waves)
+last_updated: "2026-05-15T20:35:00.000Z"
+last_activity: 2026-05-15 — Phase 6 plans authored (10 plans covering REF-01..REF-05)
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 10
   completed_plans: 0
 ---
 
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** Every committed detection, query, dashboard, parser mapping, and generated artifact must remain deployable and verifiable against OCI Log Analytics without leaking tenant-specific data.
-**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 6 (KQL subpackage extraction and canonicalizer)
+**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 6 (KQL subpackage extraction and canonicalizer) — planning complete
 
 ## Current Position
 
-Phase: 6 (kql-subpackage-extraction-and-canonicalizer) - Not started
-Plan: —
-Status: Not started
-Last activity: 2026-05-15 — Milestone v2.0 roadmap created (Phases 6–11)
+Phase: 6 (kql-subpackage-extraction-and-canonicalizer) - Planned, ready to execute
+Plan: 06-01 (Wave 1) is the entry point; 06-02..06-09 run in Wave 2 (parallel); 06-10 in Wave 3.
+Status: Planned
+Last activity: 2026-05-15 — 10 plans authored (planner agent stalled twice; plans authored directly using locked CONTEXT.md decisions D-01..D-16)
 
 ## Performance Metrics
 

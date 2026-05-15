@@ -1,10 +1,9 @@
-"""Phase 6 legacy operator adapters.
+"""Phase 6 legacy operator adapters (residual unsupported-only set).
 
-Each ``@register("<op>")`` here is a marker that says "the pipeline knows
-this operator name, but Phase 6 still routes the full query through the
-legacy ``convert_kql_to_logan``." Subsequent plans (06-02..06-09) replace
-each marker with a real operator function in its own module; plan 06-10
-DELETES this file entirely.
+Plans 06-02..06-09 extracted each supported operator family into its own
+module; this file now only carries stub registrations for operators that
+remain unsupported in Phase 6. Plan 06-10 folds the residual set into a
+dedicated ``unsupported_op`` module and deletes this file.
 """
 
 from __future__ import annotations
@@ -24,21 +23,8 @@ def _shim(stage: KqlStage, ctx: ConversionContext) -> StageResult:  # pragma: no
     raise NotImplementedError(_PHASE_6_SHIM_MESSAGE)
 
 
-# Supported operator families — extracted in plans 06-02..06-09.
-register("where")(_shim)
-register("summarize")(_shim)
-register("project")(_shim)
-register("extend")(_shim)
-register("sort")(_shim)
-register("order")(_shim)
-register("top")(_shim)
-register("distinct")(_shim)
-register("union")(_shim)
-register("let")(_shim)
-register("fields")(_shim)
-
-# Currently-unsupported operators (Tier-3 SKIPPED). These never get extracted
-# in Phase 6; they get a real Tier-3 module in plan 06-10's unsupported_op.py.
+# Currently-unsupported operators (Tier-3 SKIPPED). Plan 06-10 moves these
+# into ``unsupported_op.py`` and deletes this file.
 register("take")(_shim)
 register("count")(_shim)
 register("limit")(_shim)

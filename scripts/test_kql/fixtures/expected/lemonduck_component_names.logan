@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Parent Process Name' = 'cmd.exe') and (('Command Line' like '*kr.bin*' or 'Command Line' like '*if.bin*' or 'Command Line' like '*m6.bin*'))

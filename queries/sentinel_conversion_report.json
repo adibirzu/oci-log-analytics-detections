@@ -1,0 +1,468 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-05-15T03:57:00.778886+00:00",
+  "source": {
+    "name": "Microsoft Sentinel",
+    "repository": "https://github.com/Azure/Azure-Sentinel",
+    "commit": "63ff8eedc58e7df0d22eba05ca73c92b59a66634",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "summary": {
+    "total_candidates": 4452,
+    "attempted_candidates": 25,
+    "promoted_count": 8,
+    "converted_count": 8,
+    "skipped_count": 17,
+    "ranking": "quality-first",
+    "live_validation_requested": true,
+    "live_validation_passed": 8,
+    "live_validation_failed": 10,
+    "tier_distribution": {
+      "tier_1": 8,
+      "tier_2": 0,
+      "tier_3": 17
+    }
+  },
+  "unsupported_features": {
+    "synthetic live validation not run": 10,
+    "unsupported KQL stage: parse EventData with * 'ObjectDN\">' ObjectDN \"<\" *": 1,
+    "unsupported Sentinel field mapping: ActingProcessFileInternalName": 1,
+    "unsupported Sentinel field mapping: ClientInfoString": 1,
+    "unsupported Sentinel field mapping: EventData": 1,
+    "unsupported Sentinel field mapping: Exe": 1,
+    "unsupported Sentinel field mapping: InitiatingProcessAccountDomain": 1,
+    "unsupported Sentinel field mapping: InitiatingProcessAccountName": 1,
+    "unsupported Sentinel field mapping: InitiatingProcessSHA256": 1,
+    "unsupported Sentinel field mapping: LocalFile": 1,
+    "unsupported Sentinel field mapping: Logon_Type": 1,
+    "unsupported Sentinel field mapping: MailboxOwnerUPN": 1,
+    "unsupported Sentinel field mapping: ObjectDN": 1,
+    "unsupported Sentinel field mapping: OfficeWorkload": 1,
+    "unsupported Sentinel field mapping: OrganizationName": 1,
+    "unsupported Sentinel field mapping: ParentProcessName": 1,
+    "unsupported Sentinel field mapping: ProcessId": 1,
+    "unsupported Sentinel field mapping: SubjectAccount": 2,
+    "unsupported Sentinel field mapping: SubjectDomainName": 1,
+    "unsupported Sentinel field mapping: SubjectLogonId": 1,
+    "unsupported Sentinel field mapping: SubjectUserSid": 1,
+    "unsupported Sentinel field mapping: UserType": 1,
+    "unsupported Sentinel field mapping: timeout": 1,
+    "unsupported extend expression: Direction = iff(ProcessCommandLine has \"/Upload\", 'Upload', 'Download')": 1,
+    "unsupported extend expression: Exe = countof(InitiatingProcessCommandLine, \".exe\")": 1,
+    "unsupported extend expression: LocalFile= tostring(ParsedCommandLine[-1])": 1,
+    "unsupported extend expression: ParsedCommandLine = parse_command_line(ProcessCommandLine,'windows')": 1,
+    "unsupported extend expression: RemoteUrl = tostring(ParsedCommandLine[-2])": 1,
+    "unsupported predicate expression: (FileName =~ \"bitsadmin.exe\" or column_ifexists('ProcessVersionInfoOriginalFileName','ColumnNotAvailable') =~ 'bitsadmin.exe')\n    and ProcessCommandLine has_any ('/Transfer','/AddFile', '/AddFileSet','/AddFileWithRanges')": 1,
+    "unsupported predicate expression: ActingProcessName !has ActingProcessFileInternalName": 1
+  },
+  "attempted": [
+    {
+      "sentinel_id": "8bb86556-67b4-11ec-90d6-0242ac120003",
+      "title": "ApexOne - Top sources with alerts",
+      "quality_score": null,
+      "source_path": "Solutions/Trend Micro Apex One/Hunting Queries/TMApexOneTopSources.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Trend Micro Apex One/Hunting Queries/TMApexOneTopSources.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "fa2f7d8a-6726-465a-aa72-6f6e3d4c99d7",
+      "title": "Detect Suspicious Commands Initiated by Webserver Processes",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Discovery/SuspiciousCommandInitiatedByWebServerProcess.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Discovery/SuspiciousCommandInitiatedByWebServerProcess.yaml",
+      "conversion_status": "promoted",
+      "output_file": "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
+      "skip_reasons": [],
+      "local_validation_errors": [],
+      "live_validation_status": "passed",
+      "live_validation_error": "",
+      "tier": "tier_1"
+    },
+    {
+      "sentinel_id": "f53e5168-afdb-4fad-b29a-bb9cb71ec460",
+      "title": "McAfee ePO - Multiple threats on same host",
+      "quality_score": null,
+      "source_path": "Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOMultipleThreatsSameHost.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOMultipleThreatsSameHost.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "6d70a26a-c119-45b7-b4c6-44ac4fd1bcb7",
+      "title": "McAfee ePO - Threat was not blocked",
+      "quality_score": null,
+      "source_path": "Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOThreatNotBlocked.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOThreatNotBlocked.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "c25a8cd4-5b4a-45a8-9ba0-3b753a652f6b",
+      "title": "Deimos Component Execution",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Campaign/Jupyter-Solarmaker/DeimosComponentExecution.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Campaign/Jupyter-Solarmaker/DeimosComponentExecution.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "1eebfaf3-40e1-4bc2-9f42-049b7b8ceb60",
+      "title": "Critical Risks",
+      "quality_score": null,
+      "source_path": "Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Risks.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Risks.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "d096643d-6789-4c74-8893-dd3fc8a94069",
+      "title": "Vulerabilities",
+      "quality_score": null,
+      "source_path": "Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Vulnerabilities.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Vulnerabilities.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "738702fd-0a66-42c7-8586-e30f0583f8fe",
+      "title": "TEARDROP memory-only dropper",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/SolarWinds_TEARDROP_Process-IOCs.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/SolarWinds_TEARDROP_Process-IOCs.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "5bdc1504-880c-4b30-a39c-7c746535928d",
+      "title": "Doppelpaymer Stop Services",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Defense Evasion/DoppelpaymerStopService.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Defense Evasion/DoppelpaymerStopService.yaml",
+      "conversion_status": "promoted",
+      "output_file": "sentinel/doppelpaymer_stop_services.json",
+      "skip_reasons": [],
+      "local_validation_errors": [],
+      "live_validation_status": "passed",
+      "live_validation_error": "",
+      "tier": "tier_1"
+    },
+    {
+      "sentinel_id": "174de33b-107b-4cd8-a85d-b4025a35453f",
+      "title": "Office Apps Launching Wscipt",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Execution/OfficeAppsLaunchingWscript.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Execution/OfficeAppsLaunchingWscript.yaml",
+      "conversion_status": "promoted",
+      "output_file": "sentinel/office_apps_launching_wscipt.json",
+      "skip_reasons": [],
+      "local_validation_errors": [],
+      "live_validation_status": "passed",
+      "live_validation_error": "",
+      "tier": "tier_1"
+    },
+    {
+      "sentinel_id": "767f9dc4-3b01-11ec-8d3d-0242ac130003",
+      "title": "Apache - Apache 2.4.49 flaw CVE-2021-41773",
+      "quality_score": null,
+      "source_path": "Solutions/ApacheHTTPServer/Analytic Rules/ApacheCVE-2021-41773.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/ApacheHTTPServer/Analytic Rules/ApacheCVE-2021-41773.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "2a1dc4c2-a8d6-4a0e-8539-9b971c851195",
+      "title": "Bitsadmin Activity",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Execution/BITSAdminActivity.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Execution/BITSAdminActivity.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "unsupported Sentinel field mapping: InitiatingProcessAccountDomain",
+        "unsupported Sentinel field mapping: InitiatingProcessAccountName",
+        "unsupported Sentinel field mapping: InitiatingProcessSHA256",
+        "unsupported Sentinel field mapping: LocalFile",
+        "unsupported Sentinel field mapping: ProcessId",
+        "unsupported extend expression: Direction = iff(ProcessCommandLine has \"/Upload\", 'Upload', 'Download')",
+        "unsupported extend expression: LocalFile= tostring(ParsedCommandLine[-1])",
+        "unsupported extend expression: ParsedCommandLine = parse_command_line(ProcessCommandLine,'windows')",
+        "unsupported extend expression: RemoteUrl = tostring(ParsedCommandLine[-2])",
+        "unsupported predicate expression: (FileName =~ \"bitsadmin.exe\" or column_ifexists('ProcessVersionInfoOriginalFileName','ColumnNotAvailable') =~ 'bitsadmin.exe')\n    and ProcessCommandLine has_any ('/Transfer','/AddFile', '/AddFileSet','/AddFileWithRanges')"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "not_run",
+      "live_validation_error": "",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "ba9db6b2-3d05-42ae-8aee-3a15bbe29f27",
+      "title": "Qakbot Discovery Activies",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Ransomware/QakbotDiscoveryActivities.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Ransomware/QakbotDiscoveryActivities.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "unsupported Sentinel field mapping: timeout"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "not_run",
+      "live_validation_error": "",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "b12b3dab-d973-45af-b07e-e29bb34d8db9",
+      "title": "Cisco Cloud Security - Windows PowerShell User-Agent Detected",
+      "quality_score": null,
+      "source_path": "Solutions/CiscoUmbrella/Analytic Rules/CiscoUmbrellaPowershellUserAgentDetected.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CiscoUmbrella/Analytic Rules/CiscoUmbrellaPowershellUserAgentDetected.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "bcb5f147-863a-4972-aec9-48f67cc24727",
+      "title": "LemonDuck-component-names",
+      "quality_score": null,
+      "source_path": "Hunting Queries/Microsoft 365 Defender/Campaigns/LemonDuck/LemonDuck-component-names.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/LemonDuck/LemonDuck-component-names.yaml",
+      "conversion_status": "promoted",
+      "output_file": "sentinel/lemonduck-component-names.json",
+      "skip_reasons": [],
+      "local_validation_errors": [],
+      "live_validation_status": "passed",
+      "live_validation_error": "",
+      "tier": "tier_1"
+    },
+    {
+      "sentinel_id": "b619d1f1-7f39-4c7e-bf9e-afbb46457997",
+      "title": "Cisco Cloud Security - Crypto Miner User-Agent Detected",
+      "quality_score": null,
+      "source_path": "Solutions/CiscoUmbrella/Analytic Rules/CiscoUmbrellaCryptoMinerUserAgentDetected.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CiscoUmbrella/Analytic Rules/CiscoUmbrellaCryptoMinerUserAgentDetected.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "synthetic live validation not run"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "failed",
+      "live_validation_error": "synthetic live validation not run",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "9281b7cc-8f05-45a9-bf10-17fb29492a84",
+      "title": "CyberArkEPM - Renamed Windows binary",
+      "quality_score": null,
+      "source_path": "Solutions/CyberArkEPM/Analytic Rules/CyberArkEPMRenamedWindowsBinary.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CyberArkEPM/Analytic Rules/CyberArkEPMRenamedWindowsBinary.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "unsupported Sentinel field mapping: ActingProcessFileInternalName",
+        "unsupported predicate expression: ActingProcessName !has ActingProcessFileInternalName"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "not_run",
+      "live_validation_error": "",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "1be34fb9-f81b-47ae-84fb-465e6686d76c",
+      "title": "DopplePaymer Procdump",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Credential Access/DoppelPaymerProcDump.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Credential Access/DoppelPaymerProcDump.yaml",
+      "conversion_status": "promoted",
+      "output_file": "sentinel/dopplepaymer_procdump.json",
+      "skip_reasons": [],
+      "local_validation_errors": [],
+      "live_validation_status": "passed",
+      "live_validation_error": "",
+      "tier": "tier_1"
+    },
+    {
+      "sentinel_id": "c332b840-61e4-462e-a201-0e2d69bad45d",
+      "title": "LSASS Credential Dumping with Procdump",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Credential Access/LSASSCredDumpProcdump.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Credential Access/LSASSCredDumpProcdump.yaml",
+      "conversion_status": "promoted",
+      "output_file": "sentinel/lsass_credential_dumping_with_procdump.json",
+      "skip_reasons": [],
+      "local_validation_errors": [],
+      "live_validation_status": "passed",
+      "live_validation_error": "",
+      "tier": "tier_1"
+    },
+    {
+      "sentinel_id": "35ab0d58-baab-4154-87ed-fa2f69797e9e",
+      "title": "Remote File Creation with PsExec",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Lateral Movement/RemoteFileCreationWithPsExec.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Lateral Movement/RemoteFileCreationWithPsExec.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "unsupported Sentinel field mapping: Exe",
+        "unsupported extend expression: Exe = countof(InitiatingProcessCommandLine, \".exe\")"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "not_run",
+      "live_validation_error": "",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "7ad4c32b-d0d2-411c-a0e8-b557afa12fce",
+      "title": "NRT Process executed from binary hidden in Base64 encoded file",
+      "quality_score": null,
+      "source_path": "Solutions/Windows Security Events/Analytic Rules/NRT_execute_base64_decodedpayload.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Windows Security Events/Analytic Rules/NRT_execute_base64_decodedpayload.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "unsupported Sentinel field mapping: ParentProcessName",
+        "unsupported Sentinel field mapping: SubjectAccount",
+        "unsupported Sentinel field mapping: SubjectDomainName"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "not_run",
+      "live_validation_error": "",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "e7dd442a-0af8-48eb-8358-9e91f4911849",
+      "title": "Discord download invoked from cmd line",
+      "quality_score": null,
+      "source_path": "Solutions/Windows Security Events/Hunting Queries/Discorddownloadinvokedfromcmdline.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Windows Security Events/Hunting Queries/Discorddownloadinvokedfromcmdline.yaml",
+      "conversion_status": "promoted",
+      "output_file": "sentinel/discord_download_invoked_from_cmd_line.json",
+      "skip_reasons": [],
+      "local_validation_errors": [],
+      "live_validation_status": "passed",
+      "live_validation_error": "",
+      "tier": "tier_1"
+    },
+    {
+      "sentinel_id": "52aec824-96c1-4a03-8e44-bb70532e6cea",
+      "title": "AdminSDHolder Modifications",
+      "quality_score": null,
+      "source_path": "Detections/SecurityEvent/AdminSDHolder_Modifications.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/SecurityEvent/AdminSDHolder_Modifications.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "unsupported KQL stage: parse EventData with * 'ObjectDN\">' ObjectDN \"<\" *",
+        "unsupported Sentinel field mapping: EventData",
+        "unsupported Sentinel field mapping: ObjectDN",
+        "unsupported Sentinel field mapping: SubjectAccount",
+        "unsupported Sentinel field mapping: SubjectLogonId",
+        "unsupported Sentinel field mapping: SubjectUserSid"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "not_run",
+      "live_validation_error": "",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "49a4f65a-fe18-408e-afec-042fde93d3ce",
+      "title": "PowerShell or non-browser mailbox login activity",
+      "quality_score": null,
+      "source_path": "Solutions/Microsoft 365/Hunting Queries/powershell_or_nonbrowser_MailboxLogin.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft 365/Hunting Queries/powershell_or_nonbrowser_MailboxLogin.yaml",
+      "conversion_status": "skipped",
+      "output_file": "",
+      "skip_reasons": [
+        "unsupported Sentinel field mapping: ClientInfoString",
+        "unsupported Sentinel field mapping: Logon_Type",
+        "unsupported Sentinel field mapping: MailboxOwnerUPN",
+        "unsupported Sentinel field mapping: OfficeWorkload",
+        "unsupported Sentinel field mapping: OrganizationName",
+        "unsupported Sentinel field mapping: UserType"
+      ],
+      "local_validation_errors": [],
+      "live_validation_status": "not_run",
+      "live_validation_error": "",
+      "tier": "tier_3"
+    },
+    {
+      "sentinel_id": "c3e5dbaa-a540-408c-8b36-68bdfb3df088",
+      "title": "NRT Base64 Encoded Windows Process Command-lines",
+      "quality_score": null,
+      "source_path": "Solutions/Windows Security Events/Analytic Rules/NRT_base64_encoded_pefile.yaml",
+      "source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Windows Security Events/Analytic Rules/NRT_base64_encoded_pefile.yaml",
+      "conversion_status": "promoted",
+      "output_file": "sentinel/nrt_base64_encoded_windows_process_command-lines.json",
+      "skip_reasons": [],
+      "local_validation_errors": [],
+      "live_validation_status": "passed",
+      "live_validation_error": "",
+      "tier": "tier_1"
+    }
+  ]
+}

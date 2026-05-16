@@ -11,7 +11,7 @@ The wrapper executes the full pre-flight cycle and emits one banner plus a
 JSON report under `docs/health/`:
 
 ```bash
-python3 scripts/daily_health_check.py --lookback 14d
+python3 scripts/daily_health_check.py --lookback 21d
 ```
 
 Sections:
@@ -43,9 +43,9 @@ Exit codes feed CI gates:
 | `inventory_dashboards.py`             | Census + classification of dashboards                | n/a              |
 | `cleanup_soc_dashboards.py`           | Delete SOC dashboards + saved searches by prefix     | n/a              |
 | `smoke_test_bluelight.py`             | 17 BLUELIGHT detections + kill-chain hunt            | `30d`            |
-| `smoke_test_all_queries.py`           | Walk every `queries/**.json` and run filter half     | `14d`            |
-| `verify_deployed_dashboards.py`       | Fetch each deployed dashboard, run stored queries    | `14d`            |
-| `daily_health_check.py`               | Wraps the three above, emits banner + JSON report    | `14d`            |
+| `smoke_test_all_queries.py`           | Walk every `queries/**.json` and run filter half     | `21d`            |
+| `verify_deployed_dashboards.py`       | Fetch each deployed dashboard, run stored queries    | `21d`            |
+| `daily_health_check.py`               | Wraps the three above, emits banner + JSON report    | `21d`            |
 
 All scripts honor `--lookback Nd|Nh|Nm` and (where applicable) `--json` for
 machine-readable output.
@@ -59,7 +59,7 @@ update):
 python3 scripts/cleanup_soc_dashboards.py --dry-run   # confirm scope
 python3 scripts/cleanup_soc_dashboards.py             # execute
 python3 scripts/deploy_dashboard.py                   # redeploy
-python3 scripts/verify_deployed_dashboards.py --lookback 14d
+python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90
 ```
 
 Note: redeploy can take **20–30 minutes** end-to-end because OCI
@@ -101,7 +101,7 @@ destination. If you ever re-add the native source first, the
 ```json
 {
   "timestamp": "2026-04-28T22:00:00Z",
-  "lookback": "14d",
+  "lookback": "21d",
   "overall_status": "OK | MISS | ERROR",
   "sections": [
     {"name": "inventory",        "exit_code": 0, "output": "..."},
@@ -123,7 +123,7 @@ The simplest cron line:
 ```cron
 # Daily 06:00 UTC — generate report, ignore non-zero exit
 0 6 * * * cd /path/to/oci-log-analytics-detections && \
-  /usr/bin/env python3 scripts/daily_health_check.py --lookback 14d \
+  /usr/bin/env python3 scripts/daily_health_check.py --lookback 21d \
   >> /var/log/soc-health.log 2>&1
 ```
 

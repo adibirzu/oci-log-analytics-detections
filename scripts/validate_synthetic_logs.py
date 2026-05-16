@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from oci_config import PROJECT_DIR, TEST_DATA_DIR
+from query_artifacts import is_generated_query_artifact
 
 CONTRACT_PATH = Path(PROJECT_DIR) / "config" / "synthetic_log_contracts.json"
 
@@ -134,12 +135,27 @@ def validate_contract(dataset_path: Path, contract: dict[str, Any]) -> list[str]
     return errors
 
 
+def validate_contract_filename(filename: str) -> str | None:
+    """Return an error when a contract key is not a generated JSONL dataset."""
+    if is_generated_query_artifact(filename):
+        return f"{filename}: generated support artifact is not a synthetic JSONL dataset"
+    if Path(filename).suffix != ".jsonl":
+        return f"{filename}: contract filename must target a .jsonl dataset"
+    return None
+
+
 def validate_all(test_data_dir: Path = Path(TEST_DATA_DIR), contracts_path: Path = CONTRACT_PATH) -> dict[str, Any]:
     contracts = load_contracts(contracts_path)
     results = {}
     total_errors = 0
 
     for filename, contract in contracts.items():
+        filename_error = validate_contract_filename(filename)
+        if filename_error:
+            results[filename] = {"ok": False, "errors": [filename_error]}
+            total_errors += 1
+            continue
+
         dataset_path = test_data_dir / filename
         if not dataset_path.exists():
             results[filename] = {"ok": False, "errors": [f"{filename}: dataset not found"]}

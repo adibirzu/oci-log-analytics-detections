@@ -1,33 +1,33 @@
 {
   "soc-detection-oci-audit": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaaug3df2iaqajreigpycx3awfa34qqjky6gerpw6kgefhok3earcua",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_OCI_AUDIT>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "OCI Audit Logs"
   },
   "soc-detection-cloud-guard": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaaug3df2iawr4gsspfw4zmmndila3r6gcqu3xa2bs575fc3zrmfdua",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_CLOUD_GUARD>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "OCI Cloud Guard Problems"
   },
   "soc-detection-linux-audit": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaaug3df2iauk3jwjskk3g4m666w3srbl7oyq7pfuu3km7bq47y5bia",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_LINUX_AUDIT>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "SOC Linux Syslog Logs"
   },
   "soc-detection-windows-sysmon": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaaug3df2iafraasa273ihg52cgdurjidtrd7hqx6mmwguvht3qqrda",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_WINDOWS_SYSMON>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "SOC Windows Sysmon Logs"
   },
   "soc-detection-multicloud-health": {
-    "stream_id": "ocid1.stream.oc1.eu-frankfurt-1.amaaaaaaug3df2iazsmpwspasbrvwm7qpjssawjqtmf3us46fwb5oosoyxza",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_MULTICLOUD_HEALTH>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "SOC Multicloud Health Logs"
   },
   "_metadata": {
-    "log_group_id": "ocid1.loganalyticsloggroup.oc1.eu-frankfurt-1.amaaaaaaug3df2iau2igg4vocynarmm3pib2kxoiytx567baiiijslluh7rq",
-    "la_namespace": "fr4zqfimuxtr",
-    "compartment_id": "ocid1.compartment.oc1..aaaaaaaanr7jafpn7kawwa6sqdjukuvuo2woeb7wyuia2h2anaa5cxn33pxq",
+    "log_group_id": "<LOG_ANALYTICS_LOG_GROUP_OCID>",
+    "la_namespace": "<LA_NAMESPACE>",
+    "compartment_id": "<COMPARTMENT_OCID>",
     "connector_summary": {
       "expected": 5,
       "active": 5,

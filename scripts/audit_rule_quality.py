@@ -23,6 +23,9 @@ import yaml
 from collections import defaultdict
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from query_artifacts import is_saved_search_query_file  # noqa: E402
+
 PROJECT_DIR = Path(__file__).parent.parent
 RULES_DIR = PROJECT_DIR / "rules"
 QUERIES_DIR = PROJECT_DIR / "queries"
@@ -57,7 +60,7 @@ def load_all_queries(queries_dir=QUERIES_DIR):
     """Load all source-derived generated JSON queries."""
     queries = []
     for f in sorted(queries_dir.rglob("*.json")):
-        if f.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
+        if not is_saved_search_query_file(f):
             continue
         with open(f) as fh:
             data = json.load(fh)
@@ -175,6 +178,20 @@ def check_logsource_fallback(queries):
     return issues
 
 
+def check_missing_stable_id(rules):
+    """Find rules without a stable id field."""
+    issues = []
+    for rule in rules:
+        if not rule.get("id"):
+            issues.append({
+                "rule": rule.get("title", "?"),
+                "path": rule.get("_path", "?"),
+                "issue": "Missing stable ID field",
+                "severity": "low",
+            })
+    return issues
+
+
 def check_missing_version(rules):
     """Find rules without a version field."""
     count = sum(1 for r in rules if not r.get("version"))
@@ -261,6 +278,7 @@ def main():
         ("Duplicate queries", check_duplicate_queries, queries),
         ("Broad patterns", check_broad_patterns, rules),
         ("Logsource fallback", check_logsource_fallback, queries),
+        ("Missing stable ID", check_missing_stable_id, rules),
         ("Missing version", check_missing_version, rules),
     ]
 

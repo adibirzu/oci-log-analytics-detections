@@ -3,8 +3,10 @@ Centralized OCI configuration, client factories, and validation for SOC detectio
 
 Config resolution order (highest priority first):
   1. Environment variables (OCI_TENANCY_ID, OCI_COMPARTMENT_ID, etc.)
-  2. .env.local file in project root
-  3. Empty string (no hardcoded defaults — use require_oci_config() to guard API calls)
+  2. Profile-scoped environment variables (DEFAULT_LA_NAMESPACE, CAP_LA_NAMESPACE, etc.)
+  3. Profile-scoped .env.local values
+  4. .env.local values for the selected profile
+  5. Empty string (no hardcoded defaults — use require_oci_config() to guard API calls)
 
 Client factories defer `import oci` so offline scripts (convert_sigma.py,
 generate_test_logs.py) can import constants without requiring the OCI SDK.
@@ -38,27 +40,134 @@ def _load_env_file(path):
     return values
 
 
-_env_local = _load_env_file(os.path.join(PROJECT_DIR, '.env.local'))
+_env_base = _load_env_file(os.path.join(PROJECT_DIR, '.env.local'))
 
 
-def _cfg(env_key, default):
-    """Resolve config: env var > .env.local > default."""
-    return os.environ.get(env_key) or _env_local.get(env_key) or default
+def _resolve_active_profile_for_overlay():
+    """Pick the active profile early to choose the overlay file."""
+    return (
+        os.environ.get('OCI_PROFILE')
+        or os.environ.get('OCI_CONFIG_PROFILE')
+        or _env_base.get('OCI_PROFILE')
+        or _env_base.get('OCI_CONFIG_PROFILE')
+        or 'DEFAULT'
+    )
+
+
+_env_overlay = _load_env_file(
+    os.path.join(PROJECT_DIR, f'.env.local.{_resolve_active_profile_for_overlay()}')
+)
+
+# Effective env-file dict: per-profile overlay wins over the base file.
+_env_local = {**_env_base, **_env_overlay}
+
+
+def _profile_env_prefix(profile):
+    """Return a safe prefix for profile-scoped config keys."""
+    return re.sub(r'[^A-Za-z0-9]+', '_', profile).strip('_').upper()
+
+
+def _profile_env_key(profile, env_key):
+    """Return the profile-scoped key name for a config key."""
+    prefix = _profile_env_prefix(profile)
+    return f"{prefix}_{env_key}" if prefix else env_key
+
+
+def _first_config_value(values, keys):
+    """Return the first non-empty config value from a dict-like object."""
+    for key in keys:
+        value = values.get(key)
+        if value:
+            return value
+    return ""
+
+
+def _env_file_profile(env_file=None):
+    """Return the profile declared by .env.local, if any."""
+    env_file = _env_local if env_file is None else env_file
+    return env_file.get("OCI_PROFILE") or env_file.get("OCI_CONFIG_PROFILE") or ""
+
+
+def _resolve_profile(env=None, env_file=None):
+    """Resolve the selected OCI CLI profile without using profile-scoped keys."""
+    env = os.environ if env is None else env
+    env_file = _env_local if env_file is None else env_file
+    return (
+        env.get("OCI_PROFILE")
+        or env.get("OCI_CONFIG_PROFILE")
+        or env_file.get("OCI_PROFILE")
+        or env_file.get("OCI_CONFIG_PROFILE")
+        or "DEFAULT"
+    )
+
+
+def _cfg(env_key, default, aliases=(), profile_bound=False, profile=None,
+         env=None, env_file=None):
+    """Resolve config: env var > profile-scoped env/.env.local > .env.local > default.
+
+    Profile-bound values such as compartment, namespace, and log group are not
+    inherited from a .env.local file that declares a different OCI profile. This
+    prevents commands like ``OCI_PROFILE=DEFAULT ...`` from accidentally reusing
+    another tenancy or Log Analytics identifiers from the local defaults.
+    """
+    env = os.environ if env is None else env
+    env_file = _env_local if env_file is None else env_file
+    keys = (env_key,) + tuple(aliases)
+
+    value = _first_config_value(env, keys)
+    if value:
+        return value
+
+    if profile_bound:
+        selected_profile = profile or _resolve_profile(env=env, env_file=env_file)
+        profile_keys = tuple(_profile_env_key(selected_profile, key) for key in keys)
+
+        value = _first_config_value(env, profile_keys)
+        if value:
+            return value
+
+        value = _first_config_value(env_file, profile_keys)
+        if value:
+            return value
+
+        file_profile = _env_file_profile(env_file)
+        if file_profile and selected_profile and file_profile != selected_profile:
+            return default
+
+    return _first_config_value(env_file, keys) or default
 
 
 # ─── Configuration constants ──────────────────────────────────
 
-TENANCY_ID = _cfg("OCI_TENANCY_ID", "") or _cfg("OCI_TENANCY_OCID", "")
-COMPARTMENT_ID = (
-    _cfg("OCI_COMPARTMENT_ID", "")  # MAIN demo-observability (set in .env.local)
-    or _cfg("COMP_OBSERVABILITY", "")  # fallback
-)
 OCI_PROFILE = _cfg("OCI_PROFILE", "") or _cfg("OCI_CONFIG_PROFILE", "DEFAULT")
+_TENANCY_ID_EAGER = _cfg(
+    "OCI_TENANCY_ID",
+    "",
+    aliases=("OCI_TENANCY_OCID",),
+    profile_bound=True,
+    profile=OCI_PROFILE,
+)
+_COMPARTMENT_ID_EAGER = _cfg(
+    "OCI_COMPARTMENT_ID",
+    "",
+    aliases=("COMP_OBSERVABILITY",),
+    profile_bound=True,
+    profile=OCI_PROFILE,
+)  # MAIN demo-observability (set in .env.local)
 OCI_REGION = _cfg("OCI_REGION", "")
 
 # Log Analytics identifiers — honour values set by upstream provisioning (OCI-DEMO)
-LOG_GROUP_ID = _cfg("LOG_ANALYTICS_LOG_GROUP_ID", "") or _cfg("LA_LOG_GROUP_ID", "")
-LA_NAMESPACE = _cfg("LA_NAMESPACE", "")
+LOG_GROUP_ID = _cfg(
+    "LOG_ANALYTICS_LOG_GROUP_ID",
+    "",
+    aliases=("LA_LOG_GROUP_ID",),
+    profile_bound=True,
+    profile=OCI_PROFILE,
+)
+LA_NAMESPACE = _cfg("LA_NAMESPACE", "", profile_bound=True, profile=OCI_PROFILE)
+
+# Cache for lazy SDK-fallback resolution (PEP 562 __getattr__ below)
+_lazy_cache = {}
 
 QUERIES_DIR = os.path.join(PROJECT_DIR, 'queries')
 HUNTING_DIR = os.path.join(QUERIES_DIR, 'hunting')
@@ -74,7 +183,23 @@ CUSTOM_LOG_SOURCES = [
     "SOC Sysmon Network Logs",
     "SOC Cloud Guard Logs",
     "SOC Application Logs",
+    "SOC VCN Flow Logs",
+    "SOC Network Firewall Logs",
 ]
+
+GENERATED_QUERY_ARTIFACT_FILENAMES = {
+    "catalog.json",
+    "content_candidates.json",
+    "dashboard_inventory.json",
+    "detection_rule_specs.json",
+    "log_source_field_dictionary.json",
+    "manifest.json",
+    "octo_apm_workshop_bundle.json",
+    "sentinel_candidates.json",
+    "sentinel_conversion_report.json",
+    "sentinel_synthetic_live_results.json",
+    "sentinel_synthetic_plan.json",
+}
 
 # Preferred-to-fallback source candidates by detection family.
 # Order matters: first match wins for runtime source selection.
@@ -144,6 +269,16 @@ SOURCE_CANDIDATE_GROUPS = {
     "application_logs": [
         "SOC Application Logs",
     ],
+    "vcn_flow": [
+        "SOC VCN Flow Logs",
+        "OCI VCN Flow Logs",
+        "VCN Flow Logs",
+    ],
+    "network_firewall": [
+        "SOC Network Firewall Logs",
+        "OCI Network Firewall Logs",
+        "Network Firewall Logs",
+    ],
     "multicloud_health": [
         "SOC Multicloud Health Logs",
     ],
@@ -163,6 +298,8 @@ TEST_DATA_FILES = [
     "lb_access.jsonl",
     "webapp_security.jsonl",
     "application_logs.jsonl",
+    "vcn_flow.jsonl",
+    "network_firewall.jsonl",
     "multicloud_health.jsonl",
 ]
 
@@ -215,21 +352,27 @@ def get_expected_connector_names(streaming_config=None, config_path=STREAMING_CO
 
 
 def require_oci_config():
-    """Verify that essential OCI identifiers are set. Call before any API access.
+    """Verify that essential OCI identifiers can be resolved before API access.
 
-    Raises SystemExit with a descriptive message if TENANCY_ID or COMPARTMENT_ID
-    is empty.  NOT called at import time so offline scripts still work.
+    Multi-tenancy: TENANCY_ID auto-derives from ``~/.oci/config`` when not
+    explicitly set, and COMPARTMENT_ID falls back to the tenancy root.  This
+    function only fails if NEITHER source is reachable — typically when the
+    selected ``OCI_PROFILE`` does not exist in ``~/.oci/config``.
     """
     missing = []
-    if not TENANCY_ID:
-        missing.append("TENANCY_ID (set OCI_TENANCY_ID or OCI_TENANCY_OCID)")
-    if not COMPARTMENT_ID:
+    if not resolve_tenancy_id():
+        missing.append(
+            f"TENANCY_ID (set OCI_TENANCY_ID, drop a .env.local.{OCI_PROFILE} "
+            f"overlay, or ensure ~/.oci/config has profile [{OCI_PROFILE}])"
+        )
+    if not resolve_compartment_id():
         missing.append("COMPARTMENT_ID (set OCI_COMPARTMENT_ID or COMP_OBSERVABILITY)")
     if missing:
         print("ERROR: Required OCI configuration is missing:")
         for m in missing:
             print(f"  - {m}")
-        print("\nSet these in .env.local or as environment variables.")
+        print(f"\nActive profile: {OCI_PROFILE}")
+        print(f"Set values in .env.local.{OCI_PROFILE} or as environment variables.")
         sys.exit(1)
 
 
@@ -307,6 +450,52 @@ def get_oci_config():
     return config
 
 
+def resolve_tenancy_id():
+    """Return TENANCY_ID, falling back to the OCI SDK config file.
+
+    Used when running with a profile that has no explicit ``OCI_TENANCY_ID``
+    in the per-profile env overlay — the OCI CLI config already pins the
+    tenancy for that profile, so we trust it.
+    """
+    if _TENANCY_ID_EAGER:
+        return _TENANCY_ID_EAGER
+    if "tenancy" in _lazy_cache:
+        return _lazy_cache["tenancy"]
+    try:
+        cfg = get_oci_config()
+        val = cfg.get("tenancy", "")
+    except Exception:
+        val = ""
+    _lazy_cache["tenancy"] = val
+    return val
+
+
+def resolve_compartment_id():
+    """Return COMPARTMENT_ID, defaulting to the tenancy root when unset."""
+    if _COMPARTMENT_ID_EAGER:
+        return _COMPARTMENT_ID_EAGER
+    if "compartment" in _lazy_cache:
+        return _lazy_cache["compartment"]
+    val = resolve_tenancy_id()
+    _lazy_cache["compartment"] = val
+    return val
+
+
+def __getattr__(name):
+    """PEP 562 lazy attribute resolution for the legacy bare constants.
+
+    Many scripts ``from oci_config import COMPARTMENT_ID`` or ``TENANCY_ID``.
+    With multi-tenancy, those values may be empty for a profile that has no
+    explicit overlay yet. Auto-fall back to the SDK-derived values so callers
+    don't need to be rewritten.
+    """
+    if name == "COMPARTMENT_ID":
+        return resolve_compartment_id()
+    if name == "TENANCY_ID":
+        return resolve_tenancy_id()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 def get_la_client(timeout=None):
     """Return an OCI Log Analytics client."""
     import oci
@@ -314,10 +503,10 @@ def get_la_client(timeout=None):
     return _get_client(oci.log_analytics.LogAnalyticsClient, **kwargs)
 
 
-def get_dashboard_client():
+def get_dashboard_client(timeout=(10, 180)):
     """Return an OCI Management Dashboard client."""
     import oci
-    return _get_client(oci.management_dashboard.DashxApisClient)
+    return _get_client(oci.management_dashboard.DashxApisClient, timeout=timeout)
 
 
 def get_streaming_admin_client():
@@ -334,17 +523,34 @@ def get_sch_client():
 
 # ─── Shared utilities ─────────────────────────────────────────
 
-def get_namespace(la_client):
-    """Return the Log Analytics namespace, using LA_NAMESPACE env var if set."""
+def get_namespace(la_client, quiet=False):
+    """Return the Log Analytics namespace.
+
+    Resolution order:
+      1. ``LA_NAMESPACE`` from env / per-profile overlay (if set for this profile)
+      2. ``list_namespaces`` against the active tenancy (auto-discovery)
+
+    Auto-discovery makes the script tenancy-agnostic: switching ``OCI_PROFILE``
+    is enough to ingest into the right namespace, no code changes required.
+    """
     if LA_NAMESPACE:
-        print(f"  Namespace (from env): {LA_NAMESPACE}")
+        if quiet:
+            return LA_NAMESPACE
+        print("  Namespace: resolved from env")
         return LA_NAMESPACE
-    namespaces = la_client.list_namespaces(compartment_id=TENANCY_ID).data
+    tenancy = resolve_tenancy_id()
+    if not tenancy:
+        print("ERROR: Cannot resolve tenancy. Set OCI_TENANCY_ID or ensure "
+              f"~/.oci/config has profile [{OCI_PROFILE}] with a tenancy line.")
+        sys.exit(1)
+    namespaces = la_client.list_namespaces(compartment_id=tenancy).data
     if not namespaces.items:
         print("ERROR: No Log Analytics namespace found. Is Log Analytics enabled?")
         sys.exit(1)
     ns = namespaces.items[0].namespace_name
-    print(f"  Namespace: {ns}")
+    if quiet:
+        return ns
+    print(f"  Namespace: auto-discovered for {OCI_PROFILE}")
     return ns
 
 
@@ -371,10 +577,15 @@ def ensure_log_group(la_client, namespace):
             print(f"  WARNING: LOG_GROUP_ID from env not accessible ({e.status}): {LOG_GROUP_ID}")
             print("  Falling back to name-based search...")
 
-    # Priority 2: search by name
+    # Priority 2: search by name (use resolved compartment so DEFAULT-tenancy
+    # runs without an explicit COMPARTMENT_ID land at the tenancy root).
+    compartment_id = resolve_compartment_id()
+    if not compartment_id:
+        print("ERROR: No COMPARTMENT_ID resolvable for log group search.")
+        sys.exit(1)
     existing = la_client.list_log_analytics_log_groups(
         namespace_name=namespace,
-        compartment_id=COMPARTMENT_ID,
+        compartment_id=compartment_id,
     ).data.items
 
     for lg in existing:
@@ -391,7 +602,7 @@ def ensure_log_group(la_client, namespace):
     details = oci.log_analytics.models.CreateLogAnalyticsLogGroupDetails(
         display_name=LOG_GROUP_NAME,
         description=LOG_GROUP_DESC,
-        compartment_id=COMPARTMENT_ID,
+        compartment_id=compartment_id,
     )
     new_lg = la_client.create_log_analytics_log_group(
         namespace_name=namespace,
@@ -401,8 +612,10 @@ def ensure_log_group(la_client, namespace):
     return new_lg.id
 
 
-def list_available_log_sources(la_client, namespace, compartment_id=COMPARTMENT_ID):
+def list_available_log_sources(la_client, namespace, compartment_id=None):
     """Return a set of available Log Analytics source display names."""
+    if compartment_id is None:
+        compartment_id = resolve_compartment_id()
     sources = set()
     page = None
     while True:
@@ -443,7 +656,10 @@ _OCID_RE = re.compile(
 def validate_ocid_format():
     """Check that TENANCY_ID, COMPARTMENT_ID, and LOG_GROUP_ID look like valid OCIDs."""
     results = []
-    checks = [("TENANCY_ID", TENANCY_ID), ("COMPARTMENT_ID", COMPARTMENT_ID)]
+    checks = [
+        ("TENANCY_ID", resolve_tenancy_id()),
+        ("COMPARTMENT_ID", resolve_compartment_id()),
+    ]
     if LOG_GROUP_ID:
         checks.append(("LOG_GROUP_ID", LOG_GROUP_ID))
     for name, value in checks:
@@ -488,7 +704,10 @@ def validate_namespace():
     """Check that the Log Analytics namespace is discoverable (online)."""
     try:
         la_client = get_la_client()
-        ns = la_client.list_namespaces(compartment_id=TENANCY_ID).data
+        tenancy = resolve_tenancy_id()
+        if not tenancy:
+            return [("LA Namespace", False, "tenancy unresolved")]
+        ns = la_client.list_namespaces(compartment_id=tenancy).data
         if ns.items:
             return [("LA Namespace", True, ns.items[0].namespace_name)]
         return [("LA Namespace", False, "no namespace found")]
@@ -501,7 +720,7 @@ def validate_compartment():
     try:
         import oci
         identity = _get_client(oci.identity.IdentityClient)
-        comp = identity.get_compartment(COMPARTMENT_ID).data
+        comp = identity.get_compartment(resolve_compartment_id()).data
         return [("Compartment", True, comp.name)]
     except Exception as e:
         return [("Compartment", False, str(e)[:100])]
@@ -517,7 +736,7 @@ def validate_query_files():
     json_files = []
     for root, _, files in os.walk(QUERIES_DIR):
         for f in files:
-            if f.endswith('.json') and f not in ('manifest.json', 'catalog.json', 'dashboard_inventory.json'):
+            if f.endswith('.json') and f not in GENERATED_QUERY_ARTIFACT_FILENAMES:
                 json_files.append(os.path.join(root, f))
 
     if not json_files:
@@ -546,8 +765,9 @@ def validate_log_sources():
     """Check that at least one candidate source exists per detection family."""
     try:
         la_client = get_la_client()
-        ns = la_client.list_namespaces(compartment_id=TENANCY_ID).data.items[0].namespace_name
-        available = list_available_log_sources(la_client, ns, COMPARTMENT_ID)
+        tenancy = resolve_tenancy_id()
+        ns = la_client.list_namespaces(compartment_id=tenancy).data.items[0].namespace_name
+        available = list_available_log_sources(la_client, ns, resolve_compartment_id())
         results = []
 
         for group_name, candidates in SOURCE_CANDIDATE_GROUPS.items():
@@ -581,7 +801,7 @@ def validate_log_group():
     try:
         la_client = get_la_client()
         ns = get_namespace.__wrapped__(la_client) if hasattr(get_namespace, '__wrapped__') else (
-            LA_NAMESPACE or la_client.list_namespaces(compartment_id=TENANCY_ID).data.items[0].namespace_name
+            LA_NAMESPACE or la_client.list_namespaces(compartment_id=resolve_tenancy_id()).data.items[0].namespace_name
         )
         lg = la_client.get_log_analytics_log_group(
             namespace_name=ns,
@@ -597,10 +817,11 @@ def validate_streams():
     expected_names = get_expected_stream_names()
     try:
         stream_admin = get_streaming_admin_client()
+        compartment_id = resolve_compartment_id()
         results = []
         for name in expected_names:
             streams = stream_admin.list_streams(
-                compartment_id=COMPARTMENT_ID, name=name, lifecycle_state="ACTIVE"
+                compartment_id=compartment_id, name=name, lifecycle_state="ACTIVE"
             ).data
             if streams:
                 results.append((name, True, f"ACTIVE ({streams[0].id[:40]}...)"))
@@ -616,10 +837,11 @@ def validate_service_connectors():
     expected_prefixes = get_expected_connector_names()
     try:
         sch = get_sch_client()
+        compartment_id = resolve_compartment_id()
         results = []
         for name in expected_prefixes:
             connectors = sch.list_service_connectors(
-                compartment_id=COMPARTMENT_ID, display_name=name
+                compartment_id=compartment_id, display_name=name
             ).data.items
             active = [c for c in connectors if getattr(c, "lifecycle_state", "") == "ACTIVE"]
             if active:
@@ -659,9 +881,10 @@ def validate_streaming_config():
 
     # Check compartment consistency
     cfg_comp = meta.get("compartment_id", "")
-    if COMPARTMENT_ID and cfg_comp and cfg_comp != COMPARTMENT_ID:
+    active_comp = resolve_compartment_id()
+    if active_comp and cfg_comp and cfg_comp != active_comp:
         results.append(("compartment_id", False,
-                         f"MISMATCH: config={cfg_comp[-12:]} vs env={COMPARTMENT_ID[-12:]}"))
+                         f"MISMATCH: config={cfg_comp[-12:]} vs env={active_comp[-12:]}"))
     elif cfg_comp:
         results.append(("compartment_id", True, f"...{cfg_comp[-12:]}"))
 

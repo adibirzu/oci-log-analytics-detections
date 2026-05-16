@@ -6,7 +6,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from detection_rule_creator import build_detection_rule_spec, classify_query
+from detection_rule_creator import build_catalog, build_detection_rule_spec, classify_query
 
 
 class TestDetectionRuleCreator(unittest.TestCase):
@@ -69,6 +69,54 @@ class TestDetectionRuleCreator(unittest.TestCase):
 
         self.assertFalse(result["eligible"])
         self.assertTrue(any("Fusion Apps" in reason for reason in result["reasons"]))
+
+    def test_build_catalog_includes_export_metadata(self):
+        payloads = [
+            (
+                "queries/apps/app_error_rate_by_service.json",
+                {
+                    "title": "Application Error Rate by Service",
+                    "query": "'Log Source' = 'SOC Application Logs' | stats count as ErrorCount by 'Service Name'",
+                    "level": "high",
+                    "dashboard": {"visualizationType": "bar"},
+                },
+            )
+        ]
+
+        catalog = build_catalog(payloads=payloads)
+
+        self.assertEqual(catalog["total_queries"], 1)
+        self.assertEqual(catalog["eligible_queries"], 1)
+        self.assertEqual(catalog["specs"][0]["scheduled_rule_eligibility"], "deployable")
+        self.assertEqual(catalog["specs"][0]["live_validation_status"], "not_run")
+        self.assertTrue(catalog["specs"][0]["alarm_template"]["enabled"])
+
+    def test_octo_apm_rule_safe_query_is_deployable(self):
+        payload = {
+            "title": "APM: Octo Demo Payment Redirect Detection Rule",
+            "query": (
+                "'Log Source' = 'SOC Application Logs' and "
+                "'Service Namespace' = 'octo' and 'Attack ID' != null and "
+                "'Payment Redirect URL' != null | "
+                "stats count as PaymentRedirectEvents by "
+                "'Attack ID', 'Trace ID', 'Payment Redirect URL'"
+            ),
+            "level": "critical",
+            "detection_rule": {"schedule": "5m", "lookback": "15m"},
+        }
+
+        spec = build_detection_rule_spec(
+            "queries/apps/apm_octo_rule_payment_redirect_count.json",
+            payload,
+        )
+
+        self.assertTrue(spec["eligible"])
+        self.assertEqual(spec["scheduled_rule_eligibility"], "deployable")
+        self.assertEqual(spec["metric_name"], "PaymentRedirectEvents")
+        self.assertEqual(
+            spec["dimensions"],
+            ["Attack ID", "Trace ID", "Payment Redirect URL"],
+        )
 
 
 if __name__ == "__main__":

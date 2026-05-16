@@ -31,6 +31,12 @@
   "falsepositives": [
     "Browser helper objects launching legitimate utilities"
   ],
+  "atomic_red_team": {
+    "has_tests": false,
+    "test_count": 0,
+    "techniques_with_tests": [],
+    "tests": []
+  },
   "splunk_original": "index=sysmon EventCode=1 ParentImage=\"*iexplore.exe\" Image IN (\"*cmd.exe\",\"*powershell.exe\",\"*wscript.exe\",\"*mshta.exe\") | table _time, ParentImage, Image, CommandLine, User",
   "threat_intel": {
     "malware_family": "BLUELIGHT",

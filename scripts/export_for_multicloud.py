@@ -30,6 +30,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from oci_config import SOURCE_CANDIDATE_GROUPS
+from query_artifacts import is_saved_search_query_file
 
 PROJECT_DIR = Path(__file__).parent.parent
 RULES_DIR = PROJECT_DIR / 'rules'
@@ -44,7 +45,7 @@ def load_all_queries():
     """Load all source-derived generated query JSON files."""
     queries = {}
     for f in sorted(QUERIES_DIR.rglob('*.json')):
-        if f.name in ('manifest.json', 'catalog.json', 'dashboard_inventory.json'):
+        if not is_saved_search_query_file(f):
             continue
         with open(f) as fh:
             data = json.load(fh)

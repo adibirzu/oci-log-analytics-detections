@@ -19,7 +19,11 @@ field_mappings:
   resource_id: ResourceIdentifier
   resource_name: "'Resource Name'"
   resource_type: "'Resource Type'"
-  request_action: "'Request Action Type'"
+  # OCI Audit's parser exposes the API verb under ``HTTP Method``; the
+  # ``Request Action Type`` display name is reserved for the higher-level
+  # action verb (e.g. CREATE/UPDATE) and isn't searchable on the audit
+  # source. Use HTTP Method so `request_action: POST` filters work.
+  request_action: "'HTTP Method'"
   compartment_name: "'Compartment Name'"
   compartment_id: "'Compartment OCID'"
   region: "'Region'"
@@ -83,15 +87,25 @@ field_mappings:
   TargetDomainName: "'Target Domain Name'"
   LogonType: "'Logon Type'"
   ObjectName: "'Object Name'"
-  NewProcessName: "'New Process Name'"
+  # OCI Log Analytics' Windows Security parser surfaces the new-process name
+  # under ``Process Name``, not ``New Process Name``. Map to the working field.
+  NewProcessName: "'Process Name'"
   ServiceName: "'Service Name'"
   ServiceFileName: "'Service File Name'"
+  # ``Target Server Name`` is NOT extracted by OCI's stock Windows Security
+  # parser. We keep the mapping for reference, but consumers should fall back
+  # to ``Subject User Name`` or drop the filter.
   TargetServerName: "'Target Server Name'"
+  # Kerberos ticket details (events 4768/4769/4770)
+  TicketEncryptionType: "'Ticket Encryption Type'"
+  PrivilegeList: "'Privilege List'"
+  # Linux Auditd / lower-snake_case variants used by some hand-written rules
+  parent_process_name: "'Parent Process Name'"
   ShareName: "'Share Name'"
   RelativeTargetName: "'Relative Target Name'"
   AccessMask: "'Access Mask'"
   ObjectType: "'Object Type'"
-  Properties: Properties
+  Properties: "'Properties'"
   TargetObject: "'Target Object'"
   Details: Details
 

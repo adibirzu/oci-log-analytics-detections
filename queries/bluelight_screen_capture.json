@@ -33,6 +33,12 @@
     "Automated testing frameworks generating screenshots"
   ],
   "requires_aggregation": true,
+  "atomic_red_team": {
+    "has_tests": false,
+    "test_count": 0,
+    "techniques_with_tests": [],
+    "tests": []
+  },
   "splunk_original": "index=sysmon EventCode=11 TargetFilename=\"*.jpg\" NOT Image IN (\"*chrome.exe\",\"*msedge.exe\",\"*Photos.exe\",\"*SnippingTool.exe\") | bucket _time span=1m | stats count by _time, Image, TargetFilename | where count > 3",
   "threat_intel": {
     "malware_family": "BLUELIGHT",

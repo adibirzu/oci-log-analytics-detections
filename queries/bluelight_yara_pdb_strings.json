@@ -32,6 +32,12 @@
   "falsepositives": [
     "None expected - PDB paths are unique compilation artifacts"
   ],
+  "atomic_red_team": {
+    "has_tests": false,
+    "test_count": 0,
+    "techniques_with_tests": [],
+    "tests": []
+  },
   "yara_source": {
     "rule_name": "APT_MAL_Win_BlueLight",
     "rule_id": "3ec2d44c-4c08-514d-a839-acef3f53f7dc",

@@ -1,7 +1,7 @@
 {
   "title": "APM: Total Browser Attacks (24h)",
   "description": "KPI tile counting every SOC Application Logs record carrying an Attack Type tag in the last 24 hours. Headline metric for executive dashboards.",
-  "query": "'Log Source' = 'SOC Application Logs' and 'Attack Type' != '' | stats count as Attacks",
+  "query": "'Log Source' = 'SOC Application Logs' and 'Attack Type' != null | timestats span = 1hour count as Attacks",
   "type": "hunting",
   "level": "informational",
   "tags": ["apm", "kpi", "showcase"],

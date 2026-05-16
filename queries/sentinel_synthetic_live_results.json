@@ -1,0 +1,98 @@
+{
+  "lookback": "24h",
+  "timeout": 60,
+  "tested": 8,
+  "passed": 8,
+  "empty": 0,
+  "failed": 0,
+  "results": [
+    {
+      "title": "Detect Suspicious Commands Initiated by Webserver Processes",
+      "sentinel_id": "fa2f7d8a-6726-465a-aa72-6f6e3d4c99d7",
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Discovery/SuspiciousCommandInitiatedByWebServerProcess.yaml",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "ok": true,
+      "rows": 1,
+      "empty": false,
+      "error": "",
+      "duration_seconds": 1.02
+    },
+    {
+      "title": "Doppelpaymer Stop Services",
+      "sentinel_id": "5bdc1504-880c-4b30-a39c-7c746535928d",
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Defense Evasion/DoppelpaymerStopService.yaml",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "ok": true,
+      "rows": 1,
+      "empty": false,
+      "error": "",
+      "duration_seconds": 0.68
+    },
+    {
+      "title": "Office Apps Launching Wscipt",
+      "sentinel_id": "174de33b-107b-4cd8-a85d-b4025a35453f",
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Execution/OfficeAppsLaunchingWscript.yaml",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "ok": true,
+      "rows": 1,
+      "empty": false,
+      "error": "",
+      "duration_seconds": 0.74
+    },
+    {
+      "title": "LemonDuck-component-names",
+      "sentinel_id": "bcb5f147-863a-4972-aec9-48f67cc24727",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/Campaigns/LemonDuck/LemonDuck-component-names.yaml",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "ok": true,
+      "rows": 1,
+      "empty": false,
+      "error": "",
+      "duration_seconds": 0.74
+    },
+    {
+      "title": "DopplePaymer Procdump",
+      "sentinel_id": "1be34fb9-f81b-47ae-84fb-465e6686d76c",
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Credential Access/DoppelPaymerProcDump.yaml",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "ok": true,
+      "rows": 1,
+      "empty": false,
+      "error": "",
+      "duration_seconds": 0.77
+    },
+    {
+      "title": "LSASS Credential Dumping with Procdump",
+      "sentinel_id": "c332b840-61e4-462e-a201-0e2d69bad45d",
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Credential Access/LSASSCredDumpProcdump.yaml",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "ok": true,
+      "rows": 1,
+      "empty": false,
+      "error": "",
+      "duration_seconds": 0.75
+    },
+    {
+      "title": "Discord download invoked from cmd line",
+      "sentinel_id": "e7dd442a-0af8-48eb-8358-9e91f4911849",
+      "source_path": "Solutions/Windows Security Events/Hunting Queries/Discorddownloadinvokedfromcmdline.yaml",
+      "selected_source": "Windows Event Security Logs",
+      "ok": true,
+      "rows": 1,
+      "empty": false,
+      "error": "",
+      "duration_seconds": 0.83
+    },
+    {
+      "title": "NRT Base64 Encoded Windows Process Command-lines",
+      "sentinel_id": "c3e5dbaa-a540-408c-8b36-68bdfb3df088",
+      "source_path": "Solutions/Windows Security Events/Analytic Rules/NRT_base64_encoded_pefile.yaml",
+      "selected_source": "Windows Event Security Logs",
+      "ok": true,
+      "rows": 1,
+      "empty": false,
+      "error": "",
+      "duration_seconds": 0.84
+    }
+  ]
+}

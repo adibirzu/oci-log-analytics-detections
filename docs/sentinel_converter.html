@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sentinel to Logan QL Conversion</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #5f6b7a;
+      --line: #d9e0e8;
+      --panel: #f7f9fb;
+      --accent: #0f766e;
+      --accent-2: #b45309;
+      --accent-3: #1d4ed8;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--white);
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header {
+      padding: 32px clamp(20px, 5vw, 64px) 24px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(90deg, #f8fafc, #f1f8f6 45%, #fff7ed);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+    main {
+      padding: 28px clamp(20px, 5vw, 64px) 48px;
+    }
+    .lede {
+      max-width: 980px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 24px;
+      margin-top: 18px;
+      color: var(--muted);
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 12px;
+      margin: 0 0 28px;
+    }
+    .metric {
+      min-height: 96px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 30px;
+      line-height: 1;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 18px;
+      align-items: start;
+    }
+    section.panel {
+      margin-bottom: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 10px 9px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 650;
+      background: #f8fafc;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(105px, 170px) 1fr 48px;
+      gap: 12px;
+      align-items: center;
+      margin: 10px 0;
+    }
+    .bar-track {
+      height: 14px;
+      border-radius: 999px;
+      background: #edf2f7;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-3));
+    }
+    code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #eef2ff;
+      color: #1e3a8a;
+    }
+    pre {
+      overflow-x: auto;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #111827;
+      color: #f9fafb;
+    }
+    .muted { color: var(--muted); }
+    .callout {
+      border-left: 4px solid var(--accent-2);
+      padding-left: 14px;
+      color: var(--muted);
+    }
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 1fr; gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sentinel to Logan QL Conversion</h1>
+    <p class="lede">Static review page for the Microsoft Sentinel conversion pipeline. Promoted queries are source-attributed, mapped to real OCI Log Analytics fields, and written only after live parser validation.</p>
+    <div class="meta">
+      <span>Generated: 2026-05-15T04:03:15.819656+00:00</span>
+      <span>Source: https://github.com/Azure/Azure-Sentinel</span>
+      <span>Ranking: quality-first</span>
+    </div>
+  </header>
+  <main>
+    <div class="metrics"><section class="metric"><span>Candidates</span><strong>4452</strong></section><section class="metric"><span>Attempted</span><strong>25</strong></section><section class="metric"><span>Promoted</span><strong>8</strong></section><section class="metric"><span>Live passed</span><strong>8</strong></section><section class="metric"><span>Live failed</span><strong>10</strong></section><section class="metric"><span>Promoted files</span><strong>8</strong></section></div>
+    <div class="grid">
+      <div>
+        <section class="panel">
+          <h2>Promoted Categories</h2>
+          <div class="bar-row"><span>endpoint</span><div class="bar-track"><div class="bar" style="width: 100%"></div></div><strong>8</strong></div>
+        </section>
+        <section class="panel">
+          <h2>Sentinel Dashboards</h2>
+          <table><thead><tr><th>Dashboard</th><th>Widgets</th></tr></thead><tbody><tr><td>SOC: Microsoft Sentinel Endpoint Converted Detections</td><td>8</td></tr></tbody></table>
+        </section>
+        <section class="panel">
+          <h2>Top Skip Reasons</h2>
+          <table><thead><tr><th>Reason</th><th>Count</th></tr></thead><tbody><tr><td>synthetic live validation not run</td><td>10</td></tr><tr><td>unsupported Sentinel field mapping: SubjectAccount</td><td>2</td></tr><tr><td>unsupported KQL stage: parse EventData with * &#x27;ObjectDN&quot;&gt;&#x27; ObjectDN &quot;&lt;&quot; *</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: ActingProcessFileInternalName</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: ClientInfoString</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: EventData</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: Exe</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: InitiatingProcessAccountDomain</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: InitiatingProcessAccountName</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: InitiatingProcessSHA256</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: LocalFile</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: Logon_Type</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: MailboxOwnerUPN</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: ObjectDN</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: OfficeWorkload</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: OrganizationName</td><td>1</td></tr></tbody></table>
+        </section>
+        <section class="panel">
+          <h2>Live Validation Failures Kept Out</h2>
+          <table><thead><tr><th>Title</th><th>Source path</th><th>Error</th></tr></thead><tbody><tr><td>ApexOne - Top sources with alerts</td><td>Solutions/Trend Micro Apex One/Hunting Queries/TMApexOneTopSources.yaml</td><td>synthetic live validation not run</td></tr><tr><td>McAfee ePO - Multiple threats on same host</td><td>Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOMultipleThreatsSameHost.yaml</td><td>synthetic live validation not run</td></tr><tr><td>McAfee ePO - Threat was not blocked</td><td>Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOThreatNotBlocked.yaml</td><td>synthetic live validation not run</td></tr><tr><td>Deimos Component Execution</td><td>Solutions/Microsoft Defender XDR/Analytic Rules/Campaign/Jupyter-Solarmaker/DeimosComponentExecution.yaml</td><td>synthetic live validation not run</td></tr><tr><td>Critical Risks</td><td>Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Risks.yaml</td><td>synthetic live validation not run</td></tr><tr><td>Vulerabilities</td><td>Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Vulnerabilities.yaml</td><td>synthetic live validation not run</td></tr><tr><td>TEARDROP memory-only dropper</td><td>Solutions/Microsoft Defender XDR/Analytic Rules/SolarWinds_TEARDROP_Process-IOCs.yaml</td><td>synthetic live validation not run</td></tr><tr><td>Apache - Apache 2.4.49 flaw CVE-2021-41773</td><td>Solutions/ApacheHTTPServer/Analytic Rules/ApacheCVE-2021-41773.yaml</td><td>synthetic live validation not run</td></tr></tbody></table>
+        </section>
+      </div>
+      <aside>
+        <section class="panel">
+          <h2>Severity Mix</h2>
+          <table><thead><tr><th>Severity</th><th>Promoted</th></tr></thead><tbody><tr><td>high</td><td>4</td></tr><tr><td>medium</td><td>4</td></tr></tbody></table>
+        </section>
+        <section class="panel">
+          <h2>Promoted Live Status</h2>
+          <table><thead><tr><th>Live status</th><th>Promoted files</th></tr></thead><tbody><tr><td>passed</td><td>8</td></tr></tbody></table>
+        </section>
+        <section class="panel">
+          <h2>Operator Commands</h2>
+          <pre>python3 scripts/sentinel_conversion_workflow.py local
+python3 scripts/sentinel_conversion_workflow.py promote --top all --timeout 20
+python3 scripts/sentinel_conversion_workflow.py promote --top all --timeout 60 --progress-interval 0
+python3 scripts/sentinel_conversion_workflow.py refresh-artifacts
+python3 scripts/sentinel_conversion_workflow.py triage
+python3 scripts/sentinel_conversion_workflow.py next-queries --limit 10
+python3 scripts/sentinel_conversion_workflow.py next-queries --strategy foundational --limit 10
+python3 scripts/sentinel_conversion_workflow.py status --json --strict</pre>
+          <p class="callout">The local command writes to <code>/tmp/sentinel_conversion_local.json</code> by default so it does not overwrite the canonical live validation report.</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "title": "Alternate Data Stream Execution",
   "description": "Detects execution of payloads hidden in NTFS Alternate Data Streams.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Command Line' REGEX MATCH '.*:\\w+\\.\\w+:.*'))",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*.exe:*' or 'Command Line' like '*.dll:*' or 'Command Line' like '*.txt:*' or 'Command Line' like '*.ps1:*' or 'Command Line' like '*.bat:*' or 'Command Line' like '*.vbs:*' or 'Command Line' like '*.js:*')))",
   "sigma_id": "a2ffd565-aa4f-4a2f-9b9c-d69df97fe67b",
   "level": "high",
   "stig_category": "CAT I",

@@ -11,12 +11,10 @@ logsource:
 detection:
   selection:
     EventID: 4648
-  filter_localhost:
-    TargetServerName: 'localhost'
-  condition: selection and not filter_localhost
+  condition: selection
   aggregation:
     count_by_subject:
-      field: TargetServerName
+      field: SubjectUserName
       by: SubjectUserName
       threshold: 5
   timeframe: 1h

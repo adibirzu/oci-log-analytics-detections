@@ -30,6 +30,7 @@ from convert_sigma import (
     load_config,
     merge_preserved_fields,
     resolve_output_relative_path,
+    should_skip_existing_output,
 )
 
 
@@ -128,6 +129,28 @@ class TestContainsAll(unittest.TestCase):
         field_map = {'CommandLine': "'Command Line'"}
         result = parse_selection(selection, field_map)
         self.assertIn(' or ', result)
+
+
+class TestBackslashEscaping(unittest.TestCase):
+    """Test Windows path and pipe-name literal escaping for OCI LA."""
+
+    def test_exact_string_values_escape_backslashes(self):
+        selection = {'Image': r'C:\Windows\System32\reg.exe'}
+        field_map = {'Image': "'Process Name'"}
+
+        result = parse_selection(selection, field_map)
+
+        self.assertIn(r"'Process Name' = 'C:\\Windows\\System32\\reg.exe'", result)
+
+    def test_pipe_name_exact_values_use_escaped_wildcard_patterns(self):
+        selection = {'PipeName': [r'\HID_CTRL', r'\Win32Pipes.']}
+        field_map = {'PipeName': "'Pipe Name'"}
+
+        result = parse_selection(selection, field_map)
+
+        self.assertIn(r"'Pipe Name' like '*\\HID_CTRL*'", result)
+        self.assertIn(r"'Pipe Name' like '*\\Win32Pipes.*'", result)
+        self.assertNotIn("'Pipe Name' = '\\HID_CTRL'", result)
 
 
 class TestUnknownLogsourceWarning(unittest.TestCase):
@@ -231,7 +254,10 @@ class TestCountGracefulDegradation(unittest.TestCase):
             self.assertIsNotNone(result)
             self.assertTrue(result.get('requires_aggregation', False))
             # Base filter should still be present
-            self.assertIn("'Event ID' = 4625", result['query'])
+            # Event ID is a string-typed OCI field — converter quotes integer
+            # values so the parser doesn't reject them with
+            # ``Invalid string value for the field 'Event ID': 4625``.
+            self.assertIn("'Event ID' = '4625'", result['query'])
         finally:
             os.unlink(tmp_path)
 
@@ -347,6 +373,17 @@ class TestPreservedMetadata(unittest.TestCase):
         self.assertNotIn('logsource_fallback', merged)
         self.assertNotIn('requires_aggregation', merged)
         self.assertEqual(merged['threat_intel']['family'], 'example')
+
+    def test_do_not_overwrite_skips_existing_outputs_only(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            existing_path = os.path.join(tmpdir, 'existing.json')
+            missing_path = os.path.join(tmpdir, 'missing.json')
+            with open(existing_path, 'w') as f:
+                json.dump({'title': 'Existing'}, f)
+
+            self.assertTrue(should_skip_existing_output({'do_not_overwrite': True}, existing_path))
+            self.assertFalse(should_skip_existing_output({'do_not_overwrite': True}, missing_path))
+            self.assertFalse(should_skip_existing_output({}, existing_path))
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ from generate_dashboard_data import PROJECT_DIR, build_commands, run_commands
 
 
 class TestGenerateDashboardData(unittest.TestCase):
-    """Ensure the 14-day dataset generator composes the right steps."""
+    """Ensure the dataset generator composes the right steps."""
 
     def test_build_commands_covers_security_and_multicloud_generation(self):
         commands = build_commands(

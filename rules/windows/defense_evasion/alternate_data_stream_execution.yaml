@@ -7,7 +7,14 @@ logsource:
   category: process_creation
 detection:
   selection:
-    CommandLine|re: .*:\w+\.\w+:.*
+    CommandLine|contains:
+    - '.exe:'
+    - '.dll:'
+    - '.txt:'
+    - '.ps1:'
+    - '.bat:'
+    - '.vbs:'
+    - '.js:'
   condition: selection
 level: high
 tags:

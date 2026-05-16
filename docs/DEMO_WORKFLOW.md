@@ -1,11 +1,11 @@
 # OCI Log Analytics Advanced Detection — Demo Workflow
 
-Date: 2026-05-03
+Date: 2026-05-12
 Audience: Demo operators, SOC analysts, security architects, platform engineers
 
 ## Overview
 
-This document provides a step-by-step demo workflow showcasing OCI Log Analytics advanced detection capabilities deployed as part of the OCI-DEMO platform. The demo covers five scenarios across 35-45 minutes, progressing from foundational SOC operations to advanced APT threat hunting and browser/application telemetry detection.
+This document provides a step-by-step demo workflow showcasing OCI Log Analytics advanced detection capabilities deployed as part of the OCI-DEMO platform. The demo covers seven scenarios across 55-65 minutes, progressing from foundational SOC operations to advanced APT threat hunting, browser/application telemetry detection, an end-to-end web-to-cloud incident drilldown, and 2025-2026 MELTS-based attack hunting.
 
 ## Current Operator Shortcut
 
@@ -13,22 +13,22 @@ Before the demo, refresh the tenancy with the current dashboard-first path:
 
 ```bash
 python3 scripts/setup_log_sources.py
-python3 scripts/generate_test_logs.py --days 1 --validate
-python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5
+python3 scripts/generate_dashboard_data.py --days 21 --geo-interval 15 --validate
 python3 scripts/ingest_test_data.py --validate
 python3 scripts/ingest_test_data.py --mode direct
-python3 scripts/smoke_test_bluelight.py --lookback 24h
-python3 scripts/deploy_dashboard.py --cleanup
+python3 scripts/deploy_dashboard.py --cleanup --query-lookback 21d --query-timeout 90
+python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --json docs/health/verify-default-21d-final.json
 ```
 
-Validated on `2026-05-03` for local generation and on `2026-04-28` for direct OCI ingest/smoke/deploy:
+Validated on `2026-05-12` for local generation and live dashboard deployment:
 
-- `2,922` synthetic events generated across `14` files
-- `14/14` files uploaded to OCI Log Analytics through direct ingest
-- `17/17` BLUELIGHT widgets returned rows with a 24-hour lookback
-- `16` dashboards and `264` saved searches resolve from generated inventory
+- `221,078` synthetic events generated across `17` files in the latest local 21-day dataset
+- `16/16` standard files pass ingest pre-flight validation and direct upload; the scoped Octo APM workshop JSONL is uploaded by the workshop wrapper
+- `22` dashboards and `343` active saved searches resolve from generated inventory after the C2, FreeLabFriday, web-to-cloud, browser, APT, application telemetry, 2025-2026 MELTS, and Octo APM updates
+- `<OCI_PROFILE_CAP>` has parser/source setup complete, the updated Octo application/APM dataset uploaded, and the current `343` dashboard-widget baseline verified HIT
+- Live health is validated with a 21-day lookback after full cleanup redeploys. Regenerate `docs/health/verify-<profile>-21d-final.json` and `docs/health/verify-default-21d-final.json` after deploying the current `22`-dashboard inventory.
 
-Current repository configuration on `2026-05-03` resolves to `16` dashboards and `264` saved searches after the APM/WAF browser showcase update.
+Current repository configuration on `2026-05-12` resolves to `22` dashboards and `343` active saved searches. The Octo APM workshop, C2, FreeLabFriday, web-to-cloud, and 2025-2026 drilldown widgets request `l21d` so the full three-week incident remains visible after ingest.
 
 Use this path before recreating dashboards. `deploy_dashboard.py` validates the generated inventory and every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
 
@@ -36,12 +36,12 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 
 | Requirement | Current State |
 |-------------|---------------|
-| OCI Console access | `https://console.eu-frankfurt-1.oraclecloud.com` |
-| Demo Controls | `https://cp.octodemo.cloud` |
-| Control Plane | `https://cp.octodemo.cloud` |
-| Log Analytics | demo-observability compartment → Dashboards |
-| Test data ingested | 2,922 generated events across 14 NDJSON datasets |
-| Dashboards configured | 16 SOC dashboards + 264 saved searches |
+| OCI Console access | `https://console.<OCI_REGION>.oraclecloud.com` |
+| Demo Controls | `https://<DEMO_CONTROL_PLANE_HOST>` |
+| Control Plane | `https://<DEMO_CONTROL_PLANE_HOST>` |
+| Log Analytics | <OBSERVABILITY_COMPARTMENT> compartment → Dashboards |
+| Test data generated | 221,078 local events across 17 NDJSON datasets |
+| Dashboards configured | 22 SOC/demo dashboards + 343 active saved searches |
 
 ---
 
@@ -52,13 +52,13 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 ### Steps
 
 1. **Open OCI Console** → Observability & Management → Log Analytics → Dashboards
-2. **Select compartment:** `demo-observability`
+2. **Select compartment:** `<OBSERVABILITY_COMPARTMENT>`
 3. **Open:** `SOC Overview Dashboard`
 
 **Talking Points:**
 - "This is a unified SOC overview pulling security events from OCI Audit, Windows Sysmon, Linux, Cloud Guard, and WAF — all in one dashboard."
 - "Each widget represents a detection rule converted from industry-standard Sigma format into OCI Log Analytics Query Language."
-- "The repo currently ships 454 source rules, 486 Sigma-derived OCI query artifacts, and 211 MITRE ATT&CK techniques across 14 tactics."
+- "The repo currently ships 454 source rules, 455 Sigma-derived OCI query artifacts, 24 curated app/APM analytics, 87 hunting analytics, and 216 MITRE ATT&CK techniques across 14 tactics."
 
 4. **Click into** `SOC: Console Login Failures` — show the OCL query behind it
 5. **Show** the hunting widget: `Hunt: SSH Brute Force` — highlight the frequency analysis pattern:
@@ -123,7 +123,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 ### Steps
 
 1. **Open:** `SOC: APT Detection Dashboard`
-   - This is a dedicated BLUELIGHT kill chain dashboard with 17 widgets
+   - This is a dedicated BLUELIGHT kill chain dashboard with 22 widgets: 5 showcase/correlation widgets plus 17 per-stage detections
 
 2. **Walk the kill chain** (top to bottom):
 
@@ -193,11 +193,134 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
    - Show how application trace telemetry correlates with security events
    - "The same trace ID that shows a slow request in the app telemetry view also shows a WAF block in the security dashboard."
 
+6. **Open the dedicated APM view** — `OCI-DEMO: Octo APM Demo Dashboard`:
+   - Show `octo-apm-demo` RED metrics, request/error timeline, span hotspots, trace-to-log correlation, Java/payment/API Gateway errors, OSQuery host evidence, and compromised VM pivots
+   - "This view uses the same `Trace ID`, `Span ID`, and metric fields to correlate application logs, APM-shaped spans, and metric samples."
+
 **Key Message:** "Browser-side detection is a significant blind spot for most organizations. By normalizing browser and application telemetry into `SOC Application Logs`, we extend detection from the server all the way to the browser — covering OWASP Top 10 attack patterns that WAF alone cannot see."
 
 ---
 
-## Demo Scenario 5: STIG Compliance & Hunting (5 min)
+## Demo Scenario 5: Web-to-Cloud Threat Hunting Drilldown (12 min)
+
+**Objective:** Show a complete threat-hunting investigation from the web entry point through compromised machines, cloud identity abuse, C2, and exfiltrated data.
+
+### Attack Description
+
+| Stage | What Happens | Primary Evidence |
+|-------|--------------|------------------|
+| **Recon / Entry** | Attacker `<ATTACK_SOURCE_IP>` probes the CRM endpoint and sends an SSRF payload to the instance metadata endpoint. | WAF, Load Balancer, Web Application, Application logs |
+| **Host Compromise** | The app host `<APP_HOST>` accesses `<OCI_METADATA_ENDPOINT>`, stages `<OBJECT_EXPORT_NAME>`, and begins outbound transfer. | Linux Secure, Application logs |
+| **C2 / Egress** | Private IP `<COMPROMISED_PRIVATE_IP>` communicates with C2 destination `<C2_DESTINATION_IP>`; Windows host `<WINDOWS_HOST>` shows matching outbound C2. | VCN Flow, Network Firewall, Sysmon Network |
+| **Cloud Abuse** | Service identity `<COMPROMISED_PRINCIPAL>` lists and reads objects from bucket `<OBJECT_STORAGE_BUCKET>`. | OCI Audit |
+| **Exfiltration** | Large outbound byte counts and firewall threat alert identify the exfil destination and object name. | VCN Flow, Network Firewall, OCI Audit, Application logs |
+
+### Steps
+
+1. **Open:** `SOC: Web-to-Cloud Threat Hunting Dashboard`
+   - Set time range to **Last 21 days**
+   - Start with `W2C: Correlated Timeline`
+   - Point out the shared Trace ID: `<TRACE_ID>`
+
+2. **Find the entry point**
+   - Open `W2C: Entry Point and SSRF`
+   - Show:
+     - `Client IP`: `<ATTACK_SOURCE_IP>`
+     - `Request URL`: contains `<OCI_METADATA_ENDPOINT>`
+     - WAF action `DETECT`, not `BLOCK`
+     - Backend/app host context tied to `<APP_HOST>`
+
+3. **Identify compromised machines**
+   - Open `W2C: Compromised Machines`
+   - Confirm:
+     - Linux app host: `<APP_HOST>`
+     - Compromised private IP: `<COMPROMISED_PRIVATE_IP>`
+     - Windows C2 indicator host: `<WINDOWS_HOST>`
+   - Pivot to Linux command lines showing metadata access and export staging.
+
+4. **Confirm cloud identity abuse**
+   - Open `W2C: Compromised Identity`
+   - Show the abused OCI principal:
+     - `<COMPROMISED_PRINCIPAL>`
+     - Object Storage actions: list buckets, list objects, get object, create pre-authenticated request
+     - Resource: `<OBJECT_STORAGE_EXPORT_PATH>`
+
+5. **Prove C2 and exfiltration**
+   - Open `W2C: VCN Egress`
+   - Show the large `Bytes Sent` values from `<COMPROMISED_PRIVATE_IP>` to `<C2_DESTINATION_IP>`
+   - Open `W2C: Network Firewall C2`
+   - Show `Threat Name = Suspicious Data Exfiltration`
+   - Open `W2C: Exfiltrated Data`
+   - Tie together the object name, service identity, C2 IP, and network byte counts.
+
+6. **Use advanced drilldowns**
+   - Open `W2C: Attack Path Link`
+   - Show the full path grouped by `Trace ID`, `Log Source`, and `Attack Stage`
+   - Open `W2C: MITRE Stage Breakdown`
+   - Summarize evidence coverage by attack stage.
+
+**Key Message:** "The demo is not just a set of detections. It is an investigation path: web request, compromised host, abused cloud identity, network egress, firewall alert, and exfiltrated object, all connected by deterministic synthetic telemetry across the last 21 days."
+
+---
+
+## Demo Scenario 6: 2025-2026 MELTS Threat Hunting (10 min)
+
+**Objective:** Show modern 2025-2026 attack detection with MELTS-driven pivots across metrics, events, logs, traces, and security state.
+
+### Attack Description
+
+| Attack | What Happens | Primary Evidence |
+|--------|--------------|------------------|
+| ClickFix | Fake CAPTCHA lure causes browser-parented PowerShell and LOLBin execution. | Windows Sysmon, Windows Security |
+| CrashFix | ClickFix variant launches a Python RAT and HTTPS callback traffic. | Windows Sysmon, Sysmon Network |
+| SharePoint ToolShell | ToolPane / `spinstall0.aspx` exploitation and webshell command attempts. | WAF, Load Balancer, Web Application, Application logs |
+| RMM Abuse | ScreenConnect, AnyDesk, and Atera appear after compromise. | Windows Sysmon, Sysmon Network |
+| AiTM Token Replay | One cloud principal performs login, discovery, Object Storage access, and auth-token creation. | OCI Audit |
+| Exfiltration | Large network transfers and Object Storage reads tie the attack to data loss. | VCN Flow, Network Firewall, OCI Audit |
+
+### Steps
+
+1. **Open:** `SOC: 2025-2026 Threat Hunting Dashboard`
+   - Set time range to **Last 21 days**
+   - Start with `MELTS: Signal Overview`
+   - Explain the method: Metrics, Events, Logs, Traces, and Security state
+
+2. **Build the timeline**
+   - Open `MELTS: Attack Timeline`
+   - Identify the earliest source and the highest-volume stage
+   - Pivot into `MELTS: Attack Path Link` and select `trace_clickfix_2026_001`
+
+3. **Investigate ClickFix and CrashFix**
+   - Open `ClickFix: Clipboard PowerShell`
+   - Confirm browser parent, hidden PowerShell, fake CAPTCHA/clipboard indicators
+   - Open `ClickFix: LOLBin Payloads`
+   - Confirm mshta/rundll32 execution
+   - Open `CrashFix: Python RAT`
+   - Confirm `python.exe`, `crashfix.py`, and callback traffic
+
+4. **Investigate SharePoint ToolShell**
+   - Open `SharePoint: ToolShell Attempts`
+   - Confirm ToolPane and `spinstall0.aspx` requests from `<UNTRUSTED_REDIRECT_IP>`
+   - Open `SharePoint: Webshell Post-Exploit`
+   - Confirm `spinstall0.aspx?cmd=whoami`
+
+5. **Investigate RMM and identity compromise**
+   - Open `RMM: Post-Compromise Activity`
+   - Confirm ScreenConnect, AnyDesk, Atera, and relay domains
+   - Open `Cloud Identity: AiTM Token Abuse`
+   - Confirm `codeofconduct-reader@corp.example.com` and the cloud API sequence
+
+6. **Close with data impact**
+   - Open `Exfil: After Initial Access`
+   - Identify destination `<EXFIL_DESTINATION_IP>` and large outbound bytes
+   - Open `Compromised Machines and Data`
+   - State the compromised machines, abused identity, and data objects
+
+**Key Message:** "The dashboard is built for threat hunting, not one-off alerting: it starts from MELTS correlation, then drills into each attack family and ends with compromised machines and exfiltrated data."
+
+---
+
+## Demo Scenario 7: STIG Compliance & Hunting (5 min)
 
 **Objective:** Show compliance monitoring and advanced threat hunting analytics.
 
@@ -226,25 +349,24 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 
 ### Trigger Attack Simulation (via Control Plane API)
 ```bash
-# Canonical 24-hour dashboard refresh flow
+# Canonical 21-day dashboard refresh flow for the full web-to-cloud showcase
 python3 scripts/setup_log_sources.py
-python3 scripts/generate_test_logs.py --days 1 --validate
-python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5
+python3 scripts/generate_dashboard_data.py --days 21 --geo-interval 15 --validate
 python3 scripts/ingest_test_data.py --validate
 python3 scripts/ingest_test_data.py --mode direct
-python3 scripts/smoke_test_bluelight.py --lookback 24h
-python3 scripts/deploy_dashboard.py --cleanup
+python3 scripts/deploy_dashboard.py --cleanup --query-lookback 21d --query-timeout 90
+python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --json docs/health/verify-default-21d-final.json
 
-# Optional extended 14-day refresh flow
+# Optional legacy extended-data helper
 python3 scripts/populate_dashboard_data_14d.py --validate
 
 # Or run individual extended-data steps when debugging
-python3 scripts/generate_dashboard_data.py --days 14 --validate
+python3 scripts/generate_dashboard_data.py --days 21 --validate
 python3 scripts/ingest_test_data.py
-python3 scripts/demo_readiness.py --lookback 14d
+python3 scripts/demo_readiness.py --lookback 21d
 
 # Or trigger via the canonical public Control Plane
-curl -X POST https://cp.octodemo.cloud/api/demo-events/trigger \
+curl -X POST https://<DEMO_CONTROL_PLANE_HOST>/api/demo-events/trigger \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"preset": "security_incident"}'
@@ -253,13 +375,13 @@ curl -X POST https://cp.octodemo.cloud/api/demo-events/trigger \
 ### Verify Dashboard Data
 ```bash
 python3 scripts/smoke_test_bluelight.py --lookback 24h
-python3 scripts/demo_readiness.py --lookback 24h
+python3 scripts/demo_readiness.py --lookback 21d
 python3 scripts/query_audit.py --lookback 24h --eligible-only --out /tmp/eligible_query_audit_24h.json
 ```
 
 ### Refresh Dashboards
 ```bash
-python3 scripts/deploy_dashboard.py --cleanup  # Recreate all 16 dashboards after OCI query validation
+python3 scripts/deploy_dashboard.py --cleanup  # Recreate all 22 dashboards after OCI query validation
 python3 scripts/generate_catalog.py            # Regenerate catalog
 ```
 
@@ -292,12 +414,12 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 │    │ OCI Log      │ │ Splunk        │ │ ServiceNow │              │
 │    │ Analytics    │ │ (External)    │ │ (Incidents)│              │
 │    │ ┌──────────┐ │ └───────────────┘ └────────────┘              │
-│    │ │16 SOC    │ │                                                │
+│    │ │22 SOC    │ │                                                │
 │    │ │Dashboards│ │                                                │
-│    │ │264 Saved │ │                                                │
+│    │ │343 Saved │ │                                                │
 │    │ │Searches  │ │                                                │
-│    │ │547 Assets│ │                                                │
-│    │ │211 MITRE │ │                                                │
+│    │ │580 Assets│ │                                                │
+│    │ │216 MITRE │ │                                                │
 │    │ └──────────┘ │                                                │
 │    └──────────────┘                                                │
 │                                                                      │
@@ -316,7 +438,7 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 │        └────────────────────┘                                       │
 │                                                                      │
 │  ┌─────────────────────────────────────────────────┐                │
-│  │ Control Plane (cp.octodemo.cloud)               │                │
+│  │ Control Plane (<DEMO_CONTROL_PLANE_HOST>)               │                │
 │  │ ┌───────────┐ ┌──────────┐ ┌─────────────────┐ │                │
 │  │ │ One-Click │ │ Stress   │ │ Event Presets   │ │                │
 │  │ │ Controls  │ │ Tests    │ │ (P1/P2/P3/P4)   │ │                │
@@ -333,12 +455,12 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 | Content Surface | Count | Dashboards | What to Emphasize |
 |----------------|-------|------------|-------------------|
 | Source Sigma/YAML rules | 454 | 14 | Windows, OCI, Linux, web, BLUELIGHT, and browser-side detections |
-| Sigma-derived OCI searches | 486 | 14 | 478 top-level detections + 8 browser/app telemetry detections |
-| Curated app telemetry analytics | 16 | 2 | App 360 correlation, WAF-to-trace pivots, service health, APM/WAF showcase views |
-| Hunting analytics | 45 | 4 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation |
+| Sigma-derived OCI searches | 455 | 14 | 447 top-level detections + 8 browser/app telemetry detections |
+| Curated app/APM telemetry analytics | 24 | 3 | App 360 correlation, WAF-to-trace pivots, service health, APM/WAF showcase views, Octo APM spans and metrics |
+| Hunting analytics | 87 | 7 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation, MELTS drilldowns |
 | STIG-mapped detections | 24 | 1 | Continuous control monitoring for IAM, network, audit, and key management |
-| Sample datasets | 14 generated files / 2,922 events | Demo enablement | Includes app telemetry and 60 minutes of multicloud geo-health data for the geographic dashboard |
-| **Total shipped query artifacts** | **547** | **16** | **211 MITRE techniques across 14 tactics** |
+| Sample datasets | 17 generated files / 221,078 local events | Demo enablement | Includes app/APM telemetry, network/firewall telemetry, GOAD/Caldera drilldown evidence, the scoped Octo APM workshop dataset, and multicloud geo-health data |
+| **Total shipped query artifacts** | **566** | **22** | **216 MITRE techniques across 14 tactics** |
 
 ---
 

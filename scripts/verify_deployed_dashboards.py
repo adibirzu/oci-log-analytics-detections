@@ -10,7 +10,7 @@ For every dashboard in ``deploy_dashboard.DASHBOARDS``:
    over the configured lookback window and report HIT / MISS / ERROR.
 
 Usage:
-    python3 scripts/verify_deployed_dashboards.py [--lookback 14d] [--json out.json]
+    python3 scripts/verify_deployed_dashboards.py [--lookback 21d] [--json out.json]
 """
 
 from __future__ import annotations
@@ -19,14 +19,17 @@ import argparse
 import json
 import sys
 from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import nullcontext
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import threading
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_DIR / "scripts"))
 
-from deploy_dashboard import DASHBOARDS  # noqa: E402
+from deploy_dashboard import DASHBOARDS, query_deadline, select_dashboards  # noqa: E402
 from oci_config import (  # noqa: E402
     COMPARTMENT_ID,
     LA_NAMESPACE,
@@ -46,41 +49,99 @@ class WidgetVerification:
     error: str | None = None
 
 
+_THREAD_LOCAL = threading.local()
+
+
 def _parse_lookback(value: str) -> timedelta:
     units = {"m": "minutes", "h": "hours", "d": "days"}
     return timedelta(**{units[value[-1]]: int(value[:-1])})
 
 
-def _run_query(la, namespace, query, start, end):
+def _get_thread_la_client(query_timeout: int):
+    """Return one Log Analytics client per worker thread."""
+    cached = getattr(_THREAD_LOCAL, "la_client", None)
+    cached_timeout = getattr(_THREAD_LOCAL, "query_timeout", None)
+    if cached is None or cached_timeout != query_timeout:
+        cached = get_la_client(timeout=(10, query_timeout))
+        _THREAD_LOCAL.la_client = cached
+        _THREAD_LOCAL.query_timeout = query_timeout
+    return cached
+
+
+def _run_query(la, namespace, query, start, end, timeout=None):
     import oci
 
     try:
-        result = la.query(
-            namespace_name=namespace,
-            query_details=oci.log_analytics.models.QueryDetails(
-                compartment_id=COMPARTMENT_ID,
-                query_string=query,
-                sub_system="LOG",
-                max_total_count=10,
-                time_filter=oci.log_analytics.models.TimeRange(
-                    time_start=start, time_end=end, time_zone="UTC",
+        deadline = query_deadline(timeout) if threading.current_thread() is threading.main_thread() \
+            else nullcontext()
+        with deadline:
+            result = la.query(
+                namespace_name=namespace,
+                query_details=oci.log_analytics.models.QueryDetails(
+                    compartment_id=COMPARTMENT_ID,
+                    compartment_id_in_subtree=True,
+                    query_string=query,
+                    sub_system="LOG",
+                    max_total_count=10,
+                    time_filter=oci.log_analytics.models.TimeRange(
+                        time_start=start, time_end=end, time_zone="UTC",
+                    ),
                 ),
-            ),
-        )
+            )
         return len(getattr(result.data, "items", []) or []), None
     except Exception as exc:  # noqa: BLE001
         return -1, str(exc)
 
 
+def _status_for_widget(row_count: int, error: str | None, visualization_type: str) -> str:
+    if error:
+        return "ERROR"
+    if row_count > 0 or visualization_type == "link":
+        return "HIT"
+    return "MISS"
+
+
+def _verify_widget_task(task, namespace, start, end, query_timeout):
+    la = _get_thread_la_client(query_timeout)
+    count, err = _run_query(
+        la,
+        namespace,
+        task["query_string"],
+        start,
+        end,
+        timeout=query_timeout,
+    )
+    status = _status_for_widget(count, err, task["visualization_type"])
+    return WidgetVerification(
+        task["dashboard"],
+        task["widget"],
+        max(count, 0),
+        status,
+        err,
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Verify redeployed SOC dashboards")
-    parser.add_argument("--lookback", default="14d")
+    parser.add_argument("--lookback", default="21d")
+    parser.add_argument("--query-timeout", type=int, default=60,
+                        help="Per-widget OCI query timeout in seconds")
+    parser.add_argument("--max-workers", type=int, default=1,
+                        help="Parallel OCI query workers. Default keeps serial behavior.")
     parser.add_argument("--json", help="JSON report path")
+    parser.add_argument("--dashboard-name", action="append", dest="dashboard_names",
+                        help="Verify only the named dashboard. Can be supplied multiple times.")
     args = parser.parse_args()
+
+    try:
+        dashboards_to_verify = select_dashboards(args.dashboard_names)
+    except ValueError as exc:
+        print(exc)
+        return 2
 
     require_oci_config()
     md = get_dashboard_client()
-    la = get_la_client()
+    la = get_la_client(timeout=(10, args.query_timeout))
     namespace = LA_NAMESPACE
     if not namespace:
         ns = la.list_namespaces(compartment_id=TENANCY_ID).data.items
@@ -91,8 +152,11 @@ def main() -> int:
 
     dashboard_records = []
     widget_records: list[WidgetVerification] = []
+    widget_tasks = []
+    total_widgets = sum(len(cfg["widgets"]) for cfg in dashboards_to_verify.values())
+    widget_index = 0
 
-    for name, cfg in DASHBOARDS.items():
+    for name, cfg in dashboards_to_verify.items():
         expected_count = len(cfg["widgets"])
         try:
             resp = md.list_management_dashboards(
@@ -142,24 +206,71 @@ def main() -> int:
                     name, ss.display_name, 0, "ERROR",
                     "no queryString in saved search ui_config"))
                 continue
-            count, err = _run_query(la, namespace, query_string, start, end)
+            widget_index += 1
             viz = ui_config.get("visualizationType", "table") if isinstance(ui_config, dict) \
                 else "table"
-            if err:
-                status = "ERROR"
-            elif count > 0 or viz == "link":
-                status = "HIT"
-            else:
-                status = "MISS"
-            widget_records.append(WidgetVerification(
-                name, ss.display_name, max(count, 0), status, err))
+            widget_tasks.append({
+                "index": widget_index,
+                "dashboard": name,
+                "widget": ss.display_name,
+                "query_string": query_string,
+                "visualization_type": viz,
+            })
+
+    worker_count = max(1, args.max_workers)
+    if worker_count == 1:
+        for task in widget_tasks:
+            print(
+                f"  [{task['index']:03d}/{total_widgets}] "
+                f"{task['dashboard']} :: {task['widget']}",
+                flush=True,
+            )
+            widget_records.append(
+                _verify_widget_task(task, namespace, start, end, args.query_timeout)
+            )
+    else:
+        print(f"  Running widget queries with {worker_count} workers...", flush=True)
+        results_by_index = {}
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            future_map = {}
+            for task in widget_tasks:
+                print(
+                    f"  [{task['index']:03d}/{total_widgets}] "
+                    f"{task['dashboard']} :: {task['widget']}",
+                    flush=True,
+                )
+                future = executor.submit(
+                    _verify_widget_task,
+                    task,
+                    namespace,
+                    start,
+                    end,
+                    args.query_timeout,
+                )
+                future_map[future] = task
+
+            for future in as_completed(future_map):
+                task = future_map[future]
+                try:
+                    results_by_index[task["index"]] = future.result()
+                except Exception as exc:  # noqa: BLE001
+                    results_by_index[task["index"]] = WidgetVerification(
+                        task["dashboard"],
+                        task["widget"],
+                        0,
+                        "ERROR",
+                        str(exc),
+                    )
+
+        for index in sorted(results_by_index):
+            widget_records.append(results_by_index[index])
 
     print("=" * 78)
     print("Dashboard Health Verification")
     print("=" * 78)
     missing = [d for d in dashboard_records if not d.get("exists")]
     mismatched = [d for d in dashboard_records if d.get("exists") and not d.get("match", True)]
-    print(f"Total expected dashboards: {len(DASHBOARDS)}")
+    print(f"Total expected dashboards: {len(dashboards_to_verify)}")
     print(f"Missing dashboards:        {len(missing)}")
     print(f"Widget-count mismatch:     {len(mismatched)}")
     if missing:

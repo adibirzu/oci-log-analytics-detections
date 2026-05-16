@@ -35,6 +35,14 @@ class TestCatalogSurfaces(unittest.TestCase):
                 "logsource": {"product": "oci", "service": "audit"},
                 "mitre_attack": {"tactics": ["initial_access"], "techniques": ["T1078"]},
             }))
+            (queries_dir / "sentinel_synthetic_plan.json").write_text(json.dumps({
+                "summary": {"synthetic_ready": 1},
+                "candidates": [{"title": "Support artifact, not a query"}],
+            }))
+            (queries_dir / "sentinel_synthetic_live_results.json").write_text(json.dumps({
+                "tested": 1,
+                "results": [{"title": "Support artifact, not a query", "rows": 1}],
+            }))
             (apps_dir / "apm_browser.json").write_text(json.dumps({
                 "title": "Browser Detection",
                 "query": "'Log Source' = 'SOC Application Logs'",
@@ -55,6 +63,12 @@ class TestCatalogSurfaces(unittest.TestCase):
                 "query": "'Log Source' = 'OCI Audit Logs' | stats count",
                 "level": "high",
                 "mitre_attack": {"tactics": ["discovery"], "techniques": ["T1087.001"]},
+                "references": [
+                    {
+                        "name": "Black Hills InfoSec FreeLabFriday Labs",
+                        "url": "https://github.com/blackhillsinfosec/FreeLabFriday_Labs",
+                    }
+                ],
             }))
 
             (rules_dir / "apm_browser.yaml").write_text(
@@ -85,6 +99,10 @@ class TestCatalogSurfaces(unittest.TestCase):
             self.assertEqual(len(catalog["app_queries"]), 2)
             self.assertIn("T1059.007", catalog["all_mitre_techniques"])
             self.assertIn("T1087.001", catalog["all_mitre_techniques"])
+            self.assertEqual(
+                catalog["hunting_queries"][0]["references"][0]["url"],
+                "https://github.com/blackhillsinfosec/FreeLabFriday_Labs",
+            )
 
 
 if __name__ == "__main__":

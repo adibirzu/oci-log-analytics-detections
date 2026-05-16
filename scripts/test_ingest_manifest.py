@@ -7,15 +7,20 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from ingest_test_data import UPLOAD_MANIFEST
+from ingest_test_data import OPTIONAL_UPLOAD_MANIFEST, UPLOAD_MANIFEST, selected_upload_manifest
 from oci_config import SOURCE_CANDIDATE_GROUPS, TEST_DATA_DIR, TEST_DATA_FILES
 
 
 class TestIngestManifest(unittest.TestCase):
     """Ensure all checked-in NDJSON datasets are wired into ingestion."""
 
+    optional_files = {entry["filename"] for entry in OPTIONAL_UPLOAD_MANIFEST}
+
     def test_manifest_covers_all_checked_in_jsonl_files(self):
-        checked_in = sorted(path.name for path in Path(TEST_DATA_DIR).glob("*.jsonl"))
+        checked_in = sorted(
+            path.name for path in Path(TEST_DATA_DIR).glob("*.jsonl")
+            if path.name not in self.optional_files
+        )
         manifest_files = sorted(entry["filename"] for entry in UPLOAD_MANIFEST)
 
         self.assertEqual(sorted(TEST_DATA_FILES), checked_in)
@@ -51,14 +56,45 @@ class TestIngestManifest(unittest.TestCase):
         self.assertEqual(entry["source_candidates"], ["SOC Application Logs"])
         self.assertIn("application_logs.jsonl", TEST_DATA_FILES)
 
+    def test_selected_upload_manifest_filters_by_filename(self):
+        selected = selected_upload_manifest(["application_logs.jsonl"])
+
+        self.assertEqual([entry["filename"] for entry in selected], ["application_logs.jsonl"])
+        self.assertEqual(selected[0]["upload_name"], "soc-test-application")
+
+    def test_selected_upload_manifest_rejects_unknown_filename(self):
+        with self.assertRaisesRegex(ValueError, "unknown.jsonl"):
+            selected_upload_manifest(["unknown.jsonl"])
+
+    def test_vcn_and_network_firewall_logs_are_wired_to_dedicated_sources(self):
+        expected = [
+            ("vcn_flow.jsonl", "vcn_flow", "SOC VCN Flow Logs"),
+            ("network_firewall.jsonl", "network_firewall", "SOC Network Firewall Logs"),
+        ]
+
+        for filename, source_key, preferred_source in expected:
+            with self.subTest(filename=filename):
+                entry = next(item for item in UPLOAD_MANIFEST if item["filename"] == filename)
+
+                self.assertIn(filename, TEST_DATA_FILES)
+                self.assertEqual(entry["source_candidates"], SOURCE_CANDIDATE_GROUPS[source_key])
+                self.assertEqual(entry["source_candidates"][0], preferred_source)
+                self.assertTrue(entry["stream_key"].startswith("soc-detection-"))
+
     def test_manifest_json_matches_checked_in_files_and_counts(self):
         manifest_path = Path(TEST_DATA_DIR) / "manifest.json"
-        checked_in_files = sorted(path.name for path in Path(TEST_DATA_DIR).glob("*.jsonl"))
+        checked_in_files = sorted(
+            path.name for path in Path(TEST_DATA_DIR).glob("*.jsonl")
+            if path.name not in self.optional_files
+        )
 
         with manifest_path.open() as f:
             manifest = __import__("json").load(f)
 
-        manifest_files = sorted(manifest["files"].keys())
+        manifest_files = sorted(
+            filename for filename in manifest["files"]
+            if filename not in self.optional_files
+        )
         self.assertEqual(manifest_files, checked_in_files)
 
         total_events = 0
@@ -68,7 +104,9 @@ class TestIngestManifest(unittest.TestCase):
             self.assertEqual(manifest["files"][filename]["event_count"], count, filename)
             total_events += count
 
-        self.assertEqual(manifest["total_events"], total_events)
+        manifest_total = sum(item["event_count"] for item in manifest["files"].values())
+        self.assertGreaterEqual(manifest_total, total_events)
+        self.assertEqual(manifest["total_events"], manifest_total)
 
 
 if __name__ == "__main__":

@@ -122,6 +122,42 @@ class TestValidateSyntheticLogs(unittest.TestCase):
             self.assertFalse(report["ok"])
             self.assertIn("missing.jsonl", report["results"])
 
+    def test_validate_all_rejects_generated_support_artifact_contract(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            test_data_dir = Path(tmpdir) / "test_data"
+            test_data_dir.mkdir()
+            contracts_path = Path(tmpdir) / "contracts.json"
+            contracts_path.write_text(json.dumps({
+                "sentinel_synthetic_plan.json": {
+                    "required_fields": ["summary"]
+                }
+            }))
+
+            report = validate_all(test_data_dir=test_data_dir, contracts_path=contracts_path)
+
+            self.assertFalse(report["ok"])
+            self.assertIn("sentinel_synthetic_plan.json", report["results"])
+            self.assertEqual(report["total_errors"], 1)
+            self.assertTrue(
+                any(
+                    "generated support artifact" in error
+                    for error in report["results"]["sentinel_synthetic_plan.json"]["errors"]
+                )
+            )
+
+    def test_web_to_cloud_network_contracts_are_registered(self):
+        contracts_path = Path(__file__).resolve().parents[1] / "config" / "synthetic_log_contracts.json"
+
+        with contracts_path.open() as f:
+            contracts = json.load(f)
+
+        self.assertIn("vcn_flow.jsonl", contracts)
+        self.assertIn("network_firewall.jsonl", contracts)
+        self.assertIn("data.srcaddr", contracts["vcn_flow.jsonl"]["required_nested_fields"])
+        self.assertIn("data.bytesOut", contracts["vcn_flow.jsonl"]["required_nested_fields"])
+        self.assertIn("logContent.data.src_ip", contracts["network_firewall.jsonl"]["required_nested_fields"])
+        self.assertIn("logContent.data.threat_name", contracts["network_firewall.jsonl"]["required_nested_fields"])
+
 
 if __name__ == "__main__":
     unittest.main()

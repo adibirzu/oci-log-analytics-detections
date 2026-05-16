@@ -33,6 +33,12 @@
     "Legitimate Internet Explorer browsing to non-Microsoft sites",
     "Windows Update checks via IE components"
   ],
+  "atomic_red_team": {
+    "has_tests": false,
+    "test_count": 0,
+    "techniques_with_tests": [],
+    "tests": []
+  },
   "splunk_original": "index=sysmon EventCode=3 Image=\"*iexplore.exe\" NOT DestinationHostname IN (\"*.microsoft.com\",\"*.windows.com\",\"*.bing.com\") | stats count by DestinationHostname, SourceIp",
   "threat_intel": {
     "malware_family": "BLUELIGHT",

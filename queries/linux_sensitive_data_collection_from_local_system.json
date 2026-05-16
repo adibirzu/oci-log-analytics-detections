@@ -1,7 +1,8 @@
 {
   "title": "Linux Sensitive Data Collection from Local System",
   "description": "Detects mass access to sensitive system files. Attackers collect data from local systems including SSH keys, cloud credentials, database configs, and application secrets for further exploitation or exfiltration.\n",
-  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*cat /root/.ssh/id_rsa*' or msg like '*cat /home/*/.ssh/id_rsa*' or msg like '*cp /root/.ssh/*' or msg like '*find / -name id_rsa*')) or ((msg like '*.oci/config*' or msg like '*.aws/credentials*' or msg like '*.gcloud/*' or msg like '*.kube/config*')) or ((msg like '*.env*' or msg like '*database.yml*' or msg like '*wp-config.php*' or msg like '*application.properties*' or msg like '*settings.py*')))",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs') and 'Process Name' = 'bash' and (((msg like '*cat /root/.ssh/id_rsa*' or msg like '*cat /home/*/.ssh/id_rsa*' or msg like '*cp /root/.ssh/*' or msg like '*find / -name id_rsa*')) or ((msg like '*.oci/config*' or msg like '*.aws/credentials*' or msg like '*.gcloud/*' or msg like '*.kube/config*')) or ((msg like '*.env*' or msg like '*database.yml*' or msg like '*wp-config.php*' or msg like '*application.properties*' or msg like '*settings.py*')))",
+  "do_not_overwrite": true,
   "sigma_id": "a1b2c3d4-6015-4000-8000-000000000015",
   "level": "high",
   "stig_category": "CAT I",

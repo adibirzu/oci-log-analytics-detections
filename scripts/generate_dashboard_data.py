@@ -67,8 +67,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--days",
         type=positive_int,
-        default=14,
-        help="Number of days of dashboard data to generate (default: 14)",
+        default=21,
+        help="Number of days of dashboard data to generate (default: 21)",
     )
     parser.add_argument(
         "--geo-interval",

@@ -29,9 +29,9 @@ Enhance the OCI Log Analytics project by creating a comprehensive library of det
 - [x] **Log Source Mapping Fix:** Corrected Cloud Guard, Linux, and Windows log source mappings.
 - [x] **UUID Fix:** Replaced all placeholder UUIDs with proper UUIDs.
 - [x] **Query Regeneration:** Generated query inventory expanded far beyond the initial 113-query milestone.
-- [x] **Saved Searches:** Deployment pipeline matured from the initial 58 saved searches to the current 255-saved-search, 16-dashboard content set documented in the repo.
-- [x] **Dashboards:** 5 dashboards deployed (SOC Overview, OCI Audit, Cloud Guard, Linux, Windows).
-- [x] **Test Data Pipeline:** 279 NDJSON events generated and uploaded for all 113 rules.
+- [x] **Saved Searches:** Deployment pipeline matured from the initial 58 saved searches to the current 326-saved-search, 21-dashboard content set documented in the repo.
+- [x] **Dashboards:** 21 dashboards deployed across SOC overview, OCI audit/STIG, Cloud Guard, Linux, Windows, GOAD/AD, C2, FreeLabFriday, 2025-2026 MELTS, web, web-to-cloud, app, geographic health, APT, and browser telemetry views.
+- [x] **Test Data Pipeline:** 257,754 NDJSON events generated across 16 files and uploaded to both `cap` and `DEFAULT`.
 - [x] **Dashboard Widget Fix:** Rewrote saved searches with proper `ui_config`/`scopeFilters` format and embedded in dashboard JSON for `import_dashboard` API.
 - [x] **Documentation:** Updated README.md, STATUS.md, PLAN.md.
 
@@ -85,7 +85,7 @@ Enhance the OCI Log Analytics project by creating a comprehensive library of det
 1.  100+ high-quality detection rules implemented. (Achieved: 454 source YAML rules)
 2.  Functional conversion script from Sigma to OCL. (Achieved: Advanced version with STIG metadata and catalog generation)
 3.  Comprehensive documentation. (Achieved, with canonical inventory reconciled to disk state)
-4.  Functional SOC Dashboards in OCI. (Achieved: 16 dashboards, 264 saved searches deployed; 263/264 widgets HIT against live OCI Log Analytics)
+4.  Functional SOC Dashboards in OCI. (Achieved: 21 dashboards and 326 active saved searches deployed as the current 2025-2026 threat-hunting content set)
 5.  STIG compliance mapping for OCI rules. (Achieved: 24 generated detection queries carry STIG mappings, spanning 12 controls)
 6.  Cross-project integration with multicloudoperations. (Achieved: export script + manifest + canonical CSP schema builders ported to `scripts/schemas/`)
 7.  One-click deployment via OCI Resource Manager. (Achieved: Terraform stack with ORM schema)
@@ -122,31 +122,54 @@ Sorted by impact / cost ratio.
 **Problem.** `convert_sigma.py` emits LAQL like `'Pipe Name' = '\interprocess_'` (one literal backslash) for Windows pipe-name rules. OCI LA's SEARCH parser rejects this with `Unexpected input for SEARCH: '\interprocess_'`. Affected detection queries (Cobalt Strike, Mimikatz pipes) currently exist as hand-edited files that must not be regenerated.
 
 **Plan.**
-- [ ] Add a backslash-doubling pass in `scripts/convert_sigma.py` for any value containing literal `\` so the generated LAQL has properly-escaped patterns.
-- [ ] Add a fallback wildcard heuristic for `Pipe Name` rules: `*pattern*` rather than exact-match.
-- [ ] Add a `do_not_overwrite: true` rule annotation respected by the converter so hand-edited query files are protected even when their YAML source runs through a regeneration sweep.
+- [x] Add a backslash-doubling pass in `scripts/convert_sigma.py` for any value containing literal `\` so the generated LAQL has properly-escaped patterns.
+- [x] Add a fallback wildcard heuristic for `Pipe Name` rules: `*pattern*` rather than exact-match.
+- [x] Add a `do_not_overwrite: true` rule annotation respected by the converter so hand-edited query files are protected even when their YAML source runs through a regeneration sweep.
 - [ ] Regenerate all queries cleanly and re-verify with `verify_deployed_dashboards.py` to confirm no widget regresses.
 
-### 12.2 Sweep dual-Status across remaining OCI rules (2–3 hours)
+### 12.2 Dual-Status audit guardrail
 
-- [ ] Audit every `rules/cloud/oci/*.yaml` rule that filters on `status: Success` (12 rules currently).
-- [ ] Convert each to the list form `status: [Success, '200']` so the detection survives both SOC custom and native OCI Audit parser projections.
-- [ ] Regenerate queries via `convert_sigma.py`; redeploy widgets with surgical `update_management_saved_search` patches (avoids the slow full-redeploy path).
+- [x] Audit every `rules/cloud/oci/*.yaml` rule that filters on successful status.
+- [x] Confirm current successful-status selectors use list form `status: [Success, '200']` so detections survive both SOC custom and native OCI Audit parser projections.
+- [x] Add a regression test that fails if a future OCI Audit rule reintroduces a Success-only selector.
 
-### 12.3 Provision Fusion Apps source or strip the widget (1 hour)
+### 12.3 Close current live widget misses
 
-The single remaining MISS — `Hunt: OCI IAM + Fusion Correlation` — needs `Fusion Apps: Sign In - Sign Out Activity Logs` and `Fusion Apps: ESS Audit Logs` log sources. Two options:
+Current deployed target is **326 active dashboard widgets** across `21` dashboards in both `cap` and `DEFAULT` `eu-frankfurt-1` demo tenancies using the 21-day dataset.
+
+`Hunt: OCI IAM + Fusion Correlation` needs `Fusion Apps: Sign In - Sign Out Activity Logs` and `Fusion Apps: ESS Audit Logs` log sources. Two options:
 
 - [ ] **Option A:** add a Fusion Apps test-data emitter + parser, ingest, and verify the correlation widget HITs.
-- [ ] **Option B:** drop the Fusion correlation widget from `SOC: Threat Hunting Dashboard` to bring widget health to **264 / 264 (100 %)** in tenancies that do not run Fusion.
+- [x] **Option B:** keep the Fusion correlation query cataloged under `queries/hunting/` but out of the active dashboard set for tenancies that do not run Fusion. The active dashboard set now includes the C2, FreeLabFriday, 2025-2026 MELTS, browser, APT, app, GOAD/AD, and web-to-cloud dashboard additions.
 
-### 12.4 Schedule the daily health check (1 hour)
+`DNS: Data Exfiltration` needed refreshed Sysmon Operational DNS query data in the live tenancy:
 
-- [ ] Add a recurring routine that runs `scripts/daily_health_check.py --lookback 14d` on a weekly cadence.
+- [x] Add deterministic long `Query Name` values to `generate_sysmon_operational()` for the widget's `domain_length > 30` predicate.
+- [x] Ingest refreshed `test_data/sysmon_operational.jsonl` through `scripts/ingest_test_data.py --mode direct`.
+- [x] Rerun `scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --json docs/health/verify-<profile>-21d-final.json` and confirm the widget remains HIT.
+
+### 12.4 Web-to-cloud incident drilldown (2026-05-04)
+
+- [x] Add `SOC: Web-to-Cloud Threat Hunting Dashboard` with 10 widgets.
+- [x] Add curated hunting queries for entry point, compromised machines, compromised identity, VCN egress, Network Firewall C2, cloud abuse, exfiltration, link analysis, and stage breakdown.
+- [x] Add OCI-shaped `vcn_flow.jsonl` and `network_firewall.jsonl` datasets plus parser/source routing.
+- [x] Generate 21-day local data across 16 JSONL files.
+- [x] Run live log-source setup, direct ingest, dashboard cleanup deploy, and `verify_deployed_dashboards.py --lookback 21d --query-timeout 90` in both `cap` and `DEFAULT`.
+
+### 12.5 Legacy C2 dashboard refresh (2026-05-05) ✅
+
+- [x] Replace the legacy `C2 & Beaconing Detection` dashboard with current Sysmon DNS/network, VCN Flow, and Network Firewall queries.
+- [x] Add 10 C2 widgets covering DNS beacon domains, source processes, affected hosts, flow counts, destination IPs, HTTPS callbacks, timeline, and link topology.
+- [x] Add targeted dashboard deploy and verify support with `--dashboard-name` so old dashboards can be refreshed without broad cleanup.
+- [x] Verify the refreshed C2 dashboard in both the legacy parent compartment and the main `demo-observability` compartment.
+
+### 12.6 Schedule the daily health check (1 hour)
+
+- [ ] Add a recurring routine that runs `scripts/daily_health_check.py --lookback 21d` on a weekly cadence.
 - [ ] Diff the JSON report against the previous run; surface widget regressions before deploy.
 - [ ] Optionally publish the banner to a Slack channel via `slack:draft-announcement` skill.
 
-### 12.5 Sigma converter — `condition` operator coverage (3–5 days)
+### 12.7 Sigma converter — `condition` operator coverage (3–5 days)
 
 Minor backlog from earlier phases:
 
@@ -154,18 +177,25 @@ Minor backlog from earlier phases:
 - [ ] Audit converter coverage for advanced Sigma `condition` operators: `1 of`, `all of`, `near`, count modifiers.
 - [ ] Add a per-rule `--validate` mode that round-trips the generated query through OCI LA syntax check.
 
-### 12.6 Field dictionary — `DET-MISS-002` (2 days)
+### 12.7 Field dictionary — `DET-MISS-002` (2 days)
 
 - [ ] Generate a machine-readable log-source field dictionary from `scripts/setup_log_sources.py:*_FIELD_MAPPINGS` so downstream UIs (LoganSecurityDashboardv0) know which display names exist on which sources.
 - [ ] Cross-reference each detection query's field dependencies against the dictionary; flag queries that reference unmapped fields before deploy.
 
-### 12.7 Test-data schema validation (3 days)
+### 12.8 Test-data schema validation hardening (3 days)
 
-- [ ] Add `scripts/validate_synthetic_logs.py` checks for every `test_data/*.jsonl` against `config/synthetic_log_contracts.json`.
+- [x] Add `scripts/validate_synthetic_logs.py` checks for every `test_data/*.jsonl` against `config/synthetic_log_contracts.json`.
 - [ ] Run the validator inside CI so generator drift breaks the build.
 - [ ] Pin schema version with the same `do_not_overwrite` discipline as the canonical schema builders in `scripts/schemas/`.
 
-### 12.8 Expand live verification beyond Caldera discovery (2 weeks)
+### 12.9 Atomic Red Team mapping coverage
+
+- [x] Fill missing `atomic_red_team` fields for testable Windows/Linux query artifacts.
+- [x] Add `scripts/map_atomic_tests.py --enrich --missing-only` so future gap-fills do not rewrite existing ART mappings.
+- [x] Regenerate `docs/ART_COVERAGE_REPORT.md` after the current mapping pass.
+- [ ] Decide whether the 9 unmapped testable rules should remain documented no-match cases or receive custom validation notes.
+
+### 12.10 Expand live verification beyond Caldera discovery (2 weeks)
 
 - [ ] Caldera operations covering: credential-access, lateral-movement, collection, and exfiltration.
 - [ ] Per-operation verification queries layered on `scripts/verify_caldera_detections.py`.

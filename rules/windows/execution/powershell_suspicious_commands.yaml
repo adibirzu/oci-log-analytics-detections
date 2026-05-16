@@ -70,3 +70,4 @@ falsepositives:
   - IT automation scripts using encoded PowerShell
   - Security tools performing legitimate AD queries
 version: 1
+do_not_overwrite: true  # curated demo-tuned query — see scripts/test_query_audit.py

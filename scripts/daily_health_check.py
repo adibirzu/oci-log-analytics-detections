@@ -50,10 +50,12 @@ def _section(title: str) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Daily SOC detection health check")
-    parser.add_argument("--lookback", default="14d",
-                        help="Lookback for live queries (default: 14d)")
+    parser.add_argument("--lookback", default="21d",
+                        help="Lookback for live queries (default: 21d)")
     parser.add_argument("--skip-verify", action="store_true",
                         help="Skip the per-saved-search verification (slow, ~15min)")
+    parser.add_argument("--query-timeout", type=int, default=60,
+                        help="Per-widget OCI query timeout for the verifier")
     parser.add_argument("--report-dir", default=str(HEALTH_DIR),
                         help="Directory for JSON output. Default: docs/health/")
     args = parser.parse_args()
@@ -103,7 +105,9 @@ def main() -> int:
         verify_json = report_dir / f"verify-{timestamp.replace(':', '')}.json"
         rc, out = _run_subprocess([
             sys.executable, str(SCRIPTS_DIR / "verify_deployed_dashboards.py"),
-            "--lookback", args.lookback, "--json", str(verify_json),
+            "--lookback", args.lookback,
+            "--query-timeout", str(args.query_timeout),
+            "--json", str(verify_json),
         ])
         print(out)
         sections.append({"name": "verifier", "exit_code": rc,

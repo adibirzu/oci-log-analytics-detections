@@ -221,7 +221,6 @@ def extract_required_fields(query: str) -> set[str]:
     fields.update(extract_unquoted_operator_fields(query))
     fields.difference_update(extract_query_aliases(query))
     fields.difference_update(RUNTIME_FIELDS)
-    fields.difference_update(APPROVED_BUILTINS)
     return fields
 
 
@@ -235,7 +234,7 @@ def _unquote_field(raw: str) -> str:
 def _unquote_value(raw: str) -> Any:
     value = raw.strip()
     if len(value) >= 2 and value[0] == "'" and value[-1] == "'":
-        return value[1:-1].replace("\\'", "'")
+        return value[1:-1].replace("\\'", "'").replace("\\\\", "\\")
     if re.fullmatch(r"-?\d+", value):
         return int(value)
     if re.fullmatch(r"-?\d+\.\d+", value):
@@ -274,6 +273,8 @@ def _default_value_for_field(field_name: str) -> Any:
 
 def _match_value_for_operator(operator: str, raw_value: str) -> Any:
     value = _unquote_value(raw_value)
+    if isinstance(value, str):
+        value = value.replace("\\'", "'").replace("\\\\", "\\")
     if operator.lower() in {"!=", "not like"}:
         if value in {"Success", "success", "0"}:
             return "Failure"
@@ -303,9 +304,20 @@ def _merge_predicate_value(existing: Any, new_value: Any) -> Any:
     return existing
 
 
+def _should_merge_predicate(query: str, previous_end: int | None, current_start: int) -> bool:
+    """Return false when repeated field predicates are disjunctive alternatives."""
+    if previous_end is None:
+        return True
+    if current_start < previous_end:
+        return False
+    connector = _strip_single_quoted_literals(query[previous_end:current_start]).lower()
+    return not re.search(r"\bor\b", connector)
+
+
 def extract_predicate_values(query: str) -> dict[str, Any]:
     """Derive representative field values from simple Logan predicates."""
     values: dict[str, Any] = {}
+    last_field_end: dict[str, int] = {}
     field_token = r"(?:'(?P<quoted>(?:\\'|[^'])+)'|(?P<bare>[A-Za-z_][A-Za-z0-9_]*))"
     value_token = r"(?:'(?P<value>(?:\\'|[^'])*)'|(?P<raw>-?\d+(?:\.\d+)?|null))"
 
@@ -320,7 +332,9 @@ def extract_predicate_values(query: str) -> dict[str, Any]:
         first_value = (match.group("values").split(",", 1)[0] or "").strip()
         if first_value:
             value = _unquote_value(first_value)
-            values[field_name] = _merge_predicate_value(values.get(field_name), value)
+            if _should_merge_predicate(query, last_field_end.get(field_name), match.start()):
+                values[field_name] = _merge_predicate_value(values.get(field_name), value)
+            last_field_end[field_name] = match.end()
 
     comparison_pattern = re.compile(
         rf"{field_token}\s*(?P<op>=|!=|>=|<=|>|<|\blike\b|\bnot\s+like\b)\s*{value_token}",
@@ -337,7 +351,9 @@ def extract_predicate_values(query: str) -> dict[str, Any]:
         value = _match_value_for_operator(operator, str(raw_value))
         if operator in {"!=", "not like"} and field_name in values:
             continue
-        values[field_name] = _merge_predicate_value(values.get(field_name), value)
+        if _should_merge_predicate(query, last_field_end.get(field_name), match.start()):
+            values[field_name] = _merge_predicate_value(values.get(field_name), value)
+        last_field_end[field_name] = match.end()
     return values
 
 
@@ -401,6 +417,9 @@ def build_synthetic_event(
     ):
         if timestamp_field in event or timestamp_field in {"timestamp", "TimeCreated", "Timestamp"}:
             event[timestamp_field] = timestamp
+    for time_field in ("time", "Time"):
+        for json_path in contract.field_paths.get(time_field, []):
+            _set_json_path(event, json_path, timestamp)
     for field_name in sorted(required_fields):
         value = predicate_values.get(field_name, _default_value_for_field(field_name))
         for json_path in contract.field_paths.get(field_name, []):

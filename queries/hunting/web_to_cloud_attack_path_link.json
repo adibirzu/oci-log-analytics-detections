@@ -1,7 +1,7 @@
 {
   "title": "Web-to-Cloud: Attack Path Link Analysis",
   "description": "Link analysis groups all events carrying the web-to-cloud Trace ID or C2/object-storage pivots into a single path. Use this widget to drill from WAF entry to app host, network egress, firewall alert, and OCI Audit object access.",
-  "query": "('Trace ID' = 'trace_w2c_entry_001' or 'Client IP' = '185.220.101.1' or 'Source IP' = '10.0.1.50' or 'Destination IP' = '198.51.100.77' or 'User Name' = 'compromised-svc@corp.example.com' or 'Threat Name' = 'Suspicious Data Exfiltration') | link span = 15minute 'Trace ID', 'Log Source' | eventstats max(Count) as PeakEvents, sum(Count) as Events, distinctcount('Trace ID') as Traces, distinctcount('Log Source') as Sources",
+  "query": "('Trace ID' = 'trace_w2c_entry_001' or 'Client IP' = '203.0.113.50' or 'Source IP' = '10.0.1.50' or 'Destination IP' = '198.51.100.77' or 'User Name' = 'compromised-svc@corp.example.com' or 'Threat Name' = 'Suspicious Data Exfiltration') | link span = 15minute 'Trace ID', 'Log Source' | eventstats max(Count) as PeakEvents, sum(Count) as Events, distinctcount('Trace ID') as Traces, distinctcount('Log Source') as Sources",
   "type": "hunting",
   "level": "critical",
   "tags": ["web_to_cloud", "attack_path", "link", "showcase"],

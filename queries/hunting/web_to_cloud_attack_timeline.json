@@ -1,7 +1,7 @@
 {
   "title": "Web-to-Cloud: Correlated Attack Timeline",
   "description": "Summarizes the web-to-cloud attack chain across WAF, load balancer, application, host, VCN Flow, Network Firewall, Sysmon network, and OCI Audit logs. The shared Trace ID and fixed attacker/C2 pivots let analysts follow entry point, credential access, C2, cloud abuse, and exfiltration in one widget.",
-  "query": "('Trace ID' = 'trace_w2c_entry_001' or 'Client IP' = '185.220.101.1' or 'Source IP' = '10.0.1.50' or 'Destination IP' = '198.51.100.77' or 'User Name' = 'compromised-svc@corp.example.com' or 'Threat Name' = 'Suspicious Data Exfiltration') | stats count as Events, unique('Request URL') as Requests, unique('Destination IP') as Destinations by 'Log Source', 'Trace ID' | sort -Events",
+  "query": "('Trace ID' = 'trace_w2c_entry_001' or 'Client IP' = '203.0.113.50' or 'Source IP' = '10.0.1.50' or 'Destination IP' = '198.51.100.77' or 'User Name' = 'compromised-svc@corp.example.com' or 'Threat Name' = 'Suspicious Data Exfiltration') | stats count as Events, unique('Request URL') as Requests, unique('Destination IP') as Destinations by 'Log Source', 'Trace ID' | sort -Events",
   "type": "hunting",
   "level": "critical",
   "tags": ["web_to_cloud", "attack_path", "trace_correlation", "showcase"],

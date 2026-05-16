@@ -74,15 +74,17 @@ Use these prompts when adding or modifying conversion behavior:
    operators package — same registry pattern, smaller scope.
 
 4. **Is it a field/source/table mapping rule?**
-   → `config/sentinel_oci_mapping.yaml` is the allow-list; converter logic
-   that reads it lives in `_facade_impl.py` (Phase 6) or
-   `scripts/kql/field_mapper.py` (Phase 7+ destination). Never
-   hard-code field translations in operator modules.
+   → `config/sentinel_oci_mapping.yaml` is the allow-list; the converter
+   logic that reads it currently lives in `scripts/kql/_facade_impl.py`
+   (Phase 7 will redistribute it into a dedicated field-mapper module
+   alongside the mapping shards). Never hard-code field translations in
+   operator modules.
 
 5. **Is it a Logan QL output validator?**
-   → `validate_logan_query_local` (in `_facade_impl.py` today,
-   `scripts/kql/validator.py` after Phase 7+). Pure-string assertions only;
-   live OCI validation stays in `sentinel_conversion_workflow.py`.
+   → `validate_logan_query_local` lives in `scripts/kql/_facade_impl.py`
+   today; Phase 7 will lift it into its own validator module. Pure-string
+   assertions only; live OCI validation stays in
+   `scripts/sentinel_conversion_workflow.py`.
 
 6. **Is it I/O, ranking, payload building, or CLI orchestration?**
    → `scripts/convert_sentinel_kql.py` (the facade). This is where
@@ -326,7 +328,7 @@ python scripts/release_checklist.py
 |---|---|
 | `scripts/convert_sentinel_kql.py` | 678 lines (facade only — `__all__` enumerates the D-15 public surface) |
 | `scripts/kql/_facade_impl.py` | 1227 lines (Phase 7+ redistribution target) |
-| `scripts/kql/operators/_legacy.py` | absent (removed in plan 06-10) |
+| Phase 6 legacy adapter file (under `scripts/kql/operators/`) | absent (removed in plan 06-10) |
 | `OPERATOR_REGISTRY` | 21 entries (12 supported + 9 unsupported) |
 | Promoted Sentinel artifacts | 8 — byte-identical to pre-Phase-6 baseline |
 | `summary.tier_distribution` | `{tier_1: 8, tier_2: 0, tier_3: 17}` |

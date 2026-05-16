@@ -35,6 +35,9 @@ Patterns to use:
 
 - Wrap the layout in `<summary> ... </summary>`
 - Use `<container>`, `<table>`, `<row>`, `<column>`, and `<tiles>`
+- Select the Link dashboard options that expose the custom sections you need, especially `Tiles` and `Main Table`
+- In this repo, persist that selection as `visualizationOptions.dashboardOptions`
+- In this repo, persist the XML as `visualizationOptions.tileLayoutXml`
 - Use `hidden="true"` on detail tiles you only want to reveal on click
 - Use link tiles with `href="show(id=some-tile-id)"` to reveal hidden content
 - Use expander tiles when you want inline expansion instead of navigating away

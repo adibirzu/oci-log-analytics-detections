@@ -9,8 +9,12 @@ Usage:
 import json
 import os
 import re
+import sys
 import yaml
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+from query_artifacts import is_saved_search_query_file  # noqa: E402
 
 PROJECT_DIR = Path(__file__).parent.parent
 RULES_DIR = PROJECT_DIR / "rules"
@@ -269,7 +273,7 @@ def fix_json_queries(dry_run=False):
     fixed = 0
 
     for f in sorted(QUERIES_DIR.glob("*.json")):
-        if f.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
+        if not is_saved_search_query_file(f):
             continue
         with open(f) as fh:
             data = json.load(fh)

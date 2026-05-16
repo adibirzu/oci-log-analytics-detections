@@ -1,5 +1,7 @@
 # Local environment config (contains OCIDs)
 .env.local
+.env.local.*
+!.env.local.example
 
 # Python
 __pycache__/
@@ -17,6 +19,11 @@ test_data/
 
 # SigmaHQ clone (managed by sync_sigmahq.py)
 .sigmahq/
+
+# Microsoft Sentinel clone (managed by sync_sentinel_kql.py)
+.sentinel/
+queries/sentinel_candidates.json
+queries/sentinel/.gitkeep
 
 # Terraform
 stack/.terraform/
@@ -43,3 +50,10 @@ Thumbs.db
 # scripts/daily_health_check.py)
 docs/health/*.json
 !docs/health/.gitkeep
+
+# Local graph/debug outputs
+graphify-out/
+.planning/graphs/
+firebase-debug.log
+.claude/settings.local.json
+.claude/scheduled_tasks.lock

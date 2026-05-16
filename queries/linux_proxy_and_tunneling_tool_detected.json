@@ -1,7 +1,8 @@
 {
   "title": "Linux Proxy and Tunneling Tool Detected",
   "description": "Detects proxy and tunneling tools used to create covert communication channels. Attackers use tools like chisel, ligolo, reGeorg, and frp to proxy C2 traffic through compromised hosts and evade network security controls.\n",
-  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*chisel client*' or msg like '*chisel server*')) or ((msg like '*ligolo-ng*' or msg like '*ligolo-proxy*')) or ((msg like '*frpc -c*' or msg like '*frps -c*' or msg like '*frp.ini*')) or ((msg like '*reGeorg*' or msg like '*tunnel.aspx*' or msg like '*tunnel.jsp*')) or ((msg like '*proxychains*' or msg like '*tsocks*' or msg like '*revsocks*')))",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs') and 'Process Name' = 'bash' and (((msg like '*chisel client*' or msg like '*chisel server*')) or ((msg like '*ligolo-ng*' or msg like '*ligolo-proxy*')) or ((msg like '*frpc -c*' or msg like '*frps -c*' or msg like '*frp.ini*')) or ((msg like '*reGeorg*' or msg like '*tunnel.aspx*' or msg like '*tunnel.jsp*')) or ((msg like '*proxychains*' or msg like '*tsocks*' or msg like '*revsocks*')))",
+  "do_not_overwrite": true,
   "sigma_id": "a1b2c3d4-6017-4000-8000-000000000017",
   "level": "high",
   "stig_category": "CAT I",

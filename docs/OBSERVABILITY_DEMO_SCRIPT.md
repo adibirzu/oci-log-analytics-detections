@@ -1,22 +1,23 @@
 # Observability Demo Script
 
-Date: 2026-04-23
+Date: 2026-05-06
 Audience: Platform leaders, SREs, observability architects, security stakeholders
 Length: 12-15 minutes
 Primary goal: show that OCI Log Analytics is being used as one operational surface for multicloud health, application performance, trace-style correlation, and security context
 
 ## What is live right now
 
-- Time range to use: `Last 7 days`
-- Dashboards deployed: `16`
-- Saved searches configured in the current repo: `264`
-- Last live refresh on `2026-04-23`: `255` saved searches deployed
-- Demo-readiness status: green for multicloud, application, and security-correlation flows
-- Detection-rule-compatible audit status: `51/51` eligible queries return rows in OCI Log Analytics
+- Time range to use: `Last 21 days` for threat-hunting drilldowns, `Last 7 days` for the operations-first flow
+- Dashboards configured in the current repo: `22`
+- Active saved searches configured in the current repo: `334`
+- Last live refresh on `2026-05-06`: `334` saved searches across `22` dashboards in `<OCI_PROFILE_CAP>`, with `334 / 334` widgets HIT
+- Demo-readiness status: green for multicloud, application, security-correlation, APT, browser, FreeLabFriday, 2025-2026 MELTS, and web-to-cloud threat-hunting flows
+- Detection-rule-compatible audit status: rerun `python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --max-workers 4 --json docs/health/verify-<profile>-21d-2025-2026.json` before presenting
+- Local 21-day synthetic dataset: `221,078` events across `17` JSONL files, including VCN Flow and Network Firewall telemetry for the web-to-cloud, FreeLabFriday, GOAD/AD, 2025-2026 MELTS, and Octo APM drilldowns
 
 ## One-sentence narrative
 
-"This is not a security-only console. It is one workflow that starts with cross-cloud health, moves into application performance and transaction correlation, and then brings security signals in as operational context."
+"This is not a security-only console. It is one workflow that starts with cross-cloud health, moves into application performance and transaction correlation, then follows security evidence from web entry point to cloud data exfiltration."
 
 ## Before you start
 
@@ -24,8 +25,12 @@ Open these dashboards in separate tabs:
 
 1. `SOC: Geographic Health Dashboard`
 2. `OCI-DEMO: Application 360 Monitoring Dashboard`
-3. `SOC: Browser Attack Detection Dashboard`
-4. `SOC: APT Detection Dashboard`
+3. `OCI-DEMO: Octo APM Demo Dashboard`
+4. `SOC: Browser Attack Detection Dashboard`
+5. `SOC: APT Detection Dashboard`
+6. `SOC: Web-to-Cloud Threat Hunting Dashboard`
+7. `SOC: FreeLabFriday Threat Hunting Dashboard`
+8. `SOC: 2025-2026 Threat Hunting Dashboard`
 
 Keep `Log Explorer` ready in one more tab in case you want to pivot from a widget into query view.
 
@@ -106,7 +111,25 @@ Suggested phrasing:
 
 "For the audience, the important takeaway is that this is one incident narrative: degraded region, then service impact, then transaction path, then backend correlation."
 
-## 4. Bring security in as context, not as the whole story (2-3 min)
+## 4. Drill into Octo APM spans and metrics (2-3 min)
+
+Dashboard: `OCI-DEMO: Octo APM Demo Dashboard`
+
+Click in this order:
+
+1. `Octo APM: RED Metrics`
+2. `Octo APM: Request Timeline`
+3. `Octo APM: Trace Logs Correlation`
+4. `Octo APM: Span Link Analysis`
+5. `Octo APM: Metric Samples`
+
+What to say:
+
+- "This is the dedicated APM view for `octo-apm-demo`."
+- "The shared trace and span fields let us connect request logs, span hierarchy, error records, and metric samples."
+- "The span link analysis gives an investigation path instead of a flat list of slow requests."
+
+## 5. Bring security in as context, not as the whole story (2-3 min)
 
 Stay on App 360, then pivot once.
 
@@ -129,7 +152,34 @@ One useful line:
 
 "Security is not a separate console in this demo. It is a correlated signal layered into the same operational story."
 
-## 5. Optional close for technical audiences (1-2 min)
+## 6. Optional close for technical audiences (1-2 min)
+
+Dashboard: `SOC: Web-to-Cloud Threat Hunting Dashboard`
+
+Use this when the audience wants the strongest security story:
+
+1. `W2C: Correlated Timeline`
+2. `W2C: Entry Point and SSRF`
+3. `W2C: Compromised Machines`
+4. `W2C: Compromised Identity`
+5. `W2C: VCN Egress`
+6. `W2C: Network Firewall C2`
+7. `W2C: Exfiltrated Data`
+8. `W2C: Attack Path Link`
+
+What to say:
+
+- "The entry point is an SSRF request from `<EXTERNAL_SOURCE_IP>` to a metadata URL."
+- "The compromised app host is `<COMPROMISED_APP_HOST>`, with private IP `<COMPROMISED_APP_PRIVATE_IP>`."
+- "The abused identity is `compromised-svc@corp.example.com`."
+- "The exfiltrated object is `prod-customer-backups/customer-export-2026-05.csv`."
+- "The destination is `<C2_DESTINATION_IP>`, visible in VCN Flow and Network Firewall logs."
+
+One crisp close:
+
+"This is the complete investigative loop: web signal, host signal, cloud API signal, network signal, and the data object that left."
+
+## 7. Optional APT close for technical audiences (1-2 min)
 
 If the audience wants a sharper technical ending, go to `SOC: APT Detection Dashboard` and open:
 
@@ -154,7 +204,8 @@ If you only have 5-7 minutes:
 1. `SOC: Geographic Health Dashboard`
 2. `OCI-DEMO: Application 360 Monitoring Dashboard`
 3. `App: DB Performance Correlation`
-4. `App: WAF Signal Correlation`
+4. `OCI-DEMO: Octo APM Demo Dashboard`
+5. `App: WAF Signal Correlation`
 
 Use this compressed line:
 
@@ -175,6 +226,8 @@ Safe backup widgets:
 - `App: Error Rate by Service`
 - `App: Service Health Timeline`
 - `App: DB Performance Correlation`
+- `Octo APM: RED Metrics`
+- `Octo APM: Trace Logs Correlation`
 - `App: WAF Signal Correlation`
 
 ## Q&A answers
@@ -223,7 +276,7 @@ If Ask AI is not enabled, skip it. Do not introduce it as a dependency for the d
 
 If you want one product-centric moment:
 
-1. Open a widget in `OCI-DEMO: Application 360 Monitoring Dashboard`
+1. Open a widget in `OCI-DEMO: Application 360 Monitoring Dashboard` or `OCI-DEMO: Octo APM Demo Dashboard`
 2. Pivot into `Log Explorer`
 3. Keep the same time range and scope
 4. Show the query bar and visualization panel

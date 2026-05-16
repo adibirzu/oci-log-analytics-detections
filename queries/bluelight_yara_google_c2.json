@@ -36,6 +36,12 @@
     "Korean-language users browsing Google services with Firefox 80",
     "The batch execute and SNlM0e patterns are highly specific"
   ],
+  "atomic_red_team": {
+    "has_tests": false,
+    "test_count": 0,
+    "techniques_with_tests": [],
+    "tests": []
+  },
   "yara_source": {
     "rule_name": "APT_MAL_Win_BlueLight_B",
     "rule_id": "3ec2d44c-4c08-514d-a839-acef3f53f7dc",

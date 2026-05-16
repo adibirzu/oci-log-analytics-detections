@@ -20,10 +20,14 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from query_artifacts import is_saved_search_query_file  # noqa: E402
+
 PROJECT_DIR = Path(__file__).parent.parent
 QUERIES_DIR = PROJECT_DIR / "queries"
 APPS_DIR = QUERIES_DIR / "apps"
 HUNTING_DIR = QUERIES_DIR / "hunting"
+SENTINEL_DIR = QUERIES_DIR / "sentinel"
 OUTPUT_MD = PROJECT_DIR / "CATALOG.md"
 OUTPUT_JSON = QUERIES_DIR / "catalog.json"
 
@@ -72,7 +76,7 @@ def _load_query_files(directory, relative_prefix="", extra_flags=None):
         return queries
 
     for f in sorted(directory.glob("*.json")):
-        if f.name in ("manifest.json", "catalog.json", "dashboard_inventory.json"):
+        if not is_saved_search_query_file(f):
             continue
         with open(f) as fh:
             data = json.load(fh)
@@ -85,9 +89,21 @@ def _load_query_files(directory, relative_prefix="", extra_flags=None):
 def load_query_surfaces(queries_dir=QUERIES_DIR, apps_dir=APPS_DIR, hunting_dir=HUNTING_DIR):
     """Load detection, app/APM, and hunting query surfaces."""
     detections = _load_query_files(queries_dir)
+    sentinel_dir = Path(queries_dir) / "sentinel"
+    sentinel_queries = _load_query_files(
+        sentinel_dir,
+        relative_prefix="sentinel/",
+        extra_flags={"_is_sentinel": True},
+    )
     app_queries = _load_query_files(apps_dir, relative_prefix="apps/", extra_flags={"_is_app": True})
     hunting = _load_query_files(hunting_dir, relative_prefix="hunting/", extra_flags={"_is_hunting": True})
-    return detections, app_queries, hunting
+    return detections + sentinel_queries, app_queries, hunting
+
+
+def _count_saved_query_files(directory):
+    if not directory.exists():
+        return 0
+    return sum(1 for path in directory.glob("*.json") if is_saved_search_query_file(path))
 
 
 def get_inventory_counts(project_dir=PROJECT_DIR, queries_dir=QUERIES_DIR, apps_dir=APPS_DIR, hunting_dir=HUNTING_DIR):
@@ -100,14 +116,17 @@ def get_inventory_counts(project_dir=PROJECT_DIR, queries_dir=QUERIES_DIR, apps_
         top = rel.parts[0]
         rule_counts[top] += 1
 
-    apps_count = len(list(apps_dir.glob("*.json"))) if apps_dir.exists() else 0
-    hunting_count = len(list(hunting_dir.glob("*.json"))) if hunting_dir.exists() else 0
+    sentinel_dir = Path(queries_dir) / "sentinel"
+    apps_count = _count_saved_query_files(apps_dir)
+    hunting_count = _count_saved_query_files(hunting_dir)
+    sentinel_count = _count_saved_query_files(sentinel_dir)
 
     return {
         "source_yaml_rules": sum(rule_counts.values()),
         "source_rule_breakdown": dict(sorted(rule_counts.items())),
         "generated_app_queries": apps_count,
         "generated_hunting_queries": hunting_count,
+        "generated_sentinel_queries": sentinel_count,
         "legacy_dirs": {
             "logandetectionqueries": len(list((project_dir / "logandetectionqueries").iterdir())) if (project_dir / "logandetectionqueries").exists() else None,
             "logandetectionrules": len(list((project_dir / "logandetectionrules").iterdir())) if (project_dir / "logandetectionrules").exists() else None,
@@ -134,14 +153,16 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
     lines = []
     w = lines.append
     inventory = inventory or get_inventory_counts()
+    sentinel_queries = [q for q in queries if q.get("source_type") == "microsoft_sentinel"]
+    base_queries = [q for q in queries if q.get("source_type") != "microsoft_sentinel"]
     source_derived_app_queries = [q for q in app_queries if q.get("sigma_id")]
     curated_app_queries = [q for q in app_queries if not q.get("sigma_id")]
 
     w("# Detection Rule Catalog")
     w("")
     w(
-        f"> **{len(queries)} base detection queries** + **{len(app_queries)} app/APM queries** "
-        f"+ **{len(hunting)} hunting queries**"
+        f"> **{len(base_queries)} base detection queries** + **{len(sentinel_queries)} Microsoft Sentinel conversions** "
+        f"+ **{len(app_queries)} app/APM queries** + **{len(hunting)} hunting queries**"
     )
     w("")
 
@@ -151,7 +172,8 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
 
     w("| Content Surface | Count | Notes |")
     w("|-----------------|-------|-------|")
-    w(f"| Base detection queries | {len(queries)} | Sigma-derived detections in `queries/` |")
+    w(f"| Base detection queries | {len(base_queries)} | Sigma-derived detections in `queries/` |")
+    w(f"| Microsoft Sentinel conversions | {len(sentinel_queries)} | Source-derived converted detections in `queries/sentinel/` |")
     w(
         f"| App/APM queries | {len(app_queries)} | "
         f"{len(source_derived_app_queries)} Sigma-derived browser detections + "
@@ -170,7 +192,7 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
 
     # Platform breakdown
     platforms = defaultdict(int)
-    for q in queries:
+    for q in base_queries:
         p = q.get("logsource", {}).get("product", "unknown")
         platforms[p] += 1
     w("| Platform | Rules |")
@@ -182,7 +204,7 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
 
     # Severity breakdown
     severities = defaultdict(int)
-    for q in queries:
+    for q in base_queries:
         severities[q.get("level", "unknown")] += 1
     w("| Severity | Count |")
     w("|----------|-------|")
@@ -192,18 +214,18 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
     w("")
 
     # ART Coverage
-    testable = [q for q in queries
+    testable = [q for q in base_queries
                 if q.get("logsource", {}).get("product") in ("windows", "linux")]
     with_art = [q for q in testable if q.get("atomic_red_team", {}).get("has_tests")]
     if testable:
         art_pct = len(with_art) / len(testable) * 100
         total_tests = sum(q.get("atomic_red_team", {}).get("test_count", 0) for q in testable)
         w(f"**Atomic Red Team Coverage:** {len(with_art)}/{len(testable)} testable rules "
-          f"have ART tests ({art_pct:.0f}%) | {total_tests} total test mappings")
+          f"have ART tests ({art_pct:.1f}%) | {total_tests} total test mappings")
         w("")
 
     # STIG
-    stig_rules = [q for q in queries + source_derived_app_queries if q.get("stig_ids")]
+    stig_rules = [q for q in base_queries + source_derived_app_queries if q.get("stig_ids")]
     if stig_rules:
         stig_ids = set()
         for q in stig_rules:
@@ -247,7 +269,7 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
     w("")
 
     for platform in ["oci", "linux", "windows"]:
-        plat_rules = [q for q in queries
+        plat_rules = [q for q in base_queries
                       if q.get("logsource", {}).get("product") == platform]
         if not plat_rules:
             continue
@@ -283,6 +305,20 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
                 w(f"| {i} | {title} | {emoji} {level} | {techniques} | {art_str} | {stig} |")
             else:
                 w(f"| {i} | {title} | {emoji} {level} | {techniques} | {stig} |")
+        w("")
+
+    if sentinel_queries:
+        w("## Microsoft Sentinel Converted Queries")
+        w("")
+        w("| # | Title | Category | Severity | MITRE | Live Validation |")
+        w("|---|-------|----------|----------|-------|-----------------|")
+        for i, q in enumerate(sentinel_queries, 1):
+            level = q.get("level", "medium")
+            emoji = SEVERITY_EMOJI.get(level, "")
+            techniques = ", ".join(q.get("mitre_attack", {}).get("techniques", [])) or "-"
+            category = q.get("sentinel_category", q.get("logsource", {}).get("service", "-"))
+            live_status = q.get("live_validation_status", "not_run")
+            w(f"| {i} | {q['title']} | {category} | {emoji} {level} | {techniques} | {live_status} |")
         w("")
 
     # --- Hunting Queries ---
@@ -329,8 +365,9 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
     w("---")
     w(
         f"*Generated from {inventory['source_yaml_rules']} Sigma source rules routed to "
-        f"{len(queries)} top-level detection queries and {len(source_derived_app_queries)} browser app queries, "
-        f"plus {len(curated_app_queries)} curated app/APM analytics and {len(hunting)} hunting queries*"
+        f"{len(base_queries)} top-level detection queries and {len(source_derived_app_queries)} browser app queries, "
+        f"plus {len(sentinel_queries)} Microsoft Sentinel conversions, "
+        f"{len(curated_app_queries)} curated app/APM analytics, and {len(hunting)} hunting queries*"
     )
 
     return "\n".join(lines)
@@ -339,6 +376,8 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
 def generate_json_catalog(queries, app_queries, hunting, inventory=None):
     """Generate machine-readable catalog."""
     inventory = inventory or get_inventory_counts()
+    sentinel_queries = [q for q in queries if q.get("source_type") == "microsoft_sentinel"]
+    base_queries = [q for q in queries if q.get("source_type") != "microsoft_sentinel"]
     source_derived_app_queries = [q for q in app_queries if q.get("sigma_id")]
     curated_app_queries = [q for q in app_queries if not q.get("sigma_id")]
     total_content_items = len(queries) + len(app_queries) + len(hunting)
@@ -346,6 +385,8 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
         "version": "1.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "total_rules": len(queries),
+        "total_base_rules": len(base_queries),
+        "total_sentinel_queries": len(sentinel_queries),
         "total_app_queries": len(app_queries),
         "total_hunting": len(hunting),
         "total_content_items": total_content_items,
@@ -353,11 +394,13 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
             "source_yaml_rules": inventory["source_yaml_rules"],
             "source_rule_breakdown": inventory["source_rule_breakdown"],
             "generated_detection_queries": len(queries),
+            "generated_base_detection_queries": len(base_queries),
+            "generated_sentinel_queries": inventory.get("generated_sentinel_queries", len(sentinel_queries)),
             "generated_app_queries": inventory["generated_app_queries"],
             "source_derived_app_queries": len(source_derived_app_queries),
             "curated_app_queries": len(curated_app_queries),
             "generated_hunting_queries": len(hunting),
-            "generated_sigma_queries": len(queries) + len(source_derived_app_queries),
+            "generated_sigma_queries": len(base_queries) + len(source_derived_app_queries),
             "total_query_artifacts": total_content_items,
             "legacy_dirs": inventory["legacy_dirs"],
         },
@@ -369,6 +412,7 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
         "all_mitre_tactics": [],
         "stig_controls": [],
         "rules": [],
+        "sentinel_queries": [],
         "app_queries": [],
         "hunting_queries": [],
     }
@@ -381,6 +425,24 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
     combined_techniques = set()
     combined_tactics = set()
 
+    def maturity_fields(q, surface):
+        dashboard_meta = q.get("dashboard", {})
+        is_source_derived = bool(q.get("sigma_id") or q.get("sentinel_id"))
+        return {
+            "content_lifecycle": q.get("content_lifecycle", "validated_locally"),
+            "detection_maturity": q.get("detection_maturity", "production" if is_source_derived else "curated"),
+            "source_confidence": q.get("source_confidence", "high" if is_source_derived else "medium"),
+            "field_coverage": q.get("field_coverage", "not_evaluated"),
+            "test_data_coverage": q.get(
+                "test_data_coverage",
+                "covered" if q.get("atomic_red_team", {}).get("has_tests") else "not_evaluated",
+            ),
+            "live_validation_status": q.get("live_validation_status", "not_run"),
+            "dashboard_readiness": q.get("dashboard_readiness", "dashboard_ready" if dashboard_meta else "not_annotated"),
+            "scheduled_rule_eligibility": q.get("scheduled_rule_eligibility", "not_evaluated"),
+            "content_surface": surface,
+        }
+
     for q in queries:
         p = q.get("logsource", {}).get("product", "unknown")
         platforms[p] += 1
@@ -392,7 +454,7 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
         combined_tactics.update(ma.get("tactics", []))
         stig_controls.update(q.get("stig_ids", []))
 
-        catalog["rules"].append({
+        rule_entry = {
             "title": q["title"],
             "description": q.get("description", ""),
             "level": q.get("level", "medium"),
@@ -401,8 +463,30 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
             "mitre_tactics": ma.get("tactics", []),
             "stig_ids": q.get("stig_ids", []),
             "stig_category": q.get("stig_category", ""),
+            "references": q.get("references", []),
             "file": q.get("_file", ""),
-        })
+            **maturity_fields(q, "detection"),
+        }
+        if q.get("source_type") == "microsoft_sentinel":
+            sentinel_entry = {
+                **rule_entry,
+                "source_type": "microsoft_sentinel",
+                "sentinel_id": q.get("sentinel_id", ""),
+                "sentinel_source_path": q.get("sentinel_source_path", ""),
+                "sentinel_source_url": q.get("sentinel_source_url", ""),
+                "required_data_connectors": q.get("required_data_connectors", []),
+                "conversion_status": q.get("conversion_status", ""),
+                "sentinel_category": q.get("sentinel_category", ""),
+                "sentinel_tables": q.get("sentinel_tables", []),
+            }
+            catalog["sentinel_queries"].append(sentinel_entry)
+            rule_entry.update({
+                "source_type": "microsoft_sentinel",
+                "sentinel_id": q.get("sentinel_id", ""),
+                "sentinel_source_path": q.get("sentinel_source_path", ""),
+                "conversion_status": q.get("conversion_status", ""),
+            })
+        catalog["rules"].append(rule_entry)
 
     for q in hunting:
         combined_techniques.update(q.get("mitre_attack", {}).get("techniques", []))
@@ -414,7 +498,9 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
             "hunting_type": q.get("hunting_type", ""),
             "cookbook_method": q.get("cookbook_method", ""),
             "mitre_techniques": q.get("mitre_attack", {}).get("techniques", []),
+            "references": q.get("references", []),
             "file": q.get("_file", ""),
+            **maturity_fields(q, "hunting"),
         })
 
     for q in app_queries:
@@ -428,7 +514,9 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
             "source_derived": bool(q.get("sigma_id")),
             "mitre_techniques": q.get("mitre_attack", {}).get("techniques", []),
             "mitre_tactics": q.get("mitre_attack", {}).get("tactics", []),
+            "references": q.get("references", []),
             "file": q.get("_file", ""),
+            **maturity_fields(q, "app"),
         })
 
     catalog["platforms"] = dict(platforms)
@@ -442,7 +530,7 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
     catalog["inventory"]["combined_mitre_tactics"] = len(combined_tactics)
 
     # ART coverage stats
-    testable = [q for q in queries
+    testable = [q for q in base_queries
                 if q.get("logsource", {}).get("product") in ("windows", "linux")]
     with_art = [q for q in testable if q.get("atomic_red_team", {}).get("has_tests")]
     total_tests = sum(q.get("atomic_red_team", {}).get("test_count", 0) for q in testable)

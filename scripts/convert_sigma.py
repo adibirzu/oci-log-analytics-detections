@@ -26,10 +26,13 @@ import sys
 import fnmatch
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from query_artifacts import GENERATED_QUERY_ARTIFACT_FILENAMES  # noqa: E402
+
 CONFIG_PATH = 'config/sigma_oci_mapping.yaml'
 RULES_DIR = 'rules'
 OUTPUT_DIR = 'queries'
-EXCLUDED_QUERY_FILENAMES = {'manifest.json', 'catalog.json', 'dashboard_inventory.json'}
+EXCLUDED_QUERY_FILENAMES = GENERATED_QUERY_ARTIFACT_FILENAMES
 NON_PRESERVED_GENERATED_FIELDS = {'logsource_fallback', 'requires_aggregation'}
 
 # ─── STIG severity mapping ──────────────────────────────────────
@@ -64,15 +67,64 @@ def _strip_outer_single_quotes(value):
     return value
 
 
-def _escape_like_value(value):
-    """Escape backslashes in LIKE pattern values for OCL.
+# OCI Log Analytics fields that store integer-looking values as STRINGS.
+# Sigma rules express these as plain integers (``EventID: 4625``); the converter
+# must quote them so the parser doesn't reject the comparison with
+# ``Invalid string value for the field 'Event ID': 4625``.
+#
+# DO NOT include numeric LONG fields (``Source Port``, ``Destination Port``,
+# ``Bytes Sent``, etc.) — those need an unquoted integer literal, and quoting
+# them produces ``Invalid long value for the field 'Destination Port': '443'``.
+_STRING_TYPED_OCI_FIELDS = frozenset({
+    "'Event ID'",
+    "'Logon Type'",
+    "'Response Code'",
+    "'Backend Status Code'",
+    "'HTTP Status Code'",
+    "'Status Code'",
+    "'Risk Score'",
+})
 
-    OCL interprets \\r, \\n, \\t etc. as escape sequences inside LIKE strings.
-    Double the backslashes so they are treated as literal characters.
+
+def _format_eq_value(oci_field, value):
+    """Format the right-hand side of a SEARCH ``=`` comparison.
+
+    Quotes integer values destined for known string-typed OCI fields so the
+    parser accepts them — Sigma sources express Event IDs, Logon Types, etc.
+    as bare integers, but OCI Log Analytics stores them as strings.
     """
     if isinstance(value, str):
-        return value.replace('\\', '\\\\')
+        return f"'{_escape_like_value(value)}'"
+    if isinstance(value, (int, float)):
+        if oci_field in _STRING_TYPED_OCI_FIELDS:
+            return f"'{value}'"
+        return str(value)
+    return f"'{value}'"
+
+
+def _escape_like_value(value):
+    """Escape special characters in string literal values for OCL.
+
+    OCL interprets ``\\r``, ``\\n``, ``\\t`` etc. as escape sequences inside
+    strings, and a literal single quote terminates the string. Both must be
+    escaped so the generated ``like '...'`` clauses parse correctly:
+
+      * Double backslashes so ``\\r`` stays a literal two-character sequence.
+      * Backslash-escape single quotes so embedded ``'`` (e.g. SQL injection
+        payloads like ``' OR 1=1``) doesn't close the literal early —
+        unescaped quotes leave a bare ``OR 1=1*'`` orphan that the parser
+        rejects with ``Unexpected input for SEARCH: =``.
+    """
+    if isinstance(value, str):
+        return value.replace('\\', '\\\\').replace("'", "\\'")
     return value
+
+
+def _is_pipe_name_field(key_base, oci_field):
+    """Return True when the Sigma field maps to a named-pipe field."""
+    normalized_key = str(key_base).replace('_', '').replace(' ', '').lower()
+    normalized_oci = str(oci_field).strip("'").replace('_', '').replace(' ', '').lower()
+    return normalized_key == 'pipename' or normalized_oci == 'pipename'
 
 
 def slugify_title(title):
@@ -89,8 +141,32 @@ def iter_query_files(output_root):
         yield path
 
 
+def _load_dashboard_referenced_paths():
+    """Return relative ``queries/...`` paths referenced by deploy_dashboard.py.
+
+    These paths are the canonical ones for any sigma_id that has multiple
+    generated query files on disk — overwriting them would break dashboard
+    deployment, so the converter must keep regenerating into them.
+    """
+    deploy_path = Path(__file__).resolve().parent / 'deploy_dashboard.py'
+    if not deploy_path.exists():
+        return set()
+    try:
+        text = deploy_path.read_text()
+    except OSError:
+        return set()
+    return set(re.findall(r'"query_file"\s*:\s*"([^"]+)"', text))
+
+
 def load_existing_query_index(output_root):
-    """Index existing generated queries by sigma_id for stable path reuse."""
+    """Index existing generated queries by sigma_id for stable path reuse.
+
+    When multiple query files share a ``sigma_id`` (rule renames left orphans),
+    prefer the path that ``deploy_dashboard.py`` references. Without this
+    preference the converter sometimes picks an alphabetically-earlier orphan
+    and the canonical dashboard widget loses its query file on the next run.
+    """
+    referenced = _load_dashboard_referenced_paths()
     index = {}
     for path in iter_query_files(output_root):
         try:
@@ -99,8 +175,18 @@ def load_existing_query_index(output_root):
         except (OSError, json.JSONDecodeError):
             continue
         sigma_id = data.get('sigma_id')
-        if sigma_id and sigma_id not in index:
-            index[sigma_id] = path.relative_to(output_root).as_posix()
+        if not sigma_id:
+            continue
+        rel = path.relative_to(output_root).as_posix()
+        if sigma_id not in index:
+            index[sigma_id] = rel
+            continue
+        # If the existing pick is dashboard-referenced and the new one isn't,
+        # keep the existing pick. Otherwise prefer the dashboard-referenced one.
+        existing_referenced = index[sigma_id] in referenced
+        new_referenced = rel in referenced
+        if new_referenced and not existing_referenced:
+            index[sigma_id] = rel
     return index
 
 
@@ -189,6 +275,34 @@ def merge_preserved_fields(result, existing):
     return result
 
 
+def _existing_has_do_not_overwrite(output_path):
+    """Read ``do_not_overwrite`` from an on-disk query file, if present.
+
+    Lets curated query files protect themselves even when their Sigma source
+    forgot the flag — once a JSON has ``do_not_overwrite: true`` set, the
+    converter respects it on every subsequent run.
+    """
+    if not os.path.exists(output_path):
+        return False
+    try:
+        with open(output_path) as fh:
+            return bool(json.load(fh).get('do_not_overwrite'))
+    except (OSError, json.JSONDecodeError):
+        return False
+
+
+def should_skip_existing_output(result, output_path):
+    """Skip rewriting if either the Sigma rule OR the existing JSON marks the
+    target as ``do_not_overwrite``. Reading the flag from disk preserves
+    curated demo queries even when the Sigma source omits the opt-out.
+    """
+    if not os.path.exists(output_path):
+        return False
+    if bool(result.get('do_not_overwrite')):
+        return True
+    return _existing_has_do_not_overwrite(output_path)
+
+
 def normalize_log_source_candidates(raw_value):
     """Convert a mapping value to an ordered list of log source display names."""
     if raw_value is None:
@@ -271,23 +385,37 @@ def parse_selection(selection, field_map):
             else:
                 query_parts.append(f"{oci_field} like '*{_escape_like_value(value)}'")
         elif modifier == 're':
+            # OCI Log Analytics uses ``matches`` for regex search, not the
+            # SQL-style ``REGEX MATCH`` operator emitted by other Sigma
+            # backends. See OCL grammar: ``<field> matches '<pattern>'``.
             if isinstance(value, list):
-                or_parts = [f"{oci_field} REGEX MATCH '{v}'" for v in value]
+                or_parts = [f"{oci_field} matches '{_escape_like_value(v)}'" for v in value]
                 query_parts.append(f"({' or '.join(or_parts)})")
             else:
-                query_parts.append(f"{oci_field} REGEX MATCH '{value}'")
-        else:
-            if isinstance(value, str):
-                query_parts.append(f"{oci_field} = '{value}'")
+                query_parts.append(f"{oci_field} matches '{_escape_like_value(value)}'")
+        elif _is_pipe_name_field(key_base, oci_field):
+            if isinstance(value, list):
+                or_parts = [
+                    f"{oci_field} like '*{_escape_like_value(v)}*'"
+                    if isinstance(v, str)
+                    else f"{oci_field} = {v}"
+                    for v in value
+                ]
+                query_parts.append(f"({' or '.join(or_parts)})")
+            elif isinstance(value, str):
+                query_parts.append(f"{oci_field} like '*{_escape_like_value(value)}*'")
             elif isinstance(value, (int, float)):
                 query_parts.append(f"{oci_field} = {value}")
+            elif value is None:
+                query_parts.append(f"not ({oci_field} like '*')")
+        else:
+            if isinstance(value, (str, int, float)):
+                query_parts.append(f"{oci_field} = {_format_eq_value(oci_field, value)}")
             elif isinstance(value, list):
-                or_parts = []
-                for v in value:
-                    if isinstance(v, str):
-                        or_parts.append(f"{oci_field} = '{v}'")
-                    else:
-                        or_parts.append(f"{oci_field} = {v}")
+                or_parts = [
+                    f"{oci_field} = {_format_eq_value(oci_field, v)}"
+                    for v in value
+                ]
                 query_parts.append(f"({' or '.join(or_parts)})")
             elif value is None:
                 query_parts.append(f"not ({oci_field} like '*')")
@@ -475,6 +603,8 @@ def convert_rule(rule_path, field_map, logsource_map):
         result['compliance_frameworks'] = metadata['compliance_frameworks']
     if rule.get('falsepositives'):
         result['falsepositives'] = rule['falsepositives']
+    if rule.get('do_not_overwrite'):
+        result['do_not_overwrite'] = True
     if logsource_fallback:
         result['logsource_fallback'] = True
     if requires_aggregation:
@@ -571,6 +701,104 @@ def validate_queries(output_path):
     print(f"\n  Validated {total} queries, {errors} warnings")
 
 
+def _refresh_catalogs(output_root):
+    """Re-emit catalog/manifest/dashboard-inventory JSONs after a sweep.
+
+    The orphan sweep deletes stale query files; the catalogs embed those
+    filenames and otherwise drift out of sync. We invoke the existing
+    generators in-process so a single ``python3 scripts/convert_sigma.py``
+    leaves every downstream artifact internally consistent.
+
+    Failures are NOT masked: if any refresh exits non-zero we print the
+    captured stdout/stderr, collect the failure, and after running the
+    full set raise ``RuntimeError`` so the caller sees the breakage.
+    Silently swallowing returncodes was the previous bug — drift would
+    re-appear at the next deploy with no audit trail.
+    """
+    import subprocess
+    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    failures = []
+    for cmd_args, label in (
+        (['scripts/generate_catalog.py'], 'catalog'),
+        (['scripts/export_for_multicloud.py', '--manifest-only'], 'manifest'),
+        (['scripts/deploy_dashboard.py', '--export-inventory'], 'dashboard inventory'),
+    ):
+        try:
+            result = subprocess.run(
+                ['python3', *cmd_args],
+                cwd=base,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            failures.append((label, f"spawn error: {exc}"))
+            print(f"ERROR: {label} refresh could not start: {exc}", file=sys.stderr)
+            continue
+        if result.returncode != 0:
+            stderr_tail = (result.stderr or '').strip().splitlines()[-10:]
+            stdout_tail = (result.stdout or '').strip().splitlines()[-10:]
+            # Flush stdout first so the ERROR line can't get re-ordered
+            # behind buffered "Refreshed …" output when piped (2>&1 | tail).
+            sys.stdout.flush()
+            print(
+                f"ERROR: {label} refresh exited {result.returncode}",
+                file=sys.stderr, flush=True,
+            )
+            for line in stdout_tail:
+                print(f"  stdout: {line}", file=sys.stderr, flush=True)
+            for line in stderr_tail:
+                print(f"  stderr: {line}", file=sys.stderr, flush=True)
+            failures.append((label, f"exit {result.returncode}"))
+            continue
+        print(f"Refreshed {label}", flush=True)
+    if failures:
+        raise RuntimeError(
+            "Catalog refresh failed: "
+            + ", ".join(f"{label}={detail}" for label, detail in failures)
+        )
+
+
+def _sweep_stale_duplicates(output_root, written_by_sigma):
+    """Delete query files that share a sigma_id with a freshly generated file.
+
+    When a Sigma rule is renamed or moved, ``resolve_output_relative_path``
+    chooses the canonical filename for the new title. The previous filename
+    survives on disk as an orphan whose Log Source filter, field map, or
+    detection logic may already be stale. Smoke tests treat the orphan as a
+    real detection and may even deploy it. This sweep keeps exactly one
+    query file per ``sigma_id`` — the one the converter just wrote.
+
+    Files marked ``do_not_overwrite: true`` in their JSON are preserved
+    even when they share a ``sigma_id`` with a regenerated file. Several
+    curated demo-tuned queries (``mimikatz_command_indicators.json``,
+    ``cmd_suspicious_child_process.json``, etc.) are pinned by tests in
+    ``scripts/test_query_audit.py`` and must not be swept just because the
+    Sigma source got regenerated under a slightly different filename.
+    """
+    canonical = {sid: os.path.realpath(p) for sid, p in written_by_sigma.items()}
+    removed = []
+    for path in iter_query_files(output_root):
+        try:
+            with open(path) as fh:
+                data = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            continue
+        sid = data.get('sigma_id')
+        if not sid or sid not in canonical:
+            continue
+        if os.path.realpath(path) == canonical[sid]:
+            continue
+        if data.get('do_not_overwrite'):
+            continue
+        try:
+            os.remove(path)
+            removed.append(str(path))
+        except OSError:
+            pass
+    return removed
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Convert Sigma rules to OCI Log Analytics queries")
@@ -589,6 +817,12 @@ def main():
         os.makedirs(output_path)
 
     existing_index = load_existing_query_index(output_path)
+    # Track every sigma_id → canonical path written this run so we can sweep
+    # stale duplicate query files at the end. Prior rule renames left orphan
+    # files on disk with outdated Log Source filters or field mappings; without
+    # the sweep, those orphans get smoke-tested and re-deployed alongside the
+    # current canonical query, which is exactly the kind of drift Codex flagged.
+    written_by_sigma = {}
     count = 0
     for root, dirs, files in os.walk(rules_path):
         for file in sorted(files):
@@ -609,6 +843,12 @@ def main():
                     out_full_path = os.path.join(output_path, out_rel_path)
                     os.makedirs(os.path.dirname(out_full_path), exist_ok=True)
 
+                    if should_skip_existing_output(result, out_full_path):
+                        print(f"Skipped {out_full_path} (do_not_overwrite)")
+                        if result.get('sigma_id'):
+                            existing_index[result['sigma_id']] = out_rel_path
+                        continue
+
                     # Preserve hand-edited fields from existing file
                     if os.path.exists(out_full_path):
                         try:
@@ -623,9 +863,30 @@ def main():
                     print(f"Generated {out_full_path}")
                     if result.get('sigma_id'):
                         existing_index[result['sigma_id']] = out_rel_path
+                        written_by_sigma[result['sigma_id']] = out_full_path
                     count += 1
 
+    removed = _sweep_stale_duplicates(output_path, written_by_sigma)
+    catalog_refresh_error = None
+    if removed:
+        print(f"Removed {len(removed)} stale duplicate query files:")
+        for r in removed:
+            print(f"  - {r}")
+        # Catalog files (queries/catalog.json, manifest.json,
+        # dashboard_inventory.json) embed query filenames. After a sweep
+        # they reference deleted files, so refresh them in lock-step.
+        # We surface refresh failures non-fatally so the converter still
+        # finishes its primary job (regenerating queries), but the caller
+        # gets a non-zero exit so CI / the user knows catalogs are stale.
+        try:
+            _refresh_catalogs(output_path)
+        except RuntimeError as exc:
+            catalog_refresh_error = exc
+            print(f"\nWARNING: {exc}", file=sys.stderr)
+
     print(f"\nConverted {count} rules")
+    if catalog_refresh_error is not None:
+        sys.exit(2)
 
     if args.validate:
         print("\nValidating queries...")

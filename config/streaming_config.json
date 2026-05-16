@@ -1,33 +1,33 @@
 {
   "soc-detection-oci-audit": {
-    "stream_id": "ocid1.stream.oc1..example",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_OCI_AUDIT>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "OCI Audit Logs"
   },
   "soc-detection-cloud-guard": {
-    "stream_id": "ocid1.stream.oc1..example",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_CLOUD_GUARD>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "OCI Cloud Guard Problems"
   },
   "soc-detection-linux-audit": {
-    "stream_id": "ocid1.stream.oc1..example",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_LINUX_AUDIT>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "SOC Linux Syslog Logs"
   },
   "soc-detection-windows-sysmon": {
-    "stream_id": "ocid1.stream.oc1..example",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_WINDOWS_SYSMON>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "SOC Windows Sysmon Logs"
   },
   "soc-detection-multicloud-health": {
-    "stream_id": "ocid1.stream.oc1..example",
+    "stream_id": "<STREAM_OCID_SOC_DETECTION_MULTICLOUD_HEALTH>",
     "messages_endpoint": "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com",
     "log_source": "SOC Multicloud Health Logs"
   },
   "_metadata": {
-    "log_group_id": "ocid1.loganalyticsloggroup.oc1..example",
+    "log_group_id": "<LOG_ANALYTICS_LOG_GROUP_OCID>",
     "la_namespace": "<LA_NAMESPACE>",
-    "compartment_id": "ocid1.compartment.oc1..example",
+    "compartment_id": "<COMPARTMENT_OCID>",
     "connector_summary": {
       "expected": 5,
       "active": 5,

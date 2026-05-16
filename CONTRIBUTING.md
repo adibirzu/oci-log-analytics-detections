@@ -8,6 +8,7 @@ This repository publishes detection content across multiple surfaces. Pick the r
 |----------------------|-------------|-------|
 | A source-derived detection rule | `rules/**` | Source of truth is Sigma/YAML |
 | A browser-side source-derived detection | `rules/web/browser_attacks/` | These compile into `queries/apps/` |
+| Microsoft Sentinel conversion coverage | `config/sentinel_oci_mapping.yaml` + converter tests | Promote only through live validation into `queries/sentinel/` |
 | A curated app telemetry analytic | `queries/apps/` | Do not add a `sigma_id` unless the file is source-derived |
 | A curated hunting query | `queries/hunting/` | Use OCL analytics operators |
 
@@ -28,8 +29,11 @@ This repository publishes detection content across multiple surfaces. Pick the r
 
    ```bash
    python3 scripts/convert_sigma.py
+   python3 scripts/convert_sigma.py --validate
    python3 scripts/generate_catalog.py
    python3 scripts/export_for_multicloud.py --manifest-only
+   python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md
+   python3 scripts/check_inventory_drift.py
    ```
 
    If you changed checked-in demo datasets under `test_data/`, regenerate those files so `test_data/manifest.json` stays accurate.
@@ -37,7 +41,6 @@ This repository publishes detection content across multiple surfaces. Pick the r
 3. Run validation:
 
    ```bash
-   python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md
    python3 -m unittest discover -s scripts -p 'test_*.py'
    python3 -m compileall scripts
    python3 scripts/deploy_dashboard.py --dry-run
@@ -48,6 +51,34 @@ This repository publishes detection content across multiple surfaces. Pick the r
    - `queries/manifest.json`
    - affected files under `queries/`, `queries/apps/`, or `queries/hunting/`
 5. If the new content should appear on a dashboard, add it to `scripts/deploy_dashboard.py`.
+
+## Microsoft Sentinel Conversion Workflow
+
+Sentinel content is generated from the official `Azure/Azure-Sentinel` corpus. Do not hand-author files under `queries/sentinel/`; update the converter or `config/sentinel_oci_mapping.yaml`, then regenerate.
+
+Rules for Sentinel work:
+
+- `config/sentinel_oci_mapping.yaml` is an allow-list, not a guess table.
+- Map only to real OCI Log Analytics sources and fields present in `queries/log_source_field_dictionary.json` or approved converter built-ins.
+- Keep failed candidates in `queries/sentinel_conversion_report.json`; do not write them as saved-search query JSON.
+- `queries/sentinel/*.json` must have `source_type: microsoft_sentinel`, `conversion_status: promoted`, and `live_validation_status: passed`.
+- No alarms or Terraform apply are part of the Sentinel promotion workflow.
+
+Normal Sentinel loop:
+
+```bash
+python3 scripts/sentinel_conversion_workflow.py local
+python3 -m pytest scripts/test_sentinel_converter.py scripts/test_sentinel_conversion_workflow.py -q
+python3 scripts/sentinel_conversion_workflow.py promote --top all --timeout 20
+python3 scripts/sentinel_conversion_workflow.py refresh-artifacts
+python3 scripts/sentinel_conversion_workflow.py triage
+python3 scripts/sentinel_conversion_workflow.py next-queries --work-type field_mapping --limit 10
+python3 scripts/sentinel_conversion_workflow.py status --json --strict
+```
+
+Use `python3 scripts/sentinel_conversion_workflow.py status --json` for reporting and add `--strict` when CI should fail on mismatched reports, promoted files, live status, or missing Sentinel dashboards.
+Use `python3 scripts/sentinel_conversion_workflow.py triage --json` when automation needs the top skip reasons, local validation errors, live-failure examples, and suggested next actions.
+Use `python3 scripts/sentinel_conversion_workflow.py next-queries --json` to pick specific candidates for the next mapping or converter iteration without hand-authoring files under `queries/sentinel/`.
 
 ## Validation Expectations
 

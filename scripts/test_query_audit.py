@@ -88,15 +88,14 @@ class TestQueryAudit(unittest.TestCase):
         self.assertIn("'Log Source' = 'SOC Windows Sysmon Logs'", payload["query"])
         self.assertIn("'Log Source' = 'Windows Sysmon Operational Logs'", payload["query"])
 
-    def test_rare_process_hunting_queries_scale_for_weekly_demo_window(self):
-        expectations = {
-            "queries/hunting/linux_rare_process.json": "where executions < 100",
-            "queries/hunting/windows_rare_process.json": "where executions < 80",
-        }
-
-        for query_file, clause in expectations.items():
+    def test_rare_process_hunting_queries_use_bottom_n_stack(self):
+        for query_file in [
+            "queries/hunting/linux_rare_process.json",
+            "queries/hunting/windows_rare_process.json",
+        ]:
             payload = self.load_query_payload(query_file)
-            self.assertIn(clause, payload["query"], query_file)
+            self.assertIn("'Process Name' != ''", payload["query"], query_file)
+            self.assertIn("| sort executions | head 25", payload["query"], query_file)
 
     def test_windows_security_command_queries_use_command_line_dimension(self):
         expectations = {
@@ -120,6 +119,73 @@ class TestQueryAudit(unittest.TestCase):
 
         self.assertIn("requests > 50", payload["query"])
         self.assertIn("source_ips < 5", payload["query"])
+
+    def test_waf_sqli_block_query_uses_sqli_crs_rule_family_only(self):
+        payload = self.load_query_payload("queries/waf_sql_injection_attack_blocked.json")
+        query = payload["query"]
+
+        self.assertNotIn("'Rule Key' like '*941*'", query)
+        self.assertNotIn("'Rule Key' like '*942*'", query)
+        self.assertNotIn("'Request URL' like '*/**'", query)
+        self.assertIn("'Request URL' like '*UNION%20SELECT*'", query)
+        self.assertIn("'Request URL' like '*SLEEP(*'", query)
+
+    def test_linux_archive_query_uses_targeted_demo_source_and_process_filter(self):
+        payload = self.load_query_payload("queries/linux_archive_data_collected_for_exfiltration.json")
+
+        query = payload["query"]
+        self.assertIn("'Log Source' = 'SOC Linux Syslog Logs'", query)
+        self.assertIn("'Process Name' = 'bash'", query)
+        self.assertIn("msg like '*tar*'", query)
+        self.assertIn("msg like '*zip*'", query)
+        self.assertNotIn("'Log Source' = 'Linux Audit Logs'", query)
+
+    def test_linux_exfiltration_queries_use_targeted_demo_source_and_process_filter(self):
+        query_files = [
+            "queries/linux_exfiltration_over_alternative_protocol.json",
+            "queries/linux_sensitive_data_collection_from_local_system.json",
+            "queries/linux_proxy_and_tunneling_tool_detected.json",
+            "queries/hunting/linux_persistence_score.json",
+        ]
+
+        for query_file in query_files:
+            payload = self.load_query_payload(query_file)
+            query = payload["query"]
+
+            self.assertIn("'Log Source' = 'SOC Linux Syslog Logs'", query, query_file)
+            self.assertIn("'Process Name' = 'bash'", query, query_file)
+            self.assertNotIn("'Log Source' = 'Linux Audit Logs'", query, query_file)
+
+    def test_oci_success_status_selectors_include_native_parser_code(self):
+        import yaml
+
+        project_dir = Path(__file__).resolve().parent.parent
+        rule_dir = project_dir / "rules" / "cloud" / "oci"
+        failures = []
+
+        def check_status_values(path, value_path, value):
+            if value == "Success":
+                failures.append(f"{path.name}:{value_path} uses Success without '200'")
+            elif isinstance(value, list) and "Success" in value and "200" not in value:
+                failures.append(f"{path.name}:{value_path} includes Success without '200'")
+
+        def walk_status_values(path, obj, value_path="detection"):
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    child_path = f"{value_path}.{key}"
+                    if key == "status":
+                        check_status_values(path, child_path, value)
+                    walk_status_values(path, value, child_path)
+            elif isinstance(obj, list):
+                for index, value in enumerate(obj):
+                    walk_status_values(path, value, f"{value_path}[{index}]")
+
+        for rule_path in sorted(rule_dir.glob("*.yaml")):
+            with rule_path.open() as handle:
+                payload = yaml.safe_load(handle)
+            walk_status_values(rule_path, payload.get("detection", {}))
+
+        self.assertEqual(failures, [])
 
 
 if __name__ == "__main__":

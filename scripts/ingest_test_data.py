@@ -37,6 +37,7 @@ from oci_config import (
     SOURCE_CANDIDATE_GROUPS,
     list_available_log_sources,
     resolve_source_from_candidates,
+    resolve_compartment_id,
 )
 
 import oci
@@ -150,6 +151,22 @@ UPLOAD_MANIFEST = [
         "description": "Application and browser telemetry (service health, traces, OWASP attacks, browser detections)"
     },
     {
+        "filename": "vcn_flow.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["vcn_flow"],
+        "upload_name": "soc-test-vcn-flow",
+        "stream_key": "soc-detection-vcn-flow",
+        "content_type": "application/octet-stream",
+        "description": "OCI VCN Flow Logs for web-to-cloud C2, service gateway, and exfiltration flows"
+    },
+    {
+        "filename": "network_firewall.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["network_firewall"],
+        "upload_name": "soc-test-network-firewall",
+        "stream_key": "soc-detection-network-firewall",
+        "content_type": "application/octet-stream",
+        "description": "OCI Network Firewall traffic and threat logs for C2 and exfiltration drilldowns"
+    },
+    {
         "filename": "multicloud_health.jsonl",
         "source_candidates": SOURCE_CANDIDATE_GROUPS["multicloud_health"],
         "upload_name": "soc-test-multicloud-health",
@@ -158,6 +175,36 @@ UPLOAD_MANIFEST = [
         "description": "Multicloud health heartbeats (OCI, Azure, GCP — geographic map visualization)"
     },
 ]
+
+OPTIONAL_UPLOAD_MANIFEST = [
+    {
+        "filename": "octo_apm_workshop_application_logs.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["application_logs"],
+        "upload_name": "octo-apm-workshop-application",
+        "stream_key": "soc-detection-application",
+        "content_type": "application/octet-stream",
+        "description": "Octo APM workshop telemetry only (APM spans, logs, metrics, payment, API Gateway, OSQuery evidence)"
+    },
+]
+
+ALL_UPLOAD_MANIFEST = UPLOAD_MANIFEST + OPTIONAL_UPLOAD_MANIFEST
+
+
+def selected_upload_manifest(filenames=None):
+    """Return upload manifest entries, optionally filtered by filename."""
+    if not filenames:
+        return UPLOAD_MANIFEST
+
+    requested = set(filenames)
+    selected = [entry for entry in ALL_UPLOAD_MANIFEST if entry["filename"] in requested]
+    selected_names = {entry["filename"] for entry in selected}
+    unknown = sorted(requested - selected_names)
+    if unknown:
+        valid = ", ".join(entry["filename"] for entry in ALL_UPLOAD_MANIFEST)
+        raise ValueError(
+            f"Unknown upload file(s): {', '.join(unknown)}. Valid files: {valid}"
+        )
+    return selected
 
 
 # ─── Direct Upload Mode ──────────────────────────────────────────
@@ -202,20 +249,22 @@ def upload_direct(la_client, namespace, log_group_id, entry, resolved_log_source
         return False
 
 
-def run_direct_mode():
+def run_direct_mode(manifest_entries=None):
     """Upload test data directly to Log Analytics."""
+    manifest_entries = manifest_entries or UPLOAD_MANIFEST
+
     print("\n[1/3] Connecting to OCI Log Analytics...")
     la_client = get_la_client()
 
     print("\n[2/3] Setting up namespace and log group...")
     namespace = get_namespace(la_client)
     log_group_id = ensure_log_group(la_client, namespace)
-    available_sources = list_available_log_sources(la_client, namespace, COMPARTMENT_ID)
+    available_sources = list_available_log_sources(la_client, namespace, resolve_compartment_id())
     print(f"  Discovered {len(available_sources)} available log sources")
 
     print("\n[3/3] Uploading test log files...")
     results = {}
-    for entry in UPLOAD_MANIFEST:
+    for entry in manifest_entries:
         resolved = resolve_source_from_candidates(available_sources, entry["source_candidates"])
         if not resolved:
             resolved = entry["source_candidates"][0]
@@ -278,8 +327,10 @@ def publish_to_stream(stream_client, stream_id, messages, name):
     return total_published, total_failed
 
 
-def run_streaming_mode():
+def run_streaming_mode(manifest_entries=None):
     """Publish test data to OCI Streaming."""
+    manifest_entries = manifest_entries or UPLOAD_MANIFEST
+
     if not os.path.exists(STREAMING_CONFIG_PATH):
         print(f"ERROR: {STREAMING_CONFIG_PATH} not found.")
         print("Run: python3 scripts/setup_streaming_pipeline.py")
@@ -300,7 +351,7 @@ def run_streaming_mode():
     config = get_oci_config()
     results = {}
 
-    for entry in UPLOAD_MANIFEST:
+    for entry in manifest_entries:
         filepath = os.path.join(TEST_DATA_DIR, entry['filename'])
         if not os.path.exists(filepath):
             print(f"\n  SKIP: {entry['filename']}")
@@ -335,6 +386,8 @@ def main():
                         help='Ingestion mode: direct (Upload API) or streaming (OCI Streaming)')
     parser.add_argument('--validate', action='store_true',
                         help='Run pre-flight validation checks')
+    parser.add_argument('--file', action='append', dest='files',
+                        help='Only upload the named test data file; repeat for multiple files')
     args = parser.parse_args()
 
     if args.validate:
@@ -349,10 +402,16 @@ def main():
         print(f"ERROR: {TEST_DATA_DIR} not found. Run generate_test_logs.py first.")
         sys.exit(1)
 
+    try:
+        manifest_entries = selected_upload_manifest(args.files)
+    except ValueError as e:
+        print(f"ERROR: {e}")
+        sys.exit(1)
+
     if args.mode == 'direct':
-        results = run_direct_mode()
+        results = run_direct_mode(manifest_entries)
     else:
-        results = run_streaming_mode()
+        results = run_streaming_mode(manifest_entries)
 
     # Summary
     print("\n" + "=" * 60)

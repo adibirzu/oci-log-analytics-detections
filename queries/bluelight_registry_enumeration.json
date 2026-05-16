@@ -32,6 +32,12 @@
     "Software inventory tools",
     "Antivirus self-update routines"
   ],
+  "atomic_red_team": {
+    "has_tests": false,
+    "test_count": 0,
+    "techniques_with_tests": [],
+    "tests": []
+  },
   "splunk_original": "index=sysmon EventCode=13 TargetObject IN (\"*\\\\CurrentVersion\\\\Uninstall*\",\"*\\\\CurrentControlSet\\\\Services*\",\"*SecurityCenter2*\") NOT Image IN (\"*MsMpEng.exe\",\"*svchost.exe\",\"*TrustedInstaller.exe\") | table _time, Image, TargetObject, User",
   "threat_intel": {
     "malware_family": "BLUELIGHT",

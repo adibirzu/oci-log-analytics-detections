@@ -1,7 +1,7 @@
 {
   "title": "Suspicious Usage of rmmod",
   "description": "Detects execution of rmmod removing kernel modules (potential rootkit management).",
-  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'rmmod') and ( (('Command Line' like '*--force*' or 'Command Line' like '*-f*')) or ((parent_process_name like '*bash*' or parent_process_name like '*sh*' or parent_process_name like '*python*' or parent_process_name like '*perl*')) ))",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (('Process Name' = 'rmmod') and ( (('Command Line' like '*--force*' or 'Command Line' like '*-f*')) or (('Parent Process Name' like '*bash*' or 'Parent Process Name' like '*sh*' or 'Parent Process Name' like '*python*' or 'Parent Process Name' like '*perl*')) ))",
   "sigma_id": "7fe696ec-966a-418d-b9f7-7a09fae0876d",
   "level": "high",
   "stig_category": "CAT I",

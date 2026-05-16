@@ -217,27 +217,160 @@
     "required_fields": [
       "timestamp",
       "serviceName",
+      "service.name",
+      "service.namespace",
+      "service.version",
+      "service.instance.id",
+      "deployment.environment",
+      "app.name",
+      "app.runtime",
       "traceId",
+      "trace_id",
+      "span_id",
+      "oracleApmTraceId",
+      "oracleApmSpanId",
+      "traceparent",
       "requestUrl",
+      "request_id",
+      "workflow_id",
+      "workflow_step",
+      "http.method",
+      "http.request.method",
+      "http.url.path",
+      "http.status_code",
+      "http.response_time_ms",
       "statusCode",
       "clientAddress",
       "spanName",
+      "spanId",
+      "parentSpanId",
+      "spanKind",
+      "apmDomain",
+      "metricName",
+      "metricValue",
+      "metricUnit",
+      "severity",
       "message"
     ],
     "field_patterns": {
       "timestamp": "^\\d{4}-\\d{2}-\\d{2}T",
       "traceId": "^trace_",
+      "trace_id": "^trace_",
+      "oracleApmTraceId": "^trace_",
+      "spanId": "^span_",
+      "span_id": "^span_",
+      "oracleApmSpanId": "^span_",
       "statusCode": "^\\d{3}$",
+      "http.status_code": "^\\d{3}$",
       "clientAddress": "^\\d{1,3}(?:\\.\\d{1,3}){3}$"
     },
     "minimum_events": 25,
     "required_values": {
       "serviceName": [
         "enterprise-crm-portal",
-        "octo-drone-shop"
+        "octo-drone-shop",
+        "octo-apm-demo"
+      ],
+      "service.namespace": [
+        "octo"
+      ],
+      "workflow_id": [
+        "checkout",
+        "auth",
+        "admin-threat-simulation"
+      ],
+      "security.attack.id": [
+        "attack-octo-demo-001"
+      ],
+      "security.attack.stage": [
+        "vm_compromise",
+        "payment_interception",
+        "payment_redirect",
+        "exfiltration"
+      ],
+      "payment.redirect.detected": [
+        true
+      ],
+      "payment.interception.detected": [
+        true
+      ],
+      "vm.compromised": [
+        true
+      ],
+      "oci.api_gateway.action": [
+        "allow"
+      ],
+      "oci.api_gateway.policy.decision": [
+        "suspicious_burst_observed"
       ]
     },
     "sample_dir": "test_data/contracts/application_logs"
+  },
+  "vcn_flow.jsonl": {
+    "description": "VCN Flow Logs should preserve the OCI event envelope and nested data fields while exposing SOC parser aliases for network drilldowns.",
+    "required_fields": [
+      "datetime",
+      "specversion",
+      "time",
+      "type",
+      "data",
+      "oracle",
+      "Log Source",
+      "Source IP",
+      "Destination IP",
+      "Bytes Sent"
+    ],
+    "required_nested_fields": [
+      "data.srcaddr",
+      "data.dstaddr",
+      "data.srcport",
+      "data.dstport",
+      "data.protocol",
+      "data.action",
+      "data.bytesOut",
+      "data.sourceAddress",
+      "data.destinationAddress",
+      "oracle.compartmentid",
+      "oracle.tenantid"
+    ],
+    "field_patterns": {
+      "time": "^\\d{4}-\\d{2}-\\d{2}T",
+      "type": "^com\\.oraclecloud\\.vcn\\.flowlogs\\.",
+      "Log Source": "^SOC VCN Flow Logs$",
+      "Source IP": "^\\d{1,3}(?:\\.\\d{1,3}){3}$",
+      "Destination IP": "^\\d{1,3}(?:\\.\\d{1,3}){3}$"
+    },
+    "minimum_events": 10
+  },
+  "network_firewall.jsonl": {
+    "description": "Network Firewall logs should preserve the OCI logContent envelope and expose traffic/threat fields used by C2 and exfiltration widgets.",
+    "required_fields": [
+      "datetime",
+      "logContent",
+      "Log Source",
+      "Source IP",
+      "Destination IP",
+      "Bytes Sent",
+      "Action"
+    ],
+    "required_nested_fields": [
+      "logContent.data.log_type",
+      "logContent.data.action",
+      "logContent.data.src_ip",
+      "logContent.data.dst_ip",
+      "logContent.data.src_port",
+      "logContent.data.dst_port",
+      "logContent.data.bytes_sent",
+      "logContent.data.threat_name",
+      "logContent.oracle.compartmentid",
+      "logContent.oracle.tenantid"
+    ],
+    "field_patterns": {
+      "Log Source": "^SOC Network Firewall Logs$",
+      "Source IP": "^\\d{1,3}(?:\\.\\d{1,3}){3}$",
+      "Destination IP": "^\\d{1,3}(?:\\.\\d{1,3}){3}$"
+    },
+    "minimum_events": 10
   },
   "multicloud_health.jsonl": {
     "description": "Multicloud heartbeat logs should cover OCI, Azure, AWS, and GCP with provider-specific instance IDs and health metrics.",

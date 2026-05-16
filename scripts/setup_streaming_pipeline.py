@@ -162,6 +162,88 @@ def _is_service_connector_limit_error(error):
     )
 
 
+def _is_stream_partition_limit_error(error):
+    message = ((getattr(error, "message", "") or "") + " " + (getattr(error, "code", "") or "")).lower()
+    return (
+        "partition" in message
+        and (
+            "limit" in message
+            or "limitexceeded" in message
+            or "exceeded" in message
+        )
+    )
+
+
+def _truthy(value):
+    return str(value or "").strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _dedupe(values):
+    seen = set()
+    result = []
+    for value in values:
+        if not value or value == "null" or value in seen:
+            continue
+        seen.add(value)
+        result.append(value)
+    return result
+
+
+def _active_stream_by_id(stream_admin_client, stream_id):
+    if not stream_id:
+        return None
+    try:
+        stream = stream_admin_client.get_stream(stream_id).data
+    except oci.exceptions.ServiceError:
+        return None
+    if getattr(stream, "lifecycle_state", "") != "ACTIVE":
+        return None
+    return stream
+
+
+def resolve_single_stream(stream_admin_client):
+    """Resolve an ACTIVE reusable stream for low-quota demo tenancies."""
+    for stream_id in _dedupe([
+        _cfg("STREAM_OCID_OCI_UNIFIED", ""),
+        _cfg("C2_DETECTIONS_SINGLE_STREAM_OCID", ""),
+    ]):
+        stream = _active_stream_by_id(stream_admin_client, stream_id)
+        if stream:
+            print(f"  Single-stream mode: resolved active stream by OCID: {stream.id}")
+            return {
+                "name": getattr(stream, "name", "oci-unified-stream"),
+                "stream_id": stream.id,
+                "messages_endpoint": getattr(stream, "messages_endpoint", ""),
+            }
+
+    for stream_name in _dedupe([
+        _cfg("C2_DETECTIONS_SINGLE_STREAM_NAME", "oci-unified-stream"),
+        "oci-unified-stream",
+        "soc-detection-oci-audit",
+    ]):
+        streams = stream_admin_client.list_streams(
+            compartment_id=COMPARTMENT_ID,
+            name=stream_name,
+            lifecycle_state="ACTIVE"
+        ).data
+        if not streams:
+            continue
+        selected = streams[0]
+        if TARGET_STREAM_POOL_ID:
+            selected = next(
+                (stream for stream in streams if getattr(stream, "stream_pool_id", None) == TARGET_STREAM_POOL_ID),
+                selected,
+            )
+        print(f"  Single-stream mode: resolved active stream by name '{stream_name}': {selected.id}")
+        return {
+            "name": getattr(selected, "name", stream_name),
+            "stream_id": selected.id,
+            "messages_endpoint": getattr(selected, "messages_endpoint", ""),
+        }
+
+    return None
+
+
 def find_or_create_stream(stream_admin_client, stream_config):
     """Find an existing stream by name or create a new one."""
     # Search for existing stream
@@ -199,7 +281,19 @@ def find_or_create_stream(stream_admin_client, stream_config):
     else:
         details_kwargs["compartment_id"] = COMPARTMENT_ID
     details = oci.streaming.models.CreateStreamDetails(**details_kwargs)
-    new_stream = stream_admin_client.create_stream(details).data
+    try:
+        new_stream = stream_admin_client.create_stream(details).data
+    except oci.exceptions.ServiceError as e:
+        if _is_stream_partition_limit_error(e):
+            print(
+                "  ERROR: OCI Streaming partition quota is exhausted while creating "
+                f"{stream_config['name']} ({stream_config['partitions']} partition)."
+            )
+            print(
+                "  Reuse an ACTIVE stream with OCI_DEMO_SINGLE_STREAM_MODE=true and "
+                "STREAM_OCID_OCI_UNIFIED, or request additional Streaming partition quota."
+            )
+        raise
     print(f"  Created Stream: {new_stream.id} (waiting for ACTIVE state...)")
 
     # Wait for stream to become active
@@ -365,6 +459,18 @@ def main():
     stream_admin_client = get_streaming_admin_client()
     la_client = get_la_client()
     sch_client = get_sch_client()
+    single_stream = None
+    if _truthy(_cfg("OCI_DEMO_SINGLE_STREAM_MODE", "true")):
+        single_stream = resolve_single_stream(stream_admin_client)
+        if single_stream:
+            print(
+                "  Single-stream mode: mapping "
+                f"{len(STREAMS)} detection stream configs to {single_stream['name']} "
+                f"({single_stream['stream_id']})"
+            )
+        else:
+            print("  WARN: Single-stream mode enabled but no reusable ACTIVE stream was found.")
+            print("  WARN: Falling back to per-source stream creation.")
 
     # Step 1: Log Analytics namespace and log group
     print("\n[1/4] Setting up Log Analytics...")
@@ -384,7 +490,11 @@ def main():
     print("\n[2/4] Setting up Streaming streams...")
     stream_configs = {}
     for sc in STREAMS:
-        stream_id, messages_endpoint = find_or_create_stream(stream_admin_client, sc)
+        if single_stream:
+            stream_id = single_stream["stream_id"]
+            messages_endpoint = single_stream.get("messages_endpoint", "")
+        else:
+            stream_id, messages_endpoint = find_or_create_stream(stream_admin_client, sc)
         resolved_source = resolve_source_from_candidates(available_sources, sc["source_candidates"])
         if not resolved_source:
             resolved_source = sc["source_candidates"][0]

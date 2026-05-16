@@ -1,6 +1,6 @@
 # Rule Quality Report
 
-> Audited **454 rules** and **486 queries**
+> Audited **454 rules** and **455 queries**
 
 ## Summary
 

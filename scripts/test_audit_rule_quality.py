@@ -9,11 +9,30 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from audit_rule_quality import load_all_queries, load_all_rules
+from audit_rule_quality import (
+    check_missing_falsepositives,
+    check_missing_mitre_tags,
+    check_missing_stable_id,
+    check_missing_version,
+    load_all_queries,
+    load_all_rules,
+)
 
 
 class TestAuditRuleQuality(unittest.TestCase):
     """Validate quality-audit loading behavior."""
+
+    @staticmethod
+    def complete_rule(**overrides):
+        rule = {
+            "title": "Complete Rule",
+            "id": "11111111-1111-1111-1111-111111111111",
+            "version": 1,
+            "tags": ["attack.execution", "attack.t1059"],
+            "falsepositives": ["Authorized administration"],
+        }
+        rule.update(overrides)
+        return rule
 
     def test_load_all_rules_reports_invalid_yaml(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -66,6 +85,33 @@ class TestAuditRuleQuality(unittest.TestCase):
             self.assertIn("base.json", files)
             self.assertIn("apps/browser.json", files)
             self.assertNotIn("apps/curated.json", files)
+
+    def test_required_metadata_checks_flag_missing_fields(self):
+        missing_id = self.complete_rule(id="")
+        id_issues = check_missing_stable_id([missing_id])
+        self.assertEqual(len(id_issues), 1)
+        self.assertIn("Missing stable ID", id_issues[0]["issue"])
+        self.assertIn(id_issues[0]["severity"], {"critical", "high", "medium", "low"})
+
+        version_issues = check_missing_version([self.complete_rule(version=None)])
+        self.assertEqual(len(version_issues), 1)
+        self.assertIn("Missing version field", version_issues[0]["issue"])
+
+        falsepositive_issues = check_missing_falsepositives([self.complete_rule(falsepositives=[])])
+        self.assertEqual(len(falsepositive_issues), 1)
+        self.assertIn("Missing falsepositives field", falsepositive_issues[0]["issue"])
+
+        mitre_issues = check_missing_mitre_tags([self.complete_rule(tags=["attack.execution"])])
+        self.assertEqual(len(mitre_issues), 1)
+        self.assertIn("No MITRE ATT&CK technique tags", mitre_issues[0]["issue"])
+
+    def test_required_metadata_checks_accept_complete_rule(self):
+        rule = self.complete_rule()
+
+        self.assertEqual(check_missing_stable_id([rule]), [])
+        self.assertEqual(check_missing_version([rule]), [])
+        self.assertEqual(check_missing_falsepositives([rule]), [])
+        self.assertEqual(check_missing_mitre_tags([rule]), [])
 
 
 if __name__ == "__main__":

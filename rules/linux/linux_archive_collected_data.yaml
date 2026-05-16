@@ -40,3 +40,4 @@ falsepositives:
 - System backup scripts
 - Application deployment archives
 version: 1
+do_not_overwrite: true  # curated demo-tuned query — see scripts/test_query_audit.py

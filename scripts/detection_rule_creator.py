@@ -14,6 +14,7 @@ import re
 from pathlib import Path
 
 from oci_config import APPS_DIR, HUNTING_DIR, PROJECT_DIR, QUERIES_DIR
+from query_artifacts import is_saved_search_query_file
 
 UNSUPPORTED_SCHEDULED_COMMANDS = {
     "cluster",
@@ -47,6 +48,7 @@ UNSUPPORTED_QUERY_PATTERNS = [
     (re.compile(r"\bProperties\b", re.IGNORECASE), "field not mapped in demo sources: Properties"),
     (re.compile(r"Fusion Apps:", re.IGNORECASE), "query depends on unavailable Fusion Apps demo sources"),
 ]
+OUTPUT_JSON = Path(QUERIES_DIR) / "detection_rule_specs.json"
 
 
 def load_query_payloads() -> list[tuple[str, dict]]:
@@ -62,6 +64,8 @@ def load_query_payloads() -> list[tuple[str, dict]]:
     for root in roots:
         for path in sorted(root.glob("*.json")):
             if path in seen:
+                continue
+            if not is_saved_search_query_file(path):
                 continue
             seen.add(path)
             with path.open() as f:
@@ -130,6 +134,12 @@ def build_detection_rule_spec(query_path: str, payload: dict) -> dict:
 
     title = payload["title"]
     metric_name = classification["metric_name"] or re.sub(r"[^A-Za-z0-9]+", "_", title).strip("_")
+    scheduled_rule_eligibility = "deployable" if classification["eligible"] else "not_deployable"
+    dashboard_readiness = "dashboard_ready" if dashboard_meta else "not_dashboard_annotated"
+    source_confidence = payload.get("source_confidence") or ("high" if payload.get("sigma_id") else "medium")
+    test_data_coverage = payload.get("test_data_coverage") or (
+        "covered" if payload.get("atomic_red_team", {}).get("has_tests") else "not_evaluated"
+    )
 
     return {
         "query_file": query_path,
@@ -142,12 +152,28 @@ def build_detection_rule_spec(query_path: str, payload: dict) -> dict:
         "lookback": payload.get("detection_rule", {}).get("lookback", "15m"),
         "query": payload["query"],
         "reasons": classification["reasons"],
+        "detection_maturity": payload.get("detection_maturity", "validated_locally" if payload.get("query") else "draft"),
+        "source_confidence": source_confidence,
+        "field_coverage": payload.get("field_coverage", "not_evaluated"),
+        "test_data_coverage": test_data_coverage,
+        "live_validation_status": payload.get("live_validation_status", "not_run"),
+        "dashboard_readiness": dashboard_readiness,
+        "scheduled_rule_eligibility": scheduled_rule_eligibility,
+        "alarm_template": {
+            "enabled": classification["eligible"],
+            "namespace": "oci_log_analytics_detections",
+            "metric_name": metric_name,
+            "dimensions": classification["dimensions"],
+            "severity": payload.get("level", "medium"),
+            "create_alarm_by_default": False,
+        },
     }
 
 
-def build_catalog() -> dict:
+def build_catalog(payloads: list[tuple[str, dict]] | None = None) -> dict:
     """Build detection-rule specs for all query artifacts."""
-    specs = [build_detection_rule_spec(path, payload) for path, payload in load_query_payloads()]
+    payloads = payloads if payloads is not None else load_query_payloads()
+    specs = [build_detection_rule_spec(path, payload) for path, payload in payloads]
     eligible = [spec for spec in specs if spec["eligible"]]
     ineligible = [spec for spec in specs if not spec["eligible"]]
 
@@ -161,7 +187,8 @@ def build_catalog() -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build scheduled-search detection rule specs")
-    parser.add_argument("--out", help="Optional JSON output path")
+    parser.add_argument("--out", help=f"Optional JSON output path (for example {OUTPUT_JSON})")
+    parser.add_argument("--write-default", action="store_true", help=f"Write {OUTPUT_JSON}")
     parser.add_argument("--eligible-only", action="store_true", help="Only print eligible rule specs")
     args = parser.parse_args()
 
@@ -170,8 +197,9 @@ def main() -> None:
     if args.eligible_only:
         specs = [spec for spec in specs if spec["eligible"]]
 
-    if args.out:
-        out_path = Path(args.out)
+    output_path = args.out or (str(OUTPUT_JSON) if args.write_default else "")
+    if output_path:
+        out_path = Path(output_path)
         out_path.write_text(json.dumps({**catalog, "specs": specs}, indent=2))
         print(f"Wrote detection rule specs to {out_path}")
         return

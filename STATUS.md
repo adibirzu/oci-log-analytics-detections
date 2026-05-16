@@ -1,24 +1,27 @@
 # Project Status
 
-Date: 2026-05-04
+Date: 2026-05-16
 
 ## Current State
 
 - Core scope: OCI Log Analytics query generation, synthetic log generation, query/dashboard validation, and OCI dashboard creation.
 - Source Sigma/YAML rules: 454
-- Sigma-derived OCI query artifacts: 486
-  - 478 top-level detections in `queries/`
+- Sigma-derived OCI query artifacts: 455
+  - 447 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
-- Curated analytics: 61
-  - 16 app telemetry analytics
-  - 45 hunting analytics
-- Total query artifacts: 547
-- Dashboards: 16
-- Saved searches: 264
-- Live dashboard health: **263 / 264 widgets HIT (99.6 %)** in `eu-frankfurt-1` with a 14-day lookback (1 environmental MISS — Fusion Apps source not provisioned in this tenancy).
+- Microsoft Sentinel converted queries: 8 live OCI parser-passing queries
+- Curated analytics: 125
+  - 38 app telemetry analytics
+  - 87 hunting analytics
+- Total query artifacts/content items: 588
+- Dashboards: 23
+- Saved searches: 351 active dashboard saved searches; 588 total content items
+- Sentinel live validation: 8 / 18 locally clean conversions; 10 live failures remain in `queries/sentinel_conversion_report.json`
+- Live dashboard health: **351 / 351 widgets HIT (100.0 %)** in the `cap` profile with a 21-day lookback.
 - Generated demo data: 14 NDJSON files / 2,922 events in the latest local `test_data/manifest.json`
-- MITRE ATT&CK coverage: 211 techniques / 14 tactics
+- MITRE ATT&CK coverage: 218 techniques / 16 tactics
 - STIG coverage: 24 detections / 12 controls
+- Atomic Red Team coverage: 280 / 317 testable rules have mapped tests
 
 ## Architecture Updates Shipped
 

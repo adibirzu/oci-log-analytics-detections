@@ -31,6 +31,12 @@
   "falsepositives": [
     "System management scripts launched via browser-based admin portals"
   ],
+  "atomic_red_team": {
+    "has_tests": false,
+    "test_count": 0,
+    "techniques_with_tests": [],
+    "tests": []
+  },
   "splunk_original": "index=sysmon EventCode=1 Image IN (\"*wmic.exe\",\"*powershell.exe\") CommandLine IN (\"*Win32_ComputerSystem*\",\"*Win32_OperatingSystem*\",\"*Win32_Processor*\") ParentImage IN (\"*iexplore.exe\",\"*wscript.exe\") | table _time, Image, CommandLine, ParentImage",
   "threat_intel": {
     "malware_family": "BLUELIGHT",

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Run every detection / hunting / app query against live OCI Log Analytics.
 
-Walks ``queries/**.json`` (excluding ``manifest.json`` and ``catalog.json``),
+Walks runnable query JSON under ``queries/**`` (excluding generated inventory
+artifacts such as ``manifest.json``, ``catalog.json``, and field/spec exports),
 strips post-pipeline aggregations for the smoke check (so the runner counts
 matching raw rows even when the original widget query ends in ``stats``),
 and reports HIT / MISS / ERROR per query plus a per-directory rollup.
 
 Usage:
-    python3 scripts/smoke_test_all_queries.py [--lookback 14d] [--json out.json]
+    python3 scripts/smoke_test_all_queries.py [--lookback 21d] [--json out.json]
                                               [--include-aggregations] [--limit 10]
 
 Exit codes:
@@ -38,9 +39,9 @@ from oci_config import (  # noqa: E402
     get_la_client,
     require_oci_config,
 )
+from query_artifacts import is_saved_search_query_file  # noqa: E402
 
 QUERIES_DIR = PROJECT_DIR / "queries"
-SKIP_FILES = {"manifest.json", "catalog.json", "dashboard_inventory.json"}
 
 
 @dataclass(frozen=True)
@@ -66,8 +67,21 @@ def _time_window(lookback: str) -> tuple[datetime, datetime]:
 
 
 def _strip_aggregations(query: str) -> str:
-    """Return the raw filter half of a query (everything before the first ``|``)."""
-    return query.split("|", 1)[0].strip()
+    """Return the raw filter half of a query (everything before the first ``|``).
+
+    The pipe must be at the OCL command level — pipes inside ``like '...'``
+    literals (e.g. ``msg like '*| nc *'`` for shell-pipe payloads) are part
+    of the search value, not stage delimiters. Splitting naively on the
+    first ``|`` truncates the literal and produces ``Invalid string for
+    LIKE: '`` errors during smoke tests.
+    """
+    in_quote = False
+    for i, ch in enumerate(query):
+        if ch == "'":
+            in_quote = not in_quote
+        elif ch == "|" and not in_quote:
+            return query[:i].strip()
+    return query.strip()
 
 
 def _classify(rel_path: str) -> str:
@@ -80,7 +94,7 @@ def _classify(rel_path: str) -> str:
 
 def _iter_query_files() -> Iterable[Path]:
     for path in sorted(QUERIES_DIR.rglob("*.json")):
-        if path.name in SKIP_FILES:
+        if not is_saved_search_query_file(path):
             continue
         yield path
 
@@ -187,8 +201,8 @@ def _print_problems(results: list[QueryResult]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Smoke-test all detection queries")
-    parser.add_argument("--lookback", default="14d",
-                        help="Lookback window (e.g. 60m, 6h, 14d). Default: 14d")
+    parser.add_argument("--lookback", default="21d",
+                        help="Lookback window (e.g. 60m, 6h, 21d). Default: 21d")
     parser.add_argument("--include-aggregations", action="store_true",
                         help="Run the full pipelined query instead of only the filter half")
     parser.add_argument("--limit", type=int, default=10,

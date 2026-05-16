@@ -1,15 +1,18 @@
 """
 Deploy SOC detection dashboards to OCI Log Analytics.
 
-Creates 16 dashboards backed by 264 embedded saved-search widgets covering:
+Creates 22 dashboards backed by 343 embedded saved-search widgets covering:
   - OCI audit and STIG compliance
   - Cloud Guard, Linux, Windows, Sysmon network, and web detections
   - Browser/APM detections, application analytics, APT content, and hunting
+  - FreeLabFriday-inspired C2/exfiltration/persistence hunts
+  - 2025-2026 MELTS hunts for ClickFix, ToolShell, RMM, token replay, and exfiltration
   - Geographic health / multicloud operational views
 
 Usage:
   python3 scripts/deploy_dashboard.py              # Deploy all
   python3 scripts/deploy_dashboard.py --cleanup     # Delete existing SOC content first
+  python3 scripts/deploy_dashboard.py --dashboard-name "C2 & Beaconing Detection"
   python3 scripts/deploy_dashboard.py --dry-run     # Print plan without executing
   python3 scripts/deploy_dashboard.py --export-inventory
 """
@@ -19,6 +22,7 @@ import os
 import sys
 import argparse
 import multiprocessing
+import re
 import signal
 import time
 from collections import Counter
@@ -31,6 +35,7 @@ from oci_config import (
     get_dashboard_client, get_la_client, get_namespace, validate_oci_setup,
 )
 from oci_time import build_time_window
+from query_artifacts import is_saved_search_query_file
 
 import oci
 
@@ -67,9 +72,79 @@ ADVANCED_VISUALIZATION_TYPES = {
     "treemap",
 }
 
+FIELD_REFERENCE_RE = re.compile(r"'([^']+)'")
+FIELD_OPERATOR_RE = re.compile(r"\s*(?:=|!=|>=|<=|>|<|\blike\b|\bnot\s+like\b|\bin\b|\bnot\s+in\b|\bis\b)", re.IGNORECASE)
+PROGRESS_REDACTIONS = (
+    (re.compile(r"\bopc-request-id\s*[:=]\s*[A-Za-z0-9_.:-]+", re.IGNORECASE), "opc-request-id=<redacted>"),
+    (re.compile(r"\bocid1\.[A-Za-z0-9_.-]+\b"), "<OCI_OCID>"),
+    (re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"), "<IP_ADDRESS>"),
+    (re.compile(r"\bhttps?://[^\s\"']+"), "<URL>"),
+    (re.compile(r"\bprofile\s+['\"]?[A-Za-z0-9_.:-]+['\"]?", re.IGNORECASE), "profile <redacted>"),
+    (re.compile(r"\bnamespace\s+['\"]?[A-Za-z0-9_.:-]+['\"]?", re.IGNORECASE), "namespace <redacted>"),
+)
+
+
+def _iter_quoted_values(text):
+    in_quote = False
+    escaped = False
+    start = 0
+    value = []
+    for index, char in enumerate(text):
+        if escaped:
+            value.append(char)
+            escaped = False
+            continue
+        if char == "\\" and in_quote:
+            escaped = True
+            value.append(char)
+            continue
+        if char == "'":
+            if in_quote:
+                yield "".join(value), start, index + 1
+                in_quote = False
+                value = []
+            else:
+                in_quote = True
+                start = index
+                value = []
+            continue
+        if in_quote:
+            value.append(char)
+
 DASHBOARD_INVENTORY_PATH = os.path.join(QUERIES_DIR, "dashboard_inventory.json")
 DEFAULT_DASHBOARD_TIME_PERIOD = "l24h"
 DEFAULT_QUERY_VALIDATION_LOOKBACK = "24h"
+OCTO_APM_WORKSHOP_TIME_SELECTION = {"timePeriod": "l21d"}
+DASHBOARD_GRID_COLUMNS = 12
+
+VISUALIZATION_LAYOUT_DEFAULTS = {
+    "bar": {"width": 6, "height": 5},
+    "cluster": {"width": 12, "height": 6},
+    "distinct": {"width": 3, "height": 3},
+    "hbar": {"width": 6, "height": 5},
+    "issues": {"width": 12, "height": 6},
+    "line": {"width": 6, "height": 5},
+    "link": {"width": 12, "height": 6},
+    "map": {"width": 12, "height": 6},
+    "pie": {"width": 6, "height": 5},
+    "records": {"width": 12, "height": 6},
+    "records_histogram": {"width": 12, "height": 6},
+    "summary_table": {"width": 12, "height": 5},
+    "sunburst": {"width": 6, "height": 6},
+    "table": {"width": 12, "height": 5},
+    "table_histogram": {"width": 12, "height": 6},
+    "tile": {"width": 3, "height": 3},
+    "treemap": {"width": 6, "height": 6},
+}
+
+
+def octo_apm_workshop_widget(title, query_file):
+    """Return an Octo workshop widget pinned to the workshop evidence window."""
+    return {
+        "title": title,
+        "query_file": query_file,
+        "time_selection": OCTO_APM_WORKSHOP_TIME_SELECTION.copy(),
+    }
 
 
 # ─── Dashboard Definitions ────────────────────────────────────────
@@ -246,7 +321,7 @@ DASHBOARDS = {
             {"title": "Brute Force: Failed Logons", "query_file": "brute_force_failed_logon_spike.json"},
             {"title": "PS: Suspicious Commands", "query_file": "powershell_suspicious_commands.json"},
             {"title": "CMD: Suspicious Execution", "query_file": "cmd_suspicious_child_process.json"},
-            {"title": "Mimikatz: Command Indicators", "query_file": "mimikatz_command_indicators.json"},
+            {"title": "Mimikatz: Command Indicators", "query_file": "mimikatz_command_and_module_indicators_in_process_logs.json"},
             {"title": "Cred Manager: Dump Activity", "query_file": "credential_manager_access.json"},
             {"title": "Group Enum: SharpHound/BloodH", "query_file": "security_group_enumeration.json"},
             {"title": "Hunt: Kerb RC4/AES Ratio", "query_file": "hunting/kerberoasting_anomaly_detection.json"},
@@ -254,6 +329,34 @@ DASHBOARDS = {
             {"title": "Win: Screen Capture", "query_file": "windows_screen_capture_activity.json"},
             {"title": "Win: Remote Access Tool", "query_file": "windows_remote_access_tool_detected.json"},
             {"title": "Win: Token Manipulation", "query_file": "windows_access_token_manipulation.json"},
+        ]
+    },
+    "SOC: GOAD Caldera Operations Dashboard": {
+        "description": "Maps the 5 Caldera adversary operations from c7_run_caldera_operations.sh (Discovery, Credential Access, Lateral Movement, Collection, Exfiltration) to detection rules firing on the 10 GOAD + Apex AD Windows hosts (kingslanding, winterfell, meereen, castelblack, braavos, hq-dc01, eu-dc01, eu-app01, apac-dc01, apac-db01). Each Caldera operation phase maps to a row of detection tiles plus two host-scoped hunting tiles (sandcat agent activity + multi-stage attack chain) that filter to the 11 lab Entities so red-team noise stays scoped and BLUE drilldowns stay attributable to a specific Caldera op.",
+        "widgets": [
+            {"title": "Op1 Discovery: AD Enum (AdFind)", "query_file": "ad_enumeration_via_adfind.json"},
+            {"title": "Op1 Discovery: BloodHound", "query_file": "bloodhound_ad_enumeration.json"},
+            {"title": "Op1 Discovery: Domain Trust (nltest)", "query_file": "domain_trust_discovery_via_nltest.json"},
+            {"title": "Op1 Discovery: Net View Shares", "query_file": "network_share_enumeration_via_net_view.json"},
+            {"title": "Op1 Discovery: Win Share Enum", "query_file": "windows_network_share_discovery.json"},
+            {"title": "Op2 CredAccess: Kerberoast RC4", "query_file": "kerberoasting_rc4_ticket_request.json"},
+            {"title": "Op2 CredAccess: AS-REP Roasting", "query_file": "as-rep_roasting_via_rubeus.json"},
+            {"title": "Op2 CredAccess: LSASS via comsvcs", "query_file": "lsass_memory_dump_via_comsvcs_dll.json"},
+            {"title": "Op2 CredAccess: DCSync (Non-DC)", "query_file": "dcsync_directory_replication.json"},
+            {"title": "Op2 CredAccess: Mimikatz Indicators", "query_file": "mimikatz_command_and_module_indicators_in_process_logs.json"},
+            {"title": "Op3 Lateral: PSExec Remote Exec", "query_file": "windows_psexec_remote_execution.json"},
+            {"title": "Op3 Lateral: WinRM (PowerShell)", "query_file": "winrm_lateral_movement_via_powershell.json"},
+            {"title": "Op3 Lateral: Admin Share (net use)", "query_file": "windows_admin_share_access_via_net_use.json"},
+            {"title": "Op3 Lateral: Pass-the-Ticket", "query_file": "pass_the_ticket_logon.json"},
+            {"title": "Op3 Lateral: Tool Transfer (robocopy)", "query_file": "lateral_tool_transfer_via_robocopy.json"},
+            {"title": "Op4 Collection: 7-Zip Archive", "query_file": "data_compression_for_exfiltration_via_7zip.json"},
+            {"title": "Op4 Collection: Screen Capture", "query_file": "windows_screen_capture_activity.json"},
+            {"title": "Op4 Collection: Data Staging", "query_file": "windows_data_staging_for_exfiltration.json"},
+            {"title": "Op5 Exfil: BITS Job Abuse", "query_file": "windows_bits_job_abuse_for_persistence.json"},
+            {"title": "Op5 Exfil: PowerShell Download Cradle", "query_file": "windows_powershell_download_cradle.json"},
+            {"title": "Op5 Exfil: Large HTTP Response", "query_file": "unusually_large_http_response_data_exfiltration.json"},
+            {"title": "Hunt: Sandcat Agent Activity (GOAD/Apex)", "query_file": "hunting/goad_caldera_sandcat_activity.json"},
+            {"title": "Hunt: Caldera Attack Chain (GOAD/Apex)", "query_file": "hunting/goad_caldera_attack_chain.json"},
         ]
     },
     "SOC: Threat Hunting Dashboard": {
@@ -265,7 +368,6 @@ DASHBOARDS = {
             {"title": "Hunt: Linux Rare Processes", "query_file": "hunting/linux_rare_process.json"},
             {"title": "Hunt: Long Command Lines", "query_file": "hunting/windows_long_command_line.json"},
             {"title": "Hunt: OCI IAM Rapid Changes", "query_file": "hunting/oci_iam_rapid_changes.json"},
-            {"title": "Hunt: OCI IAM + Fusion Correlation", "query_file": "hunting/oci_iam_fusion_activity_correlation.json"},
             {"title": "Hunt: Lateral Movement Cluster", "query_file": "hunting/windows_lateral_movement_cluster.json"},
             {"title": "Hunt: Linux Multi-Stage Attack", "query_file": "hunting/linux_multi_stage_attack.json"},
             {"title": "Hunt: OCI Destruction Spike", "query_file": "hunting/oci_resource_destruction_spike.json"},
@@ -297,6 +399,51 @@ DASHBOARDS = {
             {"title": "DNS: Data Exfiltration", "query_file": "sysmon_dns_data_exfiltration.json"},
             {"title": "DNS: C2 Framework Domains", "query_file": "sysmon_dns_query_to_known_c2_framework_domains.json"},
             {"title": "DNS: Suspicious TLDs", "query_file": "sysmon_dns_query_to_suspicious_tlds.json"},
+        ]
+    },
+    "C2 & Beaconing Detection": {
+        "description": "Enhanced command-and-control investigation dashboard for DNS beacons, HTTPS callbacks, suspicious C2 destinations, VCN/Network Firewall egress, and host-to-destination link analysis across the 21-day demo dataset.",
+        "widgets": [
+            {"title": "Top C2 DNS Domains", "query_file": "hunting/c2_top_dns_domains.json"},
+            {"title": "Beacon Activity Timeline", "query_file": "hunting/c2_beacon_activity_timeline.json"},
+            {"title": "DNS Beacon Queries", "query_file": "hunting/c2_dns_beacon_queries_kpi.json"},
+            {"title": "C2 Destination IPs", "query_file": "hunting/c2_destination_ips.json"},
+            {"title": "C2 Communication Topology", "query_file": "hunting/c2_communication_topology.json"},
+            {"title": "DNS Beacon Sources", "query_file": "hunting/c2_dns_beacon_sources.json"},
+            {"title": "Unique C2 Domains", "query_file": "hunting/c2_unique_domains_kpi.json"},
+            {"title": "C2 Flow Connections", "query_file": "hunting/c2_flow_connections_kpi.json"},
+            {"title": "HTTPS Beaconing (Port 443)", "query_file": "hunting/c2_https_beaconing.json"},
+            {"title": "Affected Hosts", "query_file": "hunting/c2_affected_hosts_kpi.json"},
+        ]
+    },
+    "SOC: FreeLabFriday Threat Hunting Dashboard": {
+        "description": "Black Hills InfoSec FreeLabFriday-inspired hunting dashboard for DNS C2, BITS and cloud-service exfiltration, domain-fronted C2, vsagent HTTP beaconing, credential stuffing, rogue user persistence, and port-knocking drilldowns.",
+        "widgets": [
+            {"title": "FLF: DNS C2 Patterns", "query_file": "hunting/flf_dns_c2_pattern_analysis.json"},
+            {"title": "FLF: BITS Exfiltration", "query_file": "hunting/flf_bits_exfiltration.json"},
+            {"title": "FLF: Cloud Service Exfiltration", "query_file": "hunting/flf_cloud_service_exfiltration.json"},
+            {"title": "FLF: Domain Fronting CDN C2", "query_file": "hunting/flf_domain_fronting_cdn_c2.json"},
+            {"title": "FLF: vsagent HTTP Beaconing", "query_file": "hunting/flf_vsagent_http_beaconing.json"},
+            {"title": "FLF: Credential Stuffing", "query_file": "hunting/flf_credential_stuffing_pattern.json"},
+            {"title": "FLF: New User Persistence", "query_file": "hunting/flf_new_user_persistence.json"},
+            {"title": "FLF: Port Knocking Sequence", "query_file": "hunting/flf_port_knocking_sequence.json"},
+        ]
+    },
+    "SOC: 2025-2026 Threat Hunting Dashboard": {
+        "description": "MELTS-driven threat-hunting dashboard for 2025-2026 attack tradecraft: ClickFix/CrashFix, SharePoint ToolShell, RMM abuse, AiTM token replay, compromised-machine drilldowns, and exfiltration evidence.",
+        "widgets": [
+            {"title": "MELTS: Signal Overview", "query_file": "hunting/melts_attack_signal_overview.json"},
+            {"title": "MELTS: Attack Timeline", "query_file": "hunting/melts_attack_timeline.json"},
+            {"title": "MELTS: Attack Path Link", "query_file": "hunting/melts_attack_path_link.json"},
+            {"title": "ClickFix: Clipboard PowerShell", "query_file": "hunting/clickfix_clipboard_powershell_execution.json"},
+            {"title": "ClickFix: LOLBin Payloads", "query_file": "hunting/clickfix_lolbin_payload_execution.json"},
+            {"title": "CrashFix: Python RAT", "query_file": "hunting/crashfix_python_rat_activity.json"},
+            {"title": "SharePoint: ToolShell Attempts", "query_file": "hunting/sharepoint_toolshell_exploitation.json"},
+            {"title": "SharePoint: Webshell Post-Exploit", "query_file": "hunting/sharepoint_toolshell_webshell_post_exploit.json"},
+            {"title": "RMM: Post-Compromise Activity", "query_file": "hunting/rmm_post_compromise_activity.json"},
+            {"title": "Cloud Identity: AiTM Token Abuse", "query_file": "hunting/cloud_identity_aitm_token_abuse.json"},
+            {"title": "Exfil: After Initial Access", "query_file": "hunting/exfiltration_after_initial_access_2025_2026.json"},
+            {"title": "Compromised Machines and Data", "query_file": "hunting/compromised_machines_and_data_2025_2026.json"},
         ]
     },
     "SOC: Web Application Security Dashboard": {
@@ -347,6 +494,21 @@ DASHBOARDS = {
             {"title": "Hunt: Scanner Tool Stacking", "query_file": "hunting/web_scanner_tool_stacking.json"},
         ]
     },
+    "SOC: Web-to-Cloud Threat Hunting Dashboard": {
+        "description": "Incident-focused dashboard for the web-to-cloud attack chain: SSRF entry point, compromised machines and identity, VCN egress, Network Firewall C2, OCI Audit cloud abuse, and exfiltration evidence with link and sunburst drilldowns.",
+        "widgets": [
+            {"title": "W2C: Correlated Timeline", "query_file": "hunting/web_to_cloud_attack_timeline.json"},
+            {"title": "W2C: Entry Point and SSRF", "query_file": "hunting/web_to_cloud_entry_point.json"},
+            {"title": "W2C: Compromised Machines", "query_file": "hunting/web_to_cloud_compromised_machines.json"},
+            {"title": "W2C: Compromised Identity", "query_file": "hunting/web_to_cloud_compromised_identity.json"},
+            {"title": "W2C: VCN Egress", "query_file": "hunting/web_to_cloud_vcn_egress.json"},
+            {"title": "W2C: Network Firewall C2", "query_file": "hunting/web_to_cloud_firewall_c2.json"},
+            {"title": "W2C: OCI Audit Cloud Abuse", "query_file": "hunting/web_to_cloud_cloud_abuse.json"},
+            {"title": "W2C: Exfiltrated Data", "query_file": "hunting/web_to_cloud_exfiltration.json"},
+            {"title": "W2C: Attack Path Link", "query_file": "hunting/web_to_cloud_attack_path_link.json"},
+            {"title": "W2C: MITRE Stage Breakdown", "query_file": "hunting/web_to_cloud_mitre_sunburst.json"},
+        ]
+    },
     "OCI-DEMO: Application 360 Monitoring Dashboard": {
         "description": "360-degree observability for OCI-DEMO applications (CRM Portal + Drone Shop). Runs on SOC Application Logs, a custom JSON telemetry source that models application, browser, and trace context with a shared Trace ID for correlation.",
         "widgets": [
@@ -362,6 +524,28 @@ DASHBOARDS = {
             {"title": "App: Cross-Service Trace Correlation", "query_file": "apps/app_cross_service_trace_correlation.json"},
             {"title": "App: Order Sync Pipeline", "query_file": "apps/app_order_sync_pipeline.json"},
             {"title": "App: DB Performance Correlation", "query_file": "apps/app_db_performance_correlation.json"},
+        ]
+    },
+    "OCI-DEMO: Octo APM Demo Dashboard": {
+        "description": "Dedicated APM correlation dashboard for octo-apm-demo data in SOC Application Logs. Correlates request logs, APM span hierarchy, DB spans, Java sidecar errors, API Gateway edge decisions, OSQuery host evidence, payment threats, and metric samples by Trace ID, Span ID, Parent Span ID, Request ID, Run ID, and Attack ID.",
+        "widgets": [
+            octo_apm_workshop_widget("Octo APM: RED Metrics", "apps/apm_octo_red_metrics.json"),
+            octo_apm_workshop_widget("Octo APM: Request Timeline", "apps/apm_octo_request_timeline.json"),
+            octo_apm_workshop_widget("Octo APM: Span Hotspots", "apps/apm_octo_span_latency_hotspots.json"),
+            octo_apm_workshop_widget("Octo APM: Trace Logs Correlation", "apps/apm_octo_trace_logs_correlation.json"),
+            octo_apm_workshop_widget("Octo APM: Trace Investigation Tiles", "apps/apm_octo_trace_investigation_tiles.json"),
+            octo_apm_workshop_widget("Octo APM: Span Link Analysis", "apps/apm_octo_span_link.json"),
+            octo_apm_workshop_widget("Octo APM: Error Logs", "apps/apm_octo_error_logs.json"),
+            octo_apm_workshop_widget("Octo APM: Metric Samples", "apps/apm_octo_metric_samples.json"),
+            octo_apm_workshop_widget("Octo APM: Database Spans", "apps/apm_octo_db_spans.json"),
+            octo_apm_workshop_widget("Octo APM: Java Sidecar Errors", "apps/apm_octo_java_sidecar_errors.json"),
+            octo_apm_workshop_widget("Octo APM: API Gateway Edge Decisions", "apps/apm_octo_api_gateway_edge.json"),
+            octo_apm_workshop_widget("Octo APM: Attack Timeline", "apps/apm_octo_attack_timeline.json"),
+            octo_apm_workshop_widget("Octo APM: Attack Path Link", "apps/apm_octo_attack_path_link.json"),
+            octo_apm_workshop_widget("Octo APM: Attack Trace Correlation", "apps/apm_octo_attack_trace_correlation.json"),
+            octo_apm_workshop_widget("Octo APM: Payment Threats", "apps/apm_octo_payment_threats.json"),
+            octo_apm_workshop_widget("Octo APM: OSQuery Host Evidence", "apps/apm_octo_osquery_findings.json"),
+            octo_apm_workshop_widget("Octo APM: Compromised VM Pivots", "apps/apm_octo_compromised_vm_pivots.json"),
         ]
     },
     "SOC: Geographic Health Dashboard": {
@@ -422,13 +606,179 @@ DASHBOARDS = {
 }
 
 
+SENTINEL_DASHBOARD_GROUPS = {
+    "identity": "SOC: Microsoft Sentinel Identity Converted Detections",
+    "endpoint": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+    "azure_cloud": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
+    "m365": "SOC: Microsoft Sentinel M365 Converted Detections",
+    "network": "SOC: Microsoft Sentinel Network Converted Detections",
+}
+
+SENTINEL_DASHBOARD_DESCRIPTIONS = {
+    "identity": "Live-validated Microsoft Sentinel identity detections converted to OCI Log Analytics Logan QL.",
+    "endpoint": "Live-validated Microsoft Sentinel endpoint detections converted to OCI Log Analytics Logan QL.",
+    "azure_cloud": "Live-validated Microsoft Sentinel Azure cloud detections converted to OCI Log Analytics Logan QL.",
+    "m365": "Live-validated Microsoft Sentinel Microsoft 365 detections converted to OCI Log Analytics Logan QL.",
+    "network": "Live-validated Microsoft Sentinel network detections converted to OCI Log Analytics Logan QL.",
+}
+
+SENTINEL_LIVE_VALIDATION_PASS_VALUES = {"passed", "ok", "success"}
+SENTINEL_DASHBOARD_UNSUPPORTED_QUERY_PATTERNS = (
+    "Properties like",
+)
+
+
+def _as_sorted_strings(value):
+    if isinstance(value, list):
+        return sorted(str(item) for item in value if item)
+    if value:
+        return [str(value)]
+    return []
+
+
+def _sentinel_connector_names(connectors):
+    names = []
+    if not isinstance(connectors, list):
+        return names
+    for connector in connectors:
+        if not isinstance(connector, dict):
+            continue
+        connector_id = connector.get("connector_id") or connector.get("connectorId")
+        if connector_id:
+            names.append(str(connector_id))
+        for data_type in connector.get("data_types") or connector.get("dataTypes") or []:
+            if data_type:
+                names.append(str(data_type))
+    return sorted(set(names))
+
+
+def _sentinel_coverage_keys(payload):
+    keys = []
+    for table in _as_sorted_strings(payload.get("sentinel_tables")):
+        keys.append(("table", table))
+    if payload.get("level"):
+        keys.append(("level", str(payload["level"])))
+    mitre = payload.get("mitre_attack", {})
+    if isinstance(mitre, dict):
+        for technique in _as_sorted_strings(mitre.get("techniques")):
+            keys.append(("technique", technique))
+    for connector in _sentinel_connector_names(payload.get("required_data_connectors")):
+        keys.append(("connector", connector))
+    if not keys:
+        keys.append(("query", payload.get("title", "")))
+    return tuple(keys)
+
+
+def _select_sentinel_dashboard_widgets(widgets, max_widgets):
+    """Choose a deterministic, coverage-aware subset of Sentinel widgets."""
+    remaining = sorted(widgets, key=lambda item: (item.get("title", ""), item.get("query_file", "")))
+    selected = []
+    covered = set()
+    while remaining and len(selected) < max_widgets:
+        best_index = 0
+        best_score = None
+        for index, widget in enumerate(remaining):
+            coverage = set(widget.get("_coverage_keys", ()))
+            new_coverage = len(coverage - covered)
+            score = (-new_coverage, widget.get("title", ""), widget.get("query_file", ""))
+            if best_score is None or score < best_score:
+                best_index = index
+                best_score = score
+        widget = remaining.pop(best_index)
+        covered.update(widget.get("_coverage_keys", ()))
+        selected.append({key: value for key, value in widget.items() if not key.startswith("_")})
+    return selected
+
+
+def load_sentinel_dashboard_groups(queries_dir=QUERIES_DIR, max_widgets=24):
+    """Load Sentinel dashboard groups from live-validated converted query JSON."""
+    sentinel_dir = os.path.join(queries_dir, "sentinel")
+    if not os.path.isdir(sentinel_dir):
+        return {}
+
+    grouped = {category: [] for category in SENTINEL_DASHBOARD_GROUPS}
+    for filename in sorted(os.listdir(sentinel_dir)):
+        if not filename.endswith(".json"):
+            continue
+        path = os.path.join(sentinel_dir, filename)
+        try:
+            with open(path) as f:
+                payload = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+
+        if payload.get("source_type") != "microsoft_sentinel":
+            continue
+        if payload.get("conversion_status") != "promoted":
+            continue
+        if str(payload.get("live_validation_status", "")).lower() not in SENTINEL_LIVE_VALIDATION_PASS_VALUES:
+            continue
+        if any(pattern in payload.get("query", "") for pattern in SENTINEL_DASHBOARD_UNSUPPORTED_QUERY_PATTERNS):
+            continue
+
+        category = payload.get("sentinel_category", "")
+        if category not in grouped:
+            continue
+
+        dashboard_meta = payload.get("dashboard", {})
+        grouped[category].append({
+            "title": f"Sentinel: {payload.get('title', filename)}",
+            "query_file": f"sentinel/{filename}",
+            "visualization_type": dashboard_meta.get("visualizationType", "table"),
+            "_coverage_keys": _sentinel_coverage_keys(payload),
+        })
+
+    dashboards = {}
+    for category, widgets in grouped.items():
+        if not widgets:
+            continue
+        dashboards[SENTINEL_DASHBOARD_GROUPS[category]] = {
+            "description": SENTINEL_DASHBOARD_DESCRIPTIONS[category],
+            "widgets": _select_sentinel_dashboard_widgets(widgets, max_widgets),
+        }
+    return dashboards
+
+
+DASHBOARDS.update(load_sentinel_dashboard_groups())
+
+
 # ─── Query and Dashboard Inventory Helpers ───────────────────────
+
+def select_dashboards(dashboard_names=None, dashboards=None):
+    """Return a display-name keyed dashboard subset for targeted operations."""
+    dashboards = dashboards or DASHBOARDS
+    if not dashboard_names:
+        return dashboards
+
+    selected = {}
+    name_lookup = {name.lower(): name for name in dashboards}
+    missing = []
+    for requested_name in dashboard_names:
+        canonical_name = requested_name if requested_name in dashboards else None
+        if canonical_name is None:
+            canonical_name = name_lookup.get(requested_name.lower())
+        if canonical_name is None:
+            missing.append(requested_name)
+            continue
+        selected[canonical_name] = dashboards[canonical_name]
+
+    if missing:
+        available = ", ".join(sorted(dashboards))
+        raise ValueError(
+            f"unknown dashboard name(s): {', '.join(missing)}. "
+            f"Available dashboards: {available}"
+        )
+
+    return selected
+
 
 def load_query_info(query_file, queries_dir=QUERIES_DIR):
     """Load and validate one query JSON payload referenced by a dashboard widget."""
     query_path = os.path.join(queries_dir, query_file)
     if not os.path.exists(query_path):
         raise FileNotFoundError(f"missing query file: {query_file}")
+    if not is_saved_search_query_file(query_path):
+        raise ValueError(f"{query_file}: generated support artifact is not a saved-search query file")
 
     with open(query_path, "r") as f:
         query_info = json.load(f)
@@ -448,9 +798,76 @@ def _resolve_ask_ai_prompts(widget, query_info):
     return widget.get("ask_ai_prompts", dashboard_meta.get("ask_ai_prompts", []))
 
 
+def _quote_context_indicates_field(query, start, end):
+    after = query[end:]
+    before = query[:start]
+    if FIELD_OPERATOR_RE.match(after):
+        return True
+    return bool(re.search(r"\b(?:distinctcount|unique|count|sum|max|min|avg|average)\s*\($", before[-32:].lower()))
+
+
+def extract_dashboard_query_fields(query):
+    fields = []
+    for value, start, end in _iter_quoted_values(query):
+        if value not in fields and _quote_context_indicates_field(query, start, end):
+            fields.append(value)
+    for by_match in re.finditer(
+        r"\|\s*(?:stats|timestats|eventstats|link)[^|]*\bby\b(?P<clause>[^|]+)",
+        query,
+        flags=re.IGNORECASE,
+    ):
+        for value, _start, _end in _iter_quoted_values(by_match.group("clause")):
+            if value not in fields:
+                fields.append(value)
+    for fields_match in re.finditer(r"\|\s*fields\s+(?P<clause>[^|]+)", query, flags=re.IGNORECASE):
+        for value, _start, _end in _iter_quoted_values(fields_match.group("clause")):
+            if value not in fields:
+                fields.append(value)
+    return fields
+
+
+def build_widget_drilldowns(query_info):
+    """Return lightweight field-pivot metadata for downstream UIs."""
+    fields = [
+        field for field in extract_dashboard_query_fields(query_info.get("query", ""))
+        if field not in {"Log Source", "Count"}
+    ]
+    return [
+        {
+            "type": "log_explorer_field_pivot",
+            "field": field,
+            "label": f"Pivot by {field}",
+        }
+        for field in fields[:6]
+    ]
+
+
+def score_dashboard_widget_quality(ui_config, layout):
+    """Additive dashboard-quality metadata; live row health is filled by CAP checks."""
+    checks = {
+        "no_overlap": True,
+        "supported_visualization": ui_config["visualizationType"] in SUPPORTED_VISUALIZATION_TYPES,
+        "widget_returns_rows_in_cap": "not_run",
+        "field_contract_coverage": "not_evaluated",
+        "visualization_task_fit": "not_scored",
+    }
+    score = 100
+    if not checks["supported_visualization"]:
+        score -= 40
+    if layout["width"] > DASHBOARD_GRID_COLUMNS or layout["width"] < 1:
+        score -= 20
+    if layout["height"] < 1:
+        score -= 20
+    return {
+        "score": max(score, 0),
+        "checks": checks,
+    }
+
+
 def _build_widget_inventory_record(dashboard_name, dashboard_index, widget, widget_index, queries_dir):
     query_info = load_query_info(widget["query_file"], queries_dir=queries_dir)
     ui_config = resolve_widget_ui_config(widget, query_info)
+    layout = resolve_widget_layout(widget, query_info)
 
     return {
         "dashboard_name": dashboard_name,
@@ -464,13 +881,17 @@ def _build_widget_inventory_record(dashboard_name, dashboard_index, widget, widg
         "type": query_info.get("type", "detection" if query_info.get("sigma_id") else "curated"),
         "sigma_id": query_info.get("sigma_id", ""),
         "tags": query_info.get("tags", []),
+        "references": query_info.get("references", []),
         "logsource": query_info.get("logsource", {}),
         "mitre_attack": query_info.get("mitre_attack", {}),
         "visualization_type": ui_config["visualizationType"],
         "visualization_options": ui_config.get("visualizationOptions", {}),
         "time_selection": ui_config.get("timeSelection", {}),
+        "layout": layout,
         "ask_ai_prompts": _resolve_ask_ai_prompts(widget, query_info),
         "advanced_visualization": ui_config["visualizationType"] in ADVANCED_VISUALIZATION_TYPES,
+        "drilldowns": build_widget_drilldowns(query_info),
+        "dashboard_quality": score_dashboard_widget_quality(ui_config, layout),
     }
 
 
@@ -530,6 +951,28 @@ def build_dashboard_inventory(dashboards=None, queries_dir=QUERIES_DIR, generate
     }
 
 
+def _resolve_inventory_source_widget(dashboard_name, inventory_widget):
+    """Find the source DASHBOARDS widget for an inventory widget."""
+    dashboard_config = DASHBOARDS.get(dashboard_name, {})
+    source_widgets = dashboard_config.get("widgets", [])
+    widget_index = inventory_widget.get("widget_index")
+    query_file = inventory_widget.get("query_file")
+
+    if isinstance(widget_index, int) and 0 <= widget_index < len(source_widgets):
+        source_widget = source_widgets[widget_index]
+        if source_widget.get("query_file") == query_file:
+            return source_widget
+
+    for source_widget in source_widgets:
+        if (
+            source_widget.get("query_file") == query_file
+            and source_widget.get("title") == inventory_widget.get("title")
+        ):
+            return source_widget
+
+    return inventory_widget
+
+
 def validate_dashboard_inventory(inventory, queries_dir=QUERIES_DIR):
     """Validate that an inventory artifact still matches query metadata."""
     errors = []
@@ -561,7 +1004,8 @@ def validate_dashboard_inventory(inventory, queries_dir=QUERIES_DIR):
             label = f"{dashboard_name} / {query_file}"
             try:
                 query_info = load_query_info(query_file, queries_dir=queries_dir)
-                ui_config = resolve_widget_ui_config(widget, query_info)
+                source_widget = _resolve_inventory_source_widget(dashboard_name, widget)
+                ui_config = resolve_widget_ui_config(source_widget, query_info)
             except (FileNotFoundError, ValueError, json.JSONDecodeError) as exc:
                 errors.append(f"{label}: {exc}")
                 continue
@@ -572,11 +1016,21 @@ def validate_dashboard_inventory(inventory, queries_dir=QUERIES_DIR):
                     f"({widget.get('query_title')!r} != {query_info.get('title')!r})"
                 )
 
+            if widget.get("references", []) != query_info.get("references", []):
+                errors.append(f"{label}: references mismatch")
+
             expected_viz = ui_config["visualizationType"]
             if widget.get("visualization_type") != expected_viz:
                 errors.append(
                     f"{label}: visualization_type mismatch "
                     f"({widget.get('visualization_type')!r} != {expected_viz!r})"
+                )
+
+            expected_layout = resolve_widget_layout(source_widget, query_info)
+            if widget.get("layout") != expected_layout:
+                errors.append(
+                    f"{label}: layout mismatch "
+                    f"({widget.get('layout')!r} != {expected_layout!r})"
                 )
 
     return errors
@@ -669,6 +1123,50 @@ def resolve_widget_ui_config(widget, query_info):
     }
 
 
+def _coerce_layout_dimension(value, fallback, lower_bound, upper_bound=None):
+    """Normalize widget layout dimensions from query/widget metadata."""
+    try:
+        dimension = int(value)
+    except (TypeError, ValueError):
+        dimension = fallback
+    dimension = max(lower_bound, dimension)
+    if upper_bound is not None:
+        dimension = min(upper_bound, dimension)
+    return dimension
+
+
+def resolve_widget_layout(widget, query_info):
+    """Return OCI dashboard tile dimensions for one widget.
+
+    Wide result sets are the default in this repository, so table-like
+    visualizations receive full-width tiles unless explicitly overridden.
+    """
+    dashboard_meta = query_info.get("dashboard", {}) if isinstance(query_info, dict) else {}
+    visualization_type = resolve_widget_ui_config(widget, query_info)["visualizationType"]
+    layout = VISUALIZATION_LAYOUT_DEFAULTS.get(visualization_type, {"width": 12, "height": 5}).copy()
+
+    metadata_layout = dashboard_meta.get("layout", {})
+    if isinstance(metadata_layout, dict):
+        layout.update(metadata_layout)
+
+    widget_layout = widget.get("layout", {})
+    if isinstance(widget_layout, dict):
+        layout.update(widget_layout)
+
+    width = _coerce_layout_dimension(
+        layout.get("width"),
+        VISUALIZATION_LAYOUT_DEFAULTS.get(visualization_type, {}).get("width", 12),
+        lower_bound=1,
+        upper_bound=DASHBOARD_GRID_COLUMNS,
+    )
+    height = _coerce_layout_dimension(
+        layout.get("height"),
+        VISUALIZATION_LAYOUT_DEFAULTS.get(visualization_type, {}).get("height", 5),
+        lower_bound=1,
+    )
+    return {"width": width, "height": height}
+
+
 def build_saved_search_json(search_id, title, query, description="", tags=None, ui_config=None):
     """Build a saved search JSON definition for embedding in a dashboard import.
 
@@ -720,6 +1218,9 @@ def build_dashboard_json(dashboard_id, name, description, widgets, widget_querie
     """
     tiles = []
     saved_searches = []
+    current_row = 0
+    current_column = 0
+    current_row_height = 0
 
     for i, (widget, query_info) in enumerate(zip(widgets, widget_queries)):
         if query_info is None:
@@ -728,8 +1229,17 @@ def build_dashboard_json(dashboard_id, name, description, widgets, widget_querie
         # Generate a stable short ID from the query filename
         search_id = widget['query_file'].replace('.json', '').replace('_', '-')
 
-        row = i // 2
-        col = (i % 2) * 6
+        layout = resolve_widget_layout(widget, query_info)
+        width = layout["width"]
+        height = layout["height"]
+
+        if current_column and current_column + width > DASHBOARD_GRID_COLUMNS:
+            current_row += current_row_height
+            current_column = 0
+            current_row_height = 0
+
+        row = current_row
+        col = current_column
 
         # Build the tile referencing the saved search by short ID
         tiles.append({
@@ -737,8 +1247,8 @@ def build_dashboard_json(dashboard_id, name, description, widgets, widget_querie
             "savedSearchId": search_id,
             "row": row,
             "column": col,
-            "height": 4,
-            "width": 6,
+            "height": height,
+            "width": width,
             "nls": {},
             "uiConfig": {},
             "dataConfig": [],
@@ -750,6 +1260,13 @@ def build_dashboard_json(dashboard_id, name, description, widgets, widget_querie
                 "time": "$(dashboard.params.time)",
             },
         })
+
+        current_column += width
+        current_row_height = max(current_row_height, height)
+        if current_column >= DASHBOARD_GRID_COLUMNS:
+            current_row += current_row_height
+            current_column = 0
+            current_row_height = 0
 
         # Build the embedded saved search definition
         tags = {}
@@ -848,19 +1365,31 @@ def delete_existing_dashboard(md_client, display_name):
         print(f"    - Could not list dashboards for '{display_name}': {e}")
 
 
-def import_dashboard(md_client, dashboard_json):
+def import_dashboard(md_client, dashboard_json, attempts=3):
     """Import a dashboard using the ManagementDashboardImportDetails API."""
     import_details = oci.management_dashboard.models.ManagementDashboardImportDetails(
         dashboards=[dashboard_json]
     )
 
-    try:
-        md_client.import_dashboard(import_details)
-        print(f"  Imported dashboard: {dashboard_json['displayName']}")
-        return True
-    except oci.exceptions.ServiceError as exc:
-        print(f"  Error importing '{dashboard_json['displayName']}': {exc.message[:200]}")
-        return False
+    display_name = dashboard_json["displayName"]
+    for attempt in range(1, attempts + 1):
+        try:
+            md_client.import_dashboard(import_details)
+            print(f"  Imported dashboard: {display_name}")
+            return True
+        except oci.exceptions.ServiceError as exc:
+            print(f"  Error importing '{display_name}': {exc.message[:200]}")
+            return False
+        except oci.exceptions.RequestException as exc:
+            if attempt == attempts:
+                print(f"  Error importing '{display_name}' after {attempts} attempts: {exc}")
+                return False
+            delay = attempt * 10
+            print(
+                f"  Retry {attempt}/{attempts - 1} importing '{display_name}' "
+                f"after transient OCI request error: {exc}"
+            )
+            time.sleep(delay)
 
 
 # ─── Live Query Validation ───────────────────────────────────────
@@ -893,6 +1422,7 @@ def validate_query_in_oci(la_client, namespace, query_file, query_string, lookba
                 namespace_name=namespace,
                 query_details=oci.log_analytics.models.QueryDetails(
                     compartment_id=COMPARTMENT_ID,
+                    compartment_id_in_subtree=True,
                     query_string=query_string,
                     sub_system="LOG",
                     time_filter=oci.log_analytics.models.TimeRange(
@@ -989,11 +1519,47 @@ def resolve_validation_namespace(client_timeout):
     return get_namespace(la_client)
 
 
+def _redact_progress_text(value):
+    redacted = str(value or "")
+    for pattern, replacement in PROGRESS_REDACTIONS:
+        redacted = pattern.sub(replacement, redacted)
+    return " ".join(redacted.split())
+
+
+def _validation_status(result):
+    if not result.get("ok"):
+        return "failed"
+    if result.get("empty"):
+        return "empty"
+    return "passed"
+
+
+def _should_emit_validation_progress(progress, progress_interval, index, total):
+    if not progress:
+        return False
+    interval = int(progress_interval or 1)
+    if interval <= 1:
+        return True
+    return index == 1 or index == total or index % interval == 0
+
+
+def _format_validation_progress(index, total, result):
+    status = _validation_status(result)
+    query_file = result.get("query_file", "<unknown>")
+    rows = result.get("rows", 0)
+    message = f"    [{index:03d}/{total:03d}] {query_file} status={status} rows={rows}"
+    if status == "failed" and result.get("error"):
+        error = _redact_progress_text(result["error"])
+        message = f"{message} error={error[:180]}"
+    return message
+
+
 def validate_inventory_queries_in_oci(
     inventory,
     lookback=DEFAULT_QUERY_VALIDATION_LOOKBACK,
     query_timeout=60,
     progress=False,
+    progress_interval=1,
     isolated=True,
 ):
     """Validate every unique inventory query in OCI before dashboard import."""
@@ -1003,8 +1569,9 @@ def validate_inventory_queries_in_oci(
     query_files = sorted({widget["query_file"] for widget in iter_inventory_widgets(inventory)})
     seen = {}
     for index, query_file in enumerate(query_files, start=1):
-        if progress:
-            print(f"    [{index:03d}/{len(query_files):03d}] {query_file}", flush=True)
+        emit_progress = _should_emit_validation_progress(progress, progress_interval, index, len(query_files))
+        if emit_progress:
+            print(f"    [{index:03d}/{len(query_files):03d}] validating {query_file}", flush=True)
         query_info = load_query_info(query_file)
         if isolated:
             seen[query_file] = validate_query_in_oci_isolated(
@@ -1023,24 +1590,27 @@ def validate_inventory_queries_in_oci(
                 lookback=lookback,
                 timeout=query_timeout,
             )
+        if emit_progress:
+            print(_format_validation_progress(index, len(query_files), seen[query_file]), flush=True)
 
     return [seen[query_file] for query_file in query_files]
 
 
 # ─── Cleanup ──────────────────────────────────────────────────────
 
-def cleanup_soc_content(md_client):
+def cleanup_soc_content(md_client, dashboards=None):
     """Delete all SOC-related saved searches and dashboards."""
+    dashboards = dashboards or DASHBOARDS
     print("\n  Cleaning up existing SOC content...")
 
     # Delete dashboards
-    for dashboard_name in DASHBOARDS.keys():
+    for dashboard_name in dashboards.keys():
         try:
-            dashboards = md_client.list_management_dashboards(
+            dashboard_items = md_client.list_management_dashboards(
                 compartment_id=COMPARTMENT_ID,
                 display_name=dashboard_name
             ).data.items
-            for d in dashboards:
+            for d in dashboard_items:
                 try:
                     md_client.delete_management_dashboard(d.dashboard_id)
                     print(f"    - Deleted dashboard: {dashboard_name}")
@@ -1051,7 +1621,7 @@ def cleanup_soc_content(md_client):
 
     # Delete saved searches
     all_widget_titles = set()
-    for config in DASHBOARDS.values():
+    for config in dashboards.values():
         for widget in config['widgets']:
             all_widget_titles.add(widget['title'])
 
@@ -1078,12 +1648,20 @@ def deploy(
     live_validate=True,
     query_lookback=DEFAULT_QUERY_VALIDATION_LOOKBACK,
     query_timeout=60,
+    validation_progress_interval=1,
+    dashboard_names=None,
 ):
     print("=" * 60)
     print("OCI Log Analytics - SOC Dashboard Deployment")
     print("=" * 60)
 
-    inventory = build_dashboard_inventory()
+    try:
+        dashboards_to_deploy = select_dashboards(dashboard_names)
+    except ValueError as exc:
+        print(f"\n  {exc}")
+        raise SystemExit(1) from exc
+
+    inventory = build_dashboard_inventory(dashboards=dashboards_to_deploy)
     inventory_errors = validate_dashboard_inventory(inventory)
     if inventory_errors:
         print("\n  Dashboard inventory validation failed:")
@@ -1116,7 +1694,8 @@ def deploy(
             inventory,
             lookback=query_lookback,
             query_timeout=query_timeout,
-            progress=True,
+            progress=validation_progress_interval != 0,
+            progress_interval=validation_progress_interval,
         )
         errors = [result for result in live_results if not result["ok"]]
         empty = [result for result in live_results if result["ok"] and result["empty"]]
@@ -1133,19 +1712,22 @@ def deploy(
 
     # Publish the dashboard-facing artifact only after local and optional live
     # validation pass. Dashboard import and saved-search mapping happen after this.
-    write_dashboard_inventory(inventory=inventory)
-    print(f"\n  Dashboard inventory: {DASHBOARD_INVENTORY_PATH}")
+    if dashboard_names:
+        print("\n  Targeted deployment: queries/dashboard_inventory.json was not rewritten.")
+    else:
+        write_dashboard_inventory(inventory=inventory)
+        print(f"\n  Dashboard inventory: {DASHBOARD_INVENTORY_PATH}")
 
     md_client = get_dashboard_client()
     print(f"\n  Compartment: {COMPARTMENT_ID}")
 
     if cleanup:
-        cleanup_soc_content(md_client)
+        cleanup_soc_content(md_client, dashboards=dashboards_to_deploy)
 
     total_searches = 0
     total_dashboards = 0
 
-    for dashboard_name, dashboard_config in DASHBOARDS.items():
+    for dashboard_name, dashboard_config in dashboards_to_deploy.items():
         print(f"\n{'─' * 50}")
         print(f"  Dashboard: {dashboard_name}")
         print(f"  Widgets: {len(dashboard_config['widgets'])}")
@@ -1207,6 +1789,10 @@ if __name__ == "__main__":
                         help='Lookback window for live OCI query validation')
     parser.add_argument('--query-timeout', type=int, default=60,
                         help='Per-query timeout in seconds for live OCI query validation')
+    parser.add_argument('--validation-progress-interval', type=int, default=1,
+                        help='Print live query validation progress every N queries; 0 disables progress')
+    parser.add_argument('--dashboard-name', action='append', dest='dashboard_names',
+                        help='Deploy only the named dashboard. Can be supplied multiple times.')
     args = parser.parse_args()
 
     if args.validate:
@@ -1229,4 +1815,6 @@ if __name__ == "__main__":
         live_validate=not args.skip_live_validation,
         query_lookback=args.query_lookback,
         query_timeout=args.query_timeout,
+        validation_progress_interval=args.validation_progress_interval,
+        dashboard_names=args.dashboard_names,
     )

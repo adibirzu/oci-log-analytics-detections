@@ -135,7 +135,7 @@ Subpackage decision rules (more in [kql-conversion-architecture.md](references/k
 | New KQL function rewrite | `scripts/kql/functions/<fn>.py` |
 | Stage splitting / tokenizing | `scripts/kql/lexer.py` (or `_facade_impl.py` during Phase 7 redistribution) |
 | Field/table mapping rule | `config/sentinel_oci_mapping.yaml` (data, not code) |
-| Logan QL output validator | `validate_logan_query_local` (Phase 6 in `_facade_impl.py`, target `scripts/kql/validator.py`) |
+| Logan QL output validator | `validate_logan_query_local` (Phase 6 lives in `scripts/kql/_facade_impl.py`; Phase 7 lifts it into a dedicated validator module) |
 | Ranking / payload / CLI / report | `scripts/convert_sentinel_kql.py` (the facade) |
 | Operator commands (`local`, `promote`, …) | `scripts/sentinel_conversion_workflow.py` |
 
@@ -210,8 +210,8 @@ Latest Sentinel baseline from the current repo state:
 Phase 6 converter-architecture baseline (recorded 2026-05-16):
 
 - `scripts/convert_sentinel_kql.py` is **678 lines** (under the 800-line CLAUDE.md hard rule). The `__all__` list pins the D-15 public surface.
-- `scripts/kql/_facade_impl.py` holds the relocated converter helpers (1227 lines) — Phase 7+ redistributes them into `operators/`, `lexer.py`, and `validator.py`.
-- `scripts/kql/operators/_legacy.py` is absent (deleted in plan 06-10). The residual unsupported set lives in `scripts/kql/operators/unsupported_op.py` as real Tier-3 functions.
+- `scripts/kql/_facade_impl.py` holds the relocated converter helpers (1227 lines) — Phase 7+ will redistribute them into the operator modules, the lexer, and a dedicated validator module.
+- The Phase 6 legacy adapter file (in `scripts/kql/operators/`) was deleted in plan 06-10; the residual unsupported set lives in `scripts/kql/operators/unsupported_op.py` as real Tier-3 functions.
 - `OPERATOR_REGISTRY` lists 21 entries: 12 supported families dispatched through extracted modules (`where`, `summarize`, `project`/`fields`/`project-reorder`, `extend`, `sort`/`order`, `top`, `distinct`, `union`, `let`) + 9 unsupported (`take`, `count`, `limit`, `parse`, `evaluate`, `mv-expand`, `make-series`, `join`, `render`).
 - `queries/sentinel_conversion_report.json` carries `summary.tier_distribution` (currently `{tier_1: 8, tier_2: 0, tier_3: 17}`) and a `tier` field on every `attempted[]` entry.
 - `scripts/test_kql/` holds 88 passing tests covering canonicalizer idempotence (Hypothesis, 100 examples), 18 golden fixtures (8 promoted + 10 synthetic), the line-budget gate, and operator-level unit tests (registry binding regression-fence + Tier-1 / Tier-3 paths per operator).

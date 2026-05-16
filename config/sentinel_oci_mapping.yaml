@@ -1,0 +1,526 @@
+# Microsoft Sentinel KQL to OCI Log Analytics / Logan QL mapping.
+#
+# The converter treats this file as an allow-list. Tables not listed here are
+# skipped instead of being guessed into a runnable query.
+
+tables:
+  SigninLogs:
+    category: identity
+    service: entra_signin
+    sources:
+      - Azure Entra ID Sign-in Logs
+  AADNonInteractiveUserSignInLogs:
+    category: identity
+    service: entra_signin
+    sources:
+      - Azure Entra ID Sign-in Logs
+  AuditLogs:
+    category: identity
+    service: entra_audit
+    sources:
+      - Azure Entra ID Audit Logs
+  AzureActivity:
+    category: azure_cloud
+    service: azure_activity
+    sources:
+      - Azure Activity Logs
+  SecurityEvent:
+    category: endpoint
+    service: windows_security
+    sources:
+      - Windows Security Events
+      - Windows Event Security Logs
+  WindowsEvent:
+    category: endpoint
+    service: windows_event
+    sources:
+      - Windows Event System Logs
+      - Windows Security Events
+  Sysmon:
+    category: endpoint
+    service: sysmon
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Sysmon Operational Logs
+      - Windows Sysmon Events
+  DeviceEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+      - SOC Windows Sysmon Logs
+  DeviceProcessEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Security Events
+  DeviceNetworkEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+      - SOC Sysmon Network Logs
+  DeviceLogonEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+      - Windows Security Events
+      - Windows Event Security Logs
+  DeviceFileEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+      - SOC Windows Sysmon Logs
+  DeviceImageLoadEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+      - SOC Windows Sysmon Logs
+  imProcess:
+    category: endpoint
+    service: asim_process
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Security Events
+  imProcessCreate:
+    category: endpoint
+    service: asim_process
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Security Events
+  imFileEvent:
+    category: endpoint
+    service: asim_file
+    sources:
+      - SOC Windows Sysmon Logs
+  imAuthentication:
+    category: identity
+    service: asim_authentication
+    sources:
+      - Azure Entra ID Sign-in Logs
+      - Windows Security Events
+  OfficeActivity:
+    category: m365
+    service: office_activity
+    sources:
+      - Microsoft 365 Audit Logs
+      - Office 365 Audit Logs
+      - SOC Application Logs
+  CloudAppEvents:
+    category: m365
+    service: cloud_app_events
+    sources:
+      - Microsoft 365 Cloud App Events
+      - SOC Application Logs
+  EmailEvents:
+    category: m365
+    service: defender_email
+    sources:
+      - Microsoft Defender Email Logs
+      - Microsoft 365 Audit Logs
+  EmailUrlInfo:
+    category: m365
+    service: defender_email
+    sources:
+      - Microsoft Defender Email Logs
+      - Microsoft 365 Audit Logs
+  UrlClickEvents:
+    category: m365
+    service: defender_email
+    sources:
+      - Microsoft Defender Email Logs
+      - Microsoft 365 Audit Logs
+  MessagePostDeliveryEvents:
+    category: m365
+    service: defender_email
+    sources:
+      - Microsoft Defender Email Logs
+      - Microsoft 365 Audit Logs
+  Cloudflare:
+    category: network
+    service: waf
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+  OCILogs:
+    category: azure_cloud
+    service: oci_audit
+    sources:
+      - OCI Audit Logs
+  AlertInfo:
+    category: m365
+    service: defender_alerts
+    sources:
+      - SOC Application Logs
+  ADOAuditLogs:
+    category: m365
+    service: devops_audit
+    sources:
+      - SOC Application Logs
+  BoxEvents:
+    category: m365
+    service: box_audit
+    sources:
+      - SOC Application Logs
+  ApacheHTTPServer:
+    category: network
+    service: web_server
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+      - SOC Load Balancer Access Logs
+  AWSCloudTrail:
+    category: azure_cloud
+    service: aws_cloudtrail
+    sources:
+      - SOC Cloud Guard Logs
+      - SOC Application Logs
+  CiscoDuo:
+    category: identity
+    service: cisco_duo
+    sources:
+      - SOC Application Logs
+  CiscoISEEvent:
+    category: identity
+    service: cisco_ise
+    sources:
+      - SOC Application Logs
+  CiscoSecureEndpoint:
+    category: endpoint
+    service: cisco_secure_endpoint
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Security Events
+  CiscoWSAEvent:
+    category: network
+    service: web_security
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+      - SOC Network Firewall Logs
+  Cisco_Umbrella:
+    category: network
+    service: dns_security
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+      - SOC Network Firewall Logs
+  CyberArkEPM:
+    category: endpoint
+    service: endpoint_privilege
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Security Events
+  GCPAuditLogs:
+    category: azure_cloud
+    service: gcp_audit
+    sources:
+      - SOC Cloud Guard Logs
+      - SOC Application Logs
+  GCPCloudDNS:
+    category: network
+    service: dns
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+      - SOC Network Firewall Logs
+  GCP_IAM:
+    category: azure_cloud
+    service: gcp_iam
+    sources:
+      - SOC Cloud Guard Logs
+      - SOC Application Logs
+  GitHubAuditData:
+    category: m365
+    service: github_audit
+    sources:
+      - SOC Application Logs
+  GWorkspaceActivityReports:
+    category: m365
+    service: google_workspace
+    sources:
+      - SOC Application Logs
+  ImpervaWAFCloud:
+    category: network
+    service: waf
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+      - SOC Network Firewall Logs
+  NGINXHTTPServer:
+    category: network
+    service: web_server
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+      - SOC Load Balancer Access Logs
+  OracleWebLogicServerEvent:
+    category: network
+    service: web_server
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+      - SOC Load Balancer Access Logs
+  JiraAudit:
+    category: m365
+    service: jira_audit
+    sources:
+      - SOC Application Logs
+  McAfeeEPOEvent:
+    category: endpoint
+    service: endpoint_security
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Security Events
+  PaloAltoCDLEvent:
+    category: network
+    service: firewall
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+      - SOC Network Firewall Logs
+  PaloAltoPrismaCloud:
+    category: azure_cloud
+    service: cloud_security_posture
+    sources:
+      - SOC Cloud Guard Logs
+      - SOC Application Logs
+  SecurityAlert:
+    category: m365
+    service: security_alerts
+    sources:
+      - SOC Application Logs
+  SentinelOne:
+    category: endpoint
+    service: endpoint_security
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Security Events
+  SlackAudit:
+    category: m365
+    service: slack_audit
+    sources:
+      - SOC Application Logs
+  Snowflake:
+    category: m365
+    service: snowflake_audit
+    sources:
+      - SOC Application Logs
+  Syslog:
+    category: endpoint
+    service: linux_syslog
+    sources:
+      - SOC Linux Syslog Logs
+      - Linux Secure Logs
+  TMApexOneEvent:
+    category: endpoint
+    service: endpoint_security
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Security Events
+  TomcatEvent:
+    category: network
+    service: web_server
+    sources:
+      - SOC WAF Security Logs
+      - SOC Web Application Logs
+      - SOC Load Balancer Access Logs
+  TrendMicroCAS:
+    category: m365
+    service: cloud_app_security
+    sources:
+      - SOC Application Logs
+  DnsEvents:
+    category: network
+    service: dns
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Sysmon Operational Logs
+      - SOC VCN Flow Logs
+  DNSQuery:
+    category: network
+    service: dns
+    sources:
+      - SOC Windows Sysmon Logs
+      - Windows Sysmon Operational Logs
+  CommonSecurityLog:
+    category: network
+    service: common_security
+    sources:
+      - SOC Network Firewall Logs
+      - OCI Network Firewall Logs
+      - SOC VCN Flow Logs
+  CommonSecurityLog_CL:
+    category: network
+    service: common_security
+    sources:
+      - SOC Network Firewall Logs
+      - OCI Network Firewall Logs
+      - SOC VCN Flow Logs
+  AzureDiagnostics:
+    category: azure_cloud
+    service: azure_diagnostics
+    sources:
+      - Azure Diagnostics Logs
+      - OCI Audit Logs
+
+fields:
+  Account: User
+  AccountName: User
+  Actor: User
+  Activity: "'Event Type'"
+  ActivityType: "'Event Type'"
+  ActivityDisplayName: Operation
+  AppDisplayName: "'Application Name'"
+  Application: "'Application Name'"
+  ActionType: Action
+  AccountUpn: "'User Name'"
+  AdditionalFields: Properties
+  ClientAppUsed: "'Application Name'"
+  ClientRequestHost: "'Destination Hostname'"
+  ClientRequestMethod: "'HTTP Request Method'"
+  ClientRequestPath: "'URL Path'"
+  ClientRequestURI: "'Request URL'"
+  ClientRequestUserAgent: "'User Agent'"
+  ClientIP: "'Client IP'"
+  CommandLine: "'Command Line'"
+  Computer: Entity
+  Description: Description
+  DestinationIpAddress: "'Destination IP'"
+  DstIpAddr: "'Destination IP'"
+  DstIP: "'Destination IP'"
+  DstHostname: "'Destination Hostname'"
+  DstUserName: "'Target User Name'"
+  DstUsername: "'Target User Name'"
+  DestinationHostName: "'Destination Hostname'"
+  DestinationHostname: "'Destination Hostname'"
+  DestinationIP: "'Destination IP'"
+  DestinationIp: "'Destination IP'"
+  DestinationPort: "'Destination Port'"
+  Dvc: "'Host Name'"
+  DvcAction: Action
+  DvcHostname: "'Host Name'"
+  DvcIpAddr: "'Source IP'"
+  DeviceName: "'Host Name (Server)'"
+  DeviceAction: Action
+  DeviceEventClassID: "'Event ID'"
+  DeviceProduct: "'Application Name'"
+  DeviceVendor: Provider
+  DeviceId: Entity
+  EmailDirection: Direction
+  EventCreationTime: Time
+  EventID: "'Event ID'"
+  EventId: "'Event ID'"
+  EventMessage: Description
+  EventName: "'Event Type'"
+  EventResult: Status
+  EventResultDetails: Status
+  EventEndTime: Time
+  EventSource: Provider
+  EventSubType: "'Event Type'"
+  EventType: "'Event Type'"
+  EventVendor: Provider
+  FileName: "'Process Name'"
+  FilePath: "'Target Filename'"
+  FileSize: "'Network Bytes Out'"
+  FolderPath: "'Target Filename'"
+  Hash: Hashes
+  HttpRequestHeaderHost: "'Destination Hostname'"
+  HttpStatusCode: "'HTTP Status Code'"
+  MD5: Hashes
+  SHA1: Hashes
+  SHA256: Hashes
+  HostName: "'Host Name'"
+  HttpUserAgent: "'User Agent'"
+  HttpRequestMethod: "'HTTP Request Method'"
+  LogSeverity: Severity
+  IPAddress: "'Source IP'"
+  IpAddress: "'Source IP'"
+  Image: "'Process Name'"
+  InitiatingProcessCommandLine: "'Command Line'"
+  InitiatingProcessFileName: "'Parent Process Name'"
+  InitiatingProcessParentFileName: "'Parent Process Name'"
+  InitiatingProcessFolderPath: "'Parent Process Name'"
+  LogonType: "'Logon Type'"
+  Operation: Operation
+  OperationName: Operation
+  ParentImage: "'Parent Process Name'"
+  Process: "'Process Name'"
+  ProcessCommandLine: "'Command Line'"
+  ProcessName: "'Process Name'"
+  ActorUsername: "'User Name'"
+  ActingProcessCommandLine: "'Command Line'"
+  ActingProcessName: "'Parent Process Name'"
+  ActingProcessSHA256: Hashes
+  QueryName: "'Query Name'"
+  Query: "'Query Name'"
+  RecipientEmailAddress: "'Target User Name'"
+  Reason: Description
+  RequestMethod: "'HTTP Request Method'"
+  RequestURL: "'Request URL'"
+  RequestUrl: "'Request URL'"
+  RemoteIP: "'Destination IP'"
+  RemoteUrl: "'Request URL'"
+  RemotePort: "'Destination Port'"
+  ReportId: "'Resource ID'"
+  Resource: "'Resource Name'"
+  ResourceGroup: "'Resource Group'"
+  ResourceId: "'Resource ID'"
+  ResourceProvider: "'Resource Type'"
+  Result: Status
+  ResultDescription: Description
+  ServicePrincipalName: "'Resource Name'"
+  SenderFromAddress: "'User Name'"
+  SourceIPAddress: "'Source IP'"
+  SourceIpAddress: "'Source IP'"
+  SourceIP: "'Source IP'"
+  SourceIp: "'Source IP'"
+  SourcePort: "'Source Port'"
+  SrcIP: "'Source IP'"
+  SrcFileName: "'Target Filename'"
+  SrcIpAddr: "'Source IP'"
+  SrcUserName: "'User Name'"
+  SrcUsername: "'User Name'"
+  Status: Status
+  SourceFileName: "'Target Filename'"
+  SourceItemName: "'Target Object'"
+  SourceLogin: "'User Name'"
+  SubjectUserName: "'Subject User Name'"
+  Target: "'Target Object'"
+  TargetFileMD5: Hashes
+  TargetFileName: "'Target Filename'"
+  TargetFilePath: "'Target Filename'"
+  TargetFileSHA1: Hashes
+  TargetFileSHA256: Hashes
+  TargetResource: "'Resource Name'"
+  TargetUserName: "'Target User Name'"
+  TargetUsername: "'Target User Name'"
+  TargetUserId: "'Target User Name'"
+  ThreatCategory: "'Threat Category'"
+  ThreatActionTaken: Action
+  ThreatName: "'Threat Name'"
+  ThreatType: "'Threat Category'"
+  ThreatTypes: "'Threat Category'"
+  Title: "'Threat Name'"
+  TimeGenerated: Time
+  Timestamp: Time
+  UPN: "'User Name'"
+  URL: "'Request URL'"
+  UPNSuffix: "'Target Domain Name'"
+  Url: "'Request URL'"
+  UrlCategory: "'Threat Category'"
+  UrlOriginal: "'Request URL'"
+  User: User
+  UserAgent: "'User Agent'"
+  HttpUserAgentOriginal: "'User Agent'"
+  UserId: "'User ID (hashed)'"
+  UserName: "'User Name'"
+  UserPrincipalName: "'User Name'"
+  WAFAction: "'WAF Action'"
+  WAFRuleID: "'Rule Key'"
+  WAFRuleMessage: "'Attack Type'"
+  DstPortNumber: "'Destination Port'"
+  ErrorMessage: Description
+  ObjectItemName: "'Target Object'"
+  _ResourceId: "'Resource ID'"
+  data_eventName_s: "'Event Type'"
+  data_request_headers_oci_original_url_s: "'Request URL'"

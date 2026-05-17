@@ -1,6 +1,6 @@
 # Requirements: OCI Log Analytics Detections
 
-**Defined:** 2026-05-14 (v1.0); v2.0 added 2026-05-15
+**Defined:** 2026-05-14 (v1.0); v2.0 added 2026-05-15; v3.0 added 2026-05-17
 **Core Value:** Every committed detection, query, dashboard, parser mapping, and generated artifact must remain deployable and verifiable against OCI Log Analytics without leaking tenant-specific data.
 
 ## v1 Requirements
@@ -107,6 +107,45 @@ Baseline (from `queries/sentinel_conversion_report.json`): 4,452 candidates, 25 
 - [ ] **CI-05**: `scripts/scan_sensitive_values.py` runs over `queries/sentinel/*.json` and `queries/sentinel_conversion_report.json` after promotion (not just before commit) with extended patterns covering OCIDs, public IPs, compartment names, and tenancy host suffixes.
 - [ ] **CI-06**: `scripts/check_inventory_drift.py` is extended to cover Sentinel JSON ↔ conversion report ↔ catalog ↔ manifest reconciliation so drift in any of those four artifacts fails the PR.
 
+## v3.0 Requirements - Logan QL Conversion Workbench
+
+Baseline: this repo remains the canonical producer of OCI Log Analytics detection, conversion, reference, and dashboard artifacts. The v3.0 frontend lives in a sibling app and consumes generated artifacts from this repo.
+
+### Workbench User Experience
+
+- [ ] **WB-01**: The sibling frontend provides a source language selector and editor for Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI Log Analytics QL passthrough.
+- [ ] **WB-02**: The workbench shows OCI Log Analytics QL output with formatting, copy, export, and warning states alongside a source-to-target explanation panel.
+- [ ] **WB-03**: The workbench includes 10-20 validated example conversions across the supported source languages, with expected OCI QL and warning metadata.
+
+### OCI Reference Catalog
+
+- [ ] **REFCAT-01**: This repo generates `queries/logan_ql_reference_catalog.json` from official OCI Log Analytics documentation URLs, including command names, source URLs, retrieval timestamp, syntax summary, examples when available, and command category metadata.
+- [ ] **REFCAT-02**: The sibling frontend command/reference menu consumes the generated catalog rather than hand-authored React data, and includes query-search fundamentals plus command-reference entries.
+- [ ] **REFCAT-03**: Catalog refresh tests fail when required command metadata is missing, provenance is absent, or generated menu data is edited manually.
+
+### Cross-QL Conversion Patterns
+
+- [ ] **XQL-01**: This repo generates a cross-QL pattern library covering filters, field references, boolean logic, time windows, aggregation, projection, eval/extend, regex/extraction, lookup/watchlist semantics, joins/correlation, sort/top, and unsupported constructs for Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI QL.
+- [ ] **XQL-02**: Conversion responses include structured explanations mapping source clauses to OCI Log Analytics commands, target fields, parser assumptions, support level, and warning messages.
+- [ ] **XQL-03**: Lossy or unsupported source constructs produce explicit warnings or blocked conversions; the workbench must not silently emit weaker OCI QL.
+
+### Producer/Consumer API Contract
+
+- [ ] **API-01**: This repo defines versioned JSON schemas under `schemas/logan_workbench/` for workbench artifacts, conversion requests, conversion responses, examples, warnings, and reference catalog entries.
+- [ ] **API-02**: The sibling frontend validates imported artifacts against the generated schemas at build time or startup and fails clearly when versions drift.
+- [ ] **API-03**: Sentinel and Sigma examples reuse this repo's existing converter/mapping paths; the sibling frontend does not duplicate converter generation logic.
+
+### Documentation and Mapping Guidance
+
+- [ ] **DOC-01**: `docs/logan_workbench_mapping_guide.md` explains how to map Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and generic source-query constructs to OCI Log Analytics QL with support-level notes.
+- [ ] **DOC-02**: The sibling page presents mapping guidance contextually through the command menu, examples, and explanation panel rather than as a standalone marketing page.
+
+### Validation, Security, and Release Gates
+
+- [ ] **QA-01**: Producer-side tests validate generated schemas, command catalog, mapping patterns, examples, and conversion warning behavior.
+- [ ] **QA-02**: Workbench examples and synthetic logs contain no credentials, OCIDs, public IPs, tenancy-specific names, or unredacted live payloads; sensitive-value scanning covers the new artifacts.
+- [ ] **QA-03**: Sibling frontend gates include build, typecheck, lint, accessibility-sensitive browser checks, mobile/desktop layout checks, and the editor-to-output-to-copy/export flow.
+
 ## v2 Requirements (deferred — superseded or follow-on)
 
 ### Automation Improvements (carryover)
@@ -206,14 +245,32 @@ Baseline (from `queries/sentinel_conversion_report.json`): 4,452 candidates, 25 
 | CI-04 | Phase 11 | Pending |
 | CI-05 | Phase 11 | Pending |
 | CI-06 | Phase 11 | Pending |
+| WB-01 | Phase 15 | Pending |
+| WB-02 | Phase 15 | Pending |
+| WB-03 | Phase 16 | Pending |
+| REFCAT-01 | Phase 13 | Pending |
+| REFCAT-02 | Phase 13 | Pending |
+| REFCAT-03 | Phase 13 | Pending |
+| XQL-01 | Phase 14 | Pending |
+| XQL-02 | Phase 14 | Pending |
+| XQL-03 | Phase 14 | Pending |
+| API-01 | Phase 12 | Pending |
+| API-02 | Phase 12 | Pending |
+| API-03 | Phase 12 | Pending |
+| DOC-01 | Phase 14 | Pending |
+| DOC-02 | Phase 15 | Pending |
+| QA-01 | Phase 16 | Pending |
+| QA-02 | Phase 16 | Pending |
+| QA-03 | Phase 15 | Pending |
 
 **Coverage:**
 - v1 requirements: 25 total — all Complete (Phases 1–5)
 - v2.0 requirements: 32 total — Pending (Phases 6–11)
-- Mapped to phases: 32 (every v2.0 REQ-ID maps to exactly one phase)
+- v3.0 requirements: 17 total — Pending (Phases 12–16)
+- Mapped to phases: 49 (every v2.0 and v3.0 REQ-ID maps to exactly one phase)
 - Unmapped: 0
 - Orphaned phases: 0
 
 ---
 *Requirements defined: 2026-05-14 (v1.0); v2.0 milestone added 2026-05-15*
-*Last updated: 2026-05-15 — Traceability expanded so every v2.0 REQ-ID carries its assigned phase*
+*Last updated: 2026-05-17 - v3.0 Logan QL Conversion Workbench requirements and traceability added*

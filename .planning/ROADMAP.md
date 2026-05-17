@@ -2,7 +2,7 @@
 
 ## Overview
 
-This roadmap turns the existing OCI Log Analytics detection repository into a GSD-managed brownfield project. Phases 1–5 (milestone v1.0) established durable project state and hardened detection content, Sentinel conversion, dashboards, parser contracts, and release evidence. Phases 6–11 (milestone v2.0 "Sentinel KQL Parity to Logan QL") close the conversion gap between Microsoft Sentinel KQL and OCI Log Analytics QL so the converter can move promoted Sentinel content from the current 8 promoted queries toward thousands, with live OCI parser validation remaining the sole promotion gate.
+This roadmap turns the existing OCI Log Analytics detection repository into a GSD-managed brownfield project. Phases 1-5 (milestone v1.0) established durable project state and hardened detection content, Sentinel conversion, dashboards, parser contracts, and release evidence. Phases 6-11 (milestone v2.0 "Sentinel KQL Parity to Logan QL") close the conversion gap between Microsoft Sentinel KQL and OCI Log Analytics QL so the converter can move promoted Sentinel content from the original 8 promoted-query baseline toward thousands, with live OCI parser validation remaining the sole promotion gate. Phases 12-16 (milestone v3.0 "Logan QL Conversion Workbench") add a sibling frontend workbench while this repo remains the producer of conversion, reference, example, and schema artifacts.
 
 ## Phases
 
@@ -17,6 +17,11 @@ This roadmap turns the existing OCI Log Analytics detection repository into a GS
 - [ ] **Phase 9: Operator Parity and Field Mapping Bulk Expansion** - Land `extend`/`let`/`bin`/`project` family operators, parser-side extraction, and bulk Sentinel field additions in parallel cohort work.
 - [ ] **Phase 10: Drift Detector and Synthetic-Hit Promotion Gate** - Prevent silent regressions and zero-row false passes once promotion scales.
 - [ ] **Phase 11: CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split** - Wire converter + drift + scan + inventory checks into CI; isolate live OCI calls to manual/scheduled jobs.
+- [ ] **Phase 12: Frontend Boundary and Artifact/API Contract** - Define the sibling workbench target, generated artifact set, schemas, and conversion request/response contract.
+- [ ] **Phase 13: Official OCI Logan QL Reference Catalog** - Generate the workbench command menu from official OCI Log Analytics documentation with provenance and tests.
+- [ ] **Phase 14: Cross-QL Conversion Pattern Library** - Build deterministic mapping patterns and explanations from Splunk, Sentinel, Elastic/Lucene/KQL, Sigma, and OCI passthrough into OCI Log Analytics QL.
+- [ ] **Phase 15: Sibling Workbench UX Integration** - Implement the real converter workbench surface in the sibling frontend using generated artifacts.
+- [ ] **Phase 16: Examples, Validation, and Release Gates** - Validate 10-20 conversions, scan workbench artifacts, and wire producer plus sibling frontend gates.
 
 ## Phase Details
 
@@ -228,6 +233,98 @@ Plans:
   - README/STATUS counts continue to reconcile with `queries/catalog.json` via the extended drift check.
 **Plans**: TBD
 
+---
+
+## Milestone v3.0 - Logan QL Conversion Workbench
+
+Phases 12-16 define and deliver a sibling web workbench for converting Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI passthrough examples into OCI Log Analytics QL. This repository remains the producer of generated command-reference, mapping-pattern, example, and schema artifacts; the sibling frontend consumes those artifacts and implements the user-facing editor/output experience.
+
+- [ ] **Phase 12:** Frontend Boundary and Artifact/API Contract
+- [ ] **Phase 13:** Official OCI Logan QL Reference Catalog
+- [ ] **Phase 14:** Cross-QL Conversion Pattern Library
+- [ ] **Phase 15:** Sibling Workbench UX Integration
+- [ ] **Phase 16:** Examples, Validation, and Release Gates
+
+### Phase 12: Frontend Boundary and Artifact/API Contract
+
+**Goal**: The milestone has a clear producer/consumer boundary, selected sibling frontend target, and versioned artifact/API schemas before UI implementation starts.
+**Depends on**: Phase 11 planning context; may execute while unresolved v2.0 implementation items remain isolated.
+**Requirements**: API-01, API-02, API-03
+**Success Criteria** (what must be TRUE):
+  1. The selected sibling target is documented, with `../LoganSecurityDashboardv0` as the default unless a separate sibling app is explicitly chosen during phase planning.
+  2. `schemas/logan_workbench/` defines versioned JSON schemas for artifact manifest, conversion request, conversion response, command reference, examples, and warnings.
+  3. The artifact import path from this repo to the sibling frontend is repeatable and documented, with build/startup validation expected in the sibling app.
+  4. Sentinel and Sigma workbench examples are sourced through existing converter/mapping paths rather than UI-owned converter generation logic.
+**Exit Conditions**:
+  - A phase summary names the exact sibling repo/route to implement.
+  - Producer-side schema tests pass.
+  - No companion UI code is added inside this repository.
+**Plans**: TBD
+
+### Phase 13: Official OCI Logan QL Reference Catalog
+
+**Goal**: The workbench command menu is generated from official OCI Log Analytics documentation with provenance, categories, syntax summaries, and deterministic tests.
+**Depends on**: Phase 12
+**Requirements**: REFCAT-01, REFCAT-02, REFCAT-03
+**Success Criteria** (what must be TRUE):
+  1. `scripts/generate_logan_reference_catalog.py` writes `queries/logan_ql_reference_catalog.json` from the OCI query-search and command-reference documentation sources.
+  2. Each catalog entry includes command name, category, source URL, retrieved timestamp, syntax summary, and examples or notes where the official page exposes them.
+  3. The generated catalog includes at least the core commands needed by the workbench menu: `search`, `stats`, `timestats`, `eval`, `fields`, `where`, `sort`, `top`, `distinct`, `regex`, `lookup`, extraction commands, and clustering-related commands when present in the reference.
+  4. Tests fail if required command metadata or provenance is missing, and normal local tests use fixtures rather than live network calls.
+**Exit Conditions**:
+  - Catalog generation is deterministic for unchanged fixtures.
+  - Manual edits to generated catalog output are documented as disallowed.
+  - The sibling frontend has a documented artifact field map for menu rendering.
+**Plans**: TBD
+
+### Phase 14: Cross-QL Conversion Pattern Library
+
+**Goal**: Users can understand how source-query constructs map to OCI Log Analytics QL before the UI exposes arbitrary conversion behavior.
+**Depends on**: Phase 13
+**Requirements**: XQL-01, XQL-02, XQL-03, DOC-01
+**Success Criteria** (what must be TRUE):
+  1. `queries/cross_ql_mapping_patterns.json` covers source filters, field references, boolean logic, time windows, aggregation, projection, eval/extend, regex/extraction, lookup/watchlist semantics, joins/correlation, sort/top, and unsupported constructs.
+  2. Every pattern includes source language, source construct, OCI Log Analytics QL command mapping, support level, warning behavior, and example references.
+  3. `docs/logan_workbench_mapping_guide.md` explains how to map Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and generic query constructs to OCI Log Analytics QL.
+  4. Lossy or unsupported constructs emit explicit `lossy` or `unsupported` metadata and are never represented as fully supported conversions.
+**Exit Conditions**:
+  - Pattern tests cover representative constructs for every supported source language.
+  - Unsupported examples are tested as blocked or warning-emitting responses.
+  - Mapping guide links examples to generated pattern IDs.
+**Plans**: TBD
+
+### Phase 15: Sibling Workbench UX Integration
+
+**Goal**: The sibling frontend exposes a real converter workbench as the first screen for this capability, backed by generated artifacts from this repo.
+**Depends on**: Phase 14
+**Requirements**: WB-01, WB-02, DOC-02, QA-03
+**Success Criteria** (what must be TRUE):
+  1. The sibling frontend route provides source language selector, source editor, OCI Log Analytics QL output, explanation panel, command/reference menu, example picker, warnings, and copy/export actions.
+  2. The UI consumes generated catalog, pattern, schema, and example artifacts and validates them through the sibling app's TypeScript/Zod boundary.
+  3. Command menu entries and examples provide contextual mapping guidance without turning the first screen into a marketing or static documentation page.
+  4. Browser checks cover desktop and mobile layouts, keyboard operation for copy/export, visible warning states, and no incoherent text overlap.
+**Exit Conditions**:
+  - Sibling frontend build, typecheck, lint, and targeted browser tests pass.
+  - The workbench can convert or explain all Phase 16 examples through the same UI path.
+  - This repo records the sibling artifact import command and verification evidence location.
+**Plans**: TBD
+
+### Phase 16: Examples, Validation, and Release Gates
+
+**Goal**: The workbench milestone is backed by realistic, synthetic, tested examples and repeatable release gates across producer artifacts and sibling UI.
+**Depends on**: Phase 15
+**Requirements**: WB-03, QA-01, QA-02
+**Success Criteria** (what must be TRUE):
+  1. `queries/conversion_examples.json` contains 10-20 examples across Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI QL passthrough.
+  2. Each example includes source query, source language, expected OCI Log Analytics QL, explanation, warnings, support level, and synthetic log shape reference where applicable.
+  3. Producer-side tests validate schemas, command catalog, mapping patterns, examples, warnings, and sensitive-value scans.
+  4. Sibling frontend e2e checks exercise example loading, conversion/explanation rendering, command menu use, warning display, copy/export actions, and responsive layout.
+**Exit Conditions**:
+  - No workbench artifact contains credentials, OCIDs, public IPs, tenancy names, or unredacted live payloads.
+  - `python3 -m pytest` targeted workbench tests pass in this repo.
+  - The sibling frontend verification commands pass and are recorded in the handoff.
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -243,7 +340,12 @@ Plans:
 | 9. Operator Parity and Field Mapping Bulk Expansion | 0/? | Not started | - |
 | 10. Drift Detector and Synthetic-Hit Promotion Gate | 0/? | Not started | - |
 | 11. CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split | 0/? | Not started | - |
+| 12. Frontend Boundary and Artifact/API Contract | 0/? | Not started | - |
+| 13. Official OCI Logan QL Reference Catalog | 0/? | Not started | - |
+| 14. Cross-QL Conversion Pattern Library | 0/? | Not started | - |
+| 15. Sibling Workbench UX Integration | 0/? | Not started | - |
+| 16. Examples, Validation, and Release Gates | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-05-14*
-*Last updated: 2026-05-17 — Phase 8 completed; Sentinel backlog priority artifact and release advisory passed local gates*
+*Last updated: 2026-05-17 - v3.0 Logan QL Conversion Workbench phases added*

@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Sentinel KQL Parity to Logan QL
 status: In Progress
-stopped_at: Phase 8 complete; Phase 9 ready for autonomous planning
-last_updated: "2026-05-17T06:36:13.000Z"
-last_activity: 2026-05-17 — Phase 8 local release gates green: Sentinel backlog priority generated for 4,443 candidates, top blocker field_mapping:SubjectDomainName, Sentinel strict status ok with promoted_count 8, full pytest 367 passed / 5 skipped / 2 subtests passed
+stopped_at: Phase 9 production-readiness review pass complete; Phase 9 operator/mapping work remains open
+last_updated: "2026-05-17T07:16:27.000Z"
+last_activity: 2026-05-17 — Sentinel promotion refresh under `OCI_PROFILE=cap`: 100 candidates attempted, 60 promoted live parser-passed, strict Sentinel status ok, dashboard pre-flight passed with 640 query files, synthetic Sentinel-shaped logs uploaded to CAP and 20/20 ready Logan QL queries returned rows.
 progress:
   total_phases: 6
   completed_phases: 3
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** Every committed detection, query, dashboard, parser mapping, and generated artifact must remain deployable and verifiable against OCI Log Analytics without leaking tenant-specific data.
-**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 8 complete with backlog prioritization, Phase 9 (Operator Parity and Field Mapping Bulk Expansion) next.
+**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 8 complete, Phase 9 partially advanced by a live promotion/test pass (60 parser-passed promoted queries; 20 synthetic-hit queries), with remaining operator parity and bulk mapping work still open.
 
 ## Current Position
 
-Phase: 8 (backlog-prioritizer-and-cohort-overlay) — Complete
-Plan: all 3 plans executed inline (08-01 prioritizer generator, 08-02 release advisory/artifact contract, 08-03 docs/release gates).
-Status: Complete; Phase 9 is the next incomplete roadmap phase.
-Last activity: 2026-05-17 — Local Phase 8 verification passed: `queries/sentinel_backlog_priority.json` stable, release checklist advisory prints `Sentinel backlog: 4443 ranked; top blocker: field_mapping:SubjectDomainName`, release checklist 14/14 PASS.
+Phase: 9 (operator-parity-and-field-mapping-bulk-expansion) — In Progress
+Plan: production-readiness review and live promotion/testing pass executed inline from the Phase 8 backlog output; full Phase 9 operator/mapping plan remains to be formalized before completing the phase.
+Status: Partial progress; promoted Sentinel coverage now meets the Phase 9 minimum count, but remaining operator parity, MAP-05 parser-readiness docs, and regression tests are not complete.
+Last activity: 2026-05-17 — `scripts/sentinel_conversion_workflow.py status --json --strict` returned ok with 60 promoted files / 60 live-passed; `scripts/sentinel_synthetic_logs.py validate-live --limit 20 --lookback 24h --timeout 60` returned 20 passed / 0 empty / 0 failed after CAP upload.
 
 ## Performance Metrics
 
@@ -69,14 +69,14 @@ Decisions are logged in `.planning/PROJECT.md`.
 
 ### Pending Todos
 
-- Plan Phase 9 via `$gsd-plan-phase 9` for operator parity and field mapping bulk expansion.
-- Optional: promote only the additional Sentinel candidates that have both live parser validation and non-empty synthetic-hit evidence; 12 extra candidates were live-hit tested but not promoted in the 2026-05-16 pass.
+- Plan the remaining Phase 9 operator parity and field mapping bulk expansion work via `$gsd-plan-phase 9`; do not treat the 2026-05-17 promotion/test pass as full Phase 9 completion.
+- Optional: decide whether Phase 10-style synthetic-hit promotion metadata should be backfilled for the 20 candidates that returned rows in `queries/sentinel_synthetic_live_results.json`; current canonical promotion still uses live parser validation.
 - If running `python3 scripts/release_checklist.py --include-live`, expect it to rewrite generated artifacts. Use a clean or intentionally staged worktree first.
 
 ### Blockers/Concerns
 
-- Worktree has many pre-existing modified/deleted/untracked files. Future fixes must isolate changed files and avoid reverting user work.
-- Live OCI validation requires explicit profile/environment access and should not be assumed for local-only tasks. The 2026-05-16 production validation used `OCI_PROFILE=cap`.
+- Worktree has many generated Sentinel and inventory changes from the 2026-05-17 promotion/test pass. Future fixes must isolate changed files and avoid reverting user work.
+- Live OCI validation requires explicit profile/environment access and should not be assumed for local-only tasks. The 2026-05-17 production validation used `OCI_PROFILE=cap`.
 - `python3 scripts/convert_sigma.py --validate` exits 0 but still reports 20 existing warnings for known query syntax patterns; treat these as future validation-hardening work.
 - Phase 7 strict YAML loader found no duplicate keys in the generated shard layout; future mapping edits must go through `config/mapping/` and regenerate `config/sentinel_oci_mapping.yaml`.
 - CI secrets handling for fork PRs (Phase 11) needs a short security-review spike before the `live` job is wired.
@@ -94,6 +94,6 @@ Decisions are logged in `.planning/PROJECT.md`.
 
 ## Session Continuity
 
-Last session: 2026-05-17T06:36:13.000Z
-Stopped at: Phase 8 complete; Phase 9 ready
-Resume file: docs/health/release-checklist-2026-05-17T063613Z.json (ignored local evidence)
+Last session: 2026-05-17T07:16:27.000Z
+Stopped at: Phase 9 production-readiness review pass complete; release gates and commit pending
+Resume file: queries/sentinel_synthetic_live_results.json (tracked synthetic live-hit evidence)

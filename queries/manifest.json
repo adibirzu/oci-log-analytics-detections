@@ -1,7 +1,7 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-05-14T09:57:18.787223+00:00",
+  "generated_at": "2026-05-17T07:19:31.452222+00:00",
   "stats": {
     "total_rules": 455,
     "total_sigma_rules": 454,
@@ -4311,7 +4311,7 @@
         "credential_access",
         "lateral_movement"
       ],
-      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '4648') and not ('Target Server Name' = 'localhost')) | stats count as Attempts by User, Entity | where Attempts > 5 | sort -Attempts"
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '4648')) | stats count as Attempts by User, Entity | where Attempts > 5 | sort -Attempts"
     },
     {
       "filename": "password_policy_discovery.json",
@@ -7708,8 +7708,8 @@
     }
   ],
   "dashboards": {
-    "total": 27,
-    "saved_searches": 450,
+    "total": 26,
+    "saved_searches": 387,
     "names": [
       "SOC Overview Dashboard",
       "SOC: OCI STIG Compliance Dashboard",
@@ -7735,7 +7735,6 @@
       "SOC: Browser Attack Detection Dashboard",
       "SOC: Microsoft Sentinel Identity Converted Detections",
       "SOC: Microsoft Sentinel Endpoint Converted Detections",
-      "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
       "SOC: Microsoft Sentinel M365 Converted Detections",
       "SOC: Microsoft Sentinel Network Converted Detections"
     ]

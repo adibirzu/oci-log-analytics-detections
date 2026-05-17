@@ -21,16 +21,16 @@ This repository ships both source authoring content and generated OCI query asse
 - **Sigma-derived OCI query artifacts:** 455
   - 447 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
-- **Microsoft Sentinel converted queries:** 8 live OCI parser-passing queries
+- **Microsoft Sentinel converted queries:** 60 live OCI parser-passing queries
 - **Curated analytics:** 125
   - 38 app telemetry analytics in `queries/apps/`
   - 87 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 588
+- **Total query artifacts/content items:** 640
 - **Source rule breakdown:** Windows (249), Cloud/OCI (100), Linux (67), Web/WAF (38)
-- **Combined MITRE ATT&CK coverage:** 218 techniques across 16 tactics
+- **Combined MITRE ATT&CK coverage:** 228 techniques across 16 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Atomic Red Team coverage:** 280 / 317 testable rules have ART mappings (88.3%)
-- **Dashboard inventory:** 23 dashboards with 351 active dashboard saved searches and 73 advanced visualization widgets
+- **Dashboard inventory:** 26 dashboards with 387 active dashboard saved searches and 77 advanced visualization widgets
 - **Generated demo data:** 2,922 events across 14 NDJSON files in the latest local `test_data/manifest.json`
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 
@@ -75,7 +75,7 @@ queries/** -----------------------------------------------> scripts/export_for_m
 
 queries/** -----------------------------------------------> scripts/deploy_dashboard.py
                                                              |
-                                                             +--> 23 dashboards / 351 saved searches
+                                                             +--> 26 dashboards / 387 saved searches
                                                              +--> queries/dashboard_inventory.json
 ```
 
@@ -87,8 +87,8 @@ queries/** -----------------------------------------------> scripts/deploy_dashb
   OCI Audit Events ──────────┤──> OCI Streaming ──> Service Connector Hub ──> Log Analytics
   Cloud Guard Problems ──────┤                                                    |
   WAF/LB Access Logs ────────┤                                                    v
-  App/Browser Telemetry JSON ─┘                                         SOC Dashboards (16)
-                                                                        Saved Searches (264)
+  App/Browser Telemetry JSON ─┘                                         SOC Dashboards (26)
+                                                                       Saved Searches (387)
   Generated Test Data (NDJSON) ──> Upload API ──> Log Analytics ──> Dashboard Verification
 ```
 
@@ -118,7 +118,7 @@ Notes:
 
 ## OCI Log Analytics Dashboards
 
-### SOC Detection Dashboards (23)
+### SOC Detection Dashboards (26)
 | Dashboard | Widgets | Purpose |
 | :--- | :--- | :--- |
 | SOC Overview Dashboard | 14 | Executive-level cross-domain security summary + hunting alerts |
@@ -143,7 +143,10 @@ Notes:
 | SOC: Geographic Health | 5 | Multicloud health visualization (OCI, Azure, AWS, GCP) |
 | SOC: APT Detection | 22 | BLUELIGHT RAT (S0657/APT37) summary KPIs, kill chain, links, and YARA enrichment |
 | SOC: Browser Attack Detection | 13 | SOC Application Logs: APM/WAF correlation, OWASP mix, XSS, SQLi, CSRF, session hijack |
-| SOC: Microsoft Sentinel Endpoint Converted Detections | 8 | Live-validated Sentinel endpoint detections converted to Logan QL |
+| SOC: Microsoft Sentinel Endpoint Converted Detections | 24 | Live-validated Sentinel endpoint detections converted to Logan QL |
+| SOC: Microsoft Sentinel Identity Converted Detections | 1 | Live-validated Sentinel identity detection converted to Logan QL |
+| SOC: Microsoft Sentinel M365 Converted Detections | 2 | Live-validated Sentinel M365 detections converted to Logan QL |
+| SOC: Microsoft Sentinel Network Converted Detections | 17 | Live-validated Sentinel network detections converted to Logan QL |
 
 ### APT Detection: BLUELIGHT RAT (S0657/APT37)
 Full kill chain detection for the North Korean BLUELIGHT Remote Access Trojan:
@@ -209,7 +212,7 @@ config/
 scripts/
   oci_config.py                 # Centralized config, client factories, validation
   convert_sigma.py              # Sigma -> OCL converter (with STIG metadata)
-  deploy_dashboard.py           # OCI LA dashboard deployment (23 dashboards / 351 saved searches)
+  deploy_dashboard.py           # OCI LA dashboard deployment (26 dashboards / 387 saved searches)
   generate_test_logs.py         # Core security simulation datasets for OCI LA
   generate_geo_health_logs.py   # Multicloud health dataset used by Geographic Health dashboard
   ingest_test_data.py           # Upload generated NDJSON test data to OCI LA
@@ -245,7 +248,7 @@ python3 scripts/ingest_test_data.py --mode direct
 python3 scripts/setup_streaming_pipeline.py
 python3 scripts/validate_pipeline.py --e2e
 
-# 4. Deploy 23 dashboards with 351 saved searches
+# 4. Deploy 26 dashboards with 387 saved searches
 #    The default path validates dashboard queries in OCI Log Analytics first.
 #    Failed, slow, or timed-out query validation blocks dashboard import.
 #    The dashboard default time range is l24h to match the generated demo data.

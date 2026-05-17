@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T06:36:16.278310+00:00",
+  "generated_at": "2026-05-17T07:19:00.561141+00:00",
   "source_registry": {
     "version": "1.0",
     "sources": [
@@ -70,15 +70,15 @@
     ]
   },
   "summary": {
-    "total_candidates": 54,
+    "total_candidates": 48,
     "by_classification": {
       "dashboard-only hunt": 2,
-      "needs field mapping": 45,
+      "needs field mapping": 39,
       "not applicable to OCI Log Analytics": 7
     },
     "by_source_type": {
       "elastic_csp_gap": 24,
-      "elastic_detection_reference": 27,
+      "elastic_detection_reference": 21,
       "internal_workshop": 3
     },
     "duplicates_collapsed": 1
@@ -1473,55 +1473,6 @@
       ]
     },
     {
-      "id": "cand_746c66f2428925bb",
-      "title": "Windows coverage gap: T1036 Masquerading",
-      "sigma_id": "",
-      "source_url": "https://github.com/elastic/detection-rules",
-      "local_reference": "scripts/analyze_elastic_coverage.py:ELASTIC_WINDOWS_TECHNIQUES",
-      "source_type": "elastic_detection_reference",
-      "source_types": [
-        "elastic_detection_reference"
-      ],
-      "affected_platform": "windows",
-      "mitre_tactics": [
-        "defense_evasion"
-      ],
-      "mitre_techniques": [
-        "T1036"
-      ],
-      "candidate_log_sources": [
-        "SOC Windows Sysmon Logs",
-        "Windows Sysmon Events",
-        "Windows Sysmon Operational Logs"
-      ],
-      "required_fields": [],
-      "detection_idea": "Review Windows telemetry and create OCI Log Analytics detection coverage for T1036 Masquerading.",
-      "core_indicators": [
-        "t1036"
-      ],
-      "confidence": "medium",
-      "licensing": {
-        "status": "metadata_only",
-        "notes": "Candidate metadata only; source detection logic must be reviewed before promotion."
-      },
-      "attribution": {
-        "source": "Elastic detection-rules technique coverage reference",
-        "references": [
-          "https://github.com/elastic/detection-rules"
-        ]
-      },
-      "review_status": "candidate",
-      "dedupe_key": "content:36a3bfbcf425bbf81e71d2be",
-      "source_urls": [
-        "https://github.com/elastic/detection-rules"
-      ],
-      "duplicate_count": 1,
-      "classification": "needs field mapping",
-      "classification_reasons": [
-        "candidate does not declare required fields yet"
-      ]
-    },
-    {
       "id": "cand_5a070464d6adf35c",
       "title": "Windows coverage gap: T1037 Boot or Logon Initialization Scripts",
       "sigma_id": "",
@@ -1678,55 +1629,6 @@
       ]
     },
     {
-      "id": "cand_a43dd36f82f7a77e",
-      "title": "Windows coverage gap: T1053 Scheduled Task/Job",
-      "sigma_id": "",
-      "source_url": "https://github.com/elastic/detection-rules",
-      "local_reference": "scripts/analyze_elastic_coverage.py:ELASTIC_WINDOWS_TECHNIQUES",
-      "source_type": "elastic_detection_reference",
-      "source_types": [
-        "elastic_detection_reference"
-      ],
-      "affected_platform": "windows",
-      "mitre_tactics": [
-        "execution"
-      ],
-      "mitre_techniques": [
-        "T1053"
-      ],
-      "candidate_log_sources": [
-        "SOC Windows Sysmon Logs",
-        "Windows Sysmon Events",
-        "Windows Sysmon Operational Logs"
-      ],
-      "required_fields": [],
-      "detection_idea": "Review Windows telemetry and create OCI Log Analytics detection coverage for T1053 Scheduled Task/Job.",
-      "core_indicators": [
-        "t1053"
-      ],
-      "confidence": "medium",
-      "licensing": {
-        "status": "metadata_only",
-        "notes": "Candidate metadata only; source detection logic must be reviewed before promotion."
-      },
-      "attribution": {
-        "source": "Elastic detection-rules technique coverage reference",
-        "references": [
-          "https://github.com/elastic/detection-rules"
-        ]
-      },
-      "review_status": "candidate",
-      "dedupe_key": "content:41bf95bd2514accc6b09e262",
-      "source_urls": [
-        "https://github.com/elastic/detection-rules"
-      ],
-      "duplicate_count": 1,
-      "classification": "needs field mapping",
-      "classification_reasons": [
-        "candidate does not declare required fields yet"
-      ]
-    },
-    {
       "id": "cand_b8dfacdddd26aa87",
       "title": "Windows coverage gap: T1069 Permission Groups Discovery",
       "sigma_id": "",
@@ -1776,55 +1678,6 @@
       ]
     },
     {
-      "id": "cand_619f9f52f0488035",
-      "title": "Windows coverage gap: T1070 Indicator Removal",
-      "sigma_id": "",
-      "source_url": "https://github.com/elastic/detection-rules",
-      "local_reference": "scripts/analyze_elastic_coverage.py:ELASTIC_WINDOWS_TECHNIQUES",
-      "source_type": "elastic_detection_reference",
-      "source_types": [
-        "elastic_detection_reference"
-      ],
-      "affected_platform": "windows",
-      "mitre_tactics": [
-        "defense_evasion"
-      ],
-      "mitre_techniques": [
-        "T1070"
-      ],
-      "candidate_log_sources": [
-        "SOC Windows Sysmon Logs",
-        "Windows Sysmon Events",
-        "Windows Sysmon Operational Logs"
-      ],
-      "required_fields": [],
-      "detection_idea": "Review Windows telemetry and create OCI Log Analytics detection coverage for T1070 Indicator Removal.",
-      "core_indicators": [
-        "t1070"
-      ],
-      "confidence": "medium",
-      "licensing": {
-        "status": "metadata_only",
-        "notes": "Candidate metadata only; source detection logic must be reviewed before promotion."
-      },
-      "attribution": {
-        "source": "Elastic detection-rules technique coverage reference",
-        "references": [
-          "https://github.com/elastic/detection-rules"
-        ]
-      },
-      "review_status": "candidate",
-      "dedupe_key": "content:e741de14ee09a8292b0e452d",
-      "source_urls": [
-        "https://github.com/elastic/detection-rules"
-      ],
-      "duplicate_count": 1,
-      "classification": "needs field mapping",
-      "classification_reasons": [
-        "candidate does not declare required fields yet"
-      ]
-    },
-    {
       "id": "cand_06b9b74a9573c6e1",
       "title": "Windows coverage gap: T1106 Native API",
       "sigma_id": "",
@@ -1864,55 +1717,6 @@
       },
       "review_status": "candidate",
       "dedupe_key": "content:7a13324c8e3b2c6c45fc788a",
-      "source_urls": [
-        "https://github.com/elastic/detection-rules"
-      ],
-      "duplicate_count": 1,
-      "classification": "needs field mapping",
-      "classification_reasons": [
-        "candidate does not declare required fields yet"
-      ]
-    },
-    {
-      "id": "cand_d50b7c336843242c",
-      "title": "Windows coverage gap: T1112 Modify Registry",
-      "sigma_id": "",
-      "source_url": "https://github.com/elastic/detection-rules",
-      "local_reference": "scripts/analyze_elastic_coverage.py:ELASTIC_WINDOWS_TECHNIQUES",
-      "source_type": "elastic_detection_reference",
-      "source_types": [
-        "elastic_detection_reference"
-      ],
-      "affected_platform": "windows",
-      "mitre_tactics": [
-        "defense_evasion"
-      ],
-      "mitre_techniques": [
-        "T1112"
-      ],
-      "candidate_log_sources": [
-        "SOC Windows Sysmon Logs",
-        "Windows Sysmon Events",
-        "Windows Sysmon Operational Logs"
-      ],
-      "required_fields": [],
-      "detection_idea": "Review Windows telemetry and create OCI Log Analytics detection coverage for T1112 Modify Registry.",
-      "core_indicators": [
-        "t1112"
-      ],
-      "confidence": "medium",
-      "licensing": {
-        "status": "metadata_only",
-        "notes": "Candidate metadata only; source detection logic must be reviewed before promotion."
-      },
-      "attribution": {
-        "source": "Elastic detection-rules technique coverage reference",
-        "references": [
-          "https://github.com/elastic/detection-rules"
-        ]
-      },
-      "review_status": "candidate",
-      "dedupe_key": "content:60c970c4f8dec4e65949fe47",
       "source_urls": [
         "https://github.com/elastic/detection-rules"
       ],
@@ -2266,55 +2070,6 @@
       ]
     },
     {
-      "id": "cand_0b5540cf643bd844",
-      "title": "Windows coverage gap: T1543 Create or Modify System Process",
-      "sigma_id": "",
-      "source_url": "https://github.com/elastic/detection-rules",
-      "local_reference": "scripts/analyze_elastic_coverage.py:ELASTIC_WINDOWS_TECHNIQUES",
-      "source_type": "elastic_detection_reference",
-      "source_types": [
-        "elastic_detection_reference"
-      ],
-      "affected_platform": "windows",
-      "mitre_tactics": [
-        "persistence"
-      ],
-      "mitre_techniques": [
-        "T1543"
-      ],
-      "candidate_log_sources": [
-        "SOC Windows Sysmon Logs",
-        "Windows Sysmon Events",
-        "Windows Sysmon Operational Logs"
-      ],
-      "required_fields": [],
-      "detection_idea": "Review Windows telemetry and create OCI Log Analytics detection coverage for T1543 Create or Modify System Process.",
-      "core_indicators": [
-        "t1543"
-      ],
-      "confidence": "medium",
-      "licensing": {
-        "status": "metadata_only",
-        "notes": "Candidate metadata only; source detection logic must be reviewed before promotion."
-      },
-      "attribution": {
-        "source": "Elastic detection-rules technique coverage reference",
-        "references": [
-          "https://github.com/elastic/detection-rules"
-        ]
-      },
-      "review_status": "candidate",
-      "dedupe_key": "content:12c90314448321f49f38a1ac",
-      "source_urls": [
-        "https://github.com/elastic/detection-rules"
-      ],
-      "duplicate_count": 1,
-      "classification": "needs field mapping",
-      "classification_reasons": [
-        "candidate does not declare required fields yet"
-      ]
-    },
-    {
       "id": "cand_4887be5a1b45e5ff",
       "title": "Windows coverage gap: T1546 Event Triggered Execution",
       "sigma_id": "",
@@ -2403,55 +2158,6 @@
       },
       "review_status": "candidate",
       "dedupe_key": "content:65bf1b97afa8c0d7ff081016",
-      "source_urls": [
-        "https://github.com/elastic/detection-rules"
-      ],
-      "duplicate_count": 1,
-      "classification": "needs field mapping",
-      "classification_reasons": [
-        "candidate does not declare required fields yet"
-      ]
-    },
-    {
-      "id": "cand_4e9a247439a093c4",
-      "title": "Windows coverage gap: T1548 Abuse Elevation Control Mechanism",
-      "sigma_id": "",
-      "source_url": "https://github.com/elastic/detection-rules",
-      "local_reference": "scripts/analyze_elastic_coverage.py:ELASTIC_WINDOWS_TECHNIQUES",
-      "source_type": "elastic_detection_reference",
-      "source_types": [
-        "elastic_detection_reference"
-      ],
-      "affected_platform": "windows",
-      "mitre_tactics": [
-        "defense_evasion"
-      ],
-      "mitre_techniques": [
-        "T1548"
-      ],
-      "candidate_log_sources": [
-        "SOC Windows Sysmon Logs",
-        "Windows Sysmon Events",
-        "Windows Sysmon Operational Logs"
-      ],
-      "required_fields": [],
-      "detection_idea": "Review Windows telemetry and create OCI Log Analytics detection coverage for T1548 Abuse Elevation Control Mechanism.",
-      "core_indicators": [
-        "t1548"
-      ],
-      "confidence": "medium",
-      "licensing": {
-        "status": "metadata_only",
-        "notes": "Candidate metadata only; source detection logic must be reviewed before promotion."
-      },
-      "attribution": {
-        "source": "Elastic detection-rules technique coverage reference",
-        "references": [
-          "https://github.com/elastic/detection-rules"
-        ]
-      },
-      "review_status": "candidate",
-      "dedupe_key": "content:b46b89efee626b8a1efce900",
       "source_urls": [
         "https://github.com/elastic/detection-rules"
       ],

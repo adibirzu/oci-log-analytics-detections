@@ -1,6 +1,6 @@
 # Project Status
 
-Date: 2026-05-16
+Date: 2026-05-17
 
 ## Current State
 
@@ -9,17 +9,18 @@ Date: 2026-05-16
 - Sigma-derived OCI query artifacts: 455
   - 447 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
-- Microsoft Sentinel converted queries: 8 live OCI parser-passing queries
+- Microsoft Sentinel converted queries: 60 live OCI parser-passing queries
 - Curated analytics: 125
   - 38 app telemetry analytics
   - 87 hunting analytics
-- Total query artifacts/content items: 588
-- Dashboards: 23
-- Saved searches: 351 active dashboard saved searches; 588 total content items
-- Sentinel live validation: 8 / 18 locally clean conversions; 10 live failures remain in `queries/sentinel_conversion_report.json`
-- Live dashboard health: **351 / 351 widgets HIT (100.0 %)** in the `cap` profile with a 21-day lookback.
+- Total query artifacts/content items: 640
+- Dashboards: 26
+- Saved searches: 387 active dashboard saved searches; 640 total content items
+- Sentinel live validation: 60 / 62 locally clean conversions; 2 live failures remain in `queries/sentinel_conversion_report.json`
+- Sentinel synthetic live-hit check: **20 / 20 ready Logan QL queries HIT** in the `cap` profile with a 24-hour lookback after uploading Sentinel-shaped synthetic logs.
+- Latest full live dashboard health before Sentinel expansion: **351 / 351 widgets HIT (100.0 %)** in the `cap` profile with a 21-day lookback.
 - Generated demo data: 14 NDJSON files / 2,922 events in the latest local `test_data/manifest.json`
-- MITRE ATT&CK coverage: 218 techniques / 16 tactics
+- MITRE ATT&CK coverage: 228 techniques / 16 tactics
 - STIG coverage: 24 detections / 12 controls
 - Atomic Red Team coverage: 280 / 317 testable rules have mapped tests
 

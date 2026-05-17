@@ -3,7 +3,9 @@
 
 import os
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import oci_config
@@ -101,6 +103,28 @@ class TestProfileScopedConfig(unittest.TestCase):
         )
 
         self.assertEqual(value, "eu-frankfurt-1")
+
+    def test_validate_query_files_ignores_generated_metadata_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            queries_dir = Path(tmpdir)
+            (queries_dir / "valid_detection.json").write_text(
+                '{"title": "Valid", "query": "* | stats count"}'
+            )
+            (queries_dir / "sentinel_backlog_priority.json").write_text(
+                '{"ranked": []}'
+            )
+            (queries_dir / "mapping_collisions.json").write_text(
+                '{"collisions": []}'
+            )
+
+            original_queries_dir = oci_config.QUERIES_DIR
+            try:
+                oci_config.QUERIES_DIR = str(queries_dir)
+                results = oci_config.validate_query_files()
+            finally:
+                oci_config.QUERIES_DIR = original_queries_dir
+
+        self.assertEqual(results, [("Query files", True, "1 files OK")])
 
 
 if __name__ == "__main__":

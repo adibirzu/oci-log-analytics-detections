@@ -80,6 +80,6 @@
   },
   "detection_maturity": "source_converted",
   "field_coverage": "mapped_subset",
-  "test_data_coverage": "synthetic_live_hit",
+  "test_data_coverage": "not_evaluated",
   "scheduled_rule_eligibility": "not_evaluated"
 }

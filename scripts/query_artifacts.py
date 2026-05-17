@@ -15,6 +15,7 @@ GENERATED_QUERY_ARTIFACT_FILENAMES = {
     "mapping_collisions.json",
     "octo_apm_workshop_bundle.json",
     "sentinel_candidates.json",
+    "sentinel_backlog_priority.json",
     "sentinel_conversion_report.json",
     "sentinel_synthetic_live_results.json",
     "sentinel_synthetic_plan.json",

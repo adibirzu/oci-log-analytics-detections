@@ -1,0 +1,130 @@
+{
+  "generated_at": "2026-05-17T17:40:38Z",
+  "patterns": [
+    {
+      "example_ids": [
+        "spl-powershell-encoded"
+      ],
+      "id": "spl-filter-to-search-where",
+      "logan_commands": [
+        "search",
+        "where"
+      ],
+      "oci_mapping": "Use a Logan base search for log source constraints and pipe into where for derived predicates.",
+      "source_construct": "search predicates, index, sourcetype, where",
+      "source_language": "splunk_spl",
+      "support_level": "supported",
+      "warning_behavior": "Warn when SPL macros, subsearches, or accelerated data models are present."
+    },
+    {
+      "example_ids": [
+        "kql-securityevent-powershell",
+        "kql-audit-no-mfa"
+      ],
+      "id": "kql-where-summarize",
+      "logan_commands": [
+        "search",
+        "where",
+        "stats",
+        "timestats"
+      ],
+      "oci_mapping": "Map table names to OCI Log Sources, predicates to search/where, summarize to stats, and bin(TimeGenerated) to timestats span.",
+      "source_construct": "where + summarize/count/bin",
+      "source_language": "sentinel_kql",
+      "support_level": "supported",
+      "warning_behavior": "Block unsupported joins, watchlists, dynamic bag expansion, and regex extraction unless explicitly mapped."
+    },
+    {
+      "example_ids": [
+        "sigma-powershell-encoded",
+        "sigma-soc-xss"
+      ],
+      "id": "sigma-selection-condition",
+      "logan_commands": [
+        "search",
+        "where"
+      ],
+      "oci_mapping": "Use configured Sigma field and logsource mappings, preserving MITRE/STIG metadata in the response.",
+      "source_construct": "logsource + detection selections + condition",
+      "source_language": "sigma_yaml",
+      "support_level": "supported",
+      "warning_behavior": "Warn on aggregation/timeframe conditions and unmapped fields; refuse unsafe YAML tags."
+    },
+    {
+      "example_ids": [
+        "elastic-powershell-process",
+        "elastic-web-xss"
+      ],
+      "id": "elastic-field-query",
+      "logan_commands": [
+        "search",
+        "where"
+      ],
+      "oci_mapping": "Map ECS-style fields to OCI display fields and translate wildcard values to Logan like predicates.",
+      "source_construct": "field:value, boolean operators, wildcard terms",
+      "source_language": "elastic_lucene",
+      "support_level": "partial",
+      "warning_behavior": "Warn on nested documents, scripted fields, analyzers, and sequence semantics."
+    },
+    {
+      "example_ids": [
+        "spl-threat-ip-lookup"
+      ],
+      "id": "lookup-watchlist",
+      "logan_commands": [
+        "lookup"
+      ],
+      "oci_mapping": "Use OCI lookup/searchlookup artifacts and explicit lookup command design; do not silently inline external lists.",
+      "source_construct": "Splunk lookup, Sentinel _GetWatchlist, Elastic enrich",
+      "source_language": "cross_ql",
+      "support_level": "lossy",
+      "warning_behavior": "Emit lossy_lookup warning with the required lookup/table name."
+    },
+    {
+      "example_ids": [
+        "kql-unsupported-join"
+      ],
+      "id": "join-correlation",
+      "logan_commands": [
+        "stats"
+      ],
+      "oci_mapping": "Prefer source-side parser enrichment or dashboard-level correlation. Only convert simple same-source aggregations.",
+      "source_construct": "joins, transactions, sequences, correlations",
+      "source_language": "cross_ql",
+      "support_level": "unsupported",
+      "warning_behavior": "Block true cross-table joins and sequence semantics with unsupported_join_or_sequence."
+    },
+    {
+      "example_ids": [
+        "kql-project-fields"
+      ],
+      "id": "projection-rename",
+      "logan_commands": [
+        "fields",
+        "rename"
+      ],
+      "oci_mapping": "Use fields for projection and rename for display aliases where the source semantics are lossless.",
+      "source_construct": "project/table/fields/rename",
+      "source_language": "cross_ql",
+      "support_level": "supported",
+      "warning_behavior": "Warn when projected fields are not present in the source parser contract."
+    },
+    {
+      "example_ids": [
+        "spl-powershell-encoded"
+      ],
+      "id": "sort-limit-top",
+      "logan_commands": [
+        "sort",
+        "head",
+        "top"
+      ],
+      "oci_mapping": "Use sort with '-' for descending order and head to cap result sets; use top for single-field high-frequency queries.",
+      "source_construct": "sort, order, head, limit, top",
+      "source_language": "cross_ql",
+      "support_level": "supported",
+      "warning_behavior": "Warn when source query has no explicit cap and generated result could be broad."
+    }
+  ],
+  "schema_version": "1.0.0"
+}

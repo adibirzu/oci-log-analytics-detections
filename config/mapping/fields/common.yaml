@@ -116,6 +116,22 @@ fields:
   SourceItemName:
     target: '''Target Object'''
     role: resource
+  ObjectDN:
+    target: '''Target Object'''
+    role: target
+    parser_change_required: true
+  ObjectName:
+    target: '''Target Object'''
+    role: target
+    parser_change_required: true
+  AttributeLDAPDisplayName:
+    target: '''Object Type'''
+    role: resource
+    parser_change_required: true
+  EventData:
+    target: '''Original Log Content'''
+    role: resource
+    parser_change_required: true
   ThreatCategory:
     target: '''Threat Category'''
     role: resource

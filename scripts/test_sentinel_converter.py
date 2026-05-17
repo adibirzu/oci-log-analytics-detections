@@ -197,6 +197,14 @@ class TestSentinelKqlConversion(unittest.TestCase):
         self.assertIsNone(result.query_payload)
         self.assertIn("role_mismatch:SubjectUserName:TargetUserName", result.skip_reasons)
 
+    def test_parser_pending_mapping_is_skipped(self):
+        result = convert_candidate(self._candidate(
+            query="SecurityEvent | where ObjectDN has 'CN=Admin'",
+        ), self.mapping)
+
+        self.assertIsNone(result.query_payload)
+        self.assertIn("parser_readiness:pending:ObjectDN", result.skip_reasons)
+
     def test_convert_project_distinct_and_simple_union(self):
         candidate = self._candidate(
             query=(

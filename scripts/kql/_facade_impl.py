@@ -662,6 +662,8 @@ def map_field(
     raw = _normalize_field_name(field)
     if raw in mapping["fields"]:
         mapped = mapping["fields"][raw]
+        if mapping.get("field_specs", {}).get(raw, {}).get("parser_change_required"):
+            _record_field_error(errors, f"parser_readiness:pending:{raw}")
         if not _is_allowed_logan_field(mapped, mapping, allowed_aliases):
             _record_field_error(errors, f"unsupported OCI field reference: {_display_field_name(mapped)}")
         return mapped

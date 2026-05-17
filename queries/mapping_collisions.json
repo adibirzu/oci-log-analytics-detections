@@ -2,6 +2,21 @@
   "collisions": [
     {
       "fields": [
+        "InitiatingProcessAccountName",
+        "SubjectAccount"
+      ],
+      "reasons": [
+        "lossy_mapping_collision:InitiatingProcessAccountName+SubjectAccount→Account Name"
+      ],
+      "roles": {
+        "InitiatingProcessAccountName": "initiator",
+        "SubjectAccount": "subject"
+      },
+      "target": "Account Name",
+      "target_mapping": "'Account Name'"
+    },
+    {
+      "fields": [
         "ActionType",
         "DeviceAction",
         "DvcAction",
@@ -29,21 +44,27 @@
         "AppDisplayName",
         "Application",
         "ClientAppUsed",
-        "DeviceProduct"
+        "DeviceProduct",
+        "OfficeWorkload"
       ],
       "reasons": [
         "lossy_mapping_collision:AppDisplayName+Application→Application Name",
         "lossy_mapping_collision:AppDisplayName+ClientAppUsed→Application Name",
         "lossy_mapping_collision:AppDisplayName+DeviceProduct→Application Name",
+        "lossy_mapping_collision:AppDisplayName+OfficeWorkload→Application Name",
         "lossy_mapping_collision:Application+ClientAppUsed→Application Name",
         "lossy_mapping_collision:Application+DeviceProduct→Application Name",
-        "lossy_mapping_collision:ClientAppUsed+DeviceProduct→Application Name"
+        "lossy_mapping_collision:Application+OfficeWorkload→Application Name",
+        "lossy_mapping_collision:ClientAppUsed+DeviceProduct→Application Name",
+        "lossy_mapping_collision:ClientAppUsed+OfficeWorkload→Application Name",
+        "lossy_mapping_collision:DeviceProduct+OfficeWorkload→Application Name"
       ],
       "roles": {
         "AppDisplayName": "resource",
         "Application": "resource",
         "ClientAppUsed": "resource",
-        "DeviceProduct": "resource"
+        "DeviceProduct": "resource",
+        "OfficeWorkload": "resource"
       },
       "target": "Application Name",
       "target_mapping": "'Application Name'"
@@ -263,6 +284,7 @@
       "fields": [
         "ActingProcessSHA256",
         "Hash",
+        "InitiatingProcessSHA256",
         "MD5",
         "SHA1",
         "SHA256",
@@ -272,18 +294,26 @@
       ],
       "reasons": [
         "lossy_mapping_collision:ActingProcessSHA256+Hash→Hashes",
+        "lossy_mapping_collision:ActingProcessSHA256+InitiatingProcessSHA256→Hashes",
         "lossy_mapping_collision:ActingProcessSHA256+MD5→Hashes",
         "lossy_mapping_collision:ActingProcessSHA256+SHA1→Hashes",
         "lossy_mapping_collision:ActingProcessSHA256+SHA256→Hashes",
         "lossy_mapping_collision:ActingProcessSHA256+TargetFileMD5→Hashes",
         "lossy_mapping_collision:ActingProcessSHA256+TargetFileSHA1→Hashes",
         "lossy_mapping_collision:ActingProcessSHA256+TargetFileSHA256→Hashes",
+        "lossy_mapping_collision:Hash+InitiatingProcessSHA256→Hashes",
         "lossy_mapping_collision:Hash+MD5→Hashes",
         "lossy_mapping_collision:Hash+SHA1→Hashes",
         "lossy_mapping_collision:Hash+SHA256→Hashes",
         "lossy_mapping_collision:Hash+TargetFileMD5→Hashes",
         "lossy_mapping_collision:Hash+TargetFileSHA1→Hashes",
         "lossy_mapping_collision:Hash+TargetFileSHA256→Hashes",
+        "lossy_mapping_collision:InitiatingProcessSHA256+MD5→Hashes",
+        "lossy_mapping_collision:InitiatingProcessSHA256+SHA1→Hashes",
+        "lossy_mapping_collision:InitiatingProcessSHA256+SHA256→Hashes",
+        "lossy_mapping_collision:InitiatingProcessSHA256+TargetFileMD5→Hashes",
+        "lossy_mapping_collision:InitiatingProcessSHA256+TargetFileSHA1→Hashes",
+        "lossy_mapping_collision:InitiatingProcessSHA256+TargetFileSHA256→Hashes",
         "lossy_mapping_collision:MD5+SHA1→Hashes",
         "lossy_mapping_collision:MD5+SHA256→Hashes",
         "lossy_mapping_collision:MD5+TargetFileMD5→Hashes",
@@ -303,6 +333,7 @@
       "roles": {
         "ActingProcessSHA256": "hash",
         "Hash": "hash",
+        "InitiatingProcessSHA256": "hash",
         "MD5": "hash",
         "SHA1": "hash",
         "SHA256": "hash",
@@ -353,6 +384,21 @@
     },
     {
       "fields": [
+        "LogonType",
+        "Logon_Type"
+      ],
+      "reasons": [
+        "lossy_mapping_collision:LogonType+Logon_Type→Logon Type"
+      ],
+      "roles": {
+        "LogonType": "resource",
+        "Logon_Type": "resource"
+      },
+      "target": "Logon Type",
+      "target_mapping": "'Logon Type'"
+    },
+    {
+      "fields": [
         "ActivityDisplayName",
         "Operation",
         "OperationName"
@@ -372,42 +418,77 @@
     },
     {
       "fields": [
+        "ActingProcessFileInternalName",
         "ActingProcessName",
         "InitiatingProcessFileName",
         "InitiatingProcessFolderPath",
         "InitiatingProcessParentFileName",
-        "ParentImage"
+        "ParentImage",
+        "ParentProcessName"
       ],
       "reasons": [
+        "lossy_mapping_collision:ActingProcessFileInternalName+ActingProcessName→Parent Process Name",
+        "lossy_mapping_collision:ActingProcessFileInternalName+InitiatingProcessFileName→Parent Process Name",
+        "lossy_mapping_collision:ActingProcessFileInternalName+InitiatingProcessFolderPath→Parent Process Name",
+        "lossy_mapping_collision:ActingProcessFileInternalName+InitiatingProcessParentFileName→Parent Process Name",
+        "lossy_mapping_collision:ActingProcessFileInternalName+ParentImage→Parent Process Name",
+        "lossy_mapping_collision:ActingProcessFileInternalName+ParentProcessName→Parent Process Name",
         "lossy_mapping_collision:ActingProcessName+InitiatingProcessFileName→Parent Process Name",
         "lossy_mapping_collision:ActingProcessName+InitiatingProcessFolderPath→Parent Process Name",
         "lossy_mapping_collision:ActingProcessName+InitiatingProcessParentFileName→Parent Process Name",
         "lossy_mapping_collision:ActingProcessName+ParentImage→Parent Process Name",
+        "lossy_mapping_collision:ActingProcessName+ParentProcessName→Parent Process Name",
         "lossy_mapping_collision:InitiatingProcessFileName+InitiatingProcessFolderPath→Parent Process Name",
         "lossy_mapping_collision:InitiatingProcessFileName+InitiatingProcessParentFileName→Parent Process Name",
         "lossy_mapping_collision:InitiatingProcessFileName+ParentImage→Parent Process Name",
+        "lossy_mapping_collision:InitiatingProcessFileName+ParentProcessName→Parent Process Name",
         "lossy_mapping_collision:InitiatingProcessFolderPath+InitiatingProcessParentFileName→Parent Process Name",
         "lossy_mapping_collision:InitiatingProcessFolderPath+ParentImage→Parent Process Name",
-        "lossy_mapping_collision:InitiatingProcessParentFileName+ParentImage→Parent Process Name"
+        "lossy_mapping_collision:InitiatingProcessFolderPath+ParentProcessName→Parent Process Name",
+        "lossy_mapping_collision:InitiatingProcessParentFileName+ParentImage→Parent Process Name",
+        "lossy_mapping_collision:InitiatingProcessParentFileName+ParentProcessName→Parent Process Name",
+        "lossy_mapping_collision:ParentImage+ParentProcessName→Parent Process Name"
       ],
       "roles": {
+        "ActingProcessFileInternalName": "initiator",
         "ActingProcessName": "initiator",
         "InitiatingProcessFileName": "initiator",
         "InitiatingProcessFolderPath": "initiator",
         "InitiatingProcessParentFileName": "initiator",
-        "ParentImage": "initiator"
+        "ParentImage": "initiator",
+        "ParentProcessName": "initiator"
       },
       "target": "Parent Process Name",
       "target_mapping": "'Parent Process Name'"
     },
     {
       "fields": [
+        "InitiatingProcessId",
+        "ProcessId"
+      ],
+      "reasons": [
+        "lossy_mapping_collision:InitiatingProcessId+ProcessId→Process ID"
+      ],
+      "roles": {
+        "InitiatingProcessId": "initiator",
+        "ProcessId": "initiator"
+      },
+      "target": "Process ID",
+      "target_mapping": "'Process ID'"
+    },
+    {
+      "fields": [
+        "Exe",
         "FileName",
         "Image",
         "Process",
         "ProcessName"
       ],
       "reasons": [
+        "lossy_mapping_collision:Exe+FileName→Process Name",
+        "lossy_mapping_collision:Exe+Image→Process Name",
+        "lossy_mapping_collision:Exe+Process→Process Name",
+        "lossy_mapping_collision:Exe+ProcessName→Process Name",
         "lossy_mapping_collision:FileName+Image→Process Name",
         "lossy_mapping_collision:FileName+Process→Process Name",
         "lossy_mapping_collision:FileName+ProcessName→Process Name",
@@ -416,6 +497,7 @@
         "lossy_mapping_collision:Process+ProcessName→Process Name"
       ],
       "roles": {
+        "Exe": "initiator",
         "FileName": "initiator",
         "Image": "initiator",
         "Process": "initiator",
@@ -533,16 +615,21 @@
     },
     {
       "fields": [
+        "OrganizationName",
         "Resource",
         "ServicePrincipalName",
         "TargetResource"
       ],
       "reasons": [
+        "lossy_mapping_collision:OrganizationName+Resource→Resource Name",
+        "lossy_mapping_collision:OrganizationName+ServicePrincipalName→Resource Name",
+        "lossy_mapping_collision:OrganizationName+TargetResource→Resource Name",
         "lossy_mapping_collision:Resource+ServicePrincipalName→Resource Name",
         "lossy_mapping_collision:Resource+TargetResource→Resource Name",
         "lossy_mapping_collision:ServicePrincipalName+TargetResource→Resource Name"
       ],
       "roles": {
+        "OrganizationName": "resource",
         "Resource": "resource",
         "ServicePrincipalName": "subject",
         "TargetResource": "target"
@@ -640,8 +727,28 @@
     },
     {
       "fields": [
+        "InitiatingProcessAccountDomain",
+        "SubjectDomainName",
+        "UPNSuffix"
+      ],
+      "reasons": [
+        "lossy_mapping_collision:InitiatingProcessAccountDomain+SubjectDomainName→Target Domain Name",
+        "lossy_mapping_collision:InitiatingProcessAccountDomain+UPNSuffix→Target Domain Name",
+        "lossy_mapping_collision:SubjectDomainName+UPNSuffix→Target Domain Name"
+      ],
+      "roles": {
+        "InitiatingProcessAccountDomain": "initiator",
+        "SubjectDomainName": "subject",
+        "UPNSuffix": "subject"
+      },
+      "target": "Target Domain Name",
+      "target_mapping": "'Target Domain Name'"
+    },
+    {
+      "fields": [
         "FilePath",
         "FolderPath",
+        "LocalFile",
         "SourceFileName",
         "SrcFileName",
         "TargetFileName",
@@ -649,14 +756,20 @@
       ],
       "reasons": [
         "lossy_mapping_collision:FilePath+FolderPath→Target Filename",
+        "lossy_mapping_collision:FilePath+LocalFile→Target Filename",
         "lossy_mapping_collision:FilePath+SourceFileName→Target Filename",
         "lossy_mapping_collision:FilePath+SrcFileName→Target Filename",
         "lossy_mapping_collision:FilePath+TargetFileName→Target Filename",
         "lossy_mapping_collision:FilePath+TargetFilePath→Target Filename",
+        "lossy_mapping_collision:FolderPath+LocalFile→Target Filename",
         "lossy_mapping_collision:FolderPath+SourceFileName→Target Filename",
         "lossy_mapping_collision:FolderPath+SrcFileName→Target Filename",
         "lossy_mapping_collision:FolderPath+TargetFileName→Target Filename",
         "lossy_mapping_collision:FolderPath+TargetFilePath→Target Filename",
+        "lossy_mapping_collision:LocalFile+SourceFileName→Target Filename",
+        "lossy_mapping_collision:LocalFile+SrcFileName→Target Filename",
+        "lossy_mapping_collision:LocalFile+TargetFileName→Target Filename",
+        "lossy_mapping_collision:LocalFile+TargetFilePath→Target Filename",
         "lossy_mapping_collision:SourceFileName+SrcFileName→Target Filename",
         "lossy_mapping_collision:SourceFileName+TargetFileName→Target Filename",
         "lossy_mapping_collision:SourceFileName+TargetFilePath→Target Filename",
@@ -667,6 +780,7 @@
       "roles": {
         "FilePath": "initiator",
         "FolderPath": "initiator",
+        "LocalFile": "resource",
         "SourceFileName": "initiator",
         "SrcFileName": "initiator",
         "TargetFileName": "target",
@@ -677,17 +791,28 @@
     },
     {
       "fields": [
+        "ObjectDN",
         "ObjectItemName",
+        "ObjectName",
         "SourceItemName",
         "Target"
       ],
       "reasons": [
+        "lossy_mapping_collision:ObjectDN+ObjectItemName→Target Object",
+        "lossy_mapping_collision:ObjectDN+ObjectName→Target Object",
+        "lossy_mapping_collision:ObjectDN+SourceItemName→Target Object",
+        "lossy_mapping_collision:ObjectDN+Target→Target Object",
+        "lossy_mapping_collision:ObjectItemName+ObjectName→Target Object",
         "lossy_mapping_collision:ObjectItemName+SourceItemName→Target Object",
         "lossy_mapping_collision:ObjectItemName+Target→Target Object",
+        "lossy_mapping_collision:ObjectName+SourceItemName→Target Object",
+        "lossy_mapping_collision:ObjectName+Target→Target Object",
         "lossy_mapping_collision:SourceItemName+Target→Target Object"
       ],
       "roles": {
+        "ObjectDN": "target",
         "ObjectItemName": "target",
+        "ObjectName": "target",
         "SourceItemName": "resource",
         "Target": "target"
       },
@@ -820,12 +945,17 @@
     },
     {
       "fields": [
+        "ClientInfoString",
         "ClientRequestUserAgent",
         "HttpUserAgent",
         "HttpUserAgentOriginal",
         "UserAgent"
       ],
       "reasons": [
+        "lossy_mapping_collision:ClientInfoString+ClientRequestUserAgent→User Agent",
+        "lossy_mapping_collision:ClientInfoString+HttpUserAgent→User Agent",
+        "lossy_mapping_collision:ClientInfoString+HttpUserAgentOriginal→User Agent",
+        "lossy_mapping_collision:ClientInfoString+UserAgent→User Agent",
         "lossy_mapping_collision:ClientRequestUserAgent+HttpUserAgent→User Agent",
         "lossy_mapping_collision:ClientRequestUserAgent+HttpUserAgentOriginal→User Agent",
         "lossy_mapping_collision:ClientRequestUserAgent+UserAgent→User Agent",
@@ -834,6 +964,7 @@
         "lossy_mapping_collision:HttpUserAgentOriginal+UserAgent→User Agent"
       ],
       "roles": {
+        "ClientInfoString": "network",
         "ClientRequestUserAgent": "network",
         "HttpUserAgent": "network",
         "HttpUserAgentOriginal": "network",
@@ -844,8 +975,24 @@
     },
     {
       "fields": [
+        "SubjectUserSid",
+        "UserId"
+      ],
+      "reasons": [
+        "lossy_mapping_collision:SubjectUserSid+UserId→User ID (hashed)"
+      ],
+      "roles": {
+        "SubjectUserSid": "subject",
+        "UserId": "hash"
+      },
+      "target": "User ID (hashed)",
+      "target_mapping": "'User ID (hashed)'"
+    },
+    {
+      "fields": [
         "AccountUpn",
         "ActorUsername",
+        "MailboxOwnerUPN",
         "SenderFromAddress",
         "SourceLogin",
         "SrcUserName",
@@ -856,6 +1003,7 @@
       ],
       "reasons": [
         "lossy_mapping_collision:AccountUpn+ActorUsername→User Name",
+        "lossy_mapping_collision:AccountUpn+MailboxOwnerUPN→User Name",
         "lossy_mapping_collision:AccountUpn+SenderFromAddress→User Name",
         "lossy_mapping_collision:AccountUpn+SourceLogin→User Name",
         "lossy_mapping_collision:AccountUpn+SrcUserName→User Name",
@@ -863,6 +1011,7 @@
         "lossy_mapping_collision:AccountUpn+UPN→User Name",
         "lossy_mapping_collision:AccountUpn+UserName→User Name",
         "lossy_mapping_collision:AccountUpn+UserPrincipalName→User Name",
+        "lossy_mapping_collision:ActorUsername+MailboxOwnerUPN→User Name",
         "lossy_mapping_collision:ActorUsername+SenderFromAddress→User Name",
         "lossy_mapping_collision:ActorUsername+SourceLogin→User Name",
         "lossy_mapping_collision:ActorUsername+SrcUserName→User Name",
@@ -870,6 +1019,13 @@
         "lossy_mapping_collision:ActorUsername+UPN→User Name",
         "lossy_mapping_collision:ActorUsername+UserName→User Name",
         "lossy_mapping_collision:ActorUsername+UserPrincipalName→User Name",
+        "lossy_mapping_collision:MailboxOwnerUPN+SenderFromAddress→User Name",
+        "lossy_mapping_collision:MailboxOwnerUPN+SourceLogin→User Name",
+        "lossy_mapping_collision:MailboxOwnerUPN+SrcUserName→User Name",
+        "lossy_mapping_collision:MailboxOwnerUPN+SrcUsername→User Name",
+        "lossy_mapping_collision:MailboxOwnerUPN+UPN→User Name",
+        "lossy_mapping_collision:MailboxOwnerUPN+UserName→User Name",
+        "lossy_mapping_collision:MailboxOwnerUPN+UserPrincipalName→User Name",
         "lossy_mapping_collision:SenderFromAddress+SourceLogin→User Name",
         "lossy_mapping_collision:SenderFromAddress+SrcUserName→User Name",
         "lossy_mapping_collision:SenderFromAddress+SrcUsername→User Name",
@@ -895,6 +1051,7 @@
       "roles": {
         "AccountUpn": "subject",
         "ActorUsername": "subject",
+        "MailboxOwnerUPN": "subject",
         "SenderFromAddress": "subject",
         "SourceLogin": "subject",
         "SrcUserName": "subject",
@@ -909,9 +1066,9 @@
   ],
   "generated_from": "config/mapping/_root.yaml",
   "summary": {
-    "collision_count": 32,
-    "collision_field_count": 142,
-    "field_count": 160
+    "collision_count": 37,
+    "collision_field_count": 164,
+    "field_count": 183
   },
   "version": 1
 }

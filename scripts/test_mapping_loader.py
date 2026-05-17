@@ -30,7 +30,7 @@ def test_sharded_mapping_matches_compat_projection() -> None:
     assert sharded["fields"] == compat["fields"]
     assert sharded["field_roles"] == compat["field_roles"]
     assert len(sharded["tables"]) == 61
-    assert len(sharded["fields"]) == 160
+    assert len(sharded["fields"]) == 183
 
 
 def test_all_field_mappings_have_allowed_roles() -> None:
@@ -40,6 +40,40 @@ def test_all_field_mappings_have_allowed_roles() -> None:
     assert set(mapping["field_roles"].values()) <= ALLOWED_FIELD_ROLES
     assert mapping["field_roles"]["SubjectUserName"] == "subject"
     assert mapping["field_roles"]["TargetUserName"] == "target"
+
+
+def test_map05_field_cluster_is_present_or_parser_pending() -> None:
+    mapping = load_mapping()
+    expected = {
+        "SubjectAccount",
+        "SubjectDomainName",
+        "SubjectLogonId",
+        "SubjectUserSid",
+        "SubjectUserName",
+        "InitiatingProcessAccountDomain",
+        "InitiatingProcessAccountName",
+        "InitiatingProcessSHA256",
+        "InitiatingProcessId",
+        "MailboxOwnerUPN",
+        "OfficeWorkload",
+        "OrganizationName",
+        "ClientInfoString",
+        "UserType",
+        "ParentProcessName",
+        "ProcessId",
+        "Exe",
+        "LocalFile",
+        "ActingProcessFileInternalName",
+        "Logon_Type",
+        "ObjectDN",
+        "ObjectName",
+        "AttributeLDAPDisplayName",
+        "EventData",
+    }
+
+    assert expected <= set(mapping["fields"])
+    for field in ("ObjectDN", "ObjectName", "AttributeLDAPDisplayName", "EventData"):
+        assert mapping["field_specs"][field]["parser_change_required"] is True
 
 
 def test_duplicate_yaml_key_fails_with_structured_reason(tmp_path: Path) -> None:

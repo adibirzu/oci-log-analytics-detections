@@ -400,6 +400,10 @@ fields:
   ResultDescription: Description
   Status: Status
   SourceItemName: '''Target Object'''
+  ObjectDN: '''Target Object'''
+  ObjectName: '''Target Object'''
+  AttributeLDAPDisplayName: '''Object Type'''
+  EventData: '''Original Log Content'''
   ThreatCategory: '''Threat Category'''
   ThreatActionTaken: Action
   ThreatName: '''Threat Name'''
@@ -423,6 +427,10 @@ fields:
   SrcUsername: '''User Name'''
   SourceLogin: '''User Name'''
   SubjectUserName: '''Subject User Name'''
+  SubjectAccount: '''Account Name'''
+  SubjectDomainName: '''Target Domain Name'''
+  SubjectLogonId: '''Logon ID'''
+  SubjectUserSid: '''User ID (hashed)'''
   Target: '''Target Object'''
   TargetResource: '''Resource Name'''
   TargetUserName: '''Target User Name'''
@@ -449,14 +457,24 @@ fields:
   InitiatingProcessFileName: '''Parent Process Name'''
   InitiatingProcessParentFileName: '''Parent Process Name'''
   InitiatingProcessFolderPath: '''Parent Process Name'''
+  InitiatingProcessAccountDomain: '''Target Domain Name'''
+  InitiatingProcessAccountName: '''Account Name'''
+  InitiatingProcessSHA256: Hashes
+  InitiatingProcessId: '''Process ID'''
   LogonType: '''Logon Type'''
+  Logon_Type: '''Logon Type'''
   ParentImage: '''Parent Process Name'''
+  ParentProcessName: '''Parent Process Name'''
   Process: '''Process Name'''
+  ProcessId: '''Process ID'''
   ProcessCommandLine: '''Command Line'''
   ProcessName: '''Process Name'''
+  Exe: '''Process Name'''
+  LocalFile: '''Target Filename'''
   ActingProcessCommandLine: '''Command Line'''
   ActingProcessName: '''Parent Process Name'''
   ActingProcessSHA256: Hashes
+  ActingProcessFileInternalName: '''Parent Process Name'''
   SrcFileName: '''Target Filename'''
   SourceFileName: '''Target Filename'''
   TargetFileMD5: Hashes
@@ -466,6 +484,11 @@ fields:
   TargetFileSHA256: Hashes
   UserId: '''User ID (hashed)'''
   ClientAppUsed: '''Application Name'''
+  MailboxOwnerUPN: '''User Name'''
+  OfficeWorkload: '''Application Name'''
+  OrganizationName: '''Resource Name'''
+  ClientInfoString: '''User Agent'''
+  UserType: Type
   EmailDirection: Direction
   RecipientEmailAddress: '''Target User Name'''
   SenderFromAddress: '''User Name'''
@@ -561,6 +584,10 @@ field_roles:
   ResultDescription: resource
   Status: resource
   SourceItemName: resource
+  ObjectDN: target
+  ObjectName: target
+  AttributeLDAPDisplayName: resource
+  EventData: resource
   ThreatCategory: resource
   ThreatActionTaken: resource
   ThreatName: resource
@@ -584,6 +611,10 @@ field_roles:
   SrcUsername: subject
   SourceLogin: subject
   SubjectUserName: subject
+  SubjectAccount: subject
+  SubjectDomainName: subject
+  SubjectLogonId: subject
+  SubjectUserSid: subject
   Target: target
   TargetResource: target
   TargetUserName: target
@@ -610,14 +641,24 @@ field_roles:
   InitiatingProcessFileName: initiator
   InitiatingProcessParentFileName: initiator
   InitiatingProcessFolderPath: initiator
+  InitiatingProcessAccountDomain: initiator
+  InitiatingProcessAccountName: initiator
+  InitiatingProcessSHA256: hash
+  InitiatingProcessId: initiator
   LogonType: resource
+  Logon_Type: resource
   ParentImage: initiator
+  ParentProcessName: initiator
   Process: initiator
+  ProcessId: initiator
   ProcessCommandLine: initiator
   ProcessName: initiator
+  Exe: initiator
+  LocalFile: resource
   ActingProcessCommandLine: initiator
   ActingProcessName: initiator
   ActingProcessSHA256: hash
+  ActingProcessFileInternalName: initiator
   SrcFileName: initiator
   SourceFileName: initiator
   TargetFileMD5: hash
@@ -627,6 +668,11 @@ field_roles:
   TargetFileSHA256: hash
   UserId: hash
   ClientAppUsed: resource
+  MailboxOwnerUPN: subject
+  OfficeWorkload: resource
+  OrganizationName: resource
+  ClientInfoString: network
+  UserType: subject
   EmailDirection: resource
   RecipientEmailAddress: target
   SenderFromAddress: subject

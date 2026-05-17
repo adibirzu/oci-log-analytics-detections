@@ -20,8 +20,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
-import yaml
-
 from scripts.sync_sentinel_kql import (
     DEFAULT_CACHE_DIR,
     SENTINEL_LICENSE_URL,
@@ -211,10 +209,11 @@ class ConversionResult:
         return self.query_payload is not None and not self.skip_reasons and not self.local_validation_errors
 
 
-def load_mapping_config(path: Path = CONFIG_PATH) -> dict:
+def load_mapping_config(path: Path | None = None) -> dict:
     """Load Sentinel table/field mapping configuration."""
-    with Path(path).open(encoding="utf-8") as handle:
-        payload = yaml.safe_load(handle) or {}
+    from scripts.kql.mapping_loader import load_mapping
+
+    payload = load_mapping(path)
     allowed_fields = set(payload.get("allowed_fields", []))
     allowed_fields.update(LOGAN_BUILTIN_FIELDS)
     allowed_fields.update(AZURE_AUDIT_SCHEMA_FIELDS)
@@ -222,6 +221,8 @@ def load_mapping_config(path: Path = CONFIG_PATH) -> dict:
     return {
         "tables": payload.get("tables", {}),
         "fields": payload.get("fields", {}),
+        "field_roles": payload.get("field_roles", {}),
+        "field_specs": payload.get("field_specs", {}),
         "allowed_fields": allowed_fields,
         "field_types": _load_field_dictionary_field_types(),
     }
@@ -628,6 +629,10 @@ def _record_field_error(errors: list[str] | None, reason: str) -> None:
         errors.append(reason)
 
 
+def _field_role(field: str, mapping: dict) -> str | None:
+    return mapping.get("field_roles", {}).get(_normalize_field_name(field))
+
+
 def map_field(
     field: str,
     mapping: dict,
@@ -727,6 +732,7 @@ def convert_predicate(
 
     errors: list[str] = []
     field_token = r"(?:[A-Za-z_][A-Za-z0-9_]*|`[^`]+`|'[^']+'|\"[^\"]+\")"
+    identifier_field_token = r"(?:[A-Za-z_][A-Za-z0-9_]*|`[^`]+`)"
     value_token = r"(?:@?'[^']*'|@?\"[^\"]*\"|-?\d+(?:\.\d+)?|true|false|null)"
 
     def replace_isnotempty(match: re.Match) -> str:
@@ -807,6 +813,33 @@ def convert_predicate(
     expression = re.sub(
         rf"(?P<field>{field_token})\s+(?P<neg>!|not\s+)?(?P<op>has_cs|has|hasprefix|hassuffix|contains_cs|contains|startswith|endswith)\s+(?P<value>(?:\(\s*{value_token}\s*\)|{value_token}))",
         replace_string_operator,
+        expression,
+        flags=re.IGNORECASE,
+    )
+
+    def replace_field_comparison(match: re.Match) -> str:
+        left_raw = match.group("left")
+        right_raw = match.group("right")
+        left_role = _field_role(left_raw, mapping)
+        right_role = _field_role(right_raw, mapping)
+        left_name = _normalize_field_name(left_raw)
+        right_name = _normalize_field_name(right_raw)
+        if right_name.lower() in {"true", "false", "null"}:
+            return match.group(0)
+        if left_role and right_role and left_role != right_role:
+            errors.append(f"role_mismatch:{left_name}:{right_name}")
+        left = map_field(left_raw, mapping, errors, allowed_aliases)
+        right = map_field(right_raw, mapping, errors, allowed_aliases)
+        op = match.group("op")
+        if op in {"==", "=~"}:
+            op = "="
+        elif op in {"<>", "!~"}:
+            op = "!="
+        return f"{left} {op} {right}"
+
+    expression = re.sub(
+        rf"(?P<left>{identifier_field_token})\s*(?P<op>==|=~|!~|!=|<>|>=|<=|>|<|=)\s*(?P<right>{identifier_field_token})",
+        replace_field_comparison,
         expression,
         flags=re.IGNORECASE,
     )
@@ -1223,5 +1256,3 @@ def validate_logan_query_local(query: str, mapping: dict | None = None) -> list[
         if field not in allowed_fields and field not in aliases:
             errors.append(f"unsupported OCI field reference: {field}")
     return sorted(set(errors))
-
-

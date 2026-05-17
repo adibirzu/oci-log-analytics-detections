@@ -1,0 +1,151 @@
+fields:
+  Activity:
+    target: '''Event Type'''
+    role: resource
+  ActivityType:
+    target: '''Event Type'''
+    role: resource
+  ActivityDisplayName:
+    target: Operation
+    role: resource
+  AppDisplayName:
+    target: '''Application Name'''
+    role: resource
+  Application:
+    target: '''Application Name'''
+    role: resource
+  ActionType:
+    target: Action
+    role: resource
+  AdditionalFields:
+    target: Properties
+    role: resource
+  Computer:
+    target: Entity
+    role: resource
+  Description:
+    target: Description
+    role: resource
+  DvcAction:
+    target: Action
+    role: resource
+  DeviceAction:
+    target: Action
+    role: resource
+  DeviceEventClassID:
+    target: '''Event ID'''
+    role: resource
+  DeviceProduct:
+    target: '''Application Name'''
+    role: resource
+  DeviceVendor:
+    target: Provider
+    role: resource
+  DeviceId:
+    target: Entity
+    role: resource
+  EventCreationTime:
+    target: Time
+    role: time
+  EventMessage:
+    target: Description
+    role: resource
+  EventName:
+    target: '''Event Type'''
+    role: resource
+  EventResult:
+    target: Status
+    role: resource
+  EventResultDetails:
+    target: Status
+    role: resource
+  EventEndTime:
+    target: Time
+    role: time
+  EventSource:
+    target: Provider
+    role: resource
+  EventSubType:
+    target: '''Event Type'''
+    role: resource
+  EventType:
+    target: '''Event Type'''
+    role: resource
+  EventVendor:
+    target: Provider
+    role: resource
+  LogSeverity:
+    target: Severity
+    role: resource
+  Operation:
+    target: Operation
+    role: resource
+  OperationName:
+    target: Operation
+    role: resource
+  QueryName:
+    target: '''Query Name'''
+    role: resource
+  Query:
+    target: '''Query Name'''
+    role: resource
+  Reason:
+    target: Description
+    role: resource
+  Resource:
+    target: '''Resource Name'''
+    role: resource
+  ResourceGroup:
+    target: '''Resource Group'''
+    role: resource
+  ResourceId:
+    target: '''Resource ID'''
+    role: resource
+  ResourceProvider:
+    target: '''Resource Type'''
+    role: resource
+  Result:
+    target: Status
+    role: resource
+  ResultDescription:
+    target: Description
+    role: resource
+  Status:
+    target: Status
+    role: resource
+  SourceItemName:
+    target: '''Target Object'''
+    role: resource
+  ThreatCategory:
+    target: '''Threat Category'''
+    role: resource
+  ThreatActionTaken:
+    target: Action
+    role: resource
+  ThreatName:
+    target: '''Threat Name'''
+    role: resource
+  ThreatType:
+    target: '''Threat Category'''
+    role: resource
+  ThreatTypes:
+    target: '''Threat Category'''
+    role: resource
+  Title:
+    target: '''Threat Name'''
+    role: resource
+  TimeGenerated:
+    target: Time
+    role: time
+  Timestamp:
+    target: Time
+    role: time
+  ErrorMessage:
+    target: Description
+    role: resource
+  _ResourceId:
+    target: '''Resource ID'''
+    role: resource
+  data_eventName_s:
+    target: '''Event Type'''
+    role: resource

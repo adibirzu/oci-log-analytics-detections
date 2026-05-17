@@ -12,6 +12,7 @@ GENERATED_QUERY_ARTIFACT_FILENAMES = {
     "detection_rule_specs.json",
     "log_source_field_dictionary.json",
     "manifest.json",
+    "mapping_collisions.json",
     "octo_apm_workshop_bundle.json",
     "sentinel_candidates.json",
     "sentinel_conversion_report.json",

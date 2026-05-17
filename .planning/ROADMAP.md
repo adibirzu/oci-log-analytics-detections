@@ -12,7 +12,7 @@ This roadmap turns the existing OCI Log Analytics detection repository into a GS
 - [x] **Phase 4: Dashboard and Parser Contract Hardening** - Keep dashboards, field dictionaries, synthetic logs, and Octo workshop assets aligned.
 - [x] **Phase 5: Release and Security Automation** - Make local/live verification and secret hygiene repeatable before handoff.
 - [x] **Phase 6: KQL Subpackage Extraction and Canonicalizer** - Behavior-preserving refactor of the Sentinel converter and golden-fixture test harness.
-- [ ] **Phase 7: Mapping Config Sharding and Collision Lint** - Shard `sentinel_oci_mapping.yaml`, add strict loader, role tags, and collision lint.
+- [x] **Phase 7: Mapping Config Sharding and Collision Lint** - Shard `sentinel_oci_mapping.yaml`, add strict loader, role tags, and collision lint.
 - [ ] **Phase 8: Backlog Prioritizer and Cohort Overlay** - Rank unmapped Sentinel candidates by MITRE coverage × converter difficulty so Phases 9–10 work against cohorts, not throwaways.
 - [ ] **Phase 9: Operator Parity and Field Mapping Bulk Expansion** - Land `extend`/`let`/`bin`/`project` family operators, parser-side extraction, and bulk Sentinel field additions in parallel cohort work.
 - [ ] **Phase 10: Drift Detector and Synthetic-Hit Promotion Gate** - Prevent silent regressions and zero-row false passes once promotion scales.
@@ -113,7 +113,7 @@ Plans:
 Phases 6–11 deliver KQL operator parity, mapping completeness, drift protection, and CI lane separation. Phase numbering continues from v1.0. Baseline counters from `queries/sentinel_conversion_report.json`: 4,452 candidates, 25 attempted, **8 promoted**, 10 live-failed, 17 skipped. Target promoted_count by end of Phase 10: **50–100 queries** (conservative; research notes 7/10 current live failures close after Phase 9 mapping work).
 
 - [x] **Phase 6:** KQL Subpackage Extraction and Canonicalizer
-- [ ] **Phase 7:** Mapping Config Sharding and Collision Lint
+- [x] **Phase 7:** Mapping Config Sharding and Collision Lint
 - [ ] **Phase 8:** Backlog Prioritizer and Cohort Overlay
 - [ ] **Phase 9:** Operator Parity and Field Mapping Bulk Expansion
 - [ ] **Phase 10:** Drift Detector and Synthetic-Hit Promotion Gate
@@ -134,7 +134,7 @@ Phases 6–11 deliver KQL operator parity, mapping completeness, drift protectio
   - Promoted artifact set unchanged (8 queries, identical bodies after canonical normalization).
   - `scripts/test_kql/` mirror tree exists with `fixtures/{kql,expected}/` populated for at least every currently promoted query.
   - Release checklist (`python3 scripts/release_checklist.py`) still passes locally.
-**Plans**: TBD
+**Plans**: 10 plans
 
 ### Phase 7: Mapping Config Sharding and Collision Lint
 
@@ -149,7 +149,13 @@ Phases 6–11 deliver KQL operator parity, mapping completeness, drift protectio
 **Exit Conditions**:
   - First strict-load run is documented in `docs/sentinel_mapping_strict_loader.md` with the duplicate-override findings it surfaces.
   - Promoted artifact set still re-validates against the sharded mapping (no regressions in promoted_count).
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [x] 07-01: Shard schema and strict loader.
+- [x] 07-02: Field role tags and role mismatch.
+- [x] 07-03: Collision lint and generated report.
+- [x] 07-04: Docs, status, and release gates.
 
 ### Phase 8: Backlog Prioritizer and Cohort Overlay
 
@@ -227,7 +233,7 @@ Phases 6–11 deliver KQL operator parity, mapping completeness, drift protectio
 | 4. Dashboard and Parser Contract Hardening | 4/4 | Complete | 2026-05-15 |
 | 5. Release and Security Automation | 3/3 | Complete | 2026-05-15 |
 | 6. KQL Subpackage Extraction and Canonicalizer | 10/10 | Complete | 2026-05-16 |
-| 7. Mapping Config Sharding and Collision Lint | 0/? | Not started | - |
+| 7. Mapping Config Sharding and Collision Lint | 4/4 | Complete | 2026-05-17 |
 | 8. Backlog Prioritizer and Cohort Overlay | 0/? | Not started | - |
 | 9. Operator Parity and Field Mapping Bulk Expansion | 0/? | Not started | - |
 | 10. Drift Detector and Synthetic-Hit Promotion Gate | 0/? | Not started | - |
@@ -235,4 +241,4 @@ Phases 6–11 deliver KQL operator parity, mapping completeness, drift protectio
 
 ---
 *Roadmap created: 2026-05-14*
-*Last updated: 2026-05-16 — Phase 6 completed and production validation passed in cap*
+*Last updated: 2026-05-17 — Phase 7 completed; sharded mapping loader and collision lint local gates passed*

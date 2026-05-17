@@ -35,6 +35,18 @@ fields:
   SubjectUserName:
     target: '''Subject User Name'''
     role: subject
+  SubjectAccount:
+    target: '''Account Name'''
+    role: subject
+  SubjectDomainName:
+    target: '''Target Domain Name'''
+    role: subject
+  SubjectLogonId:
+    target: '''Logon ID'''
+    role: subject
+  SubjectUserSid:
+    target: '''User ID (hashed)'''
+    role: subject
   Target:
     target: '''Target Object'''
     role: target

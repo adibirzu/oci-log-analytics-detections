@@ -1,0 +1,157 @@
+{
+  "examples": [
+    {
+      "expected_logan_ql": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\powershell.exe') and ('Command Line' like '* -enc *' or 'Command Line' like '* -EncodedCommand *'))",
+      "explanation": "Sigma logsource and field modifiers map through config/sigma_oci_mapping.yaml into OCI display fields.",
+      "id": "sigma-powershell-encoded",
+      "pattern_ids": [
+        "sigma-selection-condition"
+      ],
+      "source_language": "sigma_yaml",
+      "source_query": "title: PowerShell Encoded Command\nid: demo-sigma-ps-001\nlogsource:\n  product: windows\n  category: process_creation\ndetection:\n  selection:\n    Image|endswith: '\\\\powershell.exe'\n    CommandLine|contains:\n      - ' -enc '\n      - ' -EncodedCommand '\n  condition: selection\nlevel: high\ntags:\n  - attack.execution\n  - attack.t1059.001",
+      "support_level": "supported",
+      "synthetic_log_shape": "Windows Sysmon Events with Event ID 1, Process Name, Command Line, User Name.",
+      "title": "Sigma PowerShell Encoded Command",
+      "warnings": []
+    },
+    {
+      "expected_logan_ql": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ('Event ID' = '4688') and ('Command Line' like '* -enc *') | stats count as Hits by Entity, 'Subject User Name' | sort -Hits",
+      "explanation": "The Sentinel table maps to Windows security log sources, has maps to like, and summarize maps to stats.",
+      "id": "kql-securityevent-powershell",
+      "pattern_ids": [
+        "kql-where-summarize"
+      ],
+      "source_language": "sentinel_kql",
+      "source_query": "SecurityEvent\n| where EventID == 4688\n| where CommandLine has \" -enc \"\n| summarize Hits=count() by Computer, SubjectUserName\n| order by Hits desc",
+      "support_level": "supported",
+      "synthetic_log_shape": "Windows Security Events with Event ID 4688 and Command Line.",
+      "title": "Sentinel KQL SecurityEvent PowerShell",
+      "warnings": []
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'Windows Sysmon Events' and 'Event ID' = '1' and 'Process Name' like '*\\\\powershell.exe' and 'Command Line' like '* -enc *' | stats count as count by 'Host Name', 'User Name', 'Command Line' | sort -count | head 100",
+      "explanation": "SPL source constraints become the Logan base search; stats/sort are retained as pipe commands.",
+      "id": "spl-powershell-encoded",
+      "pattern_ids": [
+        "spl-filter-to-search-where",
+        "sort-limit-top"
+      ],
+      "source_language": "splunk_spl",
+      "source_query": "index=windows sourcetype=WinEventLog:Sysmon EventCode=1 Image=\"*\\\\powershell.exe\" CommandLine=\"* -enc *\" | stats count by host User CommandLine | sort -count",
+      "support_level": "partial",
+      "synthetic_log_shape": "Windows Sysmon Events with host, user, process, and command line fields.",
+      "title": "Splunk SPL Encoded PowerShell",
+      "warnings": [
+        "SPL conversion is heuristic unless a backend parser plugin is configured."
+      ]
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'Windows Sysmon Events' and 'Event ID' = '1' and 'Process Name' like '*powershell.exe' and ('Command Line' like '*enc*' or 'Command Line' like '*EncodedCommand*') | head 100",
+      "explanation": "ECS process fields map to OCI process display fields and wildcard terms map to like predicates.",
+      "id": "elastic-powershell-process",
+      "pattern_ids": [
+        "elastic-field-query"
+      ],
+      "source_language": "elastic_lucene",
+      "source_query": "event.code:1 AND process.name:powershell.exe AND process.command_line:(*enc* OR *EncodedCommand*)",
+      "support_level": "partial",
+      "synthetic_log_shape": "Windows Sysmon Events with ECS-like process fields mapped by parser.",
+      "title": "Elastic Lucene PowerShell Process",
+      "warnings": [
+        "Analyzer and nested-document behavior are not represented in Logan QL."
+      ]
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'SOC Application Logs' and (('Request URL' like '*<script*' or 'Request URL' like '*javascript:*'))",
+      "explanation": "The app/APM parser exposes Request URL and Trace ID on SOC Application Logs.",
+      "id": "sigma-soc-xss",
+      "pattern_ids": [
+        "sigma-selection-condition"
+      ],
+      "source_language": "sigma_yaml",
+      "source_query": "title: Reflected XSS In Browser Telemetry\nid: demo-sigma-xss-001\nlogsource:\n  product: web\ndetection:\n  selection:\n    url|contains:\n      - '<script'\n      - 'javascript:'\n  condition: selection\nlevel: high\ntags:\n  - attack.initial_access",
+      "support_level": "supported",
+      "synthetic_log_shape": "SOC Application Logs OpenTelemetry-shaped JSON with Request URL and Trace ID.",
+      "title": "Sigma SOC Application XSS",
+      "warnings": []
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'Azure Entra ID Audit Logs' and (Operation = 'UserLoggedIn') and (Status = 'success') | stats count as Attempts by Operation, Status | sort -Attempts",
+      "explanation": "Cloud audit table predicates map to audit source fields and aggregate by supported operation/status fields.",
+      "id": "kql-audit-no-mfa",
+      "pattern_ids": [
+        "kql-where-summarize"
+      ],
+      "source_language": "sentinel_kql",
+      "source_query": "AuditLogs\n| where OperationName == \"UserLoggedIn\"\n| where Result == \"success\"\n| summarize Attempts=count() by OperationName, Result\n| order by Attempts desc",
+      "support_level": "supported",
+      "synthetic_log_shape": "Cloud audit log with operation, status, target resource, and principal.",
+      "title": "Sentinel Audit Sign-In Without MFA",
+      "warnings": []
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'SOC Application Logs' and 'Request URL' like '*search*' and ('Request URL' like '*<script*' or 'Request URL' like '*onerror*') and 'Response Code' = 200 | stats count as hits by 'Service Name', 'Trace ID', 'Source IP' | sort -hits",
+      "explanation": "HTTP URL and response fields map to SOC Application Logs display fields.",
+      "id": "elastic-web-xss",
+      "pattern_ids": [
+        "elastic-field-query"
+      ],
+      "source_language": "elastic_lucene",
+      "source_query": "url.path:*search* AND url.query:(*<script* OR *onerror*) AND http.response.status_code:200",
+      "support_level": "partial",
+      "synthetic_log_shape": "SOC Application Logs with Request URL, Response Code, Source IP.",
+      "title": "Elastic Web XSS",
+      "warnings": [
+        "Escaping behavior depends on the parser-normalized request URL."
+      ]
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'OCI VCN Flow Logs' | lookup threat_ips 'Source IP' | where threat is not null | stats count as count by 'Source IP', threat",
+      "explanation": "Lookups require a pre-created OCI lookup table; the frontend must surface that dependency.",
+      "id": "spl-threat-ip-lookup",
+      "pattern_ids": [
+        "lookup-watchlist"
+      ],
+      "source_language": "splunk_spl",
+      "source_query": "index=network src_ip=* | lookup threat_ips ip as src_ip OUTPUT threat | where isnotnull(threat) | stats count by src_ip threat",
+      "support_level": "lossy",
+      "synthetic_log_shape": "VCN flow logs with Source IP plus an OCI lookup table named threat_ips.",
+      "title": "Splunk Threat IP Lookup",
+      "warnings": [
+        "lossy_lookup: requires OCI lookup table threat_ips"
+      ]
+    },
+    {
+      "expected_logan_ql": "",
+      "explanation": "True cross-table joins are blocked until a backend correlation strategy exists.",
+      "id": "kql-unsupported-join",
+      "pattern_ids": [
+        "join-correlation"
+      ],
+      "source_language": "sentinel_kql",
+      "source_query": "SecurityEvent\n| join kind=inner (SigninLogs) on Account\n| summarize count() by Account",
+      "support_level": "unsupported",
+      "synthetic_log_shape": "Requires multiple source tables; not represented by one Logan query.",
+      "title": "Sentinel Unsupported Cross-Table Join",
+      "warnings": [
+        "unsupported_join_or_sequence"
+      ]
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'SOC Application Logs' and 'Response Code' >= 500 | stats count as errors by 'Service Name' | sort -errors | head 20",
+      "explanation": "OCI Logan QL inputs pass through with validation and contextual docs.",
+      "id": "oci-passthrough-top-errors",
+      "pattern_ids": [
+        "sort-limit-top"
+      ],
+      "source_language": "oci_logan",
+      "source_query": "'Log Source' = 'SOC Application Logs' and 'Response Code' >= 500 | stats count as errors by 'Service Name' | sort -errors | head 20",
+      "support_level": "supported",
+      "synthetic_log_shape": "SOC Application Logs with Response Code and Service Name.",
+      "title": "OCI Logan QL Passthrough",
+      "warnings": []
+    }
+  ],
+  "generated_at": "2026-05-17T17:40:38Z",
+  "schema_version": "1.0.0"
+}

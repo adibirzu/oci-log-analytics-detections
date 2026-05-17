@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Sentinel KQL Parity to Logan QL
-status: Complete
-stopped_at: Production validation pass completed against OCI profile cap
-last_updated: "2026-05-16T17:23:47.000Z"
-last_activity: 2026-05-16 — cap live validation green: 23/23 dashboards present, 351/351 widgets HIT, Sentinel dashboard 8/8 HIT, Sentinel synthetic Logan QL candidates 20/20 HIT
+status: In Progress
+stopped_at: Phase 7 complete; Phase 8 ready for autonomous planning
+last_updated: "2026-05-17T06:30:19.000Z"
+last_activity: 2026-05-17 — Phase 7 local release gates green: sharded mapping strict-loads, collision report stable, Sentinel strict status ok with promoted_count 8, dashboard dry-run 23/351, full pytest 364 passed / 5 skipped / 2 subtests passed
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 10
-  completed_plans: 10
+  completed_phases: 2
+  total_plans: 14
+  completed_plans: 14
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** Every committed detection, query, dashboard, parser mapping, and generated artifact must remain deployable and verifiable against OCI Log Analytics without leaking tenant-specific data.
-**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 6 complete, production validation green in `cap`, Phase 7 (Mapping Config Sharding and Collision Lint) next.
+**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 7 complete with sharded mapping loader and collision lint, Phase 8 (Backlog Prioritizer and Cohort Overlay) next.
 
 ## Current Position
 
-Phase: 6 (kql-subpackage-extraction-and-canonicalizer) — Complete
-Plan: all 10 plans executed in sequence (06-01 Wave 1, 06-02..06-09 Wave 2 batched, 06-10 Wave 3).
-Status: Complete with one documented deferral (Plan 06-10 Task 1 — pipeline.convert registry-dispatch rewire — moved to Phase 7).
-Last activity: 2026-05-16 — Production validation pass against OCI profile `cap`: log sources/parsers refreshed, Sentinel synthetic batches uploaded, Sentinel dashboard deployed, 20/20 Sentinel-derived Logan QL candidates returned rows, and all 351 deployed dashboard widgets returned HIT.
+Phase: 7 (mapping-config-sharding-and-collision-lint) — Complete
+Plan: all 4 plans executed inline (07-01 shard schema/strict loader, 07-02 role tags/role mismatch, 07-03 collision lint, 07-04 docs/release gates).
+Status: Complete; Phase 8 is the next incomplete roadmap phase.
+Last activity: 2026-05-17 — Local Phase 7 verification passed: generated mapping compatibility export stable, `queries/mapping_collisions.json` stable, Sentinel strict status ok with 8 promoted files, release checklist 14/14 PASS.
 
 ## Performance Metrics
 
@@ -69,7 +69,7 @@ Decisions are logged in `.planning/PROJECT.md`.
 
 ### Pending Todos
 
-- Plan Phase 7 via `$gsd-plan-phase 7` for mapping config sharding and collision lint.
+- Plan Phase 8 via `$gsd-plan-phase 8` for backlog prioritizer and cohort overlay.
 - Optional: promote only the additional Sentinel candidates that have both live parser validation and non-empty synthetic-hit evidence; 12 extra candidates were live-hit tested but not promoted in the 2026-05-16 pass.
 - If running `python3 scripts/release_checklist.py --include-live`, expect it to rewrite generated artifacts. Use a clean or intentionally staged worktree first.
 
@@ -78,7 +78,7 @@ Decisions are logged in `.planning/PROJECT.md`.
 - Worktree has many pre-existing modified/deleted/untracked files. Future fixes must isolate changed files and avoid reverting user work.
 - Live OCI validation requires explicit profile/environment access and should not be assumed for local-only tasks. The 2026-05-16 production validation used `OCI_PROFILE=cap`.
 - `python3 scripts/convert_sigma.py --validate` exits 0 but still reports 20 existing warnings for known query syntax patterns; treat these as future validation-hardening work.
-- Phase 7 strict YAML loader rollout will likely surface silent overrides on the first run — treat as its own task with known-noisy outcome.
+- Phase 7 strict YAML loader found no duplicate keys in the generated shard layout; future mapping edits must go through `config/mapping/` and regenerate `config/sentinel_oci_mapping.yaml`.
 - CI secrets handling for fork PRs (Phase 11) needs a short security-review spike before the `live` job is wired.
 - `docs/health/*.json` evidence is ignored by git; live evidence files exist locally for the 2026-05-16 pass but require explicit archival if they must be shared.
 
@@ -94,6 +94,6 @@ Decisions are logged in `.planning/PROJECT.md`.
 
 ## Session Continuity
 
-Last session: 2026-05-15T10:34:04.973Z
-Stopped at: cap production validation complete
-Resume file: docs/health/all-dashboard-verify-cap-20260516.json (ignored local evidence)
+Last session: 2026-05-17T06:30:19.000Z
+Stopped at: Phase 7 complete; Phase 8 ready
+Resume file: docs/health/release-checklist-2026-05-17T063019Z.json (ignored local evidence)

@@ -16,6 +16,8 @@ import os
 import re
 import sys
 
+from query_artifacts import GENERATED_QUERY_ARTIFACT_FILENAMES
+
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STREAMING_CONFIG_PATH = os.path.join(PROJECT_DIR, 'config', 'streaming_config.json')
 
@@ -186,20 +188,6 @@ CUSTOM_LOG_SOURCES = [
     "SOC VCN Flow Logs",
     "SOC Network Firewall Logs",
 ]
-
-GENERATED_QUERY_ARTIFACT_FILENAMES = {
-    "catalog.json",
-    "content_candidates.json",
-    "dashboard_inventory.json",
-    "detection_rule_specs.json",
-    "log_source_field_dictionary.json",
-    "manifest.json",
-    "octo_apm_workshop_bundle.json",
-    "sentinel_candidates.json",
-    "sentinel_conversion_report.json",
-    "sentinel_synthetic_live_results.json",
-    "sentinel_synthetic_plan.json",
-}
 
 # Preferred-to-fallback source candidates by detection family.
 # Order matters: first match wins for runtime source selection.

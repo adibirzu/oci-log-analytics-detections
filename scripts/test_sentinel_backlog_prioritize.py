@@ -52,7 +52,12 @@ def test_priority_excludes_promoted_and_counts_unblock_chain() -> None:
         ]
     }
 
-    priority = build_priority(candidates, report, sync={"mode": "test"})
+    priority = build_priority(
+        candidates,
+        report,
+        mapping={"fields": {}, "tables": {"SecurityEvent": "SecurityEvent"}},
+        sync={"mode": "test"},
+    )
 
     ranked_ids = [row["sentinel_id"] for row in priority["ranked"]]
     assert "promoted" not in ranked_ids

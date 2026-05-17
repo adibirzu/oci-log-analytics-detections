@@ -1,27 +1,27 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T06:36:17.632441+00:00",
+  "generated_at": "2026-05-17T07:19:01.883327+00:00",
   "source": "scripts/deploy_dashboard.py:DASHBOARDS",
   "summary": {
-    "total_dashboards": 23,
-    "total_widgets": 351,
-    "advanced_visualization_widgets": 73,
+    "total_dashboards": 26,
+    "total_widgets": 387,
+    "advanced_visualization_widgets": 77,
     "visualization_types": {
       "bar": 3,
       "line": 6,
       "link": 9,
       "map": 1,
-      "summary_table": 44,
+      "summary_table": 48,
       "sunburst": 4,
-      "table": 278,
+      "table": 310,
       "tile": 6
     },
     "levels": {
       "critical": 97,
-      "high": 150,
+      "high": 174,
       "informational": 16,
       "low": 12,
-      "medium": 76
+      "medium": 88
     }
   },
   "dashboards": [
@@ -24985,14 +24985,186 @@
       ]
     },
     {
+      "name": "SOC: Microsoft Sentinel Identity Converted Detections",
+      "description": "Live-validated Microsoft Sentinel identity detections converted to OCI Log Analytics Logan QL.",
+      "widget_count": 1,
+      "widgets": [
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
+          "dashboard_index": 22,
+          "widget_index": 0,
+          "title": "Sentinel: Cisco Duo - Admin password reset",
+          "query_file": "sentinel/cisco_duo_-_admin_password_reset.json",
+          "query_title": "Cisco Duo - Admin password reset",
+          "description": "'Detects when admin's password was reset.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.identity"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CiscoDuoSecurity/Analytic Rules/CiscoDuoAdminPasswordReset.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "cisco_duo",
+            "candidates": [
+              "SOC Application Logs"
+            ],
+            "original_tables": [
+              "CiscoDuo"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "persistence"
+            ],
+            "techniques": [
+              "T1078"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
       "description": "Live-validated Microsoft Sentinel endpoint detections converted to OCI Log Analytics Logan QL.",
-      "widget_count": 8,
+      "widget_count": 24,
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 0,
+          "title": "Sentinel: ApexOne - Top sources with alerts",
+          "query_file": "sentinel/apexone_-_top_sources_with_alerts.json",
+          "query_title": "ApexOne - Top sources with alerts",
+          "description": "'Query shows list of top sources with alerts.'\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Trend Micro Apex One/Hunting Queries/TMApexOneTopSources.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "endpoint_security",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "TMApexOneEvent"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution",
+              "initial_access",
+              "privilege_escalation",
+              "defense_evasion",
+              "command_and_control",
+              "exfiltration"
+            ],
+            "techniques": [
+              "T1204",
+              "T1189",
+              "T1068",
+              "T1202",
+              "T1112",
+              "T1055",
+              "T1071",
+              "T1095",
+              "T1537",
+              "T1567"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 1,
           "title": "Sentinel: Detect Suspicious Commands Initiated by Webserver Processes",
           "query_file": "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
           "query_title": "Detect Suspicious Commands Initiated by Webserver Processes",
@@ -25090,12 +25262,12 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 22,
-          "widget_index": 1,
-          "title": "Sentinel: Discord download invoked from cmd line",
-          "query_file": "sentinel/discord_download_invoked_from_cmd_line.json",
-          "query_title": "Discord download invoked from cmd line",
-          "description": "'This hunting query looks for hosts that have attempted to interact with the Discord CDN. This activity is not normally invoked from the command line and could indicate C2, exfiltration, or malware delivery activity.'\n",
+          "dashboard_index": 23,
+          "widget_index": 2,
+          "title": "Sentinel: McAfee ePO - Multiple threats on same host",
+          "query_file": "sentinel/mcafee_epo_-_multiple_threats_on_same_host.json",
+          "query_title": "McAfee ePO - Multiple threats on same host",
+          "description": "'Rule fires when multiple threat events were detected on the same host.'\n",
           "level": "medium",
           "type": "curated",
           "sigma_id": "",
@@ -25106,7 +25278,7 @@
           "references": [
             {
               "name": "Microsoft Sentinel source rule",
-              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Windows Security Events/Hunting Queries/Discorddownloadinvokedfromcmdline.yaml"
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOMultipleThreatsSameHost.yaml"
             },
             {
               "name": "Microsoft Sentinel repository",
@@ -25119,28 +25291,32 @@
           ],
           "logsource": {
             "product": "microsoft_sentinel",
-            "service": "windows_security",
+            "service": "endpoint_security",
             "candidates": [
-              "Windows Security Events",
-              "Windows Event Security Logs"
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
             ],
             "original_tables": [
-              "SecurityEvent"
+              "McAfeeEPOEvent"
             ]
           },
           "mitre_attack": {
             "tactics": [
-              "execution",
-              "command_and_control",
-              "exfiltration"
+              "initial_access",
+              "persistence",
+              "defense_evasion",
+              "privilege_escalation"
             ],
             "techniques": [
-              "T1204",
-              "T1102",
-              "T1567"
+              "T1562",
+              "T1070",
+              "T1189",
+              "T1195",
+              "T1543",
+              "T1055"
             ]
           },
-          "visualization_type": "table",
+          "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
             "timePeriod": "l24h"
@@ -25152,22 +25328,17 @@
           "ask_ai_prompts": [
             "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
           ],
-          "advanced_visualization": false,
+          "advanced_visualization": true,
           "drilldowns": [
             {
               "type": "log_explorer_field_pivot",
-              "field": "Event ID",
-              "label": "Pivot by Event ID"
+              "field": "Threat Name",
+              "label": "Pivot by Threat Name"
             },
             {
               "type": "log_explorer_field_pivot",
-              "field": "Process Name",
-              "label": "Pivot by Process Name"
-            },
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Command Line",
-              "label": "Pivot by Command Line"
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
             }
           ],
           "dashboard_quality": {
@@ -25183,8 +25354,8 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 22,
-          "widget_index": 2,
+          "dashboard_index": 23,
+          "widget_index": 3,
           "title": "Sentinel: NRT Base64 Encoded Windows Process Command-lines",
           "query_file": "sentinel/nrt_base64_encoded_windows_process_command-lines.json",
           "query_title": "NRT Base64 Encoded Windows Process Command-lines",
@@ -25270,8 +25441,245 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 22,
-          "widget_index": 3,
+          "dashboard_index": 23,
+          "widget_index": 4,
+          "title": "Sentinel: Dev-0530 File Extension Rename",
+          "query_file": "sentinel/dev-0530_file_extension_rename.json",
+          "query_title": "Dev-0530 File Extension Rename",
+          "description": "'Dev-0530 actors are known to encrypt the contents of the victims device as well as renaming the file extensions. This query looks for the creation of files with .h0lyenc extension or presence of ransom note.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/MultipleDataSources/Dev-0530_FileExtRename.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "defender_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs"
+            ],
+            "original_tables": [
+              "DeviceFileEvents",
+              "imFileEvent"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "impact"
+            ],
+            "techniques": [
+              "T1486"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 5,
+          "title": "Sentinel: Cisco SE - Dropper activity on host",
+          "query_file": "sentinel/cisco_se_-_dropper_activity_on_host.json",
+          "query_title": "Cisco SE - Dropper activity on host",
+          "description": "'Detects possible dropper activity on host.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEDropperActivity.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "cisco_secure_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "CiscoSecureEndpoint"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution"
+            ],
+            "techniques": [
+              "T1204.002"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 6,
+          "title": "Sentinel: CyberArkEPM - Unexpected executable extension",
+          "query_file": "sentinel/cyberarkepm_-_unexpected_executable_extension.json",
+          "query_title": "CyberArkEPM - Unexpected executable extension",
+          "description": "'Detects Windows executable with unexpected extension.'\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CyberArkEPM/Analytic Rules/CyberArkEPMUnexpectedExecutableExtension.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "endpoint_privilege",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "CyberArkEPM"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution",
+              "defense_evasion"
+            ],
+            "techniques": [
+              "T1204",
+              "T1036"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Parent Process Name",
+              "label": "Pivot by Parent Process Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Name",
+              "label": "Pivot by User Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 7,
           "title": "Sentinel: Office Apps Launching Wscipt",
           "query_file": "sentinel/office_apps_launching_wscipt.json",
           "query_title": "Office Apps Launching Wscipt",
@@ -25363,8 +25771,967 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 22,
-          "widget_index": 4,
+          "dashboard_index": 23,
+          "widget_index": 8,
+          "title": "Sentinel: TEARDROP memory-only dropper",
+          "query_file": "sentinel/teardrop_memory-only_dropper.json",
+          "query_title": "TEARDROP memory-only dropper",
+          "description": "Identifies SolarWinds TEARDROP memory-only dropper IOCs in Window's defender Exploit Guard activity\nReferences:\n- https://www.fireeye.com/blog/threat-research/2020/12/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor.html\n- https://gist.github.com/olafhartong/71ffdd4cab4b6acd5cbcd1a0691ff82f\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/SolarWinds_TEARDROP_Process-IOCs.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "defender_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs"
+            ],
+            "original_tables": [
+              "DeviceEvents"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution",
+              "persistence",
+              "defense_evasion"
+            ],
+            "techniques": [
+              "T1543",
+              "T1059",
+              "T1027"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Parent Process Name",
+              "label": "Pivot by Parent Process Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Process Name",
+              "label": "Pivot by Process Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 9,
+          "title": "Sentinel: cve-2019-0808-c2",
+          "query_file": "sentinel/cve-2019-0808-c2.json",
+          "query_title": "cve-2019-0808-c2",
+          "description": "This query was originally published in the threat analytics report, Windows 7 zero-day for CVE-2019-0808\nCVE-2019-0808 is a vulnerability that allows an attacker to escape the Windows security sandbox and run arbitrary code with admin privileges. This vulnerability affects Windows 7, Windows Server 2008, and Windows Server 2008 R2.\nExploits for CVE-2019-0808 were first observed as part of highly selective attacks using the Nufsys backdoor. Although the Nufsys-associated exploit was first described as a zero-day, the issue has since been patched.\nThe following query detects possible CVE-2019-0808 exploitation by reporting network communication associated with the Nufsys attacks.\nReferences:\nhttps://nvd.nist.gov/vuln/detail/CVE-2019-0808\nhttps://portal.msrc.microsoft.com/security-guidance/advisory/CVE-2019-0808\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Privilege escalation/cve-2019-0808-c2.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "defender_endpoint",
+            "candidates": [
+              "SOC Sysmon Network Logs"
+            ],
+            "original_tables": [
+              "DeviceNetworkEvents"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "privilege_escalation",
+              "command_and_control",
+              "vulnerability"
+            ],
+            "techniques": []
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Request URL",
+              "label": "Pivot by Request URL"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Destination IP",
+              "label": "Pivot by Destination IP"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 10,
+          "title": "Sentinel: locate-dll-loaded-in-memory[Nobelium]",
+          "query_file": "sentinel/locate-dll-loaded-in-memory_nobelium.json",
+          "query_title": "locate-dll-loaded-in-memory[Nobelium]",
+          "description": "This query was originally published in the threat analytics report, Solorigate supply chain attack. Please note that these attacks are currently known as the Nobelium campaign.\nMicrosoft detects the 2020 SolarWinds supply chain attack implant and its other components as part of a campaign by the Nobelium activity group. Nobelium is the threat actor behind the attack against SolarWinds, which was previously referred to as Solorigate.\nNobelium silently added malicious code to legitimate software updates for Orion, which is IT monitoring software provided by SolarWinds. In this way, malicious dynamic link libraries (DLLs) were distributed to SolarWinds customers.\nThe following query locates malicious Nobelium-associated DLLs that have been loaded into memory on affected systems.\nMore Nobelium-related queries can be found listed under the See also section of this document.\nReferences:\nhttps://msrc-blog.microsoft.com/2020/12/13/customer-guidance-on-recent-nation-state-cyber-attacks/\nhttps://www.microsoft.com/security/blog/2020/12/18/analyzing-solorigate-the-compromised-dll-file-that-started-a-sophisticated-cyberattack-and-how-microsoft-defender-helps-protect/\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/locate-dll-loaded-in-memory[Nobelium].yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "defender_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs"
+            ],
+            "original_tables": [
+              "DeviceImageLoadEvents"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "persistence",
+              "impact",
+              "malware,_component"
+            ],
+            "techniques": []
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 11,
+          "title": "Sentinel: Cisco SE - Possible webshell",
+          "query_file": "sentinel/cisco_se_-_possible_webshell.json",
+          "query_title": "Cisco SE - Possible webshell",
+          "description": "'Detects possible webshell on host.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEWebshell.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "cisco_secure_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "CiscoSecureEndpoint"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "command_and_control"
+            ],
+            "techniques": [
+              "T1102"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 12,
+          "title": "Sentinel: DopplePaymer Procdump",
+          "query_file": "sentinel/dopplepaymer_procdump.json",
+          "query_title": "DopplePaymer Procdump",
+          "description": "This query was originally published in the threat analytics report, Doppelpaymer: More human-operated ransomware. There is also a related blog.\nDoppelPaymer is ransomware that is spread manually by human operators. These operators have exhibited extensive knowledge of system administration and common network security misconfigurations. For example, they use SysInternal utilities such as ProcDump to dump credentials from LSASS. They often use these stolen credentials to turn off security software, run malicious commands, and spread malware throughout an organization.\nThe following query detects ProcDump being used to dump credentials from LSASS.\nThe See also section below lists links to other queries associated with DoppelPaymer.\nReferences:\nhttps://msrc-blog.microsoft.com/2019/11/20/customer-guidance-for-the-dopplepaymer-ransomware/\nhttps://www.microsoft.com/en-us/wdsi/threats/malware-encyclopedia-description?Name=Ransom:Win32/DoppelPaymer.KM!MTB\nhttps://docs.microsoft.com/sysinternals/downloads/procdump\nhttps://docs.microsoft.com/windows-server/security/credentials-protection-and-management/configuring-additional-lsa-protection\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Credential Access/DoppelPaymerProcDump.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "defender_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "DeviceProcessEvents"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "credential_access"
+            ],
+            "techniques": [
+              "T1003"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Command Line",
+              "label": "Pivot by Command Line"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Process Name",
+              "label": "Pivot by Process Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 13,
+          "title": "Sentinel: VMWare-LPE-2022-22960",
+          "query_file": "sentinel/vmware-lpe-2022-22960.json",
+          "query_title": "VMWare-LPE-2022-22960",
+          "description": "The query checks process command being placed into the script; CVE-2022-22960 allows a user to write to it and be executed as root.\nThis vulnerability of VMware Workspace ONE Access, Identity Manager and vRealize Automation contain a privilege escalation vulnerability due to improper permissions in support scripts.\nCVE: CVE-2022-22960.\nRead more here:.\nhttps://www.cisa.gov/uscert/ncas/alerts/aa22-138b\nhttps://www.vmware.com/security/advisories/VMSA-2022-0011.html\nTags: #exploit #CVE-2022-22960\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Exploits/VMWare-LPE-2022-22960.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "defender_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "DeviceProcessEvents"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution",
+              "privilege_escalation"
+            ],
+            "techniques": [
+              "T1204",
+              "T1548"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Command Line",
+              "label": "Pivot by Command Line"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Process Name",
+              "label": "Pivot by Process Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name (Server)",
+              "label": "Pivot by Host Name (Server)"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 14,
+          "title": "Sentinel: Cisco SE - Connection to known C2 server",
+          "query_file": "sentinel/cisco_se_-_connection_to_known_c2_server.json",
+          "query_title": "Cisco SE - Connection to known C2 server",
+          "description": "'This rule is triggered when connection to known C2 is detected from host.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEC2Connection.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "cisco_secure_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "CiscoSecureEndpoint"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "command_and_control"
+            ],
+            "techniques": [
+              "T1071"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 15,
+          "title": "Sentinel: Cisco SE - Generic IOC",
+          "query_file": "sentinel/cisco_se_-_generic_ioc.json",
+          "query_title": "Cisco SE - Generic IOC",
+          "description": "'This rule is triggered when generic IOC is observed on host.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEGenIoC.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "cisco_secure_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "CiscoSecureEndpoint"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution"
+            ],
+            "techniques": [
+              "T1204.002"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 16,
+          "title": "Sentinel: Cisco SE - Malware execusion on host",
+          "query_file": "sentinel/cisco_se_-_malware_execusion_on_host.json",
+          "query_title": "Cisco SE - Malware execusion on host",
+          "description": "'Detects malware execution on host.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEMalwareExecution.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "cisco_secure_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "CiscoSecureEndpoint"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution"
+            ],
+            "techniques": [
+              "T1204.002"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 17,
+          "title": "Sentinel: Cisco SE - Ransomware Activity",
+          "query_file": "sentinel/cisco_se_-_ransomware_activity.json",
+          "query_title": "Cisco SE - Ransomware Activity",
+          "description": "'This rule is triggered when possible ransomware activity is detected on host.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSERansomwareActivityOnHost copy.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "cisco_secure_endpoint",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "CiscoSecureEndpoint"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "impact"
+            ],
+            "techniques": [
+              "T1486"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 18,
+          "title": "Sentinel: CyberArkEPM - Possible execution of Powershell Empire",
+          "query_file": "sentinel/cyberarkepm_-_possible_execution_of_powershell_empire.json",
+          "query_title": "CyberArkEPM - Possible execution of Powershell Empire",
+          "description": "'Detects possible execution of Powershell Empire.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CyberArkEPM/Analytic Rules/CyberArkEPMPossibleExecutionOfPowershellEmpire.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "endpoint_privilege",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events"
+            ],
+            "original_tables": [
+              "CyberArkEPM"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution"
+            ],
+            "techniques": [
+              "T1204"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Command Line",
+              "label": "Pivot by Command Line"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 19,
+          "title": "Sentinel: Discord download invoked from cmd line",
+          "query_file": "sentinel/discord_download_invoked_from_cmd_line.json",
+          "query_title": "Discord download invoked from cmd line",
+          "description": "'This hunting query looks for hosts that have attempted to interact with the Discord CDN. This activity is not normally invoked from the command line and could indicate C2, exfiltration, or malware delivery activity.'\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.endpoint"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Windows Security Events/Hunting Queries/Discorddownloadinvokedfromcmdline.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "windows_security",
+            "candidates": [
+              "Windows Security Events",
+              "Windows Event Security Logs"
+            ],
+            "original_tables": [
+              "SecurityEvent"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution",
+              "command_and_control",
+              "exfiltration"
+            ],
+            "techniques": [
+              "T1204",
+              "T1102",
+              "T1567"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event ID",
+              "label": "Pivot by Event ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Process Name",
+              "label": "Pivot by Process Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Command Line",
+              "label": "Pivot by Command Line"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
+          "dashboard_index": 23,
+          "widget_index": 20,
           "title": "Sentinel: Doppelpaymer Stop Services",
           "query_file": "sentinel/doppelpaymer_stop_services.json",
           "query_title": "Doppelpaymer Stop Services",
@@ -25454,12 +26821,12 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 22,
-          "widget_index": 5,
-          "title": "Sentinel: DopplePaymer Procdump",
-          "query_file": "sentinel/dopplepaymer_procdump.json",
-          "query_title": "DopplePaymer Procdump",
-          "description": "This query was originally published in the threat analytics report, Doppelpaymer: More human-operated ransomware. There is also a related blog.\nDoppelPaymer is ransomware that is spread manually by human operators. These operators have exhibited extensive knowledge of system administration and common network security misconfigurations. For example, they use SysInternal utilities such as ProcDump to dump credentials from LSASS. They often use these stolen credentials to turn off security software, run malicious commands, and spread malware throughout an organization.\nThe following query detects ProcDump being used to dump credentials from LSASS.\nThe See also section below lists links to other queries associated with DoppelPaymer.\nReferences:\nhttps://msrc-blog.microsoft.com/2019/11/20/customer-guidance-for-the-dopplepaymer-ransomware/\nhttps://www.microsoft.com/en-us/wdsi/threats/malware-encyclopedia-description?Name=Ransom:Win32/DoppelPaymer.KM!MTB\nhttps://docs.microsoft.com/sysinternals/downloads/procdump\nhttps://docs.microsoft.com/windows-server/security/credentials-protection-and-management/configuring-additional-lsa-protection\n",
+          "dashboard_index": 23,
+          "widget_index": 21,
+          "title": "Sentinel: Java Executing cmd to run Powershell",
+          "query_file": "sentinel/java_executing_cmd_to_run_powershell.json",
+          "query_title": "Java Executing cmd to run Powershell",
+          "description": "This query was originally published in the threat analytics report, Sysrv botnet evolution.\nSysrv is a Go-based botnet that targets both Windows and Linux servers, and steals resources to mine cryptocurrency.\nThe following query finds instances of the Java process being used to execute cmd.exe, and download and execute a PowerShell script.\n",
           "level": "high",
           "type": "curated",
           "sigma_id": "",
@@ -25470,7 +26837,7 @@
           "references": [
             {
               "name": "Microsoft Sentinel source rule",
-              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Credential Access/DoppelPaymerProcDump.yaml"
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/Campaign/Sysrv-botnet/MaliciousCMDExecutionByJava.yaml"
             },
             {
               "name": "Microsoft Sentinel repository",
@@ -25494,10 +26861,10 @@
           },
           "mitre_attack": {
             "tactics": [
-              "credential_access"
+              "execution"
             ],
             "techniques": [
-              "T1003"
+              "T1059"
             ]
           },
           "visualization_type": "table",
@@ -25516,13 +26883,18 @@
           "drilldowns": [
             {
               "type": "log_explorer_field_pivot",
-              "field": "Command Line",
-              "label": "Pivot by Command Line"
+              "field": "Parent Process Name",
+              "label": "Pivot by Parent Process Name"
             },
             {
               "type": "log_explorer_field_pivot",
               "field": "Process Name",
               "label": "Pivot by Process Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Command Line",
+              "label": "Pivot by Command Line"
             }
           ],
           "dashboard_quality": {
@@ -25538,8 +26910,8 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 22,
-          "widget_index": 6,
+          "dashboard_index": 23,
+          "widget_index": 22,
           "title": "Sentinel: LSASS Credential Dumping with Procdump",
           "query_file": "sentinel/lsass_credential_dumping_with_procdump.json",
           "query_title": "LSASS Credential Dumping with Procdump",
@@ -25622,11 +26994,11 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 22,
-          "widget_index": 7,
-          "title": "Sentinel: LemonDuck-component-names",
-          "query_file": "sentinel/lemonduck-component-names.json",
-          "query_title": "LemonDuck-component-names",
+          "dashboard_index": 23,
+          "widget_index": 23,
+          "title": "Sentinel: LemonDuck-component-download-structure",
+          "query_file": "sentinel/lemonduck-component-download-structure.json",
+          "query_title": "LemonDuck-component-download-structure",
           "description": "LemonDuck is an actively updated and robust malware primarily known for its botnet and cryptocurrency mining objectives. First discovered in 2019, LemonDuck has since adopted more sophisticated behavior and escalated its operations in 2021. Today, beyond using resources for its traditional bot and mining activities, LemonDuck steals credentials, removes security controls, spreads via emails, moves laterally, and ultimately drops more tools for human-operated activity.\n",
           "level": "medium",
           "type": "curated",
@@ -25638,7 +27010,7 @@
           "references": [
             {
               "name": "Microsoft Sentinel source rule",
-              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/LemonDuck/LemonDuck-component-names.yaml"
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/LemonDuck/LemonDuck-component-download-structure.yaml"
             },
             {
               "name": "Microsoft Sentinel repository",
@@ -25662,11 +27034,9 @@
           },
           "mitre_attack": {
             "tactics": [
-              "execution",
-              "persistence",
-              "lateral_movement",
+              "defense_evasion",
+              "command_and_control",
               "impact",
-              "vulnerability",
               "malware,_component"
             ],
             "techniques": []
@@ -25694,6 +27064,1630 @@
               "type": "log_explorer_field_pivot",
               "field": "Command Line",
               "label": "Pivot by Command Line"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SOC: Microsoft Sentinel M365 Converted Detections",
+      "description": "Live-validated Microsoft Sentinel Microsoft 365 detections converted to OCI Log Analytics Logan QL.",
+      "widget_count": 2,
+      "widgets": [
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
+          "dashboard_index": 24,
+          "widget_index": 0,
+          "title": "Sentinel: GWorkspace - Alert events",
+          "query_file": "sentinel/gworkspace_-_alert_events.json",
+          "query_title": "GWorkspace - Alert events",
+          "description": "'Detects alert events.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.m365"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/GoogleWorkspaceReports/Analytic Rules/GWorkspaceAlertEvents.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "google_workspace",
+            "candidates": [
+              "SOC Application Logs"
+            ],
+            "original_tables": [
+              "GWorkspaceActivityReports"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access"
+            ],
+            "techniques": [
+              "T1190",
+              "T1133"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
+          "dashboard_index": 24,
+          "widget_index": 1,
+          "title": "Sentinel: GWorkspace - Admin permissions granted",
+          "query_file": "sentinel/gworkspace_-_admin_permissions_granted.json",
+          "query_title": "GWorkspace - Admin permissions granted",
+          "description": "'Triggers on admin permissions granted.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.m365"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/GoogleWorkspaceReports/Analytic Rules/GWorkspaceAdminPermissionsGranted.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "google_workspace",
+            "candidates": [
+              "SOC Application Logs"
+            ],
+            "original_tables": [
+              "GWorkspaceActivityReports"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "persistence"
+            ],
+            "techniques": [
+              "T1098"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SOC: Microsoft Sentinel Network Converted Detections",
+      "description": "Live-validated Microsoft Sentinel network detections converted to OCI Log Analytics Logan QL.",
+      "widget_count": 17,
+      "widgets": [
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 0,
+          "title": "Sentinel: Critical Risks",
+          "query_file": "sentinel/critical_risks.json",
+          "query_title": "Critical Risks",
+          "description": "This query searches for all the exploited risks that RidgeBot identified\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Risks.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "common_security",
+            "candidates": [
+              "SOC Network Firewall Logs",
+              "OCI Network Firewall Logs",
+              "SOC VCN Flow Logs"
+            ],
+            "original_tables": [
+              "CommonSecurityLog"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution",
+              "initial_access",
+              "privilege_escalation"
+            ],
+            "techniques": [
+              "T1189",
+              "T1059",
+              "T1053",
+              "T1548"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event ID",
+              "label": "Pivot by Event ID"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 1,
+          "title": "Sentinel: Cisco Cloud Security - Crypto Miner User-Agent Detected",
+          "query_file": "sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
+          "query_title": "Cisco Cloud Security - Crypto Miner User-Agent Detected",
+          "description": "'Detects suspicious user agent strings used by crypto miners in proxy logs.'\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CiscoUmbrella/Analytic Rules/CiscoUmbrellaCryptoMinerUserAgentDetected.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "dns_security",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "Cisco_Umbrella"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "impact",
+              "command_and_control",
+              "exfiltration"
+            ],
+            "techniques": [
+              "T1496",
+              "T1071.001",
+              "T1041"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Agent",
+              "label": "Pivot by User Agent"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Destination IP",
+              "label": "Pivot by Destination IP"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Request URL",
+              "label": "Pivot by Request URL"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 2,
+          "title": "Sentinel: Imperva - Top destinations with blocked requests",
+          "query_file": "sentinel/imperva_-_top_destinations_with_blocked_requests.json",
+          "query_title": "Imperva - Top destinations with blocked requests",
+          "description": "'Query searches destination IP addresses requests to which were blocked by the service.'\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/ImpervaCloudWAF/Hunting Queries/ImpervaDestinationBlocked.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "waf",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "ImpervaWAFCloud"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access",
+              "impact"
+            ],
+            "techniques": [
+              "T1190",
+              "T1133",
+              "T1498"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Destination IP",
+              "label": "Pivot by Destination IP"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 3,
+          "title": "Sentinel: Apache - Unexpected Post Requests",
+          "query_file": "sentinel/apache_-_unexpected_post_requests.json",
+          "query_title": "Apache - Unexpected Post Requests",
+          "description": "'Query detects Unexpected Post Requests'\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/ApacheHTTPServer/Hunting Queries/ApacheUnexpectedPostRequests.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "web_server",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Load Balancer Access Logs"
+            ],
+            "original_tables": [
+              "ApacheHTTPServer"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "persistence",
+              "command_and_control"
+            ],
+            "techniques": [
+              "T1100",
+              "T1505",
+              "T1071"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "HTTP Request Method",
+              "label": "Pivot by HTTP Request Method"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Request URL",
+              "label": "Pivot by Request URL"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "HTTP Status Code",
+              "label": "Pivot by HTTP Status Code"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 4,
+          "title": "Sentinel: Google DNS - Exchange online autodiscover abuse",
+          "query_file": "sentinel/google_dns_-_exchange_online_autodiscover_abuse.json",
+          "query_title": "Google DNS - Exchange online autodiscover abuse",
+          "description": "'Detects possible Exchange online autodiscover abuse.'\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSExchangeAutodiscoverAbuse.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "dns",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "GCPCloudDNS"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access",
+              "credential_access"
+            ],
+            "techniques": [
+              "T1566",
+              "T1187"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Query Name",
+              "label": "Pivot by Query Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 5,
+          "title": "Sentinel: Cisco Cloud Security - Windows PowerShell User-Agent Detected",
+          "query_file": "sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
+          "query_title": "Cisco Cloud Security - Windows PowerShell User-Agent Detected",
+          "description": "'Rule helps to detect Powershell user-agent activity by an unusual process other than a web browser.'\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CiscoUmbrella/Analytic Rules/CiscoUmbrellaPowershellUserAgentDetected.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "dns_security",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "Cisco_Umbrella"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "command_and_control",
+              "defense_evasion",
+              "execution"
+            ],
+            "techniques": [
+              "T1132",
+              "T1027",
+              "T1059.001"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Agent",
+              "label": "Pivot by User Agent"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Destination IP",
+              "label": "Pivot by Destination IP"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Request URL",
+              "label": "Pivot by Request URL"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 6,
+          "title": "Sentinel: NGINX - Core Dump",
+          "query_file": "sentinel/nginx_-_core_dump.json",
+          "query_title": "NGINX - Core Dump",
+          "description": "'Detects a core dump of a crashing Nginx worker process, which could be a signal of a serious problem or exploitation attempts.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/NGINX HTTP Server/Analytic Rules/NGINXCoreDump.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "web_server",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Load Balancer Access Logs"
+            ],
+            "original_tables": [
+              "NGINXHTTPServer"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "impact"
+            ],
+            "techniques": [
+              "T1499"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 7,
+          "title": "Sentinel: Oracle - Command in URI",
+          "query_file": "sentinel/oracle_-_command_in_uri.json",
+          "query_title": "Oracle - Command in URI",
+          "description": "'Detects command in URI'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/OracleWebLogicServer/Analytic Rules/OracleWebLogicCommandInURI.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "web_server",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Load Balancer Access Logs"
+            ],
+            "original_tables": [
+              "OracleWebLogicServerEvent"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access"
+            ],
+            "techniques": [
+              "T1190",
+              "T1133"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Request URL",
+              "label": "Pivot by Request URL"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 8,
+          "title": "Sentinel: Apache - Apache 2.4.49 flaw CVE-2021-41773",
+          "query_file": "sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
+          "query_title": "Apache - Apache 2.4.49 flaw CVE-2021-41773",
+          "description": "'Detects using Apache 2.4.49 flaw CVE-2021-41773'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/ApacheHTTPServer/Analytic Rules/ApacheCVE-2021-41773.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "web_server",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Load Balancer Access Logs"
+            ],
+            "original_tables": [
+              "ApacheHTTPServer"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access",
+              "lateral_movement"
+            ],
+            "techniques": [
+              "T1190",
+              "T1133",
+              "T1210"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "HTTP Request Method",
+              "label": "Pivot by HTTP Request Method"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Request URL",
+              "label": "Pivot by Request URL"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "HTTP Status Code",
+              "label": "Pivot by HTTP Status Code"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 9,
+          "title": "Sentinel: Google DNS - CVE-2021-34527 (PrintNightmare) external exploit",
+          "query_file": "sentinel/google_dns_-_cve-2021-34527_printnightmare_external_exploit.json",
+          "query_title": "Google DNS - CVE-2021-34527 (PrintNightmare) external exploit",
+          "description": "'Detects CVE-2021-34527 (PrintNightmare) external exploit'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSPrintNightmare.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "dns",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "GCPCloudDNS"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "privilege_escalation"
+            ],
+            "techniques": [
+              "T1068"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Query Name",
+              "label": "Pivot by Query Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 10,
+          "title": "Sentinel: Google DNS - Malicous Python packages",
+          "query_file": "sentinel/google_dns_-_malicous_python_packages.json",
+          "query_title": "Google DNS - Malicous Python packages",
+          "description": "'Detects requests to resources with malicious Python packages.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSMaliciousPythonPackages.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "dns",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "GCPCloudDNS"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access"
+            ],
+            "techniques": [
+              "T1195"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Query Name",
+              "label": "Pivot by Query Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 11,
+          "title": "Sentinel: Google DNS - Possible data exfiltration",
+          "query_file": "sentinel/google_dns_-_possible_data_exfiltration.json",
+          "query_title": "Google DNS - Possible data exfiltration",
+          "description": "'Detects possible data exfiltration.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSDataExfiltration.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "dns",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "GCPCloudDNS"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "exfiltration"
+            ],
+            "techniques": [
+              "T1567"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Query Name",
+              "label": "Pivot by Query Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 12,
+          "title": "Sentinel: Google DNS - UNC2452 (Nobelium) APT Group activity",
+          "query_file": "sentinel/google_dns_-_unc2452_nobelium_apt_group_activity.json",
+          "query_title": "Google DNS - UNC2452 (Nobelium) APT Group activity",
+          "description": "'Detects UNC2452 (Nobelium) APT Group activity.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSUNC2452AptActivity.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "dns",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "GCPCloudDNS"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "command_and_control"
+            ],
+            "techniques": [
+              "T1095"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Query Name",
+              "label": "Pivot by Query Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 13,
+          "title": "Sentinel: Google DNS - CVE-2021-40444 exploitation",
+          "query_file": "sentinel/google_dns_-_cve-2021-40444_exploitation.json",
+          "query_title": "Google DNS - CVE-2021-40444 exploitation",
+          "description": "'Detects CVE-2021-40444 exploitation.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSCVE-2021-40444.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "dns",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "GCPCloudDNS"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "privilege_escalation"
+            ],
+            "techniques": [
+              "T1068"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Query Name",
+              "label": "Pivot by Query Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 14,
+          "title": "Sentinel: Imperva - Malicious user agent",
+          "query_file": "sentinel/imperva_-_malicious_user_agent.json",
+          "query_title": "Imperva - Malicious user agent",
+          "description": "'Detects requests containing known malicious user agent strings.'\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/ImpervaCloudWAF/Analytic Rules/ImpervaMaliciousUA.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "waf",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "ImpervaWAFCloud"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access"
+            ],
+            "techniques": [
+              "T1190",
+              "T1133"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Agent",
+              "label": "Pivot by User Agent"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 15,
+          "title": "Sentinel: Imperva - Top sources with blocked requests",
+          "query_file": "sentinel/imperva_-_top_sources_with_blocked_requests.json",
+          "query_title": "Imperva - Top sources with blocked requests",
+          "description": "'Query searches source IP addresses with blocked requests.'\n",
+          "level": "medium",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/ImpervaCloudWAF/Hunting Queries/ImpervaSourceBlocked.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "waf",
+            "candidates": [
+              "SOC WAF Security Logs",
+              "SOC Web Application Logs",
+              "SOC Network Firewall Logs"
+            ],
+            "original_tables": [
+              "ImpervaWAFCloud"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access",
+              "impact"
+            ],
+            "techniques": [
+              "T1190",
+              "T1133",
+              "T1498"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
+          "dashboard_index": 25,
+          "widget_index": 16,
+          "title": "Sentinel: Vulerabilities",
+          "query_file": "sentinel/vulerabilities.json",
+          "query_title": "Vulerabilities",
+          "description": "This query searches for all the vulerabilities that RidgeBot identified\n",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "microsoft_sentinel",
+            "sentinel.network"
+          ],
+          "references": [
+            {
+              "name": "Microsoft Sentinel source rule",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Vulnerabilities.yaml"
+            },
+            {
+              "name": "Microsoft Sentinel repository",
+              "url": "https://github.com/Azure/Azure-Sentinel"
+            },
+            {
+              "name": "Azure/Azure-Sentinel license",
+              "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+            }
+          ],
+          "logsource": {
+            "product": "microsoft_sentinel",
+            "service": "common_security",
+            "candidates": [
+              "SOC Network Firewall Logs",
+              "OCI Network Firewall Logs",
+              "SOC VCN Flow Logs"
+            ],
+            "original_tables": [
+              "CommonSecurityLog"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "execution",
+              "initial_access",
+              "privilege_escalation"
+            ],
+            "techniques": [
+              "T1189",
+              "T1059",
+              "T1053",
+              "T1548"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+          ],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event ID",
+              "label": "Pivot by Event ID"
             }
           ],
           "dashboard_quality": {

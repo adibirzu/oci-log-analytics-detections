@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T06:36:16.838024+00:00",
+  "generated_at": "2026-05-17T07:19:01.084250+00:00",
   "summary": {
     "total_fields": 256,
     "parser_count": 15,
     "source_count": 15,
     "reserved_mapping_violations": 0,
-    "fields_with_query_usage": 108
+    "fields_with_query_usage": 111
   },
   "approved_builtins": [
     "Channel",
@@ -363,7 +363,9 @@
         "admin"
       ],
       "contract_datasets": [],
-      "queries_using_it": [],
+      "queries_using_it": [
+        "sentinel/insider-threat-detection-queries_16.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -2189,14 +2191,26 @@
         "screensaver_hijacking_persistence.json",
         "security_support_provider_dll_persistence.json",
         "sedebugprivilege_abuse.json",
+        "sentinel/cve-2019-0808-set-scheduled-task.json",
+        "sentinel/cyberarkepm_-_possible_execution_of_powershell_empire.json",
+        "sentinel/deimos-component-execution.json",
+        "sentinel/deimos_component_execution.json",
+        "sentinel/detect-malicious-rar-extraction.json",
         "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
         "sentinel/discord_download_invoked_from_cmd_line.json",
         "sentinel/doppelpaymer_stop_services.json",
         "sentinel/dopplepaymer_procdump.json",
+        "sentinel/java_executing_cmd_to_run_powershell.json",
+        "sentinel/jse-launched-by-word.json",
+        "sentinel/lemonduck-component-download-structure.json",
         "sentinel/lemonduck-component-names.json",
         "sentinel/lsass_credential_dumping_with_procdump.json",
         "sentinel/nrt_base64_encoded_windows_process_command-lines.json",
+        "sentinel/office-apps-launching-wscipt.json",
         "sentinel/office_apps_launching_wscipt.json",
+        "sentinel/powercat-download.json",
+        "sentinel/recon-with-rundll.json",
+        "sentinel/vmware-lpe-2022-22960.json",
         "service_execution_via_scexe_create.json",
         "service_permissions_weakness_discovery.json",
         "service_stop_via_net_stop.json",
@@ -3012,6 +3026,11 @@
         "hunting/web_to_cloud_firewall_c2.json",
         "hunting/web_to_cloud_mitre_sunburst.json",
         "hunting/web_to_cloud_vcn_egress.json",
+        "sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
+        "sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
+        "sentinel/cve-2019-0808-c2.json",
+        "sentinel/imperva_-_top_destinations_with_blocked_requests.json",
+        "sentinel/recon-with-rundll.json",
         "ssrf_to_cloud_metadata_endpoint_169254169254.json",
         "sysmon_c2_beacon_-_periodic_outbound_https.json",
         "sysmon_cobalt_strike_c2_network_indicators.json",
@@ -3119,6 +3138,7 @@
         "hunting/flf_port_knocking_sequence.json",
         "hunting/network_c2_beaconing.json",
         "hunting/web_to_cloud_vcn_egress.json",
+        "sentinel/recon-with-rundll.json",
         "sysmon_c2_beacon_-_periodic_outbound_https.json",
         "sysmon_cobalt_strike_c2_network_indicators.json",
         "sysmon_dns_tunneling_via_network_connection.json",
@@ -3595,8 +3615,11 @@
         "powershell_suspicious_commands.json",
         "privilege_escalation_sensitive_privileges.json",
         "security_group_enumeration.json",
+        "sentinel/critical_risks.json",
         "sentinel/discord_download_invoked_from_cmd_line.json",
-        "sentinel/nrt_base64_encoded_windows_process_command-lines.json"
+        "sentinel/mcafee_epo_-_deployment_failed.json",
+        "sentinel/nrt_base64_encoded_windows_process_command-lines.json",
+        "sentinel/vulerabilities.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -4414,7 +4437,9 @@
         "hunting/network_c2_beaconing.json",
         "hunting/rmm_post_compromise_activity.json",
         "hunting/web_to_cloud_compromised_machines.json",
+        "sentinel/deimos_component_execution.json",
         "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
+        "sentinel/vmware-lpe-2022-22960.json",
         "sysmon_dns_data_exfiltration.json"
       ],
       "dashboards_using_it": [],
@@ -4615,7 +4640,10 @@
       "contract_datasets": [
         "application_logs.jsonl"
       ],
-      "queries_using_it": [],
+      "queries_using_it": [
+        "sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
+        "sentinel/apache_-_unexpected_post_requests.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -4663,7 +4691,10 @@
       "contract_datasets": [
         "application_logs.jsonl"
       ],
-      "queries_using_it": [],
+      "queries_using_it": [
+        "sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
+        "sentinel/apache_-_unexpected_post_requests.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -6819,10 +6850,19 @@
         "hunting/clickfix_lolbin_payload_execution.json",
         "python_execution_as_child_of_system_process.json",
         "scripting_engine_spawning_network_utility.json",
+        "sentinel/cyberarkepm_-_unexpected_executable_extension.json",
+        "sentinel/deimos-component-execution.json",
+        "sentinel/deimos_component_execution.json",
         "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
         "sentinel/doppelpaymer_stop_services.json",
+        "sentinel/java_executing_cmd_to_run_powershell.json",
+        "sentinel/jse-launched-by-word.json",
+        "sentinel/lemonduck-component-download-structure.json",
         "sentinel/lemonduck-component-names.json",
+        "sentinel/office-apps-launching-wscipt.json",
         "sentinel/office_apps_launching_wscipt.json",
+        "sentinel/recon-with-rundll.json",
+        "sentinel/teardrop_memory-only_dropper.json",
         "suspicious_usage_of_rmmod.json",
         "template_injection_via_microsoft_office.json",
         "uac_bypass_via_computerdefaults.json",
@@ -7858,12 +7898,22 @@
         "scheduled_task_xml_import.json",
         "scripting_engine_spawning_network_utility.json",
         "sdelete_secure_file_deletion.json",
+        "sentinel/cve-2019-0808-nufsys-file_creation.json",
+        "sentinel/cve-2019-0808-set-scheduled-task.json",
+        "sentinel/detect-malicious-rar-extraction.json",
         "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
         "sentinel/discord_download_invoked_from_cmd_line.json",
         "sentinel/doppelpaymer_stop_services.json",
         "sentinel/dopplepaymer_procdump.json",
+        "sentinel/insider-threat-detection-queries_16.json",
+        "sentinel/java_executing_cmd_to_run_powershell.json",
+        "sentinel/jse-launched-by-word.json",
         "sentinel/lsass_credential_dumping_with_procdump.json",
+        "sentinel/office-apps-launching-wscipt.json",
         "sentinel/office_apps_launching_wscipt.json",
+        "sentinel/powercat-download.json",
+        "sentinel/teardrop_memory-only_dropper.json",
+        "sentinel/vmware-lpe-2022-22960.json",
         "service_execution_via_scexe_create.json",
         "service_stop_via_net_stop.json",
         "software_discovery_via_wmic.json",
@@ -8272,6 +8322,12 @@
         "hunting/c2_unique_domains_kpi.json",
         "hunting/dns_exfiltration_entropy.json",
         "hunting/flf_dns_c2_pattern_analysis.json",
+        "sentinel/google_dns_-_cve-2021-34527_printnightmare_external_exploit.json",
+        "sentinel/google_dns_-_cve-2021-40444_exploitation.json",
+        "sentinel/google_dns_-_exchange_online_autodiscover_abuse.json",
+        "sentinel/google_dns_-_malicous_python_packages.json",
+        "sentinel/google_dns_-_possible_data_exfiltration.json",
+        "sentinel/google_dns_-_unc2452_nobelium_apt_group_activity.json",
         "sysmon_dns_data_exfiltration.json",
         "sysmon_dns_query_to_known_c2_framework_domains.json",
         "sysmon_dns_query_to_suspicious_tlds.json"
@@ -8831,6 +8887,13 @@
         "hunting/web_to_cloud_attack_timeline.json",
         "hunting/web_to_cloud_entry_point.json",
         "sensitive_data_endpoint_access.json",
+        "sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
+        "sentinel/apache_-_unexpected_post_requests.json",
+        "sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
+        "sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
+        "sentinel/cve-2019-0808-c2.json",
+        "sentinel/oracle_-_command_in_uri.json",
+        "sentinel/recon-with-rundll.json",
         "unusually_large_http_response_data_exfiltration.json",
         "waf_command_injection_attack_blocked.json",
         "waf_cross-site_scripting_attack_blocked.json",
@@ -10347,7 +10410,13 @@
         "hunting/web_to_cloud_firewall_c2.json",
         "hunting/web_to_cloud_mitre_sunburst.json",
         "hunting/web_to_cloud_vcn_egress.json",
-        "oci_password_spraying_attack.json"
+        "oci_password_spraying_attack.json",
+        "sentinel/apexone_-_top_sources_with_alerts.json",
+        "sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
+        "sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
+        "sentinel/imperva_-_malicious_user_agent.json",
+        "sentinel/imperva_-_top_sources_with_blocked_requests.json",
+        "sentinel/mcafee_epo_-_multiple_threats_on_same_host.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -10906,7 +10975,8 @@
         "hunting/bluelight_mitre_tactics_sunburst.json",
         "hunting/bluelight_top_affected_hosts.json",
         "hunting/bluelight_total_detections_kpi.json",
-        "hunting/goad_caldera_sandcat_activity.json"
+        "hunting/goad_caldera_sandcat_activity.json",
+        "sentinel/cve-2019-0808-nufsys-file_creation.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -11208,7 +11278,8 @@
         "hunting/web_to_cloud_attack_timeline.json",
         "hunting/web_to_cloud_exfiltration.json",
         "hunting/web_to_cloud_firewall_c2.json",
-        "hunting/web_to_cloud_mitre_sunburst.json"
+        "hunting/web_to_cloud_mitre_sunburst.json",
+        "sentinel/mcafee_epo_-_multiple_threats_on_same_host.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -12138,6 +12209,9 @@
         "hunting/flf_vsagent_http_beaconing.json",
         "hunting/web_directory_scan_clustering.json",
         "hunting/web_scanner_tool_stacking.json",
+        "sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
+        "sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
+        "sentinel/imperva_-_malicious_user_agent.json",
         "suspicious_or_empty_user_agent_detected.json",
         "waf_log4shell_cve-2021-44228_attack_blocked.json",
         "web_vulnerability_scanner_detected.json"

@@ -157,40 +157,40 @@
     <h1>Sentinel to Logan QL Conversion</h1>
     <p class="lede">Static review page for the Microsoft Sentinel conversion pipeline. Promoted queries are source-attributed, mapped to real OCI Log Analytics fields, and written only after live parser validation.</p>
     <div class="meta">
-      <span>Generated: 2026-05-15T04:03:15.819656+00:00</span>
+      <span>Generated: 2026-05-17T07:16:00.406334+00:00</span>
       <span>Source: https://github.com/Azure/Azure-Sentinel</span>
       <span>Ranking: quality-first</span>
     </div>
   </header>
   <main>
-    <div class="metrics"><section class="metric"><span>Candidates</span><strong>4452</strong></section><section class="metric"><span>Attempted</span><strong>25</strong></section><section class="metric"><span>Promoted</span><strong>8</strong></section><section class="metric"><span>Live passed</span><strong>8</strong></section><section class="metric"><span>Live failed</span><strong>10</strong></section><section class="metric"><span>Promoted files</span><strong>8</strong></section></div>
+    <div class="metrics"><section class="metric"><span>Candidates</span><strong>4452</strong></section><section class="metric"><span>Attempted</span><strong>100</strong></section><section class="metric"><span>Promoted</span><strong>60</strong></section><section class="metric"><span>Live passed</span><strong>60</strong></section><section class="metric"><span>Live failed</span><strong>2</strong></section><section class="metric"><span>Promoted files</span><strong>60</strong></section></div>
     <div class="grid">
       <div>
         <section class="panel">
           <h2>Promoted Categories</h2>
-          <div class="bar-row"><span>endpoint</span><div class="bar-track"><div class="bar" style="width: 100%"></div></div><strong>8</strong></div>
+          <div class="bar-row"><span>endpoint</span><div class="bar-track"><div class="bar" style="width: 100%"></div></div><strong>40</strong></div><div class="bar-row"><span>network</span><div class="bar-track"><div class="bar" style="width: 42%"></div></div><strong>17</strong></div><div class="bar-row"><span>m365</span><div class="bar-track"><div class="bar" style="width: 5%"></div></div><strong>2</strong></div><div class="bar-row"><span>identity</span><div class="bar-track"><div class="bar" style="width: 2%"></div></div><strong>1</strong></div>
         </section>
         <section class="panel">
           <h2>Sentinel Dashboards</h2>
-          <table><thead><tr><th>Dashboard</th><th>Widgets</th></tr></thead><tbody><tr><td>SOC: Microsoft Sentinel Endpoint Converted Detections</td><td>8</td></tr></tbody></table>
+          <table><thead><tr><th>Dashboard</th><th>Widgets</th></tr></thead><tbody><tr><td>SOC: Microsoft Sentinel Endpoint Converted Detections</td><td>24</td></tr><tr><td>SOC: Microsoft Sentinel Identity Converted Detections</td><td>1</td></tr><tr><td>SOC: Microsoft Sentinel M365 Converted Detections</td><td>2</td></tr><tr><td>SOC: Microsoft Sentinel Network Converted Detections</td><td>17</td></tr></tbody></table>
         </section>
         <section class="panel">
           <h2>Top Skip Reasons</h2>
-          <table><thead><tr><th>Reason</th><th>Count</th></tr></thead><tbody><tr><td>synthetic live validation not run</td><td>10</td></tr><tr><td>unsupported Sentinel field mapping: SubjectAccount</td><td>2</td></tr><tr><td>unsupported KQL stage: parse EventData with * &#x27;ObjectDN&quot;&gt;&#x27; ObjectDN &quot;&lt;&quot; *</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: ActingProcessFileInternalName</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: ClientInfoString</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: EventData</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: Exe</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: InitiatingProcessAccountDomain</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: InitiatingProcessAccountName</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: InitiatingProcessSHA256</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: LocalFile</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: Logon_Type</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: MailboxOwnerUPN</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: ObjectDN</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: OfficeWorkload</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: OrganizationName</td><td>1</td></tr></tbody></table>
+          <table><thead><tr><th>Reason</th><th>Count</th></tr></thead><tbody><tr><td>live OCI validation failed</td><td>2</td></tr><tr><td>unsupported Sentinel field mapping: (tostring(UrlOriginal))</td><td>2</td></tr><tr><td>unsupported Sentinel field mapping: Category</td><td>2</td></tr><tr><td>unsupported Sentinel field mapping: Identities</td><td>2</td></tr><tr><td>unsupported Sentinel field mapping: SyslogMessage</td><td>2</td></tr><tr><td>unsupported predicate expression: HttpStatusCode between(400..499)</td><td>2</td></tr><tr><td>unsupported predicate expression: HttpStatusCode between(500..599)</td><td>2</td></tr><tr><td>unsupported scalar expression: InitiatedBy.user.ipAddress</td><td>2</td></tr><tr><td>unsupported scalar expression: InitiatedBy.user.userPrincipalName</td><td>2</td></tr><tr><td>unsupported scalar expression: strcat(HttpRequestHeaderHost,ClientRequestPath)</td><td>2</td></tr><tr><td>unsupported scalar expression: substring(SyslogMessage, indexof(SyslogMessage, &quot;(&quot;)+1, indexof(SyslogMessage, &quot;)&quot;) - indexof(SyslogMessage,&quot;(&quot;)-1)</td><td>2</td></tr><tr><td>query contains unsafe double quote outside Logan string literal</td><td>1</td></tr><tr><td>summarize stage did not produce supported aggregates</td><td>1</td></tr><tr><td>unsupported Logan output token: \b(?:summarize|project|extend|join|let|datatable|externaldata|make-series)\b</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: ALL</td><td>1</td></tr><tr><td>unsupported Sentinel field mapping: AccountType</td><td>1</td></tr></tbody></table>
         </section>
         <section class="panel">
           <h2>Live Validation Failures Kept Out</h2>
-          <table><thead><tr><th>Title</th><th>Source path</th><th>Error</th></tr></thead><tbody><tr><td>ApexOne - Top sources with alerts</td><td>Solutions/Trend Micro Apex One/Hunting Queries/TMApexOneTopSources.yaml</td><td>synthetic live validation not run</td></tr><tr><td>McAfee ePO - Multiple threats on same host</td><td>Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOMultipleThreatsSameHost.yaml</td><td>synthetic live validation not run</td></tr><tr><td>McAfee ePO - Threat was not blocked</td><td>Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOThreatNotBlocked.yaml</td><td>synthetic live validation not run</td></tr><tr><td>Deimos Component Execution</td><td>Solutions/Microsoft Defender XDR/Analytic Rules/Campaign/Jupyter-Solarmaker/DeimosComponentExecution.yaml</td><td>synthetic live validation not run</td></tr><tr><td>Critical Risks</td><td>Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Risks.yaml</td><td>synthetic live validation not run</td></tr><tr><td>Vulerabilities</td><td>Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Vulnerabilities.yaml</td><td>synthetic live validation not run</td></tr><tr><td>TEARDROP memory-only dropper</td><td>Solutions/Microsoft Defender XDR/Analytic Rules/SolarWinds_TEARDROP_Process-IOCs.yaml</td><td>synthetic live validation not run</td></tr><tr><td>Apache - Apache 2.4.49 flaw CVE-2021-41773</td><td>Solutions/ApacheHTTPServer/Analytic Rules/ApacheCVE-2021-41773.yaml</td><td>synthetic live validation not run</td></tr></tbody></table>
+          <table><thead><tr><th>Title</th><th>Source path</th><th>Error</th></tr></thead><tbody><tr><td>NRT Process executed from binary hidden in Base64 encoded file</td><td>Solutions/Windows Security Events/Analytic Rules/NRT_execute_base64_decodedpayload.yaml</td><td>status=400 code=InvalidParameter message=where &#x27;Command Line&#x27; like &#x27;*.decode(\&#x27;base64\&#x27;)*&#x27; or &#x27;Command Line&#x27; like &#x27;*base64 --decode*&#x27; or &#x27;Command Line&#x27; like &#x27;*.decode64(*&#x27;. Unexpected input for WHERE: like. Syntax: WHERE</td></tr><tr><td>ApexOne - Commands in Url</td><td>Solutions/Trend Micro Apex One/Analytic Rules/TMApexOneCommandsInRequest.yaml</td><td>status=400 code=InvalidParameter message=Invalid string value for the field &#x27;Event Type&#x27;: 700106.</td></tr></tbody></table>
         </section>
       </div>
       <aside>
         <section class="panel">
           <h2>Severity Mix</h2>
-          <table><thead><tr><th>Severity</th><th>Promoted</th></tr></thead><tbody><tr><td>high</td><td>4</td></tr><tr><td>medium</td><td>4</td></tr></tbody></table>
+          <table><thead><tr><th>Severity</th><th>Promoted</th></tr></thead><tbody><tr><td>high</td><td>31</td></tr><tr><td>medium</td><td>29</td></tr></tbody></table>
         </section>
         <section class="panel">
           <h2>Promoted Live Status</h2>
-          <table><thead><tr><th>Live status</th><th>Promoted files</th></tr></thead><tbody><tr><td>passed</td><td>8</td></tr></tbody></table>
+          <table><thead><tr><th>Live status</th><th>Promoted files</th></tr></thead><tbody><tr><td>passed</td><td>60</td></tr></tbody></table>
         </section>
         <section class="panel">
           <h2>Operator Commands</h2>

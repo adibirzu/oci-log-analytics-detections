@@ -13,7 +13,7 @@ This roadmap turns the existing OCI Log Analytics detection repository into a GS
 - [x] **Phase 5: Release and Security Automation** - Make local/live verification and secret hygiene repeatable before handoff.
 - [x] **Phase 6: KQL Subpackage Extraction and Canonicalizer** - Behavior-preserving refactor of the Sentinel converter and golden-fixture test harness.
 - [x] **Phase 7: Mapping Config Sharding and Collision Lint** - Shard `sentinel_oci_mapping.yaml`, add strict loader, role tags, and collision lint.
-- [ ] **Phase 8: Backlog Prioritizer and Cohort Overlay** - Rank unmapped Sentinel candidates by MITRE coverage × converter difficulty so Phases 9–10 work against cohorts, not throwaways.
+- [x] **Phase 8: Backlog Prioritizer and Cohort Overlay** - Rank unmapped Sentinel candidates by MITRE coverage × converter difficulty so Phases 9–10 work against cohorts, not throwaways.
 - [ ] **Phase 9: Operator Parity and Field Mapping Bulk Expansion** - Land `extend`/`let`/`bin`/`project` family operators, parser-side extraction, and bulk Sentinel field additions in parallel cohort work.
 - [ ] **Phase 10: Drift Detector and Synthetic-Hit Promotion Gate** - Prevent silent regressions and zero-row false passes once promotion scales.
 - [ ] **Phase 11: CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split** - Wire converter + drift + scan + inventory checks into CI; isolate live OCI calls to manual/scheduled jobs.
@@ -114,7 +114,7 @@ Phases 6–11 deliver KQL operator parity, mapping completeness, drift protectio
 
 - [x] **Phase 6:** KQL Subpackage Extraction and Canonicalizer
 - [x] **Phase 7:** Mapping Config Sharding and Collision Lint
-- [ ] **Phase 8:** Backlog Prioritizer and Cohort Overlay
+- [x] **Phase 8:** Backlog Prioritizer and Cohort Overlay
 - [ ] **Phase 9:** Operator Parity and Field Mapping Bulk Expansion
 - [ ] **Phase 10:** Drift Detector and Synthetic-Hit Promotion Gate
 - [ ] **Phase 11:** CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split
@@ -170,7 +170,12 @@ Plans:
 **Exit Conditions**:
   - At least the top 20 backlog entries cite a concrete blocker reason traceable to either an operator in Phase 9 scope or a mapping field listed in MAP-05.
   - Prioritizer can be re-run idempotently and produces stable ordering for unchanged inputs.
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [x] 08-01: Prioritizer generator.
+- [x] 08-02: Release advisory and artifact contract.
+- [x] 08-03: Docs, status, and gates.
 
 ### Phase 9: Operator Parity and Field Mapping Bulk Expansion
 
@@ -234,11 +239,11 @@ Plans:
 | 5. Release and Security Automation | 3/3 | Complete | 2026-05-15 |
 | 6. KQL Subpackage Extraction and Canonicalizer | 10/10 | Complete | 2026-05-16 |
 | 7. Mapping Config Sharding and Collision Lint | 4/4 | Complete | 2026-05-17 |
-| 8. Backlog Prioritizer and Cohort Overlay | 0/? | Not started | - |
+| 8. Backlog Prioritizer and Cohort Overlay | 3/3 | Complete | 2026-05-17 |
 | 9. Operator Parity and Field Mapping Bulk Expansion | 0/? | Not started | - |
 | 10. Drift Detector and Synthetic-Hit Promotion Gate | 0/? | Not started | - |
 | 11. CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-05-14*
-*Last updated: 2026-05-17 — Phase 7 completed; sharded mapping loader and collision lint local gates passed*
+*Last updated: 2026-05-17 — Phase 8 completed; Sentinel backlog priority artifact and release advisory passed local gates*

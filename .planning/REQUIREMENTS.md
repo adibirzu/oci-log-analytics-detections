@@ -86,10 +86,10 @@ Baseline (from `queries/sentinel_conversion_report.json`): 4,452 candidates, 25 
 
 ### Backlog Prioritization
 
-- [ ] **PRI-01**: `scripts/sentinel_backlog_prioritize.py` emits `queries/sentinel_backlog_priority.json` ranking unmapped Sentinel candidates by MITRE coverage gap (joined against `queries/catalog.json`) × converter difficulty (joined against TIER classification from REF-03).
-- [ ] **PRI-02**: An "unblock chain length" metric annotates each skipped candidate with how many other candidates would promote if the same blocker were resolved; this guides cohort selection.
-- [ ] **PRI-03**: The prioritized backlog is wired as an advisory (non-blocking) line in `scripts/release_checklist.py` summary output.
-- [ ] **PRI-04**: `sync_sentinel_kql.py` candidate sync is rerun as an entry condition for any PRI-driven cohort selection so MITRE quality scoring reflects current Sentinel content.
+- [x] **PRI-01**: `scripts/sentinel_backlog_prioritize.py` emits `queries/sentinel_backlog_priority.json` ranking unmapped Sentinel candidates by MITRE coverage gap (joined against `queries/catalog.json`) × converter difficulty (joined against TIER classification from REF-03).
+- [x] **PRI-02**: An "unblock chain length" metric annotates each skipped candidate with how many other candidates would promote if the same blocker were resolved; this guides cohort selection.
+- [x] **PRI-03**: The prioritized backlog is wired as an advisory (non-blocking) line in `scripts/release_checklist.py` summary output.
+- [x] **PRI-04**: `sync_sentinel_kql.py` candidate sync is rerun as an entry condition for any PRI-driven cohort selection so MITRE quality scoring reflects current Sentinel content.
 
 ### Drift and Synthetic-Hit Gates
 
@@ -192,10 +192,10 @@ Baseline (from `queries/sentinel_conversion_report.json`): 4,452 candidates, 25 
 | PARSER-01 | Phase 9 | Pending |
 | PARSER-02 | Phase 9 | Pending |
 | PARSER-03 | Phase 9 | Pending |
-| PRI-01 | Phase 8 | Pending |
-| PRI-02 | Phase 8 | Pending |
-| PRI-03 | Phase 8 | Pending |
-| PRI-04 | Phase 8 | Pending |
+| PRI-01 | Phase 8 | Complete |
+| PRI-02 | Phase 8 | Complete |
+| PRI-03 | Phase 8 | Complete |
+| PRI-04 | Phase 8 | Complete |
 | DRIFT-01 | Phase 10 | Pending |
 | DRIFT-02 | Phase 10 | Pending |
 | DRIFT-03 | Phase 10 | Pending |

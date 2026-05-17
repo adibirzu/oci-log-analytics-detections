@@ -20,6 +20,7 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = PROJECT_DIR / "scripts"
 HEALTH_DIR = PROJECT_DIR / "docs" / "health"
+SENTINEL_BACKLOG_PRIORITY_PATH = PROJECT_DIR / "queries" / "sentinel_backlog_priority.json"
 
 OCID_RE = re.compile(r"\bocid1\.[A-Za-z0-9][A-Za-z0-9._-]{8,}\b", re.IGNORECASE)
 REQUEST_ID_RE = re.compile(r"(?i)(opc[-_]request[-_]id\s*[:=]\s*)[A-Za-z0-9._:-]{12,}")
@@ -122,6 +123,24 @@ def build_steps(include_live: bool, skip_tests: bool, lookback: str, query_timeo
     return steps
 
 
+def _sentinel_backlog_advisory(path: Path = SENTINEL_BACKLOG_PRIORITY_PATH) -> dict:
+    if not path.exists():
+        return {"available": False, "text": "Sentinel backlog: not ranked"}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return {"available": False, "text": f"Sentinel backlog: unreadable ({exc})"}
+    summary = payload.get("summary", {})
+    ranked = int(summary.get("ranked_count", 0) or 0)
+    blocker = str(summary.get("top_blocker", "") or "none")
+    return {
+        "available": True,
+        "ranked_count": ranked,
+        "top_blocker": blocker,
+        "text": f"Sentinel backlog: {ranked} ranked; top blocker: {blocker}",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run release checklist gates")
     parser.add_argument("--include-live", action="store_true", help="Run live dashboard verification for the active OCI_PROFILE")
@@ -157,8 +176,12 @@ def main() -> int:
         "include_live": args.include_live,
         "overall_status": "PASS" if all(result["ok"] for result in results) else "FAIL",
         "steps": results,
+        "advisories": {
+            "sentinel_backlog": _sentinel_backlog_advisory(),
+        },
     }
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    print(report["advisories"]["sentinel_backlog"]["text"])
     print(f"\nRelease evidence: {report_path}")
     if args.handoff_summary and report["overall_status"] == "PASS":
         from handoff_summary import write_summary

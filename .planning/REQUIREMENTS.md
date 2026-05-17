@@ -62,10 +62,10 @@ Baseline (from `queries/sentinel_conversion_report.json`): 4,452 candidates, 25 
 
 ### Mapping Configuration and Field Coverage
 
-- [ ] **MAP-01**: `config/mapping/` shards the mapping schema by OCI data domain: `_root.yaml` + `tables/{identity,endpoint,cloud_azure,cloud_office,network}.yaml` + `fields/{common,subject,process,office,network}.yaml`; `config/sentinel_oci_mapping.yaml` is retained as a generated compatibility re-export.
-- [ ] **MAP-02**: `scripts/kql/mapping_loader.py` loads shards in deterministic order with a strict YAML loader that fails the build on duplicate keys; the first strict-load run is a documented, possibly-noisy task.
-- [ ] **MAP-03**: A collision lint pass detects many-to-one Sentinel-to-Logan column fan-outs (e.g., nine user-name fields mapping to `User Name`) and emits `lossy_mapping_collision:<a>+<b>→<col>` skip reasons; output written to `queries/mapping_collisions.json`.
-- [ ] **MAP-04**: Every mapped field carries a role tag from `{subject, target, initiator, resource, time, hash, network}` so role-mismatched comparisons (e.g., `subject == target`) can be detected by the converter.
+- [x] **MAP-01**: `config/mapping/` shards the mapping schema by OCI data domain: `_root.yaml` + `tables/{identity,endpoint,cloud_azure,cloud_office,network}.yaml` + `fields/{common,subject,process,office,network}.yaml`; `config/sentinel_oci_mapping.yaml` is retained as a generated compatibility re-export.
+- [x] **MAP-02**: `scripts/kql/mapping_loader.py` loads shards in deterministic order with a strict YAML loader that fails the build on duplicate keys; the first strict-load run is a documented, possibly-noisy task.
+- [x] **MAP-03**: A collision lint pass detects many-to-one Sentinel-to-Logan column fan-outs (e.g., nine user-name fields mapping to `User Name`) and emits `lossy_mapping_collision:<a>+<b>→<col>` skip reasons; output written to `queries/mapping_collisions.json`.
+- [x] **MAP-04**: Every mapped field carries a role tag from `{subject, target, initiator, resource, time, hash, network}` so role-mismatched comparisons (e.g., `subject == target`) can be detected by the converter.
 - [ ] **MAP-05**: Bulk Sentinel field additions land for `SubjectAccount`, `SubjectDomainName`, `SubjectLogonId`, `SubjectUserSid`, `SubjectUserName`, `InitiatingProcessAccountDomain`, `InitiatingProcessAccountName`, `InitiatingProcessSHA256`, `InitiatingProcessId`, `MailboxOwnerUPN`, `OfficeWorkload`, `OrganizationName`, `ClientInfoString`, `UserType`, `ParentProcessName`, `ProcessId`, `Exe`, `LocalFile`, `ActingProcessFileInternalName`, plus a `Logon_Type` → `LogonType` alias.
 - [ ] **MAP-06**: Every new mapping points to a key already present in `queries/log_source_field_dictionary.json` or carries a documented parser-source contract reference (see PARSER-01).
 

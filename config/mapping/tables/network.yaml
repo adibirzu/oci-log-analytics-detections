@@ -1,0 +1,97 @@
+tables:
+  Cloudflare:
+    category: network
+    service: waf
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+  ApacheHTTPServer:
+    category: network
+    service: web_server
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+    - SOC Load Balancer Access Logs
+  CiscoWSAEvent:
+    category: network
+    service: web_security
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+    - SOC Network Firewall Logs
+  Cisco_Umbrella:
+    category: network
+    service: dns_security
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+    - SOC Network Firewall Logs
+  GCPCloudDNS:
+    category: network
+    service: dns
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+    - SOC Network Firewall Logs
+  ImpervaWAFCloud:
+    category: network
+    service: waf
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+    - SOC Network Firewall Logs
+  NGINXHTTPServer:
+    category: network
+    service: web_server
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+    - SOC Load Balancer Access Logs
+  OracleWebLogicServerEvent:
+    category: network
+    service: web_server
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+    - SOC Load Balancer Access Logs
+  PaloAltoCDLEvent:
+    category: network
+    service: firewall
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+    - SOC Network Firewall Logs
+  TomcatEvent:
+    category: network
+    service: web_server
+    sources:
+    - SOC WAF Security Logs
+    - SOC Web Application Logs
+    - SOC Load Balancer Access Logs
+  DnsEvents:
+    category: network
+    service: dns
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Sysmon Operational Logs
+    - SOC VCN Flow Logs
+  DNSQuery:
+    category: network
+    service: dns
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Sysmon Operational Logs
+  CommonSecurityLog:
+    category: network
+    service: common_security
+    sources:
+    - SOC Network Firewall Logs
+    - OCI Network Firewall Logs
+    - SOC VCN Flow Logs
+  CommonSecurityLog_CL:
+    category: network
+    service: common_security
+    sources:
+    - SOC Network Firewall Logs
+    - OCI Network Firewall Logs
+    - SOC VCN Flow Logs

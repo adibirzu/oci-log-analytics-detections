@@ -1,0 +1,41 @@
+tables:
+  AzureActivity:
+    category: azure_cloud
+    service: azure_activity
+    sources:
+    - Azure Activity Logs
+  OCILogs:
+    category: azure_cloud
+    service: oci_audit
+    sources:
+    - OCI Audit Logs
+  AWSCloudTrail:
+    category: azure_cloud
+    service: aws_cloudtrail
+    sources:
+    - SOC Cloud Guard Logs
+    - SOC Application Logs
+  GCPAuditLogs:
+    category: azure_cloud
+    service: gcp_audit
+    sources:
+    - SOC Cloud Guard Logs
+    - SOC Application Logs
+  GCP_IAM:
+    category: azure_cloud
+    service: gcp_iam
+    sources:
+    - SOC Cloud Guard Logs
+    - SOC Application Logs
+  PaloAltoPrismaCloud:
+    category: azure_cloud
+    service: cloud_security_posture
+    sources:
+    - SOC Cloud Guard Logs
+    - SOC Application Logs
+  AzureDiagnostics:
+    category: azure_cloud
+    service: azure_diagnostics
+    sources:
+    - Azure Diagnostics Logs
+    - OCI Audit Logs

@@ -1,0 +1,88 @@
+tables:
+  OfficeActivity:
+    category: m365
+    service: office_activity
+    sources:
+    - Microsoft 365 Audit Logs
+    - Office 365 Audit Logs
+    - SOC Application Logs
+  CloudAppEvents:
+    category: m365
+    service: cloud_app_events
+    sources:
+    - Microsoft 365 Cloud App Events
+    - SOC Application Logs
+  EmailEvents:
+    category: m365
+    service: defender_email
+    sources:
+    - Microsoft Defender Email Logs
+    - Microsoft 365 Audit Logs
+  EmailUrlInfo:
+    category: m365
+    service: defender_email
+    sources:
+    - Microsoft Defender Email Logs
+    - Microsoft 365 Audit Logs
+  UrlClickEvents:
+    category: m365
+    service: defender_email
+    sources:
+    - Microsoft Defender Email Logs
+    - Microsoft 365 Audit Logs
+  MessagePostDeliveryEvents:
+    category: m365
+    service: defender_email
+    sources:
+    - Microsoft Defender Email Logs
+    - Microsoft 365 Audit Logs
+  AlertInfo:
+    category: m365
+    service: defender_alerts
+    sources:
+    - SOC Application Logs
+  ADOAuditLogs:
+    category: m365
+    service: devops_audit
+    sources:
+    - SOC Application Logs
+  BoxEvents:
+    category: m365
+    service: box_audit
+    sources:
+    - SOC Application Logs
+  GitHubAuditData:
+    category: m365
+    service: github_audit
+    sources:
+    - SOC Application Logs
+  GWorkspaceActivityReports:
+    category: m365
+    service: google_workspace
+    sources:
+    - SOC Application Logs
+  JiraAudit:
+    category: m365
+    service: jira_audit
+    sources:
+    - SOC Application Logs
+  SecurityAlert:
+    category: m365
+    service: security_alerts
+    sources:
+    - SOC Application Logs
+  SlackAudit:
+    category: m365
+    service: slack_audit
+    sources:
+    - SOC Application Logs
+  Snowflake:
+    category: m365
+    service: snowflake_audit
+    sources:
+    - SOC Application Logs
+  TrendMicroCAS:
+    category: m365
+    service: cloud_app_security
+    sources:
+    - SOC Application Logs

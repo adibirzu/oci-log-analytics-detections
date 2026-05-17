@@ -1,0 +1,105 @@
+tables:
+  SecurityEvent:
+    category: endpoint
+    service: windows_security
+    sources:
+    - Windows Security Events
+    - Windows Event Security Logs
+  WindowsEvent:
+    category: endpoint
+    service: windows_event
+    sources:
+    - Windows Event System Logs
+    - Windows Security Events
+  Sysmon:
+    category: endpoint
+    service: sysmon
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Sysmon Operational Logs
+    - Windows Sysmon Events
+  DeviceEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+    - SOC Windows Sysmon Logs
+  DeviceProcessEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Security Events
+  DeviceNetworkEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+    - SOC Sysmon Network Logs
+  DeviceLogonEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+    - Windows Security Events
+    - Windows Event Security Logs
+  DeviceFileEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+    - SOC Windows Sysmon Logs
+  DeviceImageLoadEvents:
+    category: endpoint
+    service: defender_endpoint
+    sources:
+    - SOC Windows Sysmon Logs
+  imProcess:
+    category: endpoint
+    service: asim_process
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Security Events
+  imProcessCreate:
+    category: endpoint
+    service: asim_process
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Security Events
+  imFileEvent:
+    category: endpoint
+    service: asim_file
+    sources:
+    - SOC Windows Sysmon Logs
+  CiscoSecureEndpoint:
+    category: endpoint
+    service: cisco_secure_endpoint
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Security Events
+  CyberArkEPM:
+    category: endpoint
+    service: endpoint_privilege
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Security Events
+  McAfeeEPOEvent:
+    category: endpoint
+    service: endpoint_security
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Security Events
+  SentinelOne:
+    category: endpoint
+    service: endpoint_security
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Security Events
+  Syslog:
+    category: endpoint
+    service: linux_syslog
+    sources:
+    - SOC Linux Syslog Logs
+    - Linux Secure Logs
+  TMApexOneEvent:
+    category: endpoint
+    service: endpoint_security
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Security Events

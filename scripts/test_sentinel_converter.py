@@ -260,6 +260,22 @@ class TestSentinelKqlConversion(unittest.TestCase):
         self.assertIn("| stats count as Hits by 'Host Name (Server)'", query)
         self.assertIn("| where Hits > 3", query)
 
+    def test_set_directives_are_stripped(self):
+        result = convert_candidate(self._candidate(
+            query=(
+                "set timeout = 5m;\n"
+                "set query_take_max_records = 5000;\n"
+                "SecurityEvent\n"
+                "| where EventID == 4624"
+            )
+        ), self.mapping)
+
+        self.assertEqual(result.skip_reasons, [])
+        self.assertEqual(result.local_validation_errors, [])
+        query = result.query_payload["query"]
+        self.assertNotIn("set timeout", query)
+        self.assertIn("'Event ID' = '4624'", query)
+
     def test_tabular_let_variables_remain_unsupported(self):
         result = convert_candidate(self._candidate(
             query=(
@@ -323,7 +339,8 @@ class TestSentinelKqlConversion(unittest.TestCase):
         self.assertIn("distinctcount('Command Line') as DiscoveryCommands", query)
         self.assertIn("unique('Command Line') as CommandSamples", query)
         self.assertIn("unique('Process Name') as AnyFile", query)
-        self.assertIn("by 'Host Name (Server)', Time", query)
+        self.assertIn("timestats span = 5minute", query)
+        self.assertIn("by 'Host Name (Server)'", query)
         self.assertIn("| where DiscoveryCommands >= 3", query)
 
         time_query, _source_info, time_errors = convert_kql_to_logan(
@@ -333,6 +350,47 @@ class TestSentinelKqlConversion(unittest.TestCase):
         self.assertEqual(time_errors, [])
         self.assertIn("unique(Time) as any_Time", time_query)
         self.assertNotIn("TimeGenerated", time_query)
+
+    def test_phase9_extend_scalar_functions_convert(self):
+        result = convert_candidate(self._candidate(
+            query=(
+                "SecurityEvent\n"
+                "| extend ActorLower = tolower(tostring(Account)), "
+                "IsFailure = iff(EventID == 4625, 'yes', 'no'), "
+                "NumericId = toint(EventID)\n"
+                "| project ActorLower, IsFailure, NumericId"
+            )
+        ), self.mapping)
+
+        self.assertEqual(result.skip_reasons, [])
+        self.assertEqual(result.local_validation_errors, [])
+        query = result.query_payload["query"]
+        self.assertIn("eval ActorLower = lower(User)", query)
+        self.assertIn("eval IsFailure = if('Event ID' = '4625', 'yes', 'no')", query)
+        self.assertIn("eval NumericId = 'Event ID'", query)
+        self.assertIn("| fields ActorLower, IsFailure, NumericId", query)
+
+    def test_phase9_countif_bin_and_column_ifexists_convert(self):
+        result = convert_candidate(self._candidate(
+            query=(
+                "SecurityEvent\n"
+                "| where column_ifexists('Account', '') has 'admin'\n"
+                "| summarize Failures=countif(EventID == 4625), Total=count() "
+                "by bin(TimeGenerated, 15m), Account\n"
+                "| top 5 by Failures desc"
+            )
+        ), self.mapping)
+
+        self.assertEqual(result.skip_reasons, [])
+        self.assertEqual(result.local_validation_errors, [])
+        query = result.query_payload["query"]
+        self.assertIn("User like '*admin*'", query)
+        self.assertIn(
+            "timestats span = 15minute sum(if('Event ID' = '4625', 1, 0)) as Failures, "
+            "count as Total by User",
+            query,
+        )
+        self.assertIn("| sort -Failures | head 5", query)
 
     def test_duplicate_time_aggregate_aliases_are_made_unique(self):
         query, _source_info, errors = convert_kql_to_logan(
@@ -669,12 +727,28 @@ class TestSentinelKqlConversion(unittest.TestCase):
             "let suspicious = SecurityEvent | where EventID == 4624; "
             "SecurityEvent | extend bag=parse_json(AdditionalFields) "
             "| where Message matches regex 'abc' "
+            "| parse Message with 'prefix' value 'suffix' "
             "| join suspicious on Account | mv-expand TargetResources"
         )
 
         self.assertTrue(any("join" in reason for reason in unsupported))
         self.assertTrue(any("let" in reason for reason in unsupported))
         self.assertTrue(any("mv-expand" in reason for reason in unsupported))
+        self.assertTrue(any("JSON bag expansion" in reason for reason in unsupported))
+        self.assertTrue(any("regex predicate" in reason for reason in unsupported))
+        self.assertTrue(any("operator: parse" in reason for reason in unsupported))
+
+    def test_lossy_phase9_shapes_remain_skipped(self):
+        unsupported = classify_unsupported_kql(
+            "SecurityEvent | where parse_command_line(CommandLine) has 'x' "
+            "| evaluate bag_unpack(AdditionalFields) "
+            "| make-series Count=count() on TimeGenerated in range(ago(1d), now(), 1h) "
+            "| where Account matches regex 'admin.*'"
+        )
+
+        self.assertTrue(any("parse_command_line" in reason for reason in unsupported))
+        self.assertTrue(any("evaluate" in reason for reason in unsupported))
+        self.assertTrue(any("make-series" in reason for reason in unsupported))
         self.assertTrue(any("JSON bag expansion" in reason for reason in unsupported))
         self.assertTrue(any("regex predicate" in reason for reason in unsupported))
 

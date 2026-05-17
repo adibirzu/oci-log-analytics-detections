@@ -118,6 +118,18 @@ def test_summarize_count_by_tier1(ctx: ConversionContext) -> None:
     assert "count" in result.fragments[0].lower()
 
 
+def test_summarize_countif_and_time_bin_tier1(ctx: ConversionContext) -> None:
+    result = summarize_op.convert_summarize(
+        KqlStage(kind="summarize", body="Failures=countif(EventID == 4625) by bin(TimeGenerated, 15m), Account"),
+        ctx,
+    )
+    assert result.tier == Tier.TIER_1
+    assert result.skip_reasons == ()
+    assert result.fragments
+    assert result.fragments[0].startswith("timestats span = 15minute")
+    assert "sum(if('Event ID' = '4625', 1, 0)) as Failures" in result.fragments[0]
+
+
 def test_project_basic_tier1(ctx: ConversionContext) -> None:
     result = project_op.convert_project(
         KqlStage(kind="project", body="TimeGenerated, Account, Process"), ctx
@@ -137,6 +149,15 @@ def test_extend_basic_alias_propagation(ctx: ConversionContext) -> None:
     # always populate ``new_aliases`` when the legacy helper introduces one.
     if result.tier == Tier.TIER_1:
         assert "IsAdmin" in result.new_aliases
+
+
+def test_extend_scalar_function_tier1(ctx: ConversionContext) -> None:
+    result = extend_op.convert_extend(
+        KqlStage(kind="extend", body="ActorLower = tolower(tostring(Account))"), ctx
+    )
+    assert result.tier == Tier.TIER_1
+    assert result.skip_reasons == ()
+    assert result.fragments == ("eval ActorLower = lower(User)",)
 
 
 def test_sort_basic_tier1(ctx: ConversionContext) -> None:

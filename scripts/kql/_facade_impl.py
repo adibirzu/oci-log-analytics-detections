@@ -86,6 +86,7 @@ LOGAN_COMMANDS = {
     "not",
     "or",
     "sort",
+    "span",
     "stats",
     "where",
 }
@@ -173,12 +174,13 @@ UNSUPPORTED_PATTERNS = [
     (re.compile(r"\bwatchlist\b", re.IGNORECASE), "unsupported KQL construct: watchlists"),
     (re.compile(r"\binvoke\b", re.IGNORECASE), "unsupported KQL construct: custom function invocation"),
     (re.compile(r"\bevaluate\b", re.IGNORECASE), "unsupported KQL operator: evaluate"),
+    (re.compile(r"\bparse_command_line\s*\(", re.IGNORECASE), "unsupported KQL function: parse_command_line"),
+    (re.compile(r"\|\s*parse(?:-where)?\b", re.IGNORECASE), "unsupported KQL operator: parse"),
     (re.compile(r"\bmaterialize\s*\(", re.IGNORECASE), "unsupported KQL function: materialize"),
     (re.compile(r"\bstrlen\s*\(", re.IGNORECASE), "unsupported KQL function: strlen"),
     (re.compile(r"\b(parse_json|todynamic|bag_unpack|bag_keys|extractjson)\s*\(", re.IGNORECASE), "unsupported KQL JSON bag expansion"),
     (re.compile(r"\bextract\s*\(", re.IGNORECASE), "unsupported KQL regex extraction"),
     (re.compile(r"\bmatches\s+regex\b", re.IGNORECASE), "unsupported KQL regex predicate"),
-    (re.compile(r"\bcountif\s*\(", re.IGNORECASE), "unsupported KQL aggregate: countif"),
     (re.compile(r"\[[^\]]+\]\."), "unsupported KQL JSON/index path"),
 ]
 
@@ -438,8 +440,25 @@ def _replace_unquoted_variables(text: str, variables: dict[str, str]) -> str:
     return "".join(output)
 
 
+def _strip_set_directives(kql: str) -> str:
+    """Remove supported Sentinel query directives before conversion."""
+
+    text = kql.strip()
+    supported = r"(?:timeout|truncationmaxsize|query_take_max_records)"
+    while True:
+        match = re.match(
+            rf"\s*set\s+{supported}\s*=\s*[^;\n]+(?:;|\n)",
+            text,
+            flags=re.IGNORECASE,
+        )
+        if not match:
+            break
+        text = text[match.end():].lstrip()
+    return text
+
+
 def _preprocess_simple_lets(kql: str) -> tuple[str, list[str]]:
-    text = _strip_kql_comments(kql).strip()
+    text = _strip_set_directives(_strip_kql_comments(kql)).strip()
     variables: dict[str, str] = {}
     while True:
         match = re.match(r"\s*let\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*=", text, flags=re.IGNORECASE)
@@ -527,7 +546,7 @@ def _split_kql_stages(kql: str) -> list[str]:
 
 def _classify_unsupported_kql_text(kql: str) -> list[str]:
     """Return deterministic skip reasons for unsupported KQL features."""
-    stripped = _strip_string_literals(kql)
+    stripped = _strip_string_literals(_strip_set_directives(kql))
     reasons = []
     for pattern, reason in UNSUPPORTED_PATTERNS:
         if pattern.search(stripped):
@@ -735,6 +754,16 @@ def convert_predicate(
     identifier_field_token = r"(?:[A-Za-z_][A-Za-z0-9_]*|`[^`]+`)"
     value_token = r"(?:@?'[^']*'|@?\"[^\"]*\"|-?\d+(?:\.\d+)?|true|false|null)"
 
+    def replace_column_ifexists(match: re.Match) -> str:
+        return _literal_value(match.group("field"))
+
+    expression = re.sub(
+        r"column_ifexists\s*\(\s*(?P<field>'[^']+'|\"[^\"]+\"|[A-Za-z_][A-Za-z0-9_]*)\s*,\s*[^)]*\)",
+        replace_column_ifexists,
+        expression,
+        flags=re.IGNORECASE,
+    )
+
     def replace_isnotempty(match: re.Match) -> str:
         field = map_field(match.group("field"), mapping, errors, allowed_aliases)
         return f"({field} != null and {field} != '')"
@@ -878,6 +907,10 @@ def _convert_fields_clause(
     fields = []
     for field in _split_top_level(clause):
         alias, expression = _split_alias_expression(field)
+        column_ifexists = _column_ifexists_field(expression)
+        if column_ifexists:
+            fields.append(map_field(column_ifexists, mapping, errors, allowed_aliases))
+            continue
         bin_match = re.fullmatch(
             r"bin\s*\(\s*(?P<field>[A-Za-z_][A-Za-z0-9_]*)\s*,\s*[^)]+\)",
             expression.strip(),
@@ -894,6 +927,48 @@ def _convert_fields_clause(
             continue
         fields.append(map_field(field, mapping, errors, allowed_aliases))
     return ", ".join(fields)
+
+
+def _column_ifexists_field(expression: str) -> str:
+    match = re.fullmatch(
+        r"column_ifexists\s*\(\s*(?P<field>'[^']+'|\"[^\"]+\"|[A-Za-z_][A-Za-z0-9_]*)\s*,\s*(?P<fallback>[^)]*)\)",
+        expression.strip(),
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return ""
+    return _literal_value(match.group("field"))
+
+
+def _span_to_logan(span: str) -> str:
+    match = re.fullmatch(r"\s*(?P<count>\d+)\s*(?P<unit>ms|s|m|h|d)\s*", span, flags=re.IGNORECASE)
+    if not match:
+        return span.strip()
+    unit = match.group("unit").lower()
+    unit_map = {
+        "ms": "millisecond",
+        "s": "second",
+        "m": "minute",
+        "h": "hour",
+        "d": "day",
+    }
+    return f"{match.group('count')}{unit_map[unit]}"
+
+
+def _split_time_bin(by_clause: str) -> tuple[str, str]:
+    fields = []
+    span = ""
+    for field in _split_top_level(by_clause):
+        match = re.fullmatch(
+            r"bin\s*\(\s*(?P<field>TimeGenerated|Timestamp)\s*,\s*(?P<span>[^)]+)\)",
+            field.strip(),
+            flags=re.IGNORECASE,
+        )
+        if match:
+            span = _span_to_logan(match.group("span"))
+        else:
+            fields.append(field)
+    return span, ", ".join(fields)
 
 
 def _sanitize_alias(alias: str, fallback: str) -> str:
@@ -965,6 +1040,7 @@ def _convert_summarize(
     parts = re.split(r"\s+by\s+", clause, maxsplit=1, flags=re.IGNORECASE)
     aggregate_clause = parts[0].strip()
     by_clause = parts[1].strip() if len(parts) == 2 else ""
+    time_span, non_time_by_clause = _split_time_bin(by_clause) if by_clause else ("", "")
     errors = []
     aggregates = []
     aggregate_aliases: set[str] = set()
@@ -976,16 +1052,23 @@ def _convert_summarize(
             errors.append(f"unsupported summarize aggregate: {raw_aggregate}")
             continue
         func = match.group("func").lower()
-        if func not in SUPPORTED_AGGREGATIONS:
+        if func not in SUPPORTED_AGGREGATIONS and func != "countif":
             errors.append(f"unsupported summarize aggregate: {raw_aggregate}")
             continue
-        mapped_func = SUPPORTED_AGGREGATIONS[func]
         field = match.group("field").strip()
         field_args = _split_top_level(field)
         field = field_args[0].strip() if field_args else field
         alias = _sanitize_alias(alias, f"{func}_{index}") if alias else _default_aggregate_alias(func, field, index)
         alias = _unique_alias(alias, used_aliases)
         aggregate_aliases.add(alias)
+        if func == "countif":
+            predicate, predicate_errors = convert_predicate(field, mapping, allowed_aliases)
+            errors.extend(predicate_errors)
+            if predicate:
+                aggregates.append(f"sum(if({predicate}, 1, 0)) as {alias}")
+            continue
+
+        mapped_func = SUPPORTED_AGGREGATIONS[func]
         if func == "count" and not field:
             aggregates.append(f"count as {alias}")
         else:
@@ -995,6 +1078,11 @@ def _convert_summarize(
         errors.append("summarize stage did not produce supported aggregates")
         return "", errors, aggregate_aliases
 
+    if time_span:
+        command = f"timestats span = {time_span} {', '.join(aggregates)}"
+        if non_time_by_clause:
+            command = f"{command} by {_convert_fields_clause(non_time_by_clause, mapping, errors, allowed_aliases)}"
+        return command, errors, aggregate_aliases
     if by_clause:
         return (
             f"stats {', '.join(aggregates)} by {_convert_fields_clause(by_clause, mapping, errors, allowed_aliases)}",
@@ -1029,6 +1117,58 @@ def _convert_top(stage: str, mapping: dict, errors: list[str], allowed_aliases: 
     return commands
 
 
+def _function_args(expression: str, function_name: str) -> list[str] | None:
+    pattern = rf"{re.escape(function_name)}\s*\((?P<body>.*)\)"
+    match = re.fullmatch(pattern, expression.strip(), flags=re.IGNORECASE)
+    if not match:
+        return None
+    return _split_top_level(match.group("body"))
+
+
+def _convert_scalar_expression(
+    expression: str,
+    mapping: dict,
+    errors: list[str],
+    allowed_aliases: set[str],
+) -> str:
+    expr = expression.strip()
+    if not expr:
+        errors.append("unsupported empty scalar expression")
+        return "''"
+
+    column_field = _column_ifexists_field(expr)
+    if column_field:
+        return map_field(column_field, mapping, errors, allowed_aliases)
+
+    for cast_name in ("tostring", "toint", "tolong"):
+        args = _function_args(expr, cast_name)
+        if args is not None:
+            if len(args) != 1:
+                errors.append(f"unsupported scalar function: {cast_name}")
+                return "''"
+            return _convert_scalar_expression(args[0], mapping, errors, allowed_aliases)
+
+    for function_name, logan_name in (("tolower", "lower"), ("toupper", "upper")):
+        args = _function_args(expr, function_name)
+        if args is not None:
+            if len(args) != 1:
+                errors.append(f"unsupported scalar function: {function_name}")
+                return "''"
+            return f"{logan_name}({_convert_scalar_expression(args[0], mapping, errors, allowed_aliases)})"
+
+    if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", expr):
+        return map_field(expr, mapping, errors, allowed_aliases)
+    if re.fullmatch(r"-?\d+(?:\.\d+)?", expr):
+        return expr
+    if expr.lower() in {"true", "false", "null"}:
+        return _format_value(expr)
+    if (expr.startswith("'") and expr.endswith("'")) or (expr.startswith('"') and expr.endswith('"')):
+        return _format_value(expr)
+
+    errors.append(f"unsupported scalar expression: {expression}")
+    return _format_value(expr)
+
+
 def _convert_extend(stage: str, mapping: dict, allowed_aliases: set[str]) -> tuple[list[str], list[str], set[str]]:
     clause = re.sub(r"^\s*extend\s+", "", stage, flags=re.IGNORECASE).strip()
     commands = []
@@ -1042,13 +1182,18 @@ def _convert_extend(stage: str, mapping: dict, allowed_aliases: set[str]) -> tup
         sanitized_alias = _sanitize_alias(alias, "extended_field")
         if sanitized_alias.lower() in ENTITY_ENRICHMENT_ALIASES_NORMALIZED:
             continue
-        if re.search(r"\w+\s*\(", expression):
-            errors.append(f"unsupported extend expression: {assignment}")
-            continue
-        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", expression.strip()):
-            rhs = map_field(expression, mapping, errors, allowed_aliases)
+        iff_args = _function_args(expression, "iff") or _function_args(expression, "iif")
+        if iff_args is not None:
+            if len(iff_args) != 3:
+                errors.append(f"unsupported extend expression: {assignment}")
+                continue
+            predicate, predicate_errors = convert_predicate(iff_args[0], mapping, allowed_aliases)
+            errors.extend(predicate_errors)
+            true_value = _convert_scalar_expression(iff_args[1], mapping, errors, allowed_aliases)
+            false_value = _convert_scalar_expression(iff_args[2], mapping, errors, allowed_aliases)
+            rhs = f"if({predicate}, {true_value}, {false_value})" if predicate else true_value
         else:
-            rhs = _format_value(expression)
+            rhs = _convert_scalar_expression(expression, mapping, errors, allowed_aliases)
         aliases.add(sanitized_alias)
         commands.append(f"eval {sanitized_alias} = {rhs}")
     return commands, errors, aliases

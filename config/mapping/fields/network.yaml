@@ -1,0 +1,157 @@
+fields:
+  ClientRequestHost:
+    target: '''Destination Hostname'''
+    role: network
+  ClientRequestMethod:
+    target: '''HTTP Request Method'''
+    role: network
+  ClientRequestPath:
+    target: '''URL Path'''
+    role: network
+  ClientRequestURI:
+    target: '''Request URL'''
+    role: network
+  ClientRequestUserAgent:
+    target: '''User Agent'''
+    role: network
+  ClientIP:
+    target: '''Client IP'''
+    role: network
+  DestinationIpAddress:
+    target: '''Destination IP'''
+    role: network
+  DstIpAddr:
+    target: '''Destination IP'''
+    role: network
+  DstIP:
+    target: '''Destination IP'''
+    role: network
+  DstHostname:
+    target: '''Destination Hostname'''
+    role: network
+  DestinationHostName:
+    target: '''Destination Hostname'''
+    role: network
+  DestinationHostname:
+    target: '''Destination Hostname'''
+    role: network
+  DestinationIP:
+    target: '''Destination IP'''
+    role: network
+  DestinationIp:
+    target: '''Destination IP'''
+    role: network
+  DestinationPort:
+    target: '''Destination Port'''
+    role: network
+  Dvc:
+    target: '''Host Name'''
+    role: network
+  DvcHostname:
+    target: '''Host Name'''
+    role: network
+  DvcIpAddr:
+    target: '''Source IP'''
+    role: network
+  DeviceName:
+    target: '''Host Name (Server)'''
+    role: network
+  FileSize:
+    target: '''Network Bytes Out'''
+    role: network
+  HttpRequestHeaderHost:
+    target: '''Destination Hostname'''
+    role: network
+  HttpStatusCode:
+    target: '''HTTP Status Code'''
+    role: network
+  HostName:
+    target: '''Host Name'''
+    role: network
+  HttpUserAgent:
+    target: '''User Agent'''
+    role: network
+  HttpRequestMethod:
+    target: '''HTTP Request Method'''
+    role: network
+  IPAddress:
+    target: '''Source IP'''
+    role: network
+  IpAddress:
+    target: '''Source IP'''
+    role: network
+  RequestMethod:
+    target: '''HTTP Request Method'''
+    role: network
+  RequestURL:
+    target: '''Request URL'''
+    role: network
+  RequestUrl:
+    target: '''Request URL'''
+    role: network
+  RemoteIP:
+    target: '''Destination IP'''
+    role: network
+  RemoteUrl:
+    target: '''Request URL'''
+    role: network
+  RemotePort:
+    target: '''Destination Port'''
+    role: network
+  ReportId:
+    target: '''Resource ID'''
+    role: network
+  SourceIPAddress:
+    target: '''Source IP'''
+    role: network
+  SourceIpAddress:
+    target: '''Source IP'''
+    role: network
+  SourceIP:
+    target: '''Source IP'''
+    role: network
+  SourceIp:
+    target: '''Source IP'''
+    role: network
+  SourcePort:
+    target: '''Source Port'''
+    role: network
+  SrcIP:
+    target: '''Source IP'''
+    role: network
+  SrcIpAddr:
+    target: '''Source IP'''
+    role: network
+  URL:
+    target: '''Request URL'''
+    role: network
+  Url:
+    target: '''Request URL'''
+    role: network
+  UrlCategory:
+    target: '''Threat Category'''
+    role: network
+  UrlOriginal:
+    target: '''Request URL'''
+    role: network
+  UserAgent:
+    target: '''User Agent'''
+    role: network
+  HttpUserAgentOriginal:
+    target: '''User Agent'''
+    role: network
+  WAFAction:
+    target: '''WAF Action'''
+    role: network
+  WAFRuleID:
+    target: '''Rule Key'''
+    role: network
+  WAFRuleMessage:
+    target: '''Attack Type'''
+    role: network
+  DstPortNumber:
+    target: '''Destination Port'''
+    role: network
+  data_request_headers_oci_original_url_s:
+    target: '''Request URL'''
+    role: network

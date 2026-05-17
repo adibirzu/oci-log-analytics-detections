@@ -1,0 +1,94 @@
+fields:
+  CommandLine:
+    target: '''Command Line'''
+    role: initiator
+  EventID:
+    target: '''Event ID'''
+    role: resource
+  EventId:
+    target: '''Event ID'''
+    role: resource
+  FileName:
+    target: '''Process Name'''
+    role: initiator
+  FilePath:
+    target: '''Target Filename'''
+    role: initiator
+  FolderPath:
+    target: '''Target Filename'''
+    role: initiator
+  Hash:
+    target: Hashes
+    role: hash
+  MD5:
+    target: Hashes
+    role: hash
+  SHA1:
+    target: Hashes
+    role: hash
+  SHA256:
+    target: Hashes
+    role: hash
+  Image:
+    target: '''Process Name'''
+    role: initiator
+  InitiatingProcessCommandLine:
+    target: '''Command Line'''
+    role: initiator
+  InitiatingProcessFileName:
+    target: '''Parent Process Name'''
+    role: initiator
+  InitiatingProcessParentFileName:
+    target: '''Parent Process Name'''
+    role: initiator
+  InitiatingProcessFolderPath:
+    target: '''Parent Process Name'''
+    role: initiator
+  LogonType:
+    target: '''Logon Type'''
+    role: resource
+  ParentImage:
+    target: '''Parent Process Name'''
+    role: initiator
+  Process:
+    target: '''Process Name'''
+    role: initiator
+  ProcessCommandLine:
+    target: '''Command Line'''
+    role: initiator
+  ProcessName:
+    target: '''Process Name'''
+    role: initiator
+  ActingProcessCommandLine:
+    target: '''Command Line'''
+    role: initiator
+  ActingProcessName:
+    target: '''Parent Process Name'''
+    role: initiator
+  ActingProcessSHA256:
+    target: Hashes
+    role: hash
+  SrcFileName:
+    target: '''Target Filename'''
+    role: initiator
+  SourceFileName:
+    target: '''Target Filename'''
+    role: initiator
+  TargetFileMD5:
+    target: Hashes
+    role: hash
+  TargetFileName:
+    target: '''Target Filename'''
+    role: target
+  TargetFilePath:
+    target: '''Target Filename'''
+    role: target
+  TargetFileSHA1:
+    target: Hashes
+    role: hash
+  TargetFileSHA256:
+    target: Hashes
+    role: hash
+  UserId:
+    target: '''User ID (hashed)'''
+    role: hash

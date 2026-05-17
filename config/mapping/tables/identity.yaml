@@ -1,0 +1,32 @@
+tables:
+  SigninLogs:
+    category: identity
+    service: entra_signin
+    sources:
+    - Azure Entra ID Sign-in Logs
+  AADNonInteractiveUserSignInLogs:
+    category: identity
+    service: entra_signin
+    sources:
+    - Azure Entra ID Sign-in Logs
+  AuditLogs:
+    category: identity
+    service: entra_audit
+    sources:
+    - Azure Entra ID Audit Logs
+  imAuthentication:
+    category: identity
+    service: asim_authentication
+    sources:
+    - Azure Entra ID Sign-in Logs
+    - Windows Security Events
+  CiscoDuo:
+    category: identity
+    service: cisco_duo
+    sources:
+    - SOC Application Logs
+  CiscoISEEvent:
+    category: identity
+    service: cisco_ise
+    sources:
+    - SOC Application Logs

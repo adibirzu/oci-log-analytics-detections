@@ -1,0 +1,70 @@
+fields:
+  Account:
+    target: User
+    role: subject
+  AccountName:
+    target: User
+    role: subject
+  Actor:
+    target: User
+    role: subject
+  AccountUpn:
+    target: '''User Name'''
+    role: subject
+  DstUserName:
+    target: '''Target User Name'''
+    role: target
+  DstUsername:
+    target: '''Target User Name'''
+    role: target
+  ActorUsername:
+    target: '''User Name'''
+    role: subject
+  ServicePrincipalName:
+    target: '''Resource Name'''
+    role: subject
+  SrcUserName:
+    target: '''User Name'''
+    role: subject
+  SrcUsername:
+    target: '''User Name'''
+    role: subject
+  SourceLogin:
+    target: '''User Name'''
+    role: subject
+  SubjectUserName:
+    target: '''Subject User Name'''
+    role: subject
+  Target:
+    target: '''Target Object'''
+    role: target
+  TargetResource:
+    target: '''Resource Name'''
+    role: target
+  TargetUserName:
+    target: '''Target User Name'''
+    role: target
+  TargetUsername:
+    target: '''Target User Name'''
+    role: target
+  TargetUserId:
+    target: '''Target User Name'''
+    role: target
+  UPN:
+    target: '''User Name'''
+    role: subject
+  UPNSuffix:
+    target: '''Target Domain Name'''
+    role: subject
+  User:
+    target: User
+    role: subject
+  UserName:
+    target: '''User Name'''
+    role: subject
+  UserPrincipalName:
+    target: '''User Name'''
+    role: subject
+  ObjectItemName:
+    target: '''Target Object'''
+    role: target

@@ -1,0 +1,13 @@
+fields:
+  ClientAppUsed:
+    target: '''Application Name'''
+    role: resource
+  EmailDirection:
+    target: Direction
+    role: resource
+  RecipientEmailAddress:
+    target: '''Target User Name'''
+    role: target
+  SenderFromAddress:
+    target: '''User Name'''
+    role: subject

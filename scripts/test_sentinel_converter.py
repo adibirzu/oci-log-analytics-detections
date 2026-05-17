@@ -189,6 +189,14 @@ class TestSentinelKqlConversion(unittest.TestCase):
         self.assertIn("'User Name' like '*admin*'", query)
         self.assertNotRegex(query, r"\bfilter\b")
 
+    def test_role_mismatched_field_comparison_is_skipped(self):
+        result = convert_candidate(self._candidate(
+            query="SecurityEvent | where SubjectUserName == TargetUserName",
+        ), self.mapping)
+
+        self.assertIsNone(result.query_payload)
+        self.assertIn("role_mismatch:SubjectUserName:TargetUserName", result.skip_reasons)
+
     def test_convert_project_distinct_and_simple_union(self):
         candidate = self._candidate(
             query=(

@@ -44,14 +44,35 @@ fields:
   InitiatingProcessFolderPath:
     target: '''Parent Process Name'''
     role: initiator
+  InitiatingProcessAccountDomain:
+    target: '''Target Domain Name'''
+    role: initiator
+  InitiatingProcessAccountName:
+    target: '''Account Name'''
+    role: initiator
+  InitiatingProcessSHA256:
+    target: Hashes
+    role: hash
+  InitiatingProcessId:
+    target: '''Process ID'''
+    role: initiator
   LogonType:
+    target: '''Logon Type'''
+    role: resource
+  Logon_Type:
     target: '''Logon Type'''
     role: resource
   ParentImage:
     target: '''Parent Process Name'''
     role: initiator
+  ParentProcessName:
+    target: '''Parent Process Name'''
+    role: initiator
   Process:
     target: '''Process Name'''
+    role: initiator
+  ProcessId:
+    target: '''Process ID'''
     role: initiator
   ProcessCommandLine:
     target: '''Command Line'''
@@ -59,6 +80,12 @@ fields:
   ProcessName:
     target: '''Process Name'''
     role: initiator
+  Exe:
+    target: '''Process Name'''
+    role: initiator
+  LocalFile:
+    target: '''Target Filename'''
+    role: resource
   ActingProcessCommandLine:
     target: '''Command Line'''
     role: initiator
@@ -68,6 +95,9 @@ fields:
   ActingProcessSHA256:
     target: Hashes
     role: hash
+  ActingProcessFileInternalName:
+    target: '''Parent Process Name'''
+    role: initiator
   SrcFileName:
     target: '''Target Filename'''
     role: initiator

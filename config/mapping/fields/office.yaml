@@ -2,6 +2,21 @@ fields:
   ClientAppUsed:
     target: '''Application Name'''
     role: resource
+  MailboxOwnerUPN:
+    target: '''User Name'''
+    role: subject
+  OfficeWorkload:
+    target: '''Application Name'''
+    role: resource
+  OrganizationName:
+    target: '''Resource Name'''
+    role: resource
+  ClientInfoString:
+    target: '''User Agent'''
+    role: network
+  UserType:
+    target: Type
+    role: subject
   EmailDirection:
     target: Direction
     role: resource

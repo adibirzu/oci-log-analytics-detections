@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: Sentinel KQL Parity to Logan QL
-status: In Progress
-stopped_at: Phase 9 production-readiness review pass complete; Phase 9 operator/mapping work remains open
-last_updated: "2026-05-17T07:16:27.000Z"
-last_activity: 2026-05-17 — Sentinel promotion refresh under `OCI_PROFILE=cap`: 100 candidates attempted, 60 promoted live parser-passed, strict Sentinel status ok, dashboard pre-flight passed with 640 query files, synthetic Sentinel-shaped logs uploaded to CAP and 20/20 ready Logan QL queries returned rows.
+milestone: v3.0
+milestone_name: Logan QL Conversion Workbench
+status: planning
+last_updated: "2026-05-17T08:44:38.184Z"
+last_activity: "2026-05-17 - Milestone v3.0 planned; next step is Phase 12"
 progress:
-  total_phases: 6
-  completed_phases: 3
-  total_plans: 17
-  completed_plans: 17
+  total_phases: 5
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-15)
+See: .planning/PROJECT.md (updated 2026-05-17)
 
 **Core value:** Every committed detection, query, dashboard, parser mapping, and generated artifact must remain deployable and verifiable against OCI Log Analytics without leaking tenant-specific data.
-**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 8 complete, Phase 9 partially advanced by a live promotion/test pass (60 parser-passed promoted queries; 20 synthetic-hit queries), with remaining operator parity and bulk mapping work still open.
+**Current focus:** v3.0 - Logan QL Conversion Workbench; plan a sibling frontend for cross-QL conversion into OCI Log Analytics QL while this repo generates the command catalog, mapping patterns, examples, and schemas that the frontend consumes. v2.0 Phase 9+ work remains open history and must not be treated as completed by this milestone switch.
 
 ## Current Position
 
-Phase: 9 (operator-parity-and-field-mapping-bulk-expansion) — In Progress
-Plan: production-readiness review and live promotion/testing pass executed inline from the Phase 8 backlog output; full Phase 9 operator/mapping plan remains to be formalized before completing the phase.
-Status: Partial progress; promoted Sentinel coverage now meets the Phase 9 minimum count, but remaining operator parity, MAP-05 parser-readiness docs, and regression tests are not complete.
-Last activity: 2026-05-17 — `scripts/sentinel_conversion_workflow.py status --json --strict` returned ok with 60 promoted files / 60 live-passed; `scripts/sentinel_synthetic_logs.py validate-live --limit 20 --lookback 24h --timeout 60` returned 20 passed / 0 empty / 0 failed after CAP upload.
+Phase: 12 (frontend-boundary-and-artifact-api-contract) - Not started
+Plan: —
+Status: Ready to plan Phase 12
+Last activity: 2026-05-17 - v3.0 milestone research, requirements, and roadmap created
 
 ## Performance Metrics
 
@@ -66,12 +66,16 @@ Decisions are logged in `.planning/PROJECT.md`.
 - 2026-05-15: Add test-tier deps only (`pytest >= 8.3`, `hypothesis >= 6.150` in `requirements-dev.txt`); runtime deps in `requirements.txt` stay untouched.
 - 2026-05-15: Promotion gate remains live OCI parser validation — v2.0 does not relax it; new gates (synthetic-hit, drift) sit on top.
 - 2026-05-16: Sentinel synthetic readiness requires source-backed predicate fields and non-empty live Logan QL results. Do not treat parser-valid but empty results as production-ready.
+- 2026-05-17: v3.0 is scoped as a sibling frontend workbench, not UI code inside this repo; this repo produces versioned conversion/reference artifacts.
+- 2026-05-17: The v3.0 OCI command menu must be generated from official Oracle Log Analytics docs with provenance instead of being hand-authored in frontend components.
 
 ### Pending Todos
 
 - Plan the remaining Phase 9 operator parity and field mapping bulk expansion work via `$gsd-plan-phase 9`; do not treat the 2026-05-17 promotion/test pass as full Phase 9 completion.
 - Optional: decide whether Phase 10-style synthetic-hit promotion metadata should be backfilled for the 20 candidates that returned rows in `queries/sentinel_synthetic_live_results.json`; current canonical promotion still uses live parser validation.
 - If running `python3 scripts/release_checklist.py --include-live`, expect it to rewrite generated artifacts. Use a clean or intentionally staged worktree first.
+- Start v3.0 with `$gsd-plan-phase 12` to define the sibling frontend target, artifact/API schemas, and import contract.
+- Before Phase 15 execution, confirm whether the workbench extends `../LoganSecurityDashboardv0` or a new sibling app.
 
 ### Blockers/Concerns
 
@@ -81,6 +85,7 @@ Decisions are logged in `.planning/PROJECT.md`.
 - Phase 7 strict YAML loader found no duplicate keys in the generated shard layout; future mapping edits must go through `config/mapping/` and regenerate `config/sentinel_oci_mapping.yaml`.
 - CI secrets handling for fork PRs (Phase 11) needs a short security-review spike before the `live` job is wired.
 - `docs/health/*.json` evidence is ignored by git; live evidence files exist locally for the 2026-05-16 pass but require explicit archival if they must be shared.
+- v3.0 spans at least this repo and one sibling frontend repo. Phase work must avoid duplicating converter generation logic and must keep tenant-specific values out of examples.
 
 ## Deferred Items
 
@@ -94,6 +99,6 @@ Decisions are logged in `.planning/PROJECT.md`.
 
 ## Session Continuity
 
-Last session: 2026-05-17T07:16:27.000Z
-Stopped at: Phase 9 production-readiness review pass complete; release gates and commit pending
-Resume file: queries/sentinel_synthetic_live_results.json (tracked synthetic live-hit evidence)
+Last session: 2026-05-17T08:44:38.184Z
+Stopped at: v3.0 milestone initialized and ready for Phase 12 planning
+Resume file: .planning/ROADMAP.md (v3.0 Phase 12 entry point)

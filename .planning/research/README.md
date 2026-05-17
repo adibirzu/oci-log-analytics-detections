@@ -1,16 +1,12 @@
-# Research
+# Research Notes
 
-No standalone GSD project research has been run yet.
+Current research set: **v3.0 Logan QL Conversion Workbench**.
 
-Initial brownfield context was derived from local repository sources:
+These notes cover the new milestone scope only: a sibling web frontend for cross-QL conversion into OCI Log Analytics QL, plus the producer artifacts this repository must generate for that frontend.
 
-- `README.md`
-- `PLAN.md`
-- `STATUS.md`
-- `CLAUDE.md`
-- `queries/catalog.json`
-- `queries/dashboard_inventory.json`
-- `queries/sentinel_conversion_report.json`
-- local file layout and scripts
-
-Use `$gsd-plan-phase <phase>` with research enabled for phase-specific research.
+Files:
+- `STACK.md` - stack additions and sibling frontend fit
+- `FEATURES.md` - workbench feature landscape
+- `ARCHITECTURE.md` - artifact/API boundary and data flow
+- `PITFALLS.md` - conversion, docs, UX, and security risks
+- `SUMMARY.md` - roadmap implications

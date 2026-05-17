@@ -10,19 +10,19 @@ The repo is the canonical detection and dashboard artifact producer for companio
 
 Every committed detection, query, dashboard, parser mapping, and generated artifact must remain deployable and verifiable against OCI Log Analytics without leaking tenant-specific data.
 
-## Current Milestone: v2.0 Sentinel KQL Parity to Logan QL
+## Current Milestone: v3.0 Logan QL Conversion Workbench
 
-**Goal:** Close the conversion gap between Microsoft Sentinel KQL and OCI Log Analytics QL across capabilities, field mappings, and coverage so the converter can move promoted Sentinel content from 8 toward thousands of queries while keeping live OCI parser validation as the only promotion gate.
+**Goal:** Add a sibling web workbench that converts Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI passthrough examples into OCI Log Analytics QL while this repository remains the canonical producer of conversion/reference artifacts.
 
 **Target features:**
-- KQL operator/expression parity in the Sentinel conversion workflow (`parse`, `extend`, `column_ifexists`, `parse_command_line`, `iff`, `countof`, and other recurring unsupported expressions).
-- Field and table mapping completeness in `config/sentinel_oci_mapping.yaml` for unmapped Sentinel fields (Subject*, InitiatingProcess*, EventData, MailboxOwner*, OfficeWorkload, OrganizationName, etc.).
-- Promoted coverage expansion against the 4452-candidate Sentinel corpus, with promotion still gated on live OCI parser validation.
-- Backlog prioritization helper that ranks unmapped Sentinel rules by MITRE value and conversion complexity.
-- Conversion drift detector that flags promoted Sentinel queries that regress after mapping or parser changes.
-- CI workflow running converter dry-run, catalog regeneration, and release-checklist local gates on every PR.
+- Versioned artifact/API contract for a sibling frontend workbench that consumes generated content from this repo instead of duplicating conversion logic.
+- Official OCI Log Analytics command/reference catalog generated from Oracle documentation and exposed to the frontend as the workbench command menu.
+- Cross-QL mapping pattern library that explains how filters, fields, boolean logic, time windows, aggregation, projection, eval, regex/extraction, lookups, joins/correlation, and unsupported semantics map to OCI Log Analytics QL.
+- Source selector, source editor, OCI Logan QL output, explanation panel, examples, warnings, and copy/export actions in the sibling frontend.
+- 10-20 validated conversion examples using synthetic Sentinel/OCI-shaped logs and no tenant-specific data.
+- Producer-side schema/example tests plus sibling frontend build, typecheck, lint, accessibility, and browser acceptance gates.
 
-**Phase numbering:** continues from v1.0 — starts at Phase 6.
+**Phase numbering:** continues from v2.0 - starts at Phase 12.
 
 ## Requirements
 
@@ -43,7 +43,10 @@ Every committed detection, query, dashboard, parser mapping, and generated artif
 - [ ] Improve Sentinel conversion coverage by triaging local validation failures, field/table mapping gaps, and live validation failures.
 - [ ] Harden release evidence so local gates and optional live verification can be run consistently before demos or deployments.
 - [ ] Preserve the Octo APM workshop bundle contract for downstream deployment from `octo-apm-demo`.
-- [ ] Drive Sentinel KQL parity (capabilities, mappings, coverage) toward the v2.0 milestone goal while keeping live OCI parser validation as the only promotion gate.
+- [ ] Carry forward open v2.0 Sentinel KQL parity items without weakening the live parser validation gate.
+- [ ] Generate official-docs-derived OCI Log Analytics command/reference artifacts for the v3.0 workbench.
+- [ ] Generate cross-QL mapping patterns, explanations, warnings, and examples for Splunk, Sentinel, Elastic/Lucene/KQL, Sigma, and OCI QL.
+- [ ] Define and validate a versioned producer/consumer contract for the sibling frontend workbench.
 
 ### Out of Scope
 
@@ -71,6 +74,11 @@ Every committed detection, query, dashboard, parser mapping, and generated artif
   - `queries/octo_apm_workshop_bundle.json`
   - `queries/sentinel_conversion_report.json`
   - `queries/manifest.json`
+  - Proposed v3.0 workbench contracts:
+    - `queries/logan_ql_reference_catalog.json`
+    - `queries/cross_ql_mapping_patterns.json`
+    - `queries/conversion_examples.json`
+    - `schemas/logan_workbench/*.schema.json`
   - `test_data/manifest.json`
 - Existing project-specific Claude guidance lives in `CLAUDE.md`; Codex should read `AGENTS.md` and `.planning/**` going forward.
 
@@ -92,6 +100,25 @@ Every committed detection, query, dashboard, parser mapping, and generated artif
 | Keep companion UI/API out of this repo | Prevents duplicate query/dashboard generation and preserves a clean artifact-producer boundary | Good |
 | Promote Sentinel content only after live OCI parser validation | Prevents parser-invalid KQL conversions from becoming dashboard or saved-search assets | Good |
 | Keep GSD `commit_docs` enabled but do not auto-commit in dirty worktrees | Planning docs should be tracked, but commits must not include unrelated generated changes | Pending |
+| Plan v3.0 as a sibling frontend workbench backed by generated artifacts | User selected sibling app scope; this repo must stay the producer of conversion/reference artifacts | Pending |
+| Generate the OCI command menu from official Oracle docs | User requested the menu be updated from official OCI pages, so frontend menu data must carry source provenance | Pending |
+
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `$gsd-transition`):
+1. Requirements invalidated? Move to Out of Scope with reason.
+2. Requirements validated? Move to Validated with phase reference.
+3. New requirements emerged? Add to Active.
+4. Decisions to log? Add to Key Decisions.
+5. "What This Is" still accurate? Update if drifted.
+
+**After each milestone** (via `$gsd-complete-milestone`):
+1. Full review of all sections.
+2. Core Value check - still the right priority?
+3. Audit Out of Scope - reasons still valid?
+4. Update Context with current state.
 
 ## GSD Usage
 
@@ -101,4 +128,4 @@ Every committed detection, query, dashboard, parser mapping, and generated artif
 - Keep `.planning/STATE.md` updated after major sessions and phase transitions.
 
 ---
-*Last updated: 2026-05-14 after GSD brownfield initialization*
+*Last updated: 2026-05-17 for v3.0 Logan QL Conversion Workbench milestone*

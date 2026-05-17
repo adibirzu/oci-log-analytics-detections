@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Sentinel KQL Parity to Logan QL
 status: In Progress
-stopped_at: Phase 7 complete; Phase 8 ready for autonomous planning
-last_updated: "2026-05-17T06:30:19.000Z"
-last_activity: 2026-05-17 — Phase 7 local release gates green: sharded mapping strict-loads, collision report stable, Sentinel strict status ok with promoted_count 8, dashboard dry-run 23/351, full pytest 364 passed / 5 skipped / 2 subtests passed
+stopped_at: Phase 8 complete; Phase 9 ready for autonomous planning
+last_updated: "2026-05-17T06:36:13.000Z"
+last_activity: 2026-05-17 — Phase 8 local release gates green: Sentinel backlog priority generated for 4,443 candidates, top blocker field_mapping:SubjectDomainName, Sentinel strict status ok with promoted_count 8, full pytest 367 passed / 5 skipped / 2 subtests passed
 progress:
   total_phases: 6
-  completed_phases: 2
-  total_plans: 14
-  completed_plans: 14
+  completed_phases: 3
+  total_plans: 17
+  completed_plans: 17
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-15)
 
 **Core value:** Every committed detection, query, dashboard, parser mapping, and generated artifact must remain deployable and verifiable against OCI Log Analytics without leaking tenant-specific data.
-**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 7 complete with sharded mapping loader and collision lint, Phase 8 (Backlog Prioritizer and Cohort Overlay) next.
+**Current focus:** v2.0 — Sentinel KQL Parity to Logan QL; Phase 8 complete with backlog prioritization, Phase 9 (Operator Parity and Field Mapping Bulk Expansion) next.
 
 ## Current Position
 
-Phase: 7 (mapping-config-sharding-and-collision-lint) — Complete
-Plan: all 4 plans executed inline (07-01 shard schema/strict loader, 07-02 role tags/role mismatch, 07-03 collision lint, 07-04 docs/release gates).
-Status: Complete; Phase 8 is the next incomplete roadmap phase.
-Last activity: 2026-05-17 — Local Phase 7 verification passed: generated mapping compatibility export stable, `queries/mapping_collisions.json` stable, Sentinel strict status ok with 8 promoted files, release checklist 14/14 PASS.
+Phase: 8 (backlog-prioritizer-and-cohort-overlay) — Complete
+Plan: all 3 plans executed inline (08-01 prioritizer generator, 08-02 release advisory/artifact contract, 08-03 docs/release gates).
+Status: Complete; Phase 9 is the next incomplete roadmap phase.
+Last activity: 2026-05-17 — Local Phase 8 verification passed: `queries/sentinel_backlog_priority.json` stable, release checklist advisory prints `Sentinel backlog: 4443 ranked; top blocker: field_mapping:SubjectDomainName`, release checklist 14/14 PASS.
 
 ## Performance Metrics
 
@@ -69,7 +69,7 @@ Decisions are logged in `.planning/PROJECT.md`.
 
 ### Pending Todos
 
-- Plan Phase 8 via `$gsd-plan-phase 8` for backlog prioritizer and cohort overlay.
+- Plan Phase 9 via `$gsd-plan-phase 9` for operator parity and field mapping bulk expansion.
 - Optional: promote only the additional Sentinel candidates that have both live parser validation and non-empty synthetic-hit evidence; 12 extra candidates were live-hit tested but not promoted in the 2026-05-16 pass.
 - If running `python3 scripts/release_checklist.py --include-live`, expect it to rewrite generated artifacts. Use a clean or intentionally staged worktree first.
 
@@ -94,6 +94,6 @@ Decisions are logged in `.planning/PROJECT.md`.
 
 ## Session Continuity
 
-Last session: 2026-05-17T06:30:19.000Z
-Stopped at: Phase 7 complete; Phase 8 ready
-Resume file: docs/health/release-checklist-2026-05-17T063019Z.json (ignored local evidence)
+Last session: 2026-05-17T06:36:13.000Z
+Stopped at: Phase 8 complete; Phase 9 ready
+Resume file: docs/health/release-checklist-2026-05-17T063613Z.json (ignored local evidence)

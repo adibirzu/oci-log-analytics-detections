@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Logan QL Conversion Workbench
 status: in_progress
-last_updated: "2026-05-18T00:00:00Z"
-last_activity: "2026-05-18 - Forge frontend moved into webapp/ in the long-term oci-log-analytics-detections repo; old sibling app is no longer the source of truth"
+last_updated: "2026-05-18T05:30:00Z"
+last_activity: "2026-05-18 - Forge frontend deployed to OKE and OKE telemetry runbook captured for OCI Kubernetes Monitoring metadata/metrics troubleshooting"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-17)
 Phase: 12 (frontend-boundary-and-artifact-api-contract) - In progress
 Plan: —
 Status: Forge webapp is being consolidated under `webapp/`; OKE deployment remains targeted at the existing Octo APM LB on convert.octodemo.cloud with bundled read-only producer artifacts unless API Gateway backend secrets are present
-Last activity: 2026-05-18 - Updated project decision from sibling frontend to integrated webapp in this repository
+Last activity: 2026-05-18 - Deployed Forge to OKE, validated external health, and documented reusable ONM/OKE telemetry troubleshooting for future clusters/products
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ Decisions are logged in `.planning/PROJECT.md`.
 - Optional: decide whether Phase 10-style synthetic-hit promotion metadata should be backfilled for the 20 candidates that returned rows in `queries/sentinel_synthetic_live_results.json`; current canonical promotion still uses live parser validation.
 - If running `python3 scripts/release_checklist.py --include-live`, expect it to rewrite generated artifacts. Use a clean or intentionally staged worktree first.
 - Keep `webapp/` docs, deploy scripts, and security controls aligned with the generated artifact contract.
+- Use `docs/OKE_OBSERVABILITY_RUNBOOK.md` when deploying Forge or diagnosing OCI Kubernetes Monitoring telemetry on other OKE clusters; keep the runbook placeholder-safe and free of tenant-specific values.
 
 ### Blockers/Concerns
 

@@ -41,3 +41,10 @@ pnpm build
 ```
 
 Producer-side artifact changes should still run the relevant Python checks from the repository root before deployment.
+
+For OKE production rollout, use [OKE_OBSERVABILITY_RUNBOOK.md](OKE_OBSERVABILITY_RUNBOOK.md)
+and [webapp/deploy/oke/README.md](../webapp/deploy/oke/README.md). The runbook
+captures the platform checks from the latest Forge deployment: build for the
+worker node architecture, roll out through the existing OCI Load Balancer,
+verify `/forge` and `/api/health`, and confirm legacy/admin routes return
+`404`.

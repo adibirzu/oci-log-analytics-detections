@@ -4,6 +4,12 @@ Operator playbook for keeping the deployed SOC dashboards green over time.
 The monitoring stack is built from four scripts under `scripts/` plus a
 single wrapper that ties them together.
 
+For OKE cluster telemetry, OCI Kubernetes Monitoring, and Forge-on-OKE rollout
+checks, use [OKE_OBSERVABILITY_RUNBOOK.md](OKE_OBSERVABILITY_RUNBOOK.md). That
+runbook covers the reusable `Latest telemetry: Unknown` / `Invalid Date`
+diagnostic, ONM discovery validation, OCI Monitoring metric checks, and
+cross-architecture container build guidance.
+
 ## Daily health check
 
 Run `scripts/daily_health_check.py` once a day (manually or scheduled).

@@ -1,4 +1,4 @@
-# Forge Webapp on endemo OKE
+# Forge Webapp on emdemo OKE
 
 This deploys the integrated `webapp/` Forge frontend into the existing Octo APM OKE environment. The live pattern is OCI Load Balancer host routing to a Kubernetes NodePort service; do not create a second public load balancer for this UI.
 
@@ -21,8 +21,8 @@ export FORGE_IMAGE_TAG="<tag>"
 export FORGE_NODEPORT="30082"
 
 ./deploy/oke/stage-detections-runtime.sh
-docker build -t "$FORGE_IMAGE" .
-docker push "$FORGE_IMAGE"
+kubectl get nodes -o custom-columns=NAME:.metadata.name,ARCH:.status.nodeInfo.architecture
+docker buildx build --platform linux/amd64 -t "$FORGE_IMAGE" --push .
 kubectl create namespace logan-forge --dry-run=client -o yaml | kubectl apply -f -
 kubectl get secret ocir-pull-secret -n octo-drone-shop -o yaml \
   | sed 's/namespace: octo-drone-shop/namespace: logan-forge/' \
@@ -31,6 +31,11 @@ envsubst < deploy/oke/forge-frontend.yaml | kubectl apply -f -
 kubectl rollout status deployment/logan-forge -n logan-forge
 kubectl get svc logan-forge-lb -n logan-forge
 ```
+
+Use the `--platform` value that matches the OKE worker architecture. The
+validated emdemo OKE workers are AMD64; building a default ARM image from an
+Apple Silicon workstation will pull successfully but fail when scheduled on
+AMD64 nodes.
 
 ## Wire the Existing Load Balancer
 

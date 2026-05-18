@@ -1,10 +1,10 @@
 # Project Status
 
-Date: 2026-05-17
+Date: 2026-05-18
 
 ## Current State
 
-- Core scope: OCI Log Analytics query generation, synthetic log generation, query/dashboard validation, and OCI dashboard creation.
+- Core scope: OCI Log Analytics query generation, synthetic log generation, query/dashboard validation, OCI dashboard creation, and the integrated Forge conversion webapp.
 - Source Sigma/YAML rules: 454
 - Sigma-derived OCI query artifacts: 455
   - 447 top-level detections in `queries/`
@@ -52,13 +52,13 @@ Date: 2026-05-17
 - Stop-time review gate is enabled for this repository — Codex reviews every change before stop. Toggle via `node …/codex-companion.mjs setup --json --enable-review-gate`.
 - `test_data/manifest.json` is rebuilt from generated `*.jsonl` files rather than hand-maintained counts.
 - Streaming pipeline reconciliation refreshes `config/streaming_config.json` against the active tenancy resources.
-- `LoganSecurityDashboardv0` is documented as the companion operator UI and consumes this repo's catalog, dashboard inventory, and test-data artifacts instead of duplicating detection-generation logic.
+- `webapp/` is now the maintained Forge UI in this repository; it consumes generated artifacts and links to `https://github.com/adibirzu/oci-log-analytics-detections`.
 
 ## Branch and Worktree State
 
 - Only `main`, `origin/main`, and `origin/HEAD -> origin/main` are present after `git fetch --all --prune`.
 - The worktree was clean at the start of the 2026-05-03 scope cleanup pass.
-- Optional runtime helpers remain in the repository for Log Analytics ingestion support, but the canonical surfaces are `rules/**`, `queries/**`, generated manifests, synthetic logs, and dashboard deployment scripts.
+- Optional runtime helpers remain in the repository for Log Analytics ingestion support, but the canonical surfaces are `rules/**`, `queries/**`, generated manifests, synthetic logs, dashboard deployment scripts, and `webapp/`.
 
 ## Quality and Verification
 
@@ -144,16 +144,14 @@ Previously live-verified on 2026-04-15:
 
 - `README.md` — public overview, quickstart, deployment, and dashboard inventory
 - `docs/ARCHITECTURE.md` — source/generation/deployment architecture
+- `docs/WEBAPP.md` — integrated Forge webapp contract, security posture, and deployment notes
 - `CATALOG.md` — human-readable content catalog
 - `queries/catalog.json` — canonical machine-readable inventory
-- `queries/dashboard_inventory.json` — dashboard/widget/saved-search inventory for companion UIs
+- `queries/dashboard_inventory.json` — dashboard/widget/saved-search inventory for webapp and downstream integrations
 - `docs/INTEGRATION_SCHEMA.md` — generated artifact contract for downstream integrations
 - `docs/DEMO_WORKFLOW.md` — demo/operator walkthrough
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit output
 - `CONTRIBUTING.md` — contributor workflow and validation expectations
-- `../LoganSecurityDashboardv0/docs/ARCHITECTURE.md` — companion dashboard integration contract
-- `docs/DASHBOARD_INTEGRATION_GAPS.md` — detections-owned export/schema/API gaps for the companion dashboard
-- `../LoganSecurityDashboardv0/docs/CAPABILITY_CORRELATION.md` — dashboard-owned capability matrix and missing UI features
 
 ## Recommended Next Work
 

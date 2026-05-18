@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate OCI Logan workbench reference, pattern, and example artifacts.
 
-The sibling frontend consumes these JSON files.  This repository remains the
+The integrated webapp consumes these JSON files. This repository remains the
 source of truth for generated conversion guidance and examples.
 """
 

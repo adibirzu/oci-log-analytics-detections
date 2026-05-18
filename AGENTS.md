@@ -17,9 +17,9 @@ Current roadmap: `.planning/ROADMAP.md`.
 
 ## Scope
 
-This repo is scoped to OCI Log Analytics detection content, query generation, synthetic log generation, query/dashboard validation, and OCI dashboard creation.
+This repo is scoped to OCI Log Analytics detection content, query generation, synthetic log generation, query/dashboard validation, OCI dashboard creation, and the integrated Forge webapp under `webapp/`.
 
-Companion UI, API, MCP, and cross-platform integrations live in sibling repos and must consume generated artifacts from here. Do not duplicate query generation or dashboard deployment logic in this repo.
+The integrated `webapp/`, API wrappers, MCP, and cross-platform integrations must consume generated artifacts from here. Do not duplicate query generation or dashboard deployment logic in frontend code.
 
 ## Canonical Artifacts
 
@@ -36,6 +36,7 @@ Companion UI, API, MCP, and cross-platform integrations live in sibling repos an
 | Detection rule specs | `queries/detection_rule_specs.json` | `scripts/detection_rule_creator.py` |
 | Sentinel conversion report | `queries/sentinel_conversion_report.json` | Sentinel workflow |
 | Multicloud export | `queries/manifest.json` | `scripts/export_for_multicloud.py --manifest-only` |
+| Forge webapp | `webapp/**` | Next.js app consuming generated artifacts |
 
 ## Hard Rules
 
@@ -46,7 +47,8 @@ Companion UI, API, MCP, and cross-platform integrations live in sibling repos an
 5. Dashboard placement belongs in `scripts/deploy_dashboard.py`; use visualization metadata and the 12-column layout resolver.
 6. README/STATUS counts must reconcile with `queries/catalog.json`.
 7. Never commit credentials, API keys, OCIDs, public IPs, tenancy-specific values, or unredacted live error payloads.
-8. The worktree may contain unrelated user changes. Never revert or commit unrelated changes.
+8. Keep Forge as the only exposed webapp page; do not expose tenancy data or internal deployment details in UI output.
+9. The worktree may contain unrelated user changes. Never revert or commit unrelated changes.
 
 ## Common Workflows
 

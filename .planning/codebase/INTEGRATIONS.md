@@ -44,15 +44,15 @@ Sentinel content comes from an Azure Sentinel corpus cache and converter workflo
 - `queries/sentinel/**` - only live OCI parser-passing promoted query artifacts.
 - `queries/sentinel_conversion_report.json` - source of truth for skipped, failed, and promoted candidates.
 
-## Downstream Consumers
+## Webapp and Downstream Consumers
 
-This repo produces artifacts for sibling projects:
+This repo produces artifacts for its integrated webapp and downstream projects:
 
-- `LoganSecurityDashboardv0` should consume catalog, dashboard inventory, and test-data artifacts.
+- `webapp/` consumes the Logan workbench artifacts, catalog, dashboard inventory, and test-data manifest.
 - `mcp-oci-logan-server` should consume generated query/dashboard contracts.
 - `octo-apm-demo` consumes `queries/octo_apm_workshop_bundle.json` and scoped deployment assets.
 
-Downstream projects must not duplicate query generation or OCI dashboard deployment logic.
+UI and downstream projects must not duplicate query generation or OCI dashboard deployment logic.
 
 ## External Research Sources
 

@@ -57,3 +57,11 @@ graphify-out/
 firebase-debug.log
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
+
+# Integrated Next.js webapp
+webapp/node_modules/
+webapp/.next/
+webapp/out/
+webapp/build/
+webapp/.logan-detections-runtime/
+webapp/*.tsbuildinfo

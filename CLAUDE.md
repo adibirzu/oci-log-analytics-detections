@@ -4,7 +4,7 @@ Project-scoped operating rules for Claude Code in this repository.
 
 ## Scope
 
-This repo is **scoped to OCI Log Analytics**: query generation from Sigma/Sentinel sources, synthetic log generation, query/dashboard validation, and OCI dashboard creation. Companion UI/API/cross-platform code lives in sibling repos and **must consume artifacts from here** — it must not duplicate query generation or dashboard deployment.
+This repo is **scoped to OCI Log Analytics**: query generation from Sigma/Sentinel sources, synthetic log generation, query/dashboard validation, OCI dashboard creation, and the integrated Forge webapp under `webapp/`. UI/API/cross-platform code **must consume artifacts from here** and must not duplicate query generation or dashboard deployment.
 
 ## Canonical artifacts (do not duplicate)
 
@@ -21,6 +21,7 @@ This repo is **scoped to OCI Log Analytics**: query generation from Sigma/Sentin
 | Detection rule specs | `queries/detection_rule_specs.json` | `scripts/detection_rule_creator.py` |
 | Sentinel conversion report | `queries/sentinel_conversion_report.json` | Sentinel workflow |
 | Multicloud export | `queries/manifest.json` | `scripts/export_for_multicloud.py --manifest-only` |
+| Forge webapp | `webapp/**` | Next.js app consuming generated artifacts |
 
 ## Hard rules
 
@@ -31,6 +32,7 @@ This repo is **scoped to OCI Log Analytics**: query generation from Sigma/Sentin
 5. **App/APM analytics stay on `SOC Application Logs`** and must pass `scripts/test_app_query_contract.py`.
 6. **README/STATUS counts must reconcile with `queries/catalog.json`** before commit.
 7. **No public IPs, OCIDs, credentials, or tenancy specifics** in committed files (global rule — see `~/.claude/CLAUDE.md`).
+8. **Forge-only exposure**: keep `/forge`, `/api/forge/*`, `/api/health`, and required static assets as the exposed webapp surface.
 
 ## Workflow
 

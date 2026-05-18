@@ -1,0 +1,190 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logan-forge
+  labels:
+    app.kubernetes.io/name: logan-forge
+    app.kubernetes.io/part-of: octo-apm-demo
+    app.kubernetes.io/component: security-workbench
+    octo.oracle.com/tier: production
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logan-forge
+  namespace: logan-forge
+  labels:
+    app: logan-forge
+    app.kubernetes.io/name: logan-forge
+    app.kubernetes.io/part-of: octo-apm-demo
+    app.kubernetes.io/component: security-workbench
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 300
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: logan-forge
+  template:
+    metadata:
+      labels:
+        app: logan-forge
+        app.kubernetes.io/name: logan-forge
+        app.kubernetes.io/part-of: octo-apm-demo
+        app.kubernetes.io/component: security-workbench
+      annotations:
+        oracle.com/oci_la_log_source_name: "SOC Application Logs"
+        oracle.com/oci_la_log_set: "octo-apm-demo"
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: ocir-pull-secret
+      securityContext:
+        fsGroup: 1001
+        runAsGroup: 1001
+        runAsNonRoot: true
+        runAsUser: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: frontend
+          image: ${FORGE_IMAGE}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: NEXT_PUBLIC_APP_VERSION
+              value: ${FORGE_IMAGE_TAG}
+            - name: LOGAN_DETECTIONS_REPO
+              value: /app/oci-log-analytics-detections
+            # In production this should point to the API Gateway endpoint that fronts
+            # the Python conversion service. If omitted, the Next.js API route falls
+            # back to the bundled read-only LOGAN_DETECTIONS_REPO script wrapper.
+            - name: LOGAN_FORGE_BACKEND_URL
+              valueFrom:
+                secretKeyRef:
+                  name: logan-forge-backend
+                  key: backend-url
+                  optional: true
+            - name: LOGAN_FORGE_BACKEND_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: logan-forge-backend
+                  key: backend-token
+                  optional: true
+            - name: FORGE_ALLOWED_ORIGINS
+              value: "https://convert.octodemo.cloud"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 768Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: next-cache
+              mountPath: /app/.next/cache
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: next-cache
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logan-forge-lb
+  namespace: logan-forge
+  labels:
+    app: logan-forge
+    app.kubernetes.io/name: logan-forge
+    app.kubernetes.io/part-of: octo-apm-demo
+spec:
+  type: NodePort
+  selector:
+    app: logan-forge
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      nodePort: ${FORGE_NODEPORT}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: logan-forge-nodeport-only
+  namespace: logan-forge
+spec:
+  podSelector:
+    matchLabels:
+      app: logan-forge
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 10.42.0.0/16
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: logan-forge
+  namespace: logan-forge
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: logan-forge

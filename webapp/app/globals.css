@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode */
+    --background: 0 0% 100%; /* Pure White */
+    --foreground: 224 71.4% 4.1%; /* Charcoal */
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 8 57% 49%; /* Oracle Red: #C74634 */
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 13% 91%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 13% 91%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 13% 91%; /* Cool Gray */
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%; /* Red */
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 8 57% 49%;
+    --radius: 0.75rem;
+
+    /* Logan Custom Colors - Light */
+    --logan-success: 157.6 92.3% 32.2%; /* Forest Green */
+    --logan-warning: 22.1 92.1% 52.9%; /* Orange */
+    --logan-danger: 0 72.2% 50.6%; /* Red */
+
+    /* Sidebar Colors - Light */
+    --sidebar-background: 210 40% 98%; /* Surface: Cool Gray */
+    --sidebar-foreground: 215 28% 17%; /* Text: Charcoal */
+    --sidebar-border: 220 13% 91%;
+    --sidebar-accent: 220 14.3% 95.9%;
+    --sidebar-accent-foreground: 220.9 39.3% 11%;
+    --sidebar-ring: 221.2 83.2% 53.3%;
+  }
+
+  .dark {
+    /* Dark Mode */
+    --background: 222 68% 10%; /* Deep Navy */
+    --foreground: 210 20% 98%; /* Cool Gray */
+    --card: 215 30% 18%; /* Surface: Slate Blue */
+    --card-foreground: 210 20% 98%;
+    --popover: 222 68% 10%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 8 57% 49%; /* Oracle Red: #C74634 */
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 30% 18%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 215 30% 18%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 215 30% 18%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 50.6%; /* Crimson */
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 30% 18%;
+    --input: 215 30% 18%;
+    --ring: 8 57% 49%;
+
+    /* Logan Custom Colors - Dark */
+    --logan-success: 158 79% 44%; /* Emerald */
+    --logan-warning: 38 92% 50%; /* Amber */
+    --logan-danger: 355 82% 61%; /* Crimson */
+
+    /* Sidebar Colors - Dark */
+    --sidebar-background: 222 68% 10%; /* Background: Deep Navy */
+    --sidebar-foreground: 210 40% 98%; /* Text: Cool Gray */
+    --sidebar-border: 215 30% 18%;
+    --sidebar-accent: 215 30% 18%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

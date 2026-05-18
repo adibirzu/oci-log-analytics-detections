@@ -43,7 +43,7 @@ Phase 14.
 ### Pitfall 3: Repo Boundary Drift
 
 **What goes wrong:**
-The sibling frontend owns its own conversion logic and diverges from this repo's generated artifacts.
+The frontend owns its own conversion logic and diverges from this repo's generated artifacts.
 
 **Why it happens:**
 UI implementation starts before the artifact/API contract is defined.
@@ -52,7 +52,7 @@ UI implementation starts before the artifact/API contract is defined.
 Start with Phase 12. Define schemas, artifact ownership, import path, and test responsibilities before frontend implementation.
 
 **Warning signs:**
-TypeScript conversion rules appear in the sibling app without a matching generated artifact or producer-side test.
+TypeScript conversion rules appear in `webapp/` without a matching generated artifact or producer-side test.
 
 **Phase to address:**
 Phase 12.
@@ -83,10 +83,10 @@ The workbench is visually complete, but no gate proves the examples, warnings, m
 Frontend work is treated as a static page instead of a contract-consuming tool.
 
 **How to avoid:**
-Require producer-side schema/example tests and sibling build/type/lint/e2e tests before milestone completion.
+Require producer-side schema/example tests and `webapp/` build/type/lint/e2e tests before milestone completion.
 
 **Warning signs:**
-No fixture-driven examples, no Playwright path, no schema validation in sibling import code.
+No fixture-driven examples, no browser test path, no schema validation in `webapp/` import code.
 
 **Phase to address:**
 Phase 16.

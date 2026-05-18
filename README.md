@@ -4,15 +4,16 @@ A comprehensive STIG-compliant detection rules library for Oracle Cloud Infrastr
 
 ## Core Scope
 
-This repository is scoped to OCI Log Analytics query and dashboard creation:
+This repository is scoped to OCI Log Analytics query, dashboard, and Forge webapp delivery:
 
 - generate OCI Log Analytics query JSON from source Sigma/YAML rules
 - maintain curated app, WAF, geographic health, and hunting analytics
 - generate synthetic logs that populate the dashboards
 - validate query metadata, log-source mappings, and dashboard inventory
 - create OCI Log Analytics dashboards and embedded saved searches only after validation passes
+- ship the integrated Forge webapp for cross-QL conversion into OCI Log Analytics QL
 
-Companion UI, API, and cross-platform integrations must consume generated artifacts instead of duplicating query generation or dashboard deployment logic. Runtime helpers such as Streaming, Service Connector Hub, Resource Manager, and manifest export support the demo and deployment path, but the canonical product surface remains `rules/**`, `queries/**`, `test_data/manifest.json`, and `scripts/deploy_dashboard.py`.
+The integrated UI lives in `webapp/` and consumes generated artifacts from this repository instead of duplicating query generation or dashboard deployment logic. External API, MCP, and cross-platform integrations follow the same generated-artifact contract. Runtime helpers such as Streaming, Service Connector Hub, Resource Manager, and manifest export support the demo and deployment path, but the canonical product surface remains `rules/**`, `queries/**`, `test_data/manifest.json`, `scripts/deploy_dashboard.py`, and `webapp/`.
 
 ## Current Inventory
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
@@ -44,7 +45,7 @@ Canonical inventory and supporting documentation:
 - `CATALOG.md` — human-readable catalog
 - `docs/DEMO_WORKFLOW.md` — operator/demo walkthrough
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit report
-- `docs/DASHBOARD_INTEGRATION_GAPS.md` — detections-side gaps blocking the companion dashboard
+- `docs/WEBAPP.md` — integrated Forge webapp contract, security posture, and deployment notes
 - `CONTRIBUTING.md` — contributor workflow and validation expectations
 
 ## Architecture
@@ -96,7 +97,7 @@ Browser and app dashboards currently run against `SOC Application Logs`, a custo
 
 ### Canonical Inventory Contract
 
-Treat the following as the canonical output contract for downstream integrations such as `mcp-oci-logan-server` and `LoganSecurityDashboardv0`:
+Treat the following as the canonical output contract for the integrated Forge webapp and downstream integrations such as `mcp-oci-logan-server`:
 
 - `queries/catalog.json` for authoritative counts and inventory
 - `queries/dashboard_inventory.json` for dashboard, widget, saved-search, visualization, and query-file mapping
@@ -113,7 +114,7 @@ Notes:
 - `queries/catalog.json` is canonical; `queries/manifest.json` is derivative
 - `queries/dashboard_inventory.json` is generated from `scripts/deploy_dashboard.py:DASHBOARDS`
 - `queries/apps/` contains both generated browser detections and curated app analytics
-- `LoganSecurityDashboardv0` should consume these generated artifacts rather than duplicating detection-generation logic
+- `webapp/` consumes these generated artifacts rather than duplicating detection-generation logic
 - `logandetectionqueries/` and `logandetectionrules/` are legacy empty directories and should not be consumed
 
 ## OCI Log Analytics Dashboards
@@ -319,10 +320,10 @@ MAIN `demo-observability` compartment alongside 53 other multicloud dashboards.
 python3 scripts/export_for_multicloud.py    # Export to ~/dev/multicloudoperations
 ```
 
-### Logan Security Dashboard
-`../LoganSecurityDashboardv0` is the companion operator UI. This repository remains the content and deployment source of truth; the dashboard should consume `queries/catalog.json`, `queries/dashboard_inventory.json`, `queries/manifest.json`, `queries/apps/*.json`, `queries/hunting/*.json`, and `test_data/manifest.json` through a static export, API, or MCP boundary.
+### Forge Webapp
+`webapp/` is the maintained Forge UI for this project. It exposes the `/forge` workbench, links to `https://github.com/adibirzu/oci-log-analytics-detections`, and consumes `queries/logan_ql_reference_catalog.json`, `queries/cross_ql_mapping_patterns.json`, `queries/conversion_examples.json`, `queries/catalog.json`, `queries/dashboard_inventory.json`, and `test_data/manifest.json`.
 
-Cross-project capability gaps are tracked in `docs/DASHBOARD_INTEGRATION_GAPS.md` and the dashboard-side report at `../LoganSecurityDashboardv0/docs/CAPABILITY_CORRELATION.md`. Use `DET-MISS-*` for detections-owned export/schema/API gaps and `DASH-MISS-*` for dashboard-owned UI/data-layer gaps.
+The webapp deployment manifests and helper scripts live under `webapp/deploy/oke/`. Production traffic is routed through the existing Octo APM load balancer at `convert.octodemo.cloud`, with backend write actions expected to sit behind API Gateway and WAF.
 
 ## License
 See [LICENSE](LICENSE) for details.

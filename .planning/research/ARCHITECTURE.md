@@ -1,8 +1,8 @@
 # Architecture Research
 
-**Domain:** Sibling web frontend backed by OCI Log Analytics conversion artifacts
+**Domain:** Integrated web frontend backed by OCI Log Analytics conversion artifacts
 **Researched:** 2026-05-17
-**Confidence:** HIGH for repository boundary; MEDIUM for frontend route placement until Phase 12 confirms the sibling target
+**Confidence:** HIGH for repository boundary and integrated `webapp/` route placement after the 2026-05-18 user decision
 
 ## Standard Architecture
 
@@ -16,9 +16,9 @@ queries/cross_ql_mapping_patterns.json
 queries/conversion_examples.json
 schemas/logan_workbench/*.schema.json
   |
-  | consumed by versioned artifact import
+  | consumed by server-side artifact loaders
   v
-sibling frontend app
+webapp/
   |
   +-- source editor
   +-- OCI Logan QL output
@@ -33,9 +33,9 @@ sibling frontend app
 |-----------|----------------|------------------------|
 | Reference catalog generator | Fetch or parse official OCI docs into command metadata | Python script in this repo with fixture-backed tests and provenance fields. |
 | Cross-QL pattern library | Describe how source constructs map to OCI Log Analytics QL | Generated JSON plus human-readable docs from mapping inputs. |
-| Conversion response schema | Define request/response shape for arbitrary source queries | JSON Schema and TypeScript/Zod equivalent in sibling app. |
-| Sibling workbench UI | Present editor, output, command menu, examples, explanations, and warnings | Next.js route or dedicated sibling app. |
-| Validation gates | Prove artifacts and UI examples remain consistent | Python tests in this repo; build/type/lint/e2e in sibling app. |
+| Conversion response schema | Define request/response shape for arbitrary source queries | JSON Schema and TypeScript/Zod equivalent in `webapp/`. |
+| Integrated workbench UI | Present editor, output, command menu, examples, explanations, and warnings | Next.js route under `webapp/app/(dashboard)/forge/page.tsx`. |
+| Validation gates | Prove artifacts and UI examples remain consistent | Python tests in this repo; build/type/lint/e2e in `webapp/`. |
 
 ## Recommended Project Structure
 
@@ -60,12 +60,11 @@ docs/
   logan_workbench_mapping_guide.md
 ```
 
-Sibling frontend additions:
+Integrated `webapp/` additions:
 
 ```
-app/
-  logan-workbench/
-    page.tsx
+webapp/
+  app/(dashboard)/forge/page.tsx
 components/
   logan-workbench/
     source-editor.tsx
@@ -86,7 +85,7 @@ tests/
 
 ### Producer/Consumer Artifact Contract
 
-**What:** This repo emits versioned JSON artifacts and schemas; the sibling frontend imports and validates them.
+**What:** This repo emits versioned JSON artifacts and schemas; `webapp/` imports and validates them.
 
 **Trade-offs:** Static artifacts are deterministic and easy to test, but arbitrary pasted-query conversion may eventually need a service wrapper around producer-side converters.
 
@@ -111,7 +110,7 @@ Oracle docs + mapping config + converter examples
     -> Python generators
     -> JSON artifacts + schemas + docs
     -> Python artifact tests
-    -> sibling import/build/e2e tests
+    -> webapp import/build/e2e tests
 ```
 
 ### User Conversion Flow
@@ -127,7 +126,7 @@ User selects source language
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| This repo -> sibling frontend | Versioned JSON artifacts and schemas | No duplicate converter generation in the frontend. |
+| This repo -> `webapp/` | Versioned JSON artifacts and schemas | No duplicate converter generation in the frontend. |
 | OCI docs -> reference catalog | Official documentation URLs | Store source URL and retrieval timestamp for each generated catalog. |
 | Existing Sentinel converter -> workbench examples | Generated fixtures | Promoted Sentinel semantics must continue to flow through converter/live-validation workflow. |
 | Synthetic logs -> examples | Redacted synthetic fixtures | Examples must use real Sentinel/OCI-shaped fields without tenant data. |
@@ -157,7 +156,7 @@ User selects source language
 - Oracle OCI Log Analytics query search documentation.
 - Oracle OCI Log Analytics command reference.
 - `.planning/PROJECT.md` and repo artifact boundary rules.
-- `../LoganSecurityDashboardv0/package.json`.
+- `webapp/package.json`.
 
 ---
 *Architecture research for: v3.0 Logan QL Conversion Workbench*

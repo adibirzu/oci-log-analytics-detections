@@ -109,18 +109,18 @@ Baseline (from `queries/sentinel_conversion_report.json`): 4,452 candidates, 25 
 
 ## v3.0 Requirements - Logan QL Conversion Workbench
 
-Baseline: this repo remains the canonical producer of OCI Log Analytics detection, conversion, reference, and dashboard artifacts. The v3.0 frontend lives in a sibling app and consumes generated artifacts from this repo.
+Baseline: this repo remains the canonical producer of OCI Log Analytics detection, conversion, reference, dashboard, and Forge webapp artifacts. The v3.0 frontend lives in `webapp/` and consumes generated artifacts from this repo.
 
 ### Workbench User Experience
 
-- [ ] **WB-01**: The sibling frontend provides a source language selector and editor for Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI Log Analytics QL passthrough.
+- [ ] **WB-01**: The integrated `webapp/` frontend provides a source language selector and editor for Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI Log Analytics QL passthrough.
 - [ ] **WB-02**: The workbench shows OCI Log Analytics QL output with formatting, copy, export, and warning states alongside a source-to-target explanation panel.
 - [ ] **WB-03**: The workbench includes 10-20 validated example conversions across the supported source languages, with expected OCI QL and warning metadata.
 
 ### OCI Reference Catalog
 
 - [ ] **REFCAT-01**: This repo generates `queries/logan_ql_reference_catalog.json` from official OCI Log Analytics documentation URLs, including command names, source URLs, retrieval timestamp, syntax summary, examples when available, and command category metadata.
-- [ ] **REFCAT-02**: The sibling frontend command/reference menu consumes the generated catalog rather than hand-authored React data, and includes query-search fundamentals plus command-reference entries.
+- [ ] **REFCAT-02**: The integrated `webapp/` command/reference menu consumes the generated catalog rather than hand-authored React data, and includes query-search fundamentals plus command-reference entries.
 - [ ] **REFCAT-03**: Catalog refresh tests fail when required command metadata is missing, provenance is absent, or generated menu data is edited manually.
 
 ### Cross-QL Conversion Patterns
@@ -132,19 +132,19 @@ Baseline: this repo remains the canonical producer of OCI Log Analytics detectio
 ### Producer/Consumer API Contract
 
 - [ ] **API-01**: This repo defines versioned JSON schemas under `schemas/logan_workbench/` for workbench artifacts, conversion requests, conversion responses, examples, warnings, and reference catalog entries.
-- [ ] **API-02**: The sibling frontend validates imported artifacts against the generated schemas at build time or startup and fails clearly when versions drift.
-- [ ] **API-03**: Sentinel and Sigma examples reuse this repo's existing converter/mapping paths; the sibling frontend does not duplicate converter generation logic.
+- [ ] **API-02**: The integrated `webapp/` frontend validates imported artifacts against the generated schemas at build time or startup and fails clearly when versions drift.
+- [ ] **API-03**: Sentinel and Sigma examples reuse this repo's existing converter/mapping paths; `webapp/` does not duplicate converter generation logic.
 
 ### Documentation and Mapping Guidance
 
 - [ ] **DOC-01**: `docs/logan_workbench_mapping_guide.md` explains how to map Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and generic source-query constructs to OCI Log Analytics QL with support-level notes.
-- [ ] **DOC-02**: The sibling page presents mapping guidance contextually through the command menu, examples, and explanation panel rather than as a standalone marketing page.
+- [ ] **DOC-02**: The integrated `/forge` page presents mapping guidance contextually through the command menu, examples, and explanation panel rather than as a standalone marketing page.
 
 ### Validation, Security, and Release Gates
 
 - [ ] **QA-01**: Producer-side tests validate generated schemas, command catalog, mapping patterns, examples, and conversion warning behavior.
 - [ ] **QA-02**: Workbench examples and synthetic logs contain no credentials, OCIDs, public IPs, tenancy-specific names, or unredacted live payloads; sensitive-value scanning covers the new artifacts.
-- [ ] **QA-03**: Sibling frontend gates include build, typecheck, lint, accessibility-sensitive browser checks, mobile/desktop layout checks, and the editor-to-output-to-copy/export flow.
+- [ ] **QA-03**: `webapp/` gates include build, typecheck, lint, accessibility-sensitive browser checks, mobile/desktop layout checks, and the editor-to-output-to-copy/export flow.
 
 ## v2 Requirements (deferred — superseded or follow-on)
 
@@ -165,7 +165,7 @@ Baseline: this repo remains the canonical producer of OCI Log Analytics detectio
 
 | Feature | Reason |
 |---------|--------|
-| Companion UI implementation | Belongs in sibling UI/API repos that consume generated artifacts |
+| Additional companion UI implementation outside `webapp/` | Belongs in separate repos only if they consume generated artifacts and do not become the source of truth |
 | Live OCI deployment by default | Requires explicit profile, compartment, and operator approval |
 | Manual promoted Sentinel JSON patches | Breaks converter traceability and live-validation guarantees |
 | New top-level workflow surfaces outside `skills/` | Existing project guidance prefers skills-first workflow surfaces |

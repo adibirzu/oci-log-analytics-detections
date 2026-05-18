@@ -2,7 +2,7 @@
 
 **Domain:** Cross-QL conversion workbench for OCI Log Analytics QL
 **Researched:** 2026-05-17
-**Confidence:** HIGH for table-stakes features; MEDIUM for final UI shape until sibling app design starts
+**Confidence:** HIGH for table-stakes features and integrated `webapp/` target after the 2026-05-18 user decision
 
 ## Feature Landscape
 
@@ -13,7 +13,7 @@
 | Source language selector | Users need to choose Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, or OCI QL passthrough. | MEDIUM | Must drive parser, examples, validation, and explanation labels. |
 | Source editor and OCI output editor | Converter tools are expected to be paste-in, convert-out workflows. | MEDIUM | Use stable dimensions so editor/output panels do not resize unpredictably. |
 | Structured conversion explanation | Users need to know how the target Logan QL was derived. | HIGH | Explanation should map source clauses to OCI commands, fields, and warnings. |
-| Official OCI command/reference menu | User explicitly requested a menu updated from official OCI pages. | MEDIUM | Generate from Oracle docs and consume in the sibling UI. |
+| Official OCI command/reference menu | User explicitly requested a menu updated from official OCI pages. | MEDIUM | Generate from Oracle docs and consume in `webapp/`. |
 | Cross-QL mapping guide | Users need general mapping rules, not only examples. | HIGH | Cover filters, fields, boolean logic, time windows, aggregation, projection, eval, regex/extraction, lookup, and correlation limits. |
 | Copy/export actions | Converter tools need fast handoff into saved searches, docs, or demos. | LOW | Include copy Logan QL, download JSON, and copy explanation. |
 | Warning states for unsupported/lossy constructs | Detection quality depends on explicit limitations. | HIGH | Never silently weaken detections. |
@@ -45,7 +45,7 @@ Reference Catalog
     -> Mapping Guide
 
 Artifact/API Contract
-    -> Sibling UI Import
+    -> webapp Import
     -> Example Gallery
     -> Frontend Tests
 
@@ -59,7 +59,7 @@ Cross-QL Pattern Library
 
 ### Launch With
 
-- [ ] Sibling frontend route or app target selected and documented.
+- [ ] Integrated `webapp/` route selected and documented.
 - [ ] Versioned JSON schema for command catalog, mapping patterns, examples, and conversion response.
 - [ ] Official OCI command/reference catalog generated from documented Oracle URLs.
 - [ ] Workbench UI with source selector, editor, Logan QL output, explanation, command menu, warnings, and copy/export actions.

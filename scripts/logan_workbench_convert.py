@@ -25,7 +25,7 @@ for candidate in (PROJECT_ROOT, SCRIPTS_DIR):
         sys.path.insert(0, str(candidate))
 
 from scripts.convert_sigma import convert_rule, load_config  # noqa: E402
-from scripts.convert_sentinel_kql import convert_kql_to_logan, load_mapping_config  # noqa: E402
+from scripts.kql._facade_impl import convert_kql_to_logan, load_mapping_config  # noqa: E402
 
 
 LANGUAGES = {"sigma_yaml", "sentinel_kql", "splunk_spl", "elastic_lucene", "elastic_eql", "oci_logan"}
@@ -160,7 +160,7 @@ def convert_sentinel_kql(query: str) -> dict[str, Any]:
         source_query=query,
         logan_query=logan_query,
         support_level="supported",
-        explanation="Converted through scripts/convert_sentinel_kql.py and the Sentinel-to-OCI mapping shards.",
+        explanation="Converted through the repository Sentinel-to-OCI KQL conversion pipeline and mapping shards.",
         metadata={"source_info": source_info},
     )
 

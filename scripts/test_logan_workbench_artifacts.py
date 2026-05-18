@@ -115,7 +115,7 @@ class LoganWorkbenchConverterTests(unittest.TestCase):
         )
         self.assertEqual(response["support_level"], "supported")
         self.assertIn("Windows Security Events", response["logan_query"])
-        self.assertIn("convert_sentinel_kql.py", response["explanation"])
+        self.assertIn("Sentinel-to-OCI KQL conversion pipeline", response["explanation"])
 
     def test_unsafe_yaml_is_blocked(self):
         response = self.run_converter(

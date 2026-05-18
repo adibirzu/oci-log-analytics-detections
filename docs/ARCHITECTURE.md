@@ -12,7 +12,7 @@ This repository is organized around OCI Log Analytics query and dashboard creati
 4. Layer curated app, WAF, geographic health, and hunting analytics beside the generated detections
 5. Generate synthetic logs that populate the Log Analytics dashboards
 6. Validate every dashboard query before importing dashboards or embedded saved searches
-7. Publish canonical inventory artifacts for companion UIs and downstream readers
+7. Publish canonical inventory artifacts for `webapp/` and downstream readers
 
 The goal is to keep source authoring, generated content, and deployment metadata separate so the project stays maintainable as the catalog grows.
 
@@ -252,32 +252,22 @@ Current runtime note:
 - Direct NDJSON ingestion and the SOC streaming pipeline are both operational.
 - `deploy_dashboard.py` defaults dashboard widgets to `l24h`; use `--query-lookback 21d` when validating the full three-week dashboard dataset before importing saved searches. Octo APM workshop, web-to-cloud, C2, FreeLabFriday, and 2025-2026 incident widgets carry `l21d` metadata for the three-week drilldown.
 
-## Companion Dashboard
+## Integrated Forge Webapp
 
-`../LoganSecurityDashboardv0` is the companion operator UI for this content library. This repository remains the canonical content source; the dashboard should consume generated artifacts through a stable export, API, or MCP boundary.
+`webapp/` is the maintained Forge UI for this content library. It exposes `/forge` as the only browser product route, consumes generated artifacts from this repository, and calls `/api/forge/convert` for conversion behavior.
 
-Capability correlation and missing-feature references are tracked in:
+The webapp reads these artifacts through server-side typed loaders:
 
-- `docs/DASHBOARD_INTEGRATION_GAPS.md` for detections-owned `DET-MISS-*` export/schema/API gaps
-- `../../LoganSecurityDashboardv0/docs/CAPABILITY_CORRELATION.md` for dashboard-owned `DASH-MISS-*` UI/data-layer gaps
-
-Supported dashboard-facing artifacts:
-
+- `queries/logan_ql_reference_catalog.json`
+- `queries/cross_ql_mapping_patterns.json`
+- `queries/conversion_examples.json`
 - `queries/catalog.json`
 - `queries/dashboard_inventory.json`
-- `queries/detection_rule_specs.json`
-- `queries/log_source_field_dictionary.json`
-- `queries/octo_apm_workshop_bundle.json`
-- `queries/sentinel_conversion_report.json`
-- `docs/sentinel_converter.html`
-- `queries/manifest.json`
-- `queries/*.json`
-- `queries/apps/*.json`
-- `queries/hunting/*.json`
-- `queries/sentinel/*.json`
 - `test_data/manifest.json`
 
-The dashboard should not duplicate Sigma conversion, dashboard deployment, or query catalog generation.
+Deployment and security notes are tracked in `docs/WEBAPP.md` and `webapp/deploy/oke/README.md`.
+
+The webapp must not duplicate Sigma conversion, Sentinel promotion, dashboard deployment, or query catalog generation.
 
 ## Contribution Model
 

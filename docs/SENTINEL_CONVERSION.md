@@ -190,7 +190,7 @@ The page intentionally redacts OCI request identifiers from live validation erro
 - redacted live-validation failure examples
 - next actions for field mapping, table mapping, local validation, and live-parser fixes
 
-Use `--json` when a companion UI or backlog-generation job needs structured triage output. Use `--limit` to control how many rows are returned per section.
+Use `--json` when `webapp/`, a downstream UI, or a backlog-generation job needs structured triage output. Use `--limit` to control how many rows are returned per section.
 
 ## Developing The Next Queries
 
@@ -242,7 +242,7 @@ Recommended loop for later/new Sentinel query development:
 6. Promote only with live validation: `python3 scripts/sentinel_conversion_workflow.py promote --top all --timeout 20`.
 7. Run `refresh-artifacts`, `page`, `status --json --strict`, focused tests, and the full verification loop.
 
-`next-queries --json` is intended for companion UIs or backlog automation. It includes the candidate title, Sentinel ID, quality score, source path/URL, work type, reason, and next step.
+`next-queries --json` is intended for `webapp/`, downstream UIs, or backlog automation. It includes the candidate title, Sentinel ID, quality score, source path/URL, work type, reason, and next step.
 
 ## Status Check
 
@@ -254,7 +254,7 @@ Recommended loop for later/new Sentinel query development:
 - live-validation status values inside promoted query JSON
 - Sentinel dashboard presence in `queries/dashboard_inventory.json`
 
-Use `--json` when a companion UI, MCP server, or CI job needs a machine-readable summary. Add `--strict` when the command should exit non-zero if the report, promoted files, live status, or Sentinel dashboard inventory needs attention. For isolated checks, override the artifact locations with `--report`, `--sentinel-dir`, and `--dashboard-inventory`.
+Use `--json` when `webapp/`, a downstream UI, MCP server, or CI job needs a machine-readable summary. Add `--strict` when the command should exit non-zero if the report, promoted files, live status, or Sentinel dashboard inventory needs attention. For isolated checks, override the artifact locations with `--report`, `--sentinel-dir`, and `--dashboard-inventory`.
 
 ## Validation
 

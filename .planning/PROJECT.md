@@ -2,9 +2,9 @@
 
 ## What This Is
 
-This is a brownfield detection-content and deployment repository for Oracle Cloud Infrastructure Log Analytics. It converts Sigma/YAML and live-validated Microsoft Sentinel content into OCI Log Analytics Query Language, maintains curated hunting and app analytics, generates synthetic demo data, and deploys OCI Management Dashboards for SOC demonstrations and operator workflows.
+This is a brownfield detection-content, dashboard-deployment, and Forge webapp repository for Oracle Cloud Infrastructure Log Analytics. It converts Sigma/YAML and live-validated Microsoft Sentinel content into OCI Log Analytics Query Language, maintains curated hunting and app analytics, generates synthetic demo data, deploys OCI Management Dashboards, and ships the integrated Forge workbench for cross-QL conversion into OCI Log Analytics QL.
 
-The repo is the canonical detection and dashboard artifact producer for companion tools such as `LoganSecurityDashboardv0` and `mcp-oci-logan-server`; those tools should consume generated artifacts from this repo rather than duplicate generation logic.
+The repo is the canonical detection, dashboard, and workbench artifact producer for the integrated `webapp/` and downstream tools such as `mcp-oci-logan-server`; consumers should read generated artifacts from this repo rather than duplicate generation logic.
 
 ## Core Value
 
@@ -12,15 +12,15 @@ Every committed detection, query, dashboard, parser mapping, and generated artif
 
 ## Current Milestone: v3.0 Logan QL Conversion Workbench
 
-**Goal:** Add a sibling web workbench that converts Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI passthrough examples into OCI Log Analytics QL while this repository remains the canonical producer of conversion/reference artifacts.
+**Goal:** Maintain an integrated web workbench under `webapp/` that converts Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI passthrough examples into OCI Log Analytics QL while this repository remains the canonical producer of conversion/reference artifacts.
 
 **Target features:**
-- Versioned artifact/API contract for a sibling frontend workbench that consumes generated content from this repo instead of duplicating conversion logic.
+- Versioned artifact/API contract for the integrated frontend workbench that consumes generated content from this repo instead of duplicating conversion logic.
 - Official OCI Log Analytics command/reference catalog generated from Oracle documentation and exposed to the frontend as the workbench command menu.
 - Cross-QL mapping pattern library that explains how filters, fields, boolean logic, time windows, aggregation, projection, eval, regex/extraction, lookups, joins/correlation, and unsupported semantics map to OCI Log Analytics QL.
-- Source selector, source editor, OCI Logan QL output, explanation panel, examples, warnings, and copy/export actions in the sibling frontend.
+- Source selector, source editor, OCI Logan QL output, explanation panel, examples, warnings, and copy/export actions in `webapp/`.
 - 10-20 validated conversion examples using synthetic Sentinel/OCI-shaped logs and no tenant-specific data.
-- Producer-side schema/example tests plus sibling frontend build, typecheck, lint, accessibility, and browser acceptance gates.
+- Producer-side schema/example tests plus `webapp/` build, typecheck, lint, accessibility, and browser acceptance gates.
 
 **Phase numbering:** continues from v2.0 - starts at Phase 12.
 
@@ -46,11 +46,11 @@ Every committed detection, query, dashboard, parser mapping, and generated artif
 - [ ] Carry forward open v2.0 Sentinel KQL parity items without weakening the live parser validation gate.
 - [ ] Generate official-docs-derived OCI Log Analytics command/reference artifacts for the v3.0 workbench.
 - [ ] Generate cross-QL mapping patterns, explanations, warnings, and examples for Splunk, Sentinel, Elastic/Lucene/KQL, Sigma, and OCI QL.
-- [ ] Define and validate a versioned producer/consumer contract for the sibling frontend workbench.
+- [ ] Define and validate a versioned producer/consumer contract for the integrated frontend workbench.
 
 ### Out of Scope
 
-- Building the companion UI/API inside this repo - sibling projects consume this repo's generated artifacts.
+- Duplicating query generation or dashboard deployment logic in the frontend - `webapp/` and downstream projects consume this repo's generated artifacts.
 - Hand-authoring promoted Sentinel JSON under `queries/sentinel/**` - use the converter and live-validation workflow.
 - Hand-authoring content in `logandetectionqueries/` or `logandetectionrules/` - they are legacy empty directories.
 - Committing public IPs, OCIDs, tenancy names, credentials, API tokens, or profile-specific values.
@@ -97,10 +97,10 @@ Every committed detection, query, dashboard, parser mapping, and generated artif
 |----------|-----------|---------|
 | Use `.planning/` as the GSD project state root | Enables GSD phase planning, review, verification, and session continuity for this brownfield repo | Pending |
 | Treat `queries/catalog.json` as canonical inventory | Avoids stale hand-maintained counts and aligns README/STATUS with generated content | Good |
-| Keep companion UI/API out of this repo | Prevents duplicate query/dashboard generation and preserves a clean artifact-producer boundary | Good |
+| Move the Forge UI into `webapp/` | The user selected this repo as the long-term project and retired the old sibling app as the source of truth | Good |
 | Promote Sentinel content only after live OCI parser validation | Prevents parser-invalid KQL conversions from becoming dashboard or saved-search assets | Good |
 | Keep GSD `commit_docs` enabled but do not auto-commit in dirty worktrees | Planning docs should be tracked, but commits must not include unrelated generated changes | Pending |
-| Plan v3.0 as a sibling frontend workbench backed by generated artifacts | User selected sibling app scope; this repo must stay the producer of conversion/reference artifacts | Pending |
+| Plan v3.0 as an integrated frontend workbench backed by generated artifacts | User moved the webapp into this long-term repo; the generated artifacts remain the producer boundary | Good |
 | Generate the OCI command menu from official Oracle docs | User requested the menu be updated from official OCI pages, so frontend menu data must carry source provenance | Pending |
 
 ## Evolution

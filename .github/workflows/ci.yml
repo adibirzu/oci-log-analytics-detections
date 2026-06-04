@@ -1,0 +1,76 @@
+name: CI
+
+# Non-live local release gates. Runs on every push and PR.
+# NOTHING in this file may require OCI credentials — the live parser/dashboard
+# gates live in a separate, manually-dispatched workflow (live-validation.yml)
+# so they are never executed automatically on untrusted fork PRs.
+on:
+  push:
+  pull_request:
+
+# Read-only token. This workflow never needs write access to the repo, and
+# (because it uses the safe `pull_request` trigger, not `pull_request_target`)
+# fork PRs run with NO access to repository or environment secrets.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: Local release gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      # --- Gate 1: unit/integration test suite (no OCI required) ---
+      - name: Pytest
+        run: python -m pytest scripts/ -q
+
+      # --- Gate 2: Sigma -> OCL conversion validates with zero warnings ---
+      # convert_sigma.py --validate regenerates the queries and validates them;
+      # it exits non-zero on warnings/errors. No OCI access required.
+      - name: Validate Sigma -> OCL conversion (fail on warnings)
+        run: python scripts/convert_sigma.py --validate
+
+      # --- Gate 3: catalog drift ---
+      # Regenerate the catalog and fail if anything other than the embedded
+      # `generated_at` timestamp changed. A non-empty (timestamp-normalized)
+      # diff means CATALOG.md / queries/catalog.json were not regenerated after
+      # a rule/query change.
+      - name: Catalog drift check
+        run: |
+          set -euo pipefail
+          python scripts/generate_catalog.py
+          # Ignore only the volatile generated_at timestamp line, then assert
+          # there are no remaining differences in the committed catalog files.
+          DRIFT="$(git diff --no-color -- CATALOG.md queries/catalog.json \
+            | grep -E '^[+-]' \
+            | grep -Ev '^[+-]{2}' \
+            | grep -Ev '"generated_at"' \
+            || true)"
+          if [ -n "$DRIFT" ]; then
+            echo "::error::Catalog drift detected. Run 'python scripts/generate_catalog.py' and commit CATALOG.md + queries/catalog.json."
+            echo "----- drift (timestamp-normalized) -----"
+            echo "$DRIFT"
+            exit 1
+          fi
+          echo "Catalog is in sync (only the generated_at timestamp differs)."
+
+      # --- Gate 4: README/STATUS inventory reconciliation vs catalog ---
+      - name: Inventory drift check (README/STATUS vs catalog)
+        run: python scripts/check_inventory_drift.py

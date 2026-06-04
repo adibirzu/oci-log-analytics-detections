@@ -166,6 +166,7 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
         expected = [
             "synthetic log contract validation",
             "field dictionary validation",
+            "sentinel feed dependency bundle",
             "detection rule spec export",
             "catalog generation",
             "dashboard inventory export",

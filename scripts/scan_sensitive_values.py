@@ -196,6 +196,8 @@ def _looks_like_detection_or_code_token(value: str, line: str) -> bool:
     lowered_line = line.lower()
     if len(stripped) < 8:
         return True
+    if re.fullmatch(r"[A-Za-z_$][A-Za-z0-9_$]*(?:\.[A-Za-z_$][A-Za-z0-9_$]*)?", stripped):
+        return True
     if stripped.startswith(("[", "{", "(", "r'", 'r"', "re.")):
         return True
     if any(char in stripped for char in ("(", "[", "]", "\\")):

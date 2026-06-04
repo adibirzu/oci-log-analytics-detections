@@ -1,19 +1,19 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-05-17T07:19:31.452222+00:00",
+  "generated_at": "2026-06-04T17:21:58.343394+00:00",
   "stats": {
-    "total_rules": 455,
+    "total_rules": 470,
     "total_sigma_rules": 454,
     "platforms": {
-      "windows": 250,
-      "oci": 138,
-      "linux": 67
+      "windows": 263,
+      "oci": 139,
+      "linux": 68
     },
     "severity": {
-      "critical": 85,
-      "high": 195,
-      "medium": 127,
+      "critical": 90,
+      "high": 201,
+      "medium": 131,
       "low": 18,
       "informational": 30
     },
@@ -28,6 +28,7 @@
       "T1003.007",
       "T1005",
       "T1012",
+      "T1014",
       "T1016",
       "T1018",
       "T1021",
@@ -39,6 +40,7 @@
       "T1033",
       "T1036.003",
       "T1036.005",
+      "T1039",
       "T1041",
       "T1046",
       "T1047",
@@ -62,6 +64,7 @@
       "T1059.006",
       "T1059.007",
       "T1068",
+      "T1069",
       "T1069.001",
       "T1069.002",
       "T1070.001",
@@ -77,6 +80,7 @@
       "T1082",
       "T1083",
       "T1086",
+      "T1087",
       "T1087.001",
       "T1087.002",
       "T1090",
@@ -372,6 +376,22 @@
         "initial_access"
       ],
       "query": "('Log Source' = 'OCI Load Balancer Access Logs' or 'Log Source' = 'SOC Load Balancer Access Logs') and ((('Request URL' like '*/api/*' or 'Request URL' like '*/v1/*' or 'Request URL' like '*/v2/*' or 'Request URL' like '*/graphql*' or 'Request URL' like '*/rest/*')) and (('Response Code' = '401' or 'Response Code' = '403')))"
+    },
+    {
+      "filename": "apm_sql_injection_attack_in_request.json",
+      "title": "APM: SQL Injection Attack in Request",
+      "sigma_id": "d5e6f7a8-1190-4002-8003-000000000002",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "oci",
+      "service": "apm",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "query": "'Log Source' = 'SOC Application Logs' and (('Request URL' like '*UNION SELECT*' or 'Request URL' like '*UNION%20SELECT*' or 'Request URL' like '*UNION+SELECT*' or 'Request URL' like '*union select*' or 'Request URL' like '*union%20select*') or ('Request URL' like '*OR 1=1*' or 'Request URL' like '*OR%201%3D1*' or 'Request URL' like '*%27%20OR%201%3D1*' or 'Request URL' like '*AND 1=1*') or ('Request URL' like '*SLEEP(*' or 'Request URL' like '*BENCHMARK(*' or 'Request URL' like '*WAITFOR DELAY*') or ('Request URL' like '*EXTRACTVALUE(*' or 'Request URL' like '*UPDATEXML(*') or ('Request URL' like '*INFORMATION_SCHEMA.TABLES*' or 'Request URL' like '*INFORMATION_SCHEMA.COLUMNS*') or ('Request URL' like '*; DROP TABLE*'))"
     },
     {
       "filename": "appinit_dlls_persistence.json",
@@ -847,7 +867,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*\\\\Development\\\\BACKDOOR\\\\ncov\\\\*' or 'Command Line' like '*Release\\\\bluelight.pdb*') and ('Original File Name' like '*bluelight*')) or (('Target Filename' like '*bluelight.pdb*' or 'Target Filename' like '*BACKDOOR\\\\ncov*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*\\\\Development\\\\BACKDOOR\\\\ncov\\\\*' or 'Command Line' like '*Release\\\\bluelight.pdb*') and 'Original File Name' like '*bluelight*') or (('Target Filename' like '*bluelight.pdb*' or 'Target Filename' like '*BACKDOOR\\\\ncov*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'"
     },
     {
       "filename": "bluelight_yara_system_recon.json",
@@ -865,7 +885,7 @@
       "mitre_tactics": [
         "discovery"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*ipinfo.io*')) or (('Command Line' like '*\"UserName\":\"*' or 'Command Line' like '*\"ComName\":\"*' or 'Command Line' like '*\"OnlineIP\":\"*' or 'Command Line' like '*\"LocalIP\":\"*' or 'Command Line' like '*\"AntiVirus\":\"*' or 'Command Line' like '*\"Process Level\":\"*' or 'Command Line' like '*\"VM\":\"*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Command Line' like '*ipinfo.io*') or (('Command Line' like '*\"UserName\":\"*' or 'Command Line' like '*\"ComName\":\"*' or 'Command Line' like '*\"OnlineIP\":\"*' or 'Command Line' like '*\"LocalIP\":\"*' or 'Command Line' like '*\"AntiVirus\":\"*' or 'Command Line' like '*\"Process Level\":\"*' or 'Command Line' like '*\"VM\":\"*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'"
     },
     {
       "filename": "boot_configuration_change_for_persistence.json",
@@ -915,6 +935,24 @@
         "credential_access"
       ],
       "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '4625')) | stats count as Failures, distinctcount('Source Address') as UniqueSources by User, Entity | where Failures > 3 | sort -Failures"
+    },
+    {
+      "filename": "clickfix_fake_captcha_powershell_execution.json",
+      "title": "ClickFix Fake CAPTCHA PowerShell Execution",
+      "sigma_id": "logan-clickfix-fake-captcha-powershell",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "sysmon_security",
+      "mitre_techniques": [
+        "T1204",
+        "T1059.001"
+      ],
+      "mitre_tactics": [
+        "initial_access",
+        "execution"
+      ],
+      "query": "(('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs') and 'Event ID' = '1' and ('Parent Process Name' like '*chrome.exe' or 'Parent Process Name' like '*msedge.exe' or 'Parent Process Name' like '*firefox.exe' or 'Parent Process Name' like '*iexplore.exe') and 'Process Name' like '*powershell.exe' and ('Command Line' like '*ClickFix*' or 'Command Line' like '*fake CAPTCHA*' or 'Command Line' like '*clipboard*' or 'Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*iwr*' or 'Command Line' like '*WindowStyle Hidden*')) or (('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4688' and 'Process Name' like '*powershell.exe' and ('Command Line' like '*ClickFix*' or 'Command Line' like '*fake CAPTCHA*' or 'Command Line' like '*clipboard*' or 'Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*iwr*')) or ('Log Source' = 'Windows PowerShell Operational Logs' and 'Event ID' in ('4103', '4104') and ('Script Block Text' like '*ClickFix*' or 'Script Block Text' like '*fake CAPTCHA*' or 'Script Block Text' like '*clipboard*' or 'Script Block Text' like '*DownloadString*' or 'Script Block Text' like '*Invoke-WebRequest*' or 'Script Block Text' like '*iwr*' or 'Host Application' like '*WindowStyle Hidden*')) | stats count as Hits, unique('Command Line') as Commands, unique('Parent Process Name') as Parents by 'Host Name (Server)', Entity, User | sort -Hits"
     },
     {
       "filename": "clipboard_data_collection.json",
@@ -1474,7 +1512,7 @@
       "mitre_tactics": [
         "defense_evasion"
       ],
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*.exe') and ('Process Name' like '*\\\\Temp\\\\*' or 'Process Name' like '*\\\\AppData\\\\Local\\\\Temp\\\\*' or 'Process Name' like '*\\\\Downloads\\\\*' or 'Process Name' like '*\\\\Desktop\\\\*')) and not (('Process Name' like '*\\\\Windows\\\\Temp\\\\setup*' or 'Process Name' like '*\\\\Microsoft\\\\*')))"
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*.exe' and ('Process Name' like '*\\\\Temp\\\\*' or 'Process Name' like '*\\\\AppData\\\\Local\\\\Temp\\\\*' or 'Process Name' like '*\\\\Downloads\\\\*' or 'Process Name' like '*\\\\Desktop\\\\*')) and not (('Process Name' like '*\\\\Windows\\\\Temp\\\\setup*' or 'Process Name' like '*\\\\Microsoft\\\\*')))"
     },
     {
       "filename": "domain_trust_discovery_via_nltest.json",
@@ -1927,6 +1965,26 @@
         "execution"
       ],
       "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*nc -lvp*' or msg like '*nc -lp*' or msg like '*ncat -lvp*' or msg like '*ncat -lp*' or msg like '*netcat -lvp*')) or (msg like '*socat TCP-LISTEN*'))"
+    },
+    {
+      "filename": "linux_boopkit_ebpf_rootkit_activity.json",
+      "title": "Linux Boopkit eBPF Rootkit Activity",
+      "sigma_id": "a4b3c2d1-eb0f-4001-9001-000000000001",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1014",
+        "T1059.004",
+        "T1095"
+      ],
+      "mitre_tactics": [
+        "defense_evasion",
+        "execution",
+        "command_and_control"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((msg like '*boopkit*') or (msg like '*bpftool prog load*' or msg like '*bpftool map create*' or msg like '*bpftool prog show pinned*') or (msg like '*/sys/fs/bpf/*') or (msg like '*XDP_REDIRECT*') or (msg like '*magic packet*' and msg like '*reverse shell*'))"
     },
     {
       "filename": "linux_container_escape_attempt.json",
@@ -5659,6 +5717,24 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Destination Port' = 53 and Initiated = 'true') and (('Process Name' like '*\\\\powershell.exe' or 'Process Name' like '*\\\\cmd.exe' or 'Process Name' like '*\\\\nslookup.exe' or 'Process Name' like '*\\\\iodine.exe' or 'Process Name' like '*\\\\dnscat2.exe' or 'Process Name' like '*\\\\dns2tcp.exe')) and not (('Process Name' like '*\\\\svchost.exe' or 'Process Name' like '*\\\\dns.exe')))"
     },
     {
+      "filename": "sysmon_executable_file_created_or_detected.json",
+      "title": "Sysmon Executable File Created or Detected",
+      "sigma_id": "logan-sysmon-29-executable-file-detected",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "sysmon",
+      "mitre_techniques": [
+        "T1105",
+        "T1547.001"
+      ],
+      "mitre_tactics": [
+        "command_and_control",
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Event ID' in ('29', '11')) and ('Target Filename' like '*.exe' or 'Target Filename' like '*.dll' or 'Target Filename' like '*.scr' or 'Target Filename' like '*.ps1') and ('Target Filename' like '*\\\\Temp\\\\*' or 'Target Filename' like '*\\\\Users\\\\Public\\\\*' or 'Target Filename' like '*\\\\ProgramData\\\\*' or 'Target Filename' like '*\\\\Startup\\\\*') | stats count as FileEvents, unique('Target Filename') as Files, unique('Process Name') as Writers by User, 'Host Name (Server)', Entity | sort -FileEvents"
+    },
+    {
       "filename": "sysmon_kerberoasting_network_indicator.json",
       "title": "Sysmon Kerberoasting Network Indicator",
       "sigma_id": "a1b2c3d4-7001-4000-8000-000000000007",
@@ -6118,7 +6194,7 @@
       "mitre_tactics": [
         "execution"
       ],
-      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*; ls*' or 'Request URL' like '*; cat *' or 'Request URL' like '*; id*' or 'Request URL' like '*; whoami*' or 'Request URL' like '*; ping *' or 'Request URL' like '*; wget *' or 'Request URL' like '*; curl *' or 'Request URL' like '*| ls*' or 'Request URL' like '*| cat *' or 'Request URL' like '*| id*' or 'Request URL' like '*| whoami*' or 'Request URL' like '*`id`*' or 'Request URL' like '*`whoami`*' or 'Request URL' like '*$(id)*' or 'Request URL' like '*$(whoami)*' or 'Request URL' like '*$(/bin/bash*' or 'Request URL' like '*/bin/sh -c*' or 'Request URL' like '*cmd.exe /c*' or 'Request URL' like '*powershell -*')) or (('Rule Key' like '*932*')) ))"
+      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*; ls*' or 'Request URL' like '*; cat *' or 'Request URL' like '*; id*' or 'Request URL' like '*; whoami*' or 'Request URL' like '*; ping *' or 'Request URL' like '*; wget *' or 'Request URL' like '*; curl *' or 'Request URL' like '*| ls*' or 'Request URL' like '*| cat *' or 'Request URL' like '*| id*' or 'Request URL' like '*| whoami*' or 'Request URL' like '*`id`*' or 'Request URL' like '*`whoami`*' or 'Request URL' like '*$(id)*' or 'Request URL' like '*$(whoami)*' or 'Request URL' like '*$(/bin/bash*' or 'Request URL' like '*/bin/sh -c*' or 'Request URL' like '*cmd.exe /c*' or 'Request URL' like '*powershell -*')) or ('Rule Key' like '*932*') ))"
     },
     {
       "filename": "waf_cors_bypass_attempt_blocked.json",
@@ -6150,7 +6226,7 @@
       "mitre_tactics": [
         "initial_access"
       ],
-      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*<script*' or 'Request URL' like '*<SCRIPT*' or 'Request URL' like '*{'javascript': None}*' or 'Request URL' like '*onerror=*' or 'Request URL' like '*onload=*' or 'Request URL' like '*onmouseover=*' or 'Request URL' like '*onfocus=*' or 'Request URL' like '*onclick=*' or 'Request URL' like '*onsubmit=*' or 'Request URL' like '*<img src=x*' or 'Request URL' like '*<svg onload*' or 'Request URL' like '*<iframe*' or 'Request URL' like '*alert(*' or 'Request URL' like '*prompt(*' or 'Request URL' like '*confirm(*' or 'Request URL' like '*document.cookie*' or 'Request URL' like '*document.location*' or 'Request URL' like '*window.location*' or 'Request URL' like '*eval(*' or 'Request URL' like '*String.fromCharCode*' or 'Request URL' like '*atob(*')) or (('Rule Key' like '*941*')) ))"
+      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*<script*' or 'Request URL' like '*<SCRIPT*' or 'Request URL' like '*{'javascript': None}*' or 'Request URL' like '*onerror=*' or 'Request URL' like '*onload=*' or 'Request URL' like '*onmouseover=*' or 'Request URL' like '*onfocus=*' or 'Request URL' like '*onclick=*' or 'Request URL' like '*onsubmit=*' or 'Request URL' like '*<img src=x*' or 'Request URL' like '*<svg onload*' or 'Request URL' like '*<iframe*' or 'Request URL' like '*alert(*' or 'Request URL' like '*prompt(*' or 'Request URL' like '*confirm(*' or 'Request URL' like '*document.cookie*' or 'Request URL' like '*document.location*' or 'Request URL' like '*window.location*' or 'Request URL' like '*eval(*' or 'Request URL' like '*String.fromCharCode*' or 'Request URL' like '*atob(*')) or ('Rule Key' like '*941*') ))"
     },
     {
       "filename": "waf_ldap_injection_attack_blocked.json",
@@ -6216,7 +6292,7 @@
       "mitre_tactics": [
         "initial_access"
       ],
-      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*../*' or 'Request URL' like '*..%2f*' or 'Request URL' like '*..%5c*' or 'Request URL' like '*..%252f*' or 'Request URL' like '*%2e%2e/*' or 'Request URL' like '*%2e%2e%2f*' or 'Request URL' like '*..../*' or 'Request URL' like '*/etc/passwd*' or 'Request URL' like '*/etc/shadow*' or 'Request URL' like '*/proc/self*' or 'Request URL' like '*/windows/system32*' or 'Request URL' like '*boot.ini*' or 'Request URL' like '*win.ini*')) or (('Rule Key' like '*930*')) ))"
+      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*../*' or 'Request URL' like '*..%2f*' or 'Request URL' like '*..%5c*' or 'Request URL' like '*..%252f*' or 'Request URL' like '*%2e%2e/*' or 'Request URL' like '*%2e%2e%2f*' or 'Request URL' like '*..../*' or 'Request URL' like '*/etc/passwd*' or 'Request URL' like '*/etc/shadow*' or 'Request URL' like '*/proc/self*' or 'Request URL' like '*/windows/system32*' or 'Request URL' like '*boot.ini*' or 'Request URL' like '*win.ini*')) or ('Rule Key' like '*930*') ))"
     },
     {
       "filename": "waf_protocol_attack_blocked.json",
@@ -6555,6 +6631,41 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*net.exe' and ('Command Line' like '*user /domain*' or 'Command Line' like '*group /domain*' or 'Command Line' like '*localgroup administrators*')) or ('Process Name' like '*net1.exe' and ('Command Line' like '*user /domain*' or 'Command Line' like '*group /domain*')) or (('Command Line' like '*Get-ADUser*' or 'Command Line' like '*Get-ADGroup*' or 'Command Line' like '*Get-ADGroupMember*' or 'Command Line' like '*Get-LocalUser*' or 'Command Line' like '*Get-LocalGroupMember*')) or ('Process Name' like '*dsquery.exe'))"
     },
     {
+      "filename": "windows_account_or_group_enumeration_spike.json",
+      "title": "Windows Account or Group Enumeration Spike",
+      "sigma_id": "logan-winsec-4798-4799-enumeration-spike",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1087",
+        "T1069"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' in ('4798', '4799') | stats count as EnumerationEvents, unique('Target User Name') as Targets by User, 'Source Address', 'Host Name (Server)' | where EnumerationEvents > 3 | sort -EnumerationEvents"
+    },
+    {
+      "filename": "windows_admin_share_access_spike_event.json",
+      "title": "Windows Administrative Share Access Spike",
+      "sigma_id": "logan-winsec-5140-5145-admin-share-access",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1021.002",
+        "T1039"
+      ],
+      "mitre_tactics": [
+        "lateral_movement",
+        "collection"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' in ('5140', '5145') and ('Share Name' like '*C$*' or 'Share Name' like '*ADMIN$*' or 'Share Name' like '*IPC$*' or msg like '*Share Name*') | stats count as ShareEvents, unique('Share Name') as Shares, unique('Relative Target Name') as Targets by User, 'Source Address', 'Host Name (Server)' | where ShareEvents > 2 | sort -ShareEvents"
+    },
+    {
       "filename": "windows_admin_share_access_via_net_use.json",
       "title": "Windows Admin Share Access via Net Use",
       "sigma_id": "a810df3e-0caf-4546-a72c-84e415f5efe7",
@@ -6585,6 +6696,22 @@
         "defense_evasion"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*amsiInitFailed*' or 'Command Line' like '*AmsiScanBuffer*' or 'Command Line' like '*amsi.dll*' or 'Command Line' like '*amsiContext*' or 'Command Line' like '*AmsiUtils*')))"
+    },
+    {
+      "filename": "windows_audit_policy_changed.json",
+      "title": "Windows Audit Policy Changed",
+      "sigma_id": "logan-winsec-4719-audit-policy-changed",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1562.002"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4719' | stats count as Changes by User, 'Host Name (Server)', Entity | sort -Changes"
     },
     {
       "filename": "windows_backup_deletion_via_wbadmin.json",
@@ -6735,6 +6862,22 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Add-MpPreference*' and 'Command Line' like '*-ExclusionPath*')))"
     },
     {
+      "filename": "windows_defender_malware_or_remediation_event.json",
+      "title": "Windows Defender Malware or Remediation Event",
+      "sigma_id": "logan-windef-malware-remediation-or-tamper",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "defender",
+      "mitre_techniques": [
+        "T1562.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'Windows Defender Operational Logs' and 'Event ID' in ('1116', '1117', '1118', '1119', '5001', '5004', '5007', '5010', '5012') | stats count as DefenderEvents, unique('Threat Name') as Threats, unique('Action') as Actions, unique('Status') as Statuses, unique('File Path') as FilePaths by 'Host Name (Server)', User, Entity | sort -DefenderEvents"
+    },
+    {
       "filename": "windows_defender_real-time_protection_disabled.json",
       "title": "Windows Defender Real-Time Protection Disabled",
       "sigma_id": "54d547fe-0c87-44ea-9203-716d7a262c3a",
@@ -6847,6 +6990,22 @@
         "credential_access"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Rubeus*' or 'Command Line' like '*kerberoast*')) or (('Command Line' like '*Invoke-Kerberoast*' or 'Command Line' like '*Get-SPNUsers*' or 'Command Line' like '*Request-SPNTicket*')) or ('Process Name' like '*setspn.exe' and 'Command Line' like '*-Q */**'))"
+    },
+    {
+      "filename": "windows_kerberos_pre_authentication_failures.json",
+      "title": "Windows Kerberos Pre-Authentication Failure Spike",
+      "sigma_id": "logan-winsec-4771-kerberos-preauth-failures",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1110"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4771' and (Status in ('0x6', '0x12', '0x17', '0x18', '0x20', '0x25') or 'Failure Reason' in ('0x6', '0x12', '0x17', '0x18', '0x20', '0x25') or msg like '*Failure Code*') | stats count as Failures, distinctcount('Source Address') as UniqueSources by 'Target User Name', 'Source Address', 'Host Name (Server)' | where Failures > 3 | sort -Failures"
     },
     {
       "filename": "windows_keylogger_indicators.json",
@@ -7283,6 +7442,22 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*ntdsutil.exe' and ('Command Line' like '*ac i ntds*' or 'Command Line' like '*ifm*' or 'Command Line' like '*create full*')) or (('Command Line' like '*ntds.dit*' or 'Command Line' like '*SYSTEM.hiv*')))"
     },
     {
+      "filename": "windows_ntlm_authentication_failures.json",
+      "title": "Windows NTLM Authentication Failure Spike",
+      "sigma_id": "logan-winsec-4776-ntlm-auth-failures",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1110"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4776' and (Status in ('0xC0000064', '0xC000006A', '0xC000006D', '0xC0000072', '0xC0000193', '0xC0000234') or 'Failure Reason' in ('0xC0000064', '0xC000006A', '0xC000006D', '0xC0000072', '0xC0000193', '0xC0000234') or msg like '*Error Code*') | stats count as Failures, distinctcount('Source Address') as UniqueSources by 'Target User Name', 'Source Address', 'Host Name (Server)' | where Failures > 3 | sort -Failures"
+    },
+    {
       "filename": "windows_pass-the-hash_attack_indicators.json",
       "title": "Windows Pass-the-Hash Attack Indicators",
       "sigma_id": "f1e2d3c4-5017-4000-8000-000000000017",
@@ -7315,6 +7490,41 @@
         "command_and_control"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*powershell.exe' or 'Process Name' like '*pwsh.exe')) and (('Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*Net.WebClient*' or 'Command Line' like '*DownloadString*' or 'Command Line' like '*DownloadFile*' or 'Command Line' like '*Start-BitsTransfer*' or 'Command Line' like '*Invoke-RestMethod*')))"
+    },
+    {
+      "filename": "windows_powershell_script_block_suspicious_content.json",
+      "title": "Windows PowerShell Suspicious Script Block",
+      "sigma_id": "logan-winps-4104-suspicious-script-block",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "powershell",
+      "mitre_techniques": [
+        "T1059.001",
+        "T1027"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "defense_evasion"
+      ],
+      "query": "'Log Source' = 'Windows PowerShell Operational Logs' and 'Event ID' = '4104' and ('Script Block Text' like '*IEX*' or 'Script Block Text' like '*Invoke-Expression*' or 'Script Block Text' like '*DownloadString*' or 'Script Block Text' like '*FromBase64String*' or 'Script Block Text' like '*AmsiUtils*' or 'Script Block Text' like '*ExecutionPolicy Bypass*') | stats count as ScriptBlocks, unique('Script Block Text') as ScriptSamples, unique('Host Application') as HostApplications by User, 'Host Name (Server)', Entity | sort -ScriptBlocks"
+    },
+    {
+      "filename": "windows_privileged_group_membership_change_event.json",
+      "title": "Windows Privileged Group Membership Changed",
+      "sigma_id": "logan-winsec-privileged-group-membership-change",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "persistence",
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' in ('4728', '4732', '4756') and ('Target User Name' like '*Domain Admins*' or 'Target User Name' like '*Enterprise Admins*' or 'Target User Name' like '*Administrators*' or 'Target User Name' like '*Remote Desktop Users*' or msg like '*Domain Admins*' or msg like '*Administrators*') | stats count as GroupChanges, unique('Target User Name') as Groups by User, 'Host Name (Server)', Entity | sort -GroupChanges"
     },
     {
       "filename": "windows_process_hollowing_indicators.json",
@@ -7431,6 +7641,23 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*arp.exe' and 'Command Line' like '*-a*') or (('Command Line' like '*for /l*' or 'Command Line' like '*ping -n 1*')) or ('Process Name' like '*nslookup.exe') or (('Command Line' like '*Test-Connection*' or 'Command Line' like '*Test-NetConnection*' or 'Command Line' like '*Resolve-DnsName*' or 'Command Line' like '*Get-ADComputer*')) or (('Command Line' like '*nbtscan*' or 'Command Line' like '*nbtstat -a*')))"
     },
     {
+      "filename": "windows_scheduled_task_created_or_updated_event.json",
+      "title": "Windows Scheduled Task Created or Updated",
+      "sigma_id": "logan-winsec-4698-4702-scheduled-task-change",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1053.005"
+      ],
+      "mitre_tactics": [
+        "persistence",
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' in ('4698', '4702') and ('Task Name' like '*Update*' or 'Task Name' like '*Cache*' or 'Command Line' like '*powershell*' or 'Command Line' like '*\\\\Temp\\\\*' or 'Command Line' like '*\\\\Users\\\\Public\\\\*' or msg like '*Task Name*') | stats count as TaskChanges, unique('Task Name') as Tasks, unique('Command Line') as Commands by User, 'Host Name (Server)', Entity | sort -TaskChanges"
+    },
+    {
       "filename": "windows_scheduled_task_creation_via_schtasks.json",
       "title": "Windows Scheduled Task Creation via Schtasks",
       "sigma_id": "e1f2a3b4-4018-4000-8000-000000000018",
@@ -7479,6 +7706,22 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\\\cscript.exe' or 'Process Name' like '*\\\\wscript.exe') and ('Command Line' like '*\\\\Temp\\\\*' or 'Command Line' like '*\\\\tmp\\\\*')))"
     },
     {
+      "filename": "windows_security_log_cleared_event.json",
+      "title": "Windows Security or System Event Log Cleared",
+      "sigma_id": "logan-winsec-1102-event-log-cleared",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security_system",
+      "mitre_techniques": [
+        "T1070.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "(('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '1102') or ('Log Source' = 'Windows Event System Logs' and 'Event ID' = '104') | stats count as ClearEvents by User, 'Host Name (Server)', Entity | sort -ClearEvents"
+    },
+    {
       "filename": "windows_service_created_with_suspicious_binary_path.json",
       "title": "Windows Service Created with Suspicious Binary Path",
       "sigma_id": "624b2ce3-6fe8-47ab-a74e-2862cbc49e24",
@@ -7509,6 +7752,23 @@
         "persistence"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*sc.exe' and 'Command Line' like '*create*'))"
+    },
+    {
+      "filename": "windows_service_installed_event_log.json",
+      "title": "Windows Service Installed from Event Logs",
+      "sigma_id": "logan-win-event-service-installed",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "system_security",
+      "mitre_techniques": [
+        "T1543.003"
+      ],
+      "mitre_tactics": [
+        "persistence",
+        "privilege_escalation"
+      ],
+      "query": "(('Log Source' = 'Windows Event System Logs' and 'Event ID' = '7045') or (('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4697')) and ('Service File Name' like '*\\\\Temp\\\\*' or 'Service File Name' like '*\\\\Users\\\\Public\\\\*' or 'Service File Name' like '*\\\\ProgramData\\\\*' or 'Service File Name' like '*powershell*' or msg like '*Service File Name*') | stats count as ServiceInstalls, unique('Service Name') as Services, unique('Service File Name') as ServiceBinaries by User, 'Host Name (Server)', Entity | sort -ServiceInstalls"
     },
     {
       "filename": "windows_shadow_copy_deletion.json",
@@ -7708,13 +7968,14 @@
     }
   ],
   "dashboards": {
-    "total": 26,
-    "saved_searches": 387,
+    "total": 29,
+    "saved_searches": 438,
     "names": [
       "SOC Overview Dashboard",
       "SOC: OCI STIG Compliance Dashboard",
       "SOC: OCI Audit Security Dashboard",
       "SOC: Cloud Guard Security Dashboard",
+      "SOC: Cloud Guard Instance Security Dashboard",
       "SOC: Linux Security Dashboard",
       "SOC: Linux Advanced Threats Dashboard",
       "SOC: Windows Security Dashboard",
@@ -7730,9 +7991,11 @@
       "SOC: Web-to-Cloud Threat Hunting Dashboard",
       "OCI-DEMO: Application 360 Monitoring Dashboard",
       "OCI-DEMO: Octo APM Demo Dashboard",
+      "OCI-DEMO: OKE Kubernetes Attack Dashboard",
       "SOC: Geographic Health Dashboard",
       "SOC: APT Detection Dashboard",
       "SOC: Browser Attack Detection Dashboard",
+      "SOC: oci-coordinator Hunt Showcase Dashboard",
       "SOC: Microsoft Sentinel Identity Converted Detections",
       "SOC: Microsoft Sentinel Endpoint Converted Detections",
       "SOC: Microsoft Sentinel M365 Converted Detections",

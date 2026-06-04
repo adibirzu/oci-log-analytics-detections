@@ -1,0 +1,15 @@
+{
+  "name": "web-server-compromise",
+  "platform": "linux",
+  "description": "Web server compromise checks for webshells, suspicious child processes, and modified content roots.",
+  "queries": [
+    {
+      "id": "webshell_like_files",
+      "name": "Webshell-like files",
+      "sql": "SELECT path, filename FROM file WHERE directory IN ('/var/www/html', '/usr/share/nginx/html') AND filename LIKE '%.php';",
+      "severity": "high",
+      "expected_fields": ["path", "filename"],
+      "mitre": ["T1505.003"]
+    }
+  ]
+}

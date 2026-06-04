@@ -16,12 +16,27 @@ from oci_time import build_time_window
 import oci
 
 
-def load_specs(eligible_only: bool) -> list[dict]:
+def normalize_query_file_filter(files: list[str] | None) -> set[str]:
+    """Return normalized query-file selectors for exact path or basename matches."""
+    return {
+        file.replace("\\", "/").removeprefix("./")
+        for file in files or []
+    }
+
+
+def load_specs(eligible_only: bool, files: list[str] | None = None) -> list[dict]:
     """Load query specs from the detection-rule catalog."""
     catalog = build_catalog()
     specs = catalog["specs"]
     if eligible_only:
         specs = [spec for spec in specs if spec["eligible"]]
+    file_filter = normalize_query_file_filter(files)
+    if file_filter:
+        specs = [
+            spec for spec in specs
+            if spec["query_file"] in file_filter
+            or os.path.basename(spec["query_file"]) in file_filter
+        ]
     return specs
 
 
@@ -49,12 +64,12 @@ def execute_query(la_client, namespace: str, query: str, lookback: str) -> dict:
         return {"rows": 0, "ok": False, "empty": False, "error": str(exc)}
 
 
-def audit_queries(lookback: str, eligible_only: bool) -> dict:
+def audit_queries(lookback: str, eligible_only: bool, files: list[str] | None = None) -> dict:
     """Audit all configured queries against live OCI Log Analytics."""
     require_oci_config()
     la_client = get_la_client()
     namespace = get_namespace(la_client)
-    specs = load_specs(eligible_only)
+    specs = load_specs(eligible_only, files)
 
     results = []
     for spec in specs:
@@ -76,6 +91,7 @@ def audit_queries(lookback: str, eligible_only: bool) -> dict:
     return {
         "lookback": lookback,
         "eligible_only": eligible_only,
+        "requested_files": files or [],
         "total_queries": len(results),
         "queries_with_results": len(populated),
         "queries_empty": len(empty),
@@ -89,11 +105,13 @@ def main() -> None:
     parser.add_argument("--lookback", default="7d", help="Lookback window for query execution")
     parser.add_argument("--eligible-only", action="store_true",
                         help="Only audit scheduled-search eligible detection queries")
+    parser.add_argument("--files", nargs="*", default=None,
+                        help="Optional query JSON paths or basenames to audit")
     parser.add_argument("--out", help="Optional JSON output path")
     parser.add_argument("--json", action="store_true", help="Print machine-readable JSON to stdout")
     args = parser.parse_args()
 
-    report = audit_queries(args.lookback, args.eligible_only)
+    report = audit_queries(args.lookback, args.eligible_only, args.files)
 
     if args.out:
         with open(args.out, "w") as f:

@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T07:19:01.551447+00:00",
-  "total_rules": 507,
-  "total_base_rules": 447,
+  "generated_at": "2026-06-04T19:02:08.749850+00:00",
+  "total_rules": 528,
+  "total_base_rules": 468,
   "total_sentinel_queries": 60,
-  "total_app_queries": 46,
-  "total_hunting": 87,
-  "total_content_items": 640,
+  "total_app_queries": 55,
+  "total_hunting": 95,
+  "total_content_items": 678,
   "inventory": {
     "source_yaml_rules": 454,
     "source_rule_breakdown": {
@@ -15,32 +15,32 @@
       "web": 38,
       "windows": 249
     },
-    "generated_detection_queries": 507,
-    "generated_base_detection_queries": 447,
+    "generated_detection_queries": 528,
+    "generated_base_detection_queries": 468,
     "generated_sentinel_queries": 60,
-    "generated_app_queries": 46,
+    "generated_app_queries": 55,
     "source_derived_app_queries": 8,
-    "curated_app_queries": 38,
-    "generated_hunting_queries": 87,
-    "generated_sigma_queries": 455,
-    "total_query_artifacts": 640,
+    "curated_app_queries": 47,
+    "generated_hunting_queries": 95,
+    "generated_sigma_queries": 476,
+    "total_query_artifacts": 678,
     "legacy_dirs": {
       "logandetectionqueries": 0,
       "logandetectionrules": 0
     },
-    "combined_mitre_techniques": 228,
-    "combined_mitre_tactics": 16
+    "combined_mitre_techniques": 231,
+    "combined_mitre_tactics": 14
   },
   "platforms": {
-    "windows": 250,
-    "oci": 130,
-    "linux": 67,
+    "windows": 263,
+    "oci": 137,
+    "linux": 68,
     "microsoft_sentinel": 60
   },
   "severities": {
-    "critical": 84,
-    "high": 222,
-    "medium": 153,
+    "critical": 90,
+    "high": 230,
+    "medium": 160,
     "low": 18,
     "informational": 30
   },
@@ -54,6 +54,7 @@
     "T1003.007",
     "T1005",
     "T1012",
+    "T1014",
     "T1016",
     "T1018",
     "T1020",
@@ -67,6 +68,7 @@
     "T1036",
     "T1036.003",
     "T1036.005",
+    "T1039",
     "T1041",
     "T1046",
     "T1047",
@@ -91,6 +93,7 @@
     "T1059.006",
     "T1059.007",
     "T1068",
+    "T1069",
     "T1069.001",
     "T1069.002",
     "T1070",
@@ -278,12 +281,10 @@
     "impact",
     "initial_access",
     "lateral_movement",
-    "malware,_component",
     "persistence",
     "privilege_escalation",
     "reconnaissance",
-    "resource_development",
-    "vulnerability"
+    "resource_development"
   ],
   "all_mitre_techniques": [
     "T1003",
@@ -295,6 +296,7 @@
     "T1003.007",
     "T1005",
     "T1012",
+    "T1014",
     "T1016",
     "T1018",
     "T1020",
@@ -309,6 +311,7 @@
     "T1036",
     "T1036.003",
     "T1036.005",
+    "T1039",
     "T1041",
     "T1046",
     "T1047",
@@ -333,6 +336,7 @@
     "T1059.006",
     "T1059.007",
     "T1068",
+    "T1069",
     "T1069.001",
     "T1069.002",
     "T1070",
@@ -526,12 +530,10 @@
     "impact",
     "initial_access",
     "lateral_movement",
-    "malware,_component",
     "persistence",
     "privilege_escalation",
     "reconnaissance",
-    "resource_development",
-    "vulnerability"
+    "resource_development"
   ],
   "stig_controls": [
     "AC-17",
@@ -746,6 +748,31 @@
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "APM: SQL Injection Attack in Request",
+      "description": "Detects SQL injection payloads inside APM-instrumented application requests. Matches UNION SELECT, OR 1=1, time-based blind (SLEEP), boolean-based, error-based (EXTRACTVALUE), and stacked-query patterns appearing in Request URL.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [],
+      "file": "apm_sql_injection_attack_in_request.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "not_evaluated",
       "content_surface": "detection"
     },
@@ -1382,6 +1409,38 @@
       "content_surface": "detection"
     },
     {
+      "title": "ClickFix Fake CAPTCHA PowerShell Execution",
+      "description": "Detects browser-launched PowerShell patterns associated with ClickFix fake CAPTCHA social engineering, including clipboard instructions, hidden execution, and download cradles.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1204",
+        "T1059.001"
+      ],
+      "mitre_tactics": [
+        "initial_access",
+        "execution"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [
+        {
+          "name": "Microsoft Security Blog: Think before you ClickFix",
+          "url": "https://www.microsoft.com/en-us/security/blog/2025/08/21/think-before-you-clickfix-analyzing-the-clickfix-social-engineering-technique/"
+        }
+      ],
+      "file": "clickfix_fake_captcha_powershell_execution.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
       "title": "Clipboard Data Collection",
       "description": "Detects PowerShell or command-line access to clipboard data for credential or data theft.",
       "level": "medium",
@@ -1403,6 +1462,132 @@
       "test_data_coverage": "covered",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Cloud Guard Instance Security: Findings by Host",
+      "description": "Ranks Cloud Guard Instance Security findings by host and OCI compute instance.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "stig_ids": [],
+      "stig_category": "",
+      "references": [],
+      "file": "cloud_guard_instance_security_findings_by_host.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Cloud Guard Instance Security: Findings by Pack Query",
+      "description": "Shows which OSQuery pack queries are producing the most findings.",
+      "level": "high",
+      "platform": "oci",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "stig_ids": [],
+      "stig_category": "",
+      "references": [],
+      "file": "cloud_guard_instance_security_findings_by_pack_query.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Cloud Guard Instance Security: High Severity Pivots",
+      "description": "High-severity workload findings with MITRE, host, process, and network pivots.",
+      "level": "critical",
+      "platform": "oci",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "stig_ids": [],
+      "stig_category": "",
+      "references": [],
+      "file": "cloud_guard_instance_security_high_severity_pivots.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Cloud Guard Instance Security: Instance to Query Link View",
+      "description": "Links OCI instances, hosts, OSQuery pack queries, and finding names for investigation.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "stig_ids": [],
+      "stig_category": "",
+      "references": [],
+      "file": "cloud_guard_instance_security_instance_to_query_link.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Cloud Guard Instance Security: Pack Coverage",
+      "description": "Counts Cloud Guard Instance Security and OSQuery result events by pack, severity, and status.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "stig_ids": [],
+      "stig_category": "",
+      "references": [],
+      "file": "cloud_guard_instance_security_pack_coverage.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Cloud Guard Instance Security: Raw Result Detail",
+      "description": "Raw Cloud Guard Instance Security and OSQuery result detail for analyst review.",
+      "level": "medium",
+      "platform": "oci",
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "stig_ids": [],
+      "stig_category": "",
+      "references": [],
+      "file": "cloud_guard_instance_security_raw_result_detail.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "not_evaluated",
       "content_surface": "detection"
     },
@@ -2957,6 +3142,35 @@
       "test_data_coverage": "covered",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Linux Boopkit eBPF Rootkit Activity",
+      "description": "Detects boopkit/eBPF rootkit activity including BPF program/map loading, XDP attachment, and magic-packet triggered command execution. Boopkit hides reverse shells via eBPF and is invoked by attacker-crafted SYN packets.",
+      "level": "critical",
+      "platform": "linux",
+      "mitre_techniques": [
+        "T1014",
+        "T1059.004",
+        "T1095"
+      ],
+      "mitre_tactics": [
+        "defense_evasion",
+        "execution",
+        "command_and_control"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [],
+      "file": "linux_boopkit_ebpf_rootkit_activity.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "not_evaluated",
       "content_surface": "detection"
     },
@@ -8689,6 +8903,38 @@
       "content_surface": "detection"
     },
     {
+      "title": "Sysmon Executable File Created or Detected",
+      "description": "Detects Sysmon Event ID 29 FileExecutableDetected and Event ID 11 executable file creates in writable or startup locations.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1105",
+        "T1547.001"
+      ],
+      "mitre_tactics": [
+        "command_and_control",
+        "persistence"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "references": [
+        {
+          "name": "Microsoft Sysinternals: Sysmon",
+          "url": "https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon"
+        }
+      ],
+      "file": "sysmon_executable_file_created_or_detected.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
       "title": "Sysmon Kerberoasting Network Indicator",
       "description": "Detects Kerberos ticket requests (port 88) from anomalous processes. Kerberoasting attacks request service tickets (TGS) to crack service account passwords offline.\n",
       "level": "high",
@@ -10071,6 +10317,77 @@
       "content_surface": "detection"
     },
     {
+      "title": "Windows Account or Group Enumeration Spike",
+      "description": "Detects repeated Security Event IDs 4798 and 4799, which can indicate adversary account or group membership enumeration.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1087",
+        "T1069"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "references": [
+        {
+          "name": "Microsoft Learn: 4798(S) A user's local group membership was enumerated",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4798"
+        },
+        {
+          "name": "Microsoft Learn: 4799(S) A security-enabled local group membership was enumerated",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4799"
+        }
+      ],
+      "file": "windows_account_or_group_enumeration_spike.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Windows Administrative Share Access Spike",
+      "description": "Detects repeated Security Event IDs 5140 and 5145 against administrative shares such as C$, ADMIN$, and IPC$, which can indicate lateral movement or data harvesting.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1021.002",
+        "T1039"
+      ],
+      "mitre_tactics": [
+        "lateral_movement",
+        "collection"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [
+        {
+          "name": "Microsoft Learn: 5140(S,F) A network share object was accessed",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-5140"
+        },
+        {
+          "name": "Microsoft Learn: 5145(S,F) A network share object was checked",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-5145"
+        }
+      ],
+      "file": "windows_admin_share_access_spike_event.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
       "title": "Windows Admin Share Access via Net Use",
       "description": "Detects access to admin shares (C$, ADMIN$, IPC$) for lateral movement.",
       "level": "medium",
@@ -10115,6 +10432,36 @@
       "source_confidence": "high",
       "field_coverage": "not_evaluated",
       "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Windows Audit Policy Changed",
+      "description": "Detects Event ID 4719, which records Windows audit policy changes that can reduce forensic visibility during an intrusion.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1562.002"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [
+        {
+          "name": "Microsoft Learn: 4719(S) System audit policy was changed",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4719"
+        }
+      ],
+      "file": "windows_audit_policy_changed.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
       "scheduled_rule_eligibility": "not_evaluated",
@@ -10350,6 +10697,36 @@
       "content_surface": "detection"
     },
     {
+      "title": "Windows Defender Malware or Remediation Event",
+      "description": "Detects Microsoft Defender Antivirus operational events for malware detection, remediation, failed remediation, disabled protection, or configuration changes.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1562.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [
+        {
+          "name": "Microsoft Learn: Troubleshoot Microsoft Defender Antivirus event IDs",
+          "url": "https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus"
+        }
+      ],
+      "file": "windows_defender_malware_or_remediation_event.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
       "title": "Windows Defender Real-Time Protection Disabled",
       "description": "Detects commands disabling Windows Defender real-time protection via PowerShell or registry.",
       "level": "critical",
@@ -10521,6 +10898,36 @@
       "source_confidence": "high",
       "field_coverage": "not_evaluated",
       "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Windows Kerberos Pre-Authentication Failure Spike",
+      "description": "Detects repeated Kerberos pre-authentication failures through Event ID 4771, prioritizing bad-password, invalid-user, expired-ticket, and clock-skew result codes.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1110"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "references": [
+        {
+          "name": "Microsoft Learn: 4771(F) Kerberos pre-authentication failed",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4771"
+        }
+      ],
+      "file": "windows_kerberos_pre_authentication_failures.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
       "scheduled_rule_eligibility": "not_evaluated",
@@ -11204,6 +11611,36 @@
       "content_surface": "detection"
     },
     {
+      "title": "Windows NTLM Authentication Failure Spike",
+      "description": "Detects repeated NTLM validation failures through Event ID 4776, including bad password, bad username, disabled account, expired account, and lockout codes.",
+      "level": "medium",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1110"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT II",
+      "references": [
+        {
+          "name": "Microsoft Learn: 4776(S,F) The computer attempted to validate credentials",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4776"
+        }
+      ],
+      "file": "windows_ntlm_authentication_failures.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
       "title": "Windows Pass-the-Hash Attack Indicators",
       "description": "Detects command-line patterns associated with pass-the-hash attacks using tools like Impacket, CrackMapExec, or built-in Windows commands with NTLM hash parameters.",
       "level": "critical",
@@ -11250,6 +11687,73 @@
       "source_confidence": "high",
       "field_coverage": "not_evaluated",
       "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Windows PowerShell Suspicious Script Block",
+      "description": "Detects PowerShell Operational Event ID 4104 script blocks containing download cradles, AMSI bypass attempts, encoded payload handling, or Invoke-Expression execution.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1059.001",
+        "T1027"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [
+        {
+          "name": "Microsoft Learn: about_Logging_Windows",
+          "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logging_windows"
+        }
+      ],
+      "file": "windows_powershell_script_block_suspicious_content.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Windows Privileged Group Membership Changed",
+      "description": "Detects additions to privileged local, global, or universal groups through Security Event IDs 4728, 4732, and 4756.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "persistence",
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [
+        {
+          "name": "Microsoft Learn: 4728(S) A member was added to a security-enabled global group",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4728"
+        },
+        {
+          "name": "Microsoft Learn: 4732(S) A member was added to a security-enabled local group",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4732"
+        }
+      ],
+      "file": "windows_privileged_group_membership_change_event.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
       "scheduled_rule_eligibility": "not_evaluated",
@@ -11433,6 +11937,41 @@
       "content_surface": "detection"
     },
     {
+      "title": "Windows Scheduled Task Created or Updated",
+      "description": "Detects Security Event IDs 4698 and 4702 for scheduled tasks created or modified with suspicious task names or executable actions.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1053.005"
+      ],
+      "mitre_tactics": [
+        "persistence",
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [
+        {
+          "name": "Microsoft Learn: 4698(S) A scheduled task was created",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4698"
+        },
+        {
+          "name": "Microsoft Learn: 4702(S) A scheduled task was updated",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4702"
+        }
+      ],
+      "file": "windows_scheduled_task_created_or_updated_event.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
       "title": "Windows Scheduled Task Creation via Schtasks",
       "description": "Detects creation of scheduled tasks via schtasks.exe with suspicious patterns. Scheduled tasks are a common persistence and execution mechanism.",
       "level": "medium",
@@ -11508,6 +12047,36 @@
       "content_surface": "detection"
     },
     {
+      "title": "Windows Security or System Event Log Cleared",
+      "description": "Detects native Windows event log clearing through Security Event ID 1102 and System Event ID 104.",
+      "level": "critical",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1070.001"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [
+        {
+          "name": "Microsoft Learn: 1102(S) The audit log was cleared",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-1102"
+        }
+      ],
+      "file": "windows_security_log_cleared_event.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
       "title": "Windows Service Created with Suspicious Binary Path",
       "description": "Detects creation of Windows services pointing to executables in user-writable paths.",
       "level": "high",
@@ -11552,6 +12121,37 @@
       "source_confidence": "high",
       "field_coverage": "not_evaluated",
       "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "detection"
+    },
+    {
+      "title": "Windows Service Installed from Event Logs",
+      "description": "Detects service installation through System Event ID 7045 or Security Event ID 4697, with emphasis on service binaries in writable locations.",
+      "level": "high",
+      "platform": "windows",
+      "mitre_techniques": [
+        "T1543.003"
+      ],
+      "mitre_tactics": [
+        "persistence",
+        "privilege_escalation"
+      ],
+      "stig_ids": [],
+      "stig_category": "CAT I",
+      "references": [
+        {
+          "name": "Microsoft Learn: 4697(S) A service was installed in the system",
+          "url": "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4697"
+        }
+      ],
+      "file": "windows_service_installed_event_log.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
       "scheduled_rule_eligibility": "not_evaluated",
@@ -12448,8 +13048,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "privilege_escalation",
-        "command_and_control",
-        "vulnerability"
+        "command_and_control"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -12490,9 +13089,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "persistence",
-        "privilege_escalation",
-        "vulnerability",
-        "malware,_component"
+        "privilege_escalation"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -12533,8 +13130,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "persistence",
-        "privilege_escalation",
-        "vulnerability"
+        "privilege_escalation"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -12663,8 +13259,7 @@
         "execution",
         "collection",
         "exfiltration",
-        "impact",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -13698,8 +14293,7 @@
       "mitre_tactics": [
         "defense_evasion",
         "command_and_control",
-        "impact",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -13742,9 +14336,7 @@
         "execution",
         "persistence",
         "lateral_movement",
-        "impact",
-        "vulnerability",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -13785,8 +14377,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "persistence",
-        "impact",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -13827,8 +14418,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "persistence",
-        "impact",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -14270,8 +14860,7 @@
       "mitre_tactics": [
         "execution",
         "discovery",
-        "exfiltration",
-        "malware,_component"
+        "exfiltration"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -15243,8 +15832,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "privilege_escalation",
-        "command_and_control",
-        "vulnerability"
+        "command_and_control"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -15298,9 +15886,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "persistence",
-        "privilege_escalation",
-        "vulnerability",
-        "malware,_component"
+        "privilege_escalation"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -15354,8 +15940,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "persistence",
-        "privilege_escalation",
-        "vulnerability"
+        "privilege_escalation"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -15523,8 +16108,7 @@
         "execution",
         "collection",
         "exfiltration",
-        "impact",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -16877,8 +17461,7 @@
       "mitre_tactics": [
         "defense_evasion",
         "command_and_control",
-        "impact",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -16934,9 +17517,7 @@
         "execution",
         "persistence",
         "lateral_movement",
-        "impact",
-        "vulnerability",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -16990,8 +17571,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "persistence",
-        "impact",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -17045,8 +17625,7 @@
       "mitre_techniques": [],
       "mitre_tactics": [
         "persistence",
-        "impact",
-        "malware,_component"
+        "impact"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -17618,8 +18197,7 @@
       "mitre_tactics": [
         "execution",
         "discovery",
-        "exfiltration",
-        "malware,_component"
+        "exfiltration"
       ],
       "stig_ids": [],
       "stig_category": "",
@@ -18920,6 +19498,186 @@
       "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "not_evaluated",
       "content_surface": "app"
+    },
+    {
+      "title": "OKE: Boopkit Attack Timeline",
+      "description": "Chronological OKE attack-lab timeline for Boopkit-style eBPF rootkit activity. Shows API reconnaissance, secret access, privileged DaemonSet creation, pod exec, eBPF load, C2 traffic hiding, CronJob persistence, and RBAC backdoor evidence with APM trace pivots.",
+      "level": "critical",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "references": [],
+      "file": "apps/oke_boopkit_attack_timeline.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "OKE: eBPF Rootkit Activity",
+      "description": "Detects Boopkit-style eBPF rootkit activity through bpftool, kprobe, hidden-port, reverse-shell, and /sys/fs/bpf evidence in SOC Application/APM telemetry.",
+      "level": "critical",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "references": [],
+      "file": "apps/oke_ebpf_rootkit_activity.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "OKE: Exec and Node Escape",
+      "description": "Detects Kubernetes pod exec and host namespace access patterns that can lead to OKE worker node compromise.",
+      "level": "high",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "references": [],
+      "file": "apps/oke_exec_and_node_escape.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "OKE: Kubernetes Attack Overview",
+      "description": "Rollup of OKE/Kubernetes attack simulation events by stage, technique, severity, and service for dashboard triage.",
+      "level": "high",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "references": [],
+      "file": "apps/oke_kubernetes_attack_overview.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "OKE: Kubernetes Attack Path Link",
+      "description": "Link visualization for OKE Kubernetes attacks, grouping attack stage, trace, span, and host evidence into a single investigation graph.",
+      "level": "high",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "references": [],
+      "file": "apps/oke_kubernetes_attack_path_link.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "OKE: Privileged Workload Creation",
+      "description": "Detects Kubernetes audit/APM evidence for privileged workload creation, hostPID usage, hostPath mounts, and DaemonSet-based node access.",
+      "level": "critical",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "references": [],
+      "file": "apps/oke_privileged_workload_creation.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "OKE: Boopkit eBPF Rootkit Detection Rule",
+      "description": "Scheduled-rule-safe count of Boopkit-style eBPF rootkit indicators in OKE SOC Application/APM telemetry.",
+      "level": "critical",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "references": [],
+      "file": "apps/oke_rule_boopkit_ebpf_rootkit_count.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "OKE: Privileged Kubernetes Workload Detection Rule",
+      "description": "Scheduled-rule-safe count of privileged Kubernetes workload indicators such as hostPID, hostPath, DaemonSet creation, and pod exec leading to node access.",
+      "level": "critical",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "references": [],
+      "file": "apps/oke_rule_privileged_workload_count.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "OKE: Secrets and RBAC Abuse",
+      "description": "Detects Kubernetes secret reads and RBAC backdoor creation, including cluster-admin ClusterRoleBinding grants to workload service accounts.",
+      "level": "critical",
+      "sigma_id": "",
+      "source_derived": false,
+      "mitre_techniques": [],
+      "mitre_tactics": [],
+      "references": [],
+      "file": "apps/oke_secrets_and_rbac_abuse.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
     }
   ],
   "hunting_queries": [
@@ -19456,6 +20214,158 @@
       "content_surface": "hunting"
     },
     {
+      "title": "Coordinator Scenarios: Affected Hosts (l7d)",
+      "description": "Distinct host count across all 15 oci-coordinator hunt scenarios. Surfaces blast radius \u2014 how many unique hosts triggered at least one critical-severity scenario over the last 7 days.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/coordinator_affected_hosts_kpi.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Coordinator Scenarios: Attack Timeline (l7d)",
+      "description": "Histogram of scenario hits per hour across the last 7 days. Spot bursts of activity and pivot timing between scenarios.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/coordinator_attack_timeline.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Coordinator Scenarios: Critical Alerts (l7d)",
+      "description": "Tile count of CAT I / critical hunt scenarios observed. All 15 scenarios in the oci-coordinator showcase carry critical severity, so this equals the total scenario hits.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/coordinator_critical_alerts_kpi.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Coordinator Scenarios: Log Source \u2192 Process (l7d)",
+      "description": "Sunburst rollup of scenario hits grouped by Log Source then Process Name. Compact attacker-toolchain view without eval/case (parser-native fields only) \u2014 useful for spotting which process families drive each log-source's noise.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/coordinator_mitre_sunburst.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Coordinator Scenarios: Distinct Processes Observed (l7d)",
+      "description": "Distinct count of process names observed across the 15 oci-coordinator hunting scenarios. Higher cardinality signals broader attacker toolchain breadth across the kill-chain.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/coordinator_mitre_techniques_kpi.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Coordinator Scenarios: Log Source Breakdown (l7d)",
+      "description": "Bar chart of scenario hits grouped by Log Source. Identifies which telemetry stream (Linux audit, APM, Web, OCI Audit) is generating the most threat-hunt noise so analysts pivot to the right log first.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/coordinator_scenario_breakdown.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Coordinator Scenarios: Top Affected Hosts (l7d)",
+      "description": "Horizontal bar chart of hosts ranked by number of scenario hits across the 15 oci-coordinator hunts. Spot stations under sustained attack or pivot points.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/coordinator_top_affected_hosts.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Coordinator Scenarios: Total Hits (l7d)",
+      "description": "Total number of events matching any of the 15 oci-coordinator hunting scenarios over the last 7 days. Combines Linux audit/syslog, OCI Audit, APM application, and web/WAF sources.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/coordinator_total_hits_kpi.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "CrashFix: Python RAT Activity",
       "description": "Detects CrashFix-style ClickFix variants where browser social engineering leads to Python RAT execution, package retrieval, and HTTPS callback activity.",
       "level": "critical",
@@ -19485,7 +20395,7 @@
     },
     {
       "title": "Hunting: Credential Attack Correlation (PowerShell + Mimikatz + Kerberoast)",
-      "description": "Correlates credential attack indicators across Windows Security Events. Identifies hosts/entities showing multiple attack stages: PowerShell download cradles, Mimikatz execution, and Kerberoasting activity within the same time window.",
+      "description": "Correlates credential attack indicators across Windows Security Events. The content filter matches PowerShell download cradles, Mimikatz/LSASS dumping, and Kerberoasting (RC4 ticket) activity; events are classified by Event ID into Kerberoasting (4769) vs Endpoint_Credential_Tooling (4688), and entities exhibiting both stages are surfaced. (OCI LA eval does not support 'like' for inline content classification, so staging is Event-ID based.)",
       "level": "critical",
       "hunting_type": "",
       "cookbook_method": "",
@@ -19928,7 +20838,7 @@
     },
     {
       "title": "Hunting: Logon Anomaly - Account Activity Profiling",
-      "description": "Profiles user account activity across Windows Security Events: total logons, unique hosts authenticated to, explicit credential delegations, privilege assignments, and failed logon ratio. Identifies accounts with suspicious patterns: many hosts, high delegation, or privilege access.",
+      "description": "Profiles user account activity across Windows Security Events using the parsed 'Target User Name' field: total logons, unique hosts authenticated to, explicit credential delegations (4648), privilege assignments (4672), and failed-logon ratio (4625). Surfaces accounts with many hosts, high delegation, or high failure rate.",
       "level": "high",
       "hunting_type": "",
       "cookbook_method": "",
@@ -20958,9 +21868,9 @@
     }
   ],
   "art_coverage": {
-    "testable_rules": 317,
+    "testable_rules": 331,
     "rules_with_tests": 280,
-    "coverage_percent": 88.3,
+    "coverage_percent": 84.6,
     "total_test_mappings": 3208
   }
 }

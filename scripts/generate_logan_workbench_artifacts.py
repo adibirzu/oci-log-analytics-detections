@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -19,12 +20,19 @@ from urllib.request import Request, urlopen
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS_DIR = PROJECT_ROOT / "scripts"
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+from analyze_ql_conversion_coverage import build_matrix  # noqa: E402
+
 QUERY_SEARCH_URL = "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
 COMMAND_REFERENCE_URL = "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html"
 
 REFERENCE_PATH = PROJECT_ROOT / "queries" / "logan_ql_reference_catalog.json"
 PATTERNS_PATH = PROJECT_ROOT / "queries" / "cross_ql_mapping_patterns.json"
 EXAMPLES_PATH = PROJECT_ROOT / "queries" / "conversion_examples.json"
+CAPABILITY_MATRIX_PATH = PROJECT_ROOT / "queries" / "ql_conversion_capability_matrix.json"
 
 REQUIRED_COMMANDS = [
     "search",
@@ -38,6 +46,8 @@ REQUIRED_COMMANDS = [
     "distinct",
     "regex",
     "lookup",
+    "link",
+    "sequence",
     "rename",
     "head",
 ]
@@ -143,6 +153,22 @@ COMMAND_SEEDS = [
         "| lookup <lookup_name> <field>",
         ["[searchlookup table=ip_blacklist | distinct ip] | timestats count"],
         ["Sentinel watchlists and Splunk lookups need an explicit OCI lookup/table design."],
+    ),
+    CommandSeed(
+        "link",
+        "correlation",
+        "Groups related log records into transaction-style linked events.",
+        "| link 'Host Name', 'User Name'",
+        ["| link 'Host Name' | stats count as Events"],
+        ["Elastic EQL sequence conversion should use link groups when a stable entity field exists."],
+    ),
+    CommandSeed(
+        "sequence",
+        "correlation",
+        "Identifies ordered event patterns inside linked event groups.",
+        "| link 'Host Name' | sequence 'Event Name' = 'start', 'Event Name' = 'stop'",
+        ["| link 'Host Name' | sequence 'Event ID' = '4624', 'Event ID' = '4688'"],
+        ["Only convert source sequence semantics when the ordering, grouping key, and time span are preserved."],
     ),
     CommandSeed(
         "rename",
@@ -297,6 +323,26 @@ def build_patterns() -> dict:
             "example_ids": ["kql-securityevent-powershell", "kql-audit-no-mfa"],
         },
         {
+            "id": "kql-search-in",
+            "source_language": "sentinel_kql",
+            "source_construct": "search in (...) free-text terms and table-scoped search predicates",
+            "oci_mapping": "Map KQL search table scopes to OCI Log Sources and free-text terms to Original Log Content/msg predicates.",
+            "support_level": "supported",
+            "logan_commands": ["search", "where", "head"],
+            "warning_behavior": "Require mapped in (...) tables for first-stage search and warn through validation when a searched field is not mapped.",
+            "example_ids": ["kql-search-contoso"],
+        },
+        {
+            "id": "kql-common-operators",
+            "source_language": "sentinel_kql",
+            "source_construct": "where, between, extend/case, summarize by, sort, take/count",
+            "oci_mapping": "Strip explicit KQL time windows, map predicates to OCI display fields, use eval for scalar classification, stats for count/distinct rollups, sort -field for Kusto's default descending order, and head for take/limit.",
+            "support_level": "supported",
+            "logan_commands": ["search", "where", "eval", "stats", "sort", "head"],
+            "warning_behavior": "Warn through validation when projected or calculated fields are not backed by the mapping allow-list.",
+            "example_ids": ["kql-common-securityevent-outcomes"],
+        },
+        {
             "id": "sigma-selection-condition",
             "source_language": "sigma_yaml",
             "source_construct": "logsource + detection selections + condition",
@@ -317,6 +363,36 @@ def build_patterns() -> dict:
             "example_ids": ["elastic-powershell-process", "elastic-web-xss"],
         },
         {
+            "id": "elastic-kuery-field-query",
+            "source_language": "elastic_kuery",
+            "source_construct": "Kibana KQL field comparisons, boolean operators, wildcard terms, and existence checks",
+            "oci_mapping": "Map ECS field predicates to OCI display fields, preserving supported bool groups and surfacing unsupported nested/analyzed behavior.",
+            "support_level": "partial",
+            "logan_commands": ["search", "where"],
+            "warning_behavior": "Warn on nested objects, analyzer-specific token behavior, scripted fields, and unmapped ECS fields.",
+            "example_ids": ["elastic-kuery-http-post-403"],
+        },
+        {
+            "id": "elastic-esql-pipeline",
+            "source_language": "elastic_esql",
+            "source_construct": "FROM, WHERE, STATS, EVAL, KEEP, SORT, LIMIT",
+            "oci_mapping": "Map ES|QL sources to OCI log sources, filters to search/where, aggregations to stats/timestats, projections to fields, and limits to head.",
+            "support_level": "partial",
+            "logan_commands": ["search", "where", "eval", "stats", "fields", "sort", "head"],
+            "warning_behavior": "Warn or block unsupported ES|QL functions such as enrich, mv_expand, fuzzy match, or cross-source joins.",
+            "example_ids": ["elastic-esql-http-errors"],
+        },
+        {
+            "id": "elastic-toml-dispatch",
+            "source_language": "elastic_toml",
+            "source_construct": "Elastic detection rule TOML with rule.type and rule.language",
+            "oci_mapping": "Parse metadata, dispatch query/eql/esql rules to language converters, and model threshold/new_terms/threat_match/ML dependencies explicitly.",
+            "support_level": "partial",
+            "logan_commands": ["search", "where", "stats", "lookup"],
+            "warning_behavior": "Never persist third-party rule bodies; return converted output only for the request and surface rule-type dependencies.",
+            "example_ids": ["elastic-toml-synthetic-threshold"],
+        },
+        {
             "id": "lookup-watchlist",
             "source_language": "cross_ql",
             "source_construct": "Splunk lookup, Sentinel _GetWatchlist, Elastic enrich",
@@ -335,6 +411,16 @@ def build_patterns() -> dict:
             "logan_commands": ["stats"],
             "warning_behavior": "Block true cross-table joins and sequence semantics with unsupported_join_or_sequence.",
             "example_ids": ["kql-unsupported-join"],
+        },
+        {
+            "id": "stateful-or-content-scan-languages",
+            "source_language": "cross_ql",
+            "source_construct": "OSQuery SQL endpoint-state queries and raw YARA file-content rules",
+            "oci_mapping": "Convert only result-log detections when an OCI parser emits OSQuery or YARA result events; do not pretend Logan QL can execute endpoint SQL or scan file bytes.",
+            "support_level": "unsupported",
+            "logan_commands": ["search", "where"],
+            "warning_behavior": "Emit unsupported_stateful_query or unsupported_content_scan unless the input is a result-log query shape.",
+            "example_ids": ["osquery-sql-process-result", "yara-result-log"],
         },
         {
             "id": "projection-rename",
@@ -392,6 +478,30 @@ def build_examples() -> dict:
             "pattern_ids": ["kql-where-summarize"],
         },
         {
+            "id": "kql-search-contoso",
+            "title": "KQL Search Across Perf Event Alert",
+            "source_language": "sentinel_kql",
+            "source_query": "search in (Perf, Event, Alert) \"Contoso\"\n| take 10",
+            "expected_logan_ql": "('Log Source' = 'SOC Application Logs' or 'Log Source' = 'Windows Event System Logs' or 'Log Source' = 'Windows Security Events' or 'Log Source' = 'OCI Cloud Guard Problems') and (('Original Log Content' like '*Contoso*' or msg like '*Contoso*')) | head 10",
+            "explanation": "KQL search table scopes resolve to mapped OCI sources, and free-text search terms use common raw-message fields.",
+            "warnings": [],
+            "support_level": "supported",
+            "synthetic_log_shape": "SOC Application Logs plus Windows Event and alert-shaped logs with raw message text.",
+            "pattern_ids": ["kql-search-in", "sort-limit-top"],
+        },
+        {
+            "id": "kql-common-securityevent-outcomes",
+            "title": "KQL Common Operators SecurityEvent Outcomes",
+            "source_language": "sentinel_kql",
+            "source_query": "SecurityEvent\n| where TimeGenerated between (ago(1d) .. now())\n| where EventID in (4624, 4625)\n| extend Outcome = case(EventID == 4625, 'failed', EventID == 4624, 'success', 'other')\n| summarize by Computer, Outcome\n| sort by Count\n| take 20",
+            "expected_logan_ql": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ('Event ID' in ('4624', '4625')) | eval Outcome = if('Event ID' = '4625', 'failed', if('Event ID' = '4624', 'success', 'other')) | stats count as Count by Entity, Outcome | sort -Count | head 20",
+            "explanation": "Common KQL operators map to Logan filters and pipeline commands: explicit time windows are delegated to the dashboard range, case becomes eval/if, summarize-by becomes a counted distinct rollup, and take becomes head.",
+            "warnings": [],
+            "support_level": "supported",
+            "synthetic_log_shape": "Windows Security Events with Event ID, host entity, and outcome classification.",
+            "pattern_ids": ["kql-common-operators", "sort-limit-top"],
+        },
+        {
             "id": "spl-powershell-encoded",
             "title": "Splunk SPL Encoded PowerShell",
             "source_language": "splunk_spl",
@@ -414,6 +524,42 @@ def build_examples() -> dict:
             "support_level": "partial",
             "synthetic_log_shape": "Windows Sysmon Events with ECS-like process fields mapped by parser.",
             "pattern_ids": ["elastic-field-query"],
+        },
+        {
+            "id": "elastic-kuery-http-post-403",
+            "title": "Elastic Kuery HTTP POST 403",
+            "source_language": "elastic_kuery",
+            "source_query": "http.response.status_code:403 and http.request.method:post",
+            "expected_logan_ql": "'Log Source' = 'SOC Application Logs' and 'Response Code' = 403 and 'Request Method' = 'POST' | stats count as hits by 'Service Name', 'Trace ID', 'Source IP' | sort -hits | head 100",
+            "explanation": "Self-authored Kuery example mapping ECS HTTP fields to SOC Application Logs display fields.",
+            "warnings": ["Analyzer-specific KQL behavior is not represented in Logan QL."],
+            "support_level": "partial",
+            "synthetic_log_shape": "SOC Application Logs with Response Code, Request Method, Service Name, Trace ID, and Source IP.",
+            "pattern_ids": ["elastic-kuery-field-query"],
+        },
+        {
+            "id": "elastic-esql-http-errors",
+            "title": "Elastic ES|QL HTTP Error Rollup",
+            "source_language": "elastic_esql",
+            "source_query": "FROM logs-apm*\n| WHERE http.response.status_code >= 500 and service.name is not null\n| STATS errors = count(*) BY service.name\n| SORT errors DESC\n| LIMIT 20",
+            "expected_logan_ql": "'Log Source' = 'SOC Application Logs' and 'Response Code' >= 500 and 'Service Name' is not null | stats count as errors by 'Service Name' | sort -errors | head 20",
+            "explanation": "Self-authored ES|QL pipeline example mapping FROM/WHERE/STATS/SORT/LIMIT into Logan QL.",
+            "warnings": ["Only common ES|QL pipeline commands are converted in the first implementation tranche."],
+            "support_level": "partial",
+            "synthetic_log_shape": "SOC Application Logs with Response Code and Service Name.",
+            "pattern_ids": ["elastic-esql-pipeline"],
+        },
+        {
+            "id": "elastic-toml-synthetic-threshold",
+            "title": "Elastic TOML Synthetic Threshold",
+            "source_language": "elastic_toml",
+            "source_query": "[rule]\ntype = \"threshold\"\nlanguage = \"kuery\"\nname = \"Synthetic failed authentication threshold\"\nquery = '''event.category:authentication and event.outcome:failure'''\n\n[rule.threshold]\nfield = [\"source.ip\", \"user.name\"]\nvalue = 5",
+            "expected_logan_ql": "'Log Source' = 'OCI Audit Logs' and 'Original Log Content' like '*authentication*' and Status = 'failure' | stats count as event_count by 'Source IP', 'User Name' | where event_count >= 5 | head 100",
+            "explanation": "Self-authored Elastic-style TOML threshold example dispatching metadata to the Kuery converter and threshold aggregation path.",
+            "warnings": ["Threshold windows and schedules must be validated against the OCI saved-search schedule."],
+            "support_level": "lossy",
+            "synthetic_log_shape": "OCI Audit Logs with Source IP, User Name, Event Category, and Status fields.",
+            "pattern_ids": ["elastic-toml-dispatch"],
         },
         {
             "id": "sigma-soc-xss",
@@ -476,6 +622,30 @@ def build_examples() -> dict:
             "pattern_ids": ["join-correlation"],
         },
         {
+            "id": "osquery-sql-process-result",
+            "title": "OSQuery SQL Endpoint State Boundary",
+            "source_language": "osquery_sql",
+            "source_query": "select name, cmdline from processes where name = 'powershell.exe';",
+            "expected_logan_ql": "",
+            "explanation": "OSQuery SQL runs on endpoint state, so Logan Forge only converts OSQuery result logs, not raw endpoint SQL execution.",
+            "warnings": ["unsupported_stateful_query"],
+            "support_level": "unsupported",
+            "synthetic_log_shape": "Requires an OSQuery result log source before Logan QL can search results.",
+            "pattern_ids": ["stateful-or-content-scan-languages"],
+        },
+        {
+            "id": "yara-result-log",
+            "title": "YARA Content Scan Boundary",
+            "source_language": "yara",
+            "source_query": "rule SuspiciousString { strings: $a = \"Invoke-Expression\" condition: $a }",
+            "expected_logan_ql": "",
+            "explanation": "YARA scans file content; Logan Forge converts YARA match result logs only when a real OCI log source emits those events.",
+            "warnings": ["unsupported_content_scan"],
+            "support_level": "unsupported",
+            "synthetic_log_shape": "Requires a YARA match result log source before Logan QL can search matches.",
+            "pattern_ids": ["stateful-or-content-scan-languages"],
+        },
+        {
             "id": "oci-passthrough-top-errors",
             "title": "OCI Logan QL Passthrough",
             "source_language": "oci_logan",
@@ -503,14 +673,17 @@ def write_json(path: Path, payload: dict) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate Logan conversion workbench artifacts")
     parser.add_argument("--refresh-docs", action="store_true", help="Fetch official Oracle docs for command provenance")
+    parser.add_argument("--elastic-repo", type=Path, help="Optional local elastic/detection-rules checkout for aggregate counts")
     args = parser.parse_args()
 
     write_json(REFERENCE_PATH, build_reference_catalog(refresh_docs=args.refresh_docs))
     write_json(PATTERNS_PATH, build_patterns())
     write_json(EXAMPLES_PATH, build_examples())
+    write_json(CAPABILITY_MATRIX_PATH, build_matrix(args.elastic_repo))
     print(f"wrote {REFERENCE_PATH.relative_to(PROJECT_ROOT)}")
     print(f"wrote {PATTERNS_PATH.relative_to(PROJECT_ROOT)}")
     print(f"wrote {EXAMPLES_PATH.relative_to(PROJECT_ROOT)}")
+    print(f"wrote {CAPABILITY_MATRIX_PATH.relative_to(PROJECT_ROOT)}")
     return 0
 
 

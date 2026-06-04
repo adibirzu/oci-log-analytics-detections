@@ -18,7 +18,10 @@ __all__ = [
     "convert_candidate",
     "convert_candidates",
     "convert_kql_to_logan",
+    "apply_discovery_evidence",
+    "apply_mapping_profile",
     "load_mapping_config",
+    "load_mapping_profile",
     "rank_candidates",
     "select_top_candidates",
     "slugify_title",
@@ -126,6 +129,13 @@ from scripts.kql._facade_impl import (  # noqa: E402,F401
     map_field,
     validate_logan_query_local,
 )
+from scripts.sentinel_profiles import (  # noqa: E402,F401
+    DEFAULT_PROFILE_NAME,
+    apply_discovery_evidence,
+    apply_mapping_profile,
+    build_migration_plan_from_report,
+    load_mapping_profile,
+)
 
 def slugify_title(title: str) -> str:
     """Create a stable filesystem-safe slug."""
@@ -209,6 +219,7 @@ def convert_candidate(candidate: dict, mapping: dict, live_validation_status: st
 def rank_candidate(candidate: dict, mapping: dict) -> int:
     """Quality-first candidate scoring."""
     score = SEVERITY_SCORE.get(str(candidate.get("severity", "medium")).lower(), 20)
+    score += int(candidate.get("discovery_evidence_score", 0) or 0)
     if candidate.get("description"):
         score += min(len(candidate["description"]) // 80, 10)
     mitre = candidate.get("mitre_attack", {})
@@ -379,6 +390,7 @@ def build_conversion_report(
     results: list[ConversionResult],
     source: dict,
     validate_live: bool,
+    profile: dict | None = None,
 ) -> dict:
     """Build the Sentinel conversion report artifact."""
     unsupported_counts = Counter()
@@ -417,6 +429,7 @@ def build_conversion_report(
             "license": "MIT",
             "license_url": SENTINEL_LICENSE_URL,
         },
+        "runtime_profile": profile or {},
         "summary": {
             "total_candidates": len(candidates),
             "attempted_candidates": len(attempted),
@@ -435,6 +448,9 @@ def build_conversion_report(
                 "sentinel_id": result.candidate.get("sentinel_id", ""),
                 "title": result.candidate.get("title", ""),
                 "quality_score": result.candidate.get("quality_score"),
+                "discovery_evidence_score": result.candidate.get("discovery_evidence_score", 0),
+                "discovery_hit_counts_by_lookback": result.candidate.get("discovery_hit_counts_by_lookback", {}),
+                "discovery_dashboard_references": result.candidate.get("discovery_dashboard_references", []),
                 "source_path": result.candidate.get("source_path", ""),
                 "source_url": result.candidate.get("source_url", ""),
                 "conversion_status": (
@@ -476,6 +492,7 @@ def convert_candidates(
     progress_interval: float = 30.0,
     progress_every: int = 100,
     progress_stream=None,
+    profile: dict | None = None,
 ) -> dict:
     """Rank, convert, optionally live-validate, and optionally write queries."""
     attempted = select_top_candidates(candidates, mapping, top=top)
@@ -571,6 +588,7 @@ def convert_candidates(
         results=results,
         source=source or {},
         validate_live=validate_live,
+        profile=profile,
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
@@ -623,6 +641,9 @@ def main() -> int:
     parser.add_argument("--source-dir", default=str(DEFAULT_CACHE_DIR), help="Sentinel repo cache directory")
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--report", default=str(DEFAULT_REPORT_PATH))
+    parser.add_argument("--profile", default=DEFAULT_PROFILE_NAME, help="Runtime mapping profile name or YAML path")
+    parser.add_argument("--discovery-report", default="", help="Optional SIEM discovery inventory/report for ranking evidence")
+    parser.add_argument("--migration-plan-out", default="", help="Optional migration plan JSON output path")
     parser.add_argument("--ref", default="master", help="Sentinel git ref for auto-sync")
     parser.add_argument("--refresh", action="store_true", help="Fetch remote changes during auto-sync")
     parser.add_argument("--no-sync", action="store_true", help="Do not fetch if candidates file is missing")
@@ -645,8 +666,13 @@ def main() -> int:
     if args.write_working and not args.validate_live and not args.allow_local_write:
         parser.error("--write-working requires --validate-live unless --allow-local-write is supplied")
 
-    mapping = load_mapping_config()
+    profile = load_mapping_profile(args.profile)
+    mapping = apply_mapping_profile(load_mapping_config(), profile)
     candidates, source = _ensure_candidates(args)
+    candidates = apply_discovery_evidence(
+        candidates,
+        Path(args.discovery_report) if args.discovery_report else None,
+    )
     report = convert_candidates(
         candidates=candidates,
         mapping=mapping,
@@ -661,10 +687,14 @@ def main() -> int:
         clean_output=args.clean_output,
         progress_interval=args.progress_interval,
         progress_every=args.progress_every,
+        profile=profile,
     )
+    if args.migration_plan_out:
+        build_migration_plan_from_report(report, Path(args.migration_plan_out))
 
     summary = report["summary"]
     print("Microsoft Sentinel conversion")
+    print(f"  Profile:    {profile.get('name', args.profile)}")
     print(f"  Candidates: {summary['total_candidates']}")
     print(f"  Attempted:  {summary['attempted_candidates']}")
     print(f"  Converted:  {summary['converted_count']}")
@@ -682,7 +712,6 @@ from scripts.kql.canonical import (  # noqa: E402,F401
     canonical,
 )
 from scripts.kql.types import Tier  # noqa: E402,F401
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

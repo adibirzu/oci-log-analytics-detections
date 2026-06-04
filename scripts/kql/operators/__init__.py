@@ -37,6 +37,7 @@ from . import summarize_op  # noqa: E402,F401
 from . import project_op  # noqa: E402,F401
 from . import extend_op  # noqa: E402,F401
 from . import sort_op  # noqa: E402,F401
+from . import limit_op  # noqa: E402,F401
 from . import distinct_op  # noqa: E402,F401
 from . import union_op  # noqa: E402,F401
 from . import let_op  # noqa: E402,F401

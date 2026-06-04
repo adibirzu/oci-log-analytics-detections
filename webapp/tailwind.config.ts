@@ -60,6 +60,22 @@ const config = {
           warning: "hsl(var(--logan-warning))",
           danger: "hsl(var(--logan-danger))",
         },
+        // Layered console surfaces
+        surface: {
+          sunken: "hsl(var(--surface-sunken))",
+          raised: "hsl(var(--surface-raised))",
+          overlay: "hsl(var(--surface-overlay))",
+        },
+        "border-strong": "hsl(var(--border-strong))",
+        "brand-glow": "hsl(var(--brand-glow))",
+        // Semantic severity ramp (shared by warnings + support levels)
+        severity: {
+          critical: "hsl(var(--sev-critical))",
+          high: "hsl(var(--sev-high))",
+          medium: "hsl(var(--sev-medium))",
+          info: "hsl(var(--sev-info))",
+          ok: "hsl(var(--sev-ok))",
+        },
         // Sidebar specific colors
         sidebar: {
           background: "hsl(var(--sidebar-background))",
@@ -71,9 +87,16 @@ const config = {
         },
       },
       borderRadius: {
+        panel: "var(--radius-panel)",
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 7px)",
+      },
+      fontSize: {
+        eyebrow: ["var(--text-eyebrow)", { letterSpacing: "var(--tracking-eyebrow)", lineHeight: "1" }],
+        meta: ["var(--text-meta)", { lineHeight: "1.4" }],
+        display: ["var(--text-display)", { letterSpacing: "var(--tracking-display)", lineHeight: "1.04" }],
+        title: ["var(--text-title)", { letterSpacing: "-0.01em", lineHeight: "1.12" }],
       },
       keyframes: {
         "accordion-down": {
@@ -84,14 +107,25 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "console-rise": {
+          from: { opacity: "0", transform: "translateY(6px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "ping-soft": {
+          "0%": { opacity: "0.9", transform: "scale(0.9)" },
+          "70%, 100%": { opacity: "0", transform: "scale(2)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "console-rise": "console-rise var(--duration-normal) var(--ease-out-expo) both",
+        "ping-soft": "ping-soft 2.4s var(--ease-out-expo) infinite",
       },
       fontFamily: {
-        sans: ["var(--font-inter)"],
-        mono: ["var(--font-jetbrains-mono)"],
+        display: ["var(--font-display)"],
+        sans: ["var(--font-sans)"],
+        mono: ["var(--font-mono)"],
       },
     },
   },

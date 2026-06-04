@@ -7,6 +7,11 @@
 /.next/
 /out/
 
+# playwright (generated test output)
+/playwright-report/
+/test-results/
+/.playwright-cli/
+
 # production
 /build
 /.logan-detections-runtime/

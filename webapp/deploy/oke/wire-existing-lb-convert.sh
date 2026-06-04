@@ -16,6 +16,15 @@ DEFAULT_OUTPUTS_FILE="$(cd "${APP_ROOT}/../.." && pwd)/octo-apm-demo/credentials
 : "${OKE_CLUSTER_NAME:=octo-apm-demo-oke}"
 : "${SKIP_CONTEXT_CHECK:=false}"
 
+if [[ -z "${FORGE_ROUTING_RULE_NAME:-}" ]]; then
+  if [[ "${FORGE_HOSTNAME_NAME}" == "convert" ]]; then
+    FORGE_ROUTING_RULE_NAME="forge_host"
+  else
+    sanitized_hostname_name="$(printf '%s' "${FORGE_HOSTNAME_NAME}" | tr -c '[:alnum:]_' '_')"
+    FORGE_ROUTING_RULE_NAME="forge_${sanitized_hostname_name}_host"
+  fi
+fi
+
 APPLY=false
 
 usage() {
@@ -32,6 +41,7 @@ Environment:
   FORGE_HOSTNAME_NAME=${FORGE_HOSTNAME_NAME}
   FORGE_HOSTNAME=${FORGE_HOSTNAME}
   FORGE_NODEPORT=${FORGE_NODEPORT}
+  FORGE_ROUTING_RULE_NAME=${FORGE_ROUTING_RULE_NAME}
 EOF
 }
 
@@ -215,7 +225,7 @@ update_routing_policy() {
   oci_json lb routing-policy get \
     --load-balancer-id "${LB_ID}" \
     --routing-policy-name "${ROUTING_POLICY_NAME}" |
-    jq --arg name "forge_host" --arg condition "${condition}" --arg backend "${FORGE_BACKEND_SET}" '
+    jq --arg name "${FORGE_ROUTING_RULE_NAME}" --arg condition "${condition}" --arg backend "${FORGE_BACKEND_SET}" '
       .data.rules
       | map(select(.name != $name))
       + [{
@@ -225,7 +235,7 @@ update_routing_policy() {
         }]
     ' > "${tmp_rules}"
 
-  echo "Planned routing policy rule forge_host -> ${FORGE_BACKEND_SET}"
+  echo "Planned routing policy rule ${FORGE_ROUTING_RULE_NAME} -> ${FORGE_BACKEND_SET}"
   if [[ "${APPLY}" == "true" ]]; then
     oci_plain lb routing-policy update \
       --load-balancer-id "${LB_ID}" \
@@ -316,6 +326,7 @@ echo "   Host:        ${FORGE_HOSTNAME}"
 echo "   Backend set: ${FORGE_BACKEND_SET}"
 echo "   NodePort:    ${FORGE_NODEPORT}"
 echo "   Listener:    ${LISTENER_NAME}"
+echo "   Rule:        ${FORGE_ROUTING_RULE_NAME}"
 echo "   Apply:       ${APPLY}"
 echo "================================================================"
 

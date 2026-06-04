@@ -56,5 +56,6 @@ Use `code-reviewer` and `security-reviewer` (global) for cross-cutting passes; u
 ## Release gates
 
 - `scripts/release_checklist.py` — local gates + optional live profile verification (`--include-live`)
+- `scripts/parse_validate_all_queries.py` — fast live `parse_query` gate over every `queries/**` query (syntax + field/source validity, no data needed); runs under `--include-live` and writes `docs/health/parse-validate-all.json`. Use this to isolate broken queries (ERROR) from no-data (the execution smoke test's MISS). `eval`/`if` accept only equality/comparison — no `case`, `decode`, `coalesce`, or `like` inside `eval`.
 - `docs/health/all-dashboard-verify.json` — latest live dashboard health
-- Live baseline: `<OCI_PROFILE_CAP>` shows 351/351 dashboard widgets HIT, 0 MISS, 0 ERROR
+- Live baseline: `<OCI_PROFILE_CAP>` shows 351/351 dashboard widgets HIT, 0 MISS, 0 ERROR; `parse_validate_all_queries.py` shows 678/678 queries PASS

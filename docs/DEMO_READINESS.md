@@ -38,7 +38,7 @@ Live deployment evidence in the `<OCI_PROFILE_CAP>` OCI profile (`<OCI_REGION>`)
 - `scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --max-workers 4 --json docs/health/verify-<profile>-21d-2025-2026.json` is the current final gate for both `<OCI_PROFILE_CAP>` and `DEFAULT`
 - `scripts/setup_log_sources.py`: SOC/native-compatible sources exist in the target compartment; `SOC Application Logs` includes APM span and metric fields used by the Octo dashboard
 
-Repository update on `2026-05-12`: the current dashboard configuration resolves to `22` dashboards and `343` active saved searches after adding the Octo APM trace investigation Link/Tiles widget. Dashboard widgets default to `l24h` unless query or widget metadata requests `l21d`; the Octo APM workshop, web-to-cloud, C2, FreeLabFriday, and 2025-2026 drilldown widgets request `l21d`. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the legacy extended-data helper.
+The current dashboard configuration resolves to `29` dashboards and `438` active saved searches after adding the Octo APM trace investigation Link/Tiles widget. Dashboard widgets default to `l24h` unless query or widget metadata requests `l21d`; the Octo APM workshop, web-to-cloud, C2, FreeLabFriday, and 2025-2026 drilldown widgets request `l21d`. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the legacy extended-data helper.
 
 ## Demo Story
 

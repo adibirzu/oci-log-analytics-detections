@@ -28,7 +28,7 @@ Validated on `2026-05-12` for local generation and live dashboard deployment:
 - `<OCI_PROFILE_CAP>` has parser/source setup complete, the updated Octo application/APM dataset uploaded, and the current `343` dashboard-widget baseline verified HIT
 - Live health is validated with a 21-day lookback after full cleanup redeploys. Regenerate `docs/health/verify-<profile>-21d-final.json` and `docs/health/verify-default-21d-final.json` after deploying the current `22`-dashboard inventory.
 
-Current repository configuration on `2026-05-12` resolves to `22` dashboards and `343` active saved searches. The Octo APM workshop, C2, FreeLabFriday, web-to-cloud, and 2025-2026 drilldown widgets request `l21d` so the full three-week incident remains visible after ingest.
+The current repository configuration resolves to `29` dashboards and `438` active saved searches. The Octo APM workshop, C2, FreeLabFriday, web-to-cloud, and 2025-2026 drilldown widgets request `l21d` so the full three-week incident remains visible after ingest.
 
 Use this path before recreating dashboards. `deploy_dashboard.py` validates the generated inventory and every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
 
@@ -41,7 +41,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 | Control Plane | `https://<DEMO_CONTROL_PLANE_HOST>` |
 | Log Analytics | <OBSERVABILITY_COMPARTMENT> compartment → Dashboards |
 | Test data generated | 221,078 local events across 17 NDJSON datasets |
-| Dashboards configured | 22 SOC/demo dashboards + 343 active saved searches |
+| Dashboards configured | 29 SOC/demo dashboards + 438 active saved searches |
 
 ---
 
@@ -58,7 +58,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 **Talking Points:**
 - "This is a unified SOC overview pulling security events from OCI Audit, Windows Sysmon, Linux, Cloud Guard, and WAF — all in one dashboard."
 - "Each widget represents a detection rule converted from industry-standard Sigma format into OCI Log Analytics Query Language."
-- "The repo currently ships 454 source rules, 455 Sigma-derived OCI query artifacts, 24 curated app/APM analytics, 87 hunting analytics, and 216 MITRE ATT&CK techniques across 14 tactics."
+- "The repo currently ships 454 source rules, 476 Sigma-derived OCI query artifacts, 47 curated app/APM analytics, 95 hunting analytics, and 231 MITRE ATT&CK techniques across 14 tactics."
 
 4. **Click into** `SOC: Console Login Failures` — show the OCL query behind it
 5. **Show** the hunting widget: `Hunt: SSH Brute Force` — highlight the frequency analysis pattern:
@@ -381,7 +381,7 @@ python3 scripts/query_audit.py --lookback 24h --eligible-only --out /tmp/eligibl
 
 ### Refresh Dashboards
 ```bash
-python3 scripts/deploy_dashboard.py --cleanup  # Recreate all 22 dashboards after OCI query validation
+python3 scripts/deploy_dashboard.py --cleanup  # Recreate all 29 dashboards after OCI query validation
 python3 scripts/generate_catalog.py            # Regenerate catalog
 ```
 
@@ -414,12 +414,12 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 │    │ OCI Log      │ │ Splunk        │ │ ServiceNow │              │
 │    │ Analytics    │ │ (External)    │ │ (Incidents)│              │
 │    │ ┌──────────┐ │ └───────────────┘ └────────────┘              │
-│    │ │22 SOC    │ │                                                │
+│    │ │29 SOC    │ │                                                │
 │    │ │Dashboards│ │                                                │
-│    │ │343 Saved │ │                                                │
+│    │ │438 Saved │ │                                                │
 │    │ │Searches  │ │                                                │
 │    │ │580 Assets│ │                                                │
-│    │ │216 MITRE │ │                                                │
+│    │ │231 MITRE │ │                                                │
 │    │ └──────────┘ │                                                │
 │    └──────────────┘                                                │
 │                                                                      │
@@ -455,12 +455,12 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 | Content Surface | Count | Dashboards | What to Emphasize |
 |----------------|-------|------------|-------------------|
 | Source Sigma/YAML rules | 454 | 14 | Windows, OCI, Linux, web, BLUELIGHT, and browser-side detections |
-| Sigma-derived OCI searches | 455 | 14 | 447 top-level detections + 8 browser/app telemetry detections |
-| Curated app/APM telemetry analytics | 24 | 3 | App 360 correlation, WAF-to-trace pivots, service health, APM/WAF showcase views, Octo APM spans and metrics |
-| Hunting analytics | 87 | 7 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation, MELTS drilldowns |
+| Sigma-derived OCI searches | 476 | 14 | 468 top-level detections + 8 browser/app telemetry detections |
+| Curated app/APM telemetry analytics | 47 | 3 | App 360 correlation, WAF-to-trace pivots, service health, APM/WAF showcase views, Octo APM spans and metrics |
+| Hunting analytics | 95 | 7 | Frequency, anomaly, scoring, multi-stage, kill-chain correlation, MELTS drilldowns |
 | STIG-mapped detections | 24 | 1 | Continuous control monitoring for IAM, network, audit, and key management |
 | Sample datasets | 17 generated files / 221,078 local events | Demo enablement | Includes app/APM telemetry, network/firewall telemetry, GOAD/Caldera drilldown evidence, the scoped Octo APM workshop dataset, and multicloud geo-health data |
-| **Total shipped query artifacts** | **566** | **22** | **216 MITRE techniques across 14 tactics** |
+| **Total shipped query artifacts** | **678** | **29** | **231 MITRE techniques across 14 tactics** |
 
 ---
 

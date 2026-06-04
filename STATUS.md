@@ -6,23 +6,23 @@ Date: 2026-05-18
 
 - Core scope: OCI Log Analytics query generation, synthetic log generation, query/dashboard validation, OCI dashboard creation, and the integrated Forge conversion webapp.
 - Source Sigma/YAML rules: 454
-- Sigma-derived OCI query artifacts: 455
-  - 447 top-level detections in `queries/`
+- Sigma-derived OCI query artifacts: 476
+  - 468 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
 - Microsoft Sentinel converted queries: 60 live OCI parser-passing queries
-- Curated analytics: 125
-  - 38 app telemetry analytics
-  - 87 hunting analytics
-- Total query artifacts/content items: 640
-- Dashboards: 26
-- Saved searches: 387 active dashboard saved searches; 640 total content items
+- Curated analytics: 142
+  - 47 app telemetry analytics
+  - 95 hunting analytics
+- Total query artifacts/content items: 678
+- Dashboards: 29
+- Saved searches: 438 active dashboard saved searches; 678 total content items
 - Sentinel live validation: 60 / 62 locally clean conversions; 2 live failures remain in `queries/sentinel_conversion_report.json`
 - Sentinel synthetic live-hit check: **20 / 20 ready Logan QL queries HIT** in the `cap` profile with a 24-hour lookback after uploading Sentinel-shaped synthetic logs.
 - Latest full live dashboard health before Sentinel expansion: **351 / 351 widgets HIT (100.0 %)** in the `cap` profile with a 21-day lookback.
-- Generated demo data: 14 NDJSON files / 2,922 events in the latest local `test_data/manifest.json`
-- MITRE ATT&CK coverage: 228 techniques / 16 tactics
+- Generated demo data: 20 NDJSON files / 221,173 events in the latest local `test_data/manifest.json`
+- MITRE ATT&CK coverage: 231 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
-- Atomic Red Team coverage: 280 / 317 testable rules have mapped tests
+- Atomic Red Team coverage: 280 / 331 testable rules have mapped tests
 
 ## Architecture Updates Shipped
 
@@ -92,7 +92,7 @@ Previous local and pre-flight verification on 2026-04-28 before the current cata
 - `python3 scripts/deploy_dashboard.py --validate`
   - OCID, CLI profile, namespace, compartment, and 515 query files passed
 - `python3 scripts/deploy_dashboard.py --dry-run`
-  - 16 dashboards / 264 saved searches resolved from generated inventory
+  - 29 dashboards / 438 saved searches resolved from generated inventory
 - `python3 scripts/deploy_dashboard.py --cleanup`
   - 250/250 unique dashboard queries validated in OCI Log Analytics with 24-hour lookback
   - 67 validated query files returned no rows in that window

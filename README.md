@@ -19,20 +19,20 @@ The integrated UI lives in `webapp/` and consumes generated artifacts from this 
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
 
 - **Source Sigma/YAML rules:** 454
-- **Sigma-derived OCI query artifacts:** 455
-  - 447 top-level detections in `queries/*.json`
+- **Sigma-derived OCI query artifacts:** 476
+  - 468 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
 - **Microsoft Sentinel converted queries:** 60 live OCI parser-passing queries
-- **Curated analytics:** 125
-  - 38 app telemetry analytics in `queries/apps/`
-  - 87 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 640
+- **Curated analytics:** 142
+  - 47 app telemetry analytics in `queries/apps/`
+  - 95 hunting analytics in `queries/hunting/`
+- **Total query artifacts/content items:** 678
 - **Source rule breakdown:** Windows (249), Cloud/OCI (100), Linux (67), Web/WAF (38)
-- **Combined MITRE ATT&CK coverage:** 228 techniques across 16 tactics
+- **Combined MITRE ATT&CK coverage:** 231 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
-- **Atomic Red Team coverage:** 280 / 317 testable rules have ART mappings (88.3%)
-- **Dashboard inventory:** 26 dashboards with 387 active dashboard saved searches and 77 advanced visualization widgets
-- **Generated demo data:** 2,922 events across 14 NDJSON files in the latest local `test_data/manifest.json`
+- **Atomic Red Team coverage:** 280 / 331 testable rules have ART mappings (84.6%)
+- **Dashboard inventory:** 29 dashboards with 438 active dashboard saved searches and 96 advanced visualization widgets
+- **Generated demo data:** 221,173 events across 20 NDJSON files in the latest local `test_data/manifest.json`
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 
 Canonical inventory and supporting documentation:
@@ -64,8 +64,8 @@ rules/** ------------------------------------------> scripts/convert_sigma.py
                                                         +--> queries/*.json
                                                         +--> queries/apps/*.json (8 Sigma-derived browser detections)
 
-queries/apps/*.json (38 curated app analytics) --------+
-queries/hunting/*.json (87 hunting analytics) ---------+--> scripts/generate_catalog.py
+queries/apps/*.json (47 curated app analytics) --------+
+queries/hunting/*.json (95 hunting analytics) ---------+--> scripts/generate_catalog.py
                                                              |
                                                              +--> CATALOG.md
                                                              +--> queries/catalog.json
@@ -76,7 +76,7 @@ queries/** -----------------------------------------------> scripts/export_for_m
 
 queries/** -----------------------------------------------> scripts/deploy_dashboard.py
                                                              |
-                                                             +--> 26 dashboards / 387 saved searches
+                                                             +--> 29 dashboards / 438 saved searches
                                                              +--> queries/dashboard_inventory.json
 ```
 
@@ -88,8 +88,8 @@ queries/** -----------------------------------------------> scripts/deploy_dashb
   OCI Audit Events ──────────┤──> OCI Streaming ──> Service Connector Hub ──> Log Analytics
   Cloud Guard Problems ──────┤                                                    |
   WAF/LB Access Logs ────────┤                                                    v
-  App/Browser Telemetry JSON ─┘                                         SOC Dashboards (26)
-                                                                       Saved Searches (387)
+  App/Browser Telemetry JSON ─┘                                         SOC Dashboards (29)
+                                                                       Saved Searches (438)
   Generated Test Data (NDJSON) ──> Upload API ──> Log Analytics ──> Dashboard Verification
 ```
 
@@ -119,20 +119,21 @@ Notes:
 
 ## OCI Log Analytics Dashboards
 
-### SOC Detection Dashboards (26)
+### SOC Detection Dashboards (29)
 | Dashboard | Widgets | Purpose |
 | :--- | :--- | :--- |
 | SOC Overview Dashboard | 14 | Executive-level cross-domain security summary + hunting alerts |
 | SOC: OCI STIG Compliance | 17 | STIG compliance: MFA, key rotation, vault secrets, audit config |
 | SOC: OCI Audit Security | 22 | IAM, network, compute, storage, KMS, DB, bastion, discovery |
 | SOC: Cloud Guard Security | 12 | Cloud Guard problem detection |
+| SOC: Cloud Guard Instance Security | 6 | Cloud Guard Instance Security + OSQuery results for OCI workloads |
 | SOC: Linux Security | 20 | SSH, sudo, persistence, container escape, injection, C2 |
 | SOC: Linux Advanced Threats | 18 | Web shells, cryptominers, exfiltration, scanning, hidden files |
-| SOC: Windows Security | 20 | Credential theft, encoded PS, LOLBins, lateral movement |
-| SOC: Windows Advanced Threats | 18 | Kerberoasting, pass-the-hash, process hollowing, RATs |
+| SOC: Windows Security | 27 | Credential theft, encoded PS, LOLBins, lateral movement |
+| SOC: Windows Advanced Threats | 23 | Kerberoasting, pass-the-hash, process hollowing, RATs |
 | SOC: GOAD Caldera Operations | 23 | Caldera adversary operation coverage and purple-team telemetry |
 | SOC: Threat Hunting | 15 | Cookbook-inspired: frequency, anomaly, scoring, multi-stage |
-| SOC: Sysmon Network & Lateral | 17 | C2 beacons, SMB/WinRM/RDP lateral, DNS tunneling, pipes |
+| SOC: Sysmon Network & Lateral | 18 | C2 beacons, SMB/WinRM/RDP lateral, DNS tunneling, pipes |
 | C2 & Beaconing Detection | 10 | DNS, HTTPS, tunnel, and beacon investigation |
 | SOC: FreeLabFriday Threat Hunting | 8 | Black Hills InfoSec FreeLabFriday-inspired hunts |
 | SOC: 2025-2026 Threat Hunting | 12 | MELTS-era ClickFix, ToolShell, RMM, AiTM, and exfiltration pivots |
@@ -141,9 +142,11 @@ Notes:
 | SOC: Web-to-Cloud Threat Hunting | 10 | SSRF entry point through cloud credential abuse and exfiltration |
 | OCI-DEMO: Application 360 Monitoring | 12 | CRM + Drone Shop: trace telemetry, WAF correlation, DB perf |
 | OCI-DEMO: Octo APM Demo | 17 | APM trace, gateway, payment, VM compromise, and WAF correlation |
+| OCI-DEMO: OKE Kubernetes Attack | 9 | OKE/K8s attack detection via SOC Application Logs + APM correlation |
 | SOC: Geographic Health | 5 | Multicloud health visualization (OCI, Azure, AWS, GCP) |
 | SOC: APT Detection | 22 | BLUELIGHT RAT (S0657/APT37) summary KPIs, kill chain, links, and YARA enrichment |
 | SOC: Browser Attack Detection | 13 | SOC Application Logs: APM/WAF correlation, OWASP mix, XSS, SQLi, CSRF, session hijack |
+| SOC: oci-coordinator Hunt Showcase | 23 | End-to-end hunt showcase for the oci-coordinator demo: KPIs, top rules, drilldowns |
 | SOC: Microsoft Sentinel Endpoint Converted Detections | 24 | Live-validated Sentinel endpoint detections converted to Logan QL |
 | SOC: Microsoft Sentinel Identity Converted Detections | 1 | Live-validated Sentinel identity detection converted to Logan QL |
 | SOC: Microsoft Sentinel M365 Converted Detections | 2 | Live-validated Sentinel M365 detections converted to Logan QL |
@@ -203,8 +206,8 @@ rules/                          # Source detection rules (Sigma YAML)
   web/                          # 38 Web rules
     browser_attacks/            # 8 browser-side source rules compiled into queries/apps/
 queries/                        # Generated OCL queries (JSON)
-  apps/                         # 46 app telemetry queries (8 source-derived + 38 curated)
-  hunting/                      # 87 advanced hunting queries
+  apps/                         # 55 app telemetry queries (8 source-derived + 47 curated)
+  hunting/                      # 95 advanced hunting queries
   catalog.json                  # Full rule catalog (machine-readable)
   dashboard_inventory.json      # Dashboard/widget/saved-search inventory for UI integrations
   manifest.json                 # Export/integration manifest
@@ -213,8 +216,9 @@ config/
 scripts/
   oci_config.py                 # Centralized config, client factories, validation
   convert_sigma.py              # Sigma -> OCL converter (with STIG metadata)
-  deploy_dashboard.py           # OCI LA dashboard deployment (26 dashboards / 387 saved searches)
+  deploy_dashboard.py           # OCI LA dashboard deployment (29 dashboards / 438 saved searches)
   generate_test_logs.py         # Core security simulation datasets for OCI LA
+  windows_eventlog_synthetic.py # Official-shaped Windows Event Log fixtures and upload helper
   generate_geo_health_logs.py   # Multicloud health dataset used by Geographic Health dashboard
   ingest_test_data.py           # Upload generated NDJSON test data to OCI LA
   setup_log_sources.py          # Create JSON parsers & custom OCI LA log sources
@@ -245,11 +249,17 @@ python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5
 python3 scripts/ingest_test_data.py --validate
 python3 scripts/ingest_test_data.py --mode direct
 
+# Optional: generate focused Windows Event Log fixtures for parser-backed OOTB rules
+python3 scripts/windows_eventlog_synthetic.py generate
+python3 scripts/windows_eventlog_synthetic.py validate
+python3 scripts/windows_eventlog_synthetic.py ingest --dry-run
+python3 scripts/windows_eventlog_synthetic.py ingest
+
 # 3. Optional: reconcile the Streaming -> SCH -> Log Analytics pipeline
 python3 scripts/setup_streaming_pipeline.py
 python3 scripts/validate_pipeline.py --e2e
 
-# 4. Deploy 26 dashboards with 387 saved searches
+# 4. Deploy 29 dashboards with 438 saved searches
 #    The default path validates dashboard queries in OCI Log Analytics first.
 #    Failed, slow, or timed-out query validation blocks dashboard import.
 #    The dashboard default time range is l24h to match the generated demo data.

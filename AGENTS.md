@@ -1,20 +1,5 @@
 # Agent Instructions: oci-log-analytics-detections
 
-## GSD Project Mode
-
-This repository is initialized as a GSD-managed brownfield project.
-
-Before substantial development work:
-
-1. Read `.planning/STATE.md`.
-2. Read `.planning/PROJECT.md`.
-3. Read the relevant `.planning/codebase/*.md` documents.
-4. Use `$gsd-plan-phase <phase-number>` for planned feature work.
-5. Use `$gsd-audit-fix` for concrete audit/test/review findings.
-6. Update `.planning/STATE.md` after major phase transitions or handoffs.
-
-Current roadmap: `.planning/ROADMAP.md`.
-
 ## Scope
 
 This repo is scoped to OCI Log Analytics detection content, query generation, synthetic log generation, query/dashboard validation, OCI dashboard creation, and the integrated Forge webapp under `webapp/`.

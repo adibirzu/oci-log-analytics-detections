@@ -127,6 +127,33 @@ def _is_pipe_name_field(key_base, oci_field):
     return normalized_key == 'pipename' or normalized_oci == 'pipename'
 
 
+def _keyword_text_search(value):
+    """Map Sigma keyword selections to common OCI raw-message fields."""
+    escaped = _escape_like_value(value)
+    return f"('Original Log Content' like '*{escaped}*' or msg like '*{escaped}*')"
+
+
+def _join_clauses(clauses, require_all=False):
+    connector = ' and ' if require_all else ' or '
+    if not clauses:
+        return ""
+    if len(clauses) == 1:
+        return clauses[0]
+    return f"({connector.join(clauses)})"
+
+
+def _modifier_tokens(modifier):
+    if not modifier:
+        return []
+    return [token.strip().lower() for token in str(modifier).split('|') if token.strip()]
+
+
+def _bool_modifier_value(value):
+    if isinstance(value, str):
+        return value.strip().lower() not in {'false', '0', 'no'}
+    return bool(value)
+
+
 def slugify_title(title):
     """Create a filesystem-safe JSON filename stem from a rule title."""
     safe_title = title.replace(' ', '_').replace(':', '').lower()
@@ -341,12 +368,20 @@ def parse_selection(selection, field_map):
     """Parse a single Sigma selection block into an OCL query fragment."""
     query_parts = []
 
+    if isinstance(selection, (str, int, float)):
+        return _keyword_text_search(selection)
+
     # Selection can be a list of maps (OR of ANDs)
     if isinstance(selection, list):
         list_parts = []
         for item in selection:
-            list_parts.append(f"({parse_selection(item, field_map)})")
-        return f"({' or '.join(list_parts)})"
+            parsed = parse_selection(item, field_map)
+            if parsed:
+                list_parts.append(f"({parsed})")
+        return f"({' or '.join(list_parts)})" if list_parts else ""
+
+    if not isinstance(selection, dict):
+        return _keyword_text_search(str(selection))
 
     for key, value in selection.items():
         # Handle field modifiers (e.g., field|contains, field|endswith, field|contains|all)
@@ -358,41 +393,37 @@ def parse_selection(selection, field_map):
             modifier = '|'.join(parts[1:])
 
         oci_field = map_field(key_base, field_map)
+        tokens = _modifier_tokens(modifier)
+        require_all = 'all' in tokens
+        operator = next((token for token in tokens if token != 'all'), None)
 
-        if modifier == 'contains|all':
-            # AND together all values — field must contain every value
-            if isinstance(value, list):
-                and_parts = [f"{oci_field} like '*{_escape_like_value(v)}*'" for v in value]
-                query_parts.append(f"({' and '.join(and_parts)})")
-            else:
-                query_parts.append(f"{oci_field} like '*{_escape_like_value(value)}*'")
-        elif modifier == 'contains':
-            if isinstance(value, list):
-                or_parts = [f"{oci_field} like '*{_escape_like_value(v)}*'" for v in value]
-                query_parts.append(f"({' or '.join(or_parts)})")
-            else:
-                query_parts.append(f"{oci_field} like '*{_escape_like_value(value)}*'")
-        elif modifier == 'startswith':
-            if isinstance(value, list):
-                or_parts = [f"{oci_field} like '{_escape_like_value(v)}*'" for v in value]
-                query_parts.append(f"({' or '.join(or_parts)})")
-            else:
-                query_parts.append(f"{oci_field} like '{_escape_like_value(value)}*'")
-        elif modifier == 'endswith':
-            if isinstance(value, list):
-                or_parts = [f"{oci_field} like '*{_escape_like_value(v)}'" for v in value]
-                query_parts.append(f"({' or '.join(or_parts)})")
-            else:
-                query_parts.append(f"{oci_field} like '*{_escape_like_value(value)}'")
-        elif modifier == 're':
+        if operator == 'exists':
+            clause = f"{oci_field} like '*'"
+            query_parts.append(clause if _bool_modifier_value(value) else f"not ({clause})")
+        elif operator in {'gt', 'gte', 'lt', 'lte'}:
+            op = {'gt': '>', 'gte': '>=', 'lt': '<', 'lte': '<='}[operator]
+            values = value if isinstance(value, list) else [value]
+            clauses = [f"{oci_field} {op} {_format_eq_value(oci_field, item)}" for item in values]
+            query_parts.append(_join_clauses(clauses, require_all))
+        elif operator == 'contains':
+            values = value if isinstance(value, list) else [value]
+            clauses = [f"{oci_field} like '*{_escape_like_value(v)}*'" for v in values]
+            query_parts.append(_join_clauses(clauses, require_all))
+        elif operator == 'startswith':
+            values = value if isinstance(value, list) else [value]
+            clauses = [f"{oci_field} like '{_escape_like_value(v)}*'" for v in values]
+            query_parts.append(_join_clauses(clauses, require_all))
+        elif operator == 'endswith':
+            values = value if isinstance(value, list) else [value]
+            clauses = [f"{oci_field} like '*{_escape_like_value(v)}'" for v in values]
+            query_parts.append(_join_clauses(clauses, require_all))
+        elif operator == 're':
             # OCI Log Analytics uses ``matches`` for regex search, not the
             # SQL-style ``REGEX MATCH`` operator emitted by other Sigma
             # backends. See OCL grammar: ``<field> matches '<pattern>'``.
-            if isinstance(value, list):
-                or_parts = [f"{oci_field} matches '{_escape_like_value(v)}'" for v in value]
-                query_parts.append(f"({' or '.join(or_parts)})")
-            else:
-                query_parts.append(f"{oci_field} matches '{_escape_like_value(value)}'")
+            values = value if isinstance(value, list) else [value]
+            clauses = [f"{oci_field} matches '{_escape_like_value(v)}'" for v in values]
+            query_parts.append(_join_clauses(clauses, require_all))
         elif _is_pipe_name_field(key_base, oci_field):
             if isinstance(value, list):
                 or_parts = [
@@ -412,11 +443,11 @@ def parse_selection(selection, field_map):
             if isinstance(value, (str, int, float)):
                 query_parts.append(f"{oci_field} = {_format_eq_value(oci_field, value)}")
             elif isinstance(value, list):
-                or_parts = [
+                clauses = [
                     f"{oci_field} = {_format_eq_value(oci_field, v)}"
                     for v in value
                 ]
-                query_parts.append(f"({' or '.join(or_parts)})")
+                query_parts.append(_join_clauses(clauses, require_all))
             elif value is None:
                 query_parts.append(f"not ({oci_field} like '*')")
 
@@ -676,23 +707,58 @@ def validate_queries(output_path):
         total += 1
         # Basic syntax checks
         issues = []
-        if not re.match(r"^\(?\s*'Log Source'\s*(=|in)\s*", query):
+        # A query must be anchored on a scoping filter. Log Source is the common
+        # case, but cross-source correlation/hunting analytics legitimately anchor
+        # on a strong identifier field (Trace ID, Client/Source/Destination IP).
+        # Allow any number of leading group-open parens before the anchor so
+        # multi-level grouping like ((('Log Source' = ...))) is not flagged.
+        anchor = r"'(Log Source|Trace ID|Client IP|Source IP|Destination IP)'"
+        if not re.match(rf"^\(*\s*{anchor}\s*(=|in)\s*", query):
             issues.append("missing Log Source prefix")
-        # Count parentheses outside of quoted strings
+        # Count parentheses outside of quoted strings, and detect structural
+        # double spaces the same way. Several subtleties matter:
+        #   * a quote is a string delimiter only when it is NOT escaped. A quote is
+        #     escaped iff preceded by an ODD number of backslashes, so "\'" is a
+        #     literal quote inside a LIKE pattern but "\\'" (escaped backslash) is a
+        #     real delimiter -- tracking only the single previous char gets this
+        #     wrong. This keeps literal parens in patterns like '*SLEEP(*' from
+        #     desyncing the counter while still closing strings correctly;
+        #   * parenthesis depth must never go negative: a closing paren before its
+        #     opener (e.g. "(...)) ... (") is malformed even if the final depth
+        #     happens to net back to zero;
+        #   * a quote left open at end-of-string means the rest of the query was
+        #     wrongly treated as quoted, which would mask unbalanced parens or
+        #     double spaces -- flag it explicitly;
+        #   * spaces inside a LIKE literal (e.g. mimikatz '*SID      :*') are
+        #     intentional and must not count as structural double spaces.
         in_quote = False
         paren_depth = 0
+        depth_went_negative = False
+        backslashes = 0
+        prev = ""
+        double_space = False
         for ch in query:
-            if ch == "'" and not in_quote:
-                in_quote = True
-            elif ch == "'" and in_quote:
-                in_quote = False
-            elif not in_quote and ch == '(':
-                paren_depth += 1
-            elif not in_quote and ch == ')':
-                paren_depth -= 1
-        if paren_depth != 0:
+            if ch == "'":
+                if backslashes % 2 == 0:
+                    in_quote = not in_quote
+                backslashes = 0
+            else:
+                if not in_quote:
+                    if ch == '(':
+                        paren_depth += 1
+                    elif ch == ')':
+                        paren_depth -= 1
+                        if paren_depth < 0:
+                            depth_went_negative = True
+                    elif ch == ' ' and prev == ' ':
+                        double_space = True
+                backslashes = backslashes + 1 if ch == "\\" else 0
+            prev = ch
+        if paren_depth != 0 or depth_went_negative:
             issues.append("unbalanced parentheses")
-        if "  " in query:
+        if in_quote:
+            issues.append("unterminated quoted string")
+        if double_space:
             issues.append("double spaces")
         if issues:
             rel_path = path.relative_to(output_path).as_posix()

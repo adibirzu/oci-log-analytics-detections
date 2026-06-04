@@ -20,6 +20,8 @@ import unittest
 
 # Ensure project scripts are importable
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
+
 from convert_sigma import (
     parse_selection,
     parse_condition,
@@ -31,6 +33,7 @@ from convert_sigma import (
     merge_preserved_fields,
     resolve_output_relative_path,
     should_skip_existing_output,
+    validate_queries,
 )
 
 
@@ -128,6 +131,36 @@ class TestContainsAll(unittest.TestCase):
         selection = {'CommandLine|contains': ['net', 'user']}
         field_map = {'CommandLine': "'Command Line'"}
         result = parse_selection(selection, field_map)
+        self.assertIn(' or ', result)
+
+
+class TestAdditionalSigmaModifiers(unittest.TestCase):
+    """Test Sigma modifier forms used by upstream rule packs."""
+
+    def test_exists_true_and_false_map_to_presence_checks(self):
+        field_map = {'CommandLine': "'Command Line'", 'Image': "'Process Name'"}
+
+        present = parse_selection({'CommandLine|exists': True}, field_map)
+        missing = parse_selection({'Image|exists': False}, field_map)
+
+        self.assertEqual(present, "'Command Line' like '*'")
+        self.assertEqual(missing, "not ('Process Name' like '*')")
+
+    def test_numeric_comparison_modifiers_are_preserved(self):
+        field_map = {'DestinationPort': "'Destination Port'"}
+
+        result = parse_selection({'DestinationPort|gte': 1024}, field_map)
+
+        self.assertEqual(result, "'Destination Port' >= 1024")
+
+    def test_keyword_selections_search_original_content(self):
+        field_map = {'CommandLine': "'Command Line'"}
+
+        result = parse_selection(['mimikatz', {'CommandLine|contains': 'sekurlsa'}], field_map)
+
+        self.assertIn("'Original Log Content' like '*mimikatz*'", result)
+        self.assertIn("msg like '*mimikatz*'", result)
+        self.assertIn("'Command Line' like '*sekurlsa*'", result)
         self.assertIn(' or ', result)
 
 
@@ -384,6 +417,68 @@ class TestPreservedMetadata(unittest.TestCase):
             self.assertTrue(should_skip_existing_output({'do_not_overwrite': True}, existing_path))
             self.assertFalse(should_skip_existing_output({'do_not_overwrite': True}, missing_path))
             self.assertFalse(should_skip_existing_output({}, existing_path))
+
+
+class TestQueryValidator(unittest.TestCase):
+    """The validator must accept legitimate query shapes (literal parens/spaces in
+    LIKE patterns, multi-level paren nesting, trace-correlation anchors) while still
+    flagging genuinely malformed queries. All three checks must skip quoted-string
+    literal content."""
+
+    VALID = {
+        'waf_literal_parens.json':
+            "('Log Source' = 'OCI WAF Logs') and ('Request URL' like '*SLEEP(*' "
+            "or 'Request URL' like '*\\' OR 1=1*')",
+        'nested_groups.json':
+            "((('Log Source' = 'X') and 'Event ID' = '1'))",
+        'trace_correlation.json':
+            "('Trace ID' = 'abc' or 'Client IP' = '1.2.3.4')",
+        'mimikatz_spaces_in_like.json':
+            "('Log Source' = 'X') and ('Command Line' like '*SID                :*')",
+        # An escaped backslash (\\) before a quote must NOT be treated as an
+        # escaped quote: the quote still closes the string. Parity-based escape
+        # handling keeps this valid query from being flagged as unterminated.
+        'escaped_backslash.json':
+            "('Log Source' = 'X') and 'Path' = 'C:\\\\Temp\\\\'",
+    }
+    BROKEN = {
+        'unbalanced.json': "('Log Source' = 'X' and ('Event ID' = '1')",
+        'no_anchor.json': "('Action' = 'block') and 'Event ID' = '1'",
+        'structural_double_space.json': "('Log Source' = 'X')  and 'Event ID' = '1'",
+        # Depth dips negative (closer before opener) then nets back to zero — the
+        # final-depth check alone would miss this; the negative-depth guard catches it.
+        'paren_depth_negative.json': "('Log Source' = 'X')) and 'Event ID' = '1'(",
+        # A quote left open at end-of-string would otherwise swallow the rest of the
+        # query and mask other defects.
+        'unterminated_quote.json': "('Log Source' = 'X') and 'Field' = 'abc",
+    }
+
+    def _run(self, files):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            for name, query in files.items():
+                with open(os.path.join(tmpdir, name), 'w') as f:
+                    json.dump({'title': name, 'query': query}, f)
+            buf = io.StringIO()
+            old = sys.stdout
+            sys.stdout = buf
+            try:
+                validate_queries(Path(tmpdir))
+            finally:
+                sys.stdout = old
+            return buf.getvalue()
+
+    def test_valid_queries_produce_no_warnings(self):
+        out = self._run(self.VALID)
+        self.assertIn(f"Validated {len(self.VALID)} queries, 0 warnings", out)
+        self.assertNotIn("WARN", out)
+
+    def test_malformed_queries_are_flagged(self):
+        out = self._run(self.BROKEN)
+        self.assertIn(f"{len(self.BROKEN)} warnings", out)
+        self.assertIn("unbalanced parentheses", out)
+        self.assertIn("missing Log Source prefix", out)
+        self.assertIn("double spaces", out)
+        self.assertIn("unterminated quoted string", out)
 
 
 if __name__ == '__main__':

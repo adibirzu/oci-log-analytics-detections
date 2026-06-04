@@ -144,8 +144,12 @@ def get_inventory_counts(project_dir=PROJECT_DIR, queries_dir=QUERIES_DIR, apps_
         "generated_hunting_queries": hunting_count,
         "generated_sentinel_queries": sentinel_count,
         "legacy_dirs": {
-            "logandetectionqueries": len(list((project_dir / "logandetectionqueries").iterdir())) if (project_dir / "logandetectionqueries").exists() else None,
-            "logandetectionrules": len(list((project_dir / "logandetectionrules").iterdir())) if (project_dir / "logandetectionrules").exists() else None,
+            # A missing legacy dir is equivalent to an empty one (no content). Git
+            # does not track empty directories, so these resolve to absent on a
+            # fresh checkout (e.g. CI) but present-and-empty locally -- count both
+            # as 0 so the generated catalog is deterministic across environments.
+            "logandetectionqueries": len(list((project_dir / "logandetectionqueries").iterdir())) if (project_dir / "logandetectionqueries").exists() else 0,
+            "logandetectionrules": len(list((project_dir / "logandetectionrules").iterdir())) if (project_dir / "logandetectionrules").exists() else 0,
         },
     }
 

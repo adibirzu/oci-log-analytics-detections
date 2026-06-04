@@ -23,6 +23,12 @@ fields:
   Computer:
     target: Entity
     role: resource
+  CounterName:
+    target: '''Metric Name'''
+    role: resource
+  CounterValue:
+    target: '''Metric Value'''
+    role: resource
   Description:
     target: Description
     role: resource

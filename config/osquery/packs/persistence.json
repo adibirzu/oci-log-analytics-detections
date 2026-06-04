@@ -1,0 +1,15 @@
+{
+  "name": "persistence",
+  "platform": "linux,windows",
+  "description": "Persistence checks across cron, services, launch points, and shell profiles.",
+  "queries": [
+    {
+      "id": "suspicious_cron_entries",
+      "name": "Suspicious cron entries",
+      "sql": "SELECT command, path FROM crontab WHERE command LIKE '%curl%' OR command LIKE '%wget%';",
+      "severity": "high",
+      "expected_fields": ["command", "path"],
+      "mitre": ["T1053.003"]
+    }
+  ]
+}

@@ -88,7 +88,21 @@ def build_steps(include_live: bool, skip_tests: bool, lookback: str, query_timeo
         ("synthetic log contract validation", [python, str(SCRIPTS_DIR / "validate_synthetic_logs.py")], 300),
         ("threat-intel candidate inventory", [python, str(SCRIPTS_DIR / "content_discovery.py")], 300),
         ("field dictionary validation", [python, str(SCRIPTS_DIR / "field_dictionary.py"), "--validate-query-fields"], 300),
+        ("siem discovery schema validation", [python, str(SCRIPTS_DIR / "siem_discovery_report.py"), "sentinel"], 300),
+        (
+            "migration plan/report validation",
+            [
+                python,
+                str(SCRIPTS_DIR / "siem_discovery_report.py"),
+                "report",
+                "--report-only",
+            ],
+            300,
+        ),
+        ("sentinel feed dependency bundle", [python, str(SCRIPTS_DIR / "sentinel_feed_dependencies.py")], 300),
         ("detection rule spec export", [python, str(SCRIPTS_DIR / "detection_rule_creator.py"), "--write-default"], 300),
+        ("osquery pack validation", [python, str(SCRIPTS_DIR / "validate_osquery_packs.py")], 300),
+        ("cloud guard instance security synthetic contract", [python, str(SCRIPTS_DIR / "validate_cloud_guard_instance_security.py")], 300),
         ("catalog generation", [python, str(SCRIPTS_DIR / "generate_catalog.py")], 300),
         ("dashboard inventory export", [python, str(SCRIPTS_DIR / "deploy_dashboard.py"), "--export-inventory"], 300),
         ("octo apm workshop bundle validation", [python, str(SCRIPTS_DIR / "octo_apm_workshop.py"), "--validate-bundle"], 300),
@@ -105,6 +119,17 @@ def build_steps(include_live: bool, skip_tests: bool, lookback: str, query_timeo
     if not skip_tests:
         steps.append(("pytest", [python, "-m", "pytest", "-q"], 1200))
     if include_live:
+        parse_path = HEALTH_DIR / "parse-validate-all.json"
+        steps.append((
+            "live query parse validation",
+            [
+                python,
+                str(SCRIPTS_DIR / "parse_validate_all_queries.py"),
+                "--json",
+                str(parse_path),
+            ],
+            1800,
+        ))
         verify_path = HEALTH_DIR / "all-dashboard-verify.json"
         steps.append((
             "live profile dashboard verification",

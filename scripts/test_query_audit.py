@@ -30,6 +30,18 @@ class TestQueryAudit(unittest.TestCase):
         self.assertLessEqual(len(eligible_specs), len(all_specs))
         self.assertTrue(all(spec["eligible"] for spec in eligible_specs))
 
+    def test_load_specs_can_filter_to_specific_query_files(self):
+        specs = load_specs(False, files=[
+            "queries/windows_kerberos_pre_authentication_failures.json",
+            "windows_ntlm_authentication_failures.json",
+        ])
+
+        query_files = {spec["query_file"] for spec in specs}
+        self.assertEqual(query_files, {
+            "queries/windows_kerberos_pre_authentication_failures.json",
+            "queries/windows_ntlm_authentication_failures.json",
+        })
+
     def test_execute_query_returns_error_metadata_instead_of_raising(self):
         class StubClient:
             def query(self, namespace_name, query_details):
@@ -129,6 +141,25 @@ class TestQueryAudit(unittest.TestCase):
         self.assertNotIn("'Request URL' like '*/**'", query)
         self.assertIn("'Request URL' like '*UNION%20SELECT*'", query)
         self.assertIn("'Request URL' like '*SLEEP(*'", query)
+
+    def test_windows_event_queries_avoid_unique_on_message_aliases(self):
+        for query_file in [
+            "queries/windows_audit_policy_changed.json",
+            "queries/windows_security_log_cleared_event.json",
+        ]:
+            payload = self.load_query_payload(query_file)
+            self.assertNotIn("unique(msg)", payload["query"], query_file)
+            self.assertNotIn("unique(Message)", payload["query"], query_file)
+
+    def test_clickfix_query_uses_parser_tolerant_process_suffixes(self):
+        payload = self.load_query_payload("queries/clickfix_fake_captcha_powershell_execution.json")
+        query = payload["query"]
+
+        self.assertIn("'Process Name' like '*powershell.exe'", query)
+        self.assertIn("'Parent Process Name' like '*chrome.exe'", query)
+        self.assertIn("'Log Source' = 'Windows PowerShell Operational Logs'", query)
+        self.assertIn("'Script Block Text' like '*ClickFix*'", query)
+        self.assertNotIn("'Process Name' like '*\\\\powershell.exe'", query)
 
     def test_linux_archive_query_uses_targeted_demo_source_and_process_filter(self):
         payload = self.load_query_payload("queries/linux_archive_data_collected_for_exfiltration.json")

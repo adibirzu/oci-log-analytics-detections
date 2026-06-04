@@ -1,0 +1,15 @@
+{
+  "name": "privilege-escalation",
+  "platform": "linux,windows",
+  "description": "Privilege escalation checks for sudoers, token abuse, and elevated service state.",
+  "queries": [
+    {
+      "id": "sudoers_nopasswd",
+      "name": "NOPASSWD sudoers entries",
+      "sql": "SELECT path, line FROM file_lines WHERE path LIKE '/etc/sudoers%' AND line LIKE '%NOPASSWD%';",
+      "severity": "high",
+      "expected_fields": ["path", "line"],
+      "mitre": ["T1548"]
+    }
+  ]
+}

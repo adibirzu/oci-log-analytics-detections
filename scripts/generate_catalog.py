@@ -41,12 +41,28 @@ SEVERITY_EMOJI = {
 }
 
 TACTIC_ORDER = [
-    "initial_access", "execution", "persistence", "privilege_escalation",
-    "defense_evasion", "credential_access", "discovery", "lateral_movement",
-    "collection", "command_and_control", "exfiltration", "impact",
+    "reconnaissance", "resource_development", "initial_access", "execution",
+    "persistence", "privilege_escalation", "defense_evasion", "credential_access",
+    "discovery", "lateral_movement", "collection", "command_and_control",
+    "exfiltration", "impact",
 ]
 
+# The 14 canonical MITRE ATT&CK Enterprise tactics (snake_case as stored in
+# query `mitre_attack.tactics`). Sentinel-converted queries occasionally carry
+# non-ATT&CK labels (e.g. "malware,_component", "vulnerability") in their raw
+# tactic field; those must not inflate the catalog's tactic count. Filter every
+# aggregate tactic set against this allowlist so catalog.json, CATALOG.md, and
+# the multicloud manifest all agree on the real tactic coverage.
+VALID_MITRE_TACTICS = frozenset([
+    "reconnaissance", "resource_development", "initial_access", "execution",
+    "persistence", "privilege_escalation", "defense_evasion", "credential_access",
+    "discovery", "lateral_movement", "collection", "command_and_control",
+    "exfiltration", "impact",
+])
+
 TACTIC_DISPLAY = {
+    "reconnaissance": "Reconnaissance",
+    "resource_development": "Resource Development",
     "initial_access": "Initial Access",
     "execution": "Execution",
     "persistence": "Persistence",
@@ -143,6 +159,8 @@ def build_mitre_matrix(*query_groups):
             techniques = ma.get("techniques", [])
             tactics = ma.get("tactics", [])
             for tactic in tactics:
+                if tactic not in VALID_MITRE_TACTICS:
+                    continue
                 for tech in techniques:
                     matrix[tactic][tech].append(q["title"])
     return matrix
@@ -460,7 +478,7 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
             "level": q.get("level", "medium"),
             "platform": p,
             "mitre_techniques": ma.get("techniques", []),
-            "mitre_tactics": ma.get("tactics", []),
+            "mitre_tactics": [t for t in ma.get("tactics", []) if t in VALID_MITRE_TACTICS],
             "stig_ids": q.get("stig_ids", []),
             "stig_category": q.get("stig_category", ""),
             "references": q.get("references", []),
@@ -513,7 +531,7 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
             "sigma_id": q.get("sigma_id", ""),
             "source_derived": bool(q.get("sigma_id")),
             "mitre_techniques": q.get("mitre_attack", {}).get("techniques", []),
-            "mitre_tactics": q.get("mitre_attack", {}).get("tactics", []),
+            "mitre_tactics": [t for t in q.get("mitre_attack", {}).get("tactics", []) if t in VALID_MITRE_TACTICS],
             "references": q.get("references", []),
             "file": q.get("_file", ""),
             **maturity_fields(q, "app"),
@@ -521,6 +539,8 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
 
     catalog["platforms"] = dict(platforms)
     catalog["severities"] = dict(severities)
+    tactics &= VALID_MITRE_TACTICS
+    combined_tactics &= VALID_MITRE_TACTICS
     catalog["mitre_techniques"] = sorted(techniques)
     catalog["mitre_tactics"] = sorted(tactics)
     catalog["all_mitre_techniques"] = sorted(combined_techniques)
@@ -575,6 +595,7 @@ def main():
         ma = q.get("mitre_attack", {})
         all_techs.update(ma.get("techniques", []))
         all_tactics.update(ma.get("tactics", []))
+    all_tactics &= VALID_MITRE_TACTICS
 
     print(f"\n  Rules: {len(queries)} | Apps: {len(app_queries)} | Hunting: {len(hunting)}")
     print(f"  MITRE: {len(all_techs)} techniques, {len(all_tactics)} tactics")

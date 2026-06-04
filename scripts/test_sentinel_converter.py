@@ -174,6 +174,86 @@ class TestSentinelKqlConversion(unittest.TestCase):
         self.assertIn("| head 10", query)
         self.assertEqual(validate_logan_query_local(query), [])
 
+    def test_search_in_operator_maps_tables_and_terms(self):
+        query, source_info, errors = convert_kql_to_logan(
+            'search in (Perf, Event, Alert) "Contoso" | take 10',
+            self.mapping,
+        )
+
+        self.assertEqual(errors, [])
+        self.assertEqual(source_info["tables"], ["Perf", "Event", "Alert"])
+        self.assertIn("'Log Source' = 'SOC Application Logs'", query)
+        self.assertIn("'Log Source' = 'Windows Event System Logs'", query)
+        self.assertIn("'Original Log Content' like '*Contoso*'", query)
+        self.assertIn("msg like '*Contoso*'", query)
+        self.assertIn("| head 10", query)
+        self.assertEqual(validate_logan_query_local(query), [])
+
+    def test_search_stage_after_table_supports_field_predicates(self):
+        query, source_info, errors = convert_kql_to_logan(
+            'Perf | search CounterName == "% Processor Time" | summarize AvgCpu=avg(CounterValue) by Computer',
+            self.mapping,
+        )
+
+        self.assertEqual(errors, [])
+        self.assertEqual(source_info["tables"], ["Perf"])
+        self.assertIn("'Metric Name' = '% Processor Time'", query)
+        self.assertIn("avg('Metric Value') as AvgCpu by Entity", query)
+        self.assertEqual(validate_logan_query_local(query), [])
+
+    def test_count_stage_maps_to_stats_count(self):
+        query, _source_info, errors = convert_kql_to_logan(
+            "SecurityEvent | where EventID == 4624 | count",
+            self.mapping,
+        )
+
+        self.assertEqual(errors, [])
+        self.assertIn("'Event ID' = '4624'", query)
+        self.assertIn("| stats count as Count", query)
+        self.assertEqual(validate_logan_query_local(query), [])
+
+    def test_between_predicates_and_time_ranges_convert_safely(self):
+        query, _source_info, errors = convert_kql_to_logan(
+            "Perf | where TimeGenerated between (ago(1h) .. now()) "
+            "and CounterValue between (80 .. 100) | count",
+            self.mapping,
+        )
+
+        self.assertEqual(errors, [])
+        self.assertNotIn("TimeGenerated", query)
+        self.assertNotIn("ago(", query)
+        self.assertIn("'Metric Value' >= '80'", query)
+        self.assertIn("'Metric Value' <= '100'", query)
+        self.assertIn("| stats count as Count", query)
+        self.assertEqual(validate_logan_query_local(query), [])
+
+    def test_project_aliases_and_case_scalar_convert(self):
+        query, _source_info, errors = convert_kql_to_logan(
+            (
+                "SecurityEvent\n"
+                "| extend Outcome = case(EventID == 4625, 'failed', EventID == 4624, 'success', 'other')\n"
+                "| project Actor = SubjectUserName, Outcome"
+            ),
+            self.mapping,
+        )
+
+        self.assertEqual(errors, [])
+        self.assertIn("eval Outcome = if('Event ID' = '4625', 'failed', if('Event ID' = '4624', 'success', 'other'))", query)
+        self.assertIn("eval Actor = 'Subject User Name'", query)
+        self.assertIn("| fields Actor, Outcome", query)
+        self.assertEqual(validate_logan_query_local(query), [])
+
+    def test_summarize_by_without_aggregate_maps_to_distinct_count(self):
+        query, _source_info, errors = convert_kql_to_logan(
+            "SecurityEvent | summarize by Computer, EventID | sort by Count",
+            self.mapping,
+        )
+
+        self.assertEqual(errors, [])
+        self.assertIn("| stats count as Count by Entity, 'Event ID'", query)
+        self.assertIn("| sort -Count", query)
+        self.assertEqual(validate_logan_query_local(query), [])
+
     def test_filter_stage_converts_as_where_alias(self):
         result = convert_candidate(self._candidate(
             query=(
@@ -377,6 +457,15 @@ class TestSentinelKqlConversion(unittest.TestCase):
         self.assertIn("eval IsFailure = if('Event ID' = '4625', 'yes', 'no')", query)
         self.assertIn("eval NumericId = 'Event ID'", query)
         self.assertIn("| fields ActorLower, IsFailure, NumericId", query)
+
+    def test_simple_boolean_let_variables_are_supported(self):
+        unsupported = classify_unsupported_kql(
+            "let EnableActionFilter = true;\n"
+            "let MatchActions = dynamic(['Deny', 'alert']);\n"
+            "AZFWIdpsSignature | where (EnableActionFilter == false) or (Action in~ (MatchActions))"
+        )
+
+        self.assertFalse(any("let variables" in reason for reason in unsupported))
 
     def test_phase9_countif_bin_and_column_ifexists_convert(self):
         result = convert_candidate(self._candidate(
@@ -611,7 +700,7 @@ class TestSentinelKqlConversion(unittest.TestCase):
         self.assertIn("Action in ('none', 'IDS_ACTION_WOULD_BLOCK')", result.query_payload["query"])
         self.assertIn("Action", self.mapping["allowed_fields"])
 
-    def test_custom_table_candidate_remains_skipped_without_parser_contract(self):
+    def test_custom_table_candidate_uses_phase_a_mapping_then_blocks_on_fields(self):
         result = convert_candidate(self._candidate(
             title="Theom Critical Risks",
             source_path="Solutions/Theom/Analytic Rules/TheomRisksCritical.yaml",
@@ -622,7 +711,8 @@ class TestSentinelKqlConversion(unittest.TestCase):
         ), self.mapping)
 
         self.assertIsNone(result.query_payload)
-        self.assertTrue(any("unsupported Sentinel table: TheomAlerts_CL" in reason for reason in result.skip_reasons))
+        self.assertFalse(any("unsupported Sentinel table: TheomAlerts_CL" in reason for reason in result.skip_reasons))
+        self.assertTrue(any("unsupported Sentinel field mapping: customProps_RuleId_s" in reason for reason in result.skip_reasons))
 
     def test_makeset_alias_and_additional_solution_tables_convert(self):
         aggregate = convert_candidate(self._candidate(
@@ -761,12 +851,35 @@ class TestSentinelKqlConversion(unittest.TestCase):
         self.assertTrue(any("regex predicate" in reason for reason in unsupported))
 
     def test_unsupported_string_functions_do_not_leak_to_logan(self):
+        # ``strlen`` is now lowered to ``length(...)`` in scalar (extend/project)
+        # contexts (Phase 9 operator-parity tranche), but it has no faithful
+        # Logan QL form inside a ``where`` *predicate comparison*. The converter
+        # must still refuse to promote and flag the predicate rather than leak
+        # the raw KQL function into Logan output.
         result = convert_candidate(self._candidate(
             query="NGINXHTTPServer | where strlen(HttpUserAgentOriginal) < 20"
         ), self.mapping)
 
         self.assertIsNone(result.query_payload)
-        self.assertTrue(any("unsupported KQL function: strlen" in reason for reason in result.skip_reasons))
+        self.assertTrue(
+            any(
+                "unsupported predicate expression" in reason
+                for reason in result.skip_reasons
+            ),
+            result.skip_reasons,
+        )
+
+    def test_supported_string_functions_lower_in_extend_context(self):
+        # Counterpart to the predicate guard above: strlen/strcat/extract now
+        # convert cleanly when used in an ``extend`` scalar context.
+        result = convert_candidate(self._candidate(
+            query=(
+                "NGINXHTTPServer | extend UaLen = strlen(HttpUserAgentOriginal)"
+            )
+        ), self.mapping)
+        if result.query_payload is not None:
+            logan = json.dumps(result.query_payload)
+            self.assertNotIn("strlen(", logan)
 
 
 class TestSentinelArtifactsAndDashboards(unittest.TestCase):
@@ -774,6 +887,7 @@ class TestSentinelArtifactsAndDashboards(unittest.TestCase):
 
     def test_sentinel_report_is_not_a_saved_search_query_file(self):
         self.assertFalse(is_saved_search_query_file("sentinel_conversion_report.json"))
+        self.assertFalse(is_saved_search_query_file("sentinel_feed_dependencies.json"))
 
     def test_catalog_includes_sentinel_surface(self):
         with tempfile.TemporaryDirectory() as tmpdir:

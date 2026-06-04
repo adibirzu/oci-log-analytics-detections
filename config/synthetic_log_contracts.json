@@ -77,12 +77,19 @@
   "windows_event_security.jsonl": {
     "description": "Windows Security Event logs should keep both native and OCI LA mapped fields for SOC and multicloud widgets.",
     "required_fields": [
+      "Event",
       "Event ID",
       "EventID",
       "TimeCreated",
       "Computer",
       "User",
       "msg"
+    ],
+    "required_nested_fields": [
+      "Event.System.Provider.Name",
+      "Event.System.EventID",
+      "Event.System.TimeCreated.SystemTime",
+      "Event.EventData.Data"
     ],
     "field_patterns": {
       "EventID": "^\\d+$",
@@ -93,6 +100,7 @@
   "windows_event_system.jsonl": {
     "description": "Windows System Event logs should expose service-centric fields.",
     "required_fields": [
+      "Event",
       "Event ID",
       "EventID",
       "TimeCreated",
@@ -100,10 +108,75 @@
       "ServiceName",
       "msg"
     ],
+    "required_nested_fields": [
+      "Event.System.Provider.Name",
+      "Event.System.EventID",
+      "Event.System.TimeCreated.SystemTime",
+      "Event.EventData.Data"
+    ],
     "field_patterns": {
       "EventID": "^\\d+$"
     },
     "minimum_events": 10
+  },
+  "windows_powershell_operational.jsonl": {
+    "description": "PowerShell Operational events should preserve script-block fields and parser aliases used by Event ID 4104 detections.",
+    "required_fields": [
+      "Event",
+      "Event ID",
+      "EventID",
+      "TimeCreated",
+      "Computer",
+      "Channel",
+      "Provider",
+      "ScriptBlockText",
+      "Script Block Text",
+      "HostApplication",
+      "Host Application",
+      "msg"
+    ],
+    "required_nested_fields": [
+      "Event.System.Provider.Name",
+      "Event.System.EventID",
+      "Event.System.TimeCreated.SystemTime",
+      "Event.EventData.Data"
+    ],
+    "field_patterns": {
+      "EventID": "^\\d+$",
+      "Channel": "^Microsoft-Windows-PowerShell/Operational$",
+      "Provider": "^Microsoft-Windows-PowerShell$"
+    },
+    "minimum_events": 2
+  },
+  "windows_defender_operational.jsonl": {
+    "description": "Windows Defender Operational events should expose malware, action, status, and file metadata for Defender OOTB detections.",
+    "required_fields": [
+      "Event",
+      "Event ID",
+      "EventID",
+      "TimeCreated",
+      "Computer",
+      "Channel",
+      "Provider",
+      "ThreatName",
+      "Threat Name",
+      "Action",
+      "Status",
+      "File Path",
+      "msg"
+    ],
+    "required_nested_fields": [
+      "Event.System.Provider.Name",
+      "Event.System.EventID",
+      "Event.System.TimeCreated.SystemTime",
+      "Event.EventData.Data"
+    ],
+    "field_patterns": {
+      "EventID": "^\\d+$",
+      "Channel": "^Microsoft-Windows-Windows Defender/Operational$",
+      "Provider": "^Microsoft-Windows-Windows Defender$"
+    },
+    "minimum_events": 3
   },
   "linux_secure.jsonl": {
     "description": "Linux secure/auth logs should expose auth metadata and mapped OCI fields.",
@@ -126,6 +199,7 @@
   "sysmon_operational.jsonl": {
     "description": "Sysmon Operational events should include both native and mapped process/network context.",
     "required_fields": [
+      "Event",
       "EndpointOS",
       "EventID",
       "TimeCreated",
@@ -133,6 +207,12 @@
       "SourceImage",
       "CommandLine",
       "msg"
+    ],
+    "required_nested_fields": [
+      "Event.System.Provider.Name",
+      "Event.System.EventID",
+      "Event.System.TimeCreated.SystemTime",
+      "Event.EventData.Data"
     ],
     "field_patterns": {
       "EndpointOS": "^Windows$",

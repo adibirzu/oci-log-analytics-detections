@@ -12,14 +12,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html",
-      "summary": "Retrieve a specific logical expression from the available log data.",
+      "summary": "Starts an OCI Log Analytics search with source and field predicates.",
       "syntax": "'Log Source' = '<source>' and 'Field' = 'value'"
     },
     {
@@ -34,14 +34,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/where.html",
-      "summary": "Calculate the value of an expression to be true or false.",
+      "summary": "Filters the current result set with a boolean expression.",
       "syntax": "| where <predicate>"
     },
     {
@@ -56,14 +56,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/stats.html",
-      "summary": "Provide summary statistics for the search results, optionally grouped by a specified field.",
+      "summary": "Aggregates records and groups by selected dimensions.",
       "syntax": "| stats count as Count by 'Host Name', 'User Name'"
     },
     {
@@ -78,14 +78,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/timestats.html",
-      "summary": "Generate data for displaying statistical trends over time, optionally grouped by a specified field.",
+      "summary": "Aggregates records into time buckets for trend and spike detection.",
       "syntax": "| timestats span=5m count as failures by src_ip"
     },
     {
@@ -100,14 +100,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/eval.html",
-      "summary": "Calculate the value of an expression and display the value in a new field.",
+      "summary": "Calculates a new field from existing fields and expressions.",
       "syntax": "| eval risk = if(hits > 10, 'high', 'medium')"
     },
     {
@@ -122,14 +122,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/fields.html",
-      "summary": "Specify which fields to add or remove from the retrieved results, based on the field names.",
+      "summary": "Keeps or orders the selected fields in the output.",
       "syntax": "| fields 'Time', 'Host Name', 'User Name'"
     },
     {
@@ -144,14 +144,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/sort.html",
-      "summary": "Sort logs according to specified fields.",
+      "summary": "Sorts the current result set by one or more fields.",
       "syntax": "| sort -hits"
     },
     {
@@ -166,14 +166,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/top.html",
-      "summary": "Display either the specified number of field values with the most occurrences or the specified number of results with the highest aggregated value as determined by the specified field.",
+      "summary": "Returns the most frequent values for a field or aggregation.",
       "syntax": "| top 20 'Source IP'"
     },
     {
@@ -188,14 +188,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/distinct.html",
-      "summary": "Remove duplicates from the returned results.",
+      "summary": "Returns unique values for selected fields.",
       "syntax": "| distinct 'Host Name', 'User Name'"
     },
     {
@@ -210,14 +210,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/regex.html",
-      "summary": "Filter data according to a specified regular expression.",
+      "summary": "Matches or extracts values with a regular expression where supported by Logan QL.",
       "syntax": "| regex 'Message' = /Failed password/"
     },
     {
@@ -232,15 +232,59 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/lookup.html",
-      "summary": "Invoke field value lookups.",
+      "summary": "Invokes a field-value lookup for enrichment or filtering.",
       "syntax": "| lookup <lookup_name> <field>"
+    },
+    {
+      "category": "correlation",
+      "examples": [
+        "| link 'Host Name' | stats count as Events"
+      ],
+      "name": "link",
+      "notes": [
+        "Elastic EQL sequence conversion should use link groups when a stable entity field exists."
+      ],
+      "provenance": {
+        "fetch_error": "",
+        "generated_by": "scripts/generate_logan_workbench_artifacts.py",
+        "live_fetch": false,
+        "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
+        "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
+      },
+      "retrieved_at": "2026-05-19T08:07:47Z",
+      "source_title": "OCI Log Analytics Query Language Command Reference",
+      "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/link.html",
+      "summary": "Groups related log records into transaction-style linked events.",
+      "syntax": "| link 'Host Name', 'User Name'"
+    },
+    {
+      "category": "correlation",
+      "examples": [
+        "| link 'Host Name' | sequence 'Event ID' = '4624', 'Event ID' = '4688'"
+      ],
+      "name": "sequence",
+      "notes": [
+        "Only convert source sequence semantics when the ordering, grouping key, and time span are preserved."
+      ],
+      "provenance": {
+        "fetch_error": "",
+        "generated_by": "scripts/generate_logan_workbench_artifacts.py",
+        "live_fetch": false,
+        "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
+        "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
+      },
+      "retrieved_at": "2026-05-19T08:07:47Z",
+      "source_title": "OCI Log Analytics Query Language Command Reference",
+      "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/sequence.html",
+      "summary": "Identifies ordered event patterns inside linked event groups.",
+      "syntax": "| link 'Host Name' | sequence 'Event Name' = 'start', 'Event Name' = 'stop'"
     },
     {
       "category": "projection",
@@ -254,14 +298,14 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/rename.html",
-      "summary": "Change the name of a field.",
+      "summary": "Renames output fields for downstream display or grouping.",
       "syntax": "| rename 'User Name' as user"
     },
     {
@@ -276,18 +320,18 @@
       "provenance": {
         "fetch_error": "",
         "generated_by": "scripts/generate_logan_workbench_artifacts.py",
-        "live_fetch": true,
+        "live_fetch": false,
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-17T17:40:37Z",
+      "retrieved_at": "2026-05-19T08:07:47Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/head.html",
-      "summary": "Display the first n number of results.",
+      "summary": "Limits the result set to the first N rows.",
       "syntax": "| head 100"
     }
   ],
-  "generated_at": "2026-05-17T17:40:37Z",
+  "generated_at": "2026-05-19T08:07:47Z",
   "required_commands": [
     "search",
     "where",
@@ -300,6 +344,8 @@
     "distinct",
     "regex",
     "lookup",
+    "link",
+    "sequence",
     "rename",
     "head"
   ],

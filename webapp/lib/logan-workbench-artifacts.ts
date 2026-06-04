@@ -15,7 +15,12 @@ const sourceLanguageSchema = z.enum([
   "sentinel_kql",
   "splunk_spl",
   "elastic_lucene",
+  "elastic_kuery",
   "elastic_eql",
+  "elastic_esql",
+  "elastic_toml",
+  "osquery_sql",
+  "yara",
   "oci_logan",
 ])
 
@@ -80,12 +85,34 @@ const conversionExamplesSchema = z.object({
   examples: z.array(conversionExampleSchema),
 })
 
+const capabilityMatrixSchema = z
+  .object({
+    schema_version: z.literal("1.0.0"),
+    generated_at: z.string(),
+    generated_by: z.string(),
+    content_policy: z.record(z.unknown()),
+    source_capabilities: z.array(
+      z.object({
+        language: z.string(),
+        label: z.string(),
+        status: z.string(),
+        backend_entrypoint: z.string(),
+        conversion_path: z.string(),
+        next_capabilities: z.array(z.string()).optional().default([]),
+      }),
+    ),
+    target_language: z.record(z.unknown()),
+    third_party_corpora: z.array(z.record(z.unknown())).optional().default([]),
+  })
+  .passthrough()
+
 export type LoganCommand = z.infer<typeof commandSchema>
 export type LoganMappingPattern = z.infer<typeof mappingPatternSchema>
 export type LoganConversionExample = z.infer<typeof conversionExampleSchema>
+export type LoganCapabilityMatrix = z.infer<typeof capabilityMatrixSchema>
 export type LoganSourceLanguage = z.infer<typeof sourceLanguageSchema>
 
-type WorkbenchArtifactKey = "referenceCatalog" | "mappingPatterns" | "conversionExamples"
+type WorkbenchArtifactKey = "referenceCatalog" | "mappingPatterns" | "conversionExamples" | "capabilityMatrix"
 
 export interface WorkbenchArtifactReadStatus {
   key: WorkbenchArtifactKey
@@ -105,6 +132,7 @@ export interface LoganWorkbenchArtifacts {
   commands: LoganCommand[]
   patterns: LoganMappingPattern[]
   examples: LoganConversionExample[]
+  capabilityMatrix: LoganCapabilityMatrix | null
   statuses: WorkbenchArtifactReadStatus[]
   errors: string[]
   generatedAt: string | null
@@ -140,7 +168,7 @@ async function readJsonArtifact<TSchema extends z.ZodTypeAny>(
 }
 
 export const getLoganWorkbenchArtifacts = cache(async (): Promise<LoganWorkbenchArtifacts> => {
-  const [referenceCatalog, mappingPatterns, conversionExamples] = await Promise.all([
+  const [referenceCatalog, mappingPatterns, conversionExamples, capabilityMatrix] = await Promise.all([
     readJsonArtifact(
       "referenceCatalog",
       "Logan QL command reference",
@@ -159,17 +187,28 @@ export const getLoganWorkbenchArtifacts = cache(async (): Promise<LoganWorkbench
       "queries/conversion_examples.json",
       conversionExamplesSchema,
     ),
+    readJsonArtifact(
+      "capabilityMatrix",
+      "QL conversion capability matrix",
+      "queries/ql_conversion_capability_matrix.json",
+      capabilityMatrixSchema,
+    ),
   ])
 
-  const statuses = [referenceCatalog.status, mappingPatterns.status, conversionExamples.status]
+  const statuses = [referenceCatalog.status, mappingPatterns.status, conversionExamples.status, capabilityMatrix.status]
   const generatedAt =
-    conversionExamples.data?.generated_at ?? mappingPatterns.data?.generated_at ?? referenceCatalog.data?.generated_at ?? null
+    conversionExamples.data?.generated_at ??
+    mappingPatterns.data?.generated_at ??
+    referenceCatalog.data?.generated_at ??
+    capabilityMatrix.data?.generated_at ??
+    null
 
   return {
     detectionsRepoPath: "bundled artifact source",
     commands: referenceCatalog.data?.commands ?? [],
     patterns: mappingPatterns.data?.patterns ?? [],
     examples: conversionExamples.data?.examples ?? [],
+    capabilityMatrix: capabilityMatrix.data,
     statuses,
     errors: statuses.filter((status) => !status.ok).map((status) => `${status.label}: ${status.error}`),
     generatedAt,

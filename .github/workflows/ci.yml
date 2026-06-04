@@ -37,6 +37,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
 
+      # test_data/ is gitignored, so a fresh checkout has none. A few integration
+      # tests assert the ingest manifest matches the generated synthetic datasets,
+      # so generate them offline first (no --validate => no OCI access).
+      - name: Generate synthetic test data
+        run: python scripts/generate_test_logs.py --days 1
+
       # --- Gate 1: unit/integration test suite (no OCI required) ---
       - name: Pytest
         run: python -m pytest scripts/ -q

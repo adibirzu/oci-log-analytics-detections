@@ -9,7 +9,14 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from generate_catalog import generate_json_catalog, get_inventory_counts, load_query_surfaces
+from generate_catalog import (
+    TACTIC_DISPLAY,
+    TACTIC_ORDER,
+    VALID_MITRE_TACTICS,
+    generate_json_catalog,
+    get_inventory_counts,
+    load_query_surfaces,
+)
 
 
 class TestCatalogSurfaces(unittest.TestCase):
@@ -42,6 +49,18 @@ class TestCatalogSurfaces(unittest.TestCase):
             (queries_dir / "sentinel_synthetic_live_results.json").write_text(json.dumps({
                 "tested": 1,
                 "results": [{"title": "Support artifact, not a query", "rows": 1}],
+            }))
+            (queries_dir / "conversion_examples.json").write_text(json.dumps({
+                "schema_version": "1.0.0",
+                "examples": [{"title": "Support artifact, not a query"}],
+            }))
+            (queries_dir / "cross_ql_mapping_patterns.json").write_text(json.dumps({
+                "schema_version": "1.0.0",
+                "patterns": [{"id": "support-artifact"}],
+            }))
+            (queries_dir / "logan_ql_reference_catalog.json").write_text(json.dumps({
+                "schema_version": "1.0.0",
+                "commands": [{"name": "stats"}],
             }))
             (apps_dir / "apm_browser.json").write_text(json.dumps({
                 "title": "Browser Detection",
@@ -103,6 +122,73 @@ class TestCatalogSurfaces(unittest.TestCase):
                 catalog["hunting_queries"][0]["references"][0]["url"],
                 "https://github.com/blackhillsinfosec/FreeLabFriday_Labs",
             )
+
+    def test_every_counted_tactic_is_renderable_in_markdown(self):
+        """CATALOG.md reports `len(matrix) tactics` in the headline but only renders
+        a section per tactic in TACTIC_ORDER. Every canonical tactic must therefore
+        be in both TACTIC_ORDER and TACTIC_DISPLAY, otherwise the Markdown would
+        count tactics (e.g. reconnaissance, resource_development) it never shows."""
+        self.assertEqual(set(TACTIC_ORDER), VALID_MITRE_TACTICS)
+        for tactic in TACTIC_ORDER:
+            self.assertIn(tactic, TACTIC_DISPLAY, f"{tactic} has no display name")
+
+    def test_non_attack_tactics_are_filtered_from_catalog_scalars(self):
+        """Junk tactic labels carried by Sentinel conversions (e.g. 'malware,_component',
+        'vulnerability') must never inflate the catalog's tactic count. Only the 14
+        canonical ATT&CK enterprise tactics may appear in the aggregate scalars."""
+        self.assertEqual(len(VALID_MITRE_TACTICS), 14)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            project_dir = Path(tmpdir)
+            queries_dir = project_dir / "queries"
+            apps_dir = queries_dir / "apps"
+            hunting_dir = queries_dir / "hunting"
+            apps_dir.mkdir(parents=True, exist_ok=True)
+            hunting_dir.mkdir(parents=True, exist_ok=True)
+
+            (queries_dir / "clean_detection.json").write_text(json.dumps({
+                "title": "Clean Detection",
+                "query": "'Log Source' = 'OCI Audit Logs'",
+                "sigma_id": "sigma-clean-001",
+                "level": "high",
+                "logsource": {"product": "oci", "service": "audit"},
+                "mitre_attack": {"tactics": ["execution"], "techniques": ["T1059"]},
+            }))
+            (queries_dir / "junk_tactic_detection.json").write_text(json.dumps({
+                "title": "Sentinel-derived Junk Tactic",
+                "query": "'Log Source' = 'OCI Audit Logs'",
+                "sentinel_id": "sentinel-junk-001",
+                "source_type": "microsoft_sentinel",
+                "level": "medium",
+                "logsource": {"product": "oci", "service": "audit"},
+                "mitre_attack": {
+                    "tactics": ["execution", "malware,_component", "vulnerability"],
+                    "techniques": ["T1059"],
+                },
+            }))
+
+            detections, app_queries, hunting = load_query_surfaces(queries_dir, apps_dir, hunting_dir)
+            inventory = get_inventory_counts(project_dir, queries_dir, apps_dir, hunting_dir)
+            catalog = generate_json_catalog(detections, app_queries, hunting, inventory=inventory)
+
+            self.assertIn("execution", catalog["all_mitre_tactics"])
+            self.assertNotIn("malware,_component", catalog["all_mitre_tactics"])
+            self.assertNotIn("vulnerability", catalog["all_mitre_tactics"])
+            self.assertNotIn("malware,_component", catalog["mitre_tactics"])
+            self.assertTrue(set(catalog["all_mitre_tactics"]) <= VALID_MITRE_TACTICS)
+            self.assertEqual(
+                catalog["inventory"]["combined_mitre_tactics"],
+                len(catalog["all_mitre_tactics"]),
+            )
+
+            # Per-rule tactic lists must also be free of non-ATT&CK labels so no
+            # rule advertises a tactic that is absent from the aggregate scalars.
+            for surface in ("rules", "sentinel_queries", "app_queries"):
+                for entry in catalog.get(surface, []):
+                    self.assertTrue(
+                        set(entry.get("mitre_tactics", [])) <= VALID_MITRE_TACTICS,
+                        f"{surface} entry {entry.get('title')!r} carries a non-ATT&CK tactic",
+                    )
 
 
 if __name__ == "__main__":

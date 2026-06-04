@@ -10,6 +10,7 @@ export function EditorFrame({
   label,
   placeholder,
   wrapLines = false,
+  testId,
 }: {
   value: string
   onChange?: (value: string) => void
@@ -17,12 +18,13 @@ export function EditorFrame({
   label: string
   placeholder?: string
   wrapLines?: boolean
+  testId?: string
 }) {
   const lines = Math.max(1, lineCount(value))
 
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-[44px_minmax(0,1fr)] overflow-hidden bg-background/90">
-      <div className="select-none overflow-hidden border-r bg-muted/35 px-2 py-4 text-right font-mono text-[11px] leading-6 text-muted-foreground">
+    <div className="grid min-h-0 flex-1 grid-cols-[3rem_minmax(0,1fr)] overflow-hidden bg-[hsl(var(--code-bg))]">
+      <div className="select-none overflow-hidden border-r border-border/70 bg-surface-sunken/60 px-2 py-4 text-right font-mono text-[11px] leading-6 text-muted-foreground/70 tabular-nums">
         {Array.from({ length: lines }, (_, index) => (
           <div key={index}>{index + 1}</div>
         ))}
@@ -34,18 +36,20 @@ export function EditorFrame({
           spellCheck={false}
           wrap="off"
           readOnly={readOnly}
-          className="min-h-[300px] flex-1 resize-none overflow-auto whitespace-pre bg-transparent p-4 font-mono text-[13px] leading-6 outline-none placeholder:text-muted-foreground"
+          className="min-h-[280px] flex-1 resize-none overflow-auto whitespace-pre bg-transparent p-4 font-mono text-[13px] leading-6 text-foreground caret-primary outline-none placeholder:text-muted-foreground/60"
           aria-label={label}
+          data-testid={testId}
           placeholder={placeholder}
         />
       ) : (
         <pre
-          className={`min-h-[300px] flex-1 overflow-auto bg-transparent p-4 font-mono text-[13px] leading-6 ${
+          className={`min-h-[280px] flex-1 overflow-auto bg-transparent p-4 font-mono text-[13px] leading-6 text-foreground ${
             wrapLines ? "whitespace-pre-wrap break-words" : "whitespace-pre"
           }`}
           aria-label={label}
+          data-testid={testId}
         >
-          {value || placeholder}
+          {value || <span className="text-muted-foreground/55">{placeholder}</span>}
         </pre>
       )}
     </div>
@@ -71,22 +75,39 @@ export function MetadataTabs({
   ]
 
   return (
-    <div className="flex min-w-0 gap-1 overflow-x-auto border-b bg-muted/20 px-2 py-2">
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          type="button"
-          onClick={() => onChange(tab.id)}
-          className={`inline-flex h-8 shrink-0 items-center gap-1 rounded-md px-2.5 text-xs font-medium transition ${
-            active === tab.id ? "bg-[#c74634] text-white" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-          }`}
-        >
-          {tab.label}
-          {typeof counts[tab.id] === "number" ? (
-            <span className="rounded bg-background/25 px-1.5 py-0.5 font-mono text-[10px]">{counts[tab.id]}</span>
-          ) : null}
-        </button>
-      ))}
+    <div
+      role="tablist"
+      aria-label="Conversion intelligence"
+      className="flex min-w-0 gap-1 overflow-x-auto border-b border-border/70 bg-surface-sunken/50 px-2 py-2"
+    >
+      {tabs.map((tab) => {
+        const isActive = active === tab.id
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onChange(tab.id)}
+            className={`group inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium transition-colors duration-150 ${
+              isActive
+                ? "bg-primary/15 text-primary ring-1 ring-inset ring-primary/40"
+                : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+            }`}
+          >
+            {tab.label}
+            {typeof counts[tab.id] === "number" ? (
+              <span
+                className={`rounded px-1.5 py-0.5 font-mono text-[10px] tabular-nums ${
+                  isActive ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {counts[tab.id]}
+              </span>
+            ) : null}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -96,9 +117,12 @@ export function MetadataPanel({ tab, metadata }: { tab: MetadataTab; metadata: D
     return metadata.mitre.length ? (
       <div className="grid gap-2 sm:grid-cols-2">
         {metadata.mitre.map((item) => (
-          <div key={item.id} className="rounded-md border bg-background/60 p-3">
-            <div className="font-mono text-xs text-[#c74634]">{item.id}</div>
-            <div className="mt-1 text-sm font-medium">{item.name}</div>
+          <div
+            key={item.id}
+            className="rounded-md border border-border/70 bg-surface-sunken/40 p-3 transition-colors hover:border-primary/40"
+          >
+            <div className="font-mono text-xs text-primary">{item.id}</div>
+            <div className="mt-1 text-sm font-medium text-foreground">{item.name}</div>
             <div className="mt-1 text-xs text-muted-foreground">{item.tactic}</div>
           </div>
         ))}
@@ -112,10 +136,15 @@ export function MetadataPanel({ tab, metadata }: { tab: MetadataTab; metadata: D
     return metadata.stig.length ? (
       <div className="grid gap-2">
         {metadata.stig.map((item) => (
-          <div key={item.id} className="grid gap-2 rounded-md border bg-background/60 p-3 sm:grid-cols-[90px_1fr_auto]">
-            <code className="text-xs text-[#c74634]">{item.id}</code>
+          <div
+            key={item.id}
+            className="grid gap-2 rounded-md border border-border/70 bg-surface-sunken/40 p-3 sm:grid-cols-[90px_1fr_auto]"
+          >
+            <code className="text-xs text-primary">{item.id}</code>
             <span className="text-sm">{item.title}</span>
-            <span className="rounded border px-2 py-0.5 text-xs uppercase">{item.severity}</span>
+            <span className="rounded border border-border-strong/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {item.severity}
+            </span>
           </div>
         ))}
       </div>
@@ -126,9 +155,9 @@ export function MetadataPanel({ tab, metadata }: { tab: MetadataTab; metadata: D
 
   if (tab === "fields") {
     return metadata.fields.length ? (
-      <div className="overflow-auto rounded-md border">
+      <div className="overflow-auto rounded-md border border-border/70">
         <table className="w-full min-w-[560px] text-left text-xs">
-          <thead className="bg-muted/60 text-muted-foreground">
+          <thead className="bg-surface-sunken/60 text-muted-foreground">
             <tr>
               <th className="px-3 py-2 font-medium">Source field</th>
               <th className="px-3 py-2 font-medium">OCI Log Analytics field</th>
@@ -137,9 +166,9 @@ export function MetadataPanel({ tab, metadata }: { tab: MetadataTab; metadata: D
           </thead>
           <tbody>
             {metadata.fields.map((item) => (
-              <tr key={`${item.source}-${item.oci}`} className="border-t">
-                <td className="px-3 py-2 font-mono">{item.source}</td>
-                <td className="px-3 py-2 font-mono text-[#c74634]">{item.oci}</td>
+              <tr key={`${item.source}-${item.oci}`} className="border-t border-border/60 transition-colors hover:bg-accent/40">
+                <td className="px-3 py-2 font-mono text-foreground">{item.source}</td>
+                <td className="px-3 py-2 font-mono text-primary">{item.oci}</td>
                 <td className="px-3 py-2 text-muted-foreground">{item.note}</td>
               </tr>
             ))}
@@ -155,13 +184,20 @@ export function MetadataPanel({ tab, metadata }: { tab: MetadataTab; metadata: D
     return (
       <div className="grid gap-2">
         {metadata.logSources.map((item) => (
-          <div key={item.name} className="flex items-center gap-3 rounded-md border bg-background/60 p-3">
-            <Database className="size-4 text-[#c74634]" />
+          <div
+            key={item.name}
+            className="flex items-center gap-3 rounded-md border border-border/70 bg-surface-sunken/40 p-3"
+          >
+            <span className="flex size-8 items-center justify-center rounded-md bg-primary/12 text-primary">
+              <Database className="size-4" />
+            </span>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium">{item.name}</div>
+              <div className="truncate text-sm font-medium text-foreground">{item.name}</div>
               <div className="text-xs text-muted-foreground">{item.events}</div>
             </div>
-            <span className="rounded border px-2 py-0.5 text-xs">{item.status}</span>
+            <span className="rounded border border-border-strong/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {item.status}
+            </span>
           </div>
         ))}
       </div>
@@ -170,11 +206,11 @@ export function MetadataPanel({ tab, metadata }: { tab: MetadataTab; metadata: D
 
   if (tab === "metadata") {
     return (
-      <dl className="grid gap-2 text-sm sm:grid-cols-[140px_1fr]">
+      <dl className="grid gap-y-2 text-sm sm:grid-cols-[140px_1fr]">
         {metadata.metadata.map((item) => (
           <div key={item.label} className="contents">
-            <dt className="font-mono text-xs uppercase text-muted-foreground">{item.label}</dt>
-            <dd className="min-w-0 break-words">{item.value}</dd>
+            <dt className="eyebrow self-center text-[10px]">{item.label}</dt>
+            <dd className="min-w-0 break-words font-mono text-xs text-foreground">{item.value}</dd>
           </div>
         ))}
       </dl>
@@ -182,7 +218,7 @@ export function MetadataPanel({ tab, metadata }: { tab: MetadataTab; metadata: D
   }
 
   return (
-    <pre className="overflow-auto rounded-md border bg-background/70 p-3 font-mono text-xs leading-5">
+    <pre className="overflow-auto rounded-md border border-border/70 bg-[hsl(var(--code-bg))] p-3 font-mono text-xs leading-5 text-foreground">
       {JSON.stringify(
         Object.fromEntries(metadata.sampleEvent.map((item) => [item.field, item.value])),
         null,
@@ -193,5 +229,9 @@ export function MetadataPanel({ tab, metadata }: { tab: MetadataTab; metadata: D
 }
 
 function EmptyState({ label }: { label: string }) {
-  return <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">{label}</div>
+  return (
+    <div className="rounded-md border border-dashed border-border-strong/60 bg-surface-sunken/30 p-4 text-sm text-muted-foreground">
+      {label}
+    </div>
+  )
 }

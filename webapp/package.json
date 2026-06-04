@@ -5,7 +5,10 @@
   "packageManager": "pnpm@10.26.1",
   "scripts": {
     "build": "next build",
+    "build:pages": "node scripts/build-github-pages.mjs",
     "dev": "next dev",
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
     "lint": "eslint .",
     "start": "next start",
     "typecheck": "tsc --noEmit"
@@ -30,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

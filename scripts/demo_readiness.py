@@ -21,6 +21,7 @@ from oci_config import (
     require_oci_config,
 )
 from oci_time import build_time_window
+from redaction import redact_text
 
 import oci
 
@@ -105,7 +106,7 @@ def execute_query_check(
         result["ok"] = bool(items)
         result["rows"] = len(items)
     except Exception as exc:
-        result["error"] = str(exc)
+        result["error"] = redact_text(str(exc))
 
     return result
 

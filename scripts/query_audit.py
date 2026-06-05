@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from detection_rule_creator import build_catalog
 from oci_config import COMPARTMENT_ID, get_la_client, get_namespace, require_oci_config
 from oci_time import build_time_window
+from redaction import redact_text
 
 import oci
 
@@ -61,7 +62,7 @@ def execute_query(la_client, namespace: str, query: str, lookback: str) -> dict:
         items = getattr(response, "items", []) or []
         return {"rows": len(items), "ok": True, "empty": len(items) == 0}
     except Exception as exc:
-        return {"rows": 0, "ok": False, "empty": False, "error": str(exc)}
+        return {"rows": 0, "ok": False, "empty": False, "error": redact_text(str(exc))}
 
 
 def audit_queries(lookback: str, eligible_only: bool, files: list[str] | None = None) -> dict:

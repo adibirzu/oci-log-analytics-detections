@@ -9,7 +9,7 @@ I want every generated report and CI artifact to be free of tenancy-specific OCI
 So that promoting/publishing detections never leaks namespaces, request IDs, or endpoints.
 
 ## Problem → Solution
-`queries/sentinel_conversion_report.json` ships raw OCI SDK error dicts containing `fr4zqfimuxtr` (LA namespace), `opc-request-id`s, and `request_endpoint` URLs — and the scanner reports `ok: true` because it exempts `queries/` and its request-id regex misses dict-style payloads → **Centralize redaction, apply it at every live-payload write site, fix + un-exempt the scanner, and gate it in CI.**
+`queries/sentinel_conversion_report.json` ships raw OCI SDK error dicts containing `<LA_NAMESPACE>` (LA namespace), `opc-request-id`s, and `request_endpoint` URLs — and the scanner reports `ok: true` because it exempts `queries/` and its request-id regex misses dict-style payloads → **Centralize redaction, apply it at every live-payload write site, fix + un-exempt the scanner, and gate it in CI.**
 
 ## Metadata
 - **Complexity**: Medium
@@ -28,7 +28,7 @@ Internal/operational change — no user-facing UX. CI gains a visible "sensitive
 | `sentinel_conversion_report.json` `live_validation_error` | raw OCI dict w/ namespace + request-id | redacted dict (`<LA_NAMESPACE>`, `<OPC_REQUEST_ID>`, `<OCI_ENDPOINT>`) |
 | `docs/health/parse-validate-all.json` | raw `exc.message` + query | redacted error |
 | CI (`ci.yml`) | scanner only in `release_checklist.py` | scanner is an always-on gate |
-| `git grep fr4zqfimuxtr` | 1 hit (committed) | 0 hits |
+| `git grep <LA_NAMESPACE>` | 1 hit (committed) | 0 hits |
 
 ---
 
@@ -105,13 +105,13 @@ class TestSensitiveValueScanner(unittest.TestCase):
 - **IMPLEMENT**: regex replacements → `ocid1\.\w+\.oc1[\w.-]+`→`<OCID>`; `/namespaces/[a-z0-9]+/`→`/namespaces/<LA_NAMESPACE>/`; `'opc-request-id':\s*'[^']+'`→`'opc-request-id': '<OPC_REQUEST_ID>'`; `https://[a-z0-9.-]*\.oci\.oraclecloud\.com[^\s'"]*`→`<OCI_ENDPOINT>`; public-IP ranges → `<PUBLIC_IP>`.
 - **MIRROR**: regex style from `scan_sensitive_values.py:52-62`.
 - **GOTCHA**: the payload is often a `str(dict)` (single-quoted), not JSON — match single-quoted forms too.
-- **VALIDATE**: `python3 -c "from scripts.redaction import redact_text; assert 'fr4zqfimuxtr' not in redact_text(open('queries/sentinel_conversion_report.json').read())"`
+- **VALIDATE**: `python3 -c "from scripts.redaction import redact_text; assert '<LA_NAMESPACE>' not in redact_text(open('queries/sentinel_conversion_report.json').read())"`
 
 ### Task 2: Apply redaction at write sites
 - **ACTION**: Wrap the three sinks.
 - **IMPLEMENT**: `convert_sentinel_kql.py:~470` → `redact_text(result.live_validation_result.get("error",""))`; `parse_validate_all_queries.py:~86` → `redact_text(...)` for both `error` and `query`; `verify_deployed_dashboards.py:~92` → `redact_text(str(exc))`.
 - **MIRROR**: existing import style at top of each script.
-- **VALIDATE**: regenerate the sentinel report locally and `git grep -c fr4zqfimuxtr queries/sentinel_conversion_report.json` → 0.
+- **VALIDATE**: regenerate the sentinel report locally and `git grep -c <LA_NAMESPACE> queries/sentinel_conversion_report.json` → 0.
 
 ### Task 3: Fix the scanner
 - **ACTION**: Add patterns + un-exempt generated reports.
@@ -131,7 +131,7 @@ class TestSensitiveValueScanner(unittest.TestCase):
 
 ### Task 6: Scrub the committed report (working tree)
 - **ACTION**: Regenerate the report through the now-redacting converter, or manually replace the 2 leaked blocks with placeholders.
-- **VALIDATE**: `git grep -l fr4zqfimuxtr` → empty.
+- **VALIDATE**: `git grep -l <LA_NAMESPACE>` → empty.
 
 ---
 
@@ -140,13 +140,13 @@ class TestSensitiveValueScanner(unittest.TestCase):
 python3 -m pytest scripts/ -q                              # EXPECT: all pass
 python3 scripts/redaction.py --selftest 2>/dev/null || true
 python3 scripts/scan_sensitive_values.py --json            # EXPECT: ok:true, 0 findings AFTER scrub
-git grep -lI 'fr4zqfimuxtr'                                # EXPECT: (empty)
+git grep -lI '<LA_NAMESPACE>'                                # EXPECT: (empty)
 python3 scripts/convert_sigma.py --validate                # EXPECT: 678 queries, 0 warnings
 python3 -c "import yaml,glob;[yaml.safe_load(open(f)) for f in glob.glob('.github/workflows/*.yml')]"
 ```
 
 ## Acceptance Criteria
-- [ ] `git grep fr4zqfimuxtr` returns nothing in the working tree
+- [ ] `git grep <LA_NAMESPACE>` returns nothing in the working tree
 - [ ] `scan_sensitive_values.py` flags a dict-style `opc-request-id` under `queries/` (regression test) and passes clean after scrub
 - [ ] All three live-payload write sites route through `redaction.py`
 - [ ] Scanner runs as an always-on CI gate; `validate-rules.yml` watches `queries/hunting/**`
@@ -160,7 +160,7 @@ python3 -c "import yaml,glob;[yaml.safe_load(open(f)) for f in glob.glob('.githu
 | Redaction over-aggressively mangles useful error text | Low | Harder debugging | Replace only sensitive substrings, preserve the parser-syntax message |
 
 ## Notes
-- The leaked value `fr4zqfimuxtr` is a tenancy LA **namespace** (fingerprint), not a credential — medium severity, but a redaction-rule violation already in 3 public commits.
+- The leaked value `<LA_NAMESPACE>` is a tenancy LA **namespace** (fingerprint), not a credential — medium severity, but a redaction-rule violation already in 3 public commits.
 - Working-tree scrub stops re-leaking; **purging public history requires `git filter-repo --replace-text` + force-push (operator decision).**
 
 ## Broader roadmap (from the review — not in this plan)

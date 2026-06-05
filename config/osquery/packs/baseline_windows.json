@@ -1,0 +1,15 @@
+{
+  "name": "baseline-windows",
+  "platform": "windows",
+  "description": "Baseline Windows posture checks for suspicious services and startup entries.",
+  "queries": [
+    {
+      "id": "unexpected_services",
+      "name": "Unexpected services",
+      "sql": "SELECT name, path, start_type FROM services WHERE start_type = 'AUTO_START';",
+      "severity": "medium",
+      "expected_fields": ["name", "path", "start_type"],
+      "mitre": ["T1543.003"]
+    }
+  ]
+}

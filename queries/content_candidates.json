@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T07:19:00.561141+00:00",
+  "generated_at": "2026-06-01T04:18:13.139548+00:00",
   "source_registry": {
     "version": "1.0",
     "sources": [
@@ -70,15 +70,15 @@
     ]
   },
   "summary": {
-    "total_candidates": 48,
+    "total_candidates": 46,
     "by_classification": {
       "dashboard-only hunt": 2,
-      "needs field mapping": 39,
+      "needs field mapping": 37,
       "not applicable to OCI Log Analytics": 7
     },
     "by_source_type": {
       "elastic_csp_gap": 24,
-      "elastic_detection_reference": 21,
+      "elastic_detection_reference": 19,
       "internal_workshop": 3
     },
     "duplicates_collapsed": 1
@@ -1531,55 +1531,6 @@
       ]
     },
     {
-      "id": "cand_7c5d95b31ac4eaf1",
-      "title": "Windows coverage gap: T1039 Data from Network Shared Drive",
-      "sigma_id": "",
-      "source_url": "https://github.com/elastic/detection-rules",
-      "local_reference": "scripts/analyze_elastic_coverage.py:ELASTIC_WINDOWS_TECHNIQUES",
-      "source_type": "elastic_detection_reference",
-      "source_types": [
-        "elastic_detection_reference"
-      ],
-      "affected_platform": "windows",
-      "mitre_tactics": [
-        "collection"
-      ],
-      "mitre_techniques": [
-        "T1039"
-      ],
-      "candidate_log_sources": [
-        "SOC Windows Sysmon Logs",
-        "Windows Sysmon Events",
-        "Windows Sysmon Operational Logs"
-      ],
-      "required_fields": [],
-      "detection_idea": "Review Windows telemetry and create OCI Log Analytics detection coverage for T1039 Data from Network Shared Drive.",
-      "core_indicators": [
-        "t1039"
-      ],
-      "confidence": "medium",
-      "licensing": {
-        "status": "metadata_only",
-        "notes": "Candidate metadata only; source detection logic must be reviewed before promotion."
-      },
-      "attribution": {
-        "source": "Elastic detection-rules technique coverage reference",
-        "references": [
-          "https://github.com/elastic/detection-rules"
-        ]
-      },
-      "review_status": "candidate",
-      "dedupe_key": "content:bdb956a55aa302fd50a662be",
-      "source_urls": [
-        "https://github.com/elastic/detection-rules"
-      ],
-      "duplicate_count": 1,
-      "classification": "needs field mapping",
-      "classification_reasons": [
-        "candidate does not declare required fields yet"
-      ]
-    },
-    {
       "id": "cand_cc04e3b3374234bc",
       "title": "Windows coverage gap: T1049 System Network Connections Discovery",
       "sigma_id": "",
@@ -1619,55 +1570,6 @@
       },
       "review_status": "candidate",
       "dedupe_key": "content:320205bcc26a9a88735b8009",
-      "source_urls": [
-        "https://github.com/elastic/detection-rules"
-      ],
-      "duplicate_count": 1,
-      "classification": "needs field mapping",
-      "classification_reasons": [
-        "candidate does not declare required fields yet"
-      ]
-    },
-    {
-      "id": "cand_b8dfacdddd26aa87",
-      "title": "Windows coverage gap: T1069 Permission Groups Discovery",
-      "sigma_id": "",
-      "source_url": "https://github.com/elastic/detection-rules",
-      "local_reference": "scripts/analyze_elastic_coverage.py:ELASTIC_WINDOWS_TECHNIQUES",
-      "source_type": "elastic_detection_reference",
-      "source_types": [
-        "elastic_detection_reference"
-      ],
-      "affected_platform": "windows",
-      "mitre_tactics": [
-        "discovery"
-      ],
-      "mitre_techniques": [
-        "T1069"
-      ],
-      "candidate_log_sources": [
-        "SOC Windows Sysmon Logs",
-        "Windows Sysmon Events",
-        "Windows Sysmon Operational Logs"
-      ],
-      "required_fields": [],
-      "detection_idea": "Review Windows telemetry and create OCI Log Analytics detection coverage for T1069 Permission Groups Discovery.",
-      "core_indicators": [
-        "t1069"
-      ],
-      "confidence": "medium",
-      "licensing": {
-        "status": "metadata_only",
-        "notes": "Candidate metadata only; source detection logic must be reviewed before promotion."
-      },
-      "attribution": {
-        "source": "Elastic detection-rules technique coverage reference",
-        "references": [
-          "https://github.com/elastic/detection-rules"
-        ]
-      },
-      "review_status": "candidate",
-      "dedupe_key": "content:cc3d40c953da133e1d0dfb09",
       "source_urls": [
         "https://github.com/elastic/detection-rules"
       ],

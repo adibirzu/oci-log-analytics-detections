@@ -1,7 +1,7 @@
 {
-  "total_queries": 580,
-  "eligible_queries": 97,
-  "ineligible_queries": 483,
+  "total_queries": 618,
+  "eligible_queries": 120,
+  "ineligible_queries": 498,
   "specs": [
     {
       "query_file": "queries/accessibility_features_backdoor.json",
@@ -232,6 +232,35 @@
         "metric_name": "API_Endpoint_Unauthorized_Access_Attempts",
         "dimensions": [],
         "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apm_sql_injection_attack_in_request.json",
+      "title": "APM: SQL Injection Attack in Request",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "APM_SQL_Injection_Attack_in_Request",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and (('Request URL' like '*UNION SELECT*' or 'Request URL' like '*UNION%20SELECT*' or 'Request URL' like '*UNION+SELECT*' or 'Request URL' like '*union select*' or 'Request URL' like '*union%20select*') or ('Request URL' like '*OR 1=1*' or 'Request URL' like '*OR%201%3D1*' or 'Request URL' like '*%27%20OR%201%3D1*' or 'Request URL' like '*AND 1=1*') or ('Request URL' like '*SLEEP(*' or 'Request URL' like '*BENCHMARK(*' or 'Request URL' like '*WAITFOR DELAY*') or ('Request URL' like '*EXTRACTVALUE(*' or 'Request URL' like '*UPDATEXML(*') or ('Request URL' like '*INFORMATION_SCHEMA.TABLES*' or 'Request URL' like '*INFORMATION_SCHEMA.COLUMNS*') or ('Request URL' like '*; DROP TABLE*'))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "APM_SQL_Injection_Attack_in_Request",
+        "dimensions": [],
+        "severity": "critical",
         "create_alarm_by_default": false
       }
     },
@@ -934,7 +963,7 @@
       ],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*\\\\Development\\\\BACKDOOR\\\\ncov\\\\*' or 'Command Line' like '*Release\\\\bluelight.pdb*') and ('Original File Name' like '*bluelight*')) or (('Target Filename' like '*bluelight.pdb*' or 'Target Filename' like '*BACKDOOR\\\\ncov*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*\\\\Development\\\\BACKDOOR\\\\ncov\\\\*' or 'Command Line' like '*Release\\\\bluelight.pdb*') and 'Original File Name' like '*bluelight*') or (('Target Filename' like '*bluelight.pdb*' or 'Target Filename' like '*BACKDOOR\\\\ncov*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -971,7 +1000,7 @@
       ],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*ipinfo.io*')) or (('Command Line' like '*\"UserName\":\"*' or 'Command Line' like '*\"ComName\":\"*' or 'Command Line' like '*\"OnlineIP\":\"*' or 'Command Line' like '*\"LocalIP\":\"*' or 'Command Line' like '*\"AntiVirus\":\"*' or 'Command Line' like '*\"Process Level\":\"*' or 'Command Line' like '*\"VM\":\"*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Command Line' like '*ipinfo.io*') or (('Command Line' like '*\"UserName\":\"*' or 'Command Line' like '*\"ComName\":\"*' or 'Command Line' like '*\"OnlineIP\":\"*' or 'Command Line' like '*\"LocalIP\":\"*' or 'Command Line' like '*\"AntiVirus\":\"*' or 'Command Line' like '*\"Process Level\":\"*' or 'Command Line' like '*\"VM\":\"*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -1087,6 +1116,41 @@
       }
     },
     {
+      "query_file": "queries/clickfix_fake_captcha_powershell_execution.json",
+      "title": "ClickFix Fake CAPTCHA PowerShell Execution",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "Host Name (Server)",
+        "Entity",
+        "User"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "(('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs') and 'Event ID' = '1' and ('Parent Process Name' like '*chrome.exe' or 'Parent Process Name' like '*msedge.exe' or 'Parent Process Name' like '*firefox.exe' or 'Parent Process Name' like '*iexplore.exe') and 'Process Name' like '*powershell.exe' and ('Command Line' like '*ClickFix*' or 'Command Line' like '*fake CAPTCHA*' or 'Command Line' like '*clipboard*' or 'Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*iwr*' or 'Command Line' like '*WindowStyle Hidden*')) or (('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4688' and 'Process Name' like '*powershell.exe' and ('Command Line' like '*ClickFix*' or 'Command Line' like '*fake CAPTCHA*' or 'Command Line' like '*clipboard*' or 'Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*iwr*')) or ('Log Source' = 'Windows PowerShell Operational Logs' and 'Event ID' in ('4103', '4104') and ('Script Block Text' like '*ClickFix*' or 'Script Block Text' like '*fake CAPTCHA*' or 'Script Block Text' like '*clipboard*' or 'Script Block Text' like '*DownloadString*' or 'Script Block Text' like '*Invoke-WebRequest*' or 'Script Block Text' like '*iwr*' or 'Host Application' like '*WindowStyle Hidden*')) | stats count as Hits, unique('Command Line') as Commands, unique('Parent Process Name') as Parents by 'Host Name (Server)', Entity, User | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "Host Name (Server)",
+          "Entity",
+          "User"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/clipboard_data_collection.json",
       "title": "Clipboard Data Collection",
       "severity": "medium",
@@ -1110,6 +1174,209 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "Clipboard_Data_Collection",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/cloud_guard_instance_security_findings_by_host.json",
+      "title": "Cloud Guard Instance Security: Findings by Host",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Findings",
+      "dimensions": [
+        "Host Name",
+        "Instance OCID",
+        "Finding Severity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Cloud Guard Instance Security Logs' | stats count as Findings, unique('Finding Name') as FindingNames, unique('Pack Name') as Packs by 'Host Name', 'Instance OCID', 'Finding Severity' | sort -Findings",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Findings",
+        "dimensions": [
+          "Host Name",
+          "Instance OCID",
+          "Finding Severity"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/cloud_guard_instance_security_findings_by_pack_query.json",
+      "title": "Cloud Guard Instance Security: Findings by Pack Query",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Findings",
+      "dimensions": [
+        "Pack Name",
+        "Pack Query ID",
+        "Pack Query Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Cloud Guard Instance Security Logs' | stats count as Findings, unique('OSQuery Finding') as FindingSamples by 'Pack Name', 'Pack Query ID', 'Pack Query Name', 'Finding Severity' | sort -Findings",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Findings",
+        "dimensions": [
+          "Pack Name",
+          "Pack Query ID",
+          "Pack Query Name"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/cloud_guard_instance_security_high_severity_pivots.json",
+      "title": "Cloud Guard Instance Security: High Severity Pivots",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Findings",
+      "dimensions": [
+        "Host Name",
+        "Finding Name",
+        "MITRE Technique ID"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Cloud Guard Instance Security Logs' and ('Finding Severity' = 'critical' or 'Finding Severity' = 'high' or 'Security Severity' = 'critical' or 'Security Severity' = 'high') | stats count as Findings, unique('Process Command Line') as Commands, unique('File Path') as Files by 'Host Name', 'Finding Name', 'MITRE Technique ID', 'Destination IP' | sort -Findings",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Findings",
+        "dimensions": [
+          "Host Name",
+          "Finding Name",
+          "MITRE Technique ID"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/cloud_guard_instance_security_instance_to_query_link.json",
+      "title": "Cloud Guard Instance Security: Instance to Query Link View",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Cloud_Guard_Instance_Security_Instance_to_Query_Link_View",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Cloud Guard Instance Security Logs' | link 'Instance OCID', 'Host Name', 'Pack Query ID', 'Finding Name' | sort -Count",
+      "reasons": [
+        "dashboard-only visualization type: link",
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Cloud_Guard_Instance_Security_Instance_to_Query_Link_View",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/cloud_guard_instance_security_pack_coverage.json",
+      "title": "Cloud Guard Instance Security: Pack Coverage",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "Findings",
+      "dimensions": [
+        "Pack Name",
+        "Finding Severity",
+        "Finding Status"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Cloud Guard Instance Security Logs' | stats count as Findings, unique('Host Name') as Hosts by 'Pack Name', 'Finding Severity', 'Finding Status' | sort -Findings",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Findings",
+        "dimensions": [
+          "Pack Name",
+          "Finding Severity",
+          "Finding Status"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/cloud_guard_instance_security_raw_result_detail.json",
+      "title": "Cloud Guard Instance Security: Raw Result Detail",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Cloud_Guard_Instance_Security_Raw_Result_Detail",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Cloud Guard Instance Security Logs' | fields Time, 'Host Name', 'Instance OCID', 'Pack Name', 'Pack Query ID', 'Finding Name', 'Finding Severity', 'Finding Status', 'OSQuery SQL', 'OSQuery Finding', 'Process Command Line', 'File Path' | sort -Time",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Cloud_Guard_Instance_Security_Raw_Result_Detail",
         "dimensions": [],
         "severity": "medium",
         "create_alarm_by_default": false
@@ -2091,7 +2358,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*.exe') and ('Process Name' like '*\\\\Temp\\\\*' or 'Process Name' like '*\\\\AppData\\\\Local\\\\Temp\\\\*' or 'Process Name' like '*\\\\Downloads\\\\*' or 'Process Name' like '*\\\\Desktop\\\\*')) and not (('Process Name' like '*\\\\Windows\\\\Temp\\\\setup*' or 'Process Name' like '*\\\\Microsoft\\\\*')))",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*.exe' and ('Process Name' like '*\\\\Temp\\\\*' or 'Process Name' like '*\\\\AppData\\\\Local\\\\Temp\\\\*' or 'Process Name' like '*\\\\Downloads\\\\*' or 'Process Name' like '*\\\\Desktop\\\\*')) and not (('Process Name' like '*\\\\Windows\\\\Temp\\\\setup*' or 'Process Name' like '*\\\\Microsoft\\\\*')))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -2932,6 +3199,35 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "Linux_Bind_Shell_Listener",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/linux_boopkit_ebpf_rootkit_activity.json",
+      "title": "Linux Boopkit eBPF Rootkit Activity",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Linux_Boopkit_eBPF_Rootkit_Activity",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ((msg like '*boopkit*') or (msg like '*bpftool prog load*' or msg like '*bpftool map create*' or msg like '*bpftool prog show pinned*') or (msg like '*/sys/fs/bpf/*') or (msg like '*XDP_REDIRECT*') or (msg like '*magic packet*' and msg like '*reverse shell*'))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Linux_Boopkit_eBPF_Rootkit_Activity",
         "dimensions": [],
         "severity": "critical",
         "create_alarm_by_default": false
@@ -9513,6 +9809,41 @@
       }
     },
     {
+      "query_file": "queries/sysmon_executable_file_created_or_detected.json",
+      "title": "Sysmon Executable File Created or Detected",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "FileEvents",
+      "dimensions": [
+        "User",
+        "Host Name (Server)",
+        "Entity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Event ID' in ('29', '11')) and ('Target Filename' like '*.exe' or 'Target Filename' like '*.dll' or 'Target Filename' like '*.scr' or 'Target Filename' like '*.ps1') and ('Target Filename' like '*\\\\Temp\\\\*' or 'Target Filename' like '*\\\\Users\\\\Public\\\\*' or 'Target Filename' like '*\\\\ProgramData\\\\*' or 'Target Filename' like '*\\\\Startup\\\\*') | stats count as FileEvents, unique('Target Filename') as Files, unique('Process Name') as Writers by User, 'Host Name (Server)', Entity | sort -FileEvents",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "FileEvents",
+        "dimensions": [
+          "User",
+          "Host Name (Server)",
+          "Entity"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/sysmon_kerberoasting_network_indicator.json",
       "title": "Sysmon Kerberoasting Network Indicator",
       "severity": "high",
@@ -10304,7 +10635,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*; ls*' or 'Request URL' like '*; cat *' or 'Request URL' like '*; id*' or 'Request URL' like '*; whoami*' or 'Request URL' like '*; ping *' or 'Request URL' like '*; wget *' or 'Request URL' like '*; curl *' or 'Request URL' like '*| ls*' or 'Request URL' like '*| cat *' or 'Request URL' like '*| id*' or 'Request URL' like '*| whoami*' or 'Request URL' like '*`id`*' or 'Request URL' like '*`whoami`*' or 'Request URL' like '*$(id)*' or 'Request URL' like '*$(whoami)*' or 'Request URL' like '*$(/bin/bash*' or 'Request URL' like '*/bin/sh -c*' or 'Request URL' like '*cmd.exe /c*' or 'Request URL' like '*powershell -*')) or (('Rule Key' like '*932*')) ))",
+      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*; ls*' or 'Request URL' like '*; cat *' or 'Request URL' like '*; id*' or 'Request URL' like '*; whoami*' or 'Request URL' like '*; ping *' or 'Request URL' like '*; wget *' or 'Request URL' like '*; curl *' or 'Request URL' like '*| ls*' or 'Request URL' like '*| cat *' or 'Request URL' like '*| id*' or 'Request URL' like '*| whoami*' or 'Request URL' like '*`id`*' or 'Request URL' like '*`whoami`*' or 'Request URL' like '*$(id)*' or 'Request URL' like '*$(whoami)*' or 'Request URL' like '*$(/bin/bash*' or 'Request URL' like '*/bin/sh -c*' or 'Request URL' like '*cmd.exe /c*' or 'Request URL' like '*powershell -*')) or ('Rule Key' like '*932*') ))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -10362,7 +10693,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*<script*' or 'Request URL' like '*<SCRIPT*' or 'Request URL' like '*{'javascript': None}*' or 'Request URL' like '*onerror=*' or 'Request URL' like '*onload=*' or 'Request URL' like '*onmouseover=*' or 'Request URL' like '*onfocus=*' or 'Request URL' like '*onclick=*' or 'Request URL' like '*onsubmit=*' or 'Request URL' like '*<img src=x*' or 'Request URL' like '*<svg onload*' or 'Request URL' like '*<iframe*' or 'Request URL' like '*alert(*' or 'Request URL' like '*prompt(*' or 'Request URL' like '*confirm(*' or 'Request URL' like '*document.cookie*' or 'Request URL' like '*document.location*' or 'Request URL' like '*window.location*' or 'Request URL' like '*eval(*' or 'Request URL' like '*String.fromCharCode*' or 'Request URL' like '*atob(*')) or (('Rule Key' like '*941*')) ))",
+      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*<script*' or 'Request URL' like '*<SCRIPT*' or 'Request URL' like '*{'javascript': None}*' or 'Request URL' like '*onerror=*' or 'Request URL' like '*onload=*' or 'Request URL' like '*onmouseover=*' or 'Request URL' like '*onfocus=*' or 'Request URL' like '*onclick=*' or 'Request URL' like '*onsubmit=*' or 'Request URL' like '*<img src=x*' or 'Request URL' like '*<svg onload*' or 'Request URL' like '*<iframe*' or 'Request URL' like '*alert(*' or 'Request URL' like '*prompt(*' or 'Request URL' like '*confirm(*' or 'Request URL' like '*document.cookie*' or 'Request URL' like '*document.location*' or 'Request URL' like '*window.location*' or 'Request URL' like '*eval(*' or 'Request URL' like '*String.fromCharCode*' or 'Request URL' like '*atob(*')) or ('Rule Key' like '*941*') ))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -10478,7 +10809,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*../*' or 'Request URL' like '*..%2f*' or 'Request URL' like '*..%5c*' or 'Request URL' like '*..%252f*' or 'Request URL' like '*%2e%2e/*' or 'Request URL' like '*%2e%2e%2f*' or 'Request URL' like '*..../*' or 'Request URL' like '*/etc/passwd*' or 'Request URL' like '*/etc/shadow*' or 'Request URL' like '*/proc/self*' or 'Request URL' like '*/windows/system32*' or 'Request URL' like '*boot.ini*' or 'Request URL' like '*win.ini*')) or (('Rule Key' like '*930*')) ))",
+      "query": "('Log Source' = 'OCI WAF Logs' or 'Log Source' = 'SOC WAF Security Logs') and (('Action' = 'BLOCK') and ( (('Request URL' like '*../*' or 'Request URL' like '*..%2f*' or 'Request URL' like '*..%5c*' or 'Request URL' like '*..%252f*' or 'Request URL' like '*%2e%2e/*' or 'Request URL' like '*%2e%2e%2f*' or 'Request URL' like '*..../*' or 'Request URL' like '*/etc/passwd*' or 'Request URL' like '*/etc/shadow*' or 'Request URL' like '*/proc/self*' or 'Request URL' like '*/windows/system32*' or 'Request URL' like '*boot.ini*' or 'Request URL' like '*win.ini*')) or ('Rule Key' like '*930*') ))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -11079,6 +11410,76 @@
       }
     },
     {
+      "query_file": "queries/windows_account_or_group_enumeration_spike.json",
+      "title": "Windows Account or Group Enumeration Spike",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "EnumerationEvents",
+      "dimensions": [
+        "User",
+        "Source Address",
+        "Host Name (Server)"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' in ('4798', '4799') | stats count as EnumerationEvents, unique('Target User Name') as Targets by User, 'Source Address', 'Host Name (Server)' | where EnumerationEvents > 3 | sort -EnumerationEvents",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "EnumerationEvents",
+        "dimensions": [
+          "User",
+          "Source Address",
+          "Host Name (Server)"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/windows_admin_share_access_spike_event.json",
+      "title": "Windows Administrative Share Access Spike",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "ShareEvents",
+      "dimensions": [
+        "User",
+        "Source Address",
+        "Host Name (Server)"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' in ('5140', '5145') and ('Share Name' like '*C$*' or 'Share Name' like '*ADMIN$*' or 'Share Name' like '*IPC$*' or msg like '*Share Name*') | stats count as ShareEvents, unique('Share Name') as Shares, unique('Relative Target Name') as Targets by User, 'Source Address', 'Host Name (Server)' | where ShareEvents > 2 | sort -ShareEvents",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ShareEvents",
+        "dimensions": [
+          "User",
+          "Source Address",
+          "Host Name (Server)"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/windows_admin_share_access_via_net_use.json",
       "title": "Windows Admin Share Access via Net Use",
       "severity": "medium",
@@ -11132,6 +11533,41 @@
         "namespace": "oci_log_analytics_detections",
         "metric_name": "Windows_AMSI_Bypass_Attempt",
         "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/windows_audit_policy_changed.json",
+      "title": "Windows Audit Policy Changed",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Changes",
+      "dimensions": [
+        "User",
+        "Host Name (Server)",
+        "Entity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4719' | stats count as Changes by User, 'Host Name (Server)', Entity | sort -Changes",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Changes",
+        "dimensions": [
+          "User",
+          "Host Name (Server)",
+          "Entity"
+        ],
         "severity": "high",
         "create_alarm_by_default": false
       }
@@ -11398,6 +11834,41 @@
       }
     },
     {
+      "query_file": "queries/windows_defender_malware_or_remediation_event.json",
+      "title": "Windows Defender Malware or Remediation Event",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "DefenderEvents",
+      "dimensions": [
+        "Host Name (Server)",
+        "User",
+        "Entity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'Windows Defender Operational Logs' and 'Event ID' in ('1116', '1117', '1118', '1119', '5001', '5004', '5007', '5010', '5012') | stats count as DefenderEvents, unique('Threat Name') as Threats, unique('Action') as Actions, unique('Status') as Statuses, unique('File Path') as FilePaths by 'Host Name (Server)', User, Entity | sort -DefenderEvents",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "DefenderEvents",
+        "dimensions": [
+          "Host Name (Server)",
+          "User",
+          "Entity"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/windows_defender_real-time_protection_disabled.json",
       "title": "Windows Defender Real-Time Protection Disabled",
       "severity": "critical",
@@ -11597,6 +12068,41 @@
         "metric_name": "Windows_Kerberoasting_Attack",
         "dimensions": [],
         "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/windows_kerberos_pre_authentication_failures.json",
+      "title": "Windows Kerberos Pre-Authentication Failure Spike",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "Failures",
+      "dimensions": [
+        "Target User Name",
+        "Source Address",
+        "Host Name (Server)"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4771' and (Status in ('0x6', '0x12', '0x17', '0x18', '0x20', '0x25') or 'Failure Reason' in ('0x6', '0x12', '0x17', '0x18', '0x20', '0x25') or msg like '*Failure Code*') | stats count as Failures, distinctcount('Source Address') as UniqueSources by 'Target User Name', 'Source Address', 'Host Name (Server)' | where Failures > 3 | sort -Failures",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Failures",
+        "dimensions": [
+          "Target User Name",
+          "Source Address",
+          "Host Name (Server)"
+        ],
+        "severity": "medium",
         "create_alarm_by_default": false
       }
     },
@@ -12384,6 +12890,41 @@
       }
     },
     {
+      "query_file": "queries/windows_ntlm_authentication_failures.json",
+      "title": "Windows NTLM Authentication Failure Spike",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "Failures",
+      "dimensions": [
+        "Target User Name",
+        "Source Address",
+        "Host Name (Server)"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4776' and (Status in ('0xC0000064', '0xC000006A', '0xC000006D', '0xC0000072', '0xC0000193', '0xC0000234') or 'Failure Reason' in ('0xC0000064', '0xC000006A', '0xC000006D', '0xC0000072', '0xC0000193', '0xC0000234') or msg like '*Error Code*') | stats count as Failures, distinctcount('Source Address') as UniqueSources by 'Target User Name', 'Source Address', 'Host Name (Server)' | where Failures > 3 | sort -Failures",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Failures",
+        "dimensions": [
+          "Target User Name",
+          "Source Address",
+          "Host Name (Server)"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/windows_pass-the-hash_attack_indicators.json",
       "title": "Windows Pass-the-Hash Attack Indicators",
       "severity": "critical",
@@ -12438,6 +12979,76 @@
         "metric_name": "Windows_PowerShell_Download_Cradle",
         "dimensions": [],
         "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/windows_powershell_script_block_suspicious_content.json",
+      "title": "Windows PowerShell Suspicious Script Block",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "ScriptBlocks",
+      "dimensions": [
+        "User",
+        "Host Name (Server)",
+        "Entity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'Windows PowerShell Operational Logs' and 'Event ID' = '4104' and ('Script Block Text' like '*IEX*' or 'Script Block Text' like '*Invoke-Expression*' or 'Script Block Text' like '*DownloadString*' or 'Script Block Text' like '*FromBase64String*' or 'Script Block Text' like '*AmsiUtils*' or 'Script Block Text' like '*ExecutionPolicy Bypass*') | stats count as ScriptBlocks, unique('Script Block Text') as ScriptSamples, unique('Host Application') as HostApplications by User, 'Host Name (Server)', Entity | sort -ScriptBlocks",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ScriptBlocks",
+        "dimensions": [
+          "User",
+          "Host Name (Server)",
+          "Entity"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/windows_privileged_group_membership_change_event.json",
+      "title": "Windows Privileged Group Membership Changed",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "GroupChanges",
+      "dimensions": [
+        "User",
+        "Host Name (Server)",
+        "Entity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' in ('4728', '4732', '4756') and ('Target User Name' like '*Domain Admins*' or 'Target User Name' like '*Enterprise Admins*' or 'Target User Name' like '*Administrators*' or 'Target User Name' like '*Remote Desktop Users*' or msg like '*Domain Admins*' or msg like '*Administrators*') | stats count as GroupChanges, unique('Target User Name') as Groups by User, 'Host Name (Server)', Entity | sort -GroupChanges",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "GroupChanges",
+        "dimensions": [
+          "User",
+          "Host Name (Server)",
+          "Entity"
+        ],
+        "severity": "critical",
         "create_alarm_by_default": false
       }
     },
@@ -12645,6 +13256,41 @@
       }
     },
     {
+      "query_file": "queries/windows_scheduled_task_created_or_updated_event.json",
+      "title": "Windows Scheduled Task Created or Updated",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "TaskChanges",
+      "dimensions": [
+        "User",
+        "Host Name (Server)",
+        "Entity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' in ('4698', '4702') and ('Task Name' like '*Update*' or 'Task Name' like '*Cache*' or 'Command Line' like '*powershell*' or 'Command Line' like '*\\\\Temp\\\\*' or 'Command Line' like '*\\\\Users\\\\Public\\\\*' or msg like '*Task Name*') | stats count as TaskChanges, unique('Task Name') as Tasks, unique('Command Line') as Commands by User, 'Host Name (Server)', Entity | sort -TaskChanges",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "TaskChanges",
+        "dimensions": [
+          "User",
+          "Host Name (Server)",
+          "Entity"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/windows_scheduled_task_creation_via_schtasks.json",
       "title": "Windows Scheduled Task Creation via Schtasks",
       "severity": "medium",
@@ -12732,6 +13378,41 @@
       }
     },
     {
+      "query_file": "queries/windows_security_log_cleared_event.json",
+      "title": "Windows Security or System Event Log Cleared",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "ClearEvents",
+      "dimensions": [
+        "User",
+        "Host Name (Server)",
+        "Entity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "(('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '1102') or ('Log Source' = 'Windows Event System Logs' and 'Event ID' = '104') | stats count as ClearEvents by User, 'Host Name (Server)', Entity | sort -ClearEvents",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ClearEvents",
+        "dimensions": [
+          "User",
+          "Host Name (Server)",
+          "Entity"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/windows_service_created_with_suspicious_binary_path.json",
       "title": "Windows Service Created with Suspicious Binary Path",
       "severity": "high",
@@ -12786,6 +13467,41 @@
         "metric_name": "Windows_Service_Creation_via_SC",
         "dimensions": [],
         "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/windows_service_installed_event_log.json",
+      "title": "Windows Service Installed from Event Logs",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "ServiceInstalls",
+      "dimensions": [
+        "User",
+        "Host Name (Server)",
+        "Entity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "(('Log Source' = 'Windows Event System Logs' and 'Event ID' = '7045') or (('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4697')) and ('Service File Name' like '*\\\\Temp\\\\*' or 'Service File Name' like '*\\\\Users\\\\Public\\\\*' or 'Service File Name' like '*\\\\ProgramData\\\\*' or 'Service File Name' like '*powershell*' or msg like '*Service File Name*') | stats count as ServiceInstalls, unique('Service Name') as Services, unique('Service File Name') as ServiceBinaries by User, 'Host Name (Server)', Entity | sort -ServiceInstalls",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ServiceInstalls",
+        "dimensions": [
+          "User",
+          "Host Name (Server)",
+          "Entity"
+        ],
+        "severity": "high",
         "create_alarm_by_default": false
       }
     },
@@ -14714,6 +15430,320 @@
       }
     },
     {
+      "query_file": "queries/apps/oke_boopkit_attack_timeline.json",
+      "title": "OKE: Boopkit Attack Timeline",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "OKE_Boopkit_Attack_Timeline",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and 'Attack ID' = 'attack-oke-boopkit-001' | sort Time | fields Time, 'Attack ID', 'Run ID', 'Attack Stage', 'Security Severity', 'MITRE Technique ID', 'MITRE Technique', 'Service Name', 'Workflow Step', 'Host Name', 'Source IP', 'Process Command Line', 'Trace ID', 'Span ID', msg",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "OKE_Boopkit_Attack_Timeline",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/oke_ebpf_rootkit_activity.json",
+      "title": "OKE: eBPF Rootkit Activity",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Events",
+      "dimensions": [
+        "Attack Stage",
+        "MITRE Technique ID",
+        "Security Severity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and ('Span Attributes' like '*boopkit*' or 'Span Attributes' like '*ebpf*' or 'Span Attributes' like '*bpftool*' or 'Process Command Line' like '*boopkit*' or 'Process Command Line' like '*bpftool*' or 'Process Command Line' like '*/sys/fs/bpf*') | stats count as Events, distinctcount('Trace ID') as Traces, unique('Process Command Line') as Commands by 'Attack Stage', 'MITRE Technique ID', 'Security Severity', 'Host Name' | sort -Events",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "Attack Stage",
+          "MITRE Technique ID",
+          "Security Severity"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/oke_exec_and_node_escape.json",
+      "title": "OKE: Exec and Node Escape",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Events",
+      "dimensions": [
+        "Attack Stage",
+        "Host Name",
+        "Security Severity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and ('Span Attributes' like '*subresource=exec*' or 'Process Command Line' like '*kubectl exec*' or 'Process Command Line' like '*nsenter*' or 'MITRE Technique ID' = 'T1609') | stats count as Events, distinctcount('Trace ID') as Traces, unique('Process Command Line') as Commands by 'Attack Stage', 'Host Name', 'Security Severity', 'Service Name' | sort -Events",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "Attack Stage",
+          "Host Name",
+          "Security Severity"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/oke_kubernetes_attack_overview.json",
+      "title": "OKE: Kubernetes Attack Overview",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Events",
+      "dimensions": [
+        "Attack Stage",
+        "MITRE Technique ID",
+        "Security Severity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and 'Attack ID' like 'attack-oke-*' | stats count as Events, distinctcount('Trace ID') as Traces, distinctcount('Span ID') as Spans by 'Attack Stage', 'MITRE Technique ID', 'Security Severity', 'Service Name' | sort -Events",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "Attack Stage",
+          "MITRE Technique ID",
+          "Security Severity"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/oke_kubernetes_attack_path_link.json",
+      "title": "OKE: Kubernetes Attack Path Link",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "OKE_Kubernetes_Attack_Path_Link",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and 'Attack ID' like 'attack-oke-*' and 'Trace ID' != null | link span = 5minute 'Attack ID', 'Attack Stage', 'Trace ID', 'Span ID' | eventstats distinctcount('Attack ID') as Attacks, sum(Count) as Events, distinctcount('Trace ID') as Traces, distinctcount('Span ID') as Spans",
+      "reasons": [
+        "dashboard-only visualization type: link",
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "OKE_Kubernetes_Attack_Path_Link",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/oke_privileged_workload_creation.json",
+      "title": "OKE: Privileged Workload Creation",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Events",
+      "dimensions": [
+        "Attack Stage",
+        "Security Severity",
+        "Host Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and ('Span Attributes' like '*privileged=true*' or 'Span Attributes' like '*hostPID=true*' or 'Span Attributes' like '*hostPath=*' or msg like '*Privileged DaemonSet*') | stats count as Events, distinctcount('Trace ID') as Traces, unique('Process Command Line') as Commands by 'Attack Stage', 'Security Severity', 'Host Name', 'Service Name' | sort -Events",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "Attack Stage",
+          "Security Severity",
+          "Host Name"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/oke_rule_boopkit_ebpf_rootkit_count.json",
+      "title": "OKE: Boopkit eBPF Rootkit Detection Rule",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "BoopkitRootkitEvents",
+      "dimensions": [
+        "Attack ID",
+        "Host Name",
+        "Trace ID"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and ('Span Attributes' like '*boopkit*' or 'Span Attributes' like '*ebpf*' or 'Process Command Line' like '*boopkit*' or 'Process Command Line' like '*bpftool*' or 'Process Command Line' like '*/sys/fs/bpf*') | stats count as BoopkitRootkitEvents by 'Attack ID', 'Host Name', 'Trace ID'",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "BoopkitRootkitEvents",
+        "dimensions": [
+          "Attack ID",
+          "Host Name",
+          "Trace ID"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/oke_rule_privileged_workload_count.json",
+      "title": "OKE: Privileged Kubernetes Workload Detection Rule",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "PrivilegedWorkloadEvents",
+      "dimensions": [
+        "Attack ID",
+        "Attack Stage",
+        "Host Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and ('Span Attributes' like '*privileged=true*' or 'Span Attributes' like '*hostPID=true*' or 'Span Attributes' like '*hostPath=*' or 'Span Attributes' like '*subresource=exec*' or 'Process Command Line' like '*kubectl exec*' or 'Process Command Line' like '*nsenter*') | stats count as PrivilegedWorkloadEvents by 'Attack ID', 'Attack Stage', 'Host Name'",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "PrivilegedWorkloadEvents",
+        "dimensions": [
+          "Attack ID",
+          "Attack Stage",
+          "Host Name"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/oke_secrets_and_rbac_abuse.json",
+      "title": "OKE: Secrets and RBAC Abuse",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Events",
+      "dimensions": [
+        "Attack Stage",
+        "MITRE Technique ID",
+        "Security Severity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and ('Span Attributes' like '*k8s.resource=secrets*' or 'Span Attributes' like '*clusterrolebindings*' or 'Span Attributes' like '*cluster-admin*' or msg like '*ClusterRoleBinding granted*') | stats count as Events, distinctcount('Trace ID') as Traces, unique('Source IP') as SourceIPs, unique('Process Command Line') as Commands by 'Attack Stage', 'MITRE Technique ID', 'Security Severity', 'Host Name' | sort -Events",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "Attack Stage",
+          "MITRE Technique ID",
+          "Security Severity"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/hunting/ad_attack_timeline.json",
       "title": "Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain",
       "severity": "critical",
@@ -15414,6 +16444,240 @@
           "Entity"
         ],
         "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/coordinator_affected_hosts_kpi.json",
+      "title": "Coordinator Scenarios: Affected Hosts (l7d)",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Coordinator_Scenarios_Affected_Hosts_l7d",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*169.254.169.254*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats distinctcount('Host Name') as AffectedHosts",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Coordinator_Scenarios_Affected_Hosts_l7d",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/coordinator_attack_timeline.json",
+      "title": "Coordinator Scenarios: Attack Timeline (l7d)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*169.254.169.254*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | timestats span = 1h count as Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/coordinator_critical_alerts_kpi.json",
+      "title": "Coordinator Scenarios: Critical Alerts (l7d)",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "CriticalAlerts",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*169.254.169.254*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as CriticalAlerts",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "CriticalAlerts",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/coordinator_mitre_sunburst.json",
+      "title": "Coordinator Scenarios: Log Source \u2192 Process (l7d)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Events",
+      "dimensions": [
+        "Log Source",
+        "Process Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*169.254.169.254*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as Events by 'Log Source', 'Process Name' | sort -Events",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "Log Source",
+          "Process Name"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/coordinator_mitre_techniques_kpi.json",
+      "title": "Coordinator Scenarios: Distinct Processes Observed (l7d)",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Coordinator_Scenarios_Distinct_Processes_Observed_l7d",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*169.254.169.254*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats distinctcount('Process Name') as DistinctProcesses",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Coordinator_Scenarios_Distinct_Processes_Observed_l7d",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/coordinator_scenario_breakdown.json",
+      "title": "Coordinator Scenarios: Log Source Breakdown (l7d)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "Log Source"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*169.254.169.254*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as Hits by 'Log Source' | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "Log Source"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/coordinator_top_affected_hosts.json",
+      "title": "Coordinator Scenarios: Top Affected Hosts (l7d)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "Host Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*169.254.169.254*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as Hits by 'Host Name' | sort -Hits | head 15",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "Host Name"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/coordinator_total_hits_kpi.json",
+      "title": "Coordinator Scenarios: Total Hits (l7d)",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "TotalHits",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*169.254.169.254*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as TotalHits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "TotalHits",
+        "dimensions": [],
+        "severity": "critical",
         "create_alarm_by_default": false
       }
     },

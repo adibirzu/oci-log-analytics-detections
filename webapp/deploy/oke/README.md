@@ -4,7 +4,7 @@ This deploys the integrated `webapp/` Forge frontend into the existing Octo APM 
 
 Required production posture:
 
-- Browser traffic enters through `https://convert.octodemo.cloud`.
+- Browser traffic enters through `https://convert.octodemo.cloud` and `https://forge.octodemo.cloud`.
 - The OCI Load Balancer terminates TLS with the same certificate used by the APM demo hosts.
 - The service is exposed inside OKE as NodePort `30082`.
 - `/api/forge/convert` stays behind the frontend origin and proxies to `LOGAN_FORGE_BACKEND_URL`, which should be an OCI API Gateway endpoint protected by WAF.
@@ -41,7 +41,14 @@ AMD64 nodes.
 
 ```bash
 OCI_PROFILE=emdemo \
+FORGE_HOSTNAME_NAME=convert \
 FORGE_HOSTNAME=convert.octodemo.cloud \
+FORGE_NODEPORT=30082 \
+./deploy/oke/wire-existing-lb-convert.sh --apply
+
+OCI_PROFILE=emdemo \
+FORGE_HOSTNAME_NAME=forge \
+FORGE_HOSTNAME=forge.octodemo.cloud \
 FORGE_NODEPORT=30082 \
 ./deploy/oke/wire-existing-lb-convert.sh --apply
 ```
@@ -69,3 +76,5 @@ FORGE_LB_OCID=<existing-octo-apm-lb-ocid> \
 FORGE_LB_PROFILE=emdemo \
 ./deploy/oke/update-forge-dns.sh
 ```
+
+Repeat with `FORGE_RECORD_NAME=forge.octodemo.cloud` when publishing the Forge-specific hostname.

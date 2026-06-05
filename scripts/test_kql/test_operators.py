@@ -25,6 +25,7 @@ from scripts.kql.operators import (  # noqa: E402
     distinct_op,
     extend_op,
     let_op,
+    limit_op,
     project_op,
     sort_op,
     summarize_op,
@@ -76,6 +77,14 @@ def test_registry_binds_sort_and_top() -> None:
     assert OPERATOR_REGISTRY["sort"] is sort_op.convert_sort
     assert OPERATOR_REGISTRY["order"] is sort_op.convert_sort
     assert OPERATOR_REGISTRY["top"] is sort_op.convert_top
+
+
+def test_registry_binds_limit_count_and_render() -> None:
+    assert OPERATOR_REGISTRY["take"] is limit_op.convert_limit
+    assert OPERATOR_REGISTRY["limit"] is limit_op.convert_limit
+    assert OPERATOR_REGISTRY["sample"] is limit_op.convert_limit
+    assert OPERATOR_REGISTRY["count"] is limit_op.convert_count
+    assert OPERATOR_REGISTRY["render"] is limit_op.convert_render
 
 
 def test_registry_binds_distinct() -> None:
@@ -160,6 +169,29 @@ def test_extend_scalar_function_tier1(ctx: ConversionContext) -> None:
     assert result.fragments == ("eval ActorLower = lower(User)",)
 
 
+def test_extend_strlen_strcat_extract_tier1(ctx: ConversionContext) -> None:
+    # Phase 9 operator-parity tranche: strlen/strcat/extract lower to
+    # length()/concat()/extract(source, /regex/) inside an extend stage.
+    result = extend_op.convert_extend(
+        KqlStage(
+            kind="extend",
+            body=(
+                "Len = strlen(CommandLine), "
+                "Full = strcat(Account, Process), "
+                'Ip = extract("([0-9.]+)", 1, CommandLine)'
+            ),
+        ),
+        ctx,
+    )
+    assert result.tier == Tier.TIER_1
+    assert result.skip_reasons == ()
+    assert result.fragments == (
+        "eval Len = length('Command Line')",
+        "eval Full = concat(User, 'Process Name')",
+        "eval Ip = extract('Command Line', /([0-9.]+)/)",
+    )
+
+
 def test_sort_basic_tier1(ctx: ConversionContext) -> None:
     result = sort_op.convert_sort(
         KqlStage(kind="sort", body="by TimeGenerated desc"), ctx
@@ -174,6 +206,20 @@ def test_top_basic_tier1(ctx: ConversionContext) -> None:
     )
     assert result.tier == Tier.TIER_1
     assert result.fragments
+
+
+def test_count_and_limit_tier1(ctx: ConversionContext) -> None:
+    count_result = limit_op.convert_count(KqlStage(kind="count", body=""), ctx)
+    take_result = limit_op.convert_limit(KqlStage(kind="take", body="20"), ctx)
+    render_result = limit_op.convert_render(KqlStage(kind="render", body="timechart"), ctx)
+
+    assert count_result.tier == Tier.TIER_1
+    assert count_result.fragments == ("stats count as Count",)
+    assert count_result.new_aliases == ("Count",)
+    assert take_result.tier == Tier.TIER_1
+    assert take_result.fragments == ("head 20",)
+    assert render_result.tier == Tier.TIER_1
+    assert render_result.fragments == ()
 
 
 def test_distinct_emits_stats_count(ctx: ConversionContext) -> None:

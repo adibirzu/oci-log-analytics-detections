@@ -59,6 +59,19 @@ class TestSensitiveValueScanner(unittest.TestCase):
         self.assertNotIn(fixture_value, serialized)
         self.assertIn("<redacted:secret_assignment>", serialized)
 
+    def test_allows_runtime_secret_variable_assignments(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_file(
+                root,
+                "session.ts",
+                "const csrfToken = existingToken && existingToken.length >= 32 ? existingToken : randomBytes(32).toString('base64url')\n",
+            )
+
+            findings = scan_paths([root])
+
+        self.assertEqual([], findings)
+
     def test_detects_request_ids_real_ocids_and_public_ips(self):
         request_id = "1F0DB7D0F32D4C48A6F77B3D55D1F982"  # scanner-fixture
         ocid = "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  # scanner-fixture

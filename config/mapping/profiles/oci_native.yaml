@@ -1,0 +1,90 @@
+name: oci_native
+description: Remap Sentinel detection behaviors to OCI-native sources after workload migration.
+table_source_overrides:
+  SigninLogs:
+    sources:
+    - OCI Audit Logs
+    - SOC Application Logs
+  AADNonInteractiveUserSignInLogs:
+    sources:
+    - OCI Audit Logs
+    - SOC Application Logs
+  AuditLogs:
+    sources:
+    - OCI Audit Logs
+  AzureActivity:
+    sources:
+    - OCI Audit Logs
+  AzureDiagnostics:
+    sources:
+    - OCI Audit Logs
+    - SOC VCN Flow Logs
+    - SOC Load Balancer Access Logs
+    - SOC WAF Security Logs
+  SecurityEvent:
+    sources:
+    - Windows Event Security Logs
+    - SOC Cloud Guard Instance Security Logs
+    - SOC OSQuery Result Logs
+  WindowsEvent:
+    sources:
+    - Windows Event System Logs
+    - SOC Cloud Guard Instance Security Logs
+  Sysmon:
+    sources:
+    - SOC Windows Sysmon Logs
+    - Windows Sysmon Operational Logs
+    - SOC Cloud Guard Instance Security Logs
+  DeviceEvents:
+    sources:
+    - SOC Cloud Guard Instance Security Logs
+    - SOC OSQuery Result Logs
+    - SOC Windows Sysmon Logs
+  DeviceProcessEvents:
+    sources:
+    - SOC Cloud Guard Instance Security Logs
+    - SOC OSQuery Result Logs
+    - SOC Windows Sysmon Logs
+  DeviceNetworkEvents:
+    sources:
+    - SOC VCN Flow Logs
+    - SOC Network Firewall Logs
+    - SOC Sysmon Network Logs
+  DeviceLogonEvents:
+    sources:
+    - Windows Event Security Logs
+    - SOC Cloud Guard Instance Security Logs
+  DeviceFileEvents:
+    sources:
+    - SOC Cloud Guard Instance Security Logs
+    - SOC OSQuery Result Logs
+  Syslog:
+    sources:
+    - SOC Linux Syslog Logs
+    - Linux Secure Logs
+    - SOC Cloud Guard Instance Security Logs
+  CommonSecurityLog:
+    sources:
+    - SOC Network Firewall Logs
+    - OCI Network Firewall Logs
+    - SOC VCN Flow Logs
+  Cloudflare:
+    sources:
+    - SOC WAF Security Logs
+    - OCI WAF Logs
+  NGINXHTTPServer:
+    sources:
+    - SOC Load Balancer Access Logs
+    - SOC WAF Security Logs
+  ApacheHTTPServer:
+    sources:
+    - SOC Load Balancer Access Logs
+    - SOC WAF Security Logs
+  OfficeActivity:
+    sources:
+    - SOC Application Logs
+    - OCI Audit Logs
+  CloudAppEvents:
+    sources:
+    - SOC Application Logs
+    - OCI Audit Logs

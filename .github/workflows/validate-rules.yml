@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'rules/**'
-      - 'hunting/**'
+      - 'queries/hunting/**'
       - 'config/**'
       - 'scripts/convert_sigma.py'
       - 'scripts/generate_catalog.py'
@@ -14,7 +14,7 @@ on:
   pull_request:
     paths:
       - 'rules/**'
-      - 'hunting/**'
+      - 'queries/hunting/**'
       - 'config/**'
       - 'scripts/convert_sigma.py'
       - 'scripts/generate_catalog.py'
@@ -129,7 +129,7 @@ jobs:
           python3 -c "
           import json, os, sys
           errors = 0
-          hunting_dir = 'hunting'
+          hunting_dir = 'queries/hunting'
           if not os.path.isdir(hunting_dir):
               print('No hunting directory found, skipping')
               sys.exit(0)

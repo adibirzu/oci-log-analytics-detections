@@ -30,6 +30,7 @@ PROJECT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_DIR / "scripts"))
 
 from deploy_dashboard import DASHBOARDS, query_deadline, select_dashboards  # noqa: E402
+from redaction import redact_text  # noqa: E402
 from oci_config import (  # noqa: E402
     COMPARTMENT_ID,
     LA_NAMESPACE,
@@ -90,7 +91,7 @@ def _run_query(la, namespace, query, start, end, timeout=None):
             )
         return len(getattr(result.data, "items", []) or []), None
     except Exception as exc:  # noqa: BLE001
-        return -1, str(exc)
+        return -1, redact_text(str(exc))
 
 
 def _status_for_widget(row_count: int, error: str | None, visualization_type: str) -> str:
@@ -165,7 +166,7 @@ def main() -> int:
             items = resp.data.items
         except Exception as exc:  # noqa: BLE001
             dashboard_records.append({
-                "name": name, "exists": False, "error": str(exc)[:120],
+                "name": name, "exists": False, "error": redact_text(str(exc))[:120],
             })
             continue
 
@@ -181,7 +182,7 @@ def main() -> int:
             saved_searches = full.saved_searches or []
         except Exception as exc:  # noqa: BLE001
             dashboard_records.append({
-                "name": name, "exists": True, "error": str(exc)[:120],
+                "name": name, "exists": True, "error": redact_text(str(exc))[:120],
             })
             continue
 
@@ -259,7 +260,7 @@ def main() -> int:
                         task["widget"],
                         0,
                         "ERROR",
-                        str(exc),
+                        redact_text(str(exc)),
                     )
 
         for index in sorted(results_by_index):

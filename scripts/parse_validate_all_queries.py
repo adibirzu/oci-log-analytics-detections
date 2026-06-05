@@ -30,6 +30,7 @@ sys.path.insert(0, str(PROJECT_DIR / "scripts"))
 
 import oci  # noqa: E402
 from oci_config import LA_NAMESPACE, get_la_client, require_oci_config  # noqa: E402
+from redaction import redact_text  # noqa: E402
 from query_artifacts import is_saved_search_query_file  # noqa: E402
 
 QUERIES_DIR = PROJECT_DIR / "queries"
@@ -84,7 +85,8 @@ def main(argv=None) -> int:
         except oci.exceptions.ServiceError as exc:
             by_dir[rel_dir]["FAIL"] += 1
             results.append({"file": str(path), "status": "FAIL",
-                            "error": getattr(exc, "message", str(exc)), "query": query})
+                            "error": redact_text(getattr(exc, "message", str(exc))),
+                            "query": redact_text(query)})
         if i % 50 == 0:
             print(f"  {i}/{len(files)} ...")
 

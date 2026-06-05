@@ -129,6 +129,7 @@ from scripts.kql._facade_impl import (  # noqa: E402,F401
     map_field,
     validate_logan_query_local,
 )
+from scripts.redaction import redact_text  # noqa: E402
 from scripts.sentinel_profiles import (  # noqa: E402,F401
     DEFAULT_PROFILE_NAME,
     apply_discovery_evidence,
@@ -468,7 +469,7 @@ def build_conversion_report(
                     else "not_run"
                 ),
                 "live_validation_error": (
-                    result.live_validation_result.get("error", "")
+                    redact_text(result.live_validation_result.get("error", ""))
                     if result.live_validation_result else ""
                 ),
             }

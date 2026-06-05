@@ -83,3 +83,10 @@ jobs:
       # --- Gate 4: README/STATUS inventory reconciliation vs catalog ---
       - name: Inventory drift check (README/STATUS vs catalog)
         run: python scripts/check_inventory_drift.py
+
+      # --- Gate 5: no sensitive/tenancy values committed ---
+      # Always-on (not only inside release_checklist.py): scans the tree for
+      # OCIDs, LA namespaces, opc-request-ids, secrets, and internal public IPs,
+      # including generated reports under queries/. Exits non-zero on any finding.
+      - name: Sensitive value scan
+        run: python scripts/scan_sensitive_values.py --json

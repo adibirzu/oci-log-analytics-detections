@@ -92,6 +92,27 @@ class TestSensitiveValueScanner(unittest.TestCase):
         self.assertNotIn(ocid, serialized)
         self.assertNotIn(ip, serialized)
 
+    def test_detects_dict_style_live_payload_under_queries(self):
+        # Regression: a generated report under queries/ carrying a single-quoted
+        # OCI error dict (the live_validation_error leak shape) must be scanned, not
+        # exempted as a query fixture, and the dict-style opc-request-id + namespace
+        # must be flagged despite the quote before the colon and the '/' in the value.
+        request_id = "B2B5BBC515B040D3BB8642DEE773D685/D9EF19FE0E2B9CAE"  # scanner-fixture
+        namespace = "qa9z3kdm7p2x"  # scanner-fixture
+        leak = (
+            "{\"live_validation_error\": \"{'opc-request-id': '%s', "
+            "'request_endpoint': 'https://x.oci.oraclecloud.com/20200601/"
+            "namespaces/%s/search'}\"}" % (request_id, namespace)
+        )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_file(root, "queries/demo_conversion_report.json", leak)
+            findings = scan_paths([root])
+
+        kinds = self.finding_kinds(findings)
+        self.assertIn("opc_request_id", kinds)
+        self.assertIn("la_namespace", kinds)
+
     def test_allows_placeholders_example_ocids_and_documentation_ips(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

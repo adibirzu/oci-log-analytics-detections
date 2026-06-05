@@ -55,10 +55,16 @@ SECRET_ASSIGNMENT_RE = re.compile(
     r"password|passwd|private[_-]?key|secret|token)[A-Z0-9_.-]*)\b"
     r"\s*(?::(?!:)|=)\s*(?P<quote>['\"]?)(?P<value>[^'\"\s#]+)"
 )
+# Allow an optional closing quote after `id` (dict-style ``'opc-request-id': '...'``)
+# and include ``/`` in the value so multi-segment request IDs are fully captured.
 OPC_REQUEST_ID_RE = re.compile(
-    r"(?i)\bopc[-_]request[-_]id\b\s*[:=]\s*['\"]?(?P<value>[A-Za-z0-9._:-]{12,})"
+    r"(?i)\bopc[-_]request[-_]id\b['\"]?\s*[:=]\s*['\"]?(?P<value>[A-Za-z0-9._:/-]{12,})"
 )
 OCID_RE = re.compile(r"\bocid1\.[A-Za-z0-9][A-Za-z0-9._-]{8,}\b", re.IGNORECASE)
+# A Log Analytics namespace embedded in a REST path fingerprints a tenancy and
+# leaks through live error payloads. (Generic OCI service hostnames are public and
+# intentionally NOT flagged -- only the namespace inside the path is sensitive.)
+LA_NAMESPACE_PATH_RE = re.compile(r"/namespaces/(?P<value>[a-z0-9]{6,})/", re.IGNORECASE)
 IPV4_RE = re.compile(
     r"(?<![\d.])"
     r"(?:25[0-5]|2[0-4]\d|1?\d?\d)"
@@ -169,8 +175,17 @@ def _is_synthetic_fixture_path(path: Path) -> bool:
     )
     return (
         any(normalized.endswith(suffix) for suffix in fixture_suffixes)
-        or normalized.startswith("queries/")
+        or (normalized.startswith("queries/") and not _is_generated_report(relative))
         or normalized.startswith("rules/")
+    )
+
+
+def _is_generated_report(relative: Path) -> bool:
+    """Generated reports/evidence under queries/ can carry live tenancy data, so they
+    must NOT be exempted as fixtures even though they live beside detection queries."""
+    name = relative.name.lower()
+    return relative.suffix == ".json" and any(
+        token in name for token in ("report", "result", "evidence", "live", "validation", "conversion")
     )
 
 
@@ -324,6 +339,11 @@ def scan_file(path: Path) -> list[dict]:
             if not _is_public_ip(value) or _is_allowed_public_ip(path, line):
                 continue
             findings.append(_finding(path, line_number, "public_ip", "medium", line, match.start(), match.end()))
+
+        for match in LA_NAMESPACE_PATH_RE.finditer(line):
+            if _is_placeholder(match.group("value")):
+                continue
+            findings.append(_finding(path, line_number, "la_namespace", "medium", line, match.start("value"), match.end("value")))
 
     return findings
 

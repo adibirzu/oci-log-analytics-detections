@@ -36,6 +36,7 @@ from oci_config import (
     list_available_log_sources,
     resolve_source_from_candidates,
 )
+from redaction import redact_text
 
 import oci
 
@@ -403,13 +404,13 @@ def create_service_connector(sch_client, stream_id, stream_name, log_source,
             return {
                 "name": connector_name,
                 "status": "limit_exhausted",
-                "message": e.message,
+                "message": redact_text(e.message),
             }
         print(f"  ERROR creating connector: {e.message}")
         return {
             "name": connector_name,
             "status": "error",
-            "message": e.message,
+            "message": redact_text(e.message),
         }
 
 

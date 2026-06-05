@@ -97,7 +97,7 @@ class TestSensitiveValueScanner(unittest.TestCase):
         # OCI error dict (the live_validation_error leak shape) must be scanned, not
         # exempted as a query fixture, and the dict-style opc-request-id + namespace
         # must be flagged despite the quote before the colon and the '/' in the value.
-        request_id = "<OPC_REQUEST_ID>"  # scanner-fixture
+        request_id = "A1B2C3D4E5F6A7B8A1B2C3D4E5F6A7B8/C9D0E1F2A3B4C5D6"  # scanner-fixture
         namespace = "qa9z3kdm7p2x"  # scanner-fixture
         leak = (
             "{\"live_validation_error\": \"{'opc-request-id': '%s', "

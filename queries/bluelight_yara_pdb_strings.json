@@ -1,7 +1,7 @@
 {
   "title": "BLUELIGHT RAT: YARA PDB Path Indicators (APT_MAL_Win_BlueLight)",
   "description": "Detects BLUELIGHT malware PDB path strings in process memory, file content, or Sysmon ImageLoaded events. Based on Volexity YARA rule APT_MAL_Win_BlueLight (id: 3ec2d44c). The PDB paths 'Development\\BACKDOOR\\ncov\\' and 'Release\\bluelight.pdb' are unique to BLUELIGHT compilation artifacts.\n",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*\\\\Development\\\\BACKDOOR\\\\ncov\\\\*' or 'Command Line' like '*Release\\\\bluelight.pdb*') and ('Original File Name' like '*bluelight*')) or (('Target Filename' like '*bluelight.pdb*' or 'Target Filename' like '*BACKDOOR\\\\ncov*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*\\\\Development\\\\BACKDOOR\\\\ncov\\\\*' or 'Command Line' like '*Release\\\\bluelight.pdb*') and 'Original File Name' like '*bluelight*') or (('Target Filename' like '*bluelight.pdb*' or 'Target Filename' like '*BACKDOOR\\\\ncov*'))) | stats count by 'Host Name (Server)', Entity, 'Process Name'",
   "sigma_id": "bl-s0657-yara-pdb-001",
   "level": "critical",
   "stig_category": "CAT I",

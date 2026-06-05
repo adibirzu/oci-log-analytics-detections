@@ -1,12 +1,14 @@
 import { randomBytes } from "node:crypto"
+import { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 
 export const runtime = "nodejs"
 
 const SESSION_TTL_SECONDS = 15 * 60
 
-export async function GET() {
-  const csrfToken = randomBytes(32).toString("base64url")
+export async function GET(request: NextRequest) {
+  const existingToken = request.cookies.get("logan_forge_csrf")?.value
+  const csrfToken = existingToken && existingToken.length >= 32 ? existingToken : randomBytes(32).toString("base64url")
   const response = NextResponse.json(
     {
       csrfToken,
@@ -28,7 +30,7 @@ export async function GET() {
     value: csrfToken,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     path: "/api/forge",
     maxAge: SESSION_TTL_SECONDS,
   })

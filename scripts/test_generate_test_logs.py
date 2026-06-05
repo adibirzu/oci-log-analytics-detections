@@ -224,8 +224,14 @@ class TestGenerateTestLogs(unittest.TestCase):
         octo_events = [
             event for event in events
             if event.get("serviceName") == "octo-apm-demo"
+            and not str(event.get("traceId", "")).startswith("trace_oke_")
+        ]
+        oke_events = [
+            event for event in events
+            if str(event.get("traceId", "")).startswith("trace_oke_")
         ]
         self.assertGreaterEqual(len(octo_events), 8)
+        self.assertGreaterEqual(len(oke_events), 4)
 
         traces = defaultdict(set)
         for event in octo_events:
@@ -247,6 +253,12 @@ class TestGenerateTestLogs(unittest.TestCase):
             self.assertIn("http.response_time_ms", event)
             self.assertIn("apmDomain", event)
             traces[event["traceId"]].add(event["spanId"])
+
+        for event in oke_events:
+            self.assertEqual(event.get("serviceName"), "octo-apm-demo")
+            self.assertTrue(event.get("traceId", "").startswith("trace_oke_"))
+            self.assertEqual(event.get("service.namespace"), "octo")
+            self.assertEqual(event.get("security.attack.type"), "oke_kubernetes_attack")
 
         self.assertTrue(any(len(span_ids) >= 3 for span_ids in traces.values()))
         self.assertTrue(any(event.get("parentSpanId") for event in octo_events))

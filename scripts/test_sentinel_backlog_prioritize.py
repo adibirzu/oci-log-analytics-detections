@@ -67,6 +67,96 @@ def test_priority_excludes_promoted_and_counts_unblock_chain() -> None:
     assert priority["ranked"][0]["unblock_chain_length"] == 1
 
 
+def test_supported_operator_shapes_are_not_static_blockers() -> None:
+    candidates = {
+        "generated_at": "2026-05-17T00:00:00+00:00",
+        "source": {"commit": "abc123"},
+        "candidates": [
+            _candidate(
+                "supported",
+                "Supported",
+                (
+                    "SecurityEvent\n"
+                    "| extend IsFailure = iff(EventID == 4625, 'yes', 'no'), "
+                    "ActorLower = tolower(tostring(Account))\n"
+                    "| summarize Failures=countif(EventID == 4625) by bin(TimeGenerated, 15m), Account\n"
+                    "| top 5 by Failures desc"
+                ),
+            ),
+        ],
+    }
+
+    priority = build_priority(
+        candidates,
+        {"attempted": []},
+        mapping={"fields": {"Account": "User", "EventID": "'Event ID'"}, "tables": {"SecurityEvent": {}}},
+        sync={"mode": "test"},
+    )
+
+    blockers = priority["ranked"][0]["all_blockers"]
+    assert "operator:extend.iff" not in blockers
+    assert "operator:extend.tostring" not in blockers
+    assert "operator:extend.tolower" not in blockers
+    assert "operator:countif" not in blockers
+    assert "operator:bin" not in blockers
+    assert "operator:top" not in blockers
+    assert blockers == ["parser_readiness:unknown"]
+
+
+def test_unsupported_kql_features_remain_static_blockers() -> None:
+    candidates = {
+        "generated_at": "2026-05-17T00:00:00+00:00",
+        "source": {"commit": "abc123"},
+        "candidates": [
+            _candidate(
+                "unsupported",
+                "Unsupported",
+                "SecurityEvent | join (SecurityEvent) on Account | mv-expand TargetResources",
+            ),
+        ],
+    }
+
+    priority = build_priority(
+        candidates,
+        {"attempted": []},
+        mapping={"fields": {"Account": "User"}, "tables": {"SecurityEvent": {}}},
+        sync={"mode": "test"},
+    )
+
+    blockers = priority["ranked"][0]["all_blockers"]
+    assert "operator:join" in blockers
+    assert "operator:mv-expand" in blockers
+
+
+def test_externaldata_is_a_feed_dependency_not_operator_blocker() -> None:
+    candidates = {
+        "generated_at": "2026-05-17T00:00:00+00:00",
+        "source": {"commit": "abc123"},
+        "candidates": [
+            _candidate(
+                "feed",
+                "Feed",
+                (
+                    "let iocs = externaldata(IoC:string, Type:string) "
+                    "[@\"https://example.test/iocs.csv\"] with(format=\"csv\"); "
+                    "CommonSecurityLog | where DestinationIP in (iocs)"
+                ),
+            ),
+        ],
+    }
+
+    priority = build_priority(
+        candidates,
+        {"attempted": []},
+        mapping={"fields": {"DestinationIP": "'Destination IP'"}, "tables": {"CommonSecurityLog": {}}},
+        sync={"mode": "test"},
+    )
+
+    blockers = priority["ranked"][0]["all_blockers"]
+    assert "feed_dependency:externaldata" in blockers
+    assert "operator:externaldata" not in blockers
+
+
 def test_priority_render_is_stable_json() -> None:
     candidates = {
         "generated_at": "2026-05-17T00:00:00+00:00",

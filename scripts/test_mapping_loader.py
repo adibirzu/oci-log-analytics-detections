@@ -29,8 +29,9 @@ def test_sharded_mapping_matches_compat_projection() -> None:
     assert sharded["tables"] == compat["tables"]
     assert sharded["fields"] == compat["fields"]
     assert sharded["field_roles"] == compat["field_roles"]
-    assert len(sharded["tables"]) == 61
-    assert len(sharded["fields"]) == 183
+    assert len(sharded["tables"]) >= 367
+    assert sharded["tables"]["BHEAttackPathsData_CL"]["sources"][0] == "Azure Log Analytics Custom Logs"
+    assert len(sharded["fields"]) == 185
 
 
 def test_all_field_mappings_have_allowed_roles() -> None:

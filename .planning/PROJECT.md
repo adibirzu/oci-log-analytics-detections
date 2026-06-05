@@ -31,7 +31,7 @@ Every committed detection, query, dashboard, parser mapping, and generated artif
 - [x] Sigma/YAML authoring layer exists under `rules/**` with 454 source rules and quality audit coverage.
 - [x] OCI query artifacts are generated and cataloged under `queries/**`, with `queries/catalog.json` as the canonical machine-readable inventory.
 - [x] Microsoft Sentinel conversion workflow promotes only live OCI parser-passing queries into `queries/sentinel/**`.
-- [x] Dashboard inventory is generated from `scripts/deploy_dashboard.py` and currently covers 27 dashboards and 450 widgets.
+- [x] Dashboard inventory is generated from `scripts/deploy_dashboard.py` and currently covers 29 dashboards and 438 widgets.
 - [x] Synthetic log generation and parser/source setup support SOC security, app/APM, WAF, VCN, firewall, and multicloud-health demo paths.
 - [x] Local tests currently pass with `244 passed, 5 skipped, 2 subtests passed`.
 

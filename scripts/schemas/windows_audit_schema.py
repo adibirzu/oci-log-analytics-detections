@@ -102,6 +102,8 @@ def build_windows_security_event(
         event["Command Line"] = command_line
     if object_name:
         event["Object Name"] = object_name
+    if access_mask:
+        event["Access Mask"] = access_mask
     if failure_reason:
         event["Failure Reason"] = failure_reason
 

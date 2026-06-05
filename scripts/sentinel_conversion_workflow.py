@@ -22,6 +22,8 @@ DEFAULT_LOCAL_REPORT_PATH = Path("/tmp/sentinel_conversion_local.json")
 DEFAULT_SENTINEL_DIR = PROJECT_DIR / "queries" / "sentinel"
 DEFAULT_DASHBOARD_INVENTORY = PROJECT_DIR / "queries" / "dashboard_inventory.json"
 DEFAULT_HTML_PATH = PROJECT_DIR / "docs" / "sentinel_converter.html"
+DEFAULT_MIGRATION_PLAN = PROJECT_DIR / "queries" / "migration_plan_sentinel.json"
+DEFAULT_PROFILE_NAME = "azure_as_is"
 SENTINEL_DASHBOARD_PREFIX = "SOC: Microsoft Sentinel "
 NEXT_QUERY_WORK_TYPES = {
     "live_environment": {
@@ -143,6 +145,9 @@ def build_convert_command(
     no_sync: bool,
     progress_interval: float | None = None,
     progress_every: int | None = None,
+    profile: str = DEFAULT_PROFILE_NAME,
+    discovery_report: Path | None = None,
+    migration_plan_out: Path | None = None,
 ) -> list[str]:
     """Build the low-level converter command for a workflow mode."""
     command = [
@@ -156,7 +161,13 @@ def build_convert_command(
         lookback,
         "--query-timeout",
         str(timeout),
+        "--profile",
+        profile,
     ]
+    if discovery_report:
+        command.extend(["--discovery-report", str(discovery_report)])
+    if migration_plan_out:
+        command.extend(["--migration-plan-out", str(migration_plan_out)])
     if no_sync:
         command.append("--no-sync")
     if progress_interval is not None:
@@ -240,6 +251,7 @@ def build_status(
     """Build a compact status summary across Sentinel report and artifacts."""
     report = load_report(report_path)
     summary = report.get("summary", {})
+    runtime_profile = report.get("runtime_profile", {})
     promoted_counts = load_promoted_query_counts(sentinel_dir)
     dashboard_counts = load_sentinel_dashboard_counts(dashboard_inventory)
     promoted_files = promoted_counts.get("files", 0)
@@ -253,6 +265,7 @@ def build_status(
     return {
         "status": "ok" if all(checks.values()) else "attention",
         "summary": summary,
+        "runtime_profile": runtime_profile,
         "promoted_files": promoted_files,
         "promoted_categories": promoted_counts.get("categories", {}),
         "promoted_live_status": live_status,
@@ -857,6 +870,9 @@ def print_status(status: dict, as_json: bool = False) -> None:
     print(f"  promoted_files: {status.get('promoted_files', 0)}")
     print(f"  live_passed:    {summary.get('live_validation_passed', 0)}")
     print(f"  live_failed:    {summary.get('live_validation_failed', 0)}")
+    profile = status.get("runtime_profile", {})
+    if profile:
+        print(f"  profile:        {profile.get('name', 'unknown')}")
     print("  checks:")
     for name, ok in status.get("checks", {}).items():
         print(f"    {'OK' if ok else 'ATTN'} {name}")
@@ -951,6 +967,9 @@ def run_convert_mode(args, mode: str, report_path: Path) -> None:
         no_sync=args.no_sync,
         progress_interval=args.progress_interval,
         progress_every=args.progress_every,
+        profile=args.profile,
+        discovery_report=Path(args.discovery_report) if args.discovery_report else None,
+        migration_plan_out=Path(args.migration_plan_out) if args.migration_plan_out else None,
     )
     if args.candidates_file != str(DEFAULT_CANDIDATES_FILE):
         command.extend(["--candidates-file", args.candidates_file])
@@ -1032,6 +1051,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--candidates-file", default=str(DEFAULT_CANDIDATES_FILE))
     parser.add_argument("--local-report", default=str(DEFAULT_LOCAL_REPORT_PATH))
     parser.add_argument("--report", default=str(DEFAULT_REPORT_PATH))
+    parser.add_argument("--profile", default=DEFAULT_PROFILE_NAME, help="Runtime mapping profile name or YAML path.")
+    parser.add_argument("--discovery-report", default="", help="Optional SIEM discovery inventory/report for ranking.")
+    parser.add_argument("--migration-plan-out", default="", help="Optional migration plan JSON output.")
     parser.add_argument("--html", default=str(DEFAULT_HTML_PATH))
     parser.add_argument("--sentinel-dir", default=str(DEFAULT_SENTINEL_DIR))
     parser.add_argument("--dashboard-inventory", default=str(DEFAULT_DASHBOARD_INVENTORY))

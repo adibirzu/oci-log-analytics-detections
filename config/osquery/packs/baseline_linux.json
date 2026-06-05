@@ -1,0 +1,15 @@
+{
+  "name": "baseline-linux",
+  "platform": "linux",
+  "description": "Baseline Linux posture checks for suspicious filesystem and process state.",
+  "queries": [
+    {
+      "id": "world_writable_paths",
+      "name": "World-writable sensitive paths",
+      "sql": "SELECT path, mode FROM file WHERE path IN ('/tmp', '/var/tmp', '/dev/shm');",
+      "severity": "medium",
+      "expected_fields": ["path", "mode"],
+      "mitre": ["T1222"]
+    }
+  ]
+}

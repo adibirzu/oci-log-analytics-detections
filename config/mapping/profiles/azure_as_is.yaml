@@ -1,0 +1,55 @@
+name: azure_as_is
+description: Run migrated Sentinel/Azure detections against Azure-ingested OCI Log Analytics sources.
+table_source_overrides:
+  SigninLogs:
+    sources:
+    - Azure Entra ID Sign-in Logs
+  AADNonInteractiveUserSignInLogs:
+    sources:
+    - Azure Entra ID Sign-in Logs
+  AuditLogs:
+    sources:
+    - Azure Entra ID Audit Logs
+  AzureActivity:
+    sources:
+    - Azure Activity Logs
+  AzureDiagnostics:
+    sources:
+    - Azure Diagnostics Logs
+  SecurityEvent:
+    sources:
+    - Windows Security Events
+    - Windows Event Security Logs
+  WindowsEvent:
+    sources:
+    - Windows Event System Logs
+    - Windows Security Events
+  Sysmon:
+    sources:
+    - Windows Sysmon Events
+    - Windows Sysmon Operational Logs
+    - SOC Windows Sysmon Logs
+  DeviceEvents:
+    sources:
+    - Microsoft Defender Endpoint Logs
+    - SOC Windows Sysmon Logs
+  DeviceProcessEvents:
+    sources:
+    - Microsoft Defender Endpoint Logs
+    - SOC Windows Sysmon Logs
+  DeviceNetworkEvents:
+    sources:
+    - Microsoft Defender Endpoint Network Logs
+    - SOC Sysmon Network Logs
+  OfficeActivity:
+    sources:
+    - Microsoft 365 Audit Logs
+    - Office 365 Audit Logs
+  EmailEvents:
+    sources:
+    - Microsoft Defender Email Logs
+    - Microsoft 365 Audit Logs
+  CommonSecurityLog:
+    sources:
+    - Azure Common Security Logs
+    - SOC Network Firewall Logs

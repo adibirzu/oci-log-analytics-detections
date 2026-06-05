@@ -6,6 +6,7 @@ import { ChevronsLeft, ChevronsRight, Github, LayoutGrid } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useSidebar } from "@/components/ui/sidebar"
+import { publicAssetPath } from "@/lib/public-assets"
 
 const repositoryUrl = "https://github.com/adibirzu/oci-log-analytics-detections"
 
@@ -13,9 +14,9 @@ export function DashboardHeader() {
   const { toggleSidebar, state } = useSidebar()
 
   return (
-    <header className="sticky top-0 z-10 flex h-[60px] items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-6">
+    <header className="sticky top-0 z-10 flex h-[60px] items-center gap-4 border-b border-border bg-surface-sunken/85 px-6 backdrop-blur-md">
       <div className="flex items-center gap-3">
-        <Image src="/octo-logo.png" width={34} height={34} alt="OCTO" className="h-9 w-9 object-contain" priority />
+        <Image src={publicAssetPath("/octo-logo.png")} width={34} height={34} alt="OCTO" className="h-9 w-9 object-contain" priority />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -39,10 +40,11 @@ export function DashboardHeader() {
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-3">
           <div className="hidden min-w-0 sm:block">
-            <div className="truncate text-sm font-semibold">OCL Forge</div>
-            <div className="truncate text-xs text-muted-foreground">Query conversion workbench</div>
+            <div className="truncate font-display text-sm font-semibold tracking-tight">Forge</div>
+            <div className="truncate text-xs text-muted-foreground">Detection conversion console</div>
           </div>
-          <div className="truncate text-sm font-medium">OCI Log Analytics QL</div>
+          <span className="hidden h-7 w-px bg-border-strong/60 sm:block" aria-hidden="true" />
+          <div className="truncate text-xs font-medium text-muted-foreground">OCI Log Analytics QL</div>
         </div>
       </div>
       <Button asChild variant="outline" size="sm">

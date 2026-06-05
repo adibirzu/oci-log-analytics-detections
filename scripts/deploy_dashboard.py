@@ -235,6 +235,17 @@ DASHBOARDS = {
             {"title": "CG: RDP Port Open", "query_file": "cloud_guard_problem_vcn_security_list_port_rdp.json"},
         ]
     },
+    "SOC: Cloud Guard Instance Security Dashboard": {
+        "description": "Cloud Guard Instance Security and OSQuery result monitoring for OCI workload runtime posture.",
+        "widgets": [
+            {"title": "CGIS: Pack Coverage", "query_file": "cloud_guard_instance_security_pack_coverage.json"},
+            {"title": "CGIS: Findings by Host", "query_file": "cloud_guard_instance_security_findings_by_host.json"},
+            {"title": "CGIS: Findings by Pack Query", "query_file": "cloud_guard_instance_security_findings_by_pack_query.json"},
+            {"title": "CGIS: High Severity Pivots", "query_file": "cloud_guard_instance_security_high_severity_pivots.json"},
+            {"title": "CGIS: Instance to Query Link", "query_file": "cloud_guard_instance_security_instance_to_query_link.json"},
+            {"title": "CGIS: Raw Result Detail", "query_file": "cloud_guard_instance_security_raw_result_detail.json"},
+        ]
+    },
     "SOC: Linux Security Dashboard": {
         "description": "Linux endpoint security: SSH, sudo, GTFOBins, reverse shells, persistence, anti-forensics, container escape.",
         "widgets": [
@@ -302,9 +313,16 @@ DASHBOARDS = {
             {"title": "Win: Firewall Rule Change", "query_file": "windows_firewall_rule_modification.json"},
             {"title": "Win: RDP Lateral Movement", "query_file": "windows_rdp_lateral_movement.json"},
             {"title": "Win: Scheduled Task (schtasks)", "query_file": "windows_scheduled_task_creation_via_schtasks.json"},
+            {"title": "Win: Scheduled Task Event", "query_file": "windows_scheduled_task_created_or_updated_event.json"},
+            {"title": "Win: Service Installed Event", "query_file": "windows_service_installed_event_log.json"},
             {"title": "Win: PS Download Cradle", "query_file": "windows_powershell_download_cradle.json"},
+            {"title": "Win: PowerShell 4104 Suspicious", "query_file": "windows_powershell_script_block_suspicious_content.json"},
+            {"title": "Win: Defender Malware/Tamper", "query_file": "windows_defender_malware_or_remediation_event.json"},
             {"title": "Win: LSASS Memory Access", "query_file": "windows_lsass_memory_access.json"},
             {"title": "Win: Event Log Clearing", "query_file": "windows_event_log_clearing.json"},
+            {"title": "Win: Native Log Cleared", "query_file": "windows_security_log_cleared_event.json"},
+            {"title": "Win: Audit Policy Changed", "query_file": "windows_audit_policy_changed.json"},
+            {"title": "Win: ClickFix PowerShell", "query_file": "clickfix_fake_captcha_powershell_execution.json"},
             {"title": "Win: PsExec Lateral Move", "query_file": "windows_psexec_remote_execution.json"},
         ]
     },
@@ -313,12 +331,17 @@ DASHBOARDS = {
         "widgets": [
             {"title": "Kerb: RC4 Ticket (Kerberoast)", "query_file": "kerberoasting_rc4_ticket_request.json"},
             {"title": "Kerb: SPN Sweep", "query_file": "kerberoasting_spn_sweep.json"},
+            {"title": "Kerb: Pre-Auth Failures", "query_file": "windows_kerberos_pre_authentication_failures.json"},
+            {"title": "NTLM: Auth Failures", "query_file": "windows_ntlm_authentication_failures.json"},
             {"title": "Golden Ticket: RC4 TGT", "query_file": "golden_ticket_anomaly.json"},
             {"title": "DCSync: Directory Replication", "query_file": "dcsync_directory_replication.json"},
             {"title": "Pass-the-Ticket: Explicit Cred", "query_file": "pass_the_ticket_logon.json"},
             {"title": "PrivEsc: Sensitive Privileges", "query_file": "privilege_escalation_sensitive_privileges.json"},
+            {"title": "PrivEsc: Group Membership", "query_file": "windows_privileged_group_membership_change_event.json"},
             {"title": "Lateral: Network Logon Sweep", "query_file": "lateral_movement_logon_pattern.json"},
+            {"title": "Lateral: Admin Share Events", "query_file": "windows_admin_share_access_spike_event.json"},
             {"title": "Brute Force: Failed Logons", "query_file": "brute_force_failed_logon_spike.json"},
+            {"title": "Discovery: Account/Group Enum", "query_file": "windows_account_or_group_enumeration_spike.json"},
             {"title": "PS: Suspicious Commands", "query_file": "powershell_suspicious_commands.json"},
             {"title": "CMD: Suspicious Execution", "query_file": "cmd_suspicious_child_process.json"},
             {"title": "Mimikatz: Command Indicators", "query_file": "mimikatz_command_and_module_indicators_in_process_logs.json"},
@@ -390,6 +413,7 @@ DASHBOARDS = {
             {"title": "Net: LOLBin Outbound Traffic", "query_file": "sysmon_suspicious_outbound_connection_from_lolbin.json"},
             {"title": "Net: Kerberoasting Network", "query_file": "sysmon_kerberoasting_network_indicator.json"},
             {"title": "Net: LDAP Reconnaissance", "query_file": "sysmon_ldap_reconnaissance.json"},
+            {"title": "File: Executable Dropped", "query_file": "sysmon_executable_file_created_or_detected.json"},
             {"title": "Net: Cobalt Strike C2", "query_file": "sysmon_cobalt_strike_c2_network_indicators.json"},
             {"title": "Net: Mimikatz Network", "query_file": "sysmon_mimikatz_network_activity.json"},
             {"title": "Pipe: Cobalt Strike Pipes", "query_file": "sysmon_cobalt_strike_named_pipe.json"},
@@ -548,6 +572,20 @@ DASHBOARDS = {
             octo_apm_workshop_widget("Octo APM: Compromised VM Pivots", "apps/apm_octo_compromised_vm_pivots.json"),
         ]
     },
+    "OCI-DEMO: OKE Kubernetes Attack Dashboard": {
+        "description": "OKE and Kubernetes attack detection using SOC Application Logs and APM-correlated synthetic telemetry. Covers Boopkit-style eBPF rootkit activity, Kubernetes API reconnaissance, secret collection, privileged workload creation, pod exec, node escape, CronJob persistence, and RBAC backdoor creation.",
+        "widgets": [
+            {"title": "OKE: Boopkit Attack Timeline", "query_file": "apps/oke_boopkit_attack_timeline.json"},
+            {"title": "OKE: Kubernetes Attack Overview", "query_file": "apps/oke_kubernetes_attack_overview.json"},
+            {"title": "OKE: Privileged Workload Creation", "query_file": "apps/oke_privileged_workload_creation.json"},
+            {"title": "OKE: Secrets and RBAC Abuse", "query_file": "apps/oke_secrets_and_rbac_abuse.json"},
+            {"title": "OKE: Exec and Node Escape", "query_file": "apps/oke_exec_and_node_escape.json"},
+            {"title": "OKE: eBPF Rootkit Activity", "query_file": "apps/oke_ebpf_rootkit_activity.json"},
+            {"title": "OKE: Kubernetes Attack Path Link", "query_file": "apps/oke_kubernetes_attack_path_link.json"},
+            {"title": "OKE: Boopkit Rule Count", "query_file": "apps/oke_rule_boopkit_ebpf_rootkit_count.json"},
+            {"title": "OKE: Privileged Workload Rule Count", "query_file": "apps/oke_rule_privileged_workload_count.json"},
+        ]
+    },
     "SOC: Geographic Health Dashboard": {
         "description": "Multicloud geographic health visualization. Regional instance health status across OCI, Azure, AWS, and GCP on a global map with provider summaries, tier breakdowns, and unhealthy region alerts.",
         "widgets": [
@@ -601,6 +639,47 @@ DASHBOARDS = {
             {"title": "Browser: Suspicious JS Patterns", "query_file": "apps/apm_suspicious_js_patterns.json"},
             {"title": "Browser: Fingerprinting Detection", "query_file": "apps/apm_browser_fingerprinting.json"},
             {"title": "Hunt: Browser Attack Frequency", "query_file": "hunting/browser_attack_frequency_analysis.json"},
+        ]
+    },
+    "SOC: oci-coordinator Hunt Showcase Dashboard": {
+        "description": (
+            "End-to-end threat-hunting showcase for the oci-coordinator demo. "
+            "Top row: KPI tiles for total hits, affected hosts, critical alerts, and distinct MITRE techniques "
+            "across 15 critical-severity scenarios (Linux, OCI Audit, APM, Web). "
+            "Middle: MITRE tactic→technique sunburst, per-scenario breakdown bar, attack timeline line, "
+            "and top-affected-hosts horizontal bar. "
+            "Bottom: drill-down tiles for each of the 15 scenarios — bind shell, boopkit eBPF, container escape, "
+            "kernel module loaded from temp, passwd/shadow direct mod, exec from /dev/shm, reverse shell, "
+            "web shell file, SSRF to IMDS, insmod from temp, shadow file read, web process spawning shell, "
+            "APM SQL injection, insecure deserialization, OCI audit retention reduced."
+        ),
+        "widgets": [
+            # ─── KPI band ───
+            {"title": "Total Hunt Hits (l7d)", "query_file": "hunting/coordinator_total_hits_kpi.json"},
+            {"title": "Affected Hosts (l7d)", "query_file": "hunting/coordinator_affected_hosts_kpi.json"},
+            {"title": "Critical Alerts (l7d)", "query_file": "hunting/coordinator_critical_alerts_kpi.json"},
+            {"title": "MITRE Techniques (l7d)", "query_file": "hunting/coordinator_mitre_techniques_kpi.json"},
+            # ─── Analytical band ───
+            {"title": "MITRE Tactic → Technique", "query_file": "hunting/coordinator_mitre_sunburst.json"},
+            {"title": "Per-Scenario Breakdown", "query_file": "hunting/coordinator_scenario_breakdown.json"},
+            {"title": "Attack Timeline (1h bins)", "query_file": "hunting/coordinator_attack_timeline.json"},
+            {"title": "Top Affected Hosts", "query_file": "hunting/coordinator_top_affected_hosts.json"},
+            # ─── Per-scenario drilldowns (15) ───
+            {"title": "Hunt: Bind Shell Listener", "query_file": "linux_bind_shell_listener.json"},
+            {"title": "Hunt: Boopkit eBPF Rootkit", "query_file": "linux_boopkit_ebpf_rootkit_activity.json"},
+            {"title": "Hunt: Container Escape", "query_file": "linux_container_escape_attempt.json"},
+            {"title": "Hunt: Kernel Module from Temp", "query_file": "linux_kernel_module_loaded_from_temp_directory.json"},
+            {"title": "Hunt: Passwd/Shadow Direct Mod", "query_file": "linux_password_file_direct_modification.json"},
+            {"title": "Hunt: Exec from /dev/shm", "query_file": "linux_process_execution_from_devshm.json"},
+            {"title": "Hunt: Reverse Shell", "query_file": "linux_reverse_shell_detected.json"},
+            {"title": "Hunt: Web Shell File Creation", "query_file": "linux_web_shell_file_creation.json"},
+            {"title": "Hunt: SSRF to Cloud IMDS", "query_file": "ssrf_to_cloud_instance_metadata_service_linux.json"},
+            {"title": "Hunt: insmod from Temp", "query_file": "suspicious_usage_of_insmod.json"},
+            {"title": "Hunt: Shadow File Read", "query_file": "suspicious_usage_of_shadow.json"},
+            {"title": "Hunt: Web Process Spawning Shell", "query_file": "web_server_process_spawning_shell_with_injection_characters_linux.json"},
+            {"title": "Hunt: APM SQL Injection", "query_file": "apm_sql_injection_attack_in_request.json"},
+            {"title": "Hunt: Insecure Deserialization", "query_file": "insecure_deserialization_attack_detected.json"},
+            {"title": "Hunt: OCI Audit Retention Reduced", "query_file": "oci_audit_configuration_retention_reduced.json"},
         ]
     },
 }

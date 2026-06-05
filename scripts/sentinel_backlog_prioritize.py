@@ -21,7 +21,11 @@ DEFAULT_OUTPUT_PATH = PROJECT_DIR / "queries" / "sentinel_backlog_priority.json"
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
-from scripts.kql._facade_impl import extract_source_tables, load_mapping_config  # noqa: E402
+from scripts.kql._facade_impl import (  # noqa: E402
+    classify_unsupported_kql,
+    extract_source_tables,
+    load_mapping_config,
+)
 
 MAP05_FIELDS = (
     "SubjectAccount",
@@ -50,25 +54,24 @@ MAP05_FIELDS = (
     "EventData",
 )
 
-PHASE9_OPERATOR_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
-    ("operator:countif", re.compile(r"\bcountif\s*\(", re.IGNORECASE)),
-    ("operator:column_ifexists", re.compile(r"\bcolumn_ifexists\s*\(", re.IGNORECASE)),
-    ("operator:extend.iff", re.compile(r"\bextend\b[\s\S]*\b(?:iff|iif)\s*\(", re.IGNORECASE)),
-    ("operator:extend.tostring", re.compile(r"\bextend\b[\s\S]*\btostring\s*\(", re.IGNORECASE)),
-    ("operator:extend.toint", re.compile(r"\bextend\b[\s\S]*\btoint\s*\(", re.IGNORECASE)),
-    ("operator:extend.tolong", re.compile(r"\bextend\b[\s\S]*\btolong\s*\(", re.IGNORECASE)),
-    ("operator:extend.tolower", re.compile(r"\bextend\b[\s\S]*\btolower\s*\(", re.IGNORECASE)),
-    ("operator:extend.toupper", re.compile(r"\bextend\b[\s\S]*\btoupper\s*\(", re.IGNORECASE)),
-    ("operator:let", re.compile(r"\blet\s+[A-Za-z_][A-Za-z0-9_]*\s*=", re.IGNORECASE)),
-    ("operator:bin", re.compile(r"\bbin\s*\(", re.IGNORECASE)),
-    ("operator:project-away", re.compile(r"\bproject-away\b", re.IGNORECASE)),
-    ("operator:project", re.compile(r"\bproject(?:-reorder)?\b", re.IGNORECASE)),
-    ("operator:top", re.compile(r"\btop\s+\d+\s+by\b", re.IGNORECASE)),
-    ("operator:distinct", re.compile(r"\bdistinct\b", re.IGNORECASE)),
-    (
-        "directive:set",
-        re.compile(r"\bset\s+(?:timeout|truncationmaxsize|query_take_max_records)\s*=", re.IGNORECASE),
-    ),
+UNSUPPORTED_REASON_BLOCKERS: tuple[tuple[str, str], ...] = (
+    ("unsupported KQL operator: join", "operator:join"),
+    ("unsupported KQL operator: make-series", "operator:make-series"),
+    ("unsupported KQL operator: mv-expand/mv-apply", "operator:mv-expand"),
+    ("unsupported KQL operator: evaluate", "operator:evaluate"),
+    ("unsupported KQL operator: parse", "operator:parse"),
+    ("unsupported KQL construct: let variables", "operator:let"),
+    ("unsupported KQL construct: datatable", "operator:datatable"),
+    ("unsupported KQL construct: externaldata", "feed_dependency:externaldata"),
+    ("unsupported KQL construct: watchlists", "operator:watchlists"),
+    ("unsupported KQL construct: custom function invocation", "operator:invoke"),
+    ("unsupported KQL function: parse_command_line", "operator:parse_command_line"),
+    ("unsupported KQL function: materialize", "operator:materialize"),
+    ("unsupported KQL function: strlen", "operator:strlen"),
+    ("unsupported KQL JSON bag expansion", "operator:json_bag_expansion"),
+    ("unsupported KQL regex extraction", "operator:extract"),
+    ("unsupported KQL regex predicate", "operator:matches_regex"),
+    ("unsupported KQL JSON/index path", "operator:json_index_path"),
 )
 
 TIER_DIFFICULTY = {"tier_1": 1, "tier_2": 2, "tier_3": 3}
@@ -125,7 +128,14 @@ def _map05_blockers(query: str, mapping: dict) -> list[str]:
 
 
 def _operator_blockers(query: str) -> list[str]:
-    return [name for name, pattern in PHASE9_OPERATOR_PATTERNS if pattern.search(query)]
+    blockers = []
+    for reason in classify_unsupported_kql(query):
+        blocker = next(
+            (candidate for prefix, candidate in UNSUPPORTED_REASON_BLOCKERS if reason.startswith(prefix)),
+            f"converter:{reason}",
+        )
+        blockers.append(blocker)
+    return blockers
 
 
 def _table_blockers(query: str, mapping: dict) -> list[str]:

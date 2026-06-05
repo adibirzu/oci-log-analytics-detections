@@ -85,6 +85,7 @@ LOGAN_COMMANDS = {
     "like",
     "not",
     "or",
+    "rename",
     "sort",
     "span",
     "stats",
@@ -176,10 +177,12 @@ UNSUPPORTED_PATTERNS = [
     (re.compile(r"\bevaluate\b", re.IGNORECASE), "unsupported KQL operator: evaluate"),
     (re.compile(r"\bparse_command_line\s*\(", re.IGNORECASE), "unsupported KQL function: parse_command_line"),
     (re.compile(r"\|\s*parse(?:-where)?\b", re.IGNORECASE), "unsupported KQL operator: parse"),
-    (re.compile(r"\bmaterialize\s*\(", re.IGNORECASE), "unsupported KQL function: materialize"),
-    (re.compile(r"\bstrlen\s*\(", re.IGNORECASE), "unsupported KQL function: strlen"),
+    # ``materialize``, ``strlen``, ``strcat`` and ``extract`` are translated by
+    # ``_convert_scalar_expression`` (Phase 9 operator-parity tranche); they are
+    # no longer whole-query blockers. ``extract_all`` (multi-match) stays
+    # unsupported because Logan ``extract`` returns a single match.
     (re.compile(r"\b(parse_json|todynamic|bag_unpack|bag_keys|extractjson)\s*\(", re.IGNORECASE), "unsupported KQL JSON bag expansion"),
-    (re.compile(r"\bextract\s*\(", re.IGNORECASE), "unsupported KQL regex extraction"),
+    (re.compile(r"\bextract_all\s*\(", re.IGNORECASE), "unsupported KQL regex extraction (extract_all)"),
     (re.compile(r"\bmatches\s+regex\b", re.IGNORECASE), "unsupported KQL regex predicate"),
     (re.compile(r"\[[^\]]+\]\."), "unsupported KQL JSON/index path"),
 ]
@@ -209,6 +212,14 @@ class ConversionResult:
     @property
     def promoted_candidate(self) -> bool:
         return self.query_payload is not None and not self.skip_reasons and not self.local_validation_errors
+
+
+@dataclass(frozen=True)
+class SearchStage:
+    """Parsed KQL search operator source scope and expression."""
+
+    tables: list[str]
+    expression: str
 
 
 def load_mapping_config(path: Path | None = None) -> dict:
@@ -297,7 +308,7 @@ def _strip_kql_comments(kql: str) -> str:
     lines = []
     for line in kql.splitlines():
         stripped = line.lstrip()
-        if stripped.startswith("//"):
+        if stripped.startswith("//") or stripped.startswith("#"):
             continue
         quote: str | None = None
         escaped = False
@@ -390,6 +401,8 @@ def _normalize_simple_let_expression(expression: str) -> str | None:
         return value
     if re.fullmatch(r"\d+(?:\.\d+)?(?:d|h|m|s|ms)", value, flags=re.IGNORECASE):
         return value
+    if value.lower() in {"true", "false"}:
+        return value.lower()
     if re.fullmatch(r"(?:ago|datetime)\s*\([^|;]+\)", value, flags=re.IGNORECASE):
         return value
     if re.fullmatch(r"now\s*\(\s*\)", value, flags=re.IGNORECASE):
@@ -565,19 +578,156 @@ def _clean_table_name(raw: str) -> str:
     text = re.sub(r"^\s*\(", "", text)
     text = re.sub(r"\)\s*$", "", text)
     text = text.split()[0] if text.split() else text
-    return text.strip("`'\" ")
+    text = re.sub(r"\(.*$", "", text)
+    return text.strip("`'\" ,")
+
+
+def _strip_table_extraction_preamble(kql: str) -> str:
+    """Remove KQL constructs that precede the source stage but are not sources."""
+
+    text = _strip_set_directives(_strip_kql_comments(kql)).strip()
+    preprocessed, errors = _preprocess_simple_lets(text)
+    if not errors:
+        text = preprocessed.strip()
+
+    while True:
+        match = re.match(
+            r"\s*declare\s+query_parameters\s*\([\s\S]*?\)\s*;\s*",
+            text,
+            flags=re.IGNORECASE,
+        )
+        if not match:
+            break
+        text = text[match.end():].strip()
+    return text
+
+
+def _take_parenthesized_prefix(text: str) -> tuple[str, str]:
+    """Return the first parenthesized clause and trailing text."""
+    if not text.startswith("("):
+        return "", text
+    quote: str | None = None
+    depth = 0
+    for index, char in enumerate(text):
+        if quote:
+            if char == quote:
+                quote = None
+            continue
+        if char in ("'", '"'):
+            quote = char
+            continue
+        if char == "(":
+            depth += 1
+            continue
+        if char == ")":
+            depth -= 1
+            if depth == 0:
+                return text[1:index], text[index + 1:].strip()
+    return "", text
+
+
+def _strip_search_options(body: str) -> str:
+    """Remove supported search options that do not affect Logan output."""
+    text = body.strip()
+    while True:
+        match = re.match(
+            r"(?:kind|withsource)\s*=\s*[A-Za-z_][A-Za-z0-9_]*\s+",
+            text,
+            flags=re.IGNORECASE,
+        )
+        if not match:
+            return text
+        text = text[match.end():].lstrip()
+
+
+def _parse_search_stage(stage: str) -> SearchStage | None:
+    """Parse KQL ``search`` stages, including ``search in (...)``."""
+    if not re.match(r"\s*search\b", stage, flags=re.IGNORECASE):
+        return None
+
+    body = re.sub(r"^\s*search\b", "", stage, flags=re.IGNORECASE).strip()
+    body = _strip_search_options(body)
+    tables: list[str] = []
+    expression = body
+    if re.match(r"in\b", body, flags=re.IGNORECASE):
+        remainder = re.sub(r"^in\b", "", body, flags=re.IGNORECASE).strip()
+        table_clause, expression = _take_parenthesized_prefix(remainder)
+        if table_clause:
+            tables = [_clean_table_name(part) for part in _split_top_level(table_clause) if _clean_table_name(part)]
+        else:
+            parts = remainder.split(maxsplit=1)
+            if parts:
+                tables = [_clean_table_name(parts[0])]
+                expression = parts[1].strip() if len(parts) > 1 else ""
+    return SearchStage(tables=tables, expression=expression.strip())
+
+
+def _extract_union_tables(source: str) -> list[str]:
+    union_body = source[6:].strip()
+    union_body = re.sub(
+        r"\b(?:isfuzzy|kind|withsource)\s*=\s*[^,\s(]+",
+        "",
+        union_body,
+        flags=re.IGNORECASE,
+    ).strip()
+    tables: list[str] = []
+    for part in _split_union_operands(union_body):
+        table = _clean_table_name(part)
+        if table and table.lower() not in {"union"} and "=" not in part.split("|", 1)[0] and table not in tables:
+            tables.append(table)
+    return tables
+
+
+def _split_union_operands(union_body: str) -> list[str]:
+    parts: list[str] = []
+    current: list[str] = []
+    quote: str | None = None
+    depth = 0
+    for char in union_body:
+        if quote:
+            current.append(char)
+            if char == quote:
+                quote = None
+            continue
+        if char in ("'", '"'):
+            quote = char
+            current.append(char)
+            continue
+        if char in "([{":
+            depth += 1
+        elif char in ")]}" and depth:
+            depth -= 1
+        if char == "," and depth == 0:
+            candidate = "".join(current).strip()
+            if candidate.startswith("(") or "|" not in candidate:
+                if candidate:
+                    parts.append(candidate)
+                current = []
+                continue
+        current.append(char)
+    tail = "".join(current).strip()
+    if tail:
+        parts.append(tail)
+    return parts
 
 
 def extract_source_tables(kql: str) -> list[str]:
     """Extract simple KQL source table names from the first stage."""
+    kql = _strip_table_extraction_preamble(kql)
     stages = _split_kql_stages(kql)
     if not stages:
         return []
     source = stages[0].strip()
+    if re.match(r"^(?:declare|let)\b", source, flags=re.IGNORECASE):
+        return []
+    if re.match(r"^find\b", source, flags=re.IGNORECASE):
+        return []
+    source = re.sub(r"^\(\s*union\b", "union", source, flags=re.IGNORECASE)
+    search_stage = _parse_search_stage(source)
+    if search_stage:
+        return search_stage.tables
     if source.lower().startswith("union "):
-        union_body = source[6:].strip()
-        union_body = re.sub(r"\b(?:isfuzzy|kind|withsource)\s*=\s*[^,\s]+", "", union_body, flags=re.IGNORECASE)
-        return [_clean_table_name(part) for part in _split_top_level(union_body) if _clean_table_name(part)]
+        return _extract_union_tables(source)
     return [_clean_table_name(source)] if _clean_table_name(source) else []
 
 
@@ -732,9 +882,10 @@ def _cleanup_boolean_expression(expression: str) -> str:
 def _remove_time_filters(predicate: str) -> str:
     text = predicate
     time_field = r"(?:TimeGenerated|Timestamp|EventCreationTime|EventEndTime|CreationTime|StartTime|EndTime)"
+    time_value = r"(?:ago\([^)]*\)|datetime\([^)]*\)|now\(\)|[^\s)]+)"
     patterns = [
-        rf"(?:\s*(?:and|or)\s*)?\b{time_field}\s+(?:between)\s*\([^)]*\)",
-        rf"(?:\s*(?:and|or)\s*)?\b{time_field}\s*(?:>=|>|<=|<|==|=~|=)\s*(?:ago\([^)]*\)|datetime\([^)]*\)|[^\s)]+)",
+        rf"(?:\s*(?:and|or)\s*)?\b{time_field}\s+between\s*\((?:[^()]|\([^()]*\))*\s*\.\.\s*(?:[^()]|\([^()]*\))*\)",
+        rf"(?:\s*(?:and|or)\s*)?\b{time_field}\s*(?:>=|>|<=|<|==|=~|=)\s*{time_value}",
     ]
     for pattern in patterns:
         text = re.sub(pattern, " ", text, flags=re.IGNORECASE)
@@ -762,6 +913,20 @@ def convert_predicate(
     expression = re.sub(
         r"column_ifexists\s*\(\s*(?P<field>'[^']+'|\"[^\"]+\"|[A-Za-z_][A-Za-z0-9_]*)\s*,\s*[^)]*\)",
         replace_column_ifexists,
+        expression,
+        flags=re.IGNORECASE,
+    )
+
+    def replace_between(match: re.Match) -> str:
+        field = map_field(match.group("field"), mapping, errors, allowed_aliases)
+        low = _format_value_for_field(match.group("low"), field, mapping)
+        high = _format_value_for_field(match.group("high"), field, mapping)
+        clause = f"({field} >= {low} and {field} <= {high})"
+        return f"not {clause}" if match.group("neg") else clause
+
+    expression = re.sub(
+        rf"(?P<field>{field_token})\s+(?P<neg>!|not\s+)?between\s*\(\s*(?P<low>[^.()]+?)\s*\.\.\s*(?P<high>[^)]+?)\s*\)",
+        replace_between,
         expression,
         flags=re.IGNORECASE,
     )
@@ -900,6 +1065,78 @@ def convert_predicate(
     return expression, sorted(set(errors))
 
 
+def _free_text_search_clause(value: str) -> str:
+    raw_value = _literal_value(value)
+    pattern = _escape_logan_string(f"*{raw_value}*")
+    return f"('Original Log Content' like '{pattern}' or msg like '{pattern}')"
+
+
+def _search_expression_looks_like_predicate(expression: str) -> bool:
+    stripped = _strip_string_literals(expression)
+    return bool(
+        re.search(
+            r"\b(?:has|has_any|has_all|hasprefix|hassuffix|contains|startswith|endswith|in~?|not\s+in)\b|"
+            r"==|=~|!~|!=|<>|>=|<=|(?<!:)[=<>]",
+            stripped,
+            flags=re.IGNORECASE,
+        )
+    )
+
+
+def _convert_search_expression(
+    expression: str,
+    mapping: dict,
+    allowed_aliases: set[str] | None = None,
+) -> tuple[str, list[str]]:
+    """Convert a KQL search expression into Logan filters.
+
+    KQL ``search`` is broader than a single field predicate. For free-text
+    terms, Logan uses the raw-message fields available across parser contracts.
+    When the expression is a normal KQL predicate, reuse the predicate mapper so
+    fields such as ``CounterName == "..."`` keep their typed OCI mapping.
+    """
+    text = expression.strip()
+    if not text or text == "*":
+        return "", []
+    if _search_expression_looks_like_predicate(text):
+        return convert_predicate(text, mapping, allowed_aliases)
+
+    errors: list[str] = []
+    parts: list[str] = []
+    previous_clause = False
+    tokens = re.findall(r"\(|\)|\b(?:and|or|not)\b|@?'[^']*'|@?\"[^\"]*\"|[^\s()]+", text, flags=re.IGNORECASE)
+    for token in tokens:
+        lowered = token.lower()
+        if token in {"(", ")"}:
+            parts.append(token)
+            previous_clause = token == ")"
+            continue
+        if lowered in {"and", "or", "not"}:
+            parts.append(lowered)
+            previous_clause = False
+            continue
+        if token == "*":
+            continue
+
+        clause = ""
+        fielded = re.fullmatch(
+            r"(?P<field>[A-Za-z_][A-Za-z0-9_]*)\s*:\s*(?P<value>@?'[^']*'|@?\"[^\"]*\"|[^\s()]+)",
+            token,
+        )
+        if fielded:
+            field = map_field(fielded.group("field"), mapping, errors, allowed_aliases)
+            raw_value = _literal_value(fielded.group("value"))
+            clause = f"{field} like '{_escape_logan_string(f'*{raw_value}*')}'"
+        else:
+            clause = _free_text_search_clause(token)
+
+        if previous_clause:
+            parts.append("and")
+        parts.append(clause)
+        previous_clause = True
+    return _cleanup_boolean_expression(" ".join(parts)), sorted(set(errors))
+
+
 def _convert_fields_clause(
     clause: str,
     mapping: dict,
@@ -1033,12 +1270,22 @@ def _split_alias_expression(raw: str) -> tuple[str, str]:
     return "", raw.strip()
 
 
+def _summarize_by_only_clause(clause: str) -> str:
+    return re.sub(r"^\s*by\s+", "", clause, flags=re.IGNORECASE).strip()
+
+
 def _convert_summarize(
     stage: str,
     mapping: dict,
     allowed_aliases: set[str] | None = None,
 ) -> tuple[str, list[str], set[str]]:
     clause = re.sub(r"^\s*summarize\s+", "", stage, flags=re.IGNORECASE).strip()
+    by_only_clause = _summarize_by_only_clause(clause)
+    if by_only_clause != clause:
+        errors: list[str] = []
+        fields_clause = _convert_fields_clause(by_only_clause, mapping, errors, allowed_aliases)
+        return f"stats count as Count by {fields_clause}", errors, {"Count"}
+
     parts = re.split(r"\s+by\s+", clause, maxsplit=1, flags=re.IGNORECASE)
     aggregate_clause = parts[0].strip()
     by_clause = parts[1].strip() if len(parts) == 2 else ""
@@ -1099,7 +1346,7 @@ def _convert_sort(stage: str, mapping: dict, errors: list[str], allowed_aliases:
     first = _split_top_level(clause)[0] if _split_top_level(clause) else clause
     tokens = first.split()
     field = tokens[0] if tokens else first
-    direction = tokens[1].lower() if len(tokens) > 1 else "asc"
+    direction = tokens[1].lower() if len(tokens) > 1 else "desc"
     mapped = map_field(field, mapping, errors, allowed_aliases)
     prefix = "-" if direction in {"desc", "descending"} else ""
     return f"sort {prefix}{mapped}"
@@ -1117,6 +1364,33 @@ def _convert_top(stage: str, mapping: dict, errors: list[str], allowed_aliases: 
         commands.append(f"sort {'-' if direction.lower() == 'desc' else ''}{mapped}")
     commands.append(f"head {match.group('count')}")
     return commands
+
+
+def _find_top_level_binary(expression: str) -> tuple[str, str, str] | None:
+    quote: str | None = None
+    depth = 0
+    for index in range(len(expression) - 1, -1, -1):
+        char = expression[index]
+        if quote:
+            if char == quote:
+                quote = None
+            continue
+        if char in ("'", '"'):
+            quote = char
+            continue
+        if char in ")]}":
+            depth += 1
+            continue
+        if char in "([{":
+            if depth:
+                depth -= 1
+            continue
+        if depth == 0 and char in {"+", "-", "*", "/"}:
+            left = expression[:index].strip()
+            right = expression[index + 1:].strip()
+            if left and right:
+                return left, char, right
+    return None
 
 
 def _function_args(expression: str, function_name: str) -> list[str] | None:
@@ -1142,6 +1416,30 @@ def _convert_scalar_expression(
     if column_field:
         return map_field(column_field, mapping, errors, allowed_aliases)
 
+    iff_args = _function_args(expr, "iff") or _function_args(expr, "iif")
+    if iff_args is not None:
+        if len(iff_args) != 3:
+            errors.append("unsupported scalar function: iff")
+            return "''"
+        predicate, predicate_errors = convert_predicate(iff_args[0], mapping, allowed_aliases)
+        errors.extend(predicate_errors)
+        true_value = _convert_scalar_expression(iff_args[1], mapping, errors, allowed_aliases)
+        false_value = _convert_scalar_expression(iff_args[2], mapping, errors, allowed_aliases)
+        return f"if({predicate}, {true_value}, {false_value})" if predicate else true_value
+
+    case_args = _function_args(expr, "case")
+    if case_args is not None:
+        if len(case_args) < 3 or len(case_args) % 2 == 0:
+            errors.append("unsupported scalar function: case")
+            return "''"
+        fallback = _convert_scalar_expression(case_args[-1], mapping, errors, allowed_aliases)
+        for predicate_expression, value_expression in reversed(list(zip(case_args[0:-1:2], case_args[1:-1:2]))):
+            predicate, predicate_errors = convert_predicate(predicate_expression, mapping, allowed_aliases)
+            errors.extend(predicate_errors)
+            value = _convert_scalar_expression(value_expression, mapping, errors, allowed_aliases)
+            fallback = f"if({predicate}, {value}, {fallback})" if predicate else value
+        return fallback
+
     for cast_name in ("tostring", "toint", "tolong"):
         args = _function_args(expr, cast_name)
         if args is not None:
@@ -1157,6 +1455,63 @@ def _convert_scalar_expression(
                 errors.append(f"unsupported scalar function: {function_name}")
                 return "''"
             return f"{logan_name}({_convert_scalar_expression(args[0], mapping, errors, allowed_aliases)})"
+
+    # ``materialize(x)`` is a query-caching hint with no Logan equivalent;
+    # the cached subexpression is semantically equal to ``x``, so unwrap it.
+    materialize_args = _function_args(expr, "materialize")
+    if materialize_args is not None:
+        if len(materialize_args) != 1:
+            errors.append("unsupported scalar function: materialize")
+            return "''"
+        return _convert_scalar_expression(materialize_args[0], mapping, errors, allowed_aliases)
+
+    # ``strlen(x)`` -> Logan ``length(x)``.
+    strlen_args = _function_args(expr, "strlen")
+    if strlen_args is not None:
+        if len(strlen_args) != 1:
+            errors.append("unsupported scalar function: strlen")
+            return "''"
+        return f"length({_convert_scalar_expression(strlen_args[0], mapping, errors, allowed_aliases)})"
+
+    # ``strcat(a, b, ...)`` -> Logan ``concat(a, b, ...)``.
+    strcat_args = _function_args(expr, "strcat")
+    if strcat_args is not None:
+        if len(strcat_args) < 2:
+            errors.append("unsupported scalar function: strcat")
+            return "''"
+        converted = [
+            _convert_scalar_expression(arg, mapping, errors, allowed_aliases)
+            for arg in strcat_args
+        ]
+        return f"concat({', '.join(converted)})"
+
+    # KQL ``extract(regex, captureGroup, source)`` -> Logan
+    # ``extract(source, /regex/)``. Logan addresses the first capture group of
+    # the supplied regex; capture-group indices other than 1 cannot be
+    # expressed and are SKIPPED to avoid silently changing semantics.
+    extract_args = _function_args(expr, "extract")
+    if extract_args is not None:
+        if len(extract_args) != 3:
+            errors.append(f"unsupported scalar function: extract({len(extract_args)} args)")
+            return "''"
+        regex_arg, group_arg, source_arg = extract_args
+        group_text = group_arg.strip()
+        if group_text not in {"1"}:
+            errors.append(f"unsupported extract capture group: {group_text}")
+            return "''"
+        regex_literal = _literal_value(regex_arg.strip())
+        if "/" in regex_literal:
+            errors.append("unsupported extract regex: contains slash delimiter")
+            return "''"
+        source = _convert_scalar_expression(source_arg, mapping, errors, allowed_aliases)
+        return f"extract({source}, /{regex_literal}/)"
+
+    binary = _find_top_level_binary(expr)
+    if binary is not None:
+        left, operator, right = binary
+        left_value = _convert_scalar_expression(left, mapping, errors, allowed_aliases)
+        right_value = _convert_scalar_expression(right, mapping, errors, allowed_aliases)
+        return f"{left_value} {operator} {right_value}"
 
     if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", expr):
         return map_field(expr, mapping, errors, allowed_aliases)
@@ -1201,6 +1556,31 @@ def _convert_extend(stage: str, mapping: dict, allowed_aliases: set[str]) -> tup
     return commands, errors, aliases
 
 
+def _convert_project(stage: str, mapping: dict, allowed_aliases: set[str]) -> tuple[list[str], list[str], set[str]]:
+    clause = re.sub(r"^\s*project(?:-reorder)?\s+", "", stage, flags=re.IGNORECASE).strip()
+    commands: list[str] = []
+    errors: list[str] = []
+    aliases: set[str] = set()
+    fields: list[str] = []
+    current_aliases = set(allowed_aliases)
+    for item in _split_top_level(clause):
+        alias, expression = _split_alias_expression(item)
+        if alias:
+            sanitized_alias = _sanitize_alias(alias, "project_field")
+            rhs = _convert_scalar_expression(expression, mapping, errors, current_aliases)
+            aliases.add(sanitized_alias)
+            current_aliases.add(sanitized_alias)
+            commands.append(f"eval {sanitized_alias} = {rhs}")
+            fields.append(sanitized_alias)
+            continue
+        fields_clause = _convert_fields_clause(item, mapping, errors, current_aliases)
+        if fields_clause:
+            fields.append(fields_clause)
+    if fields:
+        commands.append(f"fields {', '.join(fields)}")
+    return commands, sorted(set(errors)), aliases
+
+
 def convert_kql_to_logan(kql: str, mapping: dict) -> tuple[str, dict, list[str]]:
     """Convert a supported KQL query into Logan QL."""
     kql, preprocessing_errors = _preprocess_simple_lets(kql)
@@ -1212,7 +1592,10 @@ def convert_kql_to_logan(kql: str, mapping: dict) -> tuple[str, dict, list[str]]
     if not stages:
         return "", {}, ["empty KQL query"]
 
+    initial_search_stage = _parse_search_stage(stages[0])
     tables = extract_source_tables(kql)
+    if initial_search_stage and not tables:
+        return "", {}, ["KQL search operator requires mapped in (...) tables"]
     missing_tables = [table for table in tables if table not in mapping["tables"]]
     if missing_tables:
         return "", {}, [f"unsupported Sentinel table: {table}" for table in missing_tables]
@@ -1224,6 +1607,13 @@ def convert_kql_to_logan(kql: str, mapping: dict) -> tuple[str, dict, list[str]]
     filters = [source_filter]
     commands: list[str] = []
     aliases: set[str] = set()
+
+    if initial_search_stage and initial_search_stage.expression:
+        predicate, predicate_errors = _convert_search_expression(initial_search_stage.expression, mapping, aliases)
+        errors.extend(predicate_errors)
+        if predicate:
+            filters.append(f"({predicate})")
+
     for stage in stages[1:]:
         lowered = stage.lower().strip()
         if re.match(r"(?:where|filter)\b", lowered):
@@ -1238,10 +1628,10 @@ def convert_kql_to_logan(kql: str, mapping: dict) -> tuple[str, dict, list[str]]
         elif re.match(r"project-away\b", lowered):
             continue
         elif re.match(r"project(?:-reorder)?\b", lowered):
-            project_clause = re.sub(r"^\s*project(?:-reorder)?\s+", "", stage, flags=re.IGNORECASE).strip()
-            fields_clause = _convert_fields_clause(project_clause, mapping, errors, aliases)
-            if fields_clause:
-                commands.append(f"fields {fields_clause}")
+            project_commands, project_errors, project_aliases = _convert_project(stage, mapping, aliases)
+            commands.extend(project_commands)
+            errors.extend(project_errors)
+            aliases.update(project_aliases)
         elif re.match(r"extend\b", lowered):
             extend_commands, extend_errors, extend_aliases = _convert_extend(stage, mapping, aliases)
             commands.extend(extend_commands)
@@ -1261,6 +1651,30 @@ def convert_kql_to_logan(kql: str, mapping: dict) -> tuple[str, dict, list[str]]
                 commands.append(f"head {count[0]}")
             else:
                 errors.append(f"unsupported limit stage: {stage}")
+        elif re.match(r"sample\b", lowered):
+            count = re.findall(r"\d+", stage)
+            if count:
+                commands.append(f"head {count[0]}")
+            else:
+                errors.append(f"unsupported sample stage: {stage}")
+        elif re.match(r"count\b", lowered):
+            commands.append("stats count as Count")
+            aliases.add("Count")
+        elif re.match(r"search\b", lowered):
+            search_stage = _parse_search_stage(stage)
+            if not search_stage:
+                errors.append(f"unsupported KQL search stage: {stage}")
+                continue
+            if search_stage.tables:
+                errors.append("unsupported KQL stage: nested search in (...)")
+                continue
+            predicate, predicate_errors = _convert_search_expression(search_stage.expression, mapping, aliases)
+            errors.extend(predicate_errors)
+            if predicate:
+                if commands:
+                    commands.append(f"where {predicate}")
+                else:
+                    filters.append(f"({predicate})")
         elif re.match(r"top\b", lowered):
             top_commands = _convert_top(stage, mapping, errors, aliases)
             if top_commands:

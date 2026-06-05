@@ -81,7 +81,9 @@ spec:
                   key: backend-token
                   optional: true
             - name: FORGE_ALLOWED_ORIGINS
-              value: "https://convert.octodemo.cloud"
+              value: "https://convert.octodemo.cloud,https://forge.octodemo.cloud,http://logan-forge-lb.logan-forge.svc,http://logan-forge-lb.logan-forge.svc.cluster.local"
+            - name: FORGE_TRUSTED_INTERNAL_HOSTS
+              value: "logan-forge-lb.logan-forge.svc,logan-forge-lb.logan-forge.svc.cluster.local"
           readinessProbe:
             httpGet:
               path: /api/health

@@ -26,9 +26,22 @@ for candidate in (PROJECT_ROOT, SCRIPTS_DIR):
 
 from scripts.convert_sigma import convert_rule, load_config  # noqa: E402
 from scripts.kql._facade_impl import convert_kql_to_logan, load_mapping_config  # noqa: E402
+from scripts.ql import elastic as elastic_converter  # noqa: E402
 
 
-LANGUAGES = {"sigma_yaml", "sentinel_kql", "splunk_spl", "elastic_lucene", "elastic_eql", "oci_logan"}
+LANGUAGES = {
+    "sigma_yaml",
+    "sentinel_kql",
+    "splunk_spl",
+    "elastic_lucene",
+    "elastic_kuery",
+    "elastic_eql",
+    "elastic_esql",
+    "elastic_toml",
+    "osquery_sql",
+    "yara",
+    "oci_logan",
+}
 MAX_QUERY_CHARS = 20_000
 UNSAFE_YAML_MARKERS = ("!!python", "!!binary", "!!omap", "!!set", "!!pairs")
 
@@ -215,36 +228,6 @@ def convert_splunk_spl(query: str) -> dict[str, Any]:
     )
 
 
-def convert_elastic(query: str, language: str) -> dict[str, Any]:
-    lowered = query.lower()
-    warnings = [warning("heuristic_elastic", "Elastic conversion maps common ECS fields; analyzers and sequence semantics are not preserved.")]
-    if "sequence" in lowered or " by " in lowered and language == "elastic_eql":
-        warnings.append(warning("elastic_sequence", "EQL sequence/correlation semantics are reduced to single-event filtering."))
-    source = "SOC Application Logs" if "url." in lowered or "http." in lowered else "Windows Sysmon Events"
-    predicates = [f"'Log Source' = '{source}'"]
-    if "event.code:1" in lowered or "event.code == \"1\"" in lowered:
-        predicates.append("'Event ID' = '1'")
-    if "powershell.exe" in lowered:
-        predicates.append("'Process Name' like '*powershell.exe'")
-    if "encodedcommand" in lowered or "*enc*" in lowered:
-        predicates.append("('Command Line' like '*enc*' or 'Command Line' like '*EncodedCommand*')")
-    if "<script" in lowered or "onerror" in lowered:
-        predicates.append("('Request URL' like '*<script*' or 'Request URL' like '*onerror*')")
-    if "status_code:200" in lowered or "http.response.status_code == 200" in lowered:
-        predicates.append("'Response Code' = 200")
-    logan = " and ".join(predicates)
-    if source == "SOC Application Logs":
-        logan += " | stats count as hits by 'Service Name', 'Trace ID', 'Source IP' | sort -hits"
-    logan += " | head 100"
-    return response(
-        source_language=language,
-        source_query=query,
-        logan_query=logan,
-        support_level="partial",
-        explanation="Mapped common Elastic/ECS fields and wildcard predicates into OCI Log Analytics display fields.",
-        warnings=warnings,
-    )
-
 
 def convert_oci_logan(query: str) -> dict[str, Any]:
     kql_markers = (" summarize ", " project ", " extend ", " == ", " has ")
@@ -272,8 +255,18 @@ def main() -> int:
             out = convert_sentinel_kql(query)
         elif language == "splunk_spl":
             out = convert_splunk_spl(query)
-        elif language in {"elastic_lucene", "elastic_eql"}:
-            out = convert_elastic(query, language)
+        elif language in {"elastic_lucene", "elastic_kuery"}:
+            out = elastic_converter.convert_elastic(query, language)
+        elif language == "elastic_eql":
+            out = elastic_converter.convert_elastic_eql(query)
+        elif language == "elastic_esql":
+            out = elastic_converter.convert_elastic_esql(query)
+        elif language == "elastic_toml":
+            out = elastic_converter.convert_elastic_toml(query)
+        elif language == "osquery_sql":
+            out = elastic_converter.convert_osquery_sql(query)
+        elif language == "yara":
+            out = elastic_converter.convert_yara(query)
         else:
             out = convert_oci_logan(query)
         print(json.dumps(out, sort_keys=True))

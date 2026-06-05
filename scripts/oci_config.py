@@ -184,6 +184,11 @@ CUSTOM_LOG_SOURCES = [
     "SOC Windows Sysmon Logs",
     "SOC Sysmon Network Logs",
     "SOC Cloud Guard Logs",
+    "SOC Cloud Guard Instance Security Logs",
+    "SOC OSQuery Result Logs",
+    "Windows PowerShell Operational Logs",
+    "Windows Defender Operational Logs",
+    "Azure Log Analytics Custom Logs",
     "SOC Application Logs",
     "SOC VCN Flow Logs",
     "SOC Network Firewall Logs",
@@ -202,6 +207,15 @@ SOURCE_CANDIDATE_GROUPS = {
         "SOC Cloud Guard Logs",
         "OCI Cloud Guard Problems",
         "OCI Cloud Guard Logs",
+    ],
+    "cloud_guard_instance_security": [
+        "SOC Cloud Guard Instance Security Logs",
+        "OCI Cloud Guard Instance Security Logs",
+        "SOC OSQuery Result Logs",
+    ],
+    "osquery_results": [
+        "SOC OSQuery Result Logs",
+        "SOC Cloud Guard Instance Security Logs",
     ],
     # No exact native equivalent covers all SOC Linux Syslog detection patterns.
     "linux_syslog": [
@@ -222,6 +236,12 @@ SOURCE_CANDIDATE_GROUPS = {
     ],
     "windows_event_system": [
         "Windows Event System Logs",
+    ],
+    "windows_powershell_operational": [
+        "Windows PowerShell Operational Logs",
+    ],
+    "windows_defender_operational": [
+        "Windows Defender Operational Logs",
     ],
     # SOC source first: native ``Linux Secure Logs`` parser does not extract
     # ``Command Line`` from our JSON, so detection queries that LIKE on
@@ -257,6 +277,10 @@ SOURCE_CANDIDATE_GROUPS = {
     "application_logs": [
         "SOC Application Logs",
     ],
+    "azure_log_analytics_custom": [
+        "Azure Log Analytics Custom Logs",
+        "SOC Application Logs",
+    ],
     "vcn_flow": [
         "SOC VCN Flow Logs",
         "OCI VCN Flow Logs",
@@ -275,10 +299,13 @@ SOURCE_CANDIDATE_GROUPS = {
 TEST_DATA_FILES = [
     "oci_audit.jsonl",
     "cloud_guard.jsonl",
+    "cloud_guard_instance_security.jsonl",
     "linux_syslog.jsonl",
     "windows_sysmon.jsonl",
     "windows_event_security.jsonl",
     "windows_event_system.jsonl",
+    "windows_powershell_operational.jsonl",
+    "windows_defender_operational.jsonl",
     "linux_secure.jsonl",
     "sysmon_operational.jsonl",
     "sysmon_network.jsonl",

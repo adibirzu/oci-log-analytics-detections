@@ -48,7 +48,12 @@ export const languageLabels: Record<LoganSourceLanguage, string> = {
   sentinel_kql: "Sentinel KQL",
   splunk_spl: "Splunk SPL",
   elastic_lucene: "Elastic/Lucene",
+  elastic_kuery: "Elastic Kuery",
   elastic_eql: "Elastic EQL",
+  elastic_esql: "Elastic ES|QL",
+  elastic_toml: "Elastic TOML",
+  osquery_sql: "OSQuery SQL",
+  yara: "YARA",
   oci_logan: "Raw / OCI Logan QL",
 }
 
@@ -57,7 +62,12 @@ export const languageOrder: LoganSourceLanguage[] = [
   "sentinel_kql",
   "splunk_spl",
   "elastic_lucene",
+  "elastic_kuery",
   "elastic_eql",
+  "elastic_esql",
+  "elastic_toml",
+  "osquery_sql",
+  "yara",
   "oci_logan",
 ]
 
@@ -102,11 +112,37 @@ const fieldMaps: Record<LoganSourceLanguage, Array<{ source: string; oci: string
     { source: "url.path/url.query", oci: "Request URL", note: "HTTP URL fields collapse to parser URL" },
     { source: "http.response.status_code", oci: "Response Code", note: "HTTP response status" },
   ],
+  elastic_kuery: [
+    { source: "event.category", oci: "Event Category", note: "ECS event category" },
+    { source: "event.outcome", oci: "Status", note: "ECS outcome mapped to result status" },
+    { source: "http.request.method", oci: "Request Method", note: "HTTP request method" },
+    { source: "http.response.status_code", oci: "Response Code", note: "HTTP response status" },
+    { source: "service.name", oci: "Service Name", note: "APM service dimension" },
+  ],
   elastic_eql: [
     { source: "process.name", oci: "Process Name", note: "EQL process event field" },
     { source: "process.command_line", oci: "Command Line", note: "Command-line predicate" },
     { source: "user.name", oci: "User Name", note: "Identity field" },
     { source: "event.type", oci: "Event Type", note: "Event lifecycle predicate where available" },
+  ],
+  elastic_esql: [
+    { source: "FROM logs-*", oci: "Log Source", note: "Dataset routed to OCI log source" },
+    { source: "WHERE", oci: "where/search predicate", note: "ES|QL filter stage" },
+    { source: "STATS", oci: "stats", note: "Aggregation command mapping" },
+    { source: "KEEP", oci: "fields", note: "Projection command mapping" },
+  ],
+  elastic_toml: [
+    { source: "rule.type", oci: "support strategy", note: "Dispatches query/eql/esql/threshold/new_terms/threat_match/ML" },
+    { source: "rule.language", oci: "source language", note: "Selects Elastic language converter" },
+    { source: "rule.query", oci: "Logan QL", note: "Converted only at request time, not persisted" },
+  ],
+  osquery_sql: [
+    { source: "processes", oci: "OSQuery Result Logs", note: "Only parser-backed result logs are searchable in Logan QL" },
+    { source: "cmdline", oci: "Original Log Content", note: "Raw endpoint SQL is not executed by Logan QL" },
+  ],
+  yara: [
+    { source: "rule", oci: "YARA Match Results", note: "Only parser-backed match result logs are searchable in Logan QL" },
+    { source: "strings", oci: "Original Log Content", note: "Raw file content scans are not executed by Logan QL" },
   ],
   oci_logan: [
     { source: "Log Source", oci: "Log Source", note: "Passthrough source selector" },
@@ -116,11 +152,31 @@ const fieldMaps: Record<LoganSourceLanguage, Array<{ source: string; oci: string
   ],
 }
 
+/**
+ * Semantic support level -> shared severity token classes.
+ * Drives both the conversion support badge and the library cards so the
+ * severity ramp reads consistently across the console.
+ */
 export function supportBadgeClass(level: string) {
-  if (level === "supported") return "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-  if (level === "partial") return "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300"
-  if (level === "lossy") return "border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300"
-  return "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300"
+  if (level === "supported") return "border-severity-ok/35 bg-severity-ok/12 text-severity-ok"
+  if (level === "partial") return "border-severity-medium/35 bg-severity-medium/12 text-severity-medium"
+  if (level === "lossy") return "border-severity-high/35 bg-severity-high/12 text-severity-high"
+  return "border-severity-critical/35 bg-severity-critical/12 text-severity-critical"
+}
+
+/** Warning severity -> shared severity token classes. */
+export function warningSeverityClass(severity: ConversionWarning["severity"]) {
+  if (severity === "error") return "border-severity-critical/30 bg-severity-critical/10 text-severity-critical"
+  if (severity === "warning") return "border-severity-high/30 bg-severity-high/10 text-severity-high"
+  return "border-severity-info/30 bg-severity-info/10 text-severity-info"
+}
+
+/** Audit status -> shared severity token classes. */
+export function auditStatusClass(status: AuditEntry["status"]) {
+  if (status === "ok") return "bg-severity-ok/12 text-severity-ok"
+  if (status === "warn") return "bg-severity-high/12 text-severity-high"
+  if (status === "error") return "bg-severity-critical/12 text-severity-critical"
+  return "bg-severity-info/12 text-severity-info"
 }
 
 export function lineCount(value: string) {
@@ -155,6 +211,74 @@ export function formatLoganQueryForDisplay(query: string) {
     .replace(/\s+and\s+'Log Source'/g, "\n  and 'Log Source'")
     .replace(/\s+and\s+'/g, "\n  and '")
     .trim()
+}
+
+export function convertInBrowser(
+  language: LoganSourceLanguage,
+  sourceQuery: string,
+  examples: LoganConversionExample[],
+  exampleId?: string,
+): ConversionResponse {
+  const normalizedQuery = sourceQuery.trim()
+  const selectedExample = examples.find((example) => example.id === exampleId)
+  const exactExample =
+    selectedExample && selectedExample.source_language === language && selectedExample.source_query.trim() === normalizedQuery
+      ? selectedExample
+      : examples.find((example) => example.source_language === language && example.source_query.trim() === normalizedQuery)
+
+  if (exactExample) {
+    return {
+      schema_version: "1.0.0",
+      generated_at: new Date().toISOString(),
+      source_language: language,
+      source_query: sourceQuery,
+      logan_query: exactExample.expected_logan_ql,
+      support_level: exactExample.support_level,
+      explanation: `${exactExample.explanation} This result was served from the bundled static example catalog.`,
+      warnings: exactExample.warnings.map((message) => ({
+        code: "static_example_catalog",
+        message,
+        severity: "warning",
+      })),
+      metadata: { execution_mode: "static_browser_catalog", example_id: exactExample.id },
+      backend: "Static GitHub Pages converter",
+    }
+  }
+
+  if (language === "oci_logan") {
+    return {
+      schema_version: "1.0.0",
+      generated_at: new Date().toISOString(),
+      source_language: language,
+      source_query: sourceQuery,
+      logan_query: normalizedQuery,
+      support_level: "supported",
+      explanation: "OCI Logan QL input is passed through in static browser mode.",
+      warnings: [],
+      metadata: { execution_mode: "static_browser_passthrough" },
+      backend: "Static GitHub Pages converter",
+    }
+  }
+
+  return {
+    schema_version: "1.0.0",
+    generated_at: new Date().toISOString(),
+    source_language: language,
+    source_query: sourceQuery,
+    logan_query: "",
+    support_level: "unsupported",
+    explanation:
+      "Static GitHub Pages mode cannot run the Python conversion backend. Select a bundled example, use raw OCI Logan QL passthrough, or deploy the server/API build for ad hoc conversion.",
+    warnings: [
+      {
+        code: "static_backend_unavailable",
+        message: "GitHub Pages hosts static files only; the full converter requires the Next.js API route or an external Forge backend.",
+        severity: "error",
+      },
+    ],
+    metadata: { execution_mode: "static_browser_limited" },
+    backend: "Static GitHub Pages converter",
+  }
 }
 
 export function clientSideWarnings(language: LoganSourceLanguage, sourceQuery: string): ConversionWarning[] {
@@ -202,6 +326,24 @@ export function clientSideWarnings(language: LoganSourceLanguage, sourceQuery: s
           {
             code: "eql_sequence_review",
             message: "Elastic sequence semantics are not represented by a single Logan QL query.",
+            severity: "warning" as const,
+          },
+        ]
+      : []),
+    ...(language === "osquery_sql"
+      ? [
+          {
+            code: "osquery_result_log_boundary",
+            message: "OSQuery SQL is converted only when represented as OCI-ingested result logs.",
+            severity: "warning" as const,
+          },
+        ]
+      : []),
+    ...(language === "yara"
+      ? [
+          {
+            code: "yara_result_log_boundary",
+            message: "YARA rules are converted only when represented as OCI-ingested match result logs.",
             severity: "warning" as const,
           },
         ]

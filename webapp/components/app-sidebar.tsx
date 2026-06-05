@@ -19,6 +19,7 @@ import {
   SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { publicAssetPath } from "@/lib/public-assets"
 
 const repositoryUrl = "https://github.com/adibirzu/oci-log-analytics-detections"
 
@@ -39,7 +40,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="/octo-logo.png"
+            src={publicAssetPath("/octo-logo.png")}
             width={36}
             height={36}
             alt="OCTO"

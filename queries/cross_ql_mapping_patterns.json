@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T17:40:38Z",
+  "generated_at": "2026-05-19T08:07:47Z",
   "patterns": [
     {
       "example_ids": [
@@ -36,6 +36,41 @@
     },
     {
       "example_ids": [
+        "kql-search-contoso"
+      ],
+      "id": "kql-search-in",
+      "logan_commands": [
+        "search",
+        "where",
+        "head"
+      ],
+      "oci_mapping": "Map KQL search table scopes to OCI Log Sources and free-text terms to Original Log Content/msg predicates.",
+      "source_construct": "search in (...) free-text terms and table-scoped search predicates",
+      "source_language": "sentinel_kql",
+      "support_level": "supported",
+      "warning_behavior": "Require mapped in (...) tables for first-stage search and warn through validation when a searched field is not mapped."
+    },
+    {
+      "example_ids": [
+        "kql-common-securityevent-outcomes"
+      ],
+      "id": "kql-common-operators",
+      "logan_commands": [
+        "search",
+        "where",
+        "eval",
+        "stats",
+        "sort",
+        "head"
+      ],
+      "oci_mapping": "Strip explicit KQL time windows, map predicates to OCI display fields, use eval for scalar classification, stats for count/distinct rollups, sort -field for Kusto's default descending order, and head for take/limit.",
+      "source_construct": "where, between, extend/case, summarize by, sort, take/count",
+      "source_language": "sentinel_kql",
+      "support_level": "supported",
+      "warning_behavior": "Warn through validation when projected or calculated fields are not backed by the mapping allow-list."
+    },
+    {
+      "example_ids": [
         "sigma-powershell-encoded",
         "sigma-soc-xss"
       ],
@@ -68,6 +103,58 @@
     },
     {
       "example_ids": [
+        "elastic-kuery-http-post-403"
+      ],
+      "id": "elastic-kuery-field-query",
+      "logan_commands": [
+        "search",
+        "where"
+      ],
+      "oci_mapping": "Map ECS field predicates to OCI display fields, preserving supported bool groups and surfacing unsupported nested/analyzed behavior.",
+      "source_construct": "Kibana KQL field comparisons, boolean operators, wildcard terms, and existence checks",
+      "source_language": "elastic_kuery",
+      "support_level": "partial",
+      "warning_behavior": "Warn on nested objects, analyzer-specific token behavior, scripted fields, and unmapped ECS fields."
+    },
+    {
+      "example_ids": [
+        "elastic-esql-http-errors"
+      ],
+      "id": "elastic-esql-pipeline",
+      "logan_commands": [
+        "search",
+        "where",
+        "eval",
+        "stats",
+        "fields",
+        "sort",
+        "head"
+      ],
+      "oci_mapping": "Map ES|QL sources to OCI log sources, filters to search/where, aggregations to stats/timestats, projections to fields, and limits to head.",
+      "source_construct": "FROM, WHERE, STATS, EVAL, KEEP, SORT, LIMIT",
+      "source_language": "elastic_esql",
+      "support_level": "partial",
+      "warning_behavior": "Warn or block unsupported ES|QL functions such as enrich, mv_expand, fuzzy match, or cross-source joins."
+    },
+    {
+      "example_ids": [
+        "elastic-toml-synthetic-threshold"
+      ],
+      "id": "elastic-toml-dispatch",
+      "logan_commands": [
+        "search",
+        "where",
+        "stats",
+        "lookup"
+      ],
+      "oci_mapping": "Parse metadata, dispatch query/eql/esql rules to language converters, and model threshold/new_terms/threat_match/ML dependencies explicitly.",
+      "source_construct": "Elastic detection rule TOML with rule.type and rule.language",
+      "source_language": "elastic_toml",
+      "support_level": "partial",
+      "warning_behavior": "Never persist third-party rule bodies; return converted output only for the request and surface rule-type dependencies."
+    },
+    {
+      "example_ids": [
         "spl-threat-ip-lookup"
       ],
       "id": "lookup-watchlist",
@@ -93,6 +180,22 @@
       "source_language": "cross_ql",
       "support_level": "unsupported",
       "warning_behavior": "Block true cross-table joins and sequence semantics with unsupported_join_or_sequence."
+    },
+    {
+      "example_ids": [
+        "osquery-sql-process-result",
+        "yara-result-log"
+      ],
+      "id": "stateful-or-content-scan-languages",
+      "logan_commands": [
+        "search",
+        "where"
+      ],
+      "oci_mapping": "Convert only result-log detections when an OCI parser emits OSQuery or YARA result events; do not pretend Logan QL can execute endpoint SQL or scan file bytes.",
+      "source_construct": "OSQuery SQL endpoint-state queries and raw YARA file-content rules",
+      "source_language": "cross_ql",
+      "support_level": "unsupported",
+      "warning_behavior": "Emit unsupported_stateful_query or unsupported_content_scan unless the input is a result-log query shape."
     },
     {
       "example_ids": [

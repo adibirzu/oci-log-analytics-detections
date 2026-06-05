@@ -1,0 +1,15 @@
+{
+  "name": "container-oke-host",
+  "platform": "linux",
+  "description": "Container and OKE host checks for namespace escape and privileged runtime abuse.",
+  "queries": [
+    {
+      "id": "host_namespace_processes",
+      "name": "Host namespace entry processes",
+      "sql": "SELECT pid, cmdline FROM processes WHERE cmdline LIKE '%nsenter%' OR cmdline LIKE '%hostPID%';",
+      "severity": "critical",
+      "expected_fields": ["pid", "cmdline"],
+      "mitre": ["T1611"]
+    }
+  ]
+}

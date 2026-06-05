@@ -13,15 +13,11 @@ from . import register
 from ..types import ConversionContext, KqlStage, StageResult, Tier
 
 _UNSUPPORTED = (
-    "take",
-    "count",
-    "limit",
     "parse",
     "evaluate",
     "mv-expand",
     "make-series",
     "join",
-    "render",
 )
 
 

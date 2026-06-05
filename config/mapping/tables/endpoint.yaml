@@ -11,6 +11,12 @@ tables:
     sources:
     - Windows Event System Logs
     - Windows Security Events
+  Event:
+    category: endpoint
+    service: windows_event
+    sources:
+    - Windows Event System Logs
+    - Windows Security Events
   Sysmon:
     category: endpoint
     service: sysmon
@@ -103,3 +109,14 @@ tables:
     sources:
     - SOC Windows Sysmon Logs
     - Windows Security Events
+  Perf:
+    category: monitoring
+    service: kusto_perf
+    sources:
+    - SOC Application Logs
+  Alert:
+    category: monitoring
+    service: kusto_alert
+    sources:
+    - SOC Application Logs
+    - OCI Cloud Guard Problems

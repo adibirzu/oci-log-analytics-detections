@@ -1,0 +1,15 @@
+{
+  "name": "network-exposure",
+  "platform": "linux,windows",
+  "description": "Network exposure checks for unexpected listeners and suspicious sockets.",
+  "queries": [
+    {
+      "id": "unexpected_listeners",
+      "name": "Unexpected listeners",
+      "sql": "SELECT pid, port, protocol, address FROM listening_ports WHERE port NOT IN (22, 80, 443);",
+      "severity": "critical",
+      "expected_fields": ["pid", "port", "protocol", "address"],
+      "mitre": ["T1095"]
+    }
+  ]
+}

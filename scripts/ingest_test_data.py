@@ -63,6 +63,14 @@ UPLOAD_MANIFEST = [
         "description": "Cloud Guard problem detection events"
     },
     {
+        "filename": "cloud_guard_instance_security.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["cloud_guard_instance_security"],
+        "upload_name": "soc-test-cg-instance-security",
+        "stream_key": "soc-detection-cloud-guard-instance-security",
+        "content_type": "application/octet-stream",
+        "description": "Cloud Guard Instance Security and OSQuery result findings"
+    },
+    {
         "filename": "linux_syslog.jsonl",
         "source_candidates": SOURCE_CANDIDATE_GROUPS["linux_syslog"],
         "upload_name": "soc-test-linux",
@@ -93,6 +101,22 @@ UPLOAD_MANIFEST = [
         "stream_key": "soc-detection-winsys",
         "content_type": "application/octet-stream",
         "description": "Windows System Event Log (service install, system changes)"
+    },
+    {
+        "filename": "windows_powershell_operational.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["windows_powershell_operational"],
+        "upload_name": "soc-test-winps",
+        "stream_key": "soc-detection-winps",
+        "content_type": "application/octet-stream",
+        "description": "Windows PowerShell Operational events (script block and module logging)"
+    },
+    {
+        "filename": "windows_defender_operational.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["windows_defender_operational"],
+        "upload_name": "soc-test-windef",
+        "stream_key": "soc-detection-windef",
+        "content_type": "application/octet-stream",
+        "description": "Windows Defender Operational events (malware, remediation, configuration changes)"
     },
     {
         "filename": "linux_secure.jsonl",

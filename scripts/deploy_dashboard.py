@@ -36,6 +36,7 @@ from oci_config import (
 )
 from oci_time import build_time_window
 from query_artifacts import is_saved_search_query_file
+from redaction import redact_text
 
 import oci
 
@@ -1526,7 +1527,7 @@ def validate_query_in_oci(la_client, namespace, query_file, query_string, lookba
             "ok": False,
             "rows": 0,
             "empty": False,
-            "error": str(exc),
+            "error": redact_text(str(exc)),
         }
 
 

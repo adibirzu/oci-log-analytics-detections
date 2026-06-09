@@ -8,7 +8,7 @@
   "dashboard": {
     "visualizationType": "tile",
     "showTitle": true,
-    "timeSelection": {"timePeriod": "l24h"},
+    "timeSelection": {"timePeriod": "l21d"},
     "visualizationOptions": {
       "dataField": "Detections",
       "thresholdConfig": {

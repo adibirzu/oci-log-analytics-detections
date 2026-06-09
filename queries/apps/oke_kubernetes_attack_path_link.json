@@ -21,7 +21,7 @@
     "visualizationType": "link",
     "showTitle": true,
     "timeSelection": {
-      "timePeriod": "l7d"
+      "timePeriod": "l21d"
     },
     "layout": {
       "width": 12,

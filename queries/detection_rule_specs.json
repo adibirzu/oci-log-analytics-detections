@@ -1,7 +1,7 @@
 {
-  "total_queries": 618,
-  "eligible_queries": 120,
-  "ineligible_queries": 498,
+  "total_queries": 621,
+  "eligible_queries": 125,
+  "ineligible_queries": 496,
   "specs": [
     {
       "query_file": "queries/accessibility_features_backdoor.json",
@@ -788,7 +788,7 @@
       "field_coverage": "not_evaluated",
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
-      "dashboard_readiness": "not_dashboard_annotated",
+      "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "deployable",
       "alarm_template": {
         "enabled": true,
@@ -14394,7 +14394,7 @@
       ],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and 'Attack ID' != null and ('Payment Interception' != null or 'Payment Redirect' != null or 'Payment Redirect URL' != null) | stats count as Events, distinctcount('Trace ID') as Traces, max('Payment Risk Score') as MaxRisk, unique('Payment Risk Score') as RiskScores, unique('Payment Card Last4') as CardLast4 by 'Attack ID', 'Run ID', 'Payment Provider', 'Payment Redirect URL' | sort -Events",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Service Namespace' = 'octo' and 'Attack ID' != null and ('Payment Interception' != null or 'Payment Redirect' != null or 'Payment Redirect URL' != null) | stats count as Events, distinctcount('Trace ID') as Traces, unique('Payment Risk Score') as RiskScores, unique('Payment Card Last4') as CardLast4 by 'Attack ID', 'Run ID', 'Payment Provider', 'Payment Redirect URL' | sort -Events",
       "reasons": [
         "scheduled-search rules support at most 3 dimensions"
       ],
@@ -15846,7 +15846,7 @@
       ],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'Windows Event Security Logs') and ('Process Name' like '%bluelight.exe' or 'Source Process' like '%bluelight.exe' or 'Parent Process Name' like '%iexplore.exe' or 'Destination Hostname' like '%graph.microsoft.com%' or 'Destination Hostname' like '%mail.google.com%' or 'Destination Hostname' like '%jquery.services%' or 'Granted Access' = '0x1fffff' or 'Target Filename' like '%bluelight.pdb%' or 'Target Filename' like '%cheV01%' or 'Target Filename' like '%INTEG.RAW%' or 'Command Line' like '%FromBase64String%' or 'Command Line' like '%cookie_name: OSID%' or 'Command Line' like '%ipinfo.io%' or 'Command Line' like '%Win32_%') | timestats count as Events by 'Process Name'",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'Windows Event Security Logs') and ('Process Name' like '%bluelight.exe' or 'Source Process' like '%bluelight.exe' or 'Parent Process Name' like '%iexplore.exe' or 'Destination Hostname' like '%graph.microsoft.com%' or 'Destination Hostname' like '%mail.google.com%' or 'Destination Hostname' like '%jquery.services%' or 'Granted Access' = '0x1fffff' or 'Target Filename' like '%bluelight.pdb%' or 'Target Filename' like '%cheV01%' or 'Target Filename' like '%INTEG.RAW%' or 'Command Line' like '%FromBase64String%' or 'Command Line' like '%cookie_name: OSID%' or 'Command Line' like '%ipinfo.io%' or 'Command Line' like '%Win32_%') | timestats span = 1hour count as Events by 'Process Name'",
       "reasons": [],
       "detection_maturity": "validated_locally",
       "source_confidence": "medium",
@@ -16722,32 +16722,119 @@
       "query_file": "queries/hunting/credential_attack_correlation.json",
       "title": "Hunting: Credential Attack Correlation (PowerShell + Mimikatz + Kerberoast)",
       "severity": "critical",
-      "eligible": false,
+      "eligible": true,
       "metric_name": "TotalEvents",
       "dimensions": [
         "Entity"
       ],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "'Log Source' = 'Windows Security Events' and (('Event ID' = '4688' and ('Original Log Content' like '%powershell%' and ('Original Log Content' like '%DownloadString%' or 'Original Log Content' like '%-enc %' or 'Original Log Content' like '%Invoke-Mimikatz%' or 'Original Log Content' like '%Invoke-Kerberoast%'))) or ('Event ID' = '4688' and ('Original Log Content' like '%sekurlsa::%' or 'Original Log Content' like '%lsadump::%' or 'Original Log Content' like '%mimikatz%')) or ('Event ID' = '4769' and 'Original Log Content' like '%0x17%')) | eval AttackType = case('Original Log Content' like '%sekurlsa%' or 'Original Log Content' like '%mimikatz%' or 'Original Log Content' like '%lsadump%', 'Mimikatz', 'Original Log Content' like '%0x17%', 'Kerberoasting', 'Original Log Content' like '%powershell%', 'PowerShell_Attack', 'Other') | stats count as TotalEvents, distinctcount(AttackType) as AttackTypes by Entity | where AttackTypes >= 2 | sort -TotalEvents",
-      "reasons": [
-        "unsupported scheduled-search eval: case"
-      ],
+      "query": "'Log Source' = 'Windows Security Events' and (('Event ID' = '4688' and ('Original Log Content' like '%powershell%' and ('Original Log Content' like '%DownloadString%' or 'Original Log Content' like '%-enc %' or 'Original Log Content' like '%Invoke-Mimikatz%' or 'Original Log Content' like '%Invoke-Kerberoast%'))) or ('Event ID' = '4688' and ('Original Log Content' like '%sekurlsa::%' or 'Original Log Content' like '%lsadump::%' or 'Original Log Content' like '%mimikatz%')) or ('Event ID' = '4769' and 'Original Log Content' like '%0x17%')) | eval AttackStage = if('Event ID' = '4769', 'Kerberoasting', 'Endpoint_Credential_Tooling') | stats count as TotalEvents, distinctcount(AttackStage) as AttackStages, distinctcount('Event ID') as EventVectors by Entity | where AttackStages >= 2 | sort -TotalEvents",
+      "reasons": [],
       "detection_maturity": "validated_locally",
       "source_confidence": "medium",
       "field_coverage": "not_evaluated",
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_dashboard_annotated",
-      "scheduled_rule_eligibility": "not_deployable",
+      "scheduled_rule_eligibility": "deployable",
       "alarm_template": {
-        "enabled": false,
+        "enabled": true,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "TotalEvents",
         "dimensions": [
           "Entity"
         ],
         "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/demo_attack_timeline.json",
+      "title": "Attack Activity Timeline by Log Source (l21d)",
+      "severity": "informational",
+      "eligible": true,
+      "metric_name": "Events",
+      "dimensions": [
+        "Log Source"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'OCI Audit Logs' or 'Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Network Firewall Logs') | timestats span = 6hour count as Events by 'Log Source'",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "Log Source"
+        ],
+        "severity": "informational",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/demo_cloud_critical_kpi.json",
+      "title": "Cloud: Critical OCI Audit Events (l21d)",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "CloudThreats",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like '*delete*' or 'Event Type' like '*terminate*' or 'Event Type' like '*remove*' or 'Event Type' like '*DeletePolicy*' or 'Event Type' like '*DeleteCompartment*') | stats count as CloudThreats",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "CloudThreats",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/demo_top_attacker_ips.json",
+      "title": "Top Attacker Source IPs - OCI Audit (l21d)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "DestructiveEvents",
+      "dimensions": [
+        "Source IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and 'Source IP' != null and ('Event Type' like '*delete*' or 'Event Type' like '*terminate*' or 'Event Type' like '*remove*' or 'Event Type' like '*update*' or 'Event Type' like '*create*' or 'Event Type' like '*DeletePolicy*' or 'Event Type' like '*DeleteCompartment*') | stats count as DestructiveEvents, distinctcount('Event Type') as DistinctActions, distinctcount('User Name') as Users by 'Source IP' | sort -DestructiveEvents",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "DestructiveEvents",
+        "dimensions": [
+          "Source IP"
+        ],
+        "severity": "high",
         "create_alarm_by_default": false
       }
     },
@@ -17307,31 +17394,28 @@
       "query_file": "queries/hunting/logon_anomaly_by_account.json",
       "title": "Hunting: Logon Anomaly - Account Activity Profiling",
       "severity": "high",
-      "eligible": false,
+      "eligible": true,
       "metric_name": "TotalEvents",
       "dimensions": [
-        "Account"
+        "Target User Name"
       ],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "'Log Source' = 'Windows Security Events' and 'Event ID' in ('4624', '4625', '4648', '4672') and not 'Original Log Content' like '%TargetUserName:ANONYMOUS LOGON%' and not 'Original Log Content' like '%TargetUserName:-$%' | eval Account = regexextract('Original Log Content', 'TargetUserName:([^;]+)') | eval IsFailure = case('Event ID' = '4625', 1, 0), IsExplicit = case('Event ID' = '4648', 1, 0), IsPrivilege = case('Event ID' = '4672', 1, 0) | stats count as TotalEvents, sum(IsFailure) as Failures, sum(IsExplicit) as ExplicitCreds, sum(IsPrivilege) as PrivilegeAssigns, distinctcount(Entity) as UniqueHosts by Account | eval FailRate = round(Failures * 100 / TotalEvents, 1) | where UniqueHosts > 2 or ExplicitCreds > 10 or FailRate > 20 | sort -UniqueHosts",
-      "reasons": [
-        "unsupported scheduled-search function: regexextract",
-        "unsupported scheduled-search eval: case"
-      ],
+      "query": "'Log Source' = 'Windows Security Events' and 'Event ID' in ('4624', '4625', '4648', '4672') and not 'Target User Name' = 'ANONYMOUS LOGON' and not 'Target User Name' like '%$' | eval IsFailure = if('Event ID' = '4625', 1, 0) | eval IsExplicit = if('Event ID' = '4648', 1, 0) | eval IsPrivilege = if('Event ID' = '4672', 1, 0) | stats count as TotalEvents, sum(IsFailure) as Failures, sum(IsExplicit) as ExplicitCreds, sum(IsPrivilege) as PrivilegeAssigns, distinctcount(Entity) as UniqueHosts by 'Target User Name' | eval FailRate = round(Failures * 100 / TotalEvents, 1) | where UniqueHosts > 2 or ExplicitCreds > 10 or FailRate > 20 | sort -UniqueHosts",
+      "reasons": [],
       "detection_maturity": "validated_locally",
       "source_confidence": "medium",
       "field_coverage": "not_evaluated",
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_dashboard_annotated",
-      "scheduled_rule_eligibility": "not_deployable",
+      "scheduled_rule_eligibility": "deployable",
       "alarm_template": {
-        "enabled": false,
+        "enabled": true,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "TotalEvents",
         "dimensions": [
-          "Account"
+          "Target User Name"
         ],
         "severity": "high",
         "create_alarm_by_default": false
@@ -18025,7 +18109,7 @@
       "field_coverage": "not_evaluated",
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
-      "dashboard_readiness": "not_dashboard_annotated",
+      "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "deployable",
       "alarm_template": {
         "enabled": true,

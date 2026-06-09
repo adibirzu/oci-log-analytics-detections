@@ -32,7 +32,7 @@ Dashboard-ready query JSON can also include a `dashboard` object:
 
 - `visualizationType`: one of the types in `SUPPORTED_VISUALIZATION_TYPES`
 - `visualizationOptions`: options passed to the Log Analytics saved-search UI config
-- `timeSelection`: usually `{"timePeriod": "l24h"}` for demo dashboards or a longer hunt window such as `l21d`
+- `timeSelection`: `{"timePeriod": "l21d"}` for the 3-week demo dataset (the repo default `DEFAULT_DASHBOARD_TIME_PERIOD`); shorter windows only when a widget deliberately needs them
 - `layout`: optional `{"width": <1-12>, "height": <positive integer>}` tile dimensions
 - `ask_ai_prompts`: short investigation prompts stored with the saved search tags
 

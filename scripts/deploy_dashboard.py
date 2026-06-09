@@ -113,7 +113,7 @@ def _iter_quoted_values(text):
             value.append(char)
 
 DASHBOARD_INVENTORY_PATH = os.path.join(QUERIES_DIR, "dashboard_inventory.json")
-DEFAULT_DASHBOARD_TIME_PERIOD = "l24h"
+DEFAULT_DASHBOARD_TIME_PERIOD = "l21d"
 DEFAULT_QUERY_VALIDATION_LOOKBACK = "24h"
 OCTO_APM_WORKSHOP_TIME_SELECTION = {"timePeriod": "l21d"}
 DASHBOARD_GRID_COLUMNS = 12
@@ -152,22 +152,46 @@ def octo_apm_workshop_widget(title, query_file):
 
 DASHBOARDS = {
     "SOC Overview Dashboard": {
-        "description": "Executive-level cross-domain security summary with critical alerts and hunting analytics.",
+        "description": "Executive cross-domain security command center for the 21-day demo. Opens with a KPI tile row spanning all four attack stories (Cloud/Identity, Endpoint, Web/App, Network/C2), then an attack-volume timeline and MITRE sunburst, a clickable top-attacker table, the global multicloud health map, the Kubernetes/OKE attack rollup, and a row of critical detections for fast drilldown.",
         "widgets": [
-            {"title": "SOC: Console Login Failures", "query_file": "oci_console_login_failure.json"},
-            {"title": "SOC: KMS Key Deletion Alert", "query_file": "oci_kms_key_scheduled_for_deletion.json"},
-            {"title": "SOC: Reverse Shell Detection", "query_file": "linux_reverse_shell_detected.json"},
-            {"title": "SOC: Credential Dumping Alert", "query_file": "windows_credential_dumping_via_procdump.json"},
-            {"title": "SOC: Critical IAM Policy Changes", "query_file": "oci_iam_policy_modified.json"},
-            {"title": "SOC: VCN Open to World", "query_file": "oci_vcn_security_list_open_to_world.json"},
-            {"title": "SOC: SSH Failed Logins", "query_file": "linux_ssh_failed_login.json"},
-            {"title": "SOC: Suspicious Linux Binaries", "query_file": "suspicious_usage_of_netcat.json"},
-            {"title": "SOC: Shadow Copy Deletion", "query_file": "windows_shadow_copy_deletion.json"},
-            {"title": "SOC: Compartment Deleted", "query_file": "oci_compartment_deleted.json"},
-            {"title": "Hunt: SSH Brute Force", "query_file": "hunting/ssh_brute_force_frequency.json"},
-            {"title": "Hunt: OCI Destruction Spike", "query_file": "hunting/oci_resource_destruction_spike.json"},
-            {"title": "Hunt: Web Multi-Stage Attack", "query_file": "hunting/web_owasp_multi_stage_attack.json"},
-            {"title": "Hunt: WAF Multi-Attack Score", "query_file": "hunting/waf_multi_attack_scoring.json"},
+            # ── Row 1: KPI tiles — one headline number per attack story (21-day window) ──
+            {"title": "Cloud: Critical Audit Events", "query_file": "hunting/demo_cloud_critical_kpi.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Endpoint: Critical Detections", "query_file": "hunting/coordinator_total_hits_kpi.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Web/App: Browser Attacks", "query_file": "apps/apm_total_attacks_kpi.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Network: C2 Affected Hosts", "query_file": "hunting/c2_affected_hosts_kpi.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            # ── Row 2: when did each story fire + MITRE composition ──
+            {"title": "Attack Activity Timeline (21d)", "query_file": "hunting/demo_attack_timeline.json"},
+            {"title": "MITRE Tactics x Process", "query_file": "hunting/bluelight_mitre_tactics_sunburst.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            # ── Row 3: clickable attacker drilldown ──
+            {"title": "Top Attacker Source IPs (Cloud)", "query_file": "hunting/demo_top_attacker_ips.json"},
+            # ── Row 4: global posture ──
+            {"title": "Global Multicloud Health Map", "query_file": "hunting/multicloud_geo_health_regional_map.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            # ── Row 5: Kubernetes / OKE attack rollup ──
+            {"title": "Kubernetes / OKE Attack Overview", "query_file": "apps/oke_kubernetes_attack_overview.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            # ── Row 6+: critical detections — fast drilldown across the four stories ──
+            {"title": "Cloud: IAM Policy Modified", "query_file": "oci_iam_policy_modified.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Cloud: KMS Key Deletion", "query_file": "oci_kms_key_scheduled_for_deletion.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Cloud: Compartment Deleted", "query_file": "oci_compartment_deleted.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Endpoint: Reverse Shell (Linux)", "query_file": "linux_reverse_shell_detected.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Endpoint: Credential Dumping (Win)", "query_file": "windows_credential_dumping_via_procdump.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Network: VCN Open to World", "query_file": "oci_vcn_security_list_open_to_world.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Web: OWASP Multi-Stage Attack", "query_file": "hunting/web_owasp_multi_stage_attack.json",
+             "time_selection": {"timePeriod": "l21d"}},
+            {"title": "Web: WAF Multi-Attack Score", "query_file": "hunting/waf_multi_attack_scoring.json",
+             "time_selection": {"timePeriod": "l21d"}},
         ]
     },
     "SOC: OCI STIG Compliance Dashboard": {
@@ -1302,12 +1326,24 @@ def build_dashboard_json(dashboard_id, name, description, widgets, widget_querie
     current_column = 0
     current_row_height = 0
 
+    # Per-deploy unique suffix taken from the timestamped dashboard_id
+    # (``soc-<slug>-<ts>``). Embedded saved-search IDs must be unique per deploy:
+    # a stable filename-based ID collides with OCI's *soft-deleted* saved search
+    # of the same ID when --cleanup ran first, and the import resurrects the old
+    # saved search (stale visualizationType / timeSelection) instead of applying
+    # the new uiConfig. The tile's savedSearchId uses the same suffixed ID, so the
+    # in-import reference stays consistent.
+    deploy_suffix = dashboard_id.rsplit('-', 1)[-1]
+
     for i, (widget, query_info) in enumerate(zip(widgets, widget_queries)):
         if query_info is None:
             continue
 
-        # Generate a stable short ID from the query filename
-        search_id = widget['query_file'].replace('.json', '').replace('_', '-')
+        # Unique-per-deploy short ID from the query filename + deploy suffix.
+        search_id = (
+            widget['query_file'].replace('.json', '').replace('_', '-')
+            + '-' + deploy_suffix
+        )
 
         layout = resolve_widget_layout(widget, query_info)
         width = layout["width"]

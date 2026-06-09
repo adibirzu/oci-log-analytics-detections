@@ -30,15 +30,15 @@ Live deployment evidence in the `<OCI_PROFILE_CAP>` OCI profile (`<OCI_REGION>`)
 
 - Local update: `221,078` synthetic events across `17` JSONL datasets generated from `scripts/generate_dashboard_data.py --days 21 --geo-interval 15 --validate` plus the scoped Octo APM workshop generator, including FreeLabFriday vsagent, domain-fronting, port-knocking evidence, the web-to-cloud and Windows AD/GOAD attack sequences, the 2025-2026 MELTS scenarios, and `octo-apm-demo` APM span/metric samples.
 - `16/16` standard datasets pass `scripts/ingest_test_data.py --validate`; the scoped Octo APM workshop dataset is optional in the ingest manifest and was uploaded by `deploy_octo_apm_workshop.sh` to `<OCI_PROFILE_CAP>` and `<OCI_PROFILE_EMDEMO>`
-- Current repository inventory: `22` dashboards and `343` active dashboard saved searches
+- Current repository inventory: `29` dashboards and `441` active dashboard saved searches
 - Final live health evidence is stored in `docs/health/all-dashboard-verify.json`
-- `<OCI_PROFILE_CAP>`: `343 / 343` widgets HIT, `0` MISS, `0` ERROR
+- `<OCI_PROFILE_CAP>`: `441` dashboard widgets deployed, `0` render/query errors (live `parse_validate_all_queries` 681/681 PASS; deploy-time validation 0 failed)
 - `DEFAULT`: redeploy and reverify before presenting this profile with the current 22-dashboard inventory
 - The Fusion correlation query remains cataloged for Fusion-enabled tenancies but is not deployed in this demo tenancy because no Fusion Apps source exists.
 - `scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --max-workers 4 --json docs/health/verify-<profile>-21d-2025-2026.json` is the current final gate for both `<OCI_PROFILE_CAP>` and `DEFAULT`
 - `scripts/setup_log_sources.py`: SOC/native-compatible sources exist in the target compartment; `SOC Application Logs` includes APM span and metric fields used by the Octo dashboard
 
-The current dashboard configuration resolves to `29` dashboards and `438` active saved searches after adding the Octo APM trace investigation Link/Tiles widget. Dashboard widgets default to `l24h` unless query or widget metadata requests `l21d`; the Octo APM workshop, web-to-cloud, C2, FreeLabFriday, and 2025-2026 drilldown widgets request `l21d`. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the legacy extended-data helper.
+The current dashboard configuration resolves to `29` dashboards and `441` active saved searches after adding the Octo APM trace investigation Link/Tiles widget. Dashboard widgets default to `l21d` to match the three-week demo dataset; individual widgets may override with a shorter window via query or widget metadata. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the legacy extended-data helper.
 
 ## Demo Story
 

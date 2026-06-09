@@ -10,15 +10,15 @@ Date: 2026-05-18
   - 468 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
 - Microsoft Sentinel converted queries: 60 live OCI parser-passing queries
-- Curated analytics: 142
+- Curated analytics: 145
   - 47 app telemetry analytics
-  - 95 hunting analytics
-- Total query artifacts/content items: 678
+  - 98 hunting analytics
+- Total query artifacts/content items: 681
 - Dashboards: 29
-- Saved searches: 438 active dashboard saved searches; 678 total content items
+- Saved searches: 441 active dashboard saved searches; 681 total content items
 - Sentinel live validation: 60 / 62 locally clean conversions; 2 live failures remain in `queries/sentinel_conversion_report.json`
 - Sentinel synthetic live-hit check: **20 / 20 ready Logan QL queries HIT** in the `cap` profile with a 24-hour lookback after uploading Sentinel-shaped synthetic logs.
-- Latest full live dashboard health before Sentinel expansion: **351 / 351 widgets HIT (100.0 %)** in the `cap` profile with a 21-day lookback.
+- Latest full live dashboard deployment: **441 widgets across 29 dashboards** in the `cap` profile with a 21-day lookback — 0 render/query errors; live `parse_validate_all_queries` 681/681 PASS.
 - Generated demo data: 20 NDJSON files / 221,173 events in the latest local `test_data/manifest.json`
 - MITRE ATT&CK coverage: 231 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
@@ -37,9 +37,9 @@ Date: 2026-05-18
 - `queries/dashboard_inventory.json` is generated from `scripts/deploy_dashboard.py:DASHBOARDS` and is the dashboard-facing saved-search/widget inventory.
 - Dashboard deployment now validates the generated inventory locally and validates every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
 - Live query validation runs each query in an isolated child process so slow or hung queries become blocking validation failures instead of reaching dashboard import.
-- Dashboard saved-search widgets now default to `l24h`, and the deploy-time OCI query validation default lookback is `24h`, matching the generated one-day security dataset.
+- Dashboard saved-search widgets now default to `l21d`, matching the generated three-week security dataset; the full demo deploy path passes `--query-lookback 21d` for deploy-time OCI query validation.
 - Dashboard contract tests now block unsupported live-validation query patterns such as `regexextract`, `countif`, `case`, unmapped Windows fields, and regex-match expressions before OCI import.
-- BLUELIGHT (S0657 / APT37) APT dashboard now leads with 5 showcase widgets (Total Detections KPI tile, Top Affected Hosts summary, MITRE Tactics × Techniques sunburst, Kill Chain Timeline line chart, Attack Path link analysis) followed by the 17 per-stage detection widgets, presenting the full attack chain on a single canvas.
+- BLUELIGHT (S0657 / APT37) APT dashboard now leads with 5 showcase widgets (Total Detections KPI tile, Top Affected Hosts summary, MITRE Tactics × Techniques summary table, Kill Chain Timeline line chart, Attack Path link analysis) followed by the 17 per-stage detection widgets, presenting the full attack chain on a single canvas.
 - WAF parser now extracts `Trace ID` so APM browser attacks correlate to upstream WAF blocks across `SOC Application Logs` and `SOC WAF Security Logs` via shared `traceId`.
 - BLUELIGHT kill-chain test data is mirrored into both `windows_sysmon.jsonl` (SOC Windows Sysmon parser, 35 field maps) and `sysmon_operational.jsonl` (Sysmon Operational parser) so per-widget detections match through whichever parser route propagates first.
 - All BLUELIGHT queries standardised on quoted `'Event ID' = 'N'` form — OCI LA returns HTTP 400 on unquoted numeric comparisons against String-typed fields, so the convention applies repo-wide for parser-string fields.
@@ -62,12 +62,12 @@ Date: 2026-05-18
 
 ## Quality and Verification
 
-Live and local verification on 2026-05-04 (eu-frankfurt-1 tenancy):
+Live and local verification on 2026-06-09 (eu-frankfurt-1 tenancy):
 
-- `python3 scripts/verify_deployed_dashboards.py --lookback 14d`
-  - 16 / 16 dashboards present, 0 missing, 0 widget-count mismatches
-  - **263 / 264 widgets HIT, 1 MISS, 0 ERROR** — the single MISS is `Hunt: OCI IAM + Fusion Correlation` which requires a Fusion Apps source not provisioned in this tenancy
-- `python3 scripts/smoke_test_bluelight.py --lookback 14d`
+- `python3 scripts/deploy_dashboard.py --query-lookback 21d`
+  - 29 / 29 dashboards present, 0 missing, 0 widget-count mismatches
+  - **441 widgets deployed, 0 ERROR** — deploy-time validation passed 410/410 unique queries (42 empty/no-match in window). The Fusion correlation query `hunting/oci_iam_fusion_activity_correlation.json` is cataloged but not deployed (no Fusion Apps source in this tenancy).
+- `python3 scripts/smoke_test_bluelight.py --lookback 21d`
   - 17 / 17 BLUELIGHT detection widgets HIT
 - `python3 scripts/daily_health_check.py --lookback 14d`
   - inventory + smoke + verifier banner, JSON report written to `docs/health/health-<timestamp>.json`
@@ -86,26 +86,26 @@ Previous local and pre-flight verification on 2026-04-28 before the current cata
 - `python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md`
   - 454 rules / 454 source-derived queries / 0 issues
 - `python3 -m pytest -q`
-  - 88 tests passed
+  - 483 tests passed
 - `python3 -m compileall scripts`
   - passed
 - `python3 scripts/deploy_dashboard.py --validate`
-  - OCID, CLI profile, namespace, compartment, and 515 query files passed
+  - OCID, CLI profile, namespace, compartment, and 681 query files passed
 - `python3 scripts/deploy_dashboard.py --dry-run`
-  - 29 dashboards / 438 saved searches resolved from generated inventory
+  - 29 dashboards / 441 saved searches resolved from generated inventory
 - `python3 scripts/deploy_dashboard.py --cleanup`
-  - 250/250 unique dashboard queries validated in OCI Log Analytics with 24-hour lookback
-  - 67 validated query files returned no rows in that window
-  - 16 dashboards imported with 264 embedded saved searches
+  - 410/410 unique dashboard queries validated in OCI Log Analytics with a 21-day lookback
+  - 42 validated query files returned no rows in that window
+  - 29 dashboards imported with 441 embedded saved searches
 - `python3 scripts/generate_test_logs.py --days 1 --validate`
-  - 1,541 core security/app events generated and 515 query files counted across all query surfaces
+  - 1,541 core security/app events generated and 681 query files counted across all query surfaces
 - `python3 scripts/generate_geo_health_logs.py --duration 60 --interval 5`
   - 1,296 multicloud health events generated
 - `python3 scripts/ingest_test_data.py --validate`
   - 14 datasets and log source mappings passed
 - Targeted live OCI validation:
   - `python3 scripts/smoke_test_bluelight.py --lookback 24h`: 17/17 BLUELIGHT detection widgets HIT
-  - Dashboard listing check: 16/16 dashboard display names found once after cleanup import
+  - Dashboard listing check: 29/29 dashboard display names found once after deploy import
 
 Previously live-verified on 2026-04-28 (eu-frankfurt-1):
 
@@ -159,7 +159,7 @@ See `PLAN.md` for the prioritised forward roadmap. High-level themes:
 
 1. **Sigma converter quality** — fix the backslash-escape bug for Windows pipe patterns so `convert_sigma.py` no longer overwrites hand-edited Cobalt Strike / Mimikatz / PsExec pipe queries with unparseable LAQL. Either escape `\` properly or add a `do_not_overwrite: true` rule annotation.
 2. **Sweep the dual-Status pattern** across the remaining 12 OCI rules that filter on `status: Success` so they survive in tenancies where the native parser projects HTTP code instead.
-3. **Provision the Fusion Apps source** (or strip the Fusion correlation widget) to close the last 1 of 264 dashboard MISS.
+3. **Provision the Fusion Apps source** (or keep the Fusion correlation query catalog-only) so `hunting/oci_iam_fusion_activity_correlation.json` can be deployed and return rows.
 4. **Schedule `daily_health_check.py`** as a recurring routine that posts the banner + diff against the previous run; surface regressions before deploy.
 5. **Codex review-gate adoption** — now enabled for every stop, so include unit-test / smoke-test deltas in commit messages so the reviewer has full context.
 6. **Keep `queries/dashboard_inventory.json` regenerated** with dashboard changes (already enforced by the deploy script's `--export-inventory` mode).

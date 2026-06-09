@@ -44,5 +44,16 @@
     "malware_family": "BLUELIGHT",
     "mitre_software_id": "S0657",
     "threat_actor": "APT37 (InkySquid)"
+  },
+  "dashboard": {
+    "visualizationType": "line",
+    "visualizationOptions": {
+      "timeField": "Time",
+      "valueField": "Screenshots",
+      "seriesField": "Process Name"
+    },
+    "timeSelection": {
+      "timePeriod": "l21d"
+    }
   }
 }

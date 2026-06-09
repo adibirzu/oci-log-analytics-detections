@@ -12,16 +12,12 @@
     "service": "hunting"
   },
   "dashboard": {
-    "visualizationType": "sunburst",
+    "visualizationType": "summary_table",
     "showTitle": true,
     "timeSelection": {
-      "timePeriod": "l7d"
+      "timePeriod": "l21d"
     },
     "visualizationOptions": {
-      "groupBy": [
-        "Log Source",
-        "Process Name"
-      ],
       "valueField": "Events"
     }
   }

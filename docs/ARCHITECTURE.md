@@ -41,7 +41,7 @@ Important distinction:
 
 - There are **476 Sigma-derived OCI query artifacts** in total.
 - Those 476 are split across **468 top-level detections** in `queries/` and **8 browser/app telemetry detections** in `queries/apps/`.
-- The repo also ships **142 curated analytics** that are not Sigma-derived: 47 app/APM telemetry analytics and 95 hunting queries.
+- The repo also ships **145 curated analytics** that are not Sigma-derived: 47 app/APM telemetry analytics and 98 hunting queries.
 - The repo also ships **60 live-validated Microsoft Sentinel conversions** in `queries/sentinel/`.
 
 ## Architecture Flow
@@ -63,7 +63,7 @@ rules/** ------------------------------------------+
            468 generated detections                    8 Sigma-derived browser queries
 
 queries/apps/*.json (47 curated app/APM analytics) ---+
-queries/hunting/*.json (95 curated analytics) --------+----> scripts/generate_catalog.py
+queries/hunting/*.json (98 curated analytics) --------+----> scripts/generate_catalog.py
                                                             - CATALOG.md
                                                             - queries/catalog.json
                                                             - inventory/coverage summary
@@ -79,7 +79,7 @@ queries/** -----------------------------------------------> scripts/export_for_m
 
 queries/** -----------------------------------------------> scripts/deploy_dashboard.py
                                                             - 29 dashboards
-                                                            - 438 embedded saved searches
+                                                            - 441 embedded saved searches
                                                             - queries/dashboard_inventory.json
 
 threat-intel/gap references ------------------------------> scripts/content_discovery.py
@@ -176,8 +176,8 @@ A handful of OCI LA SEARCH/LAQL behaviours have produced silent-zero MISSes duri
   - 24 STIG-mapped detections across 12 controls
 - Dashboard layer:
   - 29 dashboards
-  - 438 widget-backed saved searches
-  - 96 advanced visualization widgets (`tile`, `sunburst`, `summary_table`, `line`, `bar`, `link`, and `map`)
+  - 441 widget-backed saved searches
+  - 107 advanced visualization widgets (`tile`, `summary_table`, `line`, `bar`, `link`, and `map`)
 - Demo/test data:
   - 17 NDJSON files
   - 221,078 sample events in the latest generated local 21-day `test_data/manifest.json`
@@ -226,15 +226,15 @@ python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 
 python3 scripts/daily_health_check.py --lookback 21d
 ```
 
-`daily_health_check.py` chains the inventory + smoke + verifier into a single banner with an exit-coded JSON report under `docs/health/`. Recommended cadence: run weekly (or as a scheduled background routine) and on every deploy. The current repository inventory resolves locally to 29 dashboards / 438 saved searches, including 5 Sentinel dashboard groups. The latest `<OCI_PROFILE_CAP>` evidence in `docs/health/all-dashboard-verify.json` shows 343 / 343 pre-Sentinel widgets HIT; Sentinel queries are separately live-parser-gated in `queries/sentinel_conversion_report.json`. `hunting/oci_iam_fusion_activity_correlation.json` remains cataloged for Fusion-enabled tenancies but is not deployed in this demo tenancy because no Fusion Apps source exists.
+`daily_health_check.py` chains the inventory + smoke + verifier into a single banner with an exit-coded JSON report under `docs/health/`. Recommended cadence: run weekly (or as a scheduled background routine) and on every deploy. The current repository inventory resolves locally to 29 dashboards / 441 saved searches, including 5 Sentinel dashboard groups. The latest `<OCI_PROFILE_CAP>` deployment covers all 441 widgets across the 29 dashboards (deploy-time validation 410/410 unique queries, 0 errors; live `parse_validate_all_queries` 681/681 PASS); Sentinel queries are separately live-parser-gated in `queries/sentinel_conversion_report.json`. `hunting/oci_iam_fusion_activity_correlation.json` remains cataloged for Fusion-enabled tenancies but is not deployed in this demo tenancy because no Fusion Apps source exists.
 
 Previous local verified state on 2026-04-28 before the current catalog expansion:
 
 - Rule quality audit: 0 issues
-- Unit tests: 88 passing
-- Dashboard dry-run: 16 dashboards / 264 saved searches resolved
-- Dashboard validation: 515 query files OK
-- Dashboard cleanup deploy: 250/250 unique OCI queries validated, 16 dashboards imported, 264 embedded saved searches
+- Unit tests: 483 passing
+- Dashboard dry-run: 29 dashboards / 441 saved searches resolved
+- Dashboard validation: 681 query files OK
+- Dashboard deploy: 410/410 unique OCI queries validated (21-day lookback), 29 dashboards imported, 441 embedded saved searches
 - Ingest validation: 14 datasets and log source mappings passed
 - Log-source pre-flight validation: passed
 - BLUELIGHT live smoke test: 17/17 widgets returned rows with a 24-hour lookback
@@ -250,7 +250,7 @@ Current runtime note:
 
 - `validate_pipeline.py` derives expected streams and connector names from `config/streaming_config.json`, so the multicloud-health path is verified alongside the core SOC streams.
 - Direct NDJSON ingestion and the SOC streaming pipeline are both operational.
-- `deploy_dashboard.py` defaults dashboard widgets to `l24h`; use `--query-lookback 21d` when validating the full three-week dashboard dataset before importing saved searches. Octo APM workshop, web-to-cloud, C2, FreeLabFriday, and 2025-2026 incident widgets carry `l21d` metadata for the three-week drilldown.
+- `deploy_dashboard.py` defaults dashboard widgets to `l21d` to match the three-week dataset; the full demo deploy also passes `--query-lookback 21d` for deploy-time validation before importing saved searches. Individual widgets may override with a shorter window via query or widget metadata.
 
 ## Integrated Forge Webapp
 

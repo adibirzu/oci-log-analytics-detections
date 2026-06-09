@@ -4,13 +4,18 @@
   "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'Windows Event Security Logs') and ('Process Name' like '%bluelight.exe' or 'Source Process' like '%bluelight.exe' or 'Parent Process Name' like '%iexplore.exe' or 'Destination Hostname' like '%graph.microsoft.com%' or 'Destination Hostname' like '%mail.google.com%' or 'Destination Hostname' like '%jquery.services%' or 'Granted Access' = '0x1fffff' or 'Target Filename' like '%bluelight.pdb%' or 'Target Filename' like '%cheV01%' or 'Command Line' like '%FromBase64String%' or 'Command Line' like '%cookie_name: OSID%' or 'Command Line' like '%ipinfo.io%') | stats count as Events by 'Log Source', 'Process Name' | sort -Events",
   "type": "hunting",
   "level": "informational",
-  "tags": ["apt.apt37", "malware.bluelight", "showcase"],
+  "tags": [
+    "apt.apt37",
+    "malware.bluelight",
+    "showcase"
+  ],
   "dashboard": {
-    "visualizationType": "sunburst",
+    "visualizationType": "summary_table",
     "showTitle": true,
-    "timeSelection": {"timePeriod": "l24h"},
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
     "visualizationOptions": {
-      "groupBy": ["Log Source", "Process Name"],
       "valueField": "Events"
     },
     "ask_ai_prompts": [
@@ -19,8 +24,17 @@
     ]
   },
   "mitre_attack": {
-    "tactics": ["initial_access", "execution", "credential_access", "command_and_control"],
-    "techniques": ["T1189", "T1071.001", "T1555.003"]
+    "tactics": [
+      "initial_access",
+      "execution",
+      "credential_access",
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1189",
+      "T1071.001",
+      "T1555.003"
+    ]
   },
   "threat_intel": {
     "malware_family": "BLUELIGHT",

@@ -13,7 +13,7 @@
   "dashboard": {
     "visualizationType": "summary_table",
     "showTitle": true,
-    "timeSelection": {"timePeriod": "l24h"},
+    "timeSelection": {"timePeriod": "l21d"},
     "visualizationOptions": {
       "valueField": "Samples",
       "highlightField": "Traces"

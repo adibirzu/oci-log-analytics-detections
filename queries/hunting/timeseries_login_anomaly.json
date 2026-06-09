@@ -13,8 +13,14 @@
     "attack.t1110"
   ],
   "mitre_attack": {
-    "tactics": ["initial_access", "credential_access"],
-    "techniques": ["T1078", "T1110"]
+    "tactics": [
+      "initial_access",
+      "credential_access"
+    ],
+    "techniques": [
+      "T1078",
+      "T1110"
+    ]
   },
   "logsource": {
     "product": "oci",
@@ -24,5 +30,15 @@
     "Legitimate high-traffic periods",
     "Automated service account authentication",
     "Scheduled batch jobs authenticating"
-  ]
+  ],
+  "dashboard": {
+    "visualizationType": "line",
+    "visualizationOptions": {
+      "timeField": "Time",
+      "valueField": "login_count"
+    },
+    "timeSelection": {
+      "timePeriod": "l21d"
+    }
+  }
 }

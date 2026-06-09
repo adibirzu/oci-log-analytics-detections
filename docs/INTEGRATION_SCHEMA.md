@@ -32,25 +32,25 @@ Top-level shape:
   "generated_at": "2026-05-12T00:00:00.000000+00:00",
   "source": "scripts/deploy_dashboard.py:DASHBOARDS",
   "summary": {
-    "total_dashboards": 27,
-    "total_widgets": 450,
-    "advanced_visualization_widgets": 91,
+    "total_dashboards": 29,
+    "total_widgets": 441,
+    "advanced_visualization_widgets": 107,
     "visualization_types": {
-      "bar": 3,
-      "line": 6,
-      "link": 9,
-      "map": 1,
-      "summary_table": 62,
-      "sunburst": 4,
-      "table": 359,
-      "tile": 6
+      "bar": 4,
+      "hbar": 1,
+      "line": 9,
+      "link": 11,
+      "map": 2,
+      "summary_table": 66,
+      "table": 334,
+      "tile": 14
     },
     "levels": {
-      "critical": 97,
-      "high": 163,
-      "informational": 16,
-      "low": 14,
-      "medium": 160
+      "critical": 125,
+      "high": 191,
+      "informational": 20,
+      "low": 11,
+      "medium": 94
     }
   },
   "dashboards": []
@@ -98,7 +98,7 @@ Widget record:
     "height": 3
   },
   "time_selection": {
-    "timePeriod": "l24h"
+    "timePeriod": "l21d"
   },
   "ask_ai_prompts": [],
   "advanced_visualization": true,
@@ -336,7 +336,7 @@ The test-data manifest exposes dataset availability without requiring UI code to
 
 ## Deployment Gate
 
-`scripts/deploy_dashboard.py` builds the inventory from `DASHBOARDS`, validates every query reference locally, then validates every unique dashboard query against OCI Log Analytics before importing dashboards by default. Live validation runs each query in an isolated child process so a slow or hung query becomes a validation failure instead of reaching dashboard import. The generated OCI dashboard time parameter and widget default are `l24h`; the full demo deploy path passes `--query-lookback 21d` to validate the three-week synthetic dataset.
+`scripts/deploy_dashboard.py` builds the inventory from `DASHBOARDS`, validates every query reference locally, then validates every unique dashboard query against OCI Log Analytics before importing dashboards by default. Live validation runs each query in an isolated child process so a slow or hung query becomes a validation failure instead of reaching dashboard import. The generated OCI dashboard time parameter and widget default are `l21d`, matching the three-week synthetic dataset; the full demo deploy path also passes `--query-lookback 21d` for deploy-time validation.
 
 Default deployment behavior:
 

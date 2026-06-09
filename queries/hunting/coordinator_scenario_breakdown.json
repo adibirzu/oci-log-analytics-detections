@@ -15,7 +15,7 @@
     "visualizationType": "bar",
     "showTitle": true,
     "timeSelection": {
-      "timePeriod": "l7d"
+      "timePeriod": "l21d"
     },
     "visualizationOptions": {
       "groupBy": [

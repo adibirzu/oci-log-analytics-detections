@@ -13,7 +13,7 @@
   "dashboard": {
     "visualizationType": "link",
     "showTitle": true,
-    "timeSelection": {"timePeriod": "l24h"},
+    "timeSelection": {"timePeriod": "l21d"},
     "visualizationOptions": {
       "groupBy": ["Trace ID"],
       "linkBy": ["Log Source"],

@@ -5,19 +5,32 @@
   "type": "hunting",
   "hunting_type": "free_lab_friday_source_hunt",
   "level": "critical",
-  "tags": ["freelabfriday", "vsagent", "http_beacon", "c2", "attack.t1071.001"],
+  "tags": [
+    "freelabfriday",
+    "vsagent",
+    "http_beacon",
+    "c2",
+    "attack.t1071.001"
+  ],
   "logsource": {
     "product": "oci",
     "service": "application_and_lb",
-    "candidates": ["SOC Application Logs", "SOC Load Balancer Access Logs", "OCI Load Balancer Access Logs"]
+    "candidates": [
+      "SOC Application Logs",
+      "SOC Load Balancer Access Logs",
+      "OCI Load Balancer Access Logs"
+    ]
   },
   "dashboard": {
     "visualizationType": "line",
     "showTitle": true,
-    "timeSelection": {"timePeriod": "l21d"},
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
     "visualizationOptions": {
-      "seriesField": "User Agent",
-      "valueField": "BeaconRequests"
+      "timeField": "Time",
+      "valueField": "BeaconRequests",
+      "seriesField": "User Agent"
     },
     "ask_ai_prompts": [
       "Does this HTTP beacon pattern show regular implant check-ins?",
@@ -31,8 +44,17 @@
     }
   ],
   "mitre_attack": {
-    "tactics": ["command_and_control", "exfiltration"],
-    "techniques": ["T1071.001", "T1041"]
+    "tactics": [
+      "command_and_control",
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1071.001",
+      "T1041"
+    ]
   },
-  "falsepositives": ["Security lab traffic", "Internal beacon simulation tools"]
+  "falsepositives": [
+    "Security lab traffic",
+    "Internal beacon simulation tools"
+  ]
 }

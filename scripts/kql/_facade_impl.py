@@ -776,9 +776,28 @@ def _source_filter_for_tables(tables: Iterable[str], mapping: dict) -> tuple[str
 
 
 def _escape_logan_string(value) -> str:
+    """Escape a value for embedding inside a Logan QL single-quoted literal.
+
+    Logan QL escapes an interior single quote by DOUBLING it (``''``), never
+    with a backslash. The quote-doubling mirrors
+    ``scripts/kql/canonical.py:_emit_qstring`` so converter output is
+    ``canonical()``-stable (a stray ``\\'`` terminates the literal early and
+    makes ``canonical()`` raise).
+
+    Order of operations:
+
+    1. Normalize any backslash-escaped quote (``\\'``) an upstream conversion
+       step may have introduced back to a bare quote, so it cannot leak into
+       the emitted literal as ``\\'``.
+    2. Double literal backslashes (pre-existing behavior — Logan literals carry
+       backslashes through verbatim; a doubled ``\\\\`` survives ``canonical()``
+       because backslashes inside a quoted string are content, not escapes).
+    3. Double interior single quotes per Logan QL convention.
+    """
     if value is None:
         return ""
-    return str(value).replace("\\", "\\\\").replace("'", "\\'")
+    text = str(value).replace("\\'", "'")
+    return text.replace("\\", "\\\\").replace("'", "''")
 
 
 def _normalize_field_name(field: str) -> str:

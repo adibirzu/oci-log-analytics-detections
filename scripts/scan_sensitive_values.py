@@ -173,8 +173,20 @@ def _is_synthetic_fixture_path(path: Path) -> bool:
         "scripts/schemas/oci_audit_schema.py",
         "scripts/setup_log_sources.py",
     )
+    # Synthetic-generator packages carved out of the exempt monoliths above
+    # (T1 module split). scripts/testlogs/** holds the synthetic attack-log
+    # builders (legitimate threat-intel IOC IPs/domains for detection content)
+    # extracted from generate_test_logs.py; scripts/logsources/** holds the
+    # source/field definitions extracted from setup_log_sources.py. Both inherit
+    # the synthetic-fixture exemption. NOTE: scripts/dashboards/** (carved from
+    # deploy_dashboard.py, which was never exempt) is deliberately still scanned.
+    fixture_dir_prefixes = (
+        "scripts/testlogs/",
+        "scripts/logsources/",
+    )
     return (
         any(normalized.endswith(suffix) for suffix in fixture_suffixes)
+        or any(normalized.startswith(prefix) for prefix in fixture_dir_prefixes)
         or (normalized.startswith("queries/") and not _is_generated_report(relative))
         or normalized.startswith("rules/")
     )

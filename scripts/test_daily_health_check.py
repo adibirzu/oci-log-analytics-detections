@@ -99,6 +99,41 @@ def test_diff_banner_improved() -> None:
     assert "IMPROVED" in banner
 
 
+def test_diff_banner_section_regression_with_unchanged_overall() -> None:
+    # A section breaks (0 -> 2) while the overall status stays the same: this
+    # MUST be reported as degraded, otherwise CI silently passes a regression.
+    prev = _make_report("OK", sections=[{"name": "inventory", "exit_code": 0}])
+    curr = _make_report("OK", sections=[{"name": "inventory", "exit_code": 2}])
+    banner, degraded = _diff_banner(prev, curr)
+    assert degraded
+    assert "REGRESSED" in banner
+    assert "inventory" in banner
+
+
+def test_diff_banner_section_regression_while_overall_improves() -> None:
+    # Overall improves (ERROR -> OK) because one section recovered, but a
+    # different section regressed (0 -> 2). The net signal must still be degraded.
+    prev = _make_report("ERROR", sections=[
+        {"name": "verifier", "exit_code": 2},
+        {"name": "inventory", "exit_code": 0},
+    ])
+    curr = _make_report("OK", sections=[
+        {"name": "verifier", "exit_code": 0},
+        {"name": "inventory", "exit_code": 2},
+    ])
+    banner, degraded = _diff_banner(prev, curr)
+    assert degraded
+    assert "inventory" in banner and "REGRESSED" in banner
+
+
+def test_diff_banner_skipped_section_is_not_a_regression() -> None:
+    # A section going from a passing exit code to skipped (None) is neutral.
+    prev = _make_report("OK", sections=[{"name": "verifier", "exit_code": 0}])
+    curr = _make_report("OK", sections=[{"name": "verifier", "exit_code": None}])
+    _, degraded = _diff_banner(prev, curr)
+    assert not degraded
+
+
 def test_diff_banner_degraded_ok_to_miss() -> None:
     prev = _make_report("OK")
     curr = _make_report("MISS")

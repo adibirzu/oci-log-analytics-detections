@@ -57,11 +57,27 @@ def _find_latest_report(report_dir: Path) -> Path | None:
     return candidates[-1] if candidates else None
 
 
+def _exit_code_worsened(prev_code: int | None, curr_code: int | None) -> bool:
+    """True if a section's exit code regressed.
+
+    A ``None`` current code (section skipped/absent) is never a regression.
+    A missing previous code is treated as a passing baseline (0), so a section
+    that newly fails counts as a regression.
+    """
+    if curr_code is None:
+        return False
+    baseline = prev_code if prev_code is not None else 0
+    return curr_code > baseline
+
+
 def _diff_banner(prev: dict, curr: dict) -> tuple[str, bool]:
     """Build a human-readable diff banner and return *(text, degraded)*.
 
     *degraded* is ``True`` when the current overall status is worse than the
-    previous one (suitable for driving a CI fail).
+    previous one **or any individual section's exit code worsened**. A section
+    can regress while the overall status is unchanged or even improves (e.g. one
+    section breaks while another recovers), so per-section deltas must drive the
+    CI fail signal too — not only the overall rank.
     """
     prev_status = prev.get("overall_status", "UNKNOWN")
     curr_status = curr.get("overall_status", "UNKNOWN")
@@ -69,29 +85,39 @@ def _diff_banner(prev: dict, curr: dict) -> tuple[str, bool]:
 
     prev_rank = _STATUS_RANK.get(prev_status, 99)
     curr_rank = _STATUS_RANK.get(curr_status, 99)
+    overall_degraded = curr_rank > prev_rank
 
-    if curr_rank > prev_rank:
+    prev_sections = {s["name"]: s for s in prev.get("sections", [])}
+    curr_sections = {s["name"]: s for s in curr.get("sections", [])}
+
+    section_lines: list[str] = []
+    section_regressed = False
+    for name in sorted(set(prev_sections) | set(curr_sections)):
+        prc = prev_sections.get(name, {}).get("exit_code")
+        crc = curr_sections.get(name, {}).get("exit_code")
+        if prc == crc:
+            continue
+        worsened = _exit_code_worsened(prc, crc)
+        section_regressed = section_regressed or worsened
+        marker = "  ↓ REGRESSED" if worsened else ""
+        section_lines.append(f"  {name}: exit_code {prc} → {crc}{marker}")
+
+    degraded = overall_degraded or section_regressed
+
+    if overall_degraded:
         direction = "DEGRADED ↓"
-        degraded = True
+    elif section_regressed:
+        direction = "DEGRADED ↓ (section regression)"
     elif curr_rank < prev_rank:
         direction = "IMPROVED ↑"
-        degraded = False
     else:
         direction = "UNCHANGED ="
-        degraded = False
 
     lines = [
         f"Diff vs {prev_ts}:",
         f"  overall_status: {prev_status} → {curr_status}  [{direction}]",
     ]
-
-    prev_sections = {s["name"]: s for s in prev.get("sections", [])}
-    curr_sections = {s["name"]: s for s in curr.get("sections", [])}
-    for name in sorted(set(prev_sections) | set(curr_sections)):
-        prc = prev_sections.get(name, {}).get("exit_code")
-        crc = curr_sections.get(name, {}).get("exit_code")
-        if prc != crc:
-            lines.append(f"  {name}: exit_code {prc} → {crc}")
+    lines.extend(section_lines)
 
     return "\n".join(lines), degraded
 

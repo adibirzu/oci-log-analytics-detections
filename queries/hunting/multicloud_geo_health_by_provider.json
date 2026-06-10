@@ -2,6 +2,7 @@
   "title": "Geographic Health: Cloud Provider Summary",
   "description": "Summarizes instance health by cloud provider (OCI, Azure, AWS, GCP) showing total instances, healthy/degraded/unreachable counts, and provider-level fleet distribution.",
   "query": "'Log Source' = 'SOC Multicloud Health Logs' | stats count as heartbeats, unique('Host Name') as total_instances, unique('Region') as regions by 'Cloud Provider', 'Status' | sort 'Cloud Provider', 'Status'",
+  "type": "hunting",
   "dashboard": {
     "visualizationType": "bar",
     "ask_ai_prompts": [

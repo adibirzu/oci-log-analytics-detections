@@ -38,6 +38,7 @@ from oci_config import (
     get_la_client, get_namespace, validate_oci_setup,
     list_available_log_sources,
     resolve_compartment_id,
+    assert_write_allowed, ProdWriteGuardError,
 )
 
 import oci
@@ -2548,6 +2549,13 @@ def main():
         action="store_true",
         help="With --field-audit, print every exact field reuse mapping",
     )
+    parser.add_argument(
+        "--i-understand-prod",
+        action="store_true",
+        dest="i_understand_prod",
+        help="Acknowledge a deliberate create against the emdemo PRODUCTION "
+             "tenancy outside the LogAnalytics subtree (or set OCI_ALLOW_PROD_WRITE=1).",
+    )
     args = parser.parse_args()
     octo_apm_only = args.octo_apm_only
     application_only = args.application_only or octo_apm_only
@@ -2616,6 +2624,15 @@ def main():
 
     compartment_id = resolve_compartment_id()
     print("Compartment: resolved from OCI configuration")
+
+    # Tenancy safety: refuse field/parser/source creation against emdemo (prod)
+    # outside the LogAnalytics subtree unless --i-understand-prod was passed.
+    try:
+        assert_write_allowed(compartment_id, override=args.i_understand_prod)
+    except ProdWriteGuardError as guard_err:
+        print(f"\n  {guard_err}")
+        sys.exit(2)
+
     available_sources = list_available_log_sources(la_client, namespace, compartment_id)
     print(f"Discovered {len(available_sources)} existing log sources")
 

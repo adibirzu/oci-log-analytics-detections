@@ -33,6 +33,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oci_config import (
     TENANCY_ID, COMPARTMENT_ID, QUERIES_DIR, HUNTING_DIR, LA_NAMESPACE,
     get_dashboard_client, get_la_client, get_namespace, validate_oci_setup,
+    assert_write_allowed, ProdWriteGuardError,
 )
 from oci_time import build_time_window
 from query_artifacts import is_saved_search_query_file
@@ -1766,6 +1767,7 @@ def deploy(
     query_timeout=60,
     validation_progress_interval=1,
     dashboard_names=None,
+    allow_prod_write=False,
 ):
     print("=" * 60)
     print("OCI Log Analytics - SOC Dashboard Deployment")
@@ -1833,6 +1835,14 @@ def deploy(
     else:
         write_dashboard_inventory(inventory=inventory)
         print(f"\n  Dashboard inventory: {DASHBOARD_INVENTORY_PATH}")
+
+    # Tenancy safety: refuse mutating import/cleanup against emdemo (prod) outside
+    # the LogAnalytics subtree unless the operator passed --i-understand-prod.
+    try:
+        assert_write_allowed(COMPARTMENT_ID, override=allow_prod_write)
+    except ProdWriteGuardError as guard_err:
+        print(f"\n  {guard_err}")
+        raise SystemExit(2) from guard_err
 
     md_client = get_dashboard_client()
     print(f"\n  Compartment: {COMPARTMENT_ID}")
@@ -1909,6 +1919,9 @@ if __name__ == "__main__":
                         help='Print live query validation progress every N queries; 0 disables progress')
     parser.add_argument('--dashboard-name', action='append', dest='dashboard_names',
                         help='Deploy only the named dashboard. Can be supplied multiple times.')
+    parser.add_argument('--i-understand-prod', action='store_true', dest='i_understand_prod',
+                        help='Acknowledge a deliberate write against the emdemo PRODUCTION '
+                             'tenancy outside the LogAnalytics subtree (or set OCI_ALLOW_PROD_WRITE=1).')
     args = parser.parse_args()
 
     if args.validate:
@@ -1933,4 +1946,5 @@ if __name__ == "__main__":
         query_timeout=args.query_timeout,
         validation_progress_interval=args.validation_progress_interval,
         dashboard_names=args.dashboard_names,
+        allow_prod_write=args.i_understand_prod,
     )

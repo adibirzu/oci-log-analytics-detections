@@ -38,6 +38,7 @@ from oci_config import (
     list_available_log_sources,
     resolve_source_from_candidates,
     resolve_compartment_id,
+    assert_write_allowed, ProdWriteGuardError,
 )
 
 import oci
@@ -412,6 +413,9 @@ def main():
                         help='Run pre-flight validation checks')
     parser.add_argument('--file', action='append', dest='files',
                         help='Only upload the named test data file; repeat for multiple files')
+    parser.add_argument('--i-understand-prod', action='store_true', dest='i_understand_prod',
+                        help='Acknowledge a deliberate upload against the emdemo PRODUCTION '
+                             'tenancy outside the LogAnalytics subtree (or set OCI_ALLOW_PROD_WRITE=1).')
     args = parser.parse_args()
 
     if args.validate:
@@ -425,6 +429,14 @@ def main():
     if not os.path.exists(TEST_DATA_DIR):
         print(f"ERROR: {TEST_DATA_DIR} not found. Run generate_test_logs.py first.")
         sys.exit(1)
+
+    # Tenancy safety: refuse uploads to emdemo (prod) outside the LogAnalytics
+    # subtree unless the operator passed --i-understand-prod.
+    try:
+        assert_write_allowed(resolve_compartment_id(), override=args.i_understand_prod)
+    except ProdWriteGuardError as guard_err:
+        print(f"\n  {guard_err}")
+        sys.exit(2)
 
     try:
         manifest_entries = selected_upload_manifest(args.files)

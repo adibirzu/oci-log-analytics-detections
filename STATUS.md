@@ -10,17 +10,17 @@ Date: 2026-05-18
   - 468 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
 - Microsoft Sentinel converted queries: 60 live OCI parser-passing queries
-- Curated analytics: 145
+- Curated analytics: 162
   - 47 app telemetry analytics
-  - 98 hunting analytics
-- Total query artifacts/content items: 681
+  - 115 hunting analytics
+- Total query artifacts/content items: 698
 - Dashboards: 29
-- Saved searches: 441 active dashboard saved searches; 681 total content items
+- Saved searches: 441 active dashboard saved searches; 698 total content items
 - Sentinel live validation: 60 / 62 locally clean conversions; 2 live failures remain in `queries/sentinel_conversion_report.json`
 - Sentinel synthetic live-hit check: **20 / 20 ready Logan QL queries HIT** in the `cap` profile with a 24-hour lookback after uploading Sentinel-shaped synthetic logs.
 - Latest full live dashboard deployment: **441 widgets across 29 dashboards** in the `cap` profile with a 21-day lookback — 0 render/query errors; live `parse_validate_all_queries` 681/681 PASS.
 - Generated demo data: 20 NDJSON files / 221,173 events in the latest local `test_data/manifest.json`
-- MITRE ATT&CK coverage: 231 techniques / 14 tactics
+- MITRE ATT&CK coverage: 233 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
 - Atomic Red Team coverage: 280 / 331 testable rules have mapped tests
 

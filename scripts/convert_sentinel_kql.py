@@ -34,7 +34,9 @@ __all__ = [
 ]
 
 import argparse
+import concurrent.futures
 import json
+import os
 import re
 import sys
 import time
@@ -499,6 +501,7 @@ def convert_candidates(
     progress_every: int = 100,
     progress_stream=None,
     profile: dict | None = None,
+    workers: int = 1,
 ) -> dict:
     """Rank, convert, optionally live-validate, and optionally write queries."""
     attempted = select_top_candidates(candidates, mapping, top=top)
@@ -529,6 +532,30 @@ def convert_candidates(
         force=True,
     )
 
+    # ── Phase 1 (parallel) ────────────────────────────────────────────────────
+    # Run pure-CPU convert_candidate() for every candidate in bounded threads.
+    # No network calls, no shared mutable state: mapping is read-only, and
+    # ConversionResult is a frozen dataclass.  Results are keyed by original
+    # position so Phase 2 can retrieve them in a stable, deterministic order.
+    # workers=1 leaves _parallel_pre empty, activating the unchanged serial path.
+    _parallel_pre: dict[int, ConversionResult | Exception] = {}
+    if workers > 1:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+            future_to_idx = {
+                executor.submit(convert_candidate, candidate, mapping): idx
+                for idx, candidate in enumerate(attempted)
+            }
+            for future in concurrent.futures.as_completed(future_to_idx):
+                idx = future_to_idx[future]
+                try:
+                    _parallel_pre[idx] = future.result()
+                except Exception as exc:  # noqa: BLE001 — record, don't crash the pool
+                    _parallel_pre[idx] = exc
+
+    # ── Phase 2 (serial, ordered) ─────────────────────────────────────────────
+    # Live OCI validation, file writes, counters, and progress all run here
+    # in original candidate order.  When _parallel_pre is populated we retrieve
+    # the pre-computed result; otherwise the unchanged serial path executes.
     results: list[ConversionResult] = []
     total_attempted = len(attempted)
     for index, candidate in enumerate(attempted, start=1):
@@ -536,7 +563,15 @@ def convert_candidates(
         if not validate_live:
             maybe_progress(f"candidate-start {context}", force=index == 1)
 
-        result = convert_candidate(candidate, mapping)
+        if _parallel_pre:
+            raw = _parallel_pre[index - 1]
+            result = (
+                ConversionResult(candidate, None, [f"conversion error: {raw}"], [])
+                if isinstance(raw, Exception)
+                else raw
+            )
+        else:
+            result = convert_candidate(candidate, mapping)
         if result.promoted_candidate and validate_live:
             tentative_file = f"sentinel/{slugify_title(result.query_payload['title'])}.json"
             maybe_progress(f"live-start {context} query_file=\"{tentative_file}\"", force=True)
@@ -667,6 +702,15 @@ def main() -> int:
         default=100,
         help="Emit a candidate progress line at least every N attempted candidates.",
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=min(8, os.cpu_count() or 1),
+        help=(
+            "Parallel conversion worker threads for the CPU-bound convert_candidate phase. "
+            "1 = serial (exact original path). Default: min(8, cpu_count)."
+        ),
+    )
     args = parser.parse_args()
 
     if args.write_working and not args.validate_live and not args.allow_local_write:
@@ -694,6 +738,7 @@ def main() -> int:
         progress_interval=args.progress_interval,
         progress_every=args.progress_every,
         profile=profile,
+        workers=args.workers,
     )
     if args.migration_plan_out:
         build_migration_plan_from_report(report, Path(args.migration_plan_out))

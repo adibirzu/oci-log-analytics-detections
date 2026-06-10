@@ -7,6 +7,7 @@ import argparse
 import ast
 import html
 import json
+import os
 import re
 import subprocess
 import sys
@@ -148,6 +149,7 @@ def build_convert_command(
     profile: str = DEFAULT_PROFILE_NAME,
     discovery_report: Path | None = None,
     migration_plan_out: Path | None = None,
+    workers: int = 1,
 ) -> list[str]:
     """Build the low-level converter command for a workflow mode."""
     command = [
@@ -174,6 +176,8 @@ def build_convert_command(
         command.extend(["--progress-interval", str(progress_interval)])
     if progress_every is not None:
         command.extend(["--progress-every", str(progress_every)])
+    if workers != 1:
+        command.extend(["--workers", str(workers)])
 
     if mode == "local":
         command.append("--validate-local")
@@ -970,6 +974,7 @@ def run_convert_mode(args, mode: str, report_path: Path) -> None:
         profile=args.profile,
         discovery_report=Path(args.discovery_report) if args.discovery_report else None,
         migration_plan_out=Path(args.migration_plan_out) if args.migration_plan_out else None,
+        workers=args.workers,
     )
     if args.candidates_file != str(DEFAULT_CANDIDATES_FILE):
         command.extend(["--candidates-file", args.candidates_file])
@@ -1073,6 +1078,15 @@ def build_parser() -> argparse.ArgumentParser:
         choices=sorted(NEXT_QUERY_STRATEGIES.keys()),
         default="default",
         help="Prioritization strategy for next-queries output.",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=min(8, os.cpu_count() or 1),
+        help=(
+            "Parallel conversion worker threads for the CPU-bound convert_candidate phase "
+            "(local and promote commands only). 1 = serial. Default: min(8, cpu_count)."
+        ),
     )
     return parser
 

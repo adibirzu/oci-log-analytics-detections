@@ -66,3 +66,6 @@ webapp/out/
 webapp/build/
 webapp/.logan-detections-runtime/
 webapp/*.tsbuildinfo
+
+# Agent worktrees (local isolation, never commit)
+.claude/worktrees/

@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Windows Sysmon Logs' and (Action like '*ExploitGuardNonMicrosoftSignedBlocked*') and ('Parent Process Name' like '*svchost.exe*' and 'Process Name' like '*NetSetupSvc.dll*') | eval HashAlgorithm = 'SHA1'

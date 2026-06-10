@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (('Query Name' like '*psec.forward.io.global.prod.fastly.net*' or 'Query Name' like '*b0a0374cd1cb4305002e.d.requestbin.net*' or 'Query Name' like '*tornadodomain.000webhostapp.com*' or 'Query Name' like '*yxznlysc47wvrb9r9z211e1jbah15q*'))

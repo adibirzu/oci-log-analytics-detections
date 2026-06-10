@@ -14,6 +14,15 @@ Exit codes:
     1 = at least one MISS (zero-row query) but no errors
     2 = at least one query / dashboard ERROR or missing
     3 = OCI auth or namespace lookup failed before checks completed
+
+Diff / CI-gate mode (``--diff``):
+    When ``--diff`` is supplied the script also compares the current run
+    against the most recent previous health report found in ``--report-dir``
+    (or the path given via ``--previous-run``).  A banner is printed
+    showing the direction of change (IMPROVED / UNCHANGED / DEGRADED) and
+    any section-level exit-code deltas.  A DEGRADED result causes the
+    process to exit with code 2 regardless of the absolute current status,
+    making it suitable as a strict CI gate that fails on any regression.
 """
 
 from __future__ import annotations
@@ -29,6 +38,88 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = PROJECT_DIR / "scripts"
 HEALTH_DIR = PROJECT_DIR / "docs" / "health"
+
+# Ordered severity: higher index = worse.
+_STATUS_RANK: dict[str, int] = {"OK": 0, "MISS": 1, "ERROR": 2}
+
+
+def _load_report(path: Path) -> dict | None:
+    """Load and return a health-report JSON, or *None* on any error."""
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _find_latest_report(report_dir: Path) -> Path | None:
+    """Return the path to the most recently written health report, or None."""
+    candidates = sorted(report_dir.glob("health-*.json"))
+    return candidates[-1] if candidates else None
+
+
+def _exit_code_worsened(prev_code: int | None, curr_code: int | None) -> bool:
+    """True if a section's exit code regressed.
+
+    A ``None`` current code (section skipped/absent) is never a regression.
+    A missing previous code is treated as a passing baseline (0), so a section
+    that newly fails counts as a regression.
+    """
+    if curr_code is None:
+        return False
+    baseline = prev_code if prev_code is not None else 0
+    return curr_code > baseline
+
+
+def _diff_banner(prev: dict, curr: dict) -> tuple[str, bool]:
+    """Build a human-readable diff banner and return *(text, degraded)*.
+
+    *degraded* is ``True`` when the current overall status is worse than the
+    previous one **or any individual section's exit code worsened**. A section
+    can regress while the overall status is unchanged or even improves (e.g. one
+    section breaks while another recovers), so per-section deltas must drive the
+    CI fail signal too — not only the overall rank.
+    """
+    prev_status = prev.get("overall_status", "UNKNOWN")
+    curr_status = curr.get("overall_status", "UNKNOWN")
+    prev_ts = prev.get("timestamp", "?")
+
+    prev_rank = _STATUS_RANK.get(prev_status, 99)
+    curr_rank = _STATUS_RANK.get(curr_status, 99)
+    overall_degraded = curr_rank > prev_rank
+
+    prev_sections = {s["name"]: s for s in prev.get("sections", [])}
+    curr_sections = {s["name"]: s for s in curr.get("sections", [])}
+
+    section_lines: list[str] = []
+    section_regressed = False
+    for name in sorted(set(prev_sections) | set(curr_sections)):
+        prc = prev_sections.get(name, {}).get("exit_code")
+        crc = curr_sections.get(name, {}).get("exit_code")
+        if prc == crc:
+            continue
+        worsened = _exit_code_worsened(prc, crc)
+        section_regressed = section_regressed or worsened
+        marker = "  ↓ REGRESSED" if worsened else ""
+        section_lines.append(f"  {name}: exit_code {prc} → {crc}{marker}")
+
+    degraded = overall_degraded or section_regressed
+
+    if overall_degraded:
+        direction = "DEGRADED ↓"
+    elif section_regressed:
+        direction = "DEGRADED ↓ (section regression)"
+    elif curr_rank < prev_rank:
+        direction = "IMPROVED ↑"
+    else:
+        direction = "UNCHANGED ="
+
+    lines = [
+        f"Diff vs {prev_ts}:",
+        f"  overall_status: {prev_status} → {curr_status}  [{direction}]",
+    ]
+    lines.extend(section_lines)
+
+    return "\n".join(lines), degraded
 
 
 def _run_subprocess(cmd: list[str]) -> tuple[int, str]:
@@ -48,7 +139,7 @@ def _section(title: str) -> str:
     return f"\n{'=' * 70}\n{title}\n{'=' * 70}\n"
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Daily SOC detection health check")
     parser.add_argument("--lookback", default="21d",
                         help="Lookback for live queries (default: 21d)")
@@ -58,12 +149,37 @@ def main() -> int:
                         help="Per-widget OCI query timeout for the verifier")
     parser.add_argument("--report-dir", default=str(HEALTH_DIR),
                         help="Directory for JSON output. Default: docs/health/")
-    args = parser.parse_args()
+    parser.add_argument(
+        "--diff",
+        action="store_true",
+        help=(
+            "Compare the current run against the most recent previous health "
+            "report and emit a degradation banner.  Exits with code 2 if the "
+            "overall status is worse than the previous run (CI gate)."
+        ),
+    )
+    parser.add_argument(
+        "--previous-run",
+        metavar="REPORT_JSON",
+        default=None,
+        help="Explicit path to the previous health report for --diff comparison.",
+    )
+    args = parser.parse_args(argv)
 
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     report_dir = Path(args.report_dir)
     report_dir.mkdir(parents=True, exist_ok=True)
     report_path = report_dir / f"health-{timestamp.replace(':', '')}.json"
+
+    # Capture the previous report *before* this run writes a new one.
+    prev_report: dict | None = None
+    if args.diff or args.previous_run:
+        if args.previous_run:
+            prev_report = _load_report(Path(args.previous_run))
+        else:
+            prev_path = _find_latest_report(report_dir)
+            if prev_path is not None:
+                prev_report = _load_report(prev_path)
 
     overall_status = "OK"
     sections: list[dict] = []
@@ -127,7 +243,21 @@ def main() -> int:
 
     print(_section(f"Overall status: {overall_status}  (report: {report_path})"))
 
-    return {"OK": 0, "MISS": 1, "ERROR": 2}.get(overall_status, 3)
+    # --diff / --previous-run: compare against the previous report.
+    degraded = False
+    if (args.diff or args.previous_run) and prev_report is not None:
+        banner, degraded = _diff_banner(prev_report, report)
+        print(_section("Diff vs previous run"))
+        print(banner)
+    elif (args.diff or args.previous_run) and prev_report is None:
+        print(_section("Diff vs previous run"))
+        print("No previous report found — this is the baseline run.")
+
+    base_exit = {"OK": 0, "MISS": 1, "ERROR": 2}.get(overall_status, 3)
+    # A DEGRADED result promotes the exit code to at least 2 so CI gates fail.
+    if degraded:
+        return max(base_exit, 2)
+    return base_exit
 
 
 if __name__ == "__main__":

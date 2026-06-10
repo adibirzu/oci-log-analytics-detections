@@ -31,6 +31,28 @@ SUPPORTED_SCALAR_FUNCTIONS: dict[str, str] = {
     "strlen": "length(<arg>)",
     "strcat": "concat(<arg>, ...)",
     "extract": "extract(<source>, /<regex>/)",
+    # Phase 9 tranche B — numeric/boolean cast unwrap + delimiter concat.
+    # The casts are no-ops in Logan's loosely typed eval context; unwrapping
+    # them is lossless. ``strcat_delim`` interleaves the delimiter between the
+    # value arguments via the proven ``concat`` lowering.
+    "todouble": "<arg> (cast removed)",
+    "toreal": "<arg> (cast removed)",
+    "tofloat": "<arg> (cast removed)",
+    "todecimal": "<arg> (cast removed)",
+    "tobool": "<arg> (cast removed)",
+    "toboolean": "<arg> (cast removed)",
+    "strcat_delim": "concat(<arg>, <delim>, ...)",
+}
+
+# KQL null-test predicate functions handled in
+# ``_facade_impl.convert_predicate``. They are not pipeline scalars (they only
+# appear in ``where`` predicates), but are catalogued here for coverage
+# introspection alongside the scalar functions above.
+SUPPORTED_PREDICATE_FUNCTIONS: dict[str, str] = {
+    "isnull": "<field> = null",
+    "isnotnull": "<field> != null",
+    "isempty": "(<field> = null or <field> = '')",
+    "isnotempty": "(<field> != null and <field> != '')",
 }
 
 # Functions that have no faithful Logan QL equivalent and stay Tier-3.
@@ -47,4 +69,8 @@ SKIPPED_SCALAR_FUNCTIONS: frozenset[str] = frozenset(
     }
 )
 
-__all__ = ["SUPPORTED_SCALAR_FUNCTIONS", "SKIPPED_SCALAR_FUNCTIONS"]
+__all__ = [
+    "SUPPORTED_SCALAR_FUNCTIONS",
+    "SKIPPED_SCALAR_FUNCTIONS",
+    "SUPPORTED_PREDICATE_FUNCTIONS",
+]

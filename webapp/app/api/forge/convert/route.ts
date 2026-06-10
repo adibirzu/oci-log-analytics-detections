@@ -2,10 +2,10 @@ import { spawn } from "node:child_process"
 import path from "node:path"
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
+import { conversionRequestSchema, conversionResponseSchema } from "@/lib/api-contracts"
 
 export const runtime = "nodejs"
 
-const MAX_QUERY_CHARS = 20_000
 const RATE_LIMIT = 30
 const RATE_WINDOW_MS = 60_000
 // Trusting X-Forwarded-For for rate limiting is OPT-IN. FORGE_TRUSTED_PROXY_HOPS
@@ -31,47 +31,8 @@ const CONVERSION_TIMEOUT_MS = 12_000
 const CSRF_TOKEN_PATTERN = /^[A-Za-z0-9_-]{32,256}$/
 const BUNDLED_CONVERTER_SCRIPT = "scripts/logan_workbench_convert.py"
 
-const conversionRequestSchema = z
-  .object({
-    sourceLanguage: z.enum([
-      "sigma_yaml",
-      "sentinel_kql",
-      "splunk_spl",
-      "elastic_lucene",
-      "elastic_kuery",
-      "elastic_eql",
-      "elastic_esql",
-      "elastic_toml",
-      "osquery_sql",
-      "yara",
-      "oci_logan",
-    ]),
-    sourceQuery: z.string().min(1).max(MAX_QUERY_CHARS),
-    readOnly: z.boolean().optional().default(true),
-    exampleId: z.string().max(160).optional(),
-  })
-  .strict()
-
-const warningSchema = z.object({
-  code: z.string(),
-  message: z.string(),
-  severity: z.enum(["info", "warning", "error"]),
-})
-
-const conversionResponseSchema = z
-  .object({
-    schema_version: z.literal("1.0.0"),
-    generated_at: z.string(),
-    source_language: z.string().optional(),
-    source_query: z.string().optional(),
-    logan_query: z.string(),
-    support_level: z.enum(["supported", "partial", "lossy", "unsupported"]),
-    explanation: z.string(),
-    warnings: z.array(warningSchema),
-    metadata: z.record(z.unknown()),
-    backend: z.string(),
-  })
-  .passthrough()
+// conversionRequestSchema and conversionResponseSchema are imported from
+// @/lib/api-contracts — they are the single source of truth for these shapes.
 
 interface Bucket {
   resetAt: number

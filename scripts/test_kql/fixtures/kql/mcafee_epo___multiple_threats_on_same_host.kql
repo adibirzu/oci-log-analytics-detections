@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and (('Threat Name' != null and 'Threat Name' != '')) and ('Threat Name' != '_') | stats distinctcount('Threat Name') as th_cnt, unique('Threat Name') as th_list by 'Source IP' | where th_cnt > 1

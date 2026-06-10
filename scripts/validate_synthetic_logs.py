@@ -144,6 +144,26 @@ def validate_contract_filename(filename: str) -> str | None:
     return None
 
 
+def find_uncovered_datasets(test_data_dir: Path, contracts: dict[str, Any]) -> list[str]:
+    """Return ``test_data/*.jsonl`` files that have no registered contract.
+
+    Ingestion-time guard: a synthetic dataset that ships without a schema
+    contract is silently unvalidated, so a shape regression in it would reach
+    the parser/dashboard unchecked. Generated support artifacts (manifest,
+    plans, etc.) are intentionally not datasets and are skipped.
+    """
+    if not test_data_dir.exists():
+        return []
+    covered = set(contracts.keys())
+    uncovered = []
+    for path in sorted(test_data_dir.glob("*.jsonl")):
+        if is_generated_query_artifact(path.name):
+            continue
+        if path.name not in covered:
+            uncovered.append(path.name)
+    return uncovered
+
+
 def validate_all(test_data_dir: Path = Path(TEST_DATA_DIR), contracts_path: Path = CONTRACT_PATH) -> dict[str, Any]:
     contracts = load_contracts(contracts_path)
     results = {}
@@ -158,6 +178,12 @@ def validate_all(test_data_dir: Path = Path(TEST_DATA_DIR), contracts_path: Path
 
         dataset_path = test_data_dir / filename
         if not dataset_path.exists():
+            # Optional datasets (e.g. the Octo APM workshop bundle) come from a
+            # separate generator and are not part of the core run; skip them when
+            # absent instead of failing. Core datasets must be present.
+            if contract.get("optional"):
+                results[filename] = {"ok": True, "errors": [], "skipped": "dataset not present (optional)"}
+                continue
             results[filename] = {"ok": False, "errors": [f"{filename}: dataset not found"]}
             total_errors += 1
             continue
@@ -166,7 +192,21 @@ def validate_all(test_data_dir: Path = Path(TEST_DATA_DIR), contracts_path: Path
         results[filename] = {"ok": not errors, "errors": errors}
         total_errors += len(errors)
 
-    return {"ok": total_errors == 0, "total_errors": total_errors, "results": results}
+    # Coverage gate: every present .jsonl dataset must have a contract.
+    uncovered = find_uncovered_datasets(test_data_dir, contracts)
+    for filename in uncovered:
+        results[filename] = {
+            "ok": False,
+            "errors": [f"{filename}: dataset present in test_data/ but has no schema contract"],
+        }
+        total_errors += 1
+
+    return {
+        "ok": total_errors == 0,
+        "total_errors": total_errors,
+        "uncovered_datasets": uncovered,
+        "results": results,
+    }
 
 
 def main() -> None:

@@ -191,7 +191,13 @@ class TestQueryAudit(unittest.TestCase):
         import yaml
 
         project_dir = Path(__file__).resolve().parent.parent
-        rule_dir = project_dir / "rules" / "cloud" / "oci"
+        # Scan the entire rules/** tree, not just rules/cloud/oci, so a
+        # Success-only status selector reintroduced under ANY product (e.g. a
+        # future web/load-balancer or app rule) is caught. The dual-Status
+        # pattern (`status: [Success, '200']`) is a repo-wide invariant because
+        # the native OCI parser projects the HTTP code while SOC custom parsers
+        # surface the operator-friendly label.
+        rule_dir = project_dir / "rules"
         failures = []
 
         def check_status_values(path, value_path, value):
@@ -211,9 +217,12 @@ class TestQueryAudit(unittest.TestCase):
                 for index, value in enumerate(obj):
                     walk_status_values(path, value, f"{value_path}[{index}]")
 
-        for rule_path in sorted(rule_dir.glob("*.yaml")):
+        rule_files = sorted(rule_dir.rglob("*.yaml")) + sorted(rule_dir.rglob("*.yml"))
+        for rule_path in rule_files:
             with rule_path.open() as handle:
                 payload = yaml.safe_load(handle)
+            if not isinstance(payload, dict):
+                continue
             walk_status_values(rule_path, payload.get("detection", {}))
 
         self.assertEqual(failures, [])

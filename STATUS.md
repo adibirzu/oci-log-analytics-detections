@@ -153,17 +153,29 @@ Previously live-verified on 2026-04-15:
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit output
 - `CONTRIBUTING.md` — contributor workflow and validation expectations
 
+## Catalog-Only Queries
+
+The following queries are included in `queries/catalog.json` as reference analytics
+but are **not wired into any deployed dashboard** in `scripts/deploy_dashboard.py`
+and do not appear in `queries/dashboard_inventory.json`.  They are available for
+manual saved-search creation or future dashboard inclusion once the required data
+sources are provisioned.
+
+| Query file | Reason for catalog-only status |
+|---|---|
+| `queries/hunting/oci_iam_fusion_activity_correlation.json` | Requires `Fusion Apps: Sign In - Sign Out Activity Logs` and `Fusion Apps: ESS Audit Logs` sources, which are not provisioned in the demo tenancy.  Verified absent from `scripts/deploy_dashboard.py` (grep clean) and `queries/dashboard_inventory.json`. The single dashboard MISS noted in the 2026-05-04 verification run (`Hunt: OCI IAM + Fusion Correlation`) was from an earlier deploy cycle; the widget has since been removed from the deployed dashboard set. |
+
 ## Recommended Next Work
 
 See `PLAN.md` for the prioritised forward roadmap. High-level themes:
 
-1. **Sigma converter quality** — fix the backslash-escape bug for Windows pipe patterns so `convert_sigma.py` no longer overwrites hand-edited Cobalt Strike / Mimikatz / PsExec pipe queries with unparseable LAQL. Either escape `\` properly or add a `do_not_overwrite: true` rule annotation.
-2. **Sweep the dual-Status pattern** across the remaining 12 OCI rules that filter on `status: Success` so they survive in tenancies where the native parser projects HTTP code instead.
-3. **Provision the Fusion Apps source** (or keep the Fusion correlation query catalog-only) so `hunting/oci_iam_fusion_activity_correlation.json` can be deployed and return rows.
+1. **Sigma converter quality** — DONE. `convert_sigma.py` doubles literal backslashes in string/`LIKE` selectors and rewrites exact `PipeName` matches into escaped wildcard `LIKE` patterns, and also honors a `do_not_overwrite: true` annotation (rule source or on-disk JSON). Regenerating the 4 `rules/windows/pipe_created/*.yaml` (Cobalt Strike / Mimikatz / PsExec / generic C2) produces validator-clean LAQL with no half-escaped backslashes. Regression-fenced by `scripts/test_pipe_escaping.py` (modifier + exact escaping, end-to-end per-rule structural validation, and `do_not_overwrite` preservation); the per-query validator logic is now reusable via `convert_sigma.query_syntax_issues()`.
+2. **Sweep the dual-Status pattern** — DONE. A full `rules/**` scan finds no remaining single-value `status: Success` selectors; the only two that ever existed (`oci_compute_terminate`, `oci_console_login`) already use `status: [Success, '200']`. The invariant is now enforced repo-wide by `scripts/test_query_audit.py:test_oci_success_status_selectors_include_native_parser_code` (broadened from `rules/cloud/oci` to the whole `rules/**` tree).
+3. **Provision the Fusion Apps source** (or keep `hunting/oci_iam_fusion_activity_correlation.json` catalog-only) once the log source is available — see Catalog-Only Queries above.
 4. **Schedule `daily_health_check.py`** as a recurring routine that posts the banner + diff against the previous run; surface regressions before deploy.
 5. **Codex review-gate adoption** — now enabled for every stop, so include unit-test / smoke-test deltas in commit messages so the reviewer has full context.
 6. **Keep `queries/dashboard_inventory.json` regenerated** with dashboard changes (already enforced by the deploy script's `--export-inventory` mode).
 7. **Expand `DET-MISS-002`** with a generated log-source field dictionary for parser fields and display labels.
 8. **Expand live verification beyond Caldera discovery** so credential-access, lateral-movement, collection, and exfiltration have deterministic demo data.
-9. **Add ingestion/validation checks for `test_data/`** datasets to verify schemas alongside query generation.
+9. **Add ingestion/validation checks for `test_data/`** datasets — DONE. `scripts/validate_synthetic_logs.py` now also runs a coverage gate (`find_uncovered_datasets`) that fails if any present `test_data/*.jsonl` lacks a schema contract, and `config/synthetic_log_contracts.json` adds contracts for `cloud_guard_instance_security.jsonl` and the optional `octo_apm_workshop_application_logs.jsonl`, so every dataset the ingest manifest knows about (20/20) is schema-validated. Runs clean (0 errors) over the full generated dataset set; regression-fenced in `scripts/test_validate_synthetic_logs.py`.
 10. **Expand source rule coverage only after** log source mappings and test datasets exist for the new telemetry surface.

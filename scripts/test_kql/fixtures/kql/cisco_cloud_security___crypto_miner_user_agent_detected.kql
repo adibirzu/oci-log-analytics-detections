@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and ('Event Type' = 'proxylogs') and ('User Agent' like '*XMRig*' or 'User Agent' like '*ccminer*') | eval Message = 'Crypto Miner User Agent' | fields Time, Message, 'Source IP', 'Destination IP', 'Request URL', 'User Agent'

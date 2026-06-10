@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Load Balancer Access Logs') and ('Event Type' = 'ErrorLog') and (Description like '*exited on signal 6 (core dumped)*') | eval ProcessIdCustomEntity = 'Process ID'

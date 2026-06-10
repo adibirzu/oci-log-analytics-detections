@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Process Name' = 'cmd.exe') and ('Command Line' like '*set path=%ProgramFiles(x86)%\\WinRAR;C:\\Program Files\\WinRAR;*') and ('Command Line' like '*cd /d %~dp0 & rar.exe e -o+ -r -inul*.rar*')

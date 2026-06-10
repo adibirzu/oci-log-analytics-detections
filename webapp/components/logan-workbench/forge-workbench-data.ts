@@ -4,24 +4,11 @@ import type {
   LoganSourceLanguage,
 } from "@/lib/logan-workbench-artifacts"
 
-export interface ConversionWarning {
-  code: string
-  message: string
-  severity: "info" | "warning" | "error"
-}
-
-export interface ConversionResponse {
-  schema_version: "1.0.0"
-  generated_at: string
-  source_language?: string
-  source_query?: string
-  logan_query: string
-  support_level: "supported" | "partial" | "lossy" | "unsupported"
-  explanation: string
-  warnings: ConversionWarning[]
-  metadata: Record<string, unknown>
-  backend: string
-}
+// ConversionWarning and ConversionResponse are the canonical types from the
+// API contract layer. Import them for local use and re-export for
+// backward-compatible imports in other files.
+import type { ConversionWarning, ConversionResponse } from "@/lib/api-contracts"
+export type { ConversionWarning, ConversionResponse }
 
 export interface AuditEntry {
   id: string

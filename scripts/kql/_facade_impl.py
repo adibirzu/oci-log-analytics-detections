@@ -164,6 +164,23 @@ STRING_FIELD_TYPES = {
     "TEXT",
 }
 
+# KQL type-cast scalar functions that lower to a no-op in Logan QL's
+# loosely typed ``eval`` context. Unwrapping them to the inner expression is
+# lossless: Logan applies the same string/numeric/boolean coercion at compare
+# and render time regardless of the cast wrapper. Kept as a single source of
+# truth so the scalar converter and the predicate cast-unwrap pass agree.
+SCALAR_CAST_FUNCTIONS = (
+    "tostring",
+    "toint",
+    "tolong",
+    "todouble",
+    "toreal",
+    "tofloat",
+    "todecimal",
+    "tobool",
+    "toboolean",
+)
+
 UNSUPPORTED_PATTERNS = [
     (re.compile(r"\bjoin\b", re.IGNORECASE), "unsupported KQL operator: join"),
     (re.compile(r"\blet\s+\w+\s*=", re.IGNORECASE), "unsupported KQL construct: let variables"),
@@ -917,6 +934,40 @@ def convert_predicate(
         flags=re.IGNORECASE,
     )
 
+    # Unwrap KQL type-cast wrappers around a single (non-nested) argument so a
+    # predicate like ``toint(StatusCode) > 400`` reduces to the supported
+    # ``StatusCode > 400`` comparison. The cast is a no-op in Logan QL.
+    _cast_unwrap_pattern = (
+        r"\b(?:" + "|".join(SCALAR_CAST_FUNCTIONS) + r")\s*\(\s*([^()]+?)\s*\)"
+    )
+    expression = re.sub(
+        _cast_unwrap_pattern,
+        lambda match: match.group(1),
+        expression,
+        flags=re.IGNORECASE,
+    )
+
+    def replace_isnotnull(match: re.Match) -> str:
+        field = map_field(match.group("field"), mapping, errors, allowed_aliases)
+        return f"{field} != null"
+
+    def replace_isnull(match: re.Match) -> str:
+        field = map_field(match.group("field"), mapping, errors, allowed_aliases)
+        return f"{field} = null"
+
+    expression = re.sub(
+        rf"\bisnotnull\s*\(\s*(?P<field>{field_token})\s*\)",
+        replace_isnotnull,
+        expression,
+        flags=re.IGNORECASE,
+    )
+    expression = re.sub(
+        rf"\bisnull\s*\(\s*(?P<field>{field_token})\s*\)",
+        replace_isnull,
+        expression,
+        flags=re.IGNORECASE,
+    )
+
     def replace_between(match: re.Match) -> str:
         field = map_field(match.group("field"), mapping, errors, allowed_aliases)
         low = _format_value_for_field(match.group("low"), field, mapping)
@@ -1440,7 +1491,11 @@ def _convert_scalar_expression(
             fallback = f"if({predicate}, {value}, {fallback})" if predicate else value
         return fallback
 
-    for cast_name in ("tostring", "toint", "tolong"):
+    # KQL type-cast wrappers are no-ops in Logan QL's dynamically typed
+    # ``eval`` context: ``toint(x)``/``todouble(x)``/``tobool(x)`` all compare
+    # and render identically to ``x``. Unwrap them to the inner expression so
+    # the cast wrapper never blocks an otherwise-supported conversion.
+    for cast_name in SCALAR_CAST_FUNCTIONS:
         args = _function_args(expr, cast_name)
         if args is not None:
             if len(args) != 1:
@@ -1472,6 +1527,29 @@ def _convert_scalar_expression(
             errors.append("unsupported scalar function: strlen")
             return "''"
         return f"length({_convert_scalar_expression(strlen_args[0], mapping, errors, allowed_aliases)})"
+
+    # ``strcat_delim(delim, a, b, ...)`` -> Logan ``concat(a, delim, b, ...)``.
+    # The KQL delimiter is interleaved between the value arguments; Logan has no
+    # delimiter-aware concat so we splice the (converted) delimiter literal in
+    # between each value, reusing the proven ``concat`` lowering.
+    strcat_delim_args = _function_args(expr, "strcat_delim")
+    if strcat_delim_args is not None:
+        if len(strcat_delim_args) < 3:
+            errors.append("unsupported scalar function: strcat_delim")
+            return "''"
+        delimiter = _convert_scalar_expression(
+            strcat_delim_args[0], mapping, errors, allowed_aliases
+        )
+        values = [
+            _convert_scalar_expression(arg, mapping, errors, allowed_aliases)
+            for arg in strcat_delim_args[1:]
+        ]
+        interleaved: list[str] = []
+        for index, value in enumerate(values):
+            if index:
+                interleaved.append(delimiter)
+            interleaved.append(value)
+        return f"concat({', '.join(interleaved)})"
 
     # ``strcat(a, b, ...)`` -> Logan ``concat(a, b, ...)``.
     strcat_args = _function_args(expr, "strcat")

@@ -1,0 +1,110 @@
+{
+  "title": "Known Nylon Typhoon Registry modifications patterns",
+  "description": "'This query identifies instances where malware intentionally configures the browser settings for its use by modifying the following registry entries by Nylon Typhoon threat actor.'\n",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs' or 'Log Source' = 'Windows Event System Logs' or 'Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "f090f8f4a-b986-42d2-b536-e0795c723e25",
+  "sentinel_source_path": "Solutions/Legacy IOC based Threat Protection/Hunting Queries/NylonTyphoonRegIOCPatterns.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Legacy IOC based Threat Protection/Hunting Queries/NylonTyphoonRegIOCPatterns.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "SecurityEvents",
+      "data_types": [
+        "SecurityEvent"
+      ]
+    },
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceRegistryEvents"
+      ]
+    },
+    {
+      "connector_id": "WindowsSecurityEvents",
+      "data_types": [
+        "SecurityEvents"
+      ]
+    },
+    {
+      "connector_id": "WindowsForwardedEvents",
+      "data_types": [
+        "WindowsEvent"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "SecurityEvent",
+    "WindowsEvent",
+    "Event",
+    "imRegistry"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1546.012"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "windows_security",
+    "candidates": [
+      "Windows Security Events",
+      "Windows Event Security Logs",
+      "Windows Event System Logs",
+      "Azure Log Analytics Custom Logs",
+      "SOC Application Logs"
+    ],
+    "original_tables": [
+      "SecurityEvent",
+      "WindowsEvent",
+      "Event",
+      "imRegistry"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Legacy IOC based Threat Protection/Hunting Queries/NylonTyphoonRegIOCPatterns.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Windows Sysmon Logs' and (Action = 'FileCreated') and ('Process Name' like '*.dll') and ('Target Filename' like 'C:\\\\WINDOWS\\\\SYSTEM32\\\\SPOOL\\\\drivers\\\\x64\\\\\\3\\\\*' or 'Target Filename' like 'C:\\\\WINDOWS\\\\SYSTEM32\\\\SPOOL\\\\drivers\\\\x64\\\\\\4\\\\*')

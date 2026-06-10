@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Windows Sysmon Logs' and (('Parent Process Name' = 'winrar.exe' or 'Command Line' like '*.rar*') and 'Target Filename' like '*Programs\\\\Startup*')

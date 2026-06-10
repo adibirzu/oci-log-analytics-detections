@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (Action = 'BLOCK_CONTINUE_WEBCAT') | fields 'Request URL', 'User Name', 'Source IP'

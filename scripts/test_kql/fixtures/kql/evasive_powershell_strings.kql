@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'powershell.exe') and (('Command Line' like '*-ep bypass*' and 'Command Line' like '*-command*' and 'Command Line' like '*get-content*' and 'Command Line' like '*remove-item*' and 'Command Line' like '*iex*'))

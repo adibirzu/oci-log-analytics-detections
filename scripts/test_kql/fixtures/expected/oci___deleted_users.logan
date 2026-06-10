@@ -1,0 +1,1 @@
+'Log Source' = 'OCI Audit Logs' and ('Event Type' = 'DeleteUser')

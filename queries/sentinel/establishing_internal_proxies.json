@@ -1,0 +1,92 @@
+{
+  "title": "Establishing internal proxies",
+  "description": "'This hunting query helps to detect attempts to create proxies on compromised systems using the \n built-in netsh portproxy command. VoltTyphoon has been seen creating these proxies on compromised hosts to manage command and control communications.'\n",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs' or 'Log Source' = 'Windows Event System Logs')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "ce38c16c-a560-46c0-88d6-7757b88f08e9",
+  "sentinel_source_path": "Solutions/Windows Security Events/Hunting Queries/InternalProxies.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Windows Security Events/Hunting Queries/InternalProxies.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "WindowsSecurityEvents",
+      "data_types": [
+        "SecurityEvent"
+      ]
+    },
+    {
+      "connector_id": "WindowsForwardedEvents",
+      "data_types": [
+        "WindowsEvent"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "SecurityEvent",
+    "WindowsEvent"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "commandand_control"
+    ],
+    "techniques": [
+      "T1090"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "windows_security",
+    "candidates": [
+      "Windows Security Events",
+      "Windows Event Security Logs",
+      "Windows Event System Logs"
+    ],
+    "original_tables": [
+      "SecurityEvent",
+      "WindowsEvent"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Windows Security Events/Hunting Queries/InternalProxies.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

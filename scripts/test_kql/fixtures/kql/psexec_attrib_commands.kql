@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' like '*PSEXESVC.exe') and ('Command Line' like '*.bat*') and ('Process Name' = 'cmd.exe' and ('Command Line' like '*-s*' and 'Command Line' like '*-h*' and 'Command Line' like '*-r*' and 'Command Line' like '*-a*' and 'Command Line' like '**.**')) | head 100

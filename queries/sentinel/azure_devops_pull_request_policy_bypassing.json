@@ -1,0 +1,82 @@
+{
+  "title": "Azure DevOps Pull Request Policy Bypassing",
+  "description": "'Looks for users bypassing Update Policies in repos'\n",
+  "query": "'Log Source' = 'SOC Application Logs' and (Operation = 'Git.RefUpdatePoliciesBypassed')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "df205daf-fcf3-4b95-a7fd-043b70f6c209",
+  "sentinel_source_path": "Solutions/AzureDevOpsAuditing/Hunting Queries/AzDOPrPolicyBypassers.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/AzureDevOpsAuditing/Hunting Queries/AzDOPrPolicyBypassers.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "AzureMonitor",
+      "data_types": [
+        "AzureDevOpsAuditing"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "ADOAuditLogs"
+  ],
+  "sentinel_category": "m365",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.m365"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1098"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "devops_audit",
+    "candidates": [
+      "SOC Application Logs"
+    ],
+    "original_tables": [
+      "ADOAuditLogs"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/AzureDevOpsAuditing/Hunting Queries/AzDOPrPolicyBypassers.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

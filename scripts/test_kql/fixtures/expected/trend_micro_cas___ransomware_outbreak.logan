@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and ('Event Type' = 'ransomware') | timestats span = 2minute count as count_ by 'Target User Name' | where count_ >= 2

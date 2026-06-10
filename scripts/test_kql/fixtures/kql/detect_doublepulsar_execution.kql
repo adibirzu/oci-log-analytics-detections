@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (Hashes = 'be855cd1bfc1e1446a3390c693f29e2a3007c04e' or ('Command Line' like '*targetport*' and 'Command Line' like '*targetip*' and ('Command Line' like '*payload*' or 'Command Line' like '*verifybackdoor*')))

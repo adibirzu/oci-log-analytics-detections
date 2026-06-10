@@ -1,0 +1,1 @@
+('Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs') and (Status like '*REJECTED_BY_POLICY*') | stats count as rejected by Status, 'Target User Name' | where rejected > 1000

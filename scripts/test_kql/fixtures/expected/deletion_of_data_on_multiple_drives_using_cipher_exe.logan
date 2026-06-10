@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'cipher.exe') and ('Command Line' like '*/w*') | timestats span = 1minute distinctcount('Command Line') as CipherCount, unique('Command Line') as CipherList by Entity, 'Host Name (Server)' | where CipherCount > 1

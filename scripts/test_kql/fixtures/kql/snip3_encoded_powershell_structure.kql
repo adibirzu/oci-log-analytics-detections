@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Windows Sysmon Logs' and ('Parent Process Name' = 'powershell.exe') and (('Command Line' like '*IEX*' and 'Command Line' like '*Text.Encoding*' and 'Command Line' like '*UTF8.GetString(@*')) and (('Command Line' like '*Unrestricted*' or 'Command Line' like '*Hidden*'))

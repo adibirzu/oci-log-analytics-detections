@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Event Type' != 'AttackAttempt') and ('Parent Process Name' like '*msbuild.exe') and (('Command Line' like '*xml*' or 'Command Line' like '*csproj*' or 'Command Line' like '*vcxproj*' or 'Command Line' like '*vbproj*' or 'Command Line' like '*fsproj*'))

@@ -1,0 +1,83 @@
+{
+  "title": "Tomcat - Known malicious user agent",
+  "description": "'Detects known malicious user agents'\n",
+  "query": "('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Load Balancer Access Logs') and (('User Agent' like '*Nikto*' or 'User Agent' like '*hydra*' or 'User Agent' like '*.nasl*' or 'User Agent' like '*absinthe*' or 'User Agent' like '*advanced email extractor*' or 'User Agent' like '*arachni*' or 'User Agent' like '*autogetcontent*' or 'User Agent' like '*bilbo*' or 'User Agent' like '*BFAC*' or 'User Agent' like '*brutus*' or 'User Agent' like '*brutus/aet*' or 'User Agent' like '*bsqlbf*' or 'User Agent' like '*cgichk*' or 'User Agent' like '*cisco-torch*' or 'User Agent' like '*commix*' or 'User Agent' like '*core-project*' or 'User Agent' like '*crimscanner*' or 'User Agent' like '*datacha0s*' or 'User Agent' like '*dirbuster*' or 'User Agent' like '*domino hunter*' or 'User Agent' like '*dotdotpwn*' or 'User Agent' like '*email extractor*' or 'User Agent' like '*fhscan core*' or 'User Agent' like '*floodgate*' or 'User Agent' like '*get-minimal*' or 'User Agent' like '*gootkit auto-rooter scanner*' or 'User Agent' like '*grabber*' or 'User Agent' like '*grendel-scan*' or 'User Agent' like '*havij*' or 'User Agent' like '*inspath*' or 'User Agent' like '*internet ninja*' or 'User Agent' like '*jaascois*' or 'User Agent' like '*zmeu*' or 'User Agent' like '*masscan*' or 'User Agent' like '*metis*' or 'User Agent' like '*morfeus*' or 'User Agent' like '*mysqloit*' or 'User Agent' like '*n-stealth*' or 'User Agent' like '*nessus*' or 'User Agent' like '*netsparker*' or 'User Agent' like '*nmap nse*' or 'User Agent' like '*nmap scripting engine*' or 'User Agent' like '*nmap-nse*' or 'User Agent' like '*nsauditor*' or 'User Agent' like '*openvas*' or 'User Agent' like '*pangolin*' or 'User Agent' like '*paros*' or 'User Agent' like '*pmafind*' or 'User Agent' like '*prog.customcrawler*' or 'User Agent' like '*qualys was*' or 'User Agent' like '*s.t.a.l.k.e.r.*' or 'User Agent' like '*security scan*' or 'User Agent' like '*springenwerk*' or 'User Agent' like '*sql power injector*' or 'User Agent' like '*sqlmap*' or 'User Agent' like '*sqlninja*' or 'User Agent' like '*teh forest lobster*' or 'User Agent' like '*this is an exploit*' or 'User Agent' like '*toata dragostea*' or 'User Agent' like '*toata dragostea mea pentru diavola*' or 'User Agent' like '*uil2pn*' or 'User Agent' like '*vega*' or 'User Agent' like '*voideye*' or 'User Agent' like '*w3af.sf.net*' or 'User Agent' like '*w3af.sourceforge.net*' or 'User Agent' like '*w3af.org*' or 'User Agent' like '*webbandit*' or 'User Agent' like '*webinspect*' or 'User Agent' like '*webshag*' or 'User Agent' like '*webtrends security analyzer*' or 'User Agent' like '*webvulnscan*' or 'User Agent' like '*whatweb*' or 'User Agent' like '*whcc*' or 'User Agent' like '*wordpress hash grabber*' or 'User Agent' like '*xmlrpc exploit*' or 'User Agent' like '*WPScan*' or 'User Agent' like '*XSpider*' or 'User Agent' like '*SF/*' or 'User Agent' like '*FooBar/42*' or 'User Agent' like '*ScanAlert*' or 'User Agent' like '*Webscanner*' or 'User Agent' like '*Webster*' or 'User Agent' like '*fantomCrew*' or 'User Agent' like '*fantomBrowser*' or 'User Agent' like '*visvo*' or 'User Agent' like '*magereport*' or 'User Agent' like '*ltx71*' or 'User Agent' like '*websiteprotection*' or 'User Agent' like '*BigCliqueBOT*' or 'User Agent' like '*BOT for JCE*'))",
+  "level": "high",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "5e77a818-5825-4ff6-a901-80891c4774d1",
+  "sentinel_source_path": "Solutions/Tomcat/Analytic Rules/TomcatKnownMaliciousUserAgent.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Tomcat/Analytic Rules/TomcatKnownMaliciousUserAgent.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "CustomLogsAma",
+      "data_types": []
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "TomcatEvent"
+  ],
+  "sentinel_category": "network",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.network"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "initial_access"
+    ],
+    "techniques": [
+      "T1190",
+      "T1133"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "web_server",
+    "candidates": [
+      "SOC WAF Security Logs",
+      "SOC Web Application Logs",
+      "SOC Load Balancer Access Logs"
+    ],
+    "original_tables": [
+      "TomcatEvent"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Tomcat/Analytic Rules/TomcatKnownMaliciousUserAgent.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and ('Event Type' = 'authentication') and (Status in ('denied', 'failure')) | timestats span = 10minute count as count_ by 'Target User Name' | where count_ > 10

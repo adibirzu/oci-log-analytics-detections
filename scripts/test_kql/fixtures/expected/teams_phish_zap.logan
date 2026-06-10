@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Email Logs' or 'Log Source' = 'Microsoft 365 Audit Logs') and (Action = 'Phish ZAP')

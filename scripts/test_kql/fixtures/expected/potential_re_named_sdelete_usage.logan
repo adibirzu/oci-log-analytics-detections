@@ -1,0 +1,1 @@
+('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ('Event ID' = '4688') and ('Process Name' != 'sdelete.exe') and (('Command Line' like '*accepteula*' and 'Command Line' like '*-r*' and 'Command Line' like '*-s*' and 'Command Line' like '*-q*' and 'Command Line' like '*c:/*')) and (not ('Command Line' like '*sdelete*'))

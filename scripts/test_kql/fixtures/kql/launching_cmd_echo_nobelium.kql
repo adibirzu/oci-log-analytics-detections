@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' = 'SolarWinds.BusinessLayerHost.exe') and ('Process Name' = 'cmd.exe' and 'Command Line' like '*echo*')

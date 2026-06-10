@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*cmd.exe*' or 'Process Name' like '*powershell.exe*' or 'Process Name' like '*PowerShell_ISE.exe*')) and ('Command Line' like '*Add-PSSnapin Microsoft.Exchange.Powershell.Snapin*')

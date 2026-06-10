@@ -1,0 +1,1 @@
+('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs' or 'Log Source' = 'Windows Event System Logs' or 'Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs')

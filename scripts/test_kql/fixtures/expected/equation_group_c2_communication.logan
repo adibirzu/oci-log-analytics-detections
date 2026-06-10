@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Target Filename' like '*\\rundll32.exe' and 'Command Line' like '*,dll_u') or 'Command Line' like '* -export dll_u *') | sort -Time | head 100

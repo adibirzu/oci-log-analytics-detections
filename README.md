@@ -22,17 +22,16 @@ This repository ships both source authoring content and generated OCI query asse
 - **Sigma-derived OCI query artifacts:** 553
   - 545 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
-- **Microsoft Sentinel converted queries:** 60 live OCI parser-passing queries
+- **Microsoft Sentinel converted queries:** 590 live OCI parser-passing queries
 - **Curated analytics:** 169
   - 54 app telemetry analytics in `queries/apps/`
   - 115 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 782
+- **Total query artifacts/content items:** 1312
 - **Source rule breakdown:** Windows (302), Cloud/OCI (102), Linux (80), Web/WAF (38)
-- **Combined MITRE ATT&CK coverage:** 243 techniques across 14 tactics
-- **MITRE ATLAS (AI/ML) coverage:** 10 techniques across 10 tactics — adversarial AI/LLM detections on `SOC Application Logs` and the `SOC GenAI Gateway Logs` source (GOAD/Caldera/OpenAEV + AI red-team)
+- **Combined MITRE ATT&CK coverage:** 279 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Atomic Red Team coverage:** 280 / 397 testable rules have ART mappings (70.5%)
-- **Dashboard inventory:** 29 dashboards with 441 active dashboard saved searches and 107 advanced visualization widgets
+- **Dashboard inventory:** 30 dashboards with 506 active dashboard saved searches and 126 advanced visualization widgets
 - **Generated demo data:** 221,173 events across 20 NDJSON files in the latest local `test_data/manifest.json`
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 
@@ -66,7 +65,7 @@ rules/** ------------------------------------------> scripts/convert_sigma.py
                                                         +--> queries/apps/*.json (8 Sigma-derived browser detections)
 
 queries/apps/*.json (47 curated app analytics) --------+
-queries/hunting/*.json (115 hunting analytics) --------+--> scripts/generate_catalog.py
+queries/hunting/*.json (115 hunting analytics) ---------+--> scripts/generate_catalog.py
                                                              |
                                                              +--> CATALOG.md
                                                              +--> queries/catalog.json

@@ -1,0 +1,81 @@
+{
+  "title": "Exchange IIS Worker Dropping Webshells",
+  "description": "This query checks for the IIS worker process dropping files that resemble web shells and other artifacts seen in known attacks. Reference: https://msrc-blog.microsoft.com/2021/03/02/multiple-security-updates-released-for-exchange-server\n",
+  "query": "'Log Source' = 'SOC Windows Sysmon Logs' and ('Parent Process Name' = 'w3wp.exe') and ('Command Line' like '*MSExchange*') and (('Target Filename' like '*\\\\\\\\\\\\\\\\wwwroot\\\\\\\\\\\\\\\\*' or 'Target Filename' like '*HttpProxy\\\\\\\\\\\\\\\\owa\\\\\\\\\\\\\\\\*' or 'Target Filename' like '*\\\\\\\\\\\\\\\\Temporary ASP.NET Files\\\\\\\\\\\\\\\\*')) and (not(('Target Filename' like '*\\\\\\\\\\\\\\\\tmp\\\\\\\\\\\\\\\\*' or 'Target Filename' like '*\\\\\\\\\\\\\\\\dl3\\\\\\\\\\\\\\\\*'))) and (not ('Target Filename' like '*.log')) and (not ('Target Filename' like '*.json')) and (not ('Target Filename' like '*.ini')) and (not ('Target Filename' like '*.vb')) and (not ('Target Filename' like '*.tmp')) and (not ('Target Filename' like '*.xml')) and (not ('Target Filename' like '*.js'))",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "42e7df5b-80f6-49a5-946a-08026ec24807",
+  "sentinel_source_path": "Solutions/Web Shells Threat Protection/Hunting Queries/exchange-iis-worker-dropping-webshell.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Web Shells Threat Protection/Hunting Queries/exchange-iis-worker-dropping-webshell.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceFileEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceFileEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "persistence"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceFileEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Web Shells Threat Protection/Hunting Queries/exchange-iis-worker-dropping-webshell.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

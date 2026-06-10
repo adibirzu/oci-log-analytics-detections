@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (Action = 'pull_request.merge') | fields User, Action

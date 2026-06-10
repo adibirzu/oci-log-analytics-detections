@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Email Logs' or 'Log Source' = 'Microsoft 365 Audit Logs') and ('User Name' in ('t20saudiarabia@outlook.sa', 't20saudiarabia@hotmail.com', 't20saudiarabia@gmail.com', 'munichconference@outlook.com', 'munichconference@outlook.de', 'munichconference1962@gmail.com'))

@@ -1,0 +1,83 @@
+{
+  "title": "oceanlotus-apt32-network",
+  "description": "This query was originally published in a threat analytics report about the group known to other security researchers as APT32 or OceanLotus\nThis tracked activity group uses a wide array of malicious documents to conduct attacks. Some of their favored techniques include sideloading dynamic link libraries,  and disguising payloads as image files.\nThe following query detects network activity that may indicate an attack by this group.\nSee Detect malicious documents associated with group known as \"OceanLotus\" for another query related to this group's activity.\n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Network Logs' or 'Log Source' = 'SOC Sysmon Network Logs') and ('Request URL' in ('open.betaoffice.net', 'outlook.updateoffices.net', 'load.newappssystems.com', 'syn.servebbs.com', 'cortanazone.com', 'cortanasyn.com', 'ristineho.com', 'syn.servebbs.com'))",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "8e2c33f5-0c00-4246-b10b-9fb43da56365",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Campaigns/oceanlotus-apt32-network.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/oceanlotus-apt32-network.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceNetworkEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceNetworkEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "discovery",
+      "lateral_movement",
+      "command_and_control"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Network Logs",
+      "SOC Sysmon Network Logs"
+    ],
+    "original_tables": [
+      "DeviceNetworkEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/oceanlotus-apt32-network.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

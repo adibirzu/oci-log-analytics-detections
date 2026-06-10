@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (Description = 'Workflow scheme updated') | fields Time, 'User Name', 'Source IP', 'Target Object'

@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Event Type' != 'AttackAttempt') and (('Command Line' like '*-NoP -sta -NonI -W Hidden -Enc*' or 'Command Line' like '*-noP -sta -w 1 -enc*' or 'Command Line' like '*-NoP -NonI -W Hidden -enc*'))

@@ -153,13 +153,25 @@ Previously live-verified on 2026-04-15:
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit output
 - `CONTRIBUTING.md` — contributor workflow and validation expectations
 
+## Catalog-Only Queries
+
+The following queries are included in `queries/catalog.json` as reference analytics
+but are **not wired into any deployed dashboard** in `scripts/deploy_dashboard.py`
+and do not appear in `queries/dashboard_inventory.json`.  They are available for
+manual saved-search creation or future dashboard inclusion once the required data
+sources are provisioned.
+
+| Query file | Reason for catalog-only status |
+|---|---|
+| `queries/hunting/oci_iam_fusion_activity_correlation.json` | Requires `Fusion Apps: Sign In - Sign Out Activity Logs` and `Fusion Apps: ESS Audit Logs` sources, which are not provisioned in the demo tenancy.  Verified absent from `scripts/deploy_dashboard.py` (grep clean) and `queries/dashboard_inventory.json`. The single dashboard MISS noted in the 2026-05-04 verification run (`Hunt: OCI IAM + Fusion Correlation`) was from an earlier deploy cycle; the widget has since been removed from the deployed dashboard set. |
+
 ## Recommended Next Work
 
 See `PLAN.md` for the prioritised forward roadmap. High-level themes:
 
 1. **Sigma converter quality** — fix the backslash-escape bug for Windows pipe patterns so `convert_sigma.py` no longer overwrites hand-edited Cobalt Strike / Mimikatz / PsExec pipe queries with unparseable LAQL. Either escape `\` properly or add a `do_not_overwrite: true` rule annotation.
 2. **Sweep the dual-Status pattern** across the remaining 12 OCI rules that filter on `status: Success` so they survive in tenancies where the native parser projects HTTP code instead.
-3. **Provision the Fusion Apps source** (or keep the Fusion correlation query catalog-only) so `hunting/oci_iam_fusion_activity_correlation.json` can be deployed and return rows.
+3. **Provision the Fusion Apps source** (or keep `hunting/oci_iam_fusion_activity_correlation.json` catalog-only) once the log source is available — see Catalog-Only Queries above.
 4. **Schedule `daily_health_check.py`** as a recurring routine that posts the banner + diff against the previous run; surface regressions before deploy.
 5. **Codex review-gate adoption** — now enabled for every stop, so include unit-test / smoke-test deltas in commit messages so the reviewer has full context.
 6. **Keep `queries/dashboard_inventory.json` regenerated** with dashboard changes (already enforced by the deploy script's `--export-inventory` mode).

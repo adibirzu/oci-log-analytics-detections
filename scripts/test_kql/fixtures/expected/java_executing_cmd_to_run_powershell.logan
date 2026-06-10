@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Parent Process Name' = 'java.exe' and 'Process Name' = 'cmd.exe' and ('Command Line' like '*powershell iex*' and 'Command Line' like '*DownloadString*'))

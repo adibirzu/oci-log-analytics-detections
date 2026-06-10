@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Windows Sysmon Logs' and ('Process Name' like '*.docx' or 'Process Name' like '*.pptx' or 'Process Name' like '*.xlsx' or 'Process Name' like '*.pdf') | timestats span = 5minute count as TotalFiles by 'Account Name' | where TotalFiles > 100 | fields TotalFiles, Time, 'Account Name'

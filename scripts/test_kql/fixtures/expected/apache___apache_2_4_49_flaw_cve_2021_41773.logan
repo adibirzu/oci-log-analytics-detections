@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Load Balancer Access Logs') and ('HTTP Request Method' = 'GET') and (('Request URL' like '*/cgi-bin/*' and 'Request URL' like '*/%2e%2e/*')) and ('HTTP Status Code' = 200)

@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and (('Process Name' like '*cmd.exe*' or 'Process Name' like '*powershell.exe*' or 'Process Name' like '*PowerShell_ISE.exe*')) and ('Command Line' like '*powercat.ps1')

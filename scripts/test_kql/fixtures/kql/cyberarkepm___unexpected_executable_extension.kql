@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Event Type' != 'AttackAttempt') and ('Parent Process Name' like '*\\*') and (not ('Parent Process Name' like '*.exe')) | fields Time, Description, 'User Name', 'Parent Process Name'

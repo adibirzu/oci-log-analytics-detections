@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Windows Sysmon Logs' and (Action like 'ScreenshotTaken*')

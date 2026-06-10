@@ -1,0 +1,1 @@
+('Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs') and (('Application Name' != null and 'Application Name' != '')) | stats count as count_ by 'Application Name' | eval AppCustomEntity = 'Application Name'

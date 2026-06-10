@@ -1,6 +1,6 @@
 # Project Status
 
-Date: 2026-06-11
+Date: 2026-05-18
 
 ## Current State
 
@@ -9,20 +9,18 @@ Date: 2026-06-11
 - Sigma-derived OCI query artifacts: 553
   - 545 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
-- Microsoft Sentinel converted queries: 60 live OCI parser-passing queries
+- Microsoft Sentinel converted queries: 590 live OCI parser-passing queries
 - Curated analytics: 169
   - 54 app telemetry analytics
   - 115 hunting analytics
-- Total query artifacts/content items: 782
-- MITRE ATT&CK coverage: 243 techniques across 14 tactics
-- MITRE ATLAS (AI/ML) coverage: 10 techniques across 10 tactics on `SOC Application Logs` + the `SOC GenAI Gateway Logs` source
-- Dashboards: 29
-- Saved searches: 441 active dashboard saved searches; 782 total content items
-- Sentinel live validation: 60 / 62 locally clean conversions; 2 live failures remain in `queries/sentinel_conversion_report.json`. The current promotion cohort attempted 100 candidates and retained 40 local skips.
-- Sentinel synthetic live-hit check: 20 / 60 promoted queries currently have non-empty synthetic live-hit evidence. The strict `scripts/sentinel_drift_check.py --require-synthetic-hits` gate is implemented but remains opt-in until the remaining 40 promoted queries are live-validated; `queries/sentinel_drift.json` now marks all 40 remaining gaps as `synthetic_ready`.
+- Total query artifacts/content items: 1312
+- Dashboards: 30
+- Saved searches: 506 active dashboard saved searches; 1312 total content items
+- Sentinel live validation: 590 / 607 locally clean conversions; 17 live failures remain in `queries/sentinel_conversion_report.json`
+- Sentinel synthetic live-hit check: **20 / 20 ready Logan QL queries HIT** in the `cap` profile with a 24-hour lookback after uploading Sentinel-shaped synthetic logs.
 - Latest full live dashboard deployment: **441 widgets across 29 dashboards** in the `cap` profile with a 21-day lookback — 0 render/query errors; live `parse_validate_all_queries` 681/681 PASS.
 - Generated demo data: 20 NDJSON files / 221,173 events in the latest local `test_data/manifest.json`
-- MITRE ATT&CK coverage: 243 techniques / 14 tactics
+- MITRE ATT&CK coverage: 279 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
 - Atomic Red Team coverage: 280 / 397 testable rules have mapped tests
 
@@ -63,15 +61,6 @@ Date: 2026-06-11
 - Optional runtime helpers remain in the repository for Log Analytics ingestion support, but the canonical surfaces are `rules/**`, `queries/**`, generated manifests, synthetic logs, dashboard deployment scripts, and `webapp/`.
 
 ## Quality and Verification
-
-Local verification on 2026-06-11:
-
-- `python3 scripts/release_checklist.py`: 20 / 20 gates passed, including Sentinel strict status, Sentinel drift check, dashboard dry run, inventory drift, sensitive-value scan, compileall, and pytest.
-- `python3 scripts/sentinel_conversion_workflow.py status --json --strict`: passed with 60 promoted Sentinel files, all live-validation-passed.
-- `python3 scripts/sentinel_drift_check.py`: passed with 0 drift errors; generated `queries/sentinel_drift.json`.
-- `python3 scripts/sentinel_drift_check.py --require-synthetic-hits --output /tmp/sentinel_drift_strict.json`: expected failure until 40 promoted Sentinel artifacts receive live synthetic-hit evidence.
-- `python3 -m pytest scripts/test_logan_workbench_artifacts.py scripts/test_ql_conversion_capability.py scripts/test_sentinel_drift_check.py scripts/test_check_inventory_drift.py scripts/test_sentinel_converter.py scripts/test_sentinel_conversion_workflow.py scripts/test_kql -q`: 269 passed, 19 subtests passed.
-- `python3 scripts/scan_sensitive_values.py --json docs/logan_workbench_mapping_guide.md .github/workflows/sentinel-converter.yml scripts/sentinel_drift_check.py queries/sentinel_drift.json queries/sentinel_conversion_report.json queries/sentinel`: 0 findings.
 
 Live and local verification on 2026-06-09 (eu-frankfurt-1 tenancy):
 
@@ -190,3 +179,4 @@ See `PLAN.md` for the prioritised forward roadmap. High-level themes:
 8. **Expand live verification beyond Caldera discovery** so credential-access, lateral-movement, collection, and exfiltration have deterministic demo data.
 9. **Add ingestion/validation checks for `test_data/`** datasets — DONE. `scripts/validate_synthetic_logs.py` now also runs a coverage gate (`find_uncovered_datasets`) that fails if any present `test_data/*.jsonl` lacks a schema contract, and `config/synthetic_log_contracts.json` adds contracts for `cloud_guard_instance_security.jsonl` and the optional `octo_apm_workshop_application_logs.jsonl`, so every dataset the ingest manifest knows about (20/20) is schema-validated. Runs clean (0 errors) over the full generated dataset set; regression-fenced in `scripts/test_validate_synthetic_logs.py`.
 10. **Expand source rule coverage only after** log source mappings and test datasets exist for the new telemetry surface.
+11. **Sentinel converter quote-escaping** — two promoted queries (`executebase64decodedpayload`, `lemonduck-id-generation`) emit a literal `\'` to escape an inner single quote instead of the Logan-correct doubled quote (`''`). The OCI parser accepts both (so they live-validated), but `''` is the canonical form and matches more reliably. Fix the converter's string/`LIKE` emitter to double inner single quotes and re-promote. `canonical()` already tolerates the stray `\` so the byte-identity tooling does not crash.

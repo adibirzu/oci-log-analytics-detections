@@ -1,0 +1,104 @@
+{
+  "title": "Persisting via IFEO Registry Key",
+  "description": "'This query detects frequent creation and deletion of IFEO registry keys in a short time, a technique used by adversaries for system persistence.'\n",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs' or 'Log Source' = 'Windows Event System Logs' or 'Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "f82c89fa-c969-4d12-832f-04d55d14522c",
+  "sentinel_source_path": "Solutions/Endpoint Threat Protection Essentials/Hunting Queries/PersistViaIFEORegistryKey.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Endpoint Threat Protection Essentials/Hunting Queries/PersistViaIFEORegistryKey.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "SecurityEvents",
+      "data_types": [
+        "SecurityEvent"
+      ]
+    },
+    {
+      "connector_id": "WindowsSecurityEvents",
+      "data_types": [
+        "SecurityEvents"
+      ]
+    },
+    {
+      "connector_id": "WindowsForwardedEvents",
+      "data_types": [
+        "WindowsEvent"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "SecurityEvent",
+    "WindowsEvent",
+    "Event",
+    "imRegistry"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence"
+    ],
+    "techniques": [
+      "T1546.012"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "windows_security",
+    "candidates": [
+      "Windows Security Events",
+      "Windows Event Security Logs",
+      "Windows Event System Logs",
+      "Azure Log Analytics Custom Logs",
+      "SOC Application Logs"
+    ],
+    "original_tables": [
+      "SecurityEvent",
+      "WindowsEvent",
+      "Event",
+      "imRegistry"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Endpoint Threat Protection Essentials/Hunting Queries/PersistViaIFEORegistryKey.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

@@ -1,0 +1,1 @@
+'Log Source' = 'OCI Audit Logs' and ('Event Type' = 'LaunchInstance') | timestats span = 10minute count as count_ by 'Source IP' | where count_ >= 5

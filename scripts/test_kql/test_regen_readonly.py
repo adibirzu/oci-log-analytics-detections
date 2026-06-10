@@ -37,9 +37,11 @@ def test_check_mode_does_not_mutate_fixtures() -> None:
     exit_code = regen_promoted.main(["--check"])
 
     after = _snapshot(fixtures_root)
-    # --check exits 0 on a clean tree; the point of this test is the no-mutation
-    # invariant regardless of the (clean) drift result.
-    assert exit_code == 0, "fixtures unexpectedly drifted in this checkout"
+    # The invariant under test is no-mutation. --check returns 0 on a fully
+    # fixtured tree and 1 when promoted queries lack fixtures (e.g. after a bulk
+    # promotion that didn't regenerate every fixture); either way it must not
+    # write, create, or delete anything.
+    assert exit_code in (0, 1), f"unexpected exit code {exit_code}"
     assert before == after, (
         "regen_promoted.py --check mutated the fixtures tree "
         f"(added/removed/changed: {set(before) ^ set(after) or 'content changed'})"

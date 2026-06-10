@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Email Logs' or 'Log Source' = 'Microsoft 365 Audit Logs') and (Direction = 'Inbound') | stats count as count_ by 'User Name' | sort -count_

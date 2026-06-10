@@ -1,0 +1,82 @@
+{
+  "title": "snip3-revengerat-c2-exfiltration",
+  "description": "Snip3 is a family of related remote access trojans. Although the malware in this family contain numerous small variations, they all exhibit similar behaviors and techniques.\nThe following query looks for network connections using any protocols associated with recent RevengeRAT, AsyncRAT, and other malware campaigns targeting the aviation industry.\nThis activity is often followed by connections to copy-and-paste sites such as pastebin.com, stikked.ch, academia.edu, and archive.org. Many of these connections will occur on non-standard ports.\n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Network Logs' or 'Log Source' = 'SOC Sysmon Network Logs') and ('Request URL' in ('mail.alamdarhardware.com', 'kexa600200.ddns.net', 'h0pe1759.ddns.net', 'n0ahark2021.ddns.net', ' kimjoy007.dyndns.org', ' kimjoy.ddns.net', ' asin8988.ddns.net', ' asin8989.ddns.net', 'asin8990.ddns.net'))",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "8e169e62-be43-4f30-9f25-e003b2cd9c6e",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Campaigns/snip3-revengerat-c2-exfiltration.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/snip3-revengerat-c2-exfiltration.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceNetworkEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceNetworkEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control",
+      "exfiltration"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Network Logs",
+      "SOC Sysmon Network Logs"
+    ],
+    "original_tables": [
+      "DeviceNetworkEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/snip3-revengerat-c2-exfiltration.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

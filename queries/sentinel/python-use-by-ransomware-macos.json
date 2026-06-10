@@ -1,0 +1,85 @@
+{
+  "title": "python-use-by-ransomware-macos",
+  "description": "This query was originally published in the threat analytics report, EvilQuest signals the rise of Mac ransomware.\nAs of the time of this writing (October 2020), ransomware designed to target macOS is relatively rare. EvilQuest is one of the few examples of this kind of malware on the platform.\nThe query below can help locate an attempt to run Python in service of malicious activity by a remote operator. The command the query searches for is associated with, but not definitely indicative of, EvilQuest infections.\nOther queries related to EvilQuest ransomware can be found under the See also section below.\n",
+  "query": "('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Microsoft Defender Endpoint Logs') and ('Command Line' like '*EIKKEIKK*' and 'Command Line' like '*python*')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "8d52dce6-6143-44e9-8ff5-a62f2df742b2",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Command and Control/python-use-by-ransomware-macos.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Command and Control/python-use-by-ransomware-macos.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceFileEvents",
+        "DeviceProcessEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceFileEvents",
+    "DeviceProcessEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "command_and_control"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "SOC Windows Sysmon Logs",
+      "Microsoft Defender Endpoint Logs"
+    ],
+    "original_tables": [
+      "DeviceFileEvents",
+      "DeviceProcessEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Command and Control/python-use-by-ransomware-macos.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

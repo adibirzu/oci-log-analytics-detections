@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Command Line' like '*Set-MpPreference*' and 'Command Line' like '*DisableRealtimeMonitoring*' and 'Command Line' like '*Add-MpPreference*' and 'Command Line' like '*ExclusionProcess*')) | fields 'Command Line', 'Command Line', Entity, Time

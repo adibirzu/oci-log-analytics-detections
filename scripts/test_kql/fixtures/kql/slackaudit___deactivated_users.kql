@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (Action = 'user_deactivated') | stats count as Count by 'User Name'

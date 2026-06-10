@@ -1,0 +1,1 @@
+('Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs') and ((Action != null and Action != '') and ('Target User Name' != null and 'Target User Name' != '') and ('Source IP' != null and 'Source IP' != '')) | stats count as count_ by 'Target User Name' | sort -count_

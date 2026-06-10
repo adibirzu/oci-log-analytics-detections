@@ -1,0 +1,82 @@
+{
+  "title": "OCI - Multiple instances terminated",
+  "description": "'Detects when multiple instances were terminated.'\n",
+  "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' = 'TerminateInstance') | timestats span = 10minute count as count_ by 'Source IP' | where count_ >= 5",
+  "level": "high",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "252e651d-d825-480c-bdeb-8b239354577d",
+  "sentinel_source_path": "Solutions/Oracle Cloud Infrastructure/Analytic Rules/OCIMultipleInstancesTerminated.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Oracle Cloud Infrastructure/Analytic Rules/OCIMultipleInstancesTerminated.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "OracleCloudInfrastructureLogsConnector",
+      "data_types": [
+        "OCILogs"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "OCILogs"
+  ],
+  "sentinel_category": "azure_cloud",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.azure_cloud"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "impact"
+    ],
+    "techniques": [
+      "T1529"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "oci_audit",
+    "candidates": [
+      "OCI Audit Logs"
+    ],
+    "original_tables": [
+      "OCILogs"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Oracle Cloud Infrastructure/Analytic Rules/OCIMultipleInstancesTerminated.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

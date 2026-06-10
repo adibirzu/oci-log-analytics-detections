@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Windows Sysmon Logs' and ('Process Name' like '*.pfx' or 'Process Name' like '*.pfn' or 'Process Name' like '*.p12')

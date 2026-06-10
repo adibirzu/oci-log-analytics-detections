@@ -1,0 +1,81 @@
+{
+  "title": "McAfee ePO - Agent Handler down",
+  "description": "'Detects when AgentHandler is down.'\n",
+  "query": "('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Event ID' = '16025')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "3c1425d3-93d4-4eaf-8aa0-370dbac94c82",
+  "sentinel_source_path": "Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOAgentHandlerDown.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOAgentHandlerDown.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "SyslogAma",
+      "data_types": []
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "McAfeeEPOEvent"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": [
+      "T1562"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "endpoint_security",
+    "candidates": [
+      "SOC Windows Sysmon Logs",
+      "Windows Security Events"
+    ],
+    "original_tables": [
+      "McAfeeEPOEvent"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOAgentHandlerDown.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

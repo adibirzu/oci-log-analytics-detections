@@ -1,0 +1,1 @@
+'Log Source' = 'OCI Audit Logs' and ('Request URL' like '*/opc/v1*' or 'Request URL' like '*/openstack*') and ('HTTP Status Code' = 200)

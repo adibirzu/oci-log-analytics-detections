@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Cloud Guard Logs' or 'Log Source' = 'SOC Application Logs') and (Description = 'NEW_ALERT') and (Status = 'open')

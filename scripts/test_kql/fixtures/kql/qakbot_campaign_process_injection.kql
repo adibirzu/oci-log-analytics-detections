@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'esentutl.exe') and ('Command Line' like '*WebCache*') and (('Command Line' like '*V01*' or 'Command Line' like '*/s*' or 'Command Line' like '*/d*')) | fields 'Command Line', 'Parent Process Name', Entity, Time

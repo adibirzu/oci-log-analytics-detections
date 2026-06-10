@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' = 'wmiprvse.exe') and ('Process Name' = 'msbuild.exe' and 'Command Line' like '*programdata*')

@@ -1,0 +1,83 @@
+{
+  "title": "Bitglass - Multiple failed logins",
+  "description": "'Detects multiple failed logins.'\n",
+  "query": "('Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs') and ('Event Type' = 'access') and (Status = 'Failed login attempt.') | timestats span = 10minute count as count_ by User | where count_ >= 10",
+  "level": "high",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "7c570bfc-9f20-490e-80e8-b898c7ce4bda",
+  "sentinel_source_path": "Solutions/Bitglass/Analytic Rules/BitglassMultipleFailedLogins.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Bitglass/Analytic Rules/BitglassMultipleFailedLogins.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "Bitglass",
+      "data_types": [
+        "Bitglass"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "Bitglass"
+  ],
+  "sentinel_category": "azure_custom",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.azure_custom"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "credential_access"
+    ],
+    "techniques": [
+      "T1110"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "sentinel_workspace_custom",
+    "candidates": [
+      "Azure Log Analytics Custom Logs",
+      "SOC Application Logs"
+    ],
+    "original_tables": [
+      "Bitglass"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Bitglass/Analytic Rules/BitglassMultipleFailedLogins.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

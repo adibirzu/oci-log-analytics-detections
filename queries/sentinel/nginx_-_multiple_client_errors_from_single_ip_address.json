@@ -1,0 +1,85 @@
+{
+  "title": "NGINX - Multiple client errors from single IP address",
+  "description": "'Detects multiple client errors from one source in short timeframe'\n",
+  "query": "('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Load Balancer Access Logs') and ('HTTP Status Code' >= 400 and 'HTTP Status Code' <= 499) | timestats span = 5minute count as MultipleClientErrors by 'Source IP' | where MultipleClientErrors > 100",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "42771afe-edb3-4330-bc4a-abf6a5714454",
+  "sentinel_source_path": "Solutions/NGINX HTTP Server/Analytic Rules/NGINXMultipleClientErrorsFromSingleIP.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/NGINX HTTP Server/Analytic Rules/NGINXMultipleClientErrorsFromSingleIP.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "CustomLogsAma",
+      "data_types": [
+        "NGINX_CL"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "NGINXHTTPServer"
+  ],
+  "sentinel_category": "network",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.network"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "initial_access"
+    ],
+    "techniques": [
+      "T1190",
+      "T1133"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "web_server",
+    "candidates": [
+      "SOC WAF Security Logs",
+      "SOC Web Application Logs",
+      "SOC Load Balancer Access Logs"
+    ],
+    "original_tables": [
+      "NGINXHTTPServer"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/NGINX HTTP Server/Analytic Rules/NGINXMultipleClientErrorsFromSingleIP.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

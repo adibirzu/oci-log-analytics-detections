@@ -1,0 +1,84 @@
+{
+  "title": "Cisco WSA - Rare URL with error",
+  "description": "'Query searches for rare URLs with errors.'\n",
+  "query": "('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (Action = 'OTHER') | stats count as count_ by 'Request URL' | sort count_",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "88edb5d8-3ad9-4004-aefa-43c289483935",
+  "sentinel_source_path": "Solutions/CiscoWSA/Hunting Queries/CiscoWSAUrlRareErrorUrl.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CiscoWSA/Hunting Queries/CiscoWSAUrlRareErrorUrl.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "SyslogAma",
+      "data_types": []
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "CiscoWSAEvent"
+  ],
+  "sentinel_category": "network",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.network"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "initial_access",
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1189",
+      "T1048"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "web_security",
+    "candidates": [
+      "SOC WAF Security Logs",
+      "SOC Web Application Logs",
+      "SOC Network Firewall Logs"
+    ],
+    "original_tables": [
+      "CiscoWSAEvent"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CiscoWSA/Hunting Queries/CiscoWSAUrlRareErrorUrl.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

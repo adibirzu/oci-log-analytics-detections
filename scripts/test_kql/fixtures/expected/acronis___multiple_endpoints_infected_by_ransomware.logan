@@ -1,0 +1,1 @@
+('Log Source' = 'Azure Common Security Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (Provider = 'Acronis') and ('Event ID' = 'ActiveProtectionBlocksSuspiciousActivity') | stats count as ActiveProtectionBlocksSuspiciousActivity by 'Host Name (Server)'

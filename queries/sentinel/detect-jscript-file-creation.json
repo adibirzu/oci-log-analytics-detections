@@ -1,0 +1,81 @@
+{
+  "title": "detect-jscript-file-creation",
+  "description": "This query was originally published in the threat analytics report, Emulation-evading JavaScripts.\nAttackers in several ransomware campaigns have employed heavily obfuscated JavaScript code, in order to implant malware or execute malicious commands. The obfuscation is intended to help the code evade security systems and potentially escape sandbox environments.\nThe following query detects the creation of files with a .jse extension. Certain ransomware campaigns, such as Emotet, are known to employ encrypted JavaScript code that is saved to the target as .jse files.\nSee Detect potentially malicious .jse launch by File Explorer or Word for a similar technique.\nReference - https://www.microsoft.com/security/blog/2017/11/06/mitigating-and-eliminating-info-stealing-qakbot-and-emotet-in-corporate-networks/\n",
+  "query": "'Log Source' = 'SOC Windows Sysmon Logs' and ('Process Name' like '*.jse')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "7913cb78-0e5a-4c4c-ab5b-31ef823ba25b",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Delivery/detect-jscript-file-creation.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Delivery/detect-jscript-file-creation.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceFileEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceFileEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "defense_evasion"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceFileEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Delivery/detect-jscript-file-creation.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

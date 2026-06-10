@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and ('Event ID' in ('86009', '86010', '86011', '86012', '86013', '86014', '86015', '86016', '86017', '86018', '86019', '86020')) | fields Time, 'Target User Name', 'Source IP', 'Destination IP'

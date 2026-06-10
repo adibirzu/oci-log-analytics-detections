@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Network Logs' or 'Log Source' = 'SOC Sysmon Network Logs') and ('Request URL' in ('mail.alamdarhardware.com', 'kexa600200.ddns.net', 'h0pe1759.ddns.net', 'n0ahark2021.ddns.net', ' kimjoy007.dyndns.org', ' kimjoy.ddns.net', ' asin8988.ddns.net', ' asin8989.ddns.net', 'asin8990.ddns.net'))

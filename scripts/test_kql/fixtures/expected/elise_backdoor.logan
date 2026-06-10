@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Target Filename' = 'C:\\Windows\\SysWOW64\\cmd.exe' and 'Command Line' like '*\\Windows\\Caches\\NavShExt.dll*') or ('Command Line' like '*\\AppData\\Roaming\\MICROS~1\\Windows\\Caches\\NavShExt.dll,Setting')) | sort -Time | head 100

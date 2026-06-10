@@ -1,0 +1,82 @@
+{
+  "title": "PE file dropped in Color Profile Folder",
+  "description": "'This query looks for writes of PE files to C:\\Windows\\System32\\spool\\drivers\\color\\.\n  This is a common directory used by malware, as well as some legitimate programs, and writes of PE files to the folder should be monitored.\n  Ref: https://www.microsoft.com/security/blog/2022/07/27/untangling-knotweed-european-private-sector-offensive-actor-using-0-day-exploits/'\n",
+  "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (Action = 'FileCreated') and ('Target Filename' like '*C:\\\\\\\\Windows\\\\\\\\System32\\\\\\\\spool\\\\\\\\drivers\\\\\\\\color\\\\\\\\*') and ('Process Name' like '*.exe' or 'Process Name' like '*.dll')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "f68a5046-b7eb-4f69-9519-1e99708bb9e0",
+  "sentinel_source_path": "Detections/DeviceFileEvents/PEfiledroppedinColorDriversFolder.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/DeviceFileEvents/PEfiledroppedinColorDriversFolder.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceFileEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceFileEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1203"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceFileEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/DeviceFileEvents/PEfiledroppedinColorDriversFolder.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

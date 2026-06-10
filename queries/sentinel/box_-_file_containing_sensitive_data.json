@@ -1,0 +1,82 @@
+{
+  "title": "Box - File containing sensitive data",
+  "description": "'Detects files which potentialy may contain sensitive data such as passwords, authentication tokens, secret keys.'\n",
+  "query": "'Log Source' = 'SOC Application Logs' and ('Target Object' = 'id_rsa' or 'Target Object' like '*password*' or 'Target Object' like '*key*' or 'Target Object' like '*_key*' or 'Target Object' like '*.ssh*' or 'Target Object' like '*.npmrc' or 'Target Object' like '*.muttrc' or 'Target Object' like '*config.json*' or 'Target Object' like '*.gitconfig*' or 'Target Object' like '*.netrc' or 'Target Object' like '*package.json' or 'Target Object' like '*Gemfile' or 'Target Object' like '*bower.json' or 'Target Object' like '*config.gypi' or 'Target Object' like '*travis.yml' or 'Target Filename' = 'id_rsa' or 'Target Filename' like '*password*' or 'Target Filename' like '*key*' or 'Target Filename' like '*_key*' or 'Target Filename' like '*.ssh*' or 'Target Filename' like '*.npmrc' or 'Target Filename' like '*.muttrc' or 'Target Filename' like '*config.json*' or 'Target Filename' like '*.gitconfig*' or 'Target Filename' like '*.netrc' or 'Target Filename' like '*package.json' or 'Target Filename' like '*Gemfile' or 'Target Filename' like '*bower.json*' or 'Target Filename' like '*config.gypi*' or 'Target Filename' like '*travis.yml*')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "266746ae-5eaf-4068-a980-5d630f435c46",
+  "sentinel_source_path": "Solutions/Box/Analytic Rules/BoxSensitiveFile.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Box/Analytic Rules/BoxSensitiveFile.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "BoxDataConnector",
+      "data_types": [
+        "BoxEvents_CL"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "BoxEvents"
+  ],
+  "sentinel_category": "m365",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.m365"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1048"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "box_audit",
+    "candidates": [
+      "SOC Application Logs"
+    ],
+    "original_tables": [
+      "BoxEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Box/Analytic Rules/BoxSensitiveFile.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

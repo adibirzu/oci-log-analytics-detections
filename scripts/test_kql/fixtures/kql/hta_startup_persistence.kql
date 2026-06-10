@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Windows Sysmon Logs' and ('Target Filename' like '*\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\*') and ('Process Name' like '*.hta')

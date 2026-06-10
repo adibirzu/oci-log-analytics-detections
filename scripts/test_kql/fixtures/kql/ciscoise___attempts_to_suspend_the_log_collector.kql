@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and ('Event ID' in ('59206', '59208'))

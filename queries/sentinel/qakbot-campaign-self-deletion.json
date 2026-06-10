@@ -1,0 +1,81 @@
+{
+  "title": "qakbot-campaign-self-deletion",
+  "description": "This query was originally published in the threat analytics report, Qakbot blight lingers, seeds ransomware\nQakbot is malware that steals login credentials from banking and financial services. It has been deployed against small businesses as well as major corporations. Some outbreaks have involved targeted ransomware campaigns that use a similar set of techniques. Links to related queries are listed under See also.\nThe following query detects if an instance of Qakbot has attempted to overwrite its original binary.\nReference - https://www.microsoft.com/security/blog/2017/11/06/mitigating-and-eliminating-info-stealing-qakbot-and-emotet-in-corporate-networks/\n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'ping.exe') and ('Parent Process Name' = 'cmd.exe') and ('Command Line' like '*calc.exe*' and 'Command Line' like '*-n 6*' and 'Command Line' like '*127.0.0.1*') | fields 'Command Line', 'Command Line', 'Parent Process Name', Entity, Time",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "0ec8d8df-2a7f-4cc0-9bd4-64d8f5103e3b",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Defense evasion/qakbot-campaign-self-deletion.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Defense evasion/qakbot-campaign-self-deletion.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceProcessEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceProcessEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Logs",
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceProcessEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Defense evasion/qakbot-campaign-self-deletion.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

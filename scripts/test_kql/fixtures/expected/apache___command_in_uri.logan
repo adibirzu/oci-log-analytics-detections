@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Load Balancer Access Logs') and (('Request URL' like '*whoami*' or 'Request URL' like '*dpkg*' or 'Request URL' like '*useradd*' or 'Request URL' like '*sudo*' or 'Request URL' like '*cat*'))

@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' = 'java.exe' and 'Process Name' = 'cmd.exe' and ('Command Line' like '*powershell iex*' and 'Command Line' like '*DownloadString*'))

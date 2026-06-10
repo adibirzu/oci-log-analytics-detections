@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' like '*excel.exe*' or 'Parent Process Name' = 'excel.exe') and ('Parent Process Name' in ('excel.exe', 'regsvr32.exe')) and ('Process Name' in ('regsvr32.exe', 'rundll32.exe')) and ('Command Line' like '*..\\*')

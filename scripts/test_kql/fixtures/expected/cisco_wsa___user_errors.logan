@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (Action = 'OTHER') | stats count as count_ by 'Request URL', 'User Name'

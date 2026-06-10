@@ -24,11 +24,11 @@ Validated on `2026-05-12` for local generation and live dashboard deployment:
 
 - `221,078` synthetic events generated across `17` files in the latest local 21-day dataset
 - `16/16` standard files pass ingest pre-flight validation and direct upload; the scoped Octo APM workshop JSONL is uploaded by the workshop wrapper
-- `22` dashboards and `343` active saved searches resolve from generated inventory after the C2, FreeLabFriday, web-to-cloud, browser, APT, application telemetry, 2025-2026 MELTS, and Octo APM updates
-- `<OCI_PROFILE_CAP>` has parser/source setup complete, the updated Octo application/APM dataset uploaded, and the current `343` dashboard-widget baseline verified HIT
+- `29` dashboards and `441` active saved searches resolve from generated inventory after the C2, FreeLabFriday, web-to-cloud, browser, APT, application telemetry, 2025-2026 MELTS, Sentinel, and Octo APM updates
+- `<OCI_PROFILE_CAP>` has parser/source setup complete, the updated Octo application/APM dataset uploaded, and the current `441` dashboard-widget baseline deployed and live-validated (parse 681/681 PASS)
 - Live health is validated with a 21-day lookback after full cleanup redeploys. Regenerate `docs/health/verify-<profile>-21d-final.json` and `docs/health/verify-default-21d-final.json` after deploying the current `22`-dashboard inventory.
 
-The current repository configuration resolves to `29` dashboards and `438` active saved searches. The Octo APM workshop, C2, FreeLabFriday, web-to-cloud, and 2025-2026 drilldown widgets request `l21d` so the full three-week incident remains visible after ingest.
+The current repository configuration resolves to `29` dashboards and `441` active saved searches. The Octo APM workshop, C2, FreeLabFriday, web-to-cloud, and 2025-2026 drilldown widgets request `l21d` so the full three-week incident remains visible after ingest.
 
 Use this path before recreating dashboards. `deploy_dashboard.py` validates the generated inventory and every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
 
@@ -41,7 +41,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 | Control Plane | `https://<DEMO_CONTROL_PLANE_HOST>` |
 | Log Analytics | <OBSERVABILITY_COMPARTMENT> compartment → Dashboards |
 | Test data generated | 221,078 local events across 17 NDJSON datasets |
-| Dashboards configured | 29 SOC/demo dashboards + 438 active saved searches |
+| Dashboards configured | 29 SOC/demo dashboards + 441 active saved searches |
 
 ---
 
@@ -58,7 +58,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 **Talking Points:**
 - "This is a unified SOC overview pulling security events from OCI Audit, Windows Sysmon, Linux, Cloud Guard, and WAF — all in one dashboard."
 - "Each widget represents a detection rule converted from industry-standard Sigma format into OCI Log Analytics Query Language."
-- "The repo currently ships 454 source rules, 476 Sigma-derived OCI query artifacts, 47 curated app/APM analytics, 95 hunting analytics, and 231 MITRE ATT&CK techniques across 14 tactics."
+- "The repo currently ships 454 source rules, 476 Sigma-derived OCI query artifacts, 47 curated app/APM analytics, 98 hunting analytics, and 231 MITRE ATT&CK techniques across 14 tactics."
 
 4. **Click into** `SOC: Console Login Failures` — show the OCL query behind it
 5. **Show** the hunting widget: `Hunt: SSH Brute Force` — highlight the frequency analysis pattern:
@@ -79,7 +79,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 ### Steps
 
 1. **Open:** `SOC: Windows Security Dashboard`
-   - Set time range to **Last 24 hours**
+   - Set time range to **Last 21 days** (the dashboards default to `l21d`)
    - Point out the widgets are now populated with detection data
 
 2. **Walk through detections:**
@@ -416,7 +416,7 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 │    │ ┌──────────┐ │ └───────────────┘ └────────────┘              │
 │    │ │29 SOC    │ │                                                │
 │    │ │Dashboards│ │                                                │
-│    │ │438 Saved │ │                                                │
+│    │ │441 Saved │ │                                                │
 │    │ │Searches  │ │                                                │
 │    │ │580 Assets│ │                                                │
 │    │ │231 MITRE │ │                                                │
@@ -466,7 +466,7 @@ python3 scripts/generate_catalog.py            # Regenerate catalog
 
 ## Demo Tips
 
-1. **Set time range to "Last 24 hours"** on all dashboards to see the generated demo data
+1. **Set time range to "Last 21 days"** on all dashboards to see the generated demo data (dashboards default to `l21d`)
 2. **Use the Ops Portal** for one-click event generation — no SSH needed
 3. **Start with Scenario 1** for executive audiences, skip to Scenario 3 for security teams
 4. **The BLUELIGHT scenario** is the strongest differentiator — show the SPL→OCL conversion

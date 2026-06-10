@@ -32,6 +32,6 @@
   "dashboard": {
     "visualizationType": "table",
     "showTitle": true,
-    "timeSelection": {"timePeriod": "l7d"}
+    "timeSelection": {"timePeriod": "l21d"}
   }
 }

@@ -12,7 +12,7 @@
   },
   "dashboard": {
     "visualizationType": "table",
-    "timeSelection": {"timePeriod": "l24h"},
+    "timeSelection": {"timePeriod": "l21d"},
     "layout": {"width": 12, "height": 6}
   }
 }

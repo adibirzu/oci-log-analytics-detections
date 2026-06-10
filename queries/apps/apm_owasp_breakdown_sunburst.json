@@ -4,18 +4,25 @@
   "query": "'Log Source' = 'SOC Application Logs' and 'Attack Type' != null | stats count as Events by 'Attack Type', 'Service Name' | sort -Events",
   "type": "hunting",
   "level": "informational",
-  "tags": ["apm", "owasp", "showcase"],
+  "tags": [
+    "apm",
+    "owasp",
+    "showcase"
+  ],
   "logsource": {
     "product": "oci",
     "service": "apm",
-    "candidates": ["SOC Application Logs"]
+    "candidates": [
+      "SOC Application Logs"
+    ]
   },
   "dashboard": {
-    "visualizationType": "sunburst",
+    "visualizationType": "summary_table",
     "showTitle": true,
-    "timeSelection": {"timePeriod": "l24h"},
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
     "visualizationOptions": {
-      "groupBy": ["Attack Type", "Service Name"],
       "valueField": "Events"
     },
     "ask_ai_prompts": [
@@ -24,7 +31,11 @@
     ]
   },
   "mitre_attack": {
-    "tactics": ["initial_access"],
-    "techniques": ["T1190"]
+    "tactics": [
+      "initial_access"
+    ],
+    "techniques": [
+      "T1190"
+    ]
   }
 }

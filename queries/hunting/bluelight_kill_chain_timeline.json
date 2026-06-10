@@ -1,18 +1,25 @@
 {
   "title": "BLUELIGHT: Kill Chain Timeline",
   "description": "Time histogram of BLUELIGHT-related events grouped by process. The malware binary, browser children, and PowerShell loaders each show a distinct cadence in the line chart, exposing campaign rhythm.",
-  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'Windows Event Security Logs') and ('Process Name' like '%bluelight.exe' or 'Source Process' like '%bluelight.exe' or 'Parent Process Name' like '%iexplore.exe' or 'Destination Hostname' like '%graph.microsoft.com%' or 'Destination Hostname' like '%mail.google.com%' or 'Destination Hostname' like '%jquery.services%' or 'Granted Access' = '0x1fffff' or 'Target Filename' like '%bluelight.pdb%' or 'Target Filename' like '%cheV01%' or 'Target Filename' like '%INTEG.RAW%' or 'Command Line' like '%FromBase64String%' or 'Command Line' like '%cookie_name: OSID%' or 'Command Line' like '%ipinfo.io%' or 'Command Line' like '%Win32_%') | timestats count as Events by 'Process Name'",
+  "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'Windows Event Security Logs') and ('Process Name' like '%bluelight.exe' or 'Source Process' like '%bluelight.exe' or 'Parent Process Name' like '%iexplore.exe' or 'Destination Hostname' like '%graph.microsoft.com%' or 'Destination Hostname' like '%mail.google.com%' or 'Destination Hostname' like '%jquery.services%' or 'Granted Access' = '0x1fffff' or 'Target Filename' like '%bluelight.pdb%' or 'Target Filename' like '%cheV01%' or 'Target Filename' like '%INTEG.RAW%' or 'Command Line' like '%FromBase64String%' or 'Command Line' like '%cookie_name: OSID%' or 'Command Line' like '%ipinfo.io%' or 'Command Line' like '%Win32_%') | timestats span = 1hour count as Events by 'Process Name'",
   "type": "hunting",
   "level": "informational",
-  "tags": ["apt.apt37", "malware.bluelight", "timeline", "showcase"],
+  "tags": [
+    "apt.apt37",
+    "malware.bluelight",
+    "timeline",
+    "showcase"
+  ],
   "dashboard": {
     "visualizationType": "line",
     "showTitle": true,
-    "timeSelection": {"timePeriod": "l24h"},
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
     "visualizationOptions": {
-      "groupBy": ["Process Name"],
-      "stacked": true,
-      "showLegend": true
+      "timeField": "Time",
+      "valueField": "Events",
+      "seriesField": "Process Name"
     },
     "ask_ai_prompts": [
       "Which process drives the most BLUELIGHT activity?",
@@ -20,8 +27,19 @@
     ]
   },
   "mitre_attack": {
-    "tactics": ["initial_access", "execution", "credential_access", "command_and_control", "exfiltration"],
-    "techniques": ["T1189", "T1203", "T1071.001", "T1555.003"]
+    "tactics": [
+      "initial_access",
+      "execution",
+      "credential_access",
+      "command_and_control",
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1189",
+      "T1203",
+      "T1071.001",
+      "T1555.003"
+    ]
   },
   "threat_intel": {
     "malware_family": "BLUELIGHT",

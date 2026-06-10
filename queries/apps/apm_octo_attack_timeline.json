@@ -21,7 +21,7 @@
     "visualizationType": "table",
     "showTitle": true,
     "timeSelection": {
-      "timePeriod": "l24h"
+      "timePeriod": "l21d"
     },
     "layout": {
       "width": 12,

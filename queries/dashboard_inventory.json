@@ -1,50 +1,714 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-01T04:18:18.781700+00:00",
+  "generated_at": "2026-06-09T21:02:05.999629+00:00",
   "source": "scripts/deploy_dashboard.py:DASHBOARDS",
   "summary": {
     "total_dashboards": 29,
-    "total_widgets": 438,
-    "advanced_visualization_widgets": 96,
+    "total_widgets": 441,
+    "advanced_visualization_widgets": 107,
     "visualization_types": {
       "bar": 4,
       "hbar": 1,
-      "line": 7,
+      "line": 9,
       "link": 11,
-      "map": 1,
-      "summary_table": 57,
-      "sunburst": 5,
-      "table": 342,
-      "tile": 10
+      "map": 2,
+      "summary_table": 66,
+      "table": 334,
+      "tile": 14
     },
     "levels": {
-      "critical": 124,
+      "critical": 125,
       "high": 191,
-      "informational": 16,
-      "low": 12,
-      "medium": 95
+      "informational": 20,
+      "low": 11,
+      "medium": 94
     }
   },
   "dashboards": [
     {
       "name": "SOC Overview Dashboard",
-      "description": "Executive-level cross-domain security summary with critical alerts and hunting analytics.",
-      "widget_count": 14,
+      "description": "Executive cross-domain security command center for the 21-day demo. Opens with a KPI tile row spanning all four attack stories (Cloud/Identity, Endpoint, Web/App, Network/C2), then an attack-volume timeline and MITRE sunburst, a clickable top-attacker table, the global multicloud health map, the Kubernetes/OKE attack rollup, and a row of critical detections for fast drilldown.",
+      "widget_count": 17,
       "widgets": [
         {
           "dashboard_name": "SOC Overview Dashboard",
           "dashboard_index": 0,
           "widget_index": 0,
-          "title": "SOC: Console Login Failures",
-          "query_file": "oci_console_login_failure.json",
-          "query_title": "OCI Console Login Failure",
-          "description": "Detects failed console login attempts to OCI, which may indicate brute-force or credential stuffing attacks.",
+          "title": "Cloud: Critical Audit Events",
+          "query_file": "hunting/demo_cloud_critical_kpi.json",
+          "query_title": "Cloud: Critical OCI Audit Events (l21d)",
+          "description": "Tile count of destructive or high-risk OCI control-plane actions (delete/terminate/remove) across the audit log. Headline KPI for the Cloud/Identity attack story on the SOC command center.",
+          "level": "critical",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "demo_command_center",
+            "hunting",
+            "cloud"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "oci",
+            "service": "audit"
+          },
+          "mitre_attack": {},
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "CloudThreats",
+            "thresholdConfig": {
+              "thresholds": [
+                {
+                  "min": 0,
+                  "max": 0,
+                  "color": "#26a69a",
+                  "label": "Calm"
+                },
+                {
+                  "min": 1,
+                  "max": 49,
+                  "color": "#ffa726",
+                  "label": "Active"
+                },
+                {
+                  "min": 50,
+                  "max": 999999,
+                  "color": "#ef5350",
+                  "label": "Storm"
+                }
+              ]
+            }
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 1,
+          "title": "Endpoint: Critical Detections",
+          "query_file": "hunting/coordinator_total_hits_kpi.json",
+          "query_title": "Coordinator Scenarios: Total Hits (l7d)",
+          "description": "Total number of events matching any of the 15 oci-coordinator hunting scenarios over the last 7 days. Combines Linux audit/syslog, OCI Audit, APM application, and web/WAF sources.",
+          "level": "critical",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "coordinator_showcase",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "multi",
+            "service": "hunting"
+          },
+          "mitre_attack": {},
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "TotalHits"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 2,
+          "title": "Web/App: Browser Attacks",
+          "query_file": "apps/apm_total_attacks_kpi.json",
+          "query_title": "APM: Total Browser Attacks (24h)",
+          "description": "KPI tile counting every SOC Application Logs record carrying an Attack Type tag in the last 24 hours. Headline metric for executive dashboards.",
+          "level": "informational",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "apm",
+            "kpi",
+            "showcase"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "oci",
+            "service": "apm",
+            "candidates": [
+              "SOC Application Logs"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access"
+            ],
+            "techniques": [
+              "T1190"
+            ]
+          },
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "Attacks",
+            "thresholdConfig": {
+              "thresholds": [
+                {
+                  "min": 0,
+                  "max": 0,
+                  "color": "#26a69a",
+                  "label": "Calm"
+                },
+                {
+                  "min": 1,
+                  "max": 19,
+                  "color": "#ffa726",
+                  "label": "Active"
+                },
+                {
+                  "min": 20,
+                  "max": 999999,
+                  "color": "#ef5350",
+                  "label": "Storm"
+                }
+              ]
+            }
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [
+            "What is driving the browser attack volume right now?",
+            "Compare last 24h attacks to the previous day."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Attack Type",
+              "label": "Pivot by Attack Type"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 3,
+          "title": "Network: C2 Affected Hosts",
+          "query_file": "hunting/c2_affected_hosts_kpi.json",
+          "query_title": "C2: Affected Hosts KPI",
+          "description": "Counts distinct source IPs involved in suspicious C2 and exfiltration network activity. This gives a reliable affected-system KPI across Sysmon network, VCN Flow, and Network Firewall sources.",
+          "level": "critical",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "c2",
+            "host_pivot",
+            "kpi",
+            "showcase",
+            "attack.t1071"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "multi_source",
+            "service": "network"
+          },
+          "mitre_attack": {
+            "tactics": [
+              "command_and_control"
+            ],
+            "techniques": [
+              "T1071",
+              "T1095"
+            ]
+          },
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "AffectedHosts"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [
+            "Which source IPs should be treated as compromised machines?",
+            "Correlate the affected source IPs with DNS and firewall evidence."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event ID",
+              "label": "Pivot by Event ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Destination IP",
+              "label": "Pivot by Destination IP"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Destination Hostname",
+              "label": "Pivot by Destination Hostname"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Destination Port",
+              "label": "Pivot by Destination Port"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Threat Name",
+              "label": "Pivot by Threat Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 4,
+          "title": "Attack Activity Timeline (21d)",
+          "query_file": "hunting/demo_attack_timeline.json",
+          "query_title": "Attack Activity Timeline by Log Source (l21d)",
+          "description": "Cross-domain attack-volume timeline over the 21-day demo window, bucketed hourly and split by Log Source so analysts can see when each attack story (cloud audit, Linux, Windows, WAF, network) lit up and drill into the spike.",
+          "level": "informational",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "demo_command_center",
+            "hunting",
+            "timeline"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "multi",
+            "service": "hunting"
+          },
+          "mitre_attack": {},
+          "visualization_type": "line",
+          "visualization_options": {
+            "timeField": "Time",
+            "seriesField": "Log Source",
+            "valueField": "Events"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 6,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 5,
+          "title": "MITRE Tactics x Process",
+          "query_file": "hunting/bluelight_mitre_tactics_sunburst.json",
+          "query_title": "BLUELIGHT: Source x Process Breakdown",
+          "description": "Sunburst showing BLUELIGHT detection volume nested by Log Source and process. Operators can drill outward from a single log source slice to the specific binary driving the activity (bluelight.exe, iexplore.exe child shells, powershell loaders).",
+          "level": "informational",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "apt.apt37",
+            "malware.bluelight",
+            "showcase"
+          ],
+          "references": [],
+          "logsource": {},
+          "mitre_attack": {
+            "tactics": [
+              "initial_access",
+              "execution",
+              "credential_access",
+              "command_and_control"
+            ],
+            "techniques": [
+              "T1189",
+              "T1071.001",
+              "T1555.003"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Events"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Which log source contributes the most BLUELIGHT detections?",
+            "Drill into Sysmon Operational and show the top processes."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Process Name",
+              "label": "Pivot by Process Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source Process",
+              "label": "Pivot by Source Process"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Parent Process Name",
+              "label": "Pivot by Parent Process Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Destination Hostname",
+              "label": "Pivot by Destination Hostname"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Granted Access",
+              "label": "Pivot by Granted Access"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Target Filename",
+              "label": "Pivot by Target Filename"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 6,
+          "title": "Top Attacker Source IPs (Cloud)",
+          "query_file": "hunting/demo_top_attacker_ips.json",
+          "query_title": "Top Attacker Source IPs - OCI Audit (l21d)",
+          "description": "Ranks external source IPs by destructive/anomalous OCI control-plane activity, with the count of distinct event types each IP touched. Click a row to pivot into Log Explorer scoped to that Source IP for the full identity-attack drilldown.",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "demo_command_center",
+            "hunting",
+            "cloud"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "oci",
+            "service": "audit"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "DestructiveEvents",
+            "highlightField": "DistinctActions"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Which source IP shows the most destructive OCI activity and what did it delete?",
+            "Are any of these source IPs touching multiple user accounts (possible credential theft)?"
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Name",
+              "label": "Pivot by User Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 7,
+          "title": "Global Multicloud Health Map",
+          "query_file": "hunting/multicloud_geo_health_regional_map.json",
+          "query_title": "Geographic Health: Regional Status on Global Map",
+          "description": "Displays multicloud instance health status by region with geographic coordinates for global map visualization. Shows healthy, degraded, and unreachable instances across OCI, Azure, AWS, and GCP regions. Use with the Map visualization type in OCI Log Analytics.",
+          "level": "informational",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "operations.health",
+            "multicloud.monitoring"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "multicloud",
+            "service": "health"
+          },
+          "mitre_attack": {},
+          "visualization_type": "map",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 6
+          },
+          "ask_ai_prompts": [
+            "Summarize the current health posture across cloud providers and call out the highest-risk regions.",
+            "Explain whether any provider or geography is disproportionately degraded or unreachable."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name",
+              "label": "Pivot by Host Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Cloud Provider",
+              "label": "Pivot by Cloud Provider"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Latitude",
+              "label": "Pivot by Latitude"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Longitude",
+              "label": "Pivot by Longitude"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Status",
+              "label": "Pivot by Status"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 8,
+          "title": "Kubernetes / OKE Attack Overview",
+          "query_file": "apps/oke_kubernetes_attack_overview.json",
+          "query_title": "OKE: Kubernetes Attack Overview",
+          "description": "Rollup of OKE/Kubernetes attack simulation events by stage, technique, severity, and service for dashboard triage.",
+          "level": "high",
+          "type": "curated",
+          "sigma_id": "",
+          "tags": [
+            "oke",
+            "kubernetes",
+            "attack-overview",
+            "apm"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "application",
+            "service": "soc_application_logs",
+            "candidates": [
+              "SOC Application Logs"
+            ]
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Events",
+            "highlightField": "Traces"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Summarize the highest-severity Kubernetes attack stages and the MITRE techniques represented."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Service Namespace",
+              "label": "Pivot by Service Namespace"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Attack ID",
+              "label": "Pivot by Attack ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Trace ID",
+              "label": "Pivot by Trace ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Span ID",
+              "label": "Pivot by Span ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Attack Stage",
+              "label": "Pivot by Attack Stage"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Technique ID",
+              "label": "Pivot by MITRE Technique ID"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 9,
+          "title": "Cloud: IAM Policy Modified",
+          "query_file": "oci_iam_policy_modified.json",
+          "query_title": "OCI IAM Policy Modified",
+          "description": "Detects changes to OCI IAM Policies.",
           "level": "medium",
           "type": "detection",
-          "sigma_id": "d4e5f6a7-89ab-cdef-0123-456789012034",
+          "sigma_id": "7ef0e132-0491-4b9b-9228-dfe953a97ae1",
           "tags": [
-            "attack.initial_access",
-            "attack.t1078"
+            "attack.persistence",
+            "attack.privilege_escalation",
+            "attack.t1098"
           ],
           "references": [],
           "logsource": {
@@ -56,16 +720,17 @@
           },
           "mitre_attack": {
             "tactics": [
-              "initial_access"
+              "persistence",
+              "privilege_escalation"
             ],
             "techniques": [
-              "T1078"
+              "T1098"
             ]
           },
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -94,8 +759,8 @@
         {
           "dashboard_name": "SOC Overview Dashboard",
           "dashboard_index": 0,
-          "widget_index": 1,
-          "title": "SOC: KMS Key Deletion Alert",
+          "widget_index": 10,
+          "title": "Cloud: KMS Key Deletion",
           "query_file": "oci_kms_key_scheduled_for_deletion.json",
           "query_title": "OCI KMS Key Scheduled for Deletion",
           "description": "Detects scheduling an OCI Vault key for deletion. This can render encrypted data permanently inaccessible.",
@@ -125,7 +790,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -154,8 +819,69 @@
         {
           "dashboard_name": "SOC Overview Dashboard",
           "dashboard_index": 0,
-          "widget_index": 2,
-          "title": "SOC: Reverse Shell Detection",
+          "widget_index": 11,
+          "title": "Cloud: Compartment Deleted",
+          "query_file": "oci_compartment_deleted.json",
+          "query_title": "OCI Compartment Deleted",
+          "description": "Detects deletion of an OCI compartment. This is a high-impact destructive action that removes all resources within the compartment and could indicate sabotage or insider threat.",
+          "level": "critical",
+          "type": "detection",
+          "sigma_id": "d1a2b3c4-1005-4000-8000-000000000005",
+          "tags": [
+            "attack.impact",
+            "attack.t1485",
+            "stig.AC-6"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "oci",
+            "service": "audit",
+            "candidates": [
+              "OCI Audit Logs"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "impact"
+            ],
+            "techniques": [
+              "T1485"
+            ]
+          },
+          "visualization_type": "table",
+          "visualization_options": {},
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": false,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC Overview Dashboard",
+          "dashboard_index": 0,
+          "widget_index": 12,
+          "title": "Endpoint: Reverse Shell (Linux)",
           "query_file": "linux_reverse_shell_detected.json",
           "query_title": "Linux Reverse Shell Detected",
           "description": "Detects common reverse shell patterns in process execution, indicating potential remote access backdoor activity.",
@@ -188,7 +914,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -211,8 +937,8 @@
         {
           "dashboard_name": "SOC Overview Dashboard",
           "dashboard_index": 0,
-          "widget_index": 3,
-          "title": "SOC: Credential Dumping Alert",
+          "widget_index": 13,
+          "title": "Endpoint: Credential Dumping (Win)",
           "query_file": "windows_credential_dumping_via_procdump.json",
           "query_title": "Windows Credential Dumping via Procdump",
           "description": "Detects credential dumping attempts targeting the LSASS process using procdump or similar tools.",
@@ -244,7 +970,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -278,70 +1004,8 @@
         {
           "dashboard_name": "SOC Overview Dashboard",
           "dashboard_index": 0,
-          "widget_index": 4,
-          "title": "SOC: Critical IAM Policy Changes",
-          "query_file": "oci_iam_policy_modified.json",
-          "query_title": "OCI IAM Policy Modified",
-          "description": "Detects changes to OCI IAM Policies.",
-          "level": "medium",
-          "type": "detection",
-          "sigma_id": "7ef0e132-0491-4b9b-9228-dfe953a97ae1",
-          "tags": [
-            "attack.persistence",
-            "attack.privilege_escalation",
-            "attack.t1098"
-          ],
-          "references": [],
-          "logsource": {
-            "product": "oci",
-            "service": "audit",
-            "candidates": [
-              "OCI Audit Logs"
-            ]
-          },
-          "mitre_attack": {
-            "tactics": [
-              "persistence",
-              "privilege_escalation"
-            ],
-            "techniques": [
-              "T1098"
-            ]
-          },
-          "visualization_type": "table",
-          "visualization_options": {},
-          "time_selection": {
-            "timePeriod": "l24h"
-          },
-          "layout": {
-            "width": 12,
-            "height": 5
-          },
-          "ask_ai_prompts": [],
-          "advanced_visualization": false,
-          "drilldowns": [
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Event Type",
-              "label": "Pivot by Event Type"
-            }
-          ],
-          "dashboard_quality": {
-            "score": 100,
-            "checks": {
-              "no_overlap": true,
-              "supported_visualization": true,
-              "widget_returns_rows_in_cap": "not_run",
-              "field_contract_coverage": "not_evaluated",
-              "visualization_task_fit": "not_scored"
-            }
-          }
-        },
-        {
-          "dashboard_name": "SOC Overview Dashboard",
-          "dashboard_index": 0,
-          "widget_index": 5,
-          "title": "SOC: VCN Open to World",
+          "widget_index": 14,
+          "title": "Network: VCN Open to World",
           "query_file": "oci_vcn_security_list_open_to_world.json",
           "query_title": "OCI VCN Security List Open to World",
           "description": "Detects creation or update of a Security List allowing ingress from 0.0.0.0/0.",
@@ -371,7 +1035,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -410,393 +1074,8 @@
         {
           "dashboard_name": "SOC Overview Dashboard",
           "dashboard_index": 0,
-          "widget_index": 6,
-          "title": "SOC: SSH Failed Logins",
-          "query_file": "linux_ssh_failed_login.json",
-          "query_title": "Linux SSH Failed Login",
-          "description": "Detects failed SSH login attempts.",
-          "level": "low",
-          "type": "detection",
-          "sigma_id": "4cda756f-09a8-4261-86c0-e566a0f2a9a4",
-          "tags": [
-            "attack.initial_access",
-            "attack.credential_access",
-            "attack.t1110.001"
-          ],
-          "references": [],
-          "logsource": {
-            "product": "linux",
-            "service": "auth",
-            "candidates": [
-              "SOC Linux Syslog Logs",
-              "Linux Secure Logs",
-              "Linux Syslog Logs",
-              "Linux Audit Logs"
-            ]
-          },
-          "mitre_attack": {
-            "tactics": [
-              "initial_access",
-              "credential_access"
-            ],
-            "techniques": [
-              "T1110.001"
-            ]
-          },
-          "visualization_type": "table",
-          "visualization_options": {},
-          "time_selection": {
-            "timePeriod": "l24h"
-          },
-          "layout": {
-            "width": 12,
-            "height": 5
-          },
-          "ask_ai_prompts": [],
-          "advanced_visualization": false,
-          "drilldowns": [
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Process Name",
-              "label": "Pivot by Process Name"
-            }
-          ],
-          "dashboard_quality": {
-            "score": 100,
-            "checks": {
-              "no_overlap": true,
-              "supported_visualization": true,
-              "widget_returns_rows_in_cap": "not_run",
-              "field_contract_coverage": "not_evaluated",
-              "visualization_task_fit": "not_scored"
-            }
-          }
-        },
-        {
-          "dashboard_name": "SOC Overview Dashboard",
-          "dashboard_index": 0,
-          "widget_index": 7,
-          "title": "SOC: Suspicious Linux Binaries",
-          "query_file": "suspicious_usage_of_netcat.json",
-          "query_title": "Suspicious Usage of netcat",
-          "description": "Detects execution of netcat with execute or listen flags.",
-          "level": "high",
-          "type": "detection",
-          "sigma_id": "d68b1276-c40c-4505-a5dc-c822ea0b2eb3",
-          "tags": [
-            "attack.execution",
-            "attack.t1204"
-          ],
-          "references": [],
-          "logsource": {
-            "product": "linux",
-            "service": "audit",
-            "candidates": [
-              "SOC Linux Syslog Logs",
-              "Linux Secure Logs",
-              "Linux Syslog Logs",
-              "Linux Audit Logs"
-            ]
-          },
-          "mitre_attack": {
-            "tactics": [
-              "execution"
-            ],
-            "techniques": [
-              "T1204"
-            ]
-          },
-          "visualization_type": "table",
-          "visualization_options": {},
-          "time_selection": {
-            "timePeriod": "l24h"
-          },
-          "layout": {
-            "width": 12,
-            "height": 5
-          },
-          "ask_ai_prompts": [],
-          "advanced_visualization": false,
-          "drilldowns": [
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Process Name",
-              "label": "Pivot by Process Name"
-            }
-          ],
-          "dashboard_quality": {
-            "score": 100,
-            "checks": {
-              "no_overlap": true,
-              "supported_visualization": true,
-              "widget_returns_rows_in_cap": "not_run",
-              "field_contract_coverage": "not_evaluated",
-              "visualization_task_fit": "not_scored"
-            }
-          }
-        },
-        {
-          "dashboard_name": "SOC Overview Dashboard",
-          "dashboard_index": 0,
-          "widget_index": 8,
-          "title": "SOC: Shadow Copy Deletion",
-          "query_file": "windows_shadow_copy_deletion.json",
-          "query_title": "Windows Shadow Copy Deletion",
-          "description": "Detects deletion of volume shadow copies via vssadmin or wmic, a common ransomware indicator to prevent recovery from encrypted files.",
-          "level": "critical",
-          "type": "detection",
-          "sigma_id": "d1a2b3c4-3001-4000-8000-000000000001",
-          "tags": [
-            "attack.impact",
-            "attack.t1490"
-          ],
-          "references": [],
-          "logsource": {
-            "product": "windows",
-            "service": "process_creation",
-            "candidates": [
-              "Windows Sysmon Events",
-              "Windows Sysmon Operational Logs",
-              "SOC Windows Sysmon Logs"
-            ]
-          },
-          "mitre_attack": {
-            "tactics": [
-              "impact"
-            ],
-            "techniques": [
-              "T1490"
-            ]
-          },
-          "visualization_type": "table",
-          "visualization_options": {},
-          "time_selection": {
-            "timePeriod": "l24h"
-          },
-          "layout": {
-            "width": 12,
-            "height": 5
-          },
-          "ask_ai_prompts": [],
-          "advanced_visualization": false,
-          "drilldowns": [
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Process Name",
-              "label": "Pivot by Process Name"
-            },
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Command Line",
-              "label": "Pivot by Command Line"
-            }
-          ],
-          "dashboard_quality": {
-            "score": 100,
-            "checks": {
-              "no_overlap": true,
-              "supported_visualization": true,
-              "widget_returns_rows_in_cap": "not_run",
-              "field_contract_coverage": "not_evaluated",
-              "visualization_task_fit": "not_scored"
-            }
-          }
-        },
-        {
-          "dashboard_name": "SOC Overview Dashboard",
-          "dashboard_index": 0,
-          "widget_index": 9,
-          "title": "SOC: Compartment Deleted",
-          "query_file": "oci_compartment_deleted.json",
-          "query_title": "OCI Compartment Deleted",
-          "description": "Detects deletion of an OCI compartment. This is a high-impact destructive action that removes all resources within the compartment and could indicate sabotage or insider threat.",
-          "level": "critical",
-          "type": "detection",
-          "sigma_id": "d1a2b3c4-1005-4000-8000-000000000005",
-          "tags": [
-            "attack.impact",
-            "attack.t1485",
-            "stig.AC-6"
-          ],
-          "references": [],
-          "logsource": {
-            "product": "oci",
-            "service": "audit",
-            "candidates": [
-              "OCI Audit Logs"
-            ]
-          },
-          "mitre_attack": {
-            "tactics": [
-              "impact"
-            ],
-            "techniques": [
-              "T1485"
-            ]
-          },
-          "visualization_type": "table",
-          "visualization_options": {},
-          "time_selection": {
-            "timePeriod": "l24h"
-          },
-          "layout": {
-            "width": 12,
-            "height": 5
-          },
-          "ask_ai_prompts": [],
-          "advanced_visualization": false,
-          "drilldowns": [
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Event Type",
-              "label": "Pivot by Event Type"
-            }
-          ],
-          "dashboard_quality": {
-            "score": 100,
-            "checks": {
-              "no_overlap": true,
-              "supported_visualization": true,
-              "widget_returns_rows_in_cap": "not_run",
-              "field_contract_coverage": "not_evaluated",
-              "visualization_task_fit": "not_scored"
-            }
-          }
-        },
-        {
-          "dashboard_name": "SOC Overview Dashboard",
-          "dashboard_index": 0,
-          "widget_index": 10,
-          "title": "Hunt: SSH Brute Force",
-          "query_file": "hunting/ssh_brute_force_frequency.json",
-          "query_title": "SSH Brute Force Detection (Frequency Analysis)",
-          "description": "Identifies SSH brute force attacks by counting failed login attempts per source IP. Uses frequency analysis (Threat Hunter's Cookbook: Sorting/Stacking method) to surface IPs with more than 5 failed attempts, indicating automated credential guessing.",
-          "level": "high",
-          "type": "curated",
-          "sigma_id": "",
-          "tags": [
-            "attack.initial_access",
-            "attack.t1110.001",
-            "attack.credential_access"
-          ],
-          "references": [],
-          "logsource": {
-            "product": "linux",
-            "service": "auth"
-          },
-          "mitre_attack": {
-            "tactics": [
-              "initial_access",
-              "credential_access"
-            ],
-            "techniques": [
-              "T1110.001"
-            ]
-          },
-          "visualization_type": "table",
-          "visualization_options": {},
-          "time_selection": {
-            "timePeriod": "l24h"
-          },
-          "layout": {
-            "width": 12,
-            "height": 5
-          },
-          "ask_ai_prompts": [],
-          "advanced_visualization": false,
-          "drilldowns": [
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Client IP",
-              "label": "Pivot by Client IP"
-            }
-          ],
-          "dashboard_quality": {
-            "score": 100,
-            "checks": {
-              "no_overlap": true,
-              "supported_visualization": true,
-              "widget_returns_rows_in_cap": "not_run",
-              "field_contract_coverage": "not_evaluated",
-              "visualization_task_fit": "not_scored"
-            }
-          }
-        },
-        {
-          "dashboard_name": "SOC Overview Dashboard",
-          "dashboard_index": 0,
-          "widget_index": 11,
-          "title": "Hunt: OCI Destruction Spike",
-          "query_file": "hunting/oci_resource_destruction_spike.json",
-          "query_title": "OCI Resource Destruction Spike (Anomaly Detection)",
-          "description": "Identifies principals performing an abnormally high number of destructive operations (delete, terminate). A spike in resource destruction from a single user may indicate a compromised account performing sabotage, ransomware-style destruction, or an insider threat. Uses threshold-based anomaly detection (Threat Hunter's Cookbook: Forecasting/Anomaly Detection method).",
-          "level": "critical",
-          "type": "curated",
-          "sigma_id": "",
-          "tags": [
-            "attack.impact",
-            "attack.t1485",
-            "attack.t1489",
-            "stig.CP-9"
-          ],
-          "references": [],
-          "logsource": {
-            "product": "oci",
-            "service": "audit"
-          },
-          "mitre_attack": {
-            "tactics": [
-              "impact"
-            ],
-            "techniques": [
-              "T1485",
-              "T1489"
-            ]
-          },
-          "visualization_type": "table",
-          "visualization_options": {},
-          "time_selection": {
-            "timePeriod": "l24h"
-          },
-          "layout": {
-            "width": 12,
-            "height": 5
-          },
-          "ask_ai_prompts": [],
-          "advanced_visualization": false,
-          "drilldowns": [
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Event Type",
-              "label": "Pivot by Event Type"
-            },
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "User Name",
-              "label": "Pivot by User Name"
-            },
-            {
-              "type": "log_explorer_field_pivot",
-              "field": "Source IP",
-              "label": "Pivot by Source IP"
-            }
-          ],
-          "dashboard_quality": {
-            "score": 100,
-            "checks": {
-              "no_overlap": true,
-              "supported_visualization": true,
-              "widget_returns_rows_in_cap": "not_run",
-              "field_contract_coverage": "not_evaluated",
-              "visualization_task_fit": "not_scored"
-            }
-          }
-        },
-        {
-          "dashboard_name": "SOC Overview Dashboard",
-          "dashboard_index": 0,
-          "widget_index": 12,
-          "title": "Hunt: Web Multi-Stage Attack",
+          "widget_index": 15,
+          "title": "Web: OWASP Multi-Stage Attack",
           "query_file": "hunting/web_owasp_multi_stage_attack.json",
           "query_title": "OWASP Multi-Stage Web Attack Chain (Combined Methods)",
           "description": "Correlates web attack indicators across WAF, Load Balancer, and application logs to identify multi-stage attack chains. An IP that triggers WAF blocks, generates auth failures, and accesses sensitive endpoints is likely executing a coordinated attack campaign. Uses combined methods (Threat Hunter's Cookbook: Combined Methods - multi-stage grouping).",
@@ -832,7 +1111,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -871,8 +1150,8 @@
         {
           "dashboard_name": "SOC Overview Dashboard",
           "dashboard_index": 0,
-          "widget_index": 13,
-          "title": "Hunt: WAF Multi-Attack Score",
+          "widget_index": 16,
+          "title": "Web: WAF Multi-Attack Score",
           "query_file": "hunting/waf_multi_attack_scoring.json",
           "query_title": "WAF Multi-Attack Vector Scoring (Combined Methods)",
           "description": "Calculates a threat score per source IP based on the diversity of attack types (SQL injection, XSS, path traversal, command injection, SSRF). An IP triggering multiple different CRS rule categories indicates a sophisticated attacker using multiple techniques. Uses combined scoring (Threat Hunter's Cookbook: Combined Methods).",
@@ -903,7 +1182,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -992,7 +1271,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1053,7 +1332,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1114,7 +1393,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1175,7 +1454,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1236,7 +1515,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1298,7 +1577,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1360,7 +1639,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1422,7 +1701,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1488,7 +1767,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1549,7 +1828,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1610,7 +1889,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1671,7 +1950,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1732,7 +2011,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1793,7 +2072,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1854,7 +2133,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1915,7 +2194,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -1976,7 +2255,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2043,7 +2322,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2103,7 +2382,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2165,7 +2444,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2225,7 +2504,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2295,7 +2574,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2355,7 +2634,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2415,7 +2694,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2476,7 +2755,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2536,7 +2815,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2596,7 +2875,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2656,7 +2935,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2721,7 +3000,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2783,7 +3062,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2843,7 +3122,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2903,7 +3182,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -2974,7 +3253,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3035,7 +3314,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3096,7 +3375,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3157,7 +3436,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3218,7 +3497,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3279,7 +3558,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3342,7 +3621,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3422,7 +3701,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3485,7 +3764,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3548,7 +3827,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3611,7 +3890,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3674,7 +3953,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3737,7 +4016,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3800,7 +4079,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3863,7 +4142,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3926,7 +4205,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -3989,7 +4268,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4052,7 +4331,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4115,7 +4394,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4177,7 +4456,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4245,7 +4524,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4319,7 +4598,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4392,7 +4671,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4470,7 +4749,7 @@
           "visualization_type": "link",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4518,7 +4797,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4613,7 +4892,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4672,7 +4951,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4735,7 +5014,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4798,7 +5077,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4866,7 +5145,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4923,7 +5202,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -4980,7 +5259,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5037,7 +5316,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5094,7 +5373,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5157,7 +5436,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5214,7 +5493,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5271,7 +5550,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5328,7 +5607,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5385,7 +5664,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5442,7 +5721,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5505,7 +5784,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5562,7 +5841,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5619,7 +5898,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5676,7 +5955,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5739,7 +6018,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5803,7 +6082,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5860,7 +6139,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5917,7 +6196,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -5974,7 +6253,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6031,7 +6310,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6088,7 +6367,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6145,7 +6424,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6202,7 +6481,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6259,7 +6538,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6316,7 +6595,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6379,7 +6658,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6436,7 +6715,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6499,7 +6778,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6564,7 +6843,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6629,7 +6908,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6694,7 +6973,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6759,7 +7038,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6818,7 +7097,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6881,7 +7160,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -6948,7 +7227,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7015,7 +7294,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7086,7 +7365,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7153,7 +7432,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7215,7 +7494,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7277,7 +7556,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7339,7 +7618,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7410,7 +7689,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7477,7 +7756,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7544,7 +7823,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7606,7 +7885,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7668,7 +7947,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7735,7 +8014,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7802,7 +8081,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7869,7 +8148,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -7946,7 +8225,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8030,7 +8309,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8111,7 +8390,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8185,7 +8464,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8265,7 +8544,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8352,7 +8631,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8419,7 +8698,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8491,7 +8770,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8562,7 +8841,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8641,7 +8920,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8730,7 +9009,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8803,7 +9082,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8874,7 +9153,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -8940,7 +9219,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9026,7 +9305,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9109,7 +9388,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9175,7 +9454,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9248,7 +9527,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9311,7 +9590,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9393,7 +9672,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9466,7 +9745,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9555,7 +9834,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9638,7 +9917,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9715,7 +9994,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9793,7 +10072,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9859,7 +10138,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9929,7 +10208,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -9995,7 +10274,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10058,7 +10337,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10114,7 +10393,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10179,7 +10458,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10241,7 +10520,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10310,7 +10589,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10379,7 +10658,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10448,7 +10727,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10510,7 +10789,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10572,7 +10851,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10639,7 +10918,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10706,7 +10985,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10772,7 +11051,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10844,7 +11123,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10906,7 +11185,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -10967,7 +11246,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11042,7 +11321,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11111,7 +11390,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11178,7 +11457,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11240,7 +11519,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11308,7 +11587,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11370,7 +11649,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11437,7 +11716,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11504,7 +11783,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11573,7 +11852,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11642,7 +11921,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11713,7 +11992,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11782,7 +12061,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11864,7 +12143,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -11965,7 +12244,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12031,7 +12310,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12093,7 +12372,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12157,7 +12436,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12216,7 +12495,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12277,7 +12556,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12349,7 +12628,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12418,7 +12697,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12491,7 +12770,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12551,7 +12830,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12620,7 +12899,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12685,7 +12964,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12756,7 +13035,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12822,7 +13101,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12887,7 +13166,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -12953,7 +13232,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13030,7 +13309,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13105,7 +13384,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13177,7 +13456,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13245,7 +13524,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13317,7 +13596,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13389,7 +13668,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13457,7 +13736,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13527,7 +13806,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13603,7 +13882,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13683,7 +13962,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13758,7 +14037,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13829,7 +14108,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13895,7 +14174,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -13959,7 +14238,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -14025,7 +14304,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -14091,7 +14370,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -14160,7 +14439,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -14222,7 +14501,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -15636,8 +15915,9 @@
           },
           "visualization_type": "line",
           "visualization_options": {
-            "seriesField": "User Agent",
-            "valueField": "BeaconRequests"
+            "timeField": "Time",
+            "valueField": "BeaconRequests",
+            "seriesField": "User Agent"
           },
           "time_selection": {
             "timePeriod": "l21d"
@@ -17134,21 +17414,16 @@
               "T1041"
             ]
           },
-          "visualization_type": "sunburst",
+          "visualization_type": "summary_table",
           "visualization_options": {
-            "groupBy": [
-              "Log Source",
-              "Host Name (Server)",
-              "User Name"
-            ],
             "valueField": "Signals"
           },
           "time_selection": {
             "timePeriod": "l21d"
           },
           "layout": {
-            "width": 6,
-            "height": 6
+            "width": 12,
+            "height": 5
           },
           "ask_ai_prompts": [
             "Which machines and identities are compromised across the modern attack set?",
@@ -17243,7 +17518,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17312,7 +17587,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17379,7 +17654,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17453,7 +17728,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17527,7 +17802,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17601,7 +17876,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17668,7 +17943,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17747,7 +18022,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17816,7 +18091,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17893,7 +18168,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -17965,7 +18240,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18034,7 +18309,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18111,7 +18386,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18183,7 +18458,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18245,7 +18520,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18312,7 +18587,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18376,7 +18651,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18446,7 +18721,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18516,7 +18791,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18583,7 +18858,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18647,7 +18922,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18714,7 +18989,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18778,7 +19053,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18845,7 +19120,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18907,7 +19182,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -18974,7 +19249,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19043,7 +19318,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19112,7 +19387,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19186,7 +19461,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19253,7 +19528,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19323,7 +19598,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19391,7 +19666,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19461,7 +19736,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19529,7 +19804,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19605,7 +19880,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19683,7 +19958,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19759,7 +20034,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -19827,7 +20102,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -20782,20 +21057,16 @@
               "T1041"
             ]
           },
-          "visualization_type": "sunburst",
+          "visualization_type": "summary_table",
           "visualization_options": {
-            "groupBy": [
-              "Log Source",
-              "Threat Name"
-            ],
             "valueField": "Events"
           },
           "time_selection": {
             "timePeriod": "l21d"
           },
           "layout": {
-            "width": 6,
-            "height": 6
+            "width": 12,
+            "height": 5
           },
           "ask_ai_prompts": [
             "Which MITRE-style stages have complete evidence coverage?",
@@ -20885,7 +21156,7 @@
           "visualization_type": "bar",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 6,
@@ -20961,7 +21232,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -21030,7 +21301,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -21100,9 +21371,13 @@
             "techniques": []
           },
           "visualization_type": "line",
-          "visualization_options": {},
+          "visualization_options": {
+            "timeField": "Time",
+            "valueField": "Events",
+            "seriesField": "Service Name"
+          },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 6,
@@ -21175,7 +21450,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -21245,7 +21520,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -21329,7 +21604,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -21404,7 +21679,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -21474,7 +21749,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -21538,7 +21813,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -21598,7 +21873,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -21673,7 +21948,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -22980,7 +23255,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {
             "valueField": "Events",
-            "highlightField": "MaxRisk"
+            "highlightField": "Traces"
           },
           "time_selection": {
             "timePeriod": "l21d"
@@ -23251,7 +23526,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -23337,7 +23612,7 @@
             "highlightField": "Traces"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -23423,7 +23698,7 @@
             "highlightField": "Traces"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -23509,7 +23784,7 @@
             "highlightField": "SourceIPs"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -23594,7 +23869,7 @@
             "highlightField": "Traces"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -23680,7 +23955,7 @@
             "highlightField": "Commands"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -23762,7 +24037,7 @@
           "visualization_type": "link",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -23836,7 +24111,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -23917,7 +24192,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -23999,7 +24274,7 @@
           "visualization_type": "map",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -24072,7 +24347,7 @@
           "visualization_type": "bar",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 6,
@@ -24140,7 +24415,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -24206,7 +24481,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -24274,7 +24549,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -24380,7 +24655,7 @@
             }
           },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 3,
@@ -24474,7 +24749,7 @@
             "highlightField": "DistinctProcesses"
           },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -24559,20 +24834,16 @@
               "T1555.003"
             ]
           },
-          "visualization_type": "sunburst",
+          "visualization_type": "summary_table",
           "visualization_options": {
-            "groupBy": [
-              "Log Source",
-              "Process Name"
-            ],
             "valueField": "Events"
           },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
-            "width": 6,
-            "height": 6
+            "width": 12,
+            "height": 5
           },
           "ask_ai_prompts": [
             "Which log source contributes the most BLUELIGHT detections?",
@@ -24658,14 +24929,12 @@
           },
           "visualization_type": "line",
           "visualization_options": {
-            "groupBy": [
-              "Process Name"
-            ],
-            "stacked": true,
-            "showLegend": true
+            "timeField": "Time",
+            "valueField": "Events",
+            "seriesField": "Process Name"
           },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 6,
@@ -24778,7 +25047,7 @@
             "tileLayoutXml": "<summary><container background-color=\"#F4F6F7\"><table><row><column><tiles layout=\"table\" columns=\"4\" background-color=\"#EAF2F8\"><tile field=\"PeakEvents\" color=\"#1B4F72\" font-size=\"large\"><title align=\"bottom\"><title-text>Peak Path</title-text></title></tile><tile field=\"Events\" color=\"#7D3C98\" font-size=\"large\"><title align=\"bottom\"><title-text>Events</title-text></title></tile><tile field=\"Hosts\" color=\"#117A65\" font-size=\"large\"><title align=\"bottom\"><title-text>Hosts</title-text></title></tile><tile field=\"Processes\" color=\"#B03A2E\" font-size=\"large\"><title align=\"bottom\"><title-text>Processes</title-text></title></tile></tiles></column></row></table></container></summary>"
           },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -24871,7 +25140,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -24955,7 +25224,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25038,7 +25307,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25118,7 +25387,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25202,7 +25471,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25286,7 +25555,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25365,7 +25634,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25446,17 +25715,21 @@
               "T1113"
             ]
           },
-          "visualization_type": "table",
-          "visualization_options": {},
+          "visualization_type": "line",
+          "visualization_options": {
+            "timeField": "Time",
+            "valueField": "Screenshots",
+            "seriesField": "Process Name"
+          },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
-            "width": 12,
+            "width": 6,
             "height": 5
           },
           "ask_ai_prompts": [],
-          "advanced_visualization": false,
+          "advanced_visualization": true,
           "drilldowns": [
             {
               "type": "log_explorer_field_pivot",
@@ -25523,7 +25796,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25607,7 +25880,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25687,7 +25960,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25772,7 +26045,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25861,7 +26134,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -25942,7 +26215,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26017,7 +26290,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26095,7 +26368,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26183,7 +26456,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26280,7 +26553,7 @@
             }
           },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 3,
@@ -26341,20 +26614,16 @@
               "T1190"
             ]
           },
-          "visualization_type": "sunburst",
+          "visualization_type": "summary_table",
           "visualization_options": {
-            "groupBy": [
-              "Attack Type",
-              "Service Name"
-            ],
             "valueField": "Events"
           },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
-            "width": 6,
-            "height": 6
+            "width": 12,
+            "height": 5
           },
           "ask_ai_prompts": [
             "Which OWASP category dominates browser attacks right now?",
@@ -26426,7 +26695,7 @@
             "highlightThreshold": 2
           },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26513,7 +26782,7 @@
             "tileLayoutXml": "<summary><container background-color=\"#F4F6F7\"><table><row><column><tiles layout=\"table\" columns=\"4\" background-color=\"#EAF2F8\"><tile field=\"Traces\" color=\"#1B4F72\" font-size=\"large\"><title align=\"bottom\"><title-text>Trace Groups</title-text></title></tile><tile field=\"Events\" color=\"#7D3C98\" font-size=\"large\"><title align=\"bottom\"><title-text>Events</title-text></title></tile><tile field=\"Sources\" color=\"#117A65\" font-size=\"large\"><title align=\"bottom\"><title-text>Log Sources</title-text></title></tile><tile field=\"Services\" color=\"#B03A2E\" font-size=\"large\"><title align=\"bottom\"><title-text>Services</title-text></title></tile></tiles></column></row></table></container></summary>"
           },
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26587,7 +26856,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26664,7 +26933,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26741,7 +27010,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26826,7 +27095,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26908,7 +27177,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -26991,7 +27260,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -27079,7 +27348,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -27161,7 +27430,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -27238,7 +27507,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -27307,7 +27576,7 @@
             "dataField": "TotalHits"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 3,
@@ -27353,7 +27622,7 @@
             "dataField": "AffectedHosts"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 3,
@@ -27405,7 +27674,7 @@
             "dataField": "CriticalAlerts"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 3,
@@ -27451,7 +27720,7 @@
             "dataField": "DistinctProcesses"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 3,
@@ -27498,20 +27767,16 @@
             "service": "hunting"
           },
           "mitre_attack": {},
-          "visualization_type": "sunburst",
+          "visualization_type": "summary_table",
           "visualization_options": {
-            "groupBy": [
-              "Log Source",
-              "Process Name"
-            ],
             "valueField": "Events"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
-            "width": 6,
-            "height": 6
+            "width": 12,
+            "height": 5
           },
           "ask_ai_prompts": [],
           "advanced_visualization": true,
@@ -27562,7 +27827,7 @@
             "valueField": "Hits"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 6,
@@ -27609,7 +27874,7 @@
             "yField": "Hits"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 6,
@@ -27658,7 +27923,7 @@
             "valueField": "Hits"
           },
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 6,
@@ -27721,7 +27986,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -27786,7 +28051,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -27843,7 +28108,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -27900,7 +28165,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -27963,7 +28228,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28020,7 +28285,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28077,7 +28342,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28134,7 +28399,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28195,7 +28460,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28252,7 +28517,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28315,7 +28580,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28382,7 +28647,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28437,7 +28702,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l7d"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28501,7 +28766,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28571,7 +28836,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28659,7 +28924,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28753,7 +29018,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28837,7 +29102,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -28939,7 +29204,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29026,7 +29291,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29110,7 +29375,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29183,7 +29448,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29258,7 +29523,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29351,7 +29616,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29443,7 +29708,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29526,7 +29791,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29609,7 +29874,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29682,7 +29947,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29755,7 +30020,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29841,7 +30106,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -29930,7 +30195,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30003,7 +30268,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30076,7 +30341,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30149,7 +30414,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30222,7 +30487,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30310,7 +30575,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30401,7 +30666,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30490,7 +30755,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30579,7 +30844,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30664,7 +30929,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30755,7 +31020,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30833,7 +31098,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -30919,7 +31184,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31003,7 +31268,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31106,7 +31371,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31189,7 +31454,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31281,7 +31546,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31365,7 +31630,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31465,7 +31730,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31546,7 +31811,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31629,7 +31894,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31719,7 +31984,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31799,7 +32064,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31879,7 +32144,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -31959,7 +32224,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -32039,7 +32304,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -32117,10 +32382,10 @@
               "T1133"
             ]
           },
-          "visualization_type": "table",
+          "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -32129,7 +32394,7 @@
           "ask_ai_prompts": [
             "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
           ],
-          "advanced_visualization": false,
+          "advanced_visualization": true,
           "drilldowns": [
             {
               "type": "log_explorer_field_pivot",
@@ -32208,7 +32473,7 @@
           "visualization_type": "summary_table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,
@@ -32293,7 +32558,7 @@
           "visualization_type": "table",
           "visualization_options": {},
           "time_selection": {
-            "timePeriod": "l24h"
+            "timePeriod": "l21d"
           },
           "layout": {
             "width": 12,

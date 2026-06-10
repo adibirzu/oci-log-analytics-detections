@@ -70,6 +70,83 @@ Use these defaults:
 
 Default to the simplest visualization that answers the operator question. Do not force exotic charts onto routine SOC dashboards.
 
+## Visualization render-safety (CRITICAL — learned 2026-06-09)
+
+OCI's dashboard renderer adds a hidden records-companion query for some widget
+types: it appends `| fields Time` (chart/grid companion) or `| fields ID` (table
+row identity) to the saved-search query at **render time**. After an aggregation
+those fields do not exist, so the widget shows a banner error:
+
+- `timestats … | fields ID`  → **"Invalid field for FIELDS after TIMESTATS: ID"**
+- `stats … | fields Time`     → **"Invalid field for FIELDS after STATS: Time"**
+
+This is invisible to `scripts/parse_validate_all_queries.py` (uses `parse_query`,
+syntax only) **and** to a direct `LogAnalyticsClient.query()` — both pass. It only
+reproduces in the live dashboard, or by manually appending `| fields ID` /
+`| fields Time` to the query via the query API. So a green parse gate and green
+deploy-time live validation are **not** sufficient; the visualization/query
+pairing must also be render-safe.
+
+Safe pairings (enforce these):
+
+| Query shape | Use | Never use |
+|---|---|---|
+| `timestats … by X` (timeline) | `line` + `visualizationOptions {timeField:"Time", seriesField:X, valueField:<metric>}` and an explicit `span` | `table`, `records`, `sunburst`, `bar` (timestats→table appends `ID`) |
+| `stats … by X` (rollup) | `summary_table` (or plain `table` — safe for stats) | `sunburst`, `line`, `pie`, `treemap` (stats→chart appends `Time`) |
+| `stats … by A,B` hierarchy | `summary_table` | `sunburst`/`treemap` (they append `Time` and error) |
+| single value | `tile` + `dataField` | — |
+| `link … | eventstats` | `link` (+ `tileLayoutXml`) | — |
+
+Rules of thumb:
+
+- A `line`/timeline widget MUST carry `timeField` (or `xField`) **and**
+  `valueField` in `visualizationOptions`; without them OCI cannot map the
+  timestats output to axes and falls back to a records render that errors.
+- Plain `table` is safe for `stats` output (it shows the stat columns) but NOT
+  for `timestats` output (OCI adds a row `ID`).
+- Sunburst is attractive but currently triggers the `stats→Time` append — prefer
+  `summary_table` for MITRE/OWASP rollups on this platform until proven otherwise.
+- `bar`/`hbar` (categorical x-axis) do not append a time grid and are safe for
+  `stats`.
+
+The Sentinel generator encodes this: `scripts/convert_sentinel_kql.py`
+`_dashboard_metadata()` maps any `stats`/`timestats`/`eventstats` query to
+`summary_table`, never `table`.
+
+## Deploy gotcha: --cleanup soft-delete resurrection (learned 2026-06-09)
+
+`scripts/deploy_dashboard.py --cleanup` soft-deletes saved searches. OCI keeps a
+soft-deleted saved search by ID for a window; re-importing a saved search with the
+**same stable ID** within that window **resurrects the old saved search** (stale
+`visualizationType` / `timeSelection`) instead of applying the new `uiConfig`. The
+symptom: deploys report success but the live dashboard keeps the old widget count
+and old time window (e.g. stays at `l24h` after you changed everything to `l21d`).
+
+Fix (now in `build_dashboard_json`): embedded saved-search IDs carry the
+dashboard's per-deploy timestamp suffix (`<query-file>-<ts>`), the same way
+dashboard IDs already do, so every deploy mints fresh IDs and cannot collide with
+a soft-deleted one. The tile's `savedSearchId` uses the same suffixed ID. Regression
+test: `test_build_dashboard_json_saved_search_ids_unique_per_deploy`.
+
+When a live dashboard looks stale, verify what is actually deployed (do not trust
+the deploy summary): fetch the dashboard via `DashxApisClient.get_management_dashboard`
+and inspect each `saved_searches[].ui_config` `visualizationType`/`timeSelection`.
+
+## Time window for demo data
+
+`DEFAULT_DASHBOARD_TIME_PERIOD` is `l21d` so dashboards open on the full 3-week
+synthetic window (a `l24h` default shows ~1/21 of the spread data and most sparse
+detections render empty). The dashboard time parameter default and all
+non-overridden widgets inherit it.
+
+## Compartment scope gotcha
+
+Dashboards and data both live in the deploy `COMPARTMENT_ID`. If the OCI Console
+resource-scope filter (`rs=` in the URL / the scope picker) points at a different
+compartment, every widget shows "no data" even though the data exists. Confirm the
+console scope matches the deploy compartment (and Include sub-compartments = on)
+before assuming a data or query problem.
+
 ## Query design heuristics
 
 For dashboard-friendly analytics:

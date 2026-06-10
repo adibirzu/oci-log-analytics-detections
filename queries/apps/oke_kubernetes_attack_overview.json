@@ -21,7 +21,7 @@
     "visualizationType": "summary_table",
     "showTitle": true,
     "timeSelection": {
-      "timePeriod": "l7d"
+      "timePeriod": "l21d"
     },
     "visualizationOptions": {
       "valueField": "Events",

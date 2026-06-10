@@ -80,9 +80,8 @@ Decisions are logged in `.planning/PROJECT.md`.
 
 ### Blockers/Concerns
 
-- Worktree has many generated Sentinel and inventory changes from the 2026-05-17 promotion/test pass. Future fixes must isolate changed files and avoid reverting user work.
 - Live OCI validation requires explicit profile/environment access and should not be assumed for local-only tasks. The 2026-05-17 production validation used `OCI_PROFILE=cap`.
-- `python3 scripts/convert_sigma.py --validate` exits 0 but still reports 20 existing warnings for known query syntax patterns; treat these as future validation-hardening work.
+- RESOLVED 2026-06-05: `scripts/convert_sigma.py --validate` now reports **0 warnings** over 678 queries (previously 20). The validator was hardened (escaped-quote parity, negative-paren-depth, unterminated-quote detection) and all local gates are green.
 - Phase 7 strict YAML loader found no duplicate keys in the generated shard layout; future mapping edits must go through `config/mapping/` and regenerate `config/sentinel_oci_mapping.yaml`.
 - CI secrets handling for fork PRs (Phase 11) needs a short security-review spike before the `live` job is wired.
 - `docs/health/*.json` evidence is ignored by git; live evidence files exist locally for the 2026-05-16 pass but require explicit archival if they must be shared.

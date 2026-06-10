@@ -2,6 +2,7 @@
   "title": "Windows Process from Unusual Path (Rare Value Analysis)",
   "description": "Identifies processes executing from non-standard paths commonly used by attackers (Temp, Public, AppData, Downloads). Legitimate software typically runs from Program Files or System32. Uses rare path analysis (Threat Hunter's Cookbook: Sorting/Stacking + Field Analysis).",
   "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (('Process Name' like '*Temp*') or ('Process Name' like '*Users*Public*') or ('Process Name' like '*AppData*Local*Temp*') or ('Process Name' like '*Downloads*') or ('Process Name' like '*ProgramData*')) | stats count as executions by 'Process Name', 'Host Name' | sort -executions",
+  "type": "hunting",
   "hunting_type": "rare_value",
   "cookbook_method": "sorting_stacking",
   "level": "high",

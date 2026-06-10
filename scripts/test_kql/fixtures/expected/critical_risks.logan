@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Network Firewall Logs' or 'Log Source' = 'OCI Network Firewall Logs' or 'Log Source' = 'SOC VCN Flow Logs') and (Provider = 'RidgeSecurity') and ('Event ID' = '4001') | sort -Time

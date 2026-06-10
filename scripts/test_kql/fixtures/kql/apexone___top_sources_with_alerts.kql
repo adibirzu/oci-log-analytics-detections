@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and (('Source IP' != null and 'Source IP' != '')) | stats count as IpCount by 'Source IP' | sort -IpCount | head 20

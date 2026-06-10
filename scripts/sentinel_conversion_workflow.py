@@ -16,6 +16,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
+# scripts/ is sys.path[0] when run directly; tests put scripts/ on the path too.
+# obs_logging is a sibling module. Guard the import so importing this workflow in
+# a context without scripts/ on the path degrades to a no-op logger rather than
+# an ImportError.
+try:
+    from obs_logging import get_logger, bind  # noqa: E402
+    log = get_logger("sentinel_conversion_workflow")
+except ImportError:  # pragma: no cover - defensive
+    import logging as _logging
+    log = _logging.getLogger("sentinel_conversion_workflow")
+
+    def bind(_logger, **_fields):  # type: ignore[misc]
+        return _logger
+
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_CANDIDATES_FILE = PROJECT_DIR / "queries" / "sentinel_candidates.json"
 DEFAULT_REPORT_PATH = PROJECT_DIR / "queries" / "sentinel_conversion_report.json"
@@ -1098,6 +1112,12 @@ def main(argv: list[str] | None = None) -> int:
     html_path = Path(args.html)
     sentinel_dir = Path(args.sentinel_dir)
     dashboard_inventory = Path(args.dashboard_inventory)
+    bind(
+        log,
+        command=args.command,
+        dry_run=getattr(args, "dry_run", False),
+        workers=getattr(args, "workers", 1),
+    ).info("sentinel_workflow.start")
 
     if args.command == "local":
         run_convert_mode(args, "local", local_report_path)

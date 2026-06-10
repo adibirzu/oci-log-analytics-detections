@@ -38,6 +38,7 @@ import oci
 # Re-exported so existing ``from deploy_dashboard import X`` call sites keep working.
 from dashboards.catalog import (
     DASHBOARDS,
+    select_dashboards,
     octo_apm_workshop_widget,
     load_sentinel_dashboard_groups,
     SENTINEL_DASHBOARD_GROUPS,
@@ -79,36 +80,15 @@ from dashboards.validation import (
     _should_emit_validation_progress,
     _format_validation_progress,
 )
+from dashboards.reporting import print_dry_run_plan, print_deployment_summary
+from obs_logging import get_logger, bind
+
+# Structured diagnostics → stderr (run-id correlated). The ✅/❌ stdout prints
+# below remain the human/pipeline-facing UX contract; these log lines are an
+# additive, machine-parseable record of the live-OCI lifecycle and failures.
+log = get_logger("deploy_dashboard")
 
 DASHBOARD_INVENTORY_PATH = os.path.join(QUERIES_DIR, "dashboard_inventory.json")
-
-
-def select_dashboards(dashboard_names=None, dashboards=None):
-    """Return a display-name keyed dashboard subset for targeted operations."""
-    dashboards = dashboards or DASHBOARDS
-    if not dashboard_names:
-        return dashboards
-
-    selected = {}
-    name_lookup = {name.lower(): name for name in dashboards}
-    missing = []
-    for requested_name in dashboard_names:
-        canonical_name = requested_name if requested_name in dashboards else None
-        if canonical_name is None:
-            canonical_name = name_lookup.get(requested_name.lower())
-        if canonical_name is None:
-            missing.append(requested_name)
-            continue
-        selected[canonical_name] = dashboards[canonical_name]
-
-    if missing:
-        available = ", ".join(sorted(dashboards))
-        raise ValueError(
-            f"unknown dashboard name(s): {', '.join(missing)}. "
-            f"Available dashboards: {available}"
-        )
-
-    return selected
 
 
 def _build_widget_inventory_record(dashboard_name, dashboard_index, widget, widget_index, queries_dir):
@@ -621,10 +601,20 @@ def deploy(
     print("=" * 60)
     print("OCI Log Analytics - SOC Dashboard Deployment")
     print("=" * 60)
+    dlog = bind(
+        log,
+        compartment=COMPARTMENT_ID,
+        cleanup=cleanup,
+        dry_run=dry_run,
+        live_validate=live_validate,
+        targeted=bool(dashboard_names),
+    )
+    dlog.info("deploy.start")
 
     try:
         dashboards_to_deploy = select_dashboards(dashboard_names)
     except ValueError as exc:
+        dlog.error("deploy.select_failed", extra={"error": str(exc)})
         print(f"\n  {exc}")
         raise SystemExit(1) from exc
 
@@ -637,19 +627,7 @@ def deploy(
         raise SystemExit(1)
 
     if dry_run:
-        print("\n  [DRY RUN] No changes will be made.\n")
-        for dashboard in inventory["dashboards"]:
-            print(f"  Dashboard: {dashboard['name']}")
-            print(f"    Widgets: {dashboard['widget_count']}")
-            for widget in dashboard["widgets"]:
-                print(
-                    f"      - {widget['title']} ({widget['query_file']}) "
-                    f"[viz={widget['visualization_type']}]"
-                )
-        print(
-            f"\n  Total: {inventory['summary']['total_dashboards']} dashboards, "
-            f"{inventory['summary']['total_widgets']} saved searches"
-        )
+        print_dry_run_plan(inventory)
         return
 
     if live_validate:
@@ -668,6 +646,10 @@ def deploy(
         empty = [result for result in live_results if result["ok"] and result["empty"]]
 
         if errors:
+            dlog.error(
+                "deploy.live_validation_failed",
+                extra={"failed": len(errors), "validated": len(live_results)},
+            )
             print("  Query validation failed; no dashboards or saved searches will be imported.")
             for result in errors:
                 print(f"    - {result['query_file']}: {result['error'][:180]}")
@@ -690,6 +672,7 @@ def deploy(
     try:
         assert_write_allowed(COMPARTMENT_ID, override=allow_prod_write)
     except ProdWriteGuardError as guard_err:
+        dlog.error("deploy.prod_write_blocked", extra={"override": allow_prod_write})
         print(f"\n  {guard_err}")
         raise SystemExit(2) from guard_err
 
@@ -737,13 +720,11 @@ def deploy(
             total_dashboards += 1
 
     # Summary
-    print(f"\n{'=' * 60}")
-    print("Deployment Summary")
-    print(f"{'=' * 60}")
-    print(f"  Saved Searches created/found: {total_searches}")
-    print(f"  Dashboards imported: {total_dashboards}")
-    print(f"\n  View in OCI Console:")
-    print(f"  Observability & Management > Log Analytics > Dashboards")
+    print_deployment_summary(total_searches, total_dashboards)
+    dlog.info(
+        "deploy.done",
+        extra={"dashboards_imported": total_dashboards, "saved_searches": total_searches},
+    )
 
 
 if __name__ == "__main__":

@@ -1,29 +1,30 @@
 import { randomBytes } from "node:crypto"
 import { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
+import type { SessionResponse } from "@/lib/api-contracts"
 
 export const runtime = "nodejs"
 
 const SESSION_TTL_SECONDS = 15 * 60
+const RATE_LIMIT = 30
+const RATE_WINDOW_SECONDS = 60
 
 export async function GET(request: NextRequest) {
   const existingToken = request.cookies.get("logan_forge_csrf")?.value
   const csrfToken = existingToken && existingToken.length >= 32 ? existingToken : randomBytes(32).toString("base64url")
-  const response = NextResponse.json(
-    {
-      csrfToken,
-      expiresInSeconds: SESSION_TTL_SECONDS,
-      rateLimit: {
-        limit: 30,
-        windowSeconds: 60,
-      },
+  const body: SessionResponse = {
+    csrfToken,
+    expiresInSeconds: SESSION_TTL_SECONDS,
+    rateLimit: {
+      limit: RATE_LIMIT,
+      windowSeconds: RATE_WINDOW_SECONDS,
     },
-    {
-      headers: {
-        "Cache-Control": "no-store",
-      },
+  }
+  const response = NextResponse.json(body, {
+    headers: {
+      "Cache-Control": "no-store",
     },
-  )
+  })
 
   response.cookies.set({
     name: "logan_forge_csrf",

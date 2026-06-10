@@ -127,5 +127,109 @@ class TestProfileScopedConfig(unittest.TestCase):
         self.assertEqual(results, [("Query files", True, "1 files OK")])
 
 
+class TestAssertWriteAllowed(unittest.TestCase):
+    """Validate the production production write guard (assert_write_allowed)."""
+
+    # A syntactically OCID-shaped value standing in for the LogAnalytics root.
+    LA_ROOT = "ocid1.compartment.oc1..aaaaloganalyticsroot"
+    LA_CHILD = "ocid1.compartment.oc1..aaaaloganalyticschild"
+    OTHER = "ocid1.compartment.oc1..aaaasomeother"
+
+    def _production_env_file(self, **extra):
+        env_file = {"OCI_PROFILE": "production"}
+        env_file.update(extra)
+        return env_file
+
+    def test_production_non_la_compartment_raises_without_override(self):
+        env_file = self._production_env_file(LOGANALYTICS_COMPARTMENT_OCID=self.LA_ROOT)
+        with self.assertRaises(oci_config.ProdWriteGuardError):
+            oci_config.assert_write_allowed(
+                self.OTHER, profile="production", env={}, env_file=env_file
+            )
+
+    def test_production_la_root_compartment_passes(self):
+        env_file = self._production_env_file(LOGANALYTICS_COMPARTMENT_OCID=self.LA_ROOT)
+        # Should not raise.
+        oci_config.assert_write_allowed(
+            self.LA_ROOT, profile="production", env={}, env_file=env_file
+        )
+
+    def test_production_configured_child_compartment_passes(self):
+        env_file = self._production_env_file(
+            LOGANALYTICS_COMPARTMENT_OCID=self.LA_ROOT,
+            LOGANALYTICS_COMPARTMENT_IDS=f"{self.LA_CHILD}, {self.OTHER}",
+        )
+        oci_config.assert_write_allowed(
+            self.LA_CHILD, profile="production", env={}, env_file=env_file
+        )
+
+    def test_production_non_la_compartment_passes_with_override_flag(self):
+        env_file = self._production_env_file(LOGANALYTICS_COMPARTMENT_OCID=self.LA_ROOT)
+        oci_config.assert_write_allowed(
+            self.OTHER, profile="production", override=True, env={}, env_file=env_file
+        )
+
+    def test_production_non_la_compartment_passes_with_override_env(self):
+        env_file = self._production_env_file(LOGANALYTICS_COMPARTMENT_OCID=self.LA_ROOT)
+        oci_config.assert_write_allowed(
+            self.OTHER,
+            profile="production",
+            env={"OCI_ALLOW_PROD_WRITE": "1"},
+            env_file=env_file,
+        )
+
+    def test_production_fails_closed_when_la_root_unconfigured(self):
+        # No LogAnalytics allow-set configured → production write must be refused.
+        env_file = self._production_env_file()
+        with self.assertRaises(oci_config.ProdWriteGuardError):
+            oci_config.assert_write_allowed(
+                self.LA_ROOT, profile="production", env={}, env_file=env_file
+            )
+
+    def test_production_fails_closed_with_empty_compartment(self):
+        env_file = self._production_env_file(LOGANALYTICS_COMPARTMENT_OCID=self.LA_ROOT)
+        with self.assertRaises(oci_config.ProdWriteGuardError):
+            oci_config.assert_write_allowed(
+                "", profile="production", env={}, env_file=env_file
+            )
+
+    def test_cap_profile_is_always_allowed(self):
+        # Staging tenancy: full rights, no LogAnalytics config present.
+        env_file = {"OCI_PROFILE": "cap"}
+        oci_config.assert_write_allowed(
+            self.OTHER, profile="cap", env={}, env_file=env_file
+        )
+
+    def test_default_profile_is_always_allowed(self):
+        env_file = {"OCI_PROFILE": "DEFAULT"}
+        oci_config.assert_write_allowed(
+            self.OTHER, profile="DEFAULT", env={}, env_file=env_file
+        )
+
+    def test_unknown_profile_is_always_allowed(self):
+        oci_config.assert_write_allowed(
+            self.OTHER, profile="somerandomprofile", env={}, env_file={}
+        )
+
+    def test_profile_resolved_from_env_when_not_passed(self):
+        # production selected via env (not the profile arg) is still guarded.
+        env = {"OCI_PROFILE": "production"}
+        env_file = {"OCI_PROFILE": "production", "LOGANALYTICS_COMPARTMENT_OCID": self.LA_ROOT}
+        with self.assertRaises(oci_config.ProdWriteGuardError):
+            oci_config.assert_write_allowed(self.OTHER, env=env, env_file=env_file)
+
+    def test_production_root_via_profile_scoped_env_var(self):
+        # Operator exports PRODUCTION_LOGANALYTICS_COMPARTMENT_OCID instead of overlay.
+        env = {"PRODUCTION_LOGANALYTICS_COMPARTMENT_OCID": self.LA_ROOT}
+        env_file = {"OCI_PROFILE": "production"}
+        oci_config.assert_write_allowed(
+            self.LA_ROOT, profile="production", env=env, env_file=env_file
+        )
+        with self.assertRaises(oci_config.ProdWriteGuardError):
+            oci_config.assert_write_allowed(
+                self.OTHER, profile="production", env=env, env_file=env_file
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

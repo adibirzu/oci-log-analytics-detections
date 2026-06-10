@@ -27,9 +27,9 @@ LIMIT = 800
 # DO NOT ADD NEW ENTRIES — shrink this list instead.
 ALLOWLIST: frozenset[str] = frozenset(
     {
-        "generate_test_logs.py",           # 7513 lines — synthetic data generator
-        "setup_log_sources.py",            # 2905 lines — OCI source setup
-        "deploy_dashboard.py",             # 1936 lines — dashboard deployment
+        # generate_test_logs.py, setup_log_sources.py, and deploy_dashboard.py were
+        # refactored below the 800-line ceiling (split into the testlogs/, logsources/,
+        # and dashboards/ packages) and removed from this list on 2026-06-10.
         "sentinel_conversion_workflow.py", # 1188 lines — Sentinel workflow
         "test_sentinel_converter.py",      #  978 lines — Sentinel converter tests
         "oci_config.py",                   #  977 lines — OCI config helper

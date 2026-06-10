@@ -43,6 +43,12 @@ from oci_config import (
 
 import oci
 
+from obs_logging import get_logger, bind
+
+# Additive structured diagnostics on stderr; stdout prints remain the UX/test
+# contract. Correlates the live upload lifecycle by run-id.
+log = get_logger("ingest_test_data")
+
 STREAMING_CONFIG_PATH = os.path.join(PROJECT_DIR, 'config', 'streaming_config.json')
 
 # Maps test data files to their OCI Log Analytics log sources
@@ -425,8 +431,11 @@ def main():
     print("=" * 60)
     print(f"OCI Log Analytics - Test Data Ingestion ({args.mode} mode)")
     print("=" * 60)
+    ilog = bind(log, mode=args.mode, files=len(args.files) if args.files else "all")
+    ilog.info("ingest.start")
 
     if not os.path.exists(TEST_DATA_DIR):
+        ilog.error("ingest.test_data_missing", extra={"path": str(TEST_DATA_DIR)})
         print(f"ERROR: {TEST_DATA_DIR} not found. Run generate_test_logs.py first.")
         sys.exit(1)
 
@@ -435,6 +444,7 @@ def main():
     try:
         assert_write_allowed(resolve_compartment_id(), override=args.i_understand_prod)
     except ProdWriteGuardError as guard_err:
+        ilog.error("ingest.prod_write_blocked", extra={"override": args.i_understand_prod})
         print(f"\n  {guard_err}")
         sys.exit(2)
 
@@ -460,6 +470,9 @@ def main():
     succeeded = sum(1 for v in results.values() if v)
     total = len(results)
     print(f"\n  {succeeded}/{total} uploads completed successfully.")
+    (ilog.info if succeeded == total else ilog.warning)(
+        "ingest.done", extra={"succeeded": succeeded, "total": total}
+    )
 
     if succeeded > 0:
         wait_time = "2-3 minutes" if args.mode == 'direct' else "3-5 minutes"

@@ -722,3 +722,31 @@ def load_sentinel_dashboard_groups(queries_dir=QUERIES_DIR, max_widgets=24):
 
 
 DASHBOARDS.update(load_sentinel_dashboard_groups())
+
+
+def select_dashboards(dashboard_names=None, dashboards=None):
+    """Return a display-name keyed dashboard subset for targeted operations."""
+    dashboards = dashboards or DASHBOARDS
+    if not dashboard_names:
+        return dashboards
+
+    selected = {}
+    name_lookup = {name.lower(): name for name in dashboards}
+    missing = []
+    for requested_name in dashboard_names:
+        canonical_name = requested_name if requested_name in dashboards else None
+        if canonical_name is None:
+            canonical_name = name_lookup.get(requested_name.lower())
+        if canonical_name is None:
+            missing.append(requested_name)
+            continue
+        selected[canonical_name] = dashboards[canonical_name]
+
+    if missing:
+        available = ", ".join(sorted(dashboards))
+        raise ValueError(
+            f"unknown dashboard name(s): {', '.join(missing)}. "
+            f"Available dashboards: {available}"
+        )
+
+    return selected

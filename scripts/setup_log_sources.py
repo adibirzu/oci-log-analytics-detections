@@ -52,6 +52,11 @@ from oci.log_analytics.models import (
 # ─── Static definitions + pure helpers (extracted to the logsources package) ───
 from logsources.definitions import *  # noqa: F401,F403,E402
 from logsources.field_helpers import *  # noqa: F401,F403,E402
+from obs_logging import get_logger, bind  # noqa: E402
+
+# Additive structured diagnostics on stderr; the stdout prints stay the UX/test
+# contract. Correlates the live field/parser/source creation lifecycle by run-id.
+log = get_logger("setup_log_sources")
 
 
 # ─── Runtime retry / timeout configuration ───────────────────────
@@ -457,12 +462,20 @@ def main():
 
     compartment_id = resolve_compartment_id()
     print("Compartment: resolved from OCI configuration")
+    slog = bind(
+        log,
+        compartment=compartment_id,
+        namespace=namespace,
+        application_only=application_only,
+    )
+    slog.info("setup.start")
 
     # Tenancy safety: refuse field/parser/source creation against emdemo (prod)
     # outside the LogAnalytics subtree unless --i-understand-prod was passed.
     try:
         assert_write_allowed(compartment_id, override=args.i_understand_prod)
     except ProdWriteGuardError as guard_err:
+        slog.error("setup.prod_write_blocked", extra={"override": args.i_understand_prod})
         print(f"\n  {guard_err}")
         sys.exit(2)
 
@@ -749,6 +762,7 @@ def main():
     print(f"  - OCI Cloud Guard Problems (native, preferred when available)")
     print(f"  - Windows Sysmon Events (native, preferred when available)")
     print(f"\nNext: python3 scripts/convert_sigma.py")
+    slog.info("setup.done")
 
 
 if __name__ == "__main__":

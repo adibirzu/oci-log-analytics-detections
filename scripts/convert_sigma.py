@@ -696,6 +696,71 @@ def print_stats(output_path):
         print(f"    - {t}")
 
 
+def query_syntax_issues(query):
+    """Return a list of OCL syntax issues for a single generated query string.
+
+    Extracted from ``validate_queries`` so the per-query checks are unit-testable
+    in isolation (e.g. regression tests that regenerate the Windows named-pipe
+    rules and assert the emitted LAQL stays parseable). An empty list means the
+    query passed every structural check.
+    """
+    issues = []
+    # A query must be anchored on a scoping filter. Log Source is the common
+    # case, but cross-source correlation/hunting analytics legitimately anchor
+    # on a strong identifier field (Trace ID, Client/Source/Destination IP).
+    # Allow any number of leading group-open parens before the anchor so
+    # multi-level grouping like ((('Log Source' = ...))) is not flagged.
+    anchor = r"'(Log Source|Trace ID|Client IP|Source IP|Destination IP)'"
+    if not re.match(rf"^\(*\s*{anchor}\s*(=|in)\s*", query):
+        issues.append("missing Log Source prefix")
+    # Count parentheses outside of quoted strings, and detect structural
+    # double spaces the same way. Several subtleties matter:
+    #   * a quote is a string delimiter only when it is NOT escaped. A quote is
+    #     escaped iff preceded by an ODD number of backslashes, so "\'" is a
+    #     literal quote inside a LIKE pattern but "\\'" (escaped backslash) is a
+    #     real delimiter -- tracking only the single previous char gets this
+    #     wrong. This keeps literal parens in patterns like '*SLEEP(*' from
+    #     desyncing the counter while still closing strings correctly;
+    #   * parenthesis depth must never go negative: a closing paren before its
+    #     opener (e.g. "(...)) ... (") is malformed even if the final depth
+    #     happens to net back to zero;
+    #   * a quote left open at end-of-string means the rest of the query was
+    #     wrongly treated as quoted, which would mask unbalanced parens or
+    #     double spaces -- flag it explicitly;
+    #   * spaces inside a LIKE literal (e.g. mimikatz '*SID      :*') are
+    #     intentional and must not count as structural double spaces.
+    in_quote = False
+    paren_depth = 0
+    depth_went_negative = False
+    backslashes = 0
+    prev = ""
+    double_space = False
+    for ch in query:
+        if ch == "'":
+            if backslashes % 2 == 0:
+                in_quote = not in_quote
+            backslashes = 0
+        else:
+            if not in_quote:
+                if ch == '(':
+                    paren_depth += 1
+                elif ch == ')':
+                    paren_depth -= 1
+                    if paren_depth < 0:
+                        depth_went_negative = True
+                elif ch == ' ' and prev == ' ':
+                    double_space = True
+            backslashes = backslashes + 1 if ch == "\\" else 0
+        prev = ch
+    if paren_depth != 0 or depth_went_negative:
+        issues.append("unbalanced parentheses")
+    if in_quote:
+        issues.append("unterminated quoted string")
+    if double_space:
+        issues.append("double spaces")
+    return issues
+
+
 def validate_queries(output_path):
     """Validate OCL syntax of generated queries."""
     errors = 0
@@ -705,61 +770,7 @@ def validate_queries(output_path):
             q = json.load(fh)
         query = q.get('query', '')
         total += 1
-        # Basic syntax checks
-        issues = []
-        # A query must be anchored on a scoping filter. Log Source is the common
-        # case, but cross-source correlation/hunting analytics legitimately anchor
-        # on a strong identifier field (Trace ID, Client/Source/Destination IP).
-        # Allow any number of leading group-open parens before the anchor so
-        # multi-level grouping like ((('Log Source' = ...))) is not flagged.
-        anchor = r"'(Log Source|Trace ID|Client IP|Source IP|Destination IP)'"
-        if not re.match(rf"^\(*\s*{anchor}\s*(=|in)\s*", query):
-            issues.append("missing Log Source prefix")
-        # Count parentheses outside of quoted strings, and detect structural
-        # double spaces the same way. Several subtleties matter:
-        #   * a quote is a string delimiter only when it is NOT escaped. A quote is
-        #     escaped iff preceded by an ODD number of backslashes, so "\'" is a
-        #     literal quote inside a LIKE pattern but "\\'" (escaped backslash) is a
-        #     real delimiter -- tracking only the single previous char gets this
-        #     wrong. This keeps literal parens in patterns like '*SLEEP(*' from
-        #     desyncing the counter while still closing strings correctly;
-        #   * parenthesis depth must never go negative: a closing paren before its
-        #     opener (e.g. "(...)) ... (") is malformed even if the final depth
-        #     happens to net back to zero;
-        #   * a quote left open at end-of-string means the rest of the query was
-        #     wrongly treated as quoted, which would mask unbalanced parens or
-        #     double spaces -- flag it explicitly;
-        #   * spaces inside a LIKE literal (e.g. mimikatz '*SID      :*') are
-        #     intentional and must not count as structural double spaces.
-        in_quote = False
-        paren_depth = 0
-        depth_went_negative = False
-        backslashes = 0
-        prev = ""
-        double_space = False
-        for ch in query:
-            if ch == "'":
-                if backslashes % 2 == 0:
-                    in_quote = not in_quote
-                backslashes = 0
-            else:
-                if not in_quote:
-                    if ch == '(':
-                        paren_depth += 1
-                    elif ch == ')':
-                        paren_depth -= 1
-                        if paren_depth < 0:
-                            depth_went_negative = True
-                    elif ch == ' ' and prev == ' ':
-                        double_space = True
-                backslashes = backslashes + 1 if ch == "\\" else 0
-            prev = ch
-        if paren_depth != 0 or depth_went_negative:
-            issues.append("unbalanced parentheses")
-        if in_quote:
-            issues.append("unterminated quoted string")
-        if double_space:
-            issues.append("double spaces")
+        issues = query_syntax_issues(query)
         if issues:
             rel_path = path.relative_to(output_path).as_posix()
             print(f"  WARN {rel_path}: {', '.join(issues)}")

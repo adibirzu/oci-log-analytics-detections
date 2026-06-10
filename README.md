@@ -23,15 +23,15 @@ This repository ships both source authoring content and generated OCI query asse
   - 468 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
 - **Microsoft Sentinel converted queries:** 60 live OCI parser-passing queries
-- **Curated analytics:** 142
+- **Curated analytics:** 145
   - 47 app telemetry analytics in `queries/apps/`
-  - 95 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 678
+  - 98 hunting analytics in `queries/hunting/`
+- **Total query artifacts/content items:** 681
 - **Source rule breakdown:** Windows (249), Cloud/OCI (100), Linux (67), Web/WAF (38)
 - **Combined MITRE ATT&CK coverage:** 231 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Atomic Red Team coverage:** 280 / 331 testable rules have ART mappings (84.6%)
-- **Dashboard inventory:** 29 dashboards with 438 active dashboard saved searches and 96 advanced visualization widgets
+- **Dashboard inventory:** 29 dashboards with 441 active dashboard saved searches and 107 advanced visualization widgets
 - **Generated demo data:** 221,173 events across 20 NDJSON files in the latest local `test_data/manifest.json`
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 
@@ -65,7 +65,7 @@ rules/** ------------------------------------------> scripts/convert_sigma.py
                                                         +--> queries/apps/*.json (8 Sigma-derived browser detections)
 
 queries/apps/*.json (47 curated app analytics) --------+
-queries/hunting/*.json (95 hunting analytics) ---------+--> scripts/generate_catalog.py
+queries/hunting/*.json (98 hunting analytics) ---------+--> scripts/generate_catalog.py
                                                              |
                                                              +--> CATALOG.md
                                                              +--> queries/catalog.json
@@ -76,7 +76,7 @@ queries/** -----------------------------------------------> scripts/export_for_m
 
 queries/** -----------------------------------------------> scripts/deploy_dashboard.py
                                                              |
-                                                             +--> 29 dashboards / 438 saved searches
+                                                             +--> 29 dashboards / 441 saved searches
                                                              +--> queries/dashboard_inventory.json
 ```
 
@@ -89,7 +89,7 @@ queries/** -----------------------------------------------> scripts/deploy_dashb
   Cloud Guard Problems ──────┤                                                    |
   WAF/LB Access Logs ────────┤                                                    v
   App/Browser Telemetry JSON ─┘                                         SOC Dashboards (29)
-                                                                       Saved Searches (438)
+                                                                       Saved Searches (441)
   Generated Test Data (NDJSON) ──> Upload API ──> Log Analytics ──> Dashboard Verification
 ```
 
@@ -207,7 +207,7 @@ rules/                          # Source detection rules (Sigma YAML)
     browser_attacks/            # 8 browser-side source rules compiled into queries/apps/
 queries/                        # Generated OCL queries (JSON)
   apps/                         # 55 app telemetry queries (8 source-derived + 47 curated)
-  hunting/                      # 95 advanced hunting queries
+  hunting/                      # 98 advanced hunting queries
   catalog.json                  # Full rule catalog (machine-readable)
   dashboard_inventory.json      # Dashboard/widget/saved-search inventory for UI integrations
   manifest.json                 # Export/integration manifest
@@ -216,7 +216,7 @@ config/
 scripts/
   oci_config.py                 # Centralized config, client factories, validation
   convert_sigma.py              # Sigma -> OCL converter (with STIG metadata)
-  deploy_dashboard.py           # OCI LA dashboard deployment (29 dashboards / 438 saved searches)
+  deploy_dashboard.py           # OCI LA dashboard deployment (29 dashboards / 441 saved searches)
   generate_test_logs.py         # Core security simulation datasets for OCI LA
   windows_eventlog_synthetic.py # Official-shaped Windows Event Log fixtures and upload helper
   generate_geo_health_logs.py   # Multicloud health dataset used by Geographic Health dashboard
@@ -259,10 +259,10 @@ python3 scripts/windows_eventlog_synthetic.py ingest
 python3 scripts/setup_streaming_pipeline.py
 python3 scripts/validate_pipeline.py --e2e
 
-# 4. Deploy 29 dashboards with 438 saved searches
+# 4. Deploy 29 dashboards with 441 saved searches
 #    The default path validates dashboard queries in OCI Log Analytics first.
 #    Failed, slow, or timed-out query validation blocks dashboard import.
-#    The dashboard default time range is l24h to match the generated demo data.
+#    The dashboard default time range is l21d to match the generated 3-week demo data.
 python3 scripts/deploy_dashboard.py --cleanup
 
 # 5. Regenerate inventory artifacts

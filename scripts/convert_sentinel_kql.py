@@ -154,10 +154,15 @@ def _reference_entries(candidate: dict) -> list[dict]:
 
 
 def _dashboard_metadata(query: str) -> dict:
-    visualization = "summary_table" if "| stats " in query else "table"
+    # Aggregated queries (stats / timestats / eventstats) must NOT use a plain
+    # `table` viz: OCI's dashboard records-companion appends `| fields ID`/`Time`
+    # which is invalid after an aggregation and errors at render time. Use
+    # `summary_table`, which renders the aggregated rollup without that append.
+    aggregated = any(tok in query for tok in ("| stats ", "| timestats", "| eventstats"))
+    visualization = "summary_table" if aggregated else "table"
     return {
         "visualizationType": visualization,
-        "timeSelection": {"timePeriod": "l24h"},
+        "timeSelection": {"timePeriod": "l21d"},
         "ask_ai_prompts": [
             "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
         ],

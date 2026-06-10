@@ -116,7 +116,7 @@ class TestDashboardContract(unittest.TestCase):
 
         ui_config = resolve_widget_ui_config(widget, query_info)
 
-        self.assertEqual(ui_config["timeSelection"], {"timePeriod": "l24h"})
+        self.assertEqual(ui_config["timeSelection"], {"timePeriod": "l21d"})
 
     def test_build_saved_search_json_defaults_to_demo_ready_time_window(self):
         saved_search = build_saved_search_json(
@@ -125,7 +125,7 @@ class TestDashboardContract(unittest.TestCase):
             query="'Log Source' = 'SOC Windows Sysmon Logs' | stats count",
         )
 
-        self.assertEqual(saved_search["uiConfig"]["timeSelection"], {"timePeriod": "l24h"})
+        self.assertEqual(saved_search["uiConfig"]["timeSelection"], {"timePeriod": "l21d"})
 
     def test_build_dashboard_json_time_parameter_matches_widget_default(self):
         widget = {"title": "Default Time", "query_file": "default_time.json"}
@@ -144,8 +144,36 @@ class TestDashboardContract(unittest.TestCase):
             if parameter["paramName"] == "time"
         )
         saved_search = dashboard["savedSearches"][0]
-        self.assertEqual(time_parameter["defaultValue"], "l24h")
-        self.assertEqual(saved_search["uiConfig"]["timeSelection"], {"timePeriod": "l24h"})
+        self.assertEqual(time_parameter["defaultValue"], "l21d")
+        self.assertEqual(saved_search["uiConfig"]["timeSelection"], {"timePeriod": "l21d"})
+
+    def test_build_dashboard_json_saved_search_ids_unique_per_deploy(self):
+        # Saved-search IDs must carry the dashboard's per-deploy suffix so OCI's
+        # soft-delete cannot resurrect a stale same-named saved search after a
+        # --cleanup run. Two deploys (different dashboard_id) must yield different
+        # saved-search IDs, and every tile reference must match a saved search.
+        widget = {"title": "Reverse Shell", "query_file": "linux_reverse_shell_detected.json"}
+        query_info = {"query": "'Log Source' = 'SOC Linux Syslog Logs' | stats count"}
+
+        first = build_dashboard_json(
+            dashboard_id="soc-overview-1111111111",
+            name="SOC Overview", description="test",
+            widgets=[widget], widget_queries=[query_info],
+        )
+        second = build_dashboard_json(
+            dashboard_id="soc-overview-2222222222",
+            name="SOC Overview", description="test",
+            widgets=[widget], widget_queries=[query_info],
+        )
+
+        first_id = first["savedSearches"][0]["id"]
+        second_id = second["savedSearches"][0]["id"]
+        self.assertTrue(first_id.endswith("-1111111111"), first_id)
+        self.assertTrue(second_id.endswith("-2222222222"), second_id)
+        self.assertNotEqual(first_id, second_id)
+        # Tile reference stays consistent with the embedded saved search.
+        self.assertEqual(first["tiles"][0]["savedSearchId"], first_id)
+        self.assertEqual(second["tiles"][0]["savedSearchId"], second_id)
 
     def test_build_dashboard_json_layout_prevents_tile_overlap(self):
         for dashboard_name, config in DASHBOARDS.items():
@@ -281,7 +309,9 @@ class TestDashboardContract(unittest.TestCase):
             self.assertTrue(payload.get("dashboard", {}).get("ask_ai_prompts"), query_file)
 
         self.assertEqual(visualization_types["hunting/web_to_cloud_attack_path_link.json"], "link")
-        self.assertEqual(visualization_types["hunting/web_to_cloud_mitre_sunburst.json"], "sunburst")
+        # MITRE rollup renders as summary_table: a stats query under a sunburst viz
+        # triggers OCI's records-companion "| fields Time" append and errors at render.
+        self.assertEqual(visualization_types["hunting/web_to_cloud_mitre_sunburst.json"], "summary_table")
         self.assertIn("summary_table", set(visualization_types.values()))
 
     def test_c2_dashboard_covers_legacy_widgets_with_drilldowns(self):
@@ -531,7 +561,6 @@ class TestDashboardContract(unittest.TestCase):
         self.assertIn("link", advanced_types)
         self.assertIn("line", advanced_types)
         self.assertIn("summary_table", advanced_types)
-        self.assertIn("sunburst", advanced_types)
         self.assertTrue(source_backed_queries)
 
     def test_dashboard_inventory_exports_source_references(self):

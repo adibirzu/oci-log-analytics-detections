@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-04T18:59:00.540200+00:00",
+  "generated_at": "2026-06-09T20:47:58.534202+00:00",
   "summary": {
     "total_fields": 277,
     "parser_count": 18,
@@ -11831,6 +11831,7 @@
         "hunting/c2_destination_ips.json",
         "hunting/c2_https_beaconing.json",
         "hunting/cloud_identity_aitm_token_abuse.json",
+        "hunting/demo_top_attacker_ips.json",
         "hunting/flf_credential_stuffing_pattern.json",
         "hunting/flf_new_user_persistence.json",
         "hunting/flf_port_knocking_sequence.json",

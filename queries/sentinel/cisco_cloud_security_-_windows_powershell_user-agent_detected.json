@@ -74,7 +74,7 @@
   "dashboard": {
     "visualizationType": "table",
     "timeSelection": {
-      "timePeriod": "l24h"
+      "timePeriod": "l21d"
     },
     "ask_ai_prompts": [
       "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."

@@ -16,7 +16,7 @@
   "dashboard": {
     "visualizationType": "link",
     "showTitle": true,
-    "timeSelection": {"timePeriod": "l24h"},
+    "timeSelection": {"timePeriod": "l21d"},
     "visualizationOptions": {
       "groupBy": ["Attack ID"],
       "linkBy": ["Attack Stage", "Span ID"],

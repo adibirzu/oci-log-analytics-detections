@@ -17,7 +17,13 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from oci_config import COMPARTMENT_ID
 
-PROJECT_DIR = Path(__file__).parent.parent
+# This module lives at scripts/testlogs/common.py, so the repo root is three
+# parents up. (Before the T1 split these constants lived in
+# scripts/generate_test_logs.py at two parents up; the extra package directory
+# adds one level.) OUTPUT_DIR must equal oci_config.TEST_DATA_DIR (<repo>/test_data)
+# or the generated corpus lands in the wrong place and the ingest-manifest
+# contract test fails on a fresh checkout.
+PROJECT_DIR = Path(__file__).resolve().parent.parent.parent
 OUTPUT_DIR = PROJECT_DIR / 'test_data'
 QUERIES_DIR = PROJECT_DIR / 'queries'
 OCI_USERS = [

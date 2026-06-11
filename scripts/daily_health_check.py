@@ -39,6 +39,18 @@ PROJECT_DIR = Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = PROJECT_DIR / "scripts"
 HEALTH_DIR = PROJECT_DIR / "docs" / "health"
 
+# Additive structured diagnostics on stderr. Guarded so importing this module
+# without scripts/ on sys.path degrades to a stdlib logger rather than failing.
+try:
+    import sys as _sys
+    if str(SCRIPTS_DIR) not in _sys.path:
+        _sys.path.insert(0, str(SCRIPTS_DIR))
+    from obs_logging import get_logger
+    log = get_logger("daily_health_check")
+except ImportError:  # pragma: no cover - defensive
+    import logging as _logging
+    log = _logging.getLogger("daily_health_check")
+
 # Ordered severity: higher index = worse.
 _STATUS_RANK: dict[str, int] = {"OK": 0, "MISS": 1, "ERROR": 2}
 
@@ -184,6 +196,7 @@ def main(argv: list[str] | None = None) -> int:
     overall_status = "OK"
     sections: list[dict] = []
 
+    log.info("health_check.start", extra={"lookback": args.lookback, "skip_verify": args.skip_verify})
     print(_section(f"SOC Health Check — {timestamp}"))
 
     print(_section("[1/3] Dashboard inventory"))
@@ -241,6 +254,8 @@ def main(argv: list[str] | None = None) -> int:
     }
     report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
+    log_emit = log.error if overall_status == "ERROR" else (log.warning if overall_status == "MISS" else log.info)
+    log_emit("health_check.done", extra={"overall_status": overall_status})
     print(_section(f"Overall status: {overall_status}  (report: {report_path})"))
 
     # --diff / --previous-run: compare against the previous report.

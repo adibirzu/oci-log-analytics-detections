@@ -23,12 +23,12 @@ This repository ships both source authoring content and generated OCI query asse
   - 468 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
 - **Microsoft Sentinel converted queries:** 60 live OCI parser-passing queries
-- **Curated analytics:** 145
+- **Curated analytics:** 162
   - 47 app telemetry analytics in `queries/apps/`
-  - 98 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 681
+  - 115 hunting analytics in `queries/hunting/`
+- **Total query artifacts/content items:** 698
 - **Source rule breakdown:** Windows (249), Cloud/OCI (100), Linux (67), Web/WAF (38)
-- **Combined MITRE ATT&CK coverage:** 231 techniques across 14 tactics
+- **Combined MITRE ATT&CK coverage:** 233 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Atomic Red Team coverage:** 280 / 331 testable rules have ART mappings (84.6%)
 - **Dashboard inventory:** 29 dashboards with 441 active dashboard saved searches and 107 advanced visualization widgets
@@ -65,7 +65,7 @@ rules/** ------------------------------------------> scripts/convert_sigma.py
                                                         +--> queries/apps/*.json (8 Sigma-derived browser detections)
 
 queries/apps/*.json (47 curated app analytics) --------+
-queries/hunting/*.json (98 hunting analytics) ---------+--> scripts/generate_catalog.py
+queries/hunting/*.json (115 hunting analytics) --------+--> scripts/generate_catalog.py
                                                              |
                                                              +--> CATALOG.md
                                                              +--> queries/catalog.json

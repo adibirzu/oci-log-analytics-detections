@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-09T20:48:02.046819+00:00",
+  "generated_at": "2026-06-10T15:23:48.287584+00:00",
   "total_rules": 528,
   "total_base_rules": 468,
   "total_sentinel_queries": 60,
   "total_app_queries": 55,
-  "total_hunting": 98,
-  "total_content_items": 681,
+  "total_hunting": 115,
+  "total_content_items": 698,
   "inventory": {
     "source_yaml_rules": 454,
     "source_rule_breakdown": {
@@ -21,14 +21,14 @@
     "generated_app_queries": 55,
     "source_derived_app_queries": 8,
     "curated_app_queries": 47,
-    "generated_hunting_queries": 98,
+    "generated_hunting_queries": 115,
     "generated_sigma_queries": 476,
-    "total_query_artifacts": 681,
+    "total_query_artifacts": 698,
     "legacy_dirs": {
       "logandetectionqueries": 0,
       "logandetectionrules": 0
     },
-    "combined_mitre_techniques": 231,
+    "combined_mitre_techniques": 233,
     "combined_mitre_tactics": 14
   },
   "platforms": {
@@ -356,6 +356,7 @@
     "T1087",
     "T1087.001",
     "T1087.002",
+    "T1087.004",
     "T1090",
     "T1090.001",
     "T1090.004",
@@ -374,6 +375,7 @@
     "T1113",
     "T1114",
     "T1115",
+    "T1119",
     "T1127.001",
     "T1132",
     "T1133",
@@ -20850,6 +20852,28 @@
       "content_surface": "hunting"
     },
     {
+      "title": "Linux Unusual Outbound Connection Frequency",
+      "description": "Detects hosts making an unusually high number of outbound connections, which may indicate C2 beaconing, data exfiltration, or scanning activity.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1071",
+        "T1041"
+      ],
+      "references": [],
+      "file": "hunting/linux_outbound_connection_frequency.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "Linux Persistence Indicator Score (Combined Methods)",
       "description": "Calculates a persistence risk score per host by counting distinct persistence mechanism indicators (crontab, systemd, authorized_keys, shell profiles, at-jobs, sudoers). A host with multiple persistence vectors indicates thorough attacker entrenchment. Uses combined scoring (Threat Hunter's Cookbook: Combined Methods - risk scoring).",
       "level": "high",
@@ -20873,6 +20897,28 @@
       "content_surface": "hunting"
     },
     {
+      "title": "Linux Process Execution from Unusual Paths",
+      "description": "Identifies processes running from world-writable or temporary directories, which is a common indicator of post-exploitation activity.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1059",
+        "T1036.005"
+      ],
+      "references": [],
+      "file": "hunting/linux_process_from_unusual_path.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "Linux Rare Process Detection (Stacking)",
       "description": "Identifies rarely-seen processes on Linux endpoints. Uses the rare value hunting technique (Threat Hunter's Cookbook: Sorting/Stacking method) to surface processes that appear fewer than 100 times across the active search window, which keeps the demo resilient for a 14-day dataset and repeated reingestion while still surfacing uncommon tooling.",
       "level": "medium",
@@ -20883,6 +20929,50 @@
       ],
       "references": [],
       "file": "hunting/linux_rare_process.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Linux Rare Process Execution by Host",
+      "description": "Surfaces processes that have only been seen on a small number of hosts, which may indicate attacker tools, backdoors, or lateral movement payloads.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1059",
+        "T1036"
+      ],
+      "references": [],
+      "file": "hunting/linux_rare_process_by_host.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Linux User Privilege Change Correlation",
+      "description": "Correlates sudo/su usage with subsequent sensitive file access or network activity, revealing post-escalation attacker behavior.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1548.003",
+        "T1003"
+      ],
+      "references": [],
+      "file": "hunting/linux_user_privilege_change_correlation.json",
       "content_lifecycle": "validated_locally",
       "detection_maturity": "curated",
       "source_confidence": "medium",
@@ -21136,6 +21226,28 @@
       "content_surface": "hunting"
     },
     {
+      "title": "OCI API Call Burst by User",
+      "description": "Detects users making an unusually high number of API calls in a short window, which may indicate automated enumeration or data exfiltration scripts.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1119",
+        "T1530"
+      ],
+      "references": [],
+      "file": "hunting/oci_api_burst_by_user.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "OCI Console Login Brute Force (Frequency Analysis)",
       "description": "Detects brute force or credential stuffing against OCI Console by counting failed login attempts per user. Uses frequency analysis (Threat Hunter's Cookbook: Sorting/Stacking method) to identify accounts with more than 3 failed attempts in the time window.",
       "level": "high",
@@ -21147,6 +21259,50 @@
       ],
       "references": [],
       "file": "hunting/oci_console_brute_force.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "OCI Cross-Compartment Activity Anomaly",
+      "description": "Identifies users operating across an unusual number of compartments, which may indicate lateral movement or reconnaissance after initial access.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1087.004",
+        "T1580"
+      ],
+      "references": [],
+      "file": "hunting/oci_cross_compartment_activity.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "OCI Failed Action Spike by Source IP",
+      "description": "Identifies source IPs with a high ratio of failed to successful API calls, which may indicate credential stuffing or permission enumeration.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1110",
+        "T1078"
+      ],
+      "references": [],
+      "file": "hunting/oci_failed_action_spike.json",
       "content_lifecycle": "validated_locally",
       "detection_maturity": "curated",
       "source_confidence": "medium",
@@ -21224,6 +21380,28 @@
       "content_surface": "hunting"
     },
     {
+      "title": "OCI Off-Hours Administrative Activity",
+      "description": "Surfaces administrative API calls occurring outside business hours (evenings, weekends), which may indicate unauthorized access or compromised accounts.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1078",
+        "T1098"
+      ],
+      "references": [],
+      "file": "hunting/oci_off_hours_activity.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "OCI Privilege Escalation Chain Detection",
       "description": "Detects potential privilege escalation by identifying users who perform a sequence of IAM operations: creating policies, groups, or dynamic groups followed by adding themselves to privileged groups. Combines multiple identity control plane events from the same principal to surface escalation chains.",
       "level": "critical",
@@ -21246,6 +21424,28 @@
       "content_surface": "hunting"
     },
     {
+      "title": "OCI Resource Deletion Wave",
+      "description": "Detects mass resource deletion patterns where multiple resources are deleted in rapid succession, indicating potential ransomware, sabotage, or account compromise.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1485",
+        "T1489"
+      ],
+      "references": [],
+      "file": "hunting/oci_resource_deletion_wave.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "OCI Resource Destruction Spike (Anomaly Detection)",
       "description": "Identifies principals performing an abnormally high number of destructive operations (delete, terminate). A spike in resource destruction from a single user may indicate a compromised account performing sabotage, ransomware-style destruction, or an insider threat. Uses threshold-based anomaly detection (Threat Hunter's Cookbook: Forecasting/Anomaly Detection method).",
       "level": "critical",
@@ -21257,6 +21457,89 @@
       ],
       "references": [],
       "file": "hunting/oci_resource_destruction_spike.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "OCI Unusual API Caller - First Seen User-Agent",
+      "description": "Identifies API calls from user-agents that have not been seen in the baseline period, which may indicate new tooling or unauthorized API access.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1087",
+        "T1078"
+      ],
+      "references": [],
+      "file": "hunting/oci_unusual_api_caller.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Octo Chaos \u2014 Stale Scenario State",
+      "description": "Identifies chaos-audit events where a scenario remains active past its TTL. Used by the chaos-cleanup playbook (tier: low) to auto-clear the registry.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/octo_chaos_stale_state.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Octo Checkout \u2014 DB Slowness Correlated With Chaos",
+      "description": "Surfaces p95 DB latency spikes on the Octo checkout workflow and splits them by whether a chaos scenario was active. Used by the coordinator db-slow-remediation playbook.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1499"
+      ],
+      "references": [],
+      "file": "hunting/octo_checkout_db_slowness.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Octo WAF Detections vs App 5xx",
+      "description": "Joins OCI WAF detection events with Shop/CRM 5xx responses using the shared X-Request-Id header. Used to build the Security Posture dashboard and to feed the waf-tighten-suggest playbook.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "references": [],
+      "file": "hunting/octo_waf_vs_app_errors.json",
       "content_lifecycle": "validated_locally",
       "detection_maturity": "curated",
       "source_confidence": "medium",
@@ -21788,6 +22071,95 @@
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Windows High-Entropy DNS Queries",
+      "description": "Surfaces DNS queries with unusually long or high-entropy domain names, which are characteristic of DNS tunneling, DGA malware, or data exfiltration over DNS.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1071.004",
+        "T1048.003"
+      ],
+      "references": [],
+      "file": "hunting/win_dns_query_entropy.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Windows Lateral Movement Timeline",
+      "description": "Correlates SMB connections, remote service creation, and WinRM sessions to build a timeline of lateral movement activity across the environment.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1021.002",
+        "T1021.006",
+        "T1021.001"
+      ],
+      "references": [],
+      "file": "hunting/win_lateral_movement_timeline.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Windows LOLBin Usage Frequency Anomaly",
+      "description": "Identifies hosts with abnormally high usage of living-off-the-land binaries (LOLBins), which may indicate fileless malware or attacker tool usage.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1218",
+        "T1059"
+      ],
+      "references": [],
+      "file": "hunting/win_lolbin_frequency_anomaly.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Windows Rare Parent-Child Process Relationships",
+      "description": "Identifies unusual parent-child process pairs that deviate from normal system behavior. Rare combinations may indicate process injection, living-off-the-land, or malware execution.",
+      "level": "medium",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1055",
+        "T1218"
+      ],
+      "references": [],
+      "file": "hunting/win_rare_parent_child_process.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
       "scheduled_rule_eligibility": "not_evaluated",
       "content_surface": "hunting"
     },

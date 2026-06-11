@@ -32,6 +32,9 @@ import oci  # noqa: E402
 from oci_config import LA_NAMESPACE, get_la_client, require_oci_config  # noqa: E402
 from redaction import redact_text  # noqa: E402
 from query_artifacts import is_saved_search_query_file  # noqa: E402
+from obs_logging import get_logger  # noqa: E402
+
+log = get_logger("parse_validate_all_queries")
 
 QUERIES_DIR = PROJECT_DIR / "queries"
 
@@ -52,6 +55,7 @@ def main(argv=None) -> int:
         client = get_la_client()
         namespace = LA_NAMESPACE
     except Exception as exc:  # noqa: BLE001
+        log.error("parse_validate.oci_auth_failed", extra={"error": str(exc)})
         print(f"OCI config/auth failed: {exc}", file=sys.stderr)
         return 3
 
@@ -96,6 +100,10 @@ def main(argv=None) -> int:
         c = by_dir[d]
         print(f"  {d:24} PASS={c['PASS']:4} FAIL={c['FAIL']:3} SKIP={c['SKIP']:3}")
     print(f"\n=== total: PASS={total['PASS']} FAIL={total['FAIL']} SKIP={total['SKIP']} (of {len(files)}) ===")
+    log.info(
+        "parse_validate.done",
+        extra={"pass": total["PASS"], "fail": total["FAIL"], "skip": total["SKIP"], "total": len(files)},
+    )
 
     fails = [r for r in results if r["status"] == "FAIL"]
     if fails:

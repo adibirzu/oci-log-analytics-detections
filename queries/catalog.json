@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-11T05:22:46.786163+00:00",
+  "generated_at": "2026-06-11T05:29:09.710882+00:00",
   "total_rules": 605,
   "total_base_rules": 545,
   "total_sentinel_queries": 60,
@@ -12087,8 +12087,7 @@
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
-        "T1558",
-        "T1558.003"
+        "T1558"
       ],
       "mitre_tactics": [
         "credential_access"

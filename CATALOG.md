@@ -451,7 +451,7 @@
 | T1558 | Kerberos Ticket Export via Mimikatz, Timeroasting: Computer Account Hash Harvest via NTP, Unconstrained Delegation TGT Capture via Rubeus monitor |
 | T1558.001 | Golden Ticket: RC4 Encrypted TGT Request |
 | T1558.002 | Silver Ticket: Forged Kerberos Service Ticket |
-| T1558.003 | Constrained Delegation S4U2Proxy Abuse via Rubeus, Kerberoasting: RC4 Encrypted Service Ticket Request, +13 more |
+| T1558.003 | Constrained Delegation S4U2Proxy Abuse via Rubeus, Kerberoasting: RC4 Encrypted Service Ticket Request, +12 more |
 | T1558.004 | AS-REP Roasting via Rubeus, Targeted AS-REP Roasting: DoNotRequirePreAuth Set |
 | T1566 | Google DNS - Exchange online autodiscover abuse, 2025-2026: Compromised Machines and Data, MELTS: 2025-2026 Attack Signal Overview |
 | T1567.002 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), BLUELIGHT: Total Detections (24h) |
@@ -1146,7 +1146,7 @@ Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** (AML.T* te
 | 172 | Targeted Kerberoasting: SPN Set on User Account | 🟠 high | T1558.003 | - | - |
 | 173 | Template Injection via Microsoft Office | 🟠 high | T1221 | 1 | - |
 | 174 | Time Provider DLL Persistence | 🟠 high | T1547.003 | 2 | - |
-| 175 | Timeroasting: Computer Account Hash Harvest via NTP | 🟠 high | T1558, T1558.003 | - | - |
+| 175 | Timeroasting: Computer Account Hash Harvest via NTP | 🟠 high | T1558 | - | - |
 | 176 | Timestomping via PowerShell | 🟠 high | T1070.006 | 10 | - |
 | 177 | Token Impersonation via Incognito | 🟠 high | T1134 | 13 | - |
 | 178 | UAC Bypass via ComputerDefaults | 🟠 high | T1548.002 | 27 | - |

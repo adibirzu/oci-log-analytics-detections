@@ -1,0 +1,35 @@
+title: "Targeted Kerberoasting: SPN Set on User Account"
+id: 441f774f-e038-4117-8fb1-2c6dc07f893b
+status: experimental
+description: >
+  Detects targeted kerberoasting, where an attacker with write access to a user
+  object sets a servicePrincipalName so the account becomes kerberoastable, then
+  requests and removes it. Indicators: Set-ADUser/Set-DomainObject writing
+  serviceprincipalname, or the targetedKerberoast tool.
+references:
+  - https://attack.mitre.org/techniques/T1558/003/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'serviceprincipalname'
+      - 'targetedKerberoast'
+      - 'Set-DomainObject'
+  selection_spn:
+    CommandLine|contains:
+      - 'Set-ADUser'
+      - '-ServicePrincipalName'
+      - 'targetedKerberoast'
+      - 'serviceprincipalname'
+  condition: selection and selection_spn
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1558.003
+falsepositives:
+  - Legitimate SPN registration for new services
+version: 1

@@ -1,0 +1,37 @@
+title: "Silver Ticket: Forged Kerberos Service Ticket"
+id: 3996bf3c-392e-47d5-b3f5-331bffe11c35
+status: experimental
+description: >
+  Detects forging of a Kerberos service ticket (silver ticket) using a captured
+  service-account or computer-account hash via mimikatz kerberos::golden with a
+  /service: and /target:, or Rubeus 'silver'. Unlike a golden ticket, it forges
+  access to a single service without contacting the DC.
+references:
+  - https://attack.mitre.org/techniques/T1558/002/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_mimikatz:
+    CommandLine|contains|all:
+      - 'kerberos::golden'
+      - '/service:'
+  selection_target:
+    CommandLine|contains:
+      - '/target:'
+      - '/rc4:'
+      - '/aes256:'
+  selection_rubeus:
+    CommandLine|contains:
+      - 'rubeus silver'
+      - 'asktgs /service'
+  condition: (selection_mimikatz and selection_target) or selection_rubeus
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1558.002
+falsepositives:
+  - None expected outside sanctioned testing
+version: 1

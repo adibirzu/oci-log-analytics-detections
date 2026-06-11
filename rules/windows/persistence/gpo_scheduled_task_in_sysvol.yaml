@@ -1,0 +1,35 @@
+title: "GPO Scheduled Task Written to SYSVOL"
+id: a215a400-3d47-4a25-863a-aa0dc21fd929
+status: experimental
+description: >
+  Detects writes of a ScheduledTasks.xml (or GPT.ini bump) under the SYSVOL
+  Policies path, the on-disk artifact left by GPO-abuse tools that push an
+  immediate scheduled task to every machine the GPO applies to.
+references:
+  - https://attack.mitre.org/techniques/T1484/001/
+  - https://attack.mitre.org/techniques/T1053/005/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_path:
+    CommandLine|contains:
+      - 'SYSVOL'
+      - 'Policies'
+  selection_file:
+    CommandLine|contains:
+      - 'ScheduledTasks.xml'
+      - 'Preferences'
+      - 'GPT.INI'
+      - 'gPCMachineExtensionNames'
+  condition: selection_path and selection_file
+level: high
+tags:
+  - attack.persistence
+  - attack.t1484.001
+  - attack.t1053.005
+falsepositives:
+  - Legitimate Group Policy Preference scheduled-task deployment
+version: 1

@@ -576,5 +576,53 @@
     },
     "minimum_events": 25,
     "optional": true
+  },
+  "genai_gateway.jsonl": {
+    "description": "SOC GenAI Gateway logs expose LLM/AI-gateway telemetry used by the MITRE ATLAS detections (prompt/completion, guardrail decision, model provenance, ATLAS technique tagging).",
+    "required_fields": [
+      "timestamp",
+      "message",
+      "service",
+      "host",
+      "client_ip",
+      "http",
+      "trace_id",
+      "span_id",
+      "genai",
+      "security",
+      "atlas",
+      "mitre"
+    ],
+    "required_nested_fields": [
+      "service.name",
+      "http.method",
+      "http.path",
+      "http.status_code",
+      "genai.request_id",
+      "genai.identity",
+      "genai.api_key_id",
+      "genai.provider",
+      "genai.model",
+      "genai.endpoint",
+      "genai.operation",
+      "genai.decision",
+      "genai.prompt_tokens",
+      "genai.completion_tokens",
+      "genai.total_tokens",
+      "genai.guardrail.action",
+      "genai.guardrail.category",
+      "genai.prompt_risk_score",
+      "genai.injection_detected",
+      "genai.jailbreak_detected",
+      "genai.data_leak_detected",
+      "atlas.tactic",
+      "atlas.technique_id",
+      "mitre.technique_id",
+      "security.severity"
+    ],
+    "field_patterns": {
+      "timestamp": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
+    "minimum_events": 50
   }
 }

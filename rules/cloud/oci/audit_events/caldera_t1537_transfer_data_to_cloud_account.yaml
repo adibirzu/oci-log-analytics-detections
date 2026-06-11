@@ -1,0 +1,26 @@
+title: Caldera/OpenAEV - Transfer Data to Cloud Account via OCI Object Storage
+id: a76fa96b-fe6c-41d2-b806-8f9c1d169424
+status: experimental
+description: >
+  Detects bulk data upload to OCI Object Storage as part of exfiltration to a
+  cloud account. OpenAEV/Caldera T1537 emulation copies staged files to an OCI
+  bucket that may be attacker-controlled or pre-authenticated for external access.
+  Triggers on PutObject API calls following unusual IAM session activity.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: oci
+  service: audit
+detection:
+  sel_put_object:
+    event_type: com.oraclecloud.objectstorage.putobject
+  condition: sel_put_object
+level: medium
+tags:
+  - attack.exfiltration
+  - attack.t1537
+falsepositives:
+  - Authorized application backup jobs writing to OCI Object Storage
+  - Data pipeline ETL processes writing output files
+  - Log archival automation
+version: 1

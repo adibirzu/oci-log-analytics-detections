@@ -417,8 +417,8 @@ def main():
             print(f"  1 JSON parser: {APP_PARSER_DISPLAY} ({len(field_mappings)} field maps)")
             print(f"  1 log source: {APP_SOURCE_DISPLAY} ({APP_SOURCE_INTERNAL})")
             return
-        print(f"  18 JSON parsers")
-        print(f"  up to 20 log sources (SOC sources skipped when native equivalent exists):")
+        print(f"  19 JSON parsers")
+        print(f"  up to 21 log sources (SOC sources skipped when native equivalent exists):")
         print(f"    - {LINUX_SOURCE_DISPLAY} ({LINUX_SOURCE_INTERNAL})")
         print(f"    - {WINDOWS_SOURCE_DISPLAY} ({WINDOWS_SOURCE_INTERNAL})")
         print(f"    - {CG_SOURCE_DISPLAY} ({CG_SOURCE_INTERNAL})")
@@ -435,6 +435,7 @@ def main():
         print(f"    - {LB_SOURCE_DISPLAY} ({LB_SOURCE_INTERNAL})")
         print(f"    - {WEBAPP_SOURCE_DISPLAY} ({WEBAPP_SOURCE_INTERNAL})")
         print(f"    - {APP_SOURCE_DISPLAY} ({APP_SOURCE_INTERNAL})")
+        print(f"    - {GENAI_SOURCE_DISPLAY} ({GENAI_SOURCE_INTERNAL})")
         print(f"    - {AZURE_CUSTOM_SOURCE_DISPLAY} ({AZURE_CUSTOM_SOURCE_INTERNAL})")
         print(f"    - {VCN_SOURCE_DISPLAY} ({VCN_SOURCE_INTERNAL})")
         print(f"    - {FW_SOURCE_DISPLAY} ({FW_SOURCE_INTERNAL})")
@@ -603,6 +604,11 @@ def main():
                   APP_PARSER_NAME, APP_PARSER_DISPLAY, APP_PARSER_DESC,
                   APP_FIELD_MAPPINGS, field_map, APP_EXAMPLE)
 
+    print("\n--- GenAI Gateway Parser ---")
+    create_parser(la_client, namespace,
+                  GENAI_PARSER_NAME, GENAI_PARSER_DISPLAY, GENAI_PARSER_DESC,
+                  GENAI_FIELD_MAPPINGS, field_map, GENAI_EXAMPLE)
+
     print("\n--- VCN Flow Parser ---")
     create_parser(la_client, namespace,
                   VCN_PARSER_NAME, VCN_PARSER_DISPLAY, VCN_PARSER_DESC,
@@ -712,6 +718,11 @@ def main():
     print("\n--- Application Telemetry Source ---")
     create_source_if_needed(
         APP_SOURCE_INTERNAL, APP_SOURCE_DISPLAY, APP_SOURCE_DESC, APP_PARSER_NAME
+    )
+
+    print("\n--- GenAI Gateway Source ---")
+    create_source_if_needed(
+        GENAI_SOURCE_INTERNAL, GENAI_SOURCE_DISPLAY, GENAI_SOURCE_DESC, GENAI_PARSER_NAME
     )
 
     print("\n--- Azure Log Analytics Custom Source ---")

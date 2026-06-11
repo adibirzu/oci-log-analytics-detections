@@ -1,0 +1,34 @@
+title: "DCSync Enablement: Replication Rights Granted via Directory Change (5136)"
+id: 0ae80906-31fb-45b7-b27e-1c7f43287871
+status: experimental
+description: >
+  Detects the persistence/setup step for DCSync, where DS-Replication-Get-Changes
+  and -Get-Changes-All rights are granted to a non-DC principal by modifying the
+  domain object ACL (Event 5136 carrying the replication control-access-right
+  GUIDs in its properties). Complements the existing 4662 DCSync detection by
+  catching the rights grant itself.
+references:
+  - https://attack.mitre.org/techniques/T1098/
+  - https://attack.mitre.org/techniques/T1003/006/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 5136
+    Properties|contains:
+      - '1131f6aa-9c07-11d1-f79f-00c04fc2dcd2'
+      - '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'
+      - '89e95b76-444d-4c62-991a-0facbeda640c'
+  condition: selection
+level: critical
+tags:
+  - attack.persistence
+  - attack.t1098
+  - attack.credential_access
+  - attack.t1003.006
+falsepositives:
+  - Legitimate delegation of replication rights to a new DC or sync service
+version: 1

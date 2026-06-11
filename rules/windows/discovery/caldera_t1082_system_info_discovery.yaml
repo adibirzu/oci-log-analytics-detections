@@ -1,0 +1,42 @@
+title: Caldera - System Information Discovery via systeminfo and WMI (Windows)
+id: 545caaf5-2e0c-4078-b249-6cec2cd95b9e
+status: experimental
+description: >
+  Detects non-APT system reconnaissance commands used by Caldera T1082 emulation.
+  The operation runs systeminfo.exe, wmic commands, and PowerShell Get-ComputerInfo
+  to enumerate OS version, hotfix history, BIOS details, and hardware specs.
+  Complements the BLUELIGHT browser-child WMI rule with general emulation patterns.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_systeminfo:
+    Image|endswith: \systeminfo.exe
+  sel_wmic_os:
+    Image|endswith: \wmic.exe
+    CommandLine|contains:
+      - 'os get'
+      - 'computersystem get'
+      - 'cpu get'
+      - 'bios get'
+      - 'qfe list'
+  sel_ps_info:
+    CommandLine|contains:
+      - 'Get-ComputerInfo'
+      - 'Get-WmiObject Win32_OperatingSystem'
+      - 'Get-CimInstance Win32_OperatingSystem'
+      - 'Get-WmiObject Win32_ComputerSystem'
+      - 'Get-WmiObject Win32_BIOS'
+      - '[System.Environment]::OSVersion'
+  condition: sel_systeminfo or sel_wmic_os or sel_ps_info
+level: low
+tags:
+  - attack.discovery
+  - attack.t1082
+falsepositives:
+  - IT inventory agents
+  - Software deployment tools checking OS compatibility
+  - Support scripts collecting environment details
+version: 1

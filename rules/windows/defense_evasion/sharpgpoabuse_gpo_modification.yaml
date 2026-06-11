@@ -1,0 +1,30 @@
+title: "GPO Abuse via SharpGPOAbuse"
+id: 776df7de-2549-410b-b89b-973006bf30dd
+status: experimental
+description: >
+  Detects SharpGPOAbuse, which weaponizes write access to a Group Policy Object
+  to add an immediate scheduled task, a local admin, or a logon/startup script
+  that executes on all linked computers. GOAD includes GPO write ACL paths.
+references:
+  - https://attack.mitre.org/techniques/T1484/001/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'SharpGPOAbuse'
+      - '--AddComputerTask'
+      - '--AddUserTask'
+      - '--AddLocalAdmin'
+      - '--GPOName'
+  condition: selection
+level: critical
+tags:
+  - attack.privilege_escalation
+  - attack.t1484.001
+falsepositives:
+  - Authorized GPO security testing
+version: 1

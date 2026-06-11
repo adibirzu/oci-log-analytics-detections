@@ -1,0 +1,29 @@
+title: "DFSCoerce MS-DFSNM Authentication Coercion"
+id: 3f8d769a-77b1-465b-956b-7540c1614005
+status: experimental
+description: >
+  Detects DFSCoerce, which abuses the MS-DFSNM (NetrDfsRemoveStdRoot /
+  NetrDfsAddStdRoot) interface to coerce a Domain Controller into
+  authenticating to an attacker-controlled host for NTLM relay.
+references:
+  - https://attack.mitre.org/techniques/T1187/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'dfscoerce'
+      - 'NetrDfsRemoveStdRoot'
+      - 'NetrDfsAddStdRoot'
+      - 'MS-DFSNM'
+  condition: selection
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1187
+falsepositives:
+  - Legitimate DFS namespace administration
+version: 1

@@ -182,6 +182,14 @@ UPLOAD_MANIFEST = [
         "description": "Application and browser telemetry (service health, traces, OWASP attacks, browser detections)"
     },
     {
+        "filename": "genai_gateway.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["genai_gateway"],
+        "upload_name": "soc-test-genai-gateway",
+        "stream_key": "soc-detection-genai-gateway",
+        "content_type": "application/octet-stream",
+        "description": "LLM/GenAI inference-gateway telemetry with MITRE ATLAS attack sequences (prompt injection, jailbreak, data leakage, model extraction, provenance failures)"
+    },
+    {
         "filename": "vcn_flow.jsonl",
         "source_candidates": SOURCE_CANDIDATE_GROUPS["vcn_flow"],
         "upload_name": "soc-test-vcn-flow",

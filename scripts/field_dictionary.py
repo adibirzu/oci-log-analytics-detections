@@ -130,6 +130,7 @@ def _default_parser_definitions() -> list[dict[str, Any]]:
         "LB",
         "WEBAPP",
         "APP",
+        "GENAI",
         "VCN",
         "FW",
         "HEALTH",

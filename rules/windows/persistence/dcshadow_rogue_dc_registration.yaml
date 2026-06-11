@@ -1,0 +1,32 @@
+title: "DCShadow Rogue Domain Controller Registration"
+id: 59ac966e-8b7d-48a4-b4af-0af2301a711b
+status: experimental
+description: >
+  Detects DCShadow, where mimikatz registers a rogue Domain Controller
+  (lsadump::dcshadow) to push malicious directory replication (e.g. SID History
+  or AdminSDHolder changes) while bypassing normal change logging.
+references:
+  - https://attack.mitre.org/techniques/T1207/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'lsadump::dcshadow'
+      - 'dcshadow'
+      - '/push'
+  selection_object:
+    CommandLine|contains:
+      - '/object:'
+      - '/attribute:'
+  condition: selection and selection_object
+level: critical
+tags:
+  - attack.defense_evasion
+  - attack.t1207
+falsepositives:
+  - None expected; DCShadow has no legitimate use
+version: 1

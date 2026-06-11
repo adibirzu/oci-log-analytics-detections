@@ -1,0 +1,33 @@
+title: "Targeted AS-REP Roasting: DoNotRequirePreAuth Set"
+id: 055a6f54-47dd-43a1-a93f-53f679272eff
+status: experimental
+description: >
+  Detects targeted AS-REP roasting, where an attacker with write access disables
+  Kerberos pre-authentication (DONT_REQ_PREAUTH) on an account so its AS-REP can
+  be requested and cracked offline. Indicators: Set-ADAccountControl
+  -DoesNotRequirePreAuth, or PowerView Set-DomainObject toggling useraccountcontrol.
+references:
+  - https://attack.mitre.org/techniques/T1558/004/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'DoesNotRequirePreAuth'
+      - 'DONT_REQ_PREAUTH'
+      - 'DONT_REQUIRE_PREAUTH'
+  selection_alt:
+    CommandLine|contains|all:
+      - 'useraccountcontrol'
+      - '4194304'
+  condition: selection or selection_alt
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1558.004
+falsepositives:
+  - Legacy accounts intentionally configured without pre-authentication
+version: 1

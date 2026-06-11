@@ -1,0 +1,47 @@
+title: Caldera - Exfiltration over C2 Channel via PowerShell (Windows)
+id: df51539f-a49a-4c31-8633-25bd6a1525a2
+status: experimental
+description: >
+  Detects PowerShell-based HTTP POST exfiltration used by Caldera T1041 emulation.
+  After staging data locally, the operation transmits collected files using
+  Invoke-WebRequest or Invoke-RestMethod with -Method POST and -Body/-InFile parameters
+  to send data back over the established C2 channel.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_iwr_post:
+    CommandLine|contains:
+      - 'Invoke-WebRequest'
+      - 'Invoke-RestMethod'
+      - 'iwr '
+      - 'irm '
+  sel_post_method:
+    CommandLine|contains:
+      - '-Method POST'
+      - '-Method Put'
+      - '-Method "POST"'
+  sel_body_or_file:
+    CommandLine|contains:
+      - '-Body'
+      - '-InFile'
+      - '-UploadFile'
+  sel_curl_post:
+    Image|endswith: \curl.exe
+    CommandLine|contains:
+      - '-X POST'
+      - '--upload-file'
+      - '-d @'
+      - '-T '
+  condition: (sel_iwr_post and sel_post_method and sel_body_or_file) or sel_curl_post
+level: high
+tags:
+  - attack.exfiltration
+  - attack.t1041
+falsepositives:
+  - DevOps pipelines POSTing build results to CI systems
+  - Application monitoring agents posting health data
+  - Legitimate webhook integrations
+version: 1

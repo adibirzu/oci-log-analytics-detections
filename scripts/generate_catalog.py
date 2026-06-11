@@ -286,6 +286,32 @@ def generate_markdown(queries, app_queries, hunting, inventory=None):
             w(f"| {tech} | {names} |")
         w("")
 
+    # --- MITRE ATLAS (AI/ML) Matrix ---
+    atlas_matrix = defaultdict(list)
+    for q in list(queries) + list(app_queries) + list(hunting):
+        at = q.get("atlas", {})
+        for tech in at.get("techniques", []):
+            atlas_matrix[tech].append(q["title"])
+    if atlas_matrix:
+        atlas_tactics = sorted({t for q in (list(queries) + list(app_queries) + list(hunting))
+                                for t in q.get("atlas", {}).get("tactics", [])})
+        w("## MITRE ATLAS Coverage (AI / ML Systems)")
+        w("")
+        w(
+            f"Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** "
+            f"(AML.T* techniques). **{len(atlas_matrix)} ATLAS techniques** across "
+            f"**{len(atlas_tactics)} tactics**, detected on `SOC Application Logs` and the "
+            f"`SOC GenAI Gateway Logs` source."
+        )
+        w("")
+        w("| ATLAS Technique | Detections |")
+        w("|-----------------|------------|")
+        for tech in sorted(atlas_matrix.keys()):
+            names = atlas_matrix[tech]
+            shown = ", ".join(names) if len(names) <= 3 else f"{', '.join(names[:2])}, +{len(names)-2} more"
+            w(f"| {tech} | {shown} |")
+        w("")
+
     # --- Full Rule Table by Platform ---
     w("## All Detection Rules")
     w("")
@@ -432,6 +458,8 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
         "mitre_tactics": [],
         "all_mitre_techniques": [],
         "all_mitre_tactics": [],
+        "atlas_techniques": [],
+        "atlas_tactics": [],
         "stig_controls": [],
         "rules": [],
         "sentinel_queries": [],
@@ -483,6 +511,8 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
             "platform": p,
             "mitre_techniques": ma.get("techniques", []),
             "mitre_tactics": [t for t in ma.get("tactics", []) if t in VALID_MITRE_TACTICS],
+            "atlas_techniques": q.get("atlas", {}).get("techniques", []),
+            "atlas_tactics": q.get("atlas", {}).get("tactics", []),
             "stig_ids": q.get("stig_ids", []),
             "stig_category": q.get("stig_category", ""),
             "references": q.get("references", []),
@@ -536,6 +566,8 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
             "source_derived": bool(q.get("sigma_id")),
             "mitre_techniques": q.get("mitre_attack", {}).get("techniques", []),
             "mitre_tactics": [t for t in q.get("mitre_attack", {}).get("tactics", []) if t in VALID_MITRE_TACTICS],
+            "atlas_techniques": q.get("atlas", {}).get("techniques", []),
+            "atlas_tactics": q.get("atlas", {}).get("tactics", []),
             "references": q.get("references", []),
             "file": q.get("_file", ""),
             **maturity_fields(q, "app"),
@@ -564,6 +596,20 @@ def generate_json_catalog(queries, app_queries, hunting, inventory=None):
         "coverage_percent": round(len(with_art) / len(testable) * 100, 1) if testable else 0,
         "total_test_mappings": total_tests,
     }
+
+    # MITRE ATLAS (AI/ML) coverage — collected from the `atlas` block on any
+    # surface (detection queries, app/APM analytics, hunting). ATLAS techniques
+    # use AML.T* IDs and live alongside, not within, the ATT&CK matrix.
+    atlas_techniques = set()
+    atlas_tactics = set()
+    for q in list(queries) + list(app_queries) + list(hunting):
+        at = q.get("atlas", {})
+        atlas_techniques.update(at.get("techniques", []))
+        atlas_tactics.update(at.get("tactics", []))
+    catalog["atlas_techniques"] = sorted(atlas_techniques)
+    catalog["atlas_tactics"] = sorted(atlas_tactics)
+    catalog["inventory"]["atlas_techniques"] = len(atlas_techniques)
+    catalog["inventory"]["atlas_tactics"] = len(atlas_tactics)
 
     return catalog
 
@@ -601,8 +647,16 @@ def main():
         all_tactics.update(ma.get("tactics", []))
     all_tactics &= VALID_MITRE_TACTICS
 
+    atlas_techs = set()
+    atlas_tacts = set()
+    for q in queries + app_queries + hunting:
+        at = q.get("atlas", {})
+        atlas_techs.update(at.get("techniques", []))
+        atlas_tacts.update(at.get("tactics", []))
+
     print(f"\n  Rules: {len(queries)} | Apps: {len(app_queries)} | Hunting: {len(hunting)}")
-    print(f"  MITRE: {len(all_techs)} techniques, {len(all_tactics)} tactics")
+    print(f"  MITRE ATT&CK: {len(all_techs)} techniques, {len(all_tactics)} tactics")
+    print(f"  MITRE ATLAS:  {len(atlas_techs)} techniques, {len(atlas_tacts)} tactics")
     print(f"  STIG: {len([q for q in queries if q.get('stig_ids')])} rules")
 
 

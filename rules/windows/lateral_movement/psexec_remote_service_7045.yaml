@@ -1,0 +1,41 @@
+title: "PsExec-style Remote Service Installation (Event 7045)"
+id: c5603452-cf16-4a99-8cad-e792c22c3200
+status: experimental
+description: >
+  Detects creation of a Windows service (System Event 7045) whose binary path is
+  a randomly named or admin-share executable, the on-host artifact of PsExec /
+  impacket smbexec / paexec lateral movement. Pairs with the existing
+  process-creation PsExec rules by catching the service-control-manager record.
+references:
+  - https://attack.mitre.org/techniques/T1569/002/
+  - https://attack.mitre.org/techniques/T1021/002/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 7045
+  selection_svc:
+    ServiceName|contains:
+      - 'PSEXESVC'
+      - 'PAExec'
+      - 'RemCom'
+      - 'csexec'
+  selection_path:
+    ServiceFileName|contains:
+      - 'ADMIN$'
+      - 'Temp'
+      - 'system32'
+      - '.bat'
+  condition: selection and (selection_svc or selection_path)
+level: high
+tags:
+  - attack.execution
+  - attack.t1569.002
+  - attack.lateral_movement
+  - attack.t1021.002
+falsepositives:
+  - Legitimate third-party service installs and software deployment agents
+version: 1

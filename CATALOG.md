@@ -1,6 +1,6 @@
 # Detection Rule Catalog
 
-> **468 base detection queries** + **60 Microsoft Sentinel conversions** + **55 app/APM queries** + **98 hunting queries**
+> **468 base detection queries** + **60 Microsoft Sentinel conversions** + **55 app/APM queries** + **115 hunting queries**
 
 ## Summary
 
@@ -9,7 +9,7 @@
 | Base detection queries | 468 | Sigma-derived detections in `queries/` |
 | Microsoft Sentinel conversions | 60 | Source-derived converted detections in `queries/sentinel/` |
 | App/APM queries | 55 | 8 Sigma-derived browser detections + 47 curated analytics in `queries/apps/` |
-| Hunting queries | 98 | Curated analytics and correlation content in `queries/hunting/` |
+| Hunting queries | 115 | Curated analytics and correlation content in `queries/hunting/` |
 
 **Source YAML rules:** 454 total (cloud: 100, linux: 67, web: 38, windows: 249)
 
@@ -33,7 +33,7 @@
 
 ## MITRE ATT&CK Coverage
 
-**231 techniques** across **14 tactics**
+**233 techniques** across **14 tactics**
 
 ### Reconnaissance (4 techniques)
 
@@ -51,7 +51,7 @@
 | T1583 | OCI Action: CreateSubnet, OCI Action: CreateVcn |
 | T1583.003 | OCI Action: CreateInstance |
 
-### Initial Access (57 techniques)
+### Initial Access (58 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -69,13 +69,14 @@
 | T1070 | McAfee ePO - Multiple threats on same host, McAfee ePO - Threat was not blocked |
 | T1071 | ApexOne - Top sources with alerts, MELTS: 2025-2026 Attack Timeline |
 | T1071.001 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), +9 more |
-| T1078 | API Endpoint Unauthorized Access Attempts, OCI Console Login Failure, +8 more |
+| T1078 | API Endpoint Unauthorized Access Attempts, OCI Console Login Failure, +10 more |
 | T1082 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1083 | WAF Path Traversal Attack Blocked, BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
+| T1087 | OCI Unusual API Caller - First Seen User-Agent |
 | T1095 | ApexOne - Top sources with alerts |
 | T1098 | OCI IAM and Fusion Activity Correlation |
 | T1105 | BLUELIGHT APT37 Kill Chain Correlation |
-| T1110 | OWASP Attack Detection (CRM + Drone Shop), Security Attack Source IP Analysis, +4 more |
+| T1110 | OWASP Attack Detection (CRM + Drone Shop), Security Attack Source IP Analysis, +5 more |
 | T1110.001 | Linux SSH Failed Login, SSH Brute Force Detection (Frequency Analysis) |
 | T1110.003 | OCI Password Spraying Attack |
 | T1110.004 | FLF: Credential Stuffing Pattern, OCI Multiple Users from Same IP (Grouping) |
@@ -85,7 +86,7 @@
 | T1185 | APM: Clickjacking - Missing Frame Protection Headers, APM: CSRF Token Missing or Invalid on State-Changing Request |
 | T1187 | Google DNS - Exchange online autodiscover abuse |
 | T1189 | BLUELIGHT RAT: Internet Explorer Drive-by Compromise, WAF CORS Bypass Attempt Blocked, +14 more |
-| T1190 | API Endpoint Unauthorized Access Attempts, APM: SQL Injection Attack in Request, +43 more |
+| T1190 | API Endpoint Unauthorized Access Attempts, APM: SQL Injection Attack in Request, +44 more |
 | T1195 | Google DNS - Malicous Python packages, McAfee ePO - Multiple threats on same host, McAfee ePO - Threat was not blocked |
 | T1202 | ApexOne - Top sources with alerts |
 | T1203 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), +2 more |
@@ -113,7 +114,7 @@
 | T1606 | OCI Federated Identity Provider Modified |
 | T1621 | OCI MFA Fatigue Attack Indicators |
 
-### Execution (66 techniques)
+### Execution (67 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -125,14 +126,15 @@
 | T1021.002 | Sysmon PsExec Named Pipe |
 | T1021.006 | Sysmon Lateral Movement via WinRM |
 | T1027 | Windows Encoded PowerShell Execution, Windows PowerShell Suspicious Script Block, +7 more |
-| T1036 | CyberArkEPM - Unexpected executable extension, Hunting: GOAD/Apex Caldera Sandcat Agent Activity, Windows Process from Unusual Path (Rare Value Analysis) |
+| T1036 | CyberArkEPM - Unexpected executable extension, Hunting: GOAD/Apex Caldera Sandcat Agent Activity, +2 more |
+| T1036.005 | Linux Process Execution from Unusual Paths |
 | T1041 | 2025-2026: Compromised Machines and Data, MELTS: Attack Path Link Drilldown, +2 more |
 | T1047 | Windows Management Instrumentation Event Subscription, WMI Process Execution via Wmic |
 | T1053 | Critical Risks, Vulerabilities |
 | T1053.005 | Suspicious Scheduled Task Creation, Hunting: GOAD/Apex Caldera Sandcat Agent Activity |
-| T1055 | ApexOne - Top sources with alerts |
+| T1055 | ApexOne - Top sources with alerts, Windows Rare Parent-Child Process Relationships |
 | T1056.001 | APM: Suspicious JavaScript Execution Patterns, BLUELIGHT: Attack Path (per Host) |
-| T1059 | Insecure Deserialization Attack Detected, Linux Process Execution from /dev/shm, +24 more |
+| T1059 | Insecure Deserialization Attack Detected, Linux Process Execution from /dev/shm, +27 more |
 | T1059.001 | ClickFix Fake CAPTCHA PowerShell Execution, PowerShell Execution via Alternate Shell, +12 more |
 | T1059.003 | CMD: Suspicious Command Execution (Real Windows Security Events) |
 | T1059.004 | Linux Bind Shell Listener, Linux Boopkit eBPF Rootkit Activity, +3 more |
@@ -161,7 +163,7 @@
 | T1203 | BLUELIGHT RAT: Browser Spawning Suspicious Child Process, Office Apps Launching Wscipt, +4 more |
 | T1204 | ClickFix Fake CAPTCHA PowerShell Execution, OCI Action: StartInstance, +34 more |
 | T1204.002 | BLUELIGHT RAT: YARA PDB Path Indicators (APT_MAL_Win_BlueLight), VBA Macro Spawning Suspicious Child Process, +4 more |
-| T1218 | Control Panel Item Execution, SyncAppvPublishingServer Abuse, +3 more |
+| T1218 | Control Panel Item Execution, SyncAppvPublishingServer Abuse, +5 more |
 | T1218.005 | MSHTA JavaScript Execution, ClickFix: LOLBin Payload Execution |
 | T1218.011 | DLL Execution via Rundll32 from User Path, ClickFix: LOLBin Payload Execution |
 | T1219 | MELTS: 2025-2026 Attack Signal Overview |
@@ -198,8 +200,8 @@
 | T1059.004 | Linux Multi-Stage Attack Indicators (Combined Methods) |
 | T1070 | McAfee ePO - Multiple threats on same host |
 | T1071 | Apache - Unexpected Post Requests |
-| T1078 | Cisco Duo - Admin password reset, OCI IAM and Fusion Activity Correlation, +2 more |
-| T1098 | OCI IAM Policy Modified, OCI User Password Reset by Admin, +6 more |
+| T1078 | Cisco Duo - Admin password reset, OCI IAM and Fusion Activity Correlation, +3 more |
+| T1098 | OCI IAM Policy Modified, OCI User Password Reset by Admin, +7 more |
 | T1098.001 | OCI Action: AddUserToGroup, OCI API Key Uploaded, OCI Dynamic Group Created |
 | T1098.004 | Linux SSH Authorized Keys Modified, Linux Persistence Indicator Score (Combined Methods) |
 | T1100 | Apache - Unexpected Post Requests |
@@ -247,10 +249,11 @@
 | T1574.006 | Linux LD_PRELOAD Library Hijacking |
 | T1583 | OCI Action: AttachInternetGateway, OCI Action: CreateInternetGateway, OCI Action: CreateRouteTable |
 
-### Privilege Escalation (37 techniques)
+### Privilege Escalation (38 techniques)
 
 | Technique | Rules |
 |-----------|-------|
+| T1003 | Linux User Privilege Change Correlation |
 | T1003.006 | Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain, Hunting: GOAD/Apex Caldera Attack Chain (Multi-Stage) |
 | T1021 | Hunting: Logon Anomaly - Account Activity Profiling |
 | T1053 | Critical Risks, Vulerabilities |
@@ -280,7 +283,7 @@
 | T1548 | Critical Risks, VMWare-LPE-2022-22960, Vulerabilities |
 | T1548.001 | Linux Setuid Binary Creation |
 | T1548.002 | AlwaysInstallElevated Exploitation, UAC Bypass via ComputerDefaults, +4 more |
-| T1548.003 | Linux Sudo Usage, Linux Sudoers File Modification |
+| T1548.003 | Linux Sudo Usage, Linux Sudoers File Modification, Linux User Privilege Change Correlation |
 | T1550.003 | Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain, Hunting: GOAD/Apex Caldera Attack Chain (Multi-Stage) |
 | T1558.003 | Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain, Hunting: GOAD/Apex Caldera Attack Chain (Multi-Stage) |
 | T1562 | McAfee ePO - Multiple threats on same host, McAfee ePO - Threat was not blocked |
@@ -289,7 +292,7 @@
 | T1574.011 | DLL Hijacking via Service Registry Permission, Service Permissions Weakness Discovery |
 | T1611 | Linux Container Escape Attempt |
 
-### Defense Evasion (81 techniques)
+### Defense Evasion (82 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -297,18 +300,18 @@
 | T1012 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1014 | Linux Boopkit eBPF Rootkit Activity |
 | T1027 | BLUELIGHT RAT: Obfuscated Script Execution, Windows Encoded PowerShell Execution, +8 more |
-| T1036 | CyberArkEPM - Unexpected executable extension, Hunting: GOAD/Apex Caldera Sandcat Agent Activity, Windows Process from Unusual Path (Rare Value Analysis) |
+| T1036 | CyberArkEPM - Unexpected executable extension, Hunting: GOAD/Apex Caldera Sandcat Agent Activity, +2 more |
 | T1036.003 | Renamed System Binary Execution |
-| T1036.005 | Masquerading System Binary in Non-Standard Path |
+| T1036.005 | Masquerading System Binary in Non-Standard Path, Linux Process Execution from Unusual Paths |
 | T1048.003 | FLF: BITS Exfiltration Hunt |
 | T1053.005 | Hunting: GOAD/Apex Caldera Sandcat Agent Activity |
-| T1055 | Process Ghosting or Herpaderping, Sysmon Cobalt Strike Named Pipe, +2 more |
+| T1055 | Process Ghosting or Herpaderping, Sysmon Cobalt Strike Named Pipe, +3 more |
 | T1055.001 | Process Injection via CreateRemoteThread |
 | T1055.008 | Linux Process Injection via Ptrace |
 | T1055.012 | Windows Process Hollowing Indicators |
 | T1055.013 | Process Doppelganging via TxF |
 | T1056.001 | BLUELIGHT: Attack Path (per Host) |
-| T1059 | Detect Suspicious Commands Initiated by Webserver Processes, Doppelpaymer Stop Services, +3 more |
+| T1059 | Detect Suspicious Commands Initiated by Webserver Processes, Doppelpaymer Stop Services, +6 more |
 | T1059.001 | Windows Encoded PowerShell Execution, Windows PowerShell Suspicious Script Block, +3 more |
 | T1059.004 | Linux Boopkit eBPF Rootkit Activity, Linux Rare Process Detection (Stacking) |
 | T1059.007 | ClickFix: LOLBin Payload Execution |
@@ -321,12 +324,13 @@
 | T1070.006 | Timestomping via PowerShell |
 | T1071 | Sysmon Cobalt Strike Named Pipe, ApexOne - Top sources with alerts |
 | T1071.001 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), +2 more |
+| T1078 | OCI Off-Hours Administrative Activity |
 | T1082 | Detect Suspicious Commands Initiated by Webserver Processes, BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1083 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1087 | Detect Suspicious Commands Initiated by Webserver Processes |
 | T1090.004 | FLF: Domain Fronting CDN C2 Hunt |
 | T1095 | Linux Boopkit eBPF Rootkit Activity, ApexOne - Top sources with alerts |
-| T1098 | OCI After-Hours IAM Activity (Time-Based Anomaly) |
+| T1098 | OCI After-Hours IAM Activity (Time-Based Anomaly), OCI Off-Hours Administrative Activity |
 | T1105 | Sysmon Suspicious Outbound Connection from LOLBin, Windows Certutil Download or Decode, BLUELIGHT APT37 Kill Chain Correlation |
 | T1112 | ApexOne - Top sources with alerts |
 | T1113 | BLUELIGHT APT37 Kill Chain Correlation |
@@ -341,7 +345,7 @@
 | T1202 | Indirect Command Execution via Forfiles, ApexOne - Top sources with alerts |
 | T1203 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1204 | ApexOne - Top sources with alerts, CyberArkEPM - Unexpected executable extension, +2 more |
-| T1218 | Sysmon Suspicious Outbound Connection from LOLBin, Windows LOLBin Usage: at, +20 more |
+| T1218 | Sysmon Suspicious Outbound Connection from LOLBin, Windows LOLBin Usage: at, +22 more |
 | T1218.001 | Compiled HTML File Execution |
 | T1218.003 | CMSTP UAC Bypass |
 | T1218.004 | InstallUtil Application Whitelisting Bypass |
@@ -375,11 +379,11 @@
 | T1600 | OCI Vault Key Rotation Overdue |
 | T1620 | Reflective DLL Loading Indicators |
 
-### Credential Access (56 techniques)
+### Credential Access (57 techniques)
 
 | Technique | Rules |
 |-----------|-------|
-| T1003 | Internal Monologue NTLM Hash Theft, Windows Credential Dumping via Secretsdump, +3 more |
+| T1003 | Internal Monologue NTLM Hash Theft, Windows Credential Dumping via Secretsdump, +4 more |
 | T1003.001 | Credential Dumping via Comsvcs with Rundll32, Credential Dumping via Windows Task Manager, +11 more |
 | T1003.002 | SAM Database Extraction via Reg Save |
 | T1003.003 | NTDS.dit Database Copy Attempt, Windows NTDS.dit Database Extraction |
@@ -395,12 +399,12 @@
 | T1059 | OWASP Attack Detection (CRM + Drone Shop), 2025-2026: Compromised Machines and Data, OWASP Multi-Stage Web Attack Chain (Combined Methods) |
 | T1059.001 | Hunting: Credential Attack Correlation (PowerShell + Mimikatz + Kerberoast), MELTS: 2025-2026 Attack Signal Overview |
 | T1071.001 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), +8 more |
-| T1078 | FLF: Credential Stuffing Pattern, Hunting: Logon Anomaly - Account Activity Profiling, +2 more |
+| T1078 | FLF: Credential Stuffing Pattern, Hunting: Logon Anomaly - Account Activity Profiling, +3 more |
 | T1082 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1083 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1098.001 | OCI Customer Secret Key Created |
 | T1105 | BLUELIGHT APT37 Kill Chain Correlation |
-| T1110 | Cloud Guard Problem: IAM User Console Password Old, WAF Rate Limiting Triggered, +8 more |
+| T1110 | Cloud Guard Problem: IAM User Console Password Old, WAF Rate Limiting Triggered, +9 more |
 | T1110.001 | Brute Force: Failed Logon Spike per Account, Linux SSH Failed Login, +5 more |
 | T1110.003 | Brute Force: Failed Logon Spike per Account, OCI Password Spraying Attack, +3 more |
 | T1110.004 | FLF: Credential Stuffing Pattern |
@@ -417,6 +421,7 @@
 | T1530 | Cloud Identity: AiTM Token Abuse, MELTS: 2025-2026 Attack Signal Overview, Web-to-Cloud: Compromised Cloud Identity |
 | T1538 | Cloud Identity: AiTM Token Abuse |
 | T1539 | BLUELIGHT RAT: YARA Chrome/Edge Cookie Theft (APT_MAL_Win_BlueLight_B), Web Application Session Hijacking Indicators, APM: Session Hijacking - Rapid Session Changes |
+| T1548.003 | Linux User Privilege Change Correlation |
 | T1550.003 | Pass-the-Ticket: Excessive Explicit Credential Logons, Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain, Hunting: GOAD/Apex Caldera Attack Chain (Multi-Stage) |
 | T1550.004 | Web Application Session Hijacking Indicators, APM: Session Hijacking - Rapid Session Changes |
 | T1552.001 | Credential File Discovery, WiFi Password Extraction via Netsh |
@@ -436,7 +441,7 @@
 | T1580 | Web-to-Cloud: Compromised Cloud Identity |
 | T1649 | Credential Access via Certutil Certificate Export |
 
-### Discovery (36 techniques)
+### Discovery (38 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -453,11 +458,13 @@
 | T1069.001 | Local Group Membership Discovery |
 | T1069.002 | Security Group Enumeration: Rapid Membership Queries, Sysmon LDAP Reconnaissance |
 | T1071.001 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), BLUELIGHT: Total Detections (24h) |
+| T1078 | OCI Unusual API Caller - First Seen User-Agent |
 | T1082 | BLUELIGHT RAT: WMI System Enumeration from Browser Child, BLUELIGHT RAT: YARA System Reconnaissance JSON (APT_MAL_Win_BlueLight), +4 more |
 | T1083 | BLUELIGHT RAT: File Discovery from Browser Process, File and Directory Discovery via dir, +2 more |
-| T1087 | Windows Account or Group Enumeration Spike, Detect Suspicious Commands Initiated by Webserver Processes |
+| T1087 | Windows Account or Group Enumeration Spike, Detect Suspicious Commands Initiated by Webserver Processes, OCI Unusual API Caller - First Seen User-Agent |
 | T1087.001 | Windows Account Discovery Commands |
 | T1087.002 | AD Enumeration via ADFind, BloodHound AD Enumeration, +3 more |
+| T1087.004 | OCI Cross-Compartment Activity Anomaly |
 | T1105 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1113 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1135 | Network Share Enumeration via Net View, Windows Network Share Discovery |
@@ -475,23 +482,24 @@
 | T1567 | Web-to-Cloud: OCI Audit Cloud Abuse |
 | T1567.002 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), BLUELIGHT: Total Detections (24h) |
 | T1574 | Detect Suspicious Commands Initiated by Webserver Processes |
-| T1580 | OCI Cloud Infrastructure Discovery, Web-to-Cloud: OCI Audit Cloud Abuse, Web-to-Cloud: Compromised Cloud Identity |
+| T1580 | OCI Cloud Infrastructure Discovery, OCI Cross-Compartment Activity Anomaly, +2 more |
 
-### Lateral Movement (26 techniques)
+### Lateral Movement (28 techniques)
 
 | Technique | Rules |
 |-----------|-------|
 | T1003.006 | Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain, Hunting: GOAD/Apex Caldera Attack Chain (Multi-Stage) |
 | T1021 | OCI Bastion Session Created, OCI Instance Console Connection Created, +3 more |
-| T1021.001 | RDP Session Hijacking via tscon, SharpRDP Lateral Movement, +2 more |
-| T1021.002 | Lateral Movement: Account Authenticating from Multiple Sources, PsExec Service Installation, +6 more |
+| T1021.001 | RDP Session Hijacking via tscon, SharpRDP Lateral Movement, +3 more |
+| T1021.002 | Lateral Movement: Account Authenticating from Multiple Sources, PsExec Service Installation, +7 more |
 | T1021.003 | DCOM Lateral Movement via MMC20 |
 | T1021.004 | FLF: Port Knocking Sequence Drilldown |
-| T1021.006 | Lateral Movement: Account Authenticating from Multiple Sources, Sysmon Lateral Movement via WinRM, +2 more |
+| T1021.006 | Lateral Movement: Account Authenticating from Multiple Sources, Sysmon Lateral Movement via WinRM, +3 more |
 | T1039 | Windows Administrative Share Access Spike |
 | T1059.001 | Sysmon Lateral Movement via WinRM |
 | T1071.001 | RMM: Post-Compromise Remote Access Activity |
 | T1078 | Hunting: Logon Anomaly - Account Activity Profiling |
+| T1087.004 | OCI Cross-Compartment Activity Anomaly |
 | T1095 | FLF: Port Knocking Sequence Drilldown |
 | T1110.001 | Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain, Hunting: GOAD/Apex Caldera Attack Chain (Multi-Stage) |
 | T1133 | Apache - Apache 2.4.49 flaw CVE-2021-41773 |
@@ -506,9 +514,10 @@
 | T1558.003 | Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain, Hunting: GOAD/Apex Caldera Attack Chain (Multi-Stage) |
 | T1569.002 | Sysmon PsExec Named Pipe, Windows PsExec Remote Execution |
 | T1570 | Lateral Tool Transfer via Robocopy, Sysmon Lateral Movement via SMB, Windows Lateral Movement Tool Cluster (Grouping) |
+| T1580 | OCI Cross-Compartment Activity Anomaly |
 | T1599 | OCI DRG Attachment Created, OCI Local Peering Gateway Created, OCI Service Gateway Created |
 
-### Collection (33 techniques)
+### Collection (34 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -530,11 +539,12 @@
 | T1113 | BLUELIGHT RAT: Periodic Screen Capture, Screen Capture via PowerShell, +2 more |
 | T1114 | BLUELIGHT RAT: YARA Chrome/Edge Cookie Theft (APT_MAL_Win_BlueLight_B), Email Collection via PowerShell, OCI Notification Subscription Created |
 | T1115 | Clipboard Data Collection |
+| T1119 | OCI API Call Burst by User |
 | T1189 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), BLUELIGHT: Total Detections (24h) |
 | T1203 | Office Apps Launching Wscipt, BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1496 | APM: Suspicious JavaScript Execution Patterns |
 | T1528 | Cloud Identity: AiTM Token Abuse |
-| T1530 | OCI Action: CreateBucket, Cloud Identity: AiTM Token Abuse, +4 more |
+| T1530 | OCI Action: CreateBucket, Cloud Identity: AiTM Token Abuse, +5 more |
 | T1538 | Cloud Identity: AiTM Token Abuse |
 | T1539 | BLUELIGHT RAT: YARA Chrome/Edge Cookie Theft (APT_MAL_Win_BlueLight_B) |
 | T1552.001 | Sensitive Data Endpoint Access |
@@ -555,9 +565,9 @@
 | T1021.004 | FLF: Port Knocking Sequence Drilldown |
 | T1027 | Cisco Cloud Security - Windows PowerShell User-Agent Detected, BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1036 | Hunting: GOAD/Apex Caldera Sandcat Agent Activity |
-| T1041 | Cisco Cloud Security - Crypto Miner User-Agent Detected, C2: Destination IP Drilldown, +10 more |
+| T1041 | Cisco Cloud Security - Crypto Miner User-Agent Detected, C2: Destination IP Drilldown, +11 more |
 | T1048 | DNS Exfiltration Detection (Entropy Analysis) |
-| T1048.003 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection, +2 more |
+| T1048.003 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection, +3 more |
 | T1053.005 | Hunting: GOAD/Apex Caldera Sandcat Agent Activity |
 | T1055 | Sysmon Cobalt Strike Named Pipe, ApexOne - Top sources with alerts |
 | T1056.001 | BLUELIGHT: Attack Path (per Host) |
@@ -566,9 +576,9 @@
 | T1059.004 | Linux Boopkit eBPF Rootkit Activity |
 | T1059.006 | CrashFix: Python RAT Activity |
 | T1068 | ApexOne - Top sources with alerts |
-| T1071 | Sysmon Cobalt Strike Named Pipe, Sysmon Suspicious Named Pipe Pattern, +8 more |
+| T1071 | Sysmon Cobalt Strike Named Pipe, Sysmon Suspicious Named Pipe Pattern, +9 more |
 | T1071.001 | BLUELIGHT RAT: C2 via Microsoft Graph API, BLUELIGHT RAT: YARA Google App C2 Communication (APT_MAL_Win_BlueLight_B), +27 more |
-| T1071.004 | Linux DNS Tunneling Detected, Sysmon DNS Data Exfiltration, +10 more |
+| T1071.004 | Linux DNS Tunneling Detected, Sysmon DNS Data Exfiltration, +11 more |
 | T1082 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1083 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1090 | Linux Proxy and Tunneling Tool Detected |
@@ -605,7 +615,7 @@
 | T1573 | Linux Encrypted Channel C2 Communication, Sysmon C2 Beacon - Periodic Outbound HTTPS, C2 Beaconing Detection (Periodic Connection Analysis) |
 | T1573.002 | Linux Encrypted Channel C2 Communication |
 
-### Exfiltration (42 techniques)
+### Exfiltration (43 techniques)
 
 | Technique | Rules |
 |-----------|-------|
@@ -613,17 +623,17 @@
 | T1012 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1020 | Deimos Component Execution |
 | T1027 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
-| T1041 | Unusually Large HTTP Response (Data Exfiltration), Cisco Cloud Security - Crypto Miner User-Agent Detected, +14 more |
+| T1041 | Unusually Large HTTP Response (Data Exfiltration), Cisco Cloud Security - Crypto Miner User-Agent Detected, +15 more |
 | T1048 | Linux Exfiltration Over Alternative Protocol, Unusually Large HTTP Response (Data Exfiltration), DNS Exfiltration Detection (Entropy Analysis) |
-| T1048.003 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection, +3 more |
+| T1048.003 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection, +4 more |
 | T1055 | ApexOne - Top sources with alerts |
 | T1056.001 | BLUELIGHT: Attack Path (per Host) |
 | T1059 | Deimos Component Execution, 2025-2026: Compromised Machines and Data, +2 more |
 | T1059.001 | MELTS: 2025-2026 Attack Signal Overview |
 | T1068 | ApexOne - Top sources with alerts |
-| T1071 | ApexOne - Top sources with alerts, MELTS: 2025-2026 Attack Timeline |
+| T1071 | ApexOne - Top sources with alerts, Linux Unusual Outbound Connection Frequency, MELTS: 2025-2026 Attack Timeline |
 | T1071.001 | Cisco Cloud Security - Crypto Miner User-Agent Detected, BLUELIGHT APT37 Kill Chain Correlation, +14 more |
-| T1071.004 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection, +3 more |
+| T1071.004 | Sysmon DNS Data Exfiltration, Sysmon DNS Tunneling via Network Connection, +4 more |
 | T1074.001 | Windows Data Staging for Exfiltration, Linux Data Staging and Exfiltration Indicators |
 | T1082 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1083 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
@@ -632,6 +642,7 @@
 | T1105 | BLUELIGHT APT37 Kill Chain Correlation |
 | T1112 | ApexOne - Top sources with alerts |
 | T1113 | BLUELIGHT APT37 Kill Chain Correlation |
+| T1119 | OCI API Call Burst by User |
 | T1189 | ApexOne - Top sources with alerts, BLUELIGHT APT37 Kill Chain Correlation, +3 more |
 | T1190 | Web-to-Cloud: Attack Path Link Analysis, Web-to-Cloud: Correlated Attack Timeline, Web-to-Cloud: MITRE Stage Breakdown |
 | T1197 | FLF: BITS Exfiltration Hunt |
@@ -642,7 +653,7 @@
 | T1219 | MELTS: 2025-2026 Attack Signal Overview |
 | T1496 | Cisco Cloud Security - Crypto Miner User-Agent Detected |
 | T1528 | 2025-2026: Compromised Machines and Data |
-| T1530 | 2025-2026: Exfiltration After Initial Access, MELTS: 2025-2026 Attack Signal Overview, +2 more |
+| T1530 | 2025-2026: Exfiltration After Initial Access, MELTS: 2025-2026 Attack Signal Overview, +3 more |
 | T1537 | Cloud Guard Problem: Bucket Public Read, OCI Boot Volume Backup Created by Non-Admin, +5 more |
 | T1552.005 | Web-to-Cloud: Attack Path Link Analysis, Web-to-Cloud: Correlated Attack Timeline, Web-to-Cloud: MITRE Stage Breakdown |
 | T1555.003 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), +2 more |
@@ -663,14 +674,14 @@
 | T1133 | Imperva - Top destinations with blocked requests, Imperva - Top sources with blocked requests |
 | T1189 | Browser Attack Frequency Analysis (SOC Application Logs) |
 | T1190 | Imperva - Top destinations with blocked requests, Imperva - Top sources with blocked requests, Browser Attack Frequency Analysis (SOC Application Logs) |
-| T1485 | OCI Action: DeleteBucket, OCI Action: DeleteKey, +7 more |
+| T1485 | OCI Action: DeleteBucket, OCI Action: DeleteKey, +8 more |
 | T1486 | Ransomware File Extension Indicators, Cisco SE - Ransomware Activity, Dev-0530 File Extension Rename |
-| T1489 | OCI Action: DeleteInternetGateway, OCI Action: DeleteSubnet, +6 more |
+| T1489 | OCI Action: DeleteInternetGateway, OCI Action: DeleteSubnet, +7 more |
 | T1490 | OCI KMS Key Scheduled for Deletion, System Recovery Disabled via BCDEdit, +4 more |
 | T1491.001 | Defacement via Desktop Wallpaper Change |
 | T1496 | Cryptominer Deployment Indicators, Linux Cryptominer Activity Detected, +3 more |
 | T1498 | Imperva - Top destinations with blocked requests, Imperva - Top sources with blocked requests |
-| T1499 | Web Application Server Error Spike, NGINX - Core Dump, +2 more |
+| T1499 | Web Application Server Error Spike, NGINX - Core Dump, +3 more |
 | T1529 | System Shutdown or Reboot via shutdown.exe |
 | T1531 | Account Access Removal, OCI Action: DeleteGroup, +3 more |
 | T1561 | Disk Wipe via Format Command |
@@ -1340,54 +1351,71 @@
 | 48 | Hunting: Kerberoasting Anomaly - RC4 vs AES Encryption Ratio | - | 🔴 critical | T1558.003 |
 | 49 | Linux Data Staging and Exfiltration Indicators | combined_scoring | 🟠 high | T1560.001, T1074.001 |
 | 50 | Linux Multi-Stage Attack Indicators (Combined Methods) | multi_stage | 🔴 critical | T1110, T1059.004 |
-| 51 | Linux Persistence Indicator Score (Combined Methods) | scoring | 🟠 high | T1053, T1543.002, T1098.004 |
-| 52 | Linux Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059.004 |
-| 53 | Hunting: Logon Anomaly - Account Activity Profiling | - | 🟠 high | T1078, T1021, T1134 |
-| 54 | MELTS: Attack Path Link Drilldown | - | 🔴 critical | T1566, T1059, T1218, T1071.001, T1041 |
-| 55 | MELTS: 2025-2026 Attack Signal Overview | - | 🔴 critical | T1566, T1059.001, T1218, T1219, T1071.001, T1530, T1041 |
-| 56 | MELTS: 2025-2026 Attack Timeline | - | 🟠 high | T1566, T1059, T1071, T1041 |
-| 57 | Geographic Health: Cloud Provider Summary | aggregation | ⚪ informational | - |
-| 58 | Geographic Health: Instance Detail with Coordinates | detail_view | ⚪ informational | - |
-| 59 | Geographic Health: Regional Status on Global Map | geographic_analysis | ⚪ informational | - |
-| 60 | Geographic Health: Service Tier Status | aggregation | ⚪ informational | - |
-| 61 | Geographic Health: Unhealthy Regions Alert | alerting | 🟠 high | - |
-| 62 | C2 Beaconing Detection (Periodic Connection Analysis) | frequency_analysis | 🟠 high | T1071, T1573 |
-| 63 | OCI After-Hours IAM Activity (Time-Based Anomaly) | time_anomaly | 🟡 medium | T1098 |
-| 64 | OCI Console Login Brute Force (Frequency Analysis) | frequency_analysis | 🟠 high | T1078, T1110 |
-| 65 | OCI IAM and Fusion Activity Correlation | grouping_correlation | 🟠 high | T1078, T1098 |
-| 66 | OCI IAM Rapid Configuration Changes (Anomaly Detection) | anomaly_detection | 🟠 high | T1098, T1078 |
-| 67 | OCI Multiple Users from Same IP (Grouping) | grouping | 🟠 high | T1078, T1110.004 |
-| 68 | OCI Privilege Escalation Chain Detection | combined_scoring | 🔴 critical | T1098, T1078 |
-| 69 | OCI Resource Destruction Spike (Anomaly Detection) | anomaly_detection | 🔴 critical | T1485, T1489 |
-| 70 | RMM: Post-Compromise Remote Access Activity | - | 🟠 high | T1219, T1071.001 |
-| 71 | SharePoint ToolShell: Exploitation Attempts | - | 🔴 critical | T1190, T1505.003 |
-| 72 | SharePoint ToolShell: Webshell Post-Exploit | - | 🔴 critical | T1505.003, T1059 |
-| 73 | SSH Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001 |
-| 74 | Login Activity Time-Series Anomaly | time_series_anomaly | 🟠 high | T1078, T1110 |
-| 75 | WAF Attack Frequency by Source IP (Frequency Analysis) | frequency_analysis | 🟠 high | T1190 |
-| 76 | WAF Multi-Attack Vector Scoring (Combined Methods) | scoring | 🔴 critical | T1190, T1059 |
-| 77 | SQL Injection Pattern Stacking (Rare Value Detection) | rare_value | 🟠 high | T1190 |
-| 78 | Web Attack Geographic Anomaly (Rare Country Detection) | rare_value | 🟡 medium | T1190 |
-| 79 | Web Application Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001, T1110.003 |
-| 80 | Web Directory Scanning IP Clustering (Anomaly Detection) | anomaly_detection | 🟡 medium | T1595.002 |
-| 81 | OWASP Multi-Stage Web Attack Chain (Combined Methods) | multi_stage | 🔴 critical | T1190, T1110, T1059 |
-| 82 | Web Scanner Tool Identification (User Agent Stacking) | rare_value | 🟡 medium | T1595.002 |
-| 83 | Web-to-Cloud: Attack Path Link Analysis | - | 🔴 critical | T1190, T1552.005, T1071.001, T1041 |
-| 84 | Web-to-Cloud: Correlated Attack Timeline | - | 🔴 critical | T1190, T1552.005, T1071.001, T1041 |
-| 85 | Web-to-Cloud: OCI Audit Cloud Abuse | - | 🔴 critical | T1580, T1530, T1567 |
-| 86 | Web-to-Cloud: Compromised Cloud Identity | - | 🔴 critical | T1552.005, T1580, T1530 |
-| 87 | Web-to-Cloud: Compromised Machines | - | 🟠 high | T1059, T1071.001 |
-| 88 | Web-to-Cloud: Entry Point and SSRF Evidence | - | 🔴 critical | T1190 |
-| 89 | Web-to-Cloud: Exfiltrated Data Evidence | - | 🔴 critical | T1530, T1041, T1567 |
-| 90 | Web-to-Cloud: Network Firewall C2 and Threat Alerts | - | 🔴 critical | T1071.001, T1041 |
-| 91 | Web-to-Cloud: MITRE Stage Breakdown | - | 🟠 high | T1190, T1552.005, T1071.001, T1041 |
-| 92 | Web-to-Cloud: VCN Egress and Exfil Flows | - | 🔴 critical | T1071.001, T1041 |
-| 93 | Windows Credential Access Tool Cluster (Grouping) | grouping | 🔴 critical | T1003, T1558.003 |
-| 94 | Windows Defense Evasion Score (Combined Methods) | scoring | 🔴 critical | T1562, T1548.002, T1070 |
-| 95 | Windows Lateral Movement Tool Cluster (Grouping) | grouping | 🔴 critical | T1021, T1570 |
-| 96 | Windows Suspiciously Long Command Line (Field Analysis) | field_analysis | 🟠 high | T1059.001, T1027 |
-| 97 | Windows Process from Unusual Path (Rare Value Analysis) | rare_value | 🟠 high | T1204, T1036 |
-| 98 | Windows Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059 |
+| 51 | Linux Unusual Outbound Connection Frequency | - | 🟡 medium | T1071, T1041 |
+| 52 | Linux Persistence Indicator Score (Combined Methods) | scoring | 🟠 high | T1053, T1543.002, T1098.004 |
+| 53 | Linux Process Execution from Unusual Paths | - | 🟡 medium | T1059, T1036.005 |
+| 54 | Linux Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059.004 |
+| 55 | Linux Rare Process Execution by Host | - | 🟡 medium | T1059, T1036 |
+| 56 | Linux User Privilege Change Correlation | - | 🟡 medium | T1548.003, T1003 |
+| 57 | Hunting: Logon Anomaly - Account Activity Profiling | - | 🟠 high | T1078, T1021, T1134 |
+| 58 | MELTS: Attack Path Link Drilldown | - | 🔴 critical | T1566, T1059, T1218, T1071.001, T1041 |
+| 59 | MELTS: 2025-2026 Attack Signal Overview | - | 🔴 critical | T1566, T1059.001, T1218, T1219, T1071.001, T1530, T1041 |
+| 60 | MELTS: 2025-2026 Attack Timeline | - | 🟠 high | T1566, T1059, T1071, T1041 |
+| 61 | Geographic Health: Cloud Provider Summary | aggregation | ⚪ informational | - |
+| 62 | Geographic Health: Instance Detail with Coordinates | detail_view | ⚪ informational | - |
+| 63 | Geographic Health: Regional Status on Global Map | geographic_analysis | ⚪ informational | - |
+| 64 | Geographic Health: Service Tier Status | aggregation | ⚪ informational | - |
+| 65 | Geographic Health: Unhealthy Regions Alert | alerting | 🟠 high | - |
+| 66 | C2 Beaconing Detection (Periodic Connection Analysis) | frequency_analysis | 🟠 high | T1071, T1573 |
+| 67 | OCI After-Hours IAM Activity (Time-Based Anomaly) | time_anomaly | 🟡 medium | T1098 |
+| 68 | OCI API Call Burst by User | - | 🟡 medium | T1119, T1530 |
+| 69 | OCI Console Login Brute Force (Frequency Analysis) | frequency_analysis | 🟠 high | T1078, T1110 |
+| 70 | OCI Cross-Compartment Activity Anomaly | - | 🟡 medium | T1087.004, T1580 |
+| 71 | OCI Failed Action Spike by Source IP | - | 🟡 medium | T1110, T1078 |
+| 72 | OCI IAM and Fusion Activity Correlation | grouping_correlation | 🟠 high | T1078, T1098 |
+| 73 | OCI IAM Rapid Configuration Changes (Anomaly Detection) | anomaly_detection | 🟠 high | T1098, T1078 |
+| 74 | OCI Multiple Users from Same IP (Grouping) | grouping | 🟠 high | T1078, T1110.004 |
+| 75 | OCI Off-Hours Administrative Activity | - | 🟡 medium | T1078, T1098 |
+| 76 | OCI Privilege Escalation Chain Detection | combined_scoring | 🔴 critical | T1098, T1078 |
+| 77 | OCI Resource Deletion Wave | - | 🟡 medium | T1485, T1489 |
+| 78 | OCI Resource Destruction Spike (Anomaly Detection) | anomaly_detection | 🔴 critical | T1485, T1489 |
+| 79 | OCI Unusual API Caller - First Seen User-Agent | - | 🟡 medium | T1087, T1078 |
+| 80 | Octo Chaos — Stale Scenario State | - | 🟡 medium | - |
+| 81 | Octo Checkout — DB Slowness Correlated With Chaos | - | 🟡 medium | T1499 |
+| 82 | Octo WAF Detections vs App 5xx | - | 🟡 medium | T1190 |
+| 83 | RMM: Post-Compromise Remote Access Activity | - | 🟠 high | T1219, T1071.001 |
+| 84 | SharePoint ToolShell: Exploitation Attempts | - | 🔴 critical | T1190, T1505.003 |
+| 85 | SharePoint ToolShell: Webshell Post-Exploit | - | 🔴 critical | T1505.003, T1059 |
+| 86 | SSH Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001 |
+| 87 | Login Activity Time-Series Anomaly | time_series_anomaly | 🟠 high | T1078, T1110 |
+| 88 | WAF Attack Frequency by Source IP (Frequency Analysis) | frequency_analysis | 🟠 high | T1190 |
+| 89 | WAF Multi-Attack Vector Scoring (Combined Methods) | scoring | 🔴 critical | T1190, T1059 |
+| 90 | SQL Injection Pattern Stacking (Rare Value Detection) | rare_value | 🟠 high | T1190 |
+| 91 | Web Attack Geographic Anomaly (Rare Country Detection) | rare_value | 🟡 medium | T1190 |
+| 92 | Web Application Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001, T1110.003 |
+| 93 | Web Directory Scanning IP Clustering (Anomaly Detection) | anomaly_detection | 🟡 medium | T1595.002 |
+| 94 | OWASP Multi-Stage Web Attack Chain (Combined Methods) | multi_stage | 🔴 critical | T1190, T1110, T1059 |
+| 95 | Web Scanner Tool Identification (User Agent Stacking) | rare_value | 🟡 medium | T1595.002 |
+| 96 | Web-to-Cloud: Attack Path Link Analysis | - | 🔴 critical | T1190, T1552.005, T1071.001, T1041 |
+| 97 | Web-to-Cloud: Correlated Attack Timeline | - | 🔴 critical | T1190, T1552.005, T1071.001, T1041 |
+| 98 | Web-to-Cloud: OCI Audit Cloud Abuse | - | 🔴 critical | T1580, T1530, T1567 |
+| 99 | Web-to-Cloud: Compromised Cloud Identity | - | 🔴 critical | T1552.005, T1580, T1530 |
+| 100 | Web-to-Cloud: Compromised Machines | - | 🟠 high | T1059, T1071.001 |
+| 101 | Web-to-Cloud: Entry Point and SSRF Evidence | - | 🔴 critical | T1190 |
+| 102 | Web-to-Cloud: Exfiltrated Data Evidence | - | 🔴 critical | T1530, T1041, T1567 |
+| 103 | Web-to-Cloud: Network Firewall C2 and Threat Alerts | - | 🔴 critical | T1071.001, T1041 |
+| 104 | Web-to-Cloud: MITRE Stage Breakdown | - | 🟠 high | T1190, T1552.005, T1071.001, T1041 |
+| 105 | Web-to-Cloud: VCN Egress and Exfil Flows | - | 🔴 critical | T1071.001, T1041 |
+| 106 | Windows High-Entropy DNS Queries | - | 🟡 medium | T1071.004, T1048.003 |
+| 107 | Windows Lateral Movement Timeline | - | 🟡 medium | T1021.002, T1021.006, T1021.001 |
+| 108 | Windows LOLBin Usage Frequency Anomaly | - | 🟡 medium | T1218, T1059 |
+| 109 | Windows Rare Parent-Child Process Relationships | - | 🟡 medium | T1055, T1218 |
+| 110 | Windows Credential Access Tool Cluster (Grouping) | grouping | 🔴 critical | T1003, T1558.003 |
+| 111 | Windows Defense Evasion Score (Combined Methods) | scoring | 🔴 critical | T1562, T1548.002, T1070 |
+| 112 | Windows Lateral Movement Tool Cluster (Grouping) | grouping | 🔴 critical | T1021, T1570 |
+| 113 | Windows Suspiciously Long Command Line (Field Analysis) | field_analysis | 🟠 high | T1059.001, T1027 |
+| 114 | Windows Process from Unusual Path (Rare Value Analysis) | rare_value | 🟠 high | T1204, T1036 |
+| 115 | Windows Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059 |
 
 ## STIG Compliance Rules
 
@@ -1419,4 +1447,4 @@
 | OCI VCN Peering Connection Created | SC-7 | CAT II | medium |
 
 ---
-*Generated from 454 Sigma source rules routed to 468 top-level detection queries and 8 browser app queries, plus 60 Microsoft Sentinel conversions, 47 curated app/APM analytics, and 98 hunting queries*
+*Generated from 454 Sigma source rules routed to 468 top-level detection queries and 8 browser app queries, plus 60 Microsoft Sentinel conversions, 47 curated app/APM analytics, and 115 hunting queries*

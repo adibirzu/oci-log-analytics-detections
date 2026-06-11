@@ -5,26 +5,26 @@ Date: 2026-05-18
 ## Current State
 
 - Core scope: OCI Log Analytics query generation, synthetic log generation, query/dashboard validation, OCI dashboard creation, and the integrated Forge conversion webapp.
-- Source Sigma/YAML rules: 523
-- Sigma-derived OCI query artifacts: 554
-  - 546 top-level detections in `queries/`
+- Source Sigma/YAML rules: 522
+- Sigma-derived OCI query artifacts: 553
+  - 545 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
 - Microsoft Sentinel converted queries: 60 live OCI parser-passing queries
 - Curated analytics: 169
   - 54 app telemetry analytics
   - 115 hunting analytics
-- Total query artifacts/content items: 783
+- Total query artifacts/content items: 782
 - MITRE ATT&CK coverage: 243 techniques across 14 tactics
 - MITRE ATLAS (AI/ML) coverage: 10 techniques across 10 tactics on `SOC Application Logs` + the `SOC GenAI Gateway Logs` source
 - Dashboards: 29
-- Saved searches: 441 active dashboard saved searches; 783 total content items
+- Saved searches: 441 active dashboard saved searches; 782 total content items
 - Sentinel live validation: 60 / 62 locally clean conversions; 2 live failures remain in `queries/sentinel_conversion_report.json`
 - Sentinel synthetic live-hit check: **20 / 20 ready Logan QL queries HIT** in the `cap` profile with a 24-hour lookback after uploading Sentinel-shaped synthetic logs.
 - Latest full live dashboard deployment: **441 widgets across 29 dashboards** in the `cap` profile with a 21-day lookback — 0 render/query errors; live `parse_validate_all_queries` 681/681 PASS.
 - Generated demo data: 20 NDJSON files / 221,173 events in the latest local `test_data/manifest.json`
 - MITRE ATT&CK coverage: 243 techniques / 14 tactics
 - STIG coverage: 24 detections / 12 controls
-- Atomic Red Team coverage: 280 / 398 testable rules have mapped tests
+- Atomic Red Team coverage: 280 / 397 testable rules have mapped tests
 
 ## Architecture Updates Shipped
 

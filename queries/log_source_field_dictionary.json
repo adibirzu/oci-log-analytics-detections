@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-11T04:54:27.786073+00:00",
+  "generated_at": "2026-06-11T05:22:46.613993+00:00",
   "summary": {
     "total_fields": 304,
     "parser_count": 19,
@@ -1052,7 +1052,9 @@
       "example_values": [
         "akid_synthetic_chatbot_01"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_adversarial_evasion.json",
         "genai_gateway_denial_of_ml_service.json",
@@ -1331,7 +1333,9 @@
       "example_values": [
         "initial_access"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -1363,7 +1367,9 @@
       "example_values": [
         "AML.T0051"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -2275,6 +2281,7 @@
       ],
       "contract_datasets": [
         "application_logs.jsonl",
+        "genai_gateway.jsonl",
         "lb_access.jsonl",
         "octo_apm_workshop_application_logs.jsonl",
         "waf_security.jsonl",
@@ -3062,7 +3069,9 @@
       "example_values": [
         false
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_sensitive_data_leak.json"
       ],
@@ -4146,7 +4155,6 @@
         "windows_sysmon.jsonl"
       ],
       "queries_using_it": [
-        "as-rep_roasting_pre-auth-disabled_rc4_as-req_event_4768.json",
         "bluelight_browser_child_process.json",
         "bluelight_browser_credential_theft.json",
         "bluelight_drive_by_compromise.json",
@@ -4797,7 +4805,9 @@
       "example_values": [
         "deny"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -4899,7 +4909,9 @@
       "example_values": [
         0
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -4931,7 +4943,9 @@
       "example_values": [
         "<URL>"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -4995,7 +5009,9 @@
       "example_values": [
         "<USER_EMAIL>"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_adversarial_evasion.json",
         "genai_gateway_inference_exfiltration.json",
@@ -5067,7 +5083,9 @@
       "example_values": [
         "gpt-4o-mini"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_adversarial_evasion.json",
         "genai_gateway_inference_exfiltration.json",
@@ -5107,7 +5125,9 @@
       "example_values": [
         "chat.completions"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_inference_exfiltration.json",
         "genai_gateway_model_theft_export.json"
@@ -5174,7 +5194,9 @@
       "example_values": [
         38
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -5206,7 +5228,9 @@
       "example_values": [
         "openai"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -5238,7 +5262,9 @@
       "example_values": [
         "genai-req-synthetic-0001"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -5270,7 +5296,9 @@
       "example_values": [
         38
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_denial_of_ml_service.json",
         "genai_gateway_inference_exfiltration.json"
@@ -5356,7 +5384,9 @@
       "example_values": [
         "BLOCK"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_denial_of_ml_service.json"
       ],
@@ -5390,7 +5420,9 @@
       "example_values": [
         "prompt_injection"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_adversarial_evasion.json",
         "genai_gateway_jailbreak_blocked.json",
@@ -5737,6 +5769,7 @@
       "contract_datasets": [
         "cloud_guard.jsonl",
         "cloud_guard_instance_security.jsonl",
+        "genai_gateway.jsonl",
         "linux_secure.jsonl",
         "linux_syslog.jsonl",
         "multicloud_health.jsonl",
@@ -6084,6 +6117,7 @@
       ],
       "contract_datasets": [
         "application_logs.jsonl",
+        "genai_gateway.jsonl",
         "lb_access.jsonl"
       ],
       "queries_using_it": [
@@ -6167,7 +6201,8 @@
         "GET"
       ],
       "contract_datasets": [
-        "application_logs.jsonl"
+        "application_logs.jsonl",
+        "genai_gateway.jsonl"
       ],
       "queries_using_it": [
         "sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
@@ -6219,7 +6254,8 @@
         200
       ],
       "contract_datasets": [
-        "application_logs.jsonl"
+        "application_logs.jsonl",
+        "genai_gateway.jsonl"
       ],
       "queries_using_it": [
         "hunting/octo_checkout_db_slowness.json",
@@ -6289,7 +6325,9 @@
       "example_values": [
         true
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_prompt_injection_blocked.json"
       ],
@@ -6617,7 +6655,9 @@
       "example_values": [
         false
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_jailbreak_blocked.json"
       ],
@@ -7491,7 +7531,8 @@
         "T1059"
       ],
       "contract_datasets": [
-        "cloud_guard_instance_security.jsonl"
+        "cloud_guard_instance_security.jsonl",
+        "genai_gateway.jsonl"
       ],
       "queries_using_it": [
         "apps/apm_octo_attack_timeline.json",
@@ -7889,6 +7930,7 @@
         "application_logs.jsonl",
         "cloud_guard.jsonl",
         "cloud_guard_instance_security.jsonl",
+        "genai_gateway.jsonl",
         "linux_secure.jsonl",
         "linux_syslog.jsonl",
         "octo_apm_workshop_application_logs.jsonl",
@@ -10441,7 +10483,9 @@
       "example_values": [
         94
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "genai_gateway.jsonl"
+      ],
       "queries_using_it": [
         "genai_gateway_adversarial_evasion.json",
         "genai_gateway_jailbreak_blocked.json",
@@ -11130,7 +11174,8 @@
         "genai-req-synthetic-0001"
       ],
       "contract_datasets": [
-        "application_logs.jsonl"
+        "application_logs.jsonl",
+        "genai_gateway.jsonl"
       ],
       "queries_using_it": [
         "apps/apm_octo_attack_timeline.json"
@@ -11287,6 +11332,7 @@
       ],
       "contract_datasets": [
         "application_logs.jsonl",
+        "genai_gateway.jsonl",
         "lb_access.jsonl",
         "octo_apm_workshop_application_logs.jsonl",
         "waf_security.jsonl",
@@ -11576,6 +11622,7 @@
       ],
       "contract_datasets": [
         "application_logs.jsonl",
+        "genai_gateway.jsonl",
         "lb_access.jsonl",
         "octo_apm_workshop_application_logs.jsonl",
         "waf_security.jsonl",
@@ -12143,7 +12190,8 @@
       ],
       "contract_datasets": [
         "application_logs.jsonl",
-        "cloud_guard_instance_security.jsonl"
+        "cloud_guard_instance_security.jsonl",
+        "genai_gateway.jsonl"
       ],
       "queries_using_it": [
         "apps/apm_octo_api_gateway_edge.json",
@@ -12230,6 +12278,7 @@
       ],
       "contract_datasets": [
         "application_logs.jsonl",
+        "genai_gateway.jsonl",
         "octo_apm_workshop_application_logs.jsonl"
       ],
       "queries_using_it": [],
@@ -12464,6 +12513,7 @@
       ],
       "contract_datasets": [
         "application_logs.jsonl",
+        "genai_gateway.jsonl",
         "octo_apm_workshop_application_logs.jsonl",
         "windows_event_system.jsonl"
       ],
@@ -13399,6 +13449,7 @@
       ],
       "contract_datasets": [
         "application_logs.jsonl",
+        "genai_gateway.jsonl",
         "octo_apm_workshop_application_logs.jsonl"
       ],
       "queries_using_it": [
@@ -13934,7 +13985,6 @@
       ],
       "contract_datasets": [],
       "queries_using_it": [
-        "as-rep_roasting_pre-auth-disabled_rc4_as-req_event_4768.json",
         "hunting/logon_anomaly_by_account.json",
         "lateral_movement_logon_pattern.json",
         "windows_account_or_group_enumeration_spike.json",
@@ -14203,7 +14253,6 @@
       ],
       "contract_datasets": [],
       "queries_using_it": [
-        "as-rep_roasting_pre-auth-disabled_rc4_as-req_event_4768.json",
         "golden_ticket_anomaly.json",
         "kerberoasting_rc4_ticket_request.json"
       ],
@@ -14524,6 +14573,7 @@
         "application_logs.jsonl",
         "cloud_guard.jsonl",
         "cloud_guard_instance_security.jsonl",
+        "genai_gateway.jsonl",
         "lb_access.jsonl",
         "linux_secure.jsonl",
         "linux_syslog.jsonl",
@@ -14665,6 +14715,7 @@
       ],
       "contract_datasets": [
         "application_logs.jsonl",
+        "genai_gateway.jsonl",
         "octo_apm_workshop_application_logs.jsonl"
       ],
       "queries_using_it": [

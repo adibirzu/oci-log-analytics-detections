@@ -7,6 +7,7 @@
   "stig_category": "CAT I",
   "tags": [
     "attack.credential_access",
+    "attack.t1558",
     "attack.t1558.003"
   ],
   "mitre_attack": {
@@ -14,6 +15,7 @@
       "credential_access"
     ],
     "techniques": [
+      "T1558",
       "T1558.003"
     ]
   },

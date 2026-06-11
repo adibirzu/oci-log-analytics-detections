@@ -1,29 +1,29 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-11T05:02:18.411389+00:00",
-  "total_rules": 606,
-  "total_base_rules": 546,
+  "generated_at": "2026-06-11T05:22:46.786163+00:00",
+  "total_rules": 605,
+  "total_base_rules": 545,
   "total_sentinel_queries": 60,
   "total_app_queries": 62,
   "total_hunting": 115,
-  "total_content_items": 783,
+  "total_content_items": 782,
   "inventory": {
-    "source_yaml_rules": 523,
+    "source_yaml_rules": 522,
     "source_rule_breakdown": {
       "cloud": 102,
       "linux": 80,
       "web": 38,
-      "windows": 303
+      "windows": 302
     },
-    "generated_detection_queries": 606,
-    "generated_base_detection_queries": 546,
+    "generated_detection_queries": 605,
+    "generated_base_detection_queries": 545,
     "generated_sentinel_queries": 60,
     "generated_app_queries": 62,
     "source_derived_app_queries": 8,
     "curated_app_queries": 54,
     "generated_hunting_queries": 115,
-    "generated_sigma_queries": 554,
-    "total_query_artifacts": 783,
+    "generated_sigma_queries": 553,
+    "total_query_artifacts": 782,
     "legacy_dirs": {
       "logandetectionqueries": 0,
       "logandetectionrules": 0
@@ -34,7 +34,7 @@
     "atlas_tactics": 10
   },
   "platforms": {
-    "windows": 317,
+    "windows": 316,
     "oci": 148,
     "linux": 81,
     "microsoft_sentinel": 60
@@ -42,7 +42,7 @@
   "severities": {
     "critical": 110,
     "high": 260,
-    "medium": 177,
+    "medium": 176,
     "low": 29,
     "informational": 30
   },
@@ -1056,33 +1056,6 @@
       "source_confidence": "high",
       "field_coverage": "not_evaluated",
       "test_data_coverage": "covered",
-      "live_validation_status": "not_run",
-      "dashboard_readiness": "not_annotated",
-      "scheduled_rule_eligibility": "not_evaluated",
-      "content_surface": "detection"
-    },
-    {
-      "title": "AS-REP Roasting: Pre-Auth-Disabled RC4 AS-REQ (Event 4768)",
-      "description": "Detects AS-REP roasting at the wire level: a Kerberos AS-REQ (Event 4768) for an account that does not require pre-authentication, returned with RC4 (TicketEncryptionType 0x17). Roastable AS-REPs encrypted with RC4 are the crackable artifact harvested by Rubeus asreproast and GetNPUsers.py.\n",
-      "level": "medium",
-      "platform": "windows",
-      "mitre_techniques": [
-        "T1558.004"
-      ],
-      "mitre_tactics": [
-        "credential_access"
-      ],
-      "atlas_techniques": [],
-      "atlas_tactics": [],
-      "stig_ids": [],
-      "stig_category": "CAT II",
-      "references": [],
-      "file": "as-rep_roasting_pre-auth-disabled_rc4_as-req_event_4768.json",
-      "content_lifecycle": "validated_locally",
-      "detection_maturity": "production",
-      "source_confidence": "high",
-      "field_coverage": "not_evaluated",
-      "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
       "scheduled_rule_eligibility": "not_evaluated",
@@ -12114,6 +12087,7 @@
       "level": "high",
       "platform": "windows",
       "mitre_techniques": [
+        "T1558",
         "T1558.003"
       ],
       "mitre_tactics": [
@@ -25982,9 +25956,9 @@
     }
   ],
   "art_coverage": {
-    "testable_rules": 398,
+    "testable_rules": 397,
     "rules_with_tests": 280,
-    "coverage_percent": 70.4,
+    "coverage_percent": 70.5,
     "total_test_mappings": 3208
   }
 }

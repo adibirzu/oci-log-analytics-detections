@@ -277,6 +277,9 @@ SOURCE_CANDIDATE_GROUPS = {
     "application_logs": [
         "SOC Application Logs",
     ],
+    "genai_gateway": [
+        "SOC GenAI Gateway Logs",
+    ],
     "azure_log_analytics_custom": [
         "Azure Log Analytics Custom Logs",
         "SOC Application Logs",
@@ -313,6 +316,7 @@ TEST_DATA_FILES = [
     "lb_access.jsonl",
     "webapp_security.jsonl",
     "application_logs.jsonl",
+    "genai_gateway.jsonl",
     "vcn_flow.jsonl",
     "network_firewall.jsonl",
     "multicloud_health.jsonl",

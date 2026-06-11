@@ -1,0 +1,29 @@
+title: "AS-REP Roasting: Pre-Auth-Disabled RC4 AS-REQ (Event 4768)"
+id: 5c57fa0b-3fc5-40a2-ad8c-ca555e7445fc
+status: experimental
+description: >
+  Detects AS-REP roasting at the wire level: a Kerberos AS-REQ (Event 4768) for
+  an account that does not require pre-authentication, returned with RC4
+  (TicketEncryptionType 0x17). Roastable AS-REPs encrypted with RC4 are the
+  crackable artifact harvested by Rubeus asreproast and GetNPUsers.py.
+references:
+  - https://attack.mitre.org/techniques/T1558/004/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4768
+    TicketEncryptionType: '0x17'
+  filter_machine:
+    TargetUserName|endswith: '$'
+  condition: selection and not filter_machine
+level: medium
+tags:
+  - attack.credential_access
+  - attack.t1558.004
+falsepositives:
+  - Legacy accounts using RC4 and disabled pre-authentication
+version: 1

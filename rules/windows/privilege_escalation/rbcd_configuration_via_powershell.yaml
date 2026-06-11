@@ -1,0 +1,35 @@
+title: "RBCD Configuration via PowerShell / PowerView"
+id: 64217fa4-bfe6-446a-a3aa-bcd76b7846d2
+status: experimental
+description: >
+  Detects command-line configuration of Resource-Based Constrained Delegation
+  by writing PrincipalsAllowedToDelegateToAccount or
+  msDS-AllowedToActOnBehalfOfOtherIdentity with Set-ADComputer / PowerView
+  Set-DomainObject. Often follows a computer-account creation (MachineAccountQuota).
+references:
+  - https://attack.mitre.org/techniques/T1098/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'PrincipalsAllowedToDelegateToAccount'
+      - 'msDS-AllowedToActOnBehalfOfOtherIdentity'
+      - 'Set-ADComputer'
+      - 'Get-ADComputer'
+  selection_deleg:
+    CommandLine|contains:
+      - 'AllowedToAct'
+      - 'DelegateTo'
+      - 'rbcd'
+  condition: selection and selection_deleg
+level: high
+tags:
+  - attack.privilege_escalation
+  - attack.t1098
+falsepositives:
+  - Authorized delegation administration
+version: 1

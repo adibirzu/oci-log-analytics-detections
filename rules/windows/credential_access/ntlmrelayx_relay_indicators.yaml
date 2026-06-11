@@ -1,0 +1,33 @@
+title: "ntlmrelayx NTLM Relay Execution Indicators"
+id: f8e84b18-04c3-474c-8977-a54c0c8e9827
+status: experimental
+description: >
+  Detects execution of impacket ntlmrelayx, used to relay coerced NTLM
+  authentication to LDAP/SMB/HTTP targets for RBCD, ADCS ESC8, or remote code
+  execution. GOAD's NTLM relay scenario relays a coerced hash to a target host.
+references:
+  - https://attack.mitre.org/techniques/T1557/001/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'ntlmrelayx'
+      - 'ntlmrelayx.py'
+  selection_args:
+    CommandLine|contains:
+      - '-smb2support'
+      - '--delegate-access'
+      - '-socks'
+      - '--escalate-user'
+  condition: selection or (selection_args and selection)
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1557.001
+falsepositives:
+  - Authorized relay assessments
+version: 1

@@ -1,0 +1,36 @@
+title: "PowerView / PowerSploit Domain Reconnaissance"
+id: 410cbc30-ae35-4ff4-a358-ae0dcc3c1db8
+status: experimental
+description: >
+  Detects PowerView domain reconnaissance cmdlets used to enumerate users,
+  groups, ACLs, trusts, and delegation across Active Directory. Heavily used in
+  GOAD walkthroughs prior to privilege escalation.
+references:
+  - https://attack.mitre.org/techniques/T1087/002/
+  - https://attack.mitre.org/techniques/T1482/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'Get-DomainUser'
+      - 'Get-DomainComputer'
+      - 'Get-DomainGroup'
+      - 'Get-NetUser'
+      - 'Get-NetComputer'
+      - 'Get-ObjectAcl'
+      - 'Find-InterestingDomainAcl'
+      - 'Get-DomainTrust'
+      - 'Invoke-ACLScanner'
+  condition: selection
+level: medium
+tags:
+  - attack.discovery
+  - attack.t1087.002
+  - attack.t1482
+falsepositives:
+  - Authorized AD assessment tooling
+version: 1

@@ -1,0 +1,33 @@
+title: "Constrained Delegation S4U2Proxy Abuse via Rubeus"
+id: c03c1664-b95a-4b36-b59a-c8b3858711fd
+status: experimental
+description: >
+  Detects abuse of Kerberos constrained delegation (S4U2self + S4U2proxy) via
+  Rubeus 's4u' to impersonate a privileged user to a target service (often
+  CIFS/HOST/LDAP on a DC). GOAD demonstrates this from accounts trusted for
+  delegation.
+references:
+  - https://attack.mitre.org/techniques/T1558/003/
+  - https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/s4u2self-and-s4u2proxy
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+      - 's4u'
+      - '/impersonateuser'
+  selection_alt:
+    CommandLine|contains:
+      - '/msdsspn'
+      - '/altservice'
+  condition: selection or selection_alt
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1558.003
+falsepositives:
+  - Authorized Kerberos delegation testing
+version: 1

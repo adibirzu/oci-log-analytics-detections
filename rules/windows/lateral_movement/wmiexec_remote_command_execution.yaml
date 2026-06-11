@@ -1,0 +1,37 @@
+title: "Impacket wmiexec Remote Command Execution"
+id: 5d6e1e00-5567-4ddc-8940-b98f69512243
+status: experimental
+description: >
+  Detects impacket wmiexec-style remote execution, where commands run via WMI
+  (Win32_Process Create) with output redirected to a local admin share, e.g.
+  'cmd.exe /Q /c <cmd> 1> \\127.0.0.1\ADMIN$\__<ts> 2>&1'. A classic
+  semi-interactive lateral-movement pattern.
+references:
+  - https://attack.mitre.org/techniques/T1047/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - 'WmiPrvSE.exe'
+  selection_redirect:
+    CommandLine|contains|all:
+      - 'cmd.exe'
+      - 'ADMIN$'
+  selection_marker:
+    CommandLine|contains:
+      - '1>'
+      - '2>&1'
+      - '1>'
+  condition: (selection_parent and selection_marker) or selection_redirect
+level: high
+tags:
+  - attack.execution
+  - attack.t1047
+  - attack.lateral_movement
+falsepositives:
+  - Legitimate WMI-based remote administration frameworks
+version: 1

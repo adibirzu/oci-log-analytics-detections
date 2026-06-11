@@ -1,0 +1,44 @@
+title: "Executable Written to Remote Admin Share (Lateral Tool Transfer)"
+id: e7c4587b-3ff8-4ee0-ba82-48c8702a1649
+status: experimental
+description: >
+  Detects staging of a payload to a remote administrative share (ADMIN$, C$,
+  IPC$) prior to service- or task-based execution. Impacket smbexec/psexec and
+  manual 'copy \\host\C$' transfers leave this artifact during lateral
+  movement across the GOAD estate.
+references:
+  - https://attack.mitre.org/techniques/T1021/002/
+  - https://attack.mitre.org/techniques/T1570/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_tool:
+    CommandLine|contains:
+      - 'copy '
+      - 'xcopy'
+      - 'robocopy'
+      - 'Copy-Item'
+      - 'move '
+  selection_share:
+    CommandLine|contains:
+      - 'ADMIN$'
+      - 'C$'
+      - 'IPC$'
+  selection_exe:
+    CommandLine|contains:
+      - '.exe'
+      - '.dll'
+      - '.bat'
+      - '.ps1'
+  condition: selection_tool and selection_share and selection_exe
+level: medium
+tags:
+  - attack.lateral_movement
+  - attack.t1021.002
+  - attack.t1570
+falsepositives:
+  - Administrative software distribution over admin shares
+version: 1

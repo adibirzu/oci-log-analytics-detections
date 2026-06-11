@@ -1,0 +1,36 @@
+title: "Certifried (CVE-2022-26923): Machine Account dNSHostName Abuse"
+id: 94eef4eb-e835-450a-bd8f-777117a34f90
+status: experimental
+description: >
+  Detects Certifried, where an attacker-controlled computer account has its
+  dNSHostName set to match a DC and then requests a machine certificate to
+  impersonate the DC. Indicators: Certipy 'req'/'account' chained with a
+  dnshostname write. GOAD lists Certifried alongside the ESC paths.
+references:
+  - https://attack.mitre.org/techniques/T1649/
+  - https://attack.mitre.org/techniques/T1098/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'dNSHostName'
+      - 'dnshostname'
+  selection_certipy:
+    CommandLine|contains:
+      - 'certipy'
+      - '-template Machine'
+      - 'account update'
+  condition: selection and selection_certipy
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1649
+  - attack.privilege_escalation
+  - attack.t1098
+falsepositives:
+  - None expected outside sanctioned testing
+version: 1

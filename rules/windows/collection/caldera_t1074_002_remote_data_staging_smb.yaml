@@ -1,0 +1,43 @@
+title: Caldera - Remote Data Staging via SMB Share Write
+id: 365f9437-df92-478a-ad78-27f5326433e8
+status: experimental
+description: >
+  Detects staging of collected data on remote SMB shares before exfiltration.
+  Caldera T1074.002 emulation copies files to a UNC share path accessible from
+  the attacker system, consolidating data from multiple compromised hosts.
+  Patterns include net use with copy/xcopy writing to remote UNC destinations.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_copy_to_share:
+    CommandLine|contains:
+      - 'copy * \\'
+      - 'copy /Y \\'
+      - 'xcopy /s \\'
+  sel_robocopy_remote:
+    Image|endswith: \robocopy.exe
+    CommandLine|contains:
+      - ' \\'
+  sel_ps_copy_remote:
+    CommandLine|contains:
+      - 'Copy-Item -Destination \\'
+      - 'Move-Item -Destination \\'
+  sel_staging_source:
+    CommandLine|contains:
+      - 'C:\Temp'
+      - 'C:\Users\Public'
+      - 'C:\ProgramData'
+      - '%TEMP%'
+  condition: (sel_copy_to_share or sel_robocopy_remote or sel_ps_copy_remote) and sel_staging_source
+level: medium
+tags:
+  - attack.collection
+  - attack.t1074
+  - attack.t1074.002
+falsepositives:
+  - Backup software staging files to a central share
+  - IT teams consolidating data for migration
+version: 1

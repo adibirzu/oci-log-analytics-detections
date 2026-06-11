@@ -1,0 +1,28 @@
+title: "Skeleton Key Domain Backdoor via mimikatz"
+id: 97da42b0-3460-4e71-8e32-c90246dac513
+status: experimental
+description: >
+  Detects mimikatz misc::skeleton, which patches LSASS on a Domain Controller to
+  install a master password ("skeleton key") that authenticates as any account
+  while leaving existing passwords working.
+references:
+  - https://attack.mitre.org/techniques/T1556/001/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'misc::skeleton'
+      - 'skeleton key'
+  condition: selection
+level: critical
+tags:
+  - attack.credential_access
+  - attack.defense_evasion
+  - attack.t1556.001
+falsepositives:
+  - None expected; no legitimate use
+version: 1

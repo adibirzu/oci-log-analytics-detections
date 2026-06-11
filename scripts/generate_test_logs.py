@@ -44,6 +44,7 @@ from testlogs.network import *  # noqa: F401,F403
 from testlogs.sysmon_network import *  # noqa: F401,F403
 from testlogs.web import *  # noqa: F401,F403
 from testlogs.application import *  # noqa: F401,F403
+from testlogs.genai_gateway import *  # noqa: F401,F403
 
 
 def main():
@@ -83,6 +84,7 @@ def main():
     lb_events = generate_lb_access_events()
     webapp_events = generate_webapp_events()
     application_events = generate_application_events()
+    genai_gateway_events = generate_genai_gateway_events()
     vcn_flow_events = generate_vcn_flow_events()
     network_firewall_events = generate_network_firewall_events()
 
@@ -103,6 +105,7 @@ def main():
         "lb_access.jsonl": lb_events,
         "webapp_security.jsonl": webapp_events,
         "application_logs.jsonl": application_events,
+        "genai_gateway.jsonl": genai_gateway_events,
         "vcn_flow.jsonl": vcn_flow_events,
         "network_firewall.jsonl": network_firewall_events,
     }

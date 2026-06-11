@@ -1,0 +1,30 @@
+title: "Timeroasting: Computer Account Hash Harvest via NTP"
+id: ed405880-b1dc-4b84-895f-1109be41cc23
+status: experimental
+description: >
+  Detects Timeroasting, which abuses the unauthenticated MS-SNTP extension to
+  request authenticators for computer accounts using only their RID, yielding
+  MD5-based hashes for offline cracking without any domain credentials.
+references:
+  - https://attack.mitre.org/techniques/T1558/
+  - https://www.secura.com/blog/timeroasting-attacking-trust-accounts-in-active-directory
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'timeroast'
+      - 'timeroasting'
+      - 'sntp_roast'
+      - 'MS-SNTP'
+  condition: selection
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1558
+falsepositives:
+  - None expected; no legitimate use of timeroasting tooling
+version: 1

@@ -1,0 +1,33 @@
+title: "ADCS ESC4: Certificate Template ACL Modification via Certipy"
+id: 3c4135df-ed29-41e8-a90a-3a662d586d56
+status: experimental
+description: >
+  Detects ESC4 abuse where an attacker with write access to a certificate
+  template reconfigures it to become ESC1-vulnerable (enrollee-supplied SAN,
+  client-auth EKU). Certipy 'template' with -write/-save performs this
+  template takeover before requesting an impersonation certificate.
+references:
+  - https://attack.mitre.org/techniques/T1649/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+      - 'certipy'
+      - 'template'
+  selection_write:
+    CommandLine|contains:
+      - '-write'
+      - '-save-old'
+      - '-configuration'
+  condition: selection and selection_write
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1649
+falsepositives:
+  - Authorized ADCS template administration
+version: 1

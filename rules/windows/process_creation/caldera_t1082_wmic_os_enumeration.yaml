@@ -1,0 +1,39 @@
+title: Caldera - WMIC OS and Hardware Enumeration (Windows)
+id: bf31a6d7-a546-4afc-8277-a847952f2447
+status: experimental
+description: >
+  Detects WMIC-based system profiling commands used by Caldera T1082 discovery
+  operations. The Caldera discovery adversary profile queries Win32_OperatingSystem,
+  Win32_ComputerSystem, Win32_Processor, and installed software to build a
+  comprehensive host profile. This process_creation level rule focuses on wmic.exe
+  command-line patterns distinct from the PowerShell Get-WmiObject variant.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_wmic_os:
+    Image|endswith: \wmic.exe
+    CommandLine|contains: 'os get'
+  sel_wmic_cs:
+    Image|endswith: \wmic.exe
+    CommandLine|contains: 'computersystem get'
+  sel_wmic_cpu:
+    Image|endswith: \wmic.exe
+    CommandLine|contains: 'cpu get'
+  sel_wmic_product:
+    Image|endswith: \wmic.exe
+    CommandLine|contains: 'product get'
+  sel_wmic_nic:
+    Image|endswith: \wmic.exe
+    CommandLine|contains: 'nic get'
+  condition: sel_wmic_os or sel_wmic_cs or sel_wmic_cpu or sel_wmic_product or sel_wmic_nic
+level: low
+tags:
+  - attack.discovery
+  - attack.t1082
+falsepositives:
+  - IT inventory and asset management tools using WMIC
+  - Software deployment scripts checking compatibility
+version: 1

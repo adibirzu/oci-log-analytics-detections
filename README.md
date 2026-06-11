@@ -18,19 +18,20 @@ The integrated UI lives in `webapp/` and consumes generated artifacts from this 
 ## Current Inventory
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
 
-- **Source Sigma/YAML rules:** 454
-- **Sigma-derived OCI query artifacts:** 476
-  - 468 top-level detections in `queries/*.json`
+- **Source Sigma/YAML rules:** 522
+- **Sigma-derived OCI query artifacts:** 553
+  - 545 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
 - **Microsoft Sentinel converted queries:** 60 live OCI parser-passing queries
-- **Curated analytics:** 162
-  - 47 app telemetry analytics in `queries/apps/`
+- **Curated analytics:** 169
+  - 54 app telemetry analytics in `queries/apps/`
   - 115 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 698
-- **Source rule breakdown:** Windows (249), Cloud/OCI (100), Linux (67), Web/WAF (38)
-- **Combined MITRE ATT&CK coverage:** 233 techniques across 14 tactics
+- **Total query artifacts/content items:** 782
+- **Source rule breakdown:** Windows (302), Cloud/OCI (102), Linux (80), Web/WAF (38)
+- **Combined MITRE ATT&CK coverage:** 243 techniques across 14 tactics
+- **MITRE ATLAS (AI/ML) coverage:** 10 techniques across 10 tactics — adversarial AI/LLM detections on `SOC Application Logs` and the `SOC GenAI Gateway Logs` source (GOAD/Caldera/OpenAEV + AI red-team)
 - **STIG coverage:** 24 detections spanning 12 controls
-- **Atomic Red Team coverage:** 280 / 331 testable rules have ART mappings (84.6%)
+- **Atomic Red Team coverage:** 280 / 397 testable rules have ART mappings (70.5%)
 - **Dashboard inventory:** 29 dashboards with 441 active dashboard saved searches and 107 advanced visualization widgets
 - **Generated demo data:** 221,173 events across 20 NDJSON files in the latest local `test_data/manifest.json`
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)

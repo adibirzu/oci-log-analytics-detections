@@ -1,0 +1,30 @@
+title: "SID History Injection via mimikatz"
+id: dc9708d2-5506-4c7c-9c0b-af75ec0738bb
+status: experimental
+description: >
+  Detects mimikatz commands that inject a privileged SID into the sidHistory
+  attribute of a controlled account (sid::patch, sid::add, misc::addsid),
+  granting domain-admin-equivalent access. GOAD shows golden tickets with SID
+  history across forest trusts.
+references:
+  - https://attack.mitre.org/techniques/T1134/005/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'sid::patch'
+      - 'sid::add'
+      - 'misc::addsid'
+      - 'Add-ADGroupMember -SIDHistory'
+  condition: selection
+level: critical
+tags:
+  - attack.privilege_escalation
+  - attack.t1134.005
+falsepositives:
+  - None expected outside sanctioned testing
+version: 1

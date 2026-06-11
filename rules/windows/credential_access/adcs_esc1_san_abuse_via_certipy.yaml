@@ -1,0 +1,43 @@
+title: "ADCS ESC1: Subject Alternative Name Abuse via Certipy/Certify"
+id: 50fe3f50-4618-4135-b444-21f2b7b4e08e
+status: experimental
+description: >
+  Detects ADCS ESC1 abuse where an attacker requests a certificate from a
+  vulnerable template that allows enrollee-supplied subject and uses an
+  alternate UPN (SAN) to impersonate a privileged account. Certipy and
+  Certify expose this via the 'req' action with -upn/-template/-altname.
+  In GOAD this is run against the ESC1 template on the CA to impersonate a
+  Domain Admin.
+references:
+  - https://attack.mitre.org/techniques/T1649/
+  - https://posts.specterops.io/certified-pre-owned-d95910965cd2
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_tool:
+    CommandLine|contains:
+      - 'certipy'
+      - 'Certify.exe'
+      - 'Certify '
+  selection_req:
+    CommandLine|contains:
+      - 'req'
+      - 'request'
+  selection_san:
+    CommandLine|contains:
+      - '-upn'
+      - '/altname'
+      - '-altname'
+      - 'subject'
+      - '-sid'
+  condition: selection_tool and selection_req and selection_san
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1649
+falsepositives:
+  - Authorized certificate template security assessments
+version: 1

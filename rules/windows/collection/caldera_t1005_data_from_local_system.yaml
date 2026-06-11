@@ -1,0 +1,48 @@
+title: Caldera - Data Collection from Local System via findstr and PowerShell (Windows)
+id: 29a99d76-e1b8-47f4-b522-48dbbfeec148
+status: experimental
+description: >
+  Detects collection of sensitive documents and data files from local directories.
+  Caldera T1005 emulation searches for and copies high-value files (documents,
+  spreadsheets, databases, source code) from user profiles and common data paths
+  to a staging location. Complements credential_file_discovery with broader document collection.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_findstr_docs:
+    Image|endswith: \findstr.exe
+    CommandLine|contains:
+      - '.docx'
+      - '.xlsx'
+      - '.pdf'
+      - '.pst'
+      - '.kdbx'
+  sel_ps_doc_search:
+    CommandLine|contains:
+      - 'Get-ChildItem -Recurse'
+      - 'Get-Item -Path'
+      - 'dir /s /b'
+  sel_copy_docs:
+    CommandLine|contains:
+      - '\Documents\'
+      - '\Desktop\'
+      - '\Downloads\'
+      - '\AppData\'
+  sel_staging_dest:
+    CommandLine|contains:
+      - 'C:\Temp'
+      - 'C:\Users\Public'
+      - 'C:\ProgramData'
+  condition: (sel_findstr_docs or sel_ps_doc_search) and (sel_copy_docs or sel_staging_dest)
+level: medium
+tags:
+  - attack.collection
+  - attack.t1005
+falsepositives:
+  - Document management systems indexing files
+  - Backup agents scanning user directories
+  - E-discovery tools collecting user data
+version: 1

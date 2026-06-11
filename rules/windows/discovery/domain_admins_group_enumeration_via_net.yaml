@@ -1,0 +1,33 @@
+title: "Domain Admins Group Enumeration via net group"
+id: d641fca3-e406-4a88-9277-1b509e865eb5
+status: experimental
+description: >
+  Detects enumeration of high-value domain groups (Domain Admins, Enterprise
+  Admins) using 'net group /domain'. Standard early-stage AD recon to map
+  privileged accounts before targeting them.
+references:
+  - https://attack.mitre.org/techniques/T1069/002/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+      - 'group'
+      - '/domain'
+  selection_grp:
+    CommandLine|contains:
+      - 'Domain Admins'
+      - 'Enterprise Admins'
+      - 'Domain Controllers'
+      - 'Schema Admins'
+  condition: selection and selection_grp
+level: medium
+tags:
+  - attack.discovery
+  - attack.t1069.002
+falsepositives:
+  - Administrators auditing privileged group membership
+version: 1

@@ -293,6 +293,34 @@ CUSTOM_FIELDS = [
     "Threat Name",
     "Threat Category",
     "Direction",
+    # GenAI / LLM gateway fields (MITRE ATLAS coverage — SOC GenAI Gateway Logs)
+    "GenAI Provider",
+    "GenAI Model",
+    "GenAI Endpoint",
+    "GenAI Operation",
+    "GenAI Prompt",
+    "GenAI Completion",
+    "GenAI Prompt Tokens",
+    "GenAI Completion Tokens",
+    "GenAI Total Tokens",
+    "GenAI Latency ms",
+    "GenAI Finish Reason",
+    "GenAI Request ID",
+    "GenAI Identity",
+    "API Key ID",
+    "Guardrail Action",
+    "Guardrail Category",
+    "Gateway Decision",
+    "Prompt Risk Score",
+    "Injection Detected",
+    "Jailbreak Detected",
+    "Data Leak Detected",
+    "Model Source",
+    "Model Version",
+    "Model Hash",
+    "Model Signature Valid",
+    "ATLAS Tactic",
+    "ATLAS Technique ID",
 ]
 
 
@@ -311,6 +339,11 @@ FIELD_DATA_TYPE_OVERRIDES = {
     "API Gateway Rate Limit": "LONG",
     "API Gateway Rate Remaining": "LONG",
     "Chaos TTL Seconds": "LONG",
+    "GenAI Prompt Tokens": "LONG",
+    "GenAI Completion Tokens": "LONG",
+    "GenAI Total Tokens": "LONG",
+    "GenAI Latency ms": "LONG",
+    "Prompt Risk Score": "LONG",
 }
 
 

@@ -1,0 +1,40 @@
+title: Caldera - System Network Configuration Discovery (Windows)
+id: afd8e429-4606-414c-895c-271a2078320d
+status: experimental
+description: >
+  Detects network configuration enumeration on Windows systems as emulated by
+  Caldera T1016 operations. Adversaries run ipconfig, arp, nslookup, and
+  PowerShell network cmdlets to identify interfaces, DNS settings, and proxies.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_ipconfig:
+    Image|endswith: \ipconfig.exe
+    CommandLine|contains:
+      - '/all'
+      - '/displaydns'
+      - '/flushdns'
+  sel_arp:
+    Image|endswith: \arp.exe
+    CommandLine|contains: '-a'
+  sel_nslookup:
+    Image|endswith: \nslookup.exe
+  sel_ps_net:
+    CommandLine|contains:
+      - 'Get-NetIPConfiguration'
+      - 'Get-NetIPAddress'
+      - 'Get-DnsClientServerAddress'
+      - 'Get-NetAdapter'
+  condition: sel_ipconfig or sel_arp or sel_nslookup or sel_ps_net
+level: low
+tags:
+  - attack.discovery
+  - attack.t1016
+falsepositives:
+  - Network administrators running ipconfig
+  - IT support scripts collecting network diagnostics
+  - Monitoring agents polling network configuration
+version: 1

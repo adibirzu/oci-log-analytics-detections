@@ -1,0 +1,38 @@
+title: "Pass-the-Cert / UnPAC-the-Hash via Certipy auth"
+id: 88a0571b-8529-43f5-a264-ab3d93678fbe
+status: experimental
+description: >
+  Detects authentication using a stolen or forged certificate (pass-the-cert)
+  and PKINIT UnPAC-the-hash, where Certipy 'auth' is used with a .pfx to obtain
+  a TGT and recover the account NT hash from the PAC. Rubeus asktgt with
+  /getcredentials /certificate performs the equivalent.
+references:
+  - https://attack.mitre.org/techniques/T1550/003/
+  - https://attack.mitre.org/techniques/T1649/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_certipy:
+    CommandLine|contains|all:
+      - 'certipy'
+      - 'auth'
+  selection_pfx:
+    CommandLine|contains:
+      - '-pfx'
+      - '.pfx'
+  selection_rubeus:
+    CommandLine|contains|all:
+      - 'asktgt'
+      - '/getcredentials'
+  condition: (selection_certipy and selection_pfx) or selection_rubeus
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1550.003
+  - attack.t1649
+falsepositives:
+  - Authorized certificate-based authentication testing
+version: 1

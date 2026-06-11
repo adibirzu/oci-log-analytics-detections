@@ -12,6 +12,7 @@ from logsources.field_catalog import *  # noqa: F401,F403
 from logsources.endpoint_sources import *  # noqa: F401,F403
 from logsources.web_sources import *  # noqa: F401,F403
 from logsources.application_sources import *  # noqa: F401,F403
+from logsources.genai_gateway_sources import *  # noqa: F401,F403
 from logsources.cloud_native_sources import *  # noqa: F401,F403
 
 
@@ -30,6 +31,7 @@ NATIVE_SOURCE_ALTERNATIVES = {
     LB_SOURCE_DISPLAY: ["OCI Load Balancer Access Logs"],
     WEBAPP_SOURCE_DISPLAY: [],
     APP_SOURCE_DISPLAY: [],
+    GENAI_SOURCE_DISPLAY: [],
     AZURE_CUSTOM_SOURCE_DISPLAY: [],
     VCN_SOURCE_DISPLAY: ["OCI VCN Flow Logs", "VCN Flow Logs"],
     FW_SOURCE_DISPLAY: ["OCI Network Firewall Logs", "Network Firewall Logs"],

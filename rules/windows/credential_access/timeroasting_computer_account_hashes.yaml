@@ -6,7 +6,8 @@ description: >
   request authenticators for computer accounts using only their RID, yielding
   MD5-based hashes for offline cracking without any domain credentials.
 references:
-  - https://attack.mitre.org/techniques/T1558/003/
+  - https://attack.mitre.org/techniques/T1558/
+  - https://www.secura.com/blog/timeroasting-attacking-trust-accounts-in-active-directory
 author: SOC Detection Engineering
 date: 2026/06/11
 logsource:
@@ -23,7 +24,7 @@ detection:
 level: high
 tags:
   - attack.credential_access
-  - attack.t1558.003
+  - attack.t1558
 falsepositives:
   - None expected; no legitimate use of timeroasting tooling
 version: 1

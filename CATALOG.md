@@ -1,33 +1,33 @@
 # Detection Rule Catalog
 
-> **546 base detection queries** + **60 Microsoft Sentinel conversions** + **62 app/APM queries** + **115 hunting queries**
+> **545 base detection queries** + **60 Microsoft Sentinel conversions** + **62 app/APM queries** + **115 hunting queries**
 
 ## Summary
 
 | Content Surface | Count | Notes |
 |-----------------|-------|-------|
-| Base detection queries | 546 | Sigma-derived detections in `queries/` |
+| Base detection queries | 545 | Sigma-derived detections in `queries/` |
 | Microsoft Sentinel conversions | 60 | Source-derived converted detections in `queries/sentinel/` |
 | App/APM queries | 62 | 8 Sigma-derived browser detections + 54 curated analytics in `queries/apps/` |
 | Hunting queries | 115 | Curated analytics and correlation content in `queries/hunting/` |
 
-**Source YAML rules:** 523 total (cloud: 102, linux: 80, web: 38, windows: 303)
+**Source YAML rules:** 522 total (cloud: 102, linux: 80, web: 38, windows: 302)
 
 | Platform | Rules |
 |----------|-------|
 | OCI Cloud | 148 |
 | Linux | 81 |
-| Windows | 317 |
+| Windows | 316 |
 
 | Severity | Count |
 |----------|-------|
 | 🔴 Critical | 110 |
 | 🟠 High | 229 |
-| 🟡 Medium | 148 |
+| 🟡 Medium | 147 |
 | 🔵 Low | 29 |
 | ⚪ Informational | 30 |
 
-**Atomic Red Team Coverage:** 280/398 testable rules have ART tests (70.4%) | 3208 total test mappings
+**Atomic Red Team Coverage:** 280/397 testable rules have ART tests (70.5%) | 3208 total test mappings
 
 **STIG Coverage:** 24 rules covering 12 controls (AC-17, AC-3, AC-6, AU-11, AU-12, CP-9, IA-2, IA-5, IA-8, SC-12, SC-28, SC-7)
 
@@ -448,11 +448,11 @@
 | T1556 | NPPSpy Credential Interception, OCI User MFA Not Enabled, +2 more |
 | T1556.001 | Skeleton Key Domain Backdoor via mimikatz |
 | T1557.001 | ADCS ESC8: NTLM Relay to Certificate Web Enrollment, ntlmrelayx NTLM Relay Execution Indicators |
-| T1558 | Kerberos Ticket Export via Mimikatz, Unconstrained Delegation TGT Capture via Rubeus monitor |
+| T1558 | Kerberos Ticket Export via Mimikatz, Timeroasting: Computer Account Hash Harvest via NTP, Unconstrained Delegation TGT Capture via Rubeus monitor |
 | T1558.001 | Golden Ticket: RC4 Encrypted TGT Request |
 | T1558.002 | Silver Ticket: Forged Kerberos Service Ticket |
 | T1558.003 | Constrained Delegation S4U2Proxy Abuse via Rubeus, Kerberoasting: RC4 Encrypted Service Ticket Request, +13 more |
-| T1558.004 | AS-REP Roasting: Pre-Auth-Disabled RC4 AS-REQ (Event 4768), AS-REP Roasting via Rubeus, Targeted AS-REP Roasting: DoNotRequirePreAuth Set |
+| T1558.004 | AS-REP Roasting via Rubeus, Targeted AS-REP Roasting: DoNotRequirePreAuth Set |
 | T1566 | Google DNS - Exchange online autodiscover abuse, 2025-2026: Compromised Machines and Data, MELTS: 2025-2026 Attack Signal Overview |
 | T1567.002 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), BLUELIGHT: Total Detections (24h) |
 | T1580 | Web-to-Cloud: Compromised Cloud Identity |
@@ -968,7 +968,7 @@ Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** (AML.T* te
 | 80 | Linux Sudo Usage | 🔵 low | T1548.003 | 6 | - |
 | 81 | Linux System Owner and User Discovery | 🔵 low | T1033 | 7 | - |
 
-### Windows (317 rules)
+### Windows (316 rules)
 
 | # | Title | Severity | MITRE | ART Tests | STIG |
 |---|-------|----------|-------|-----------|------|
@@ -1146,7 +1146,7 @@ Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** (AML.T* te
 | 172 | Targeted Kerberoasting: SPN Set on User Account | 🟠 high | T1558.003 | - | - |
 | 173 | Template Injection via Microsoft Office | 🟠 high | T1221 | 1 | - |
 | 174 | Time Provider DLL Persistence | 🟠 high | T1547.003 | 2 | - |
-| 175 | Timeroasting: Computer Account Hash Harvest via NTP | 🟠 high | T1558.003 | - | - |
+| 175 | Timeroasting: Computer Account Hash Harvest via NTP | 🟠 high | T1558, T1558.003 | - | - |
 | 176 | Timestomping via PowerShell | 🟠 high | T1070.006 | 10 | - |
 | 177 | Token Impersonation via Incognito | 🟠 high | T1134 | 13 | - |
 | 178 | UAC Bypass via ComputerDefaults | 🟠 high | T1548.002 | 27 | - |
@@ -1187,108 +1187,107 @@ Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** (AML.T* te
 | 213 | Wscript Running Encoded Script | 🟠 high | T1059.005 | 3 | - |
 | 214 | XSL Script Processing via WMIC or Msxsl | 🟠 high | T1220 | 4 | - |
 | 215 | gMSA Managed Password Read Attempt | 🟠 high | T1555 | - | - |
-| 216 | AS-REP Roasting: Pre-Auth-Disabled RC4 AS-REQ (Event 4768) | 🟡 medium | T1558.004 | - | - |
-| 217 | AlwaysInstallElevated Exploitation | 🟡 medium | T1548.002 | 27 | - |
-| 218 | Application Shimming for Persistence | 🟡 medium | T1546.011 | 3 | - |
-| 219 | BITS Job Persistence | 🟡 medium | T1197 | 4 | - |
-| 220 | BLUELIGHT RAT: C2 via Microsoft Graph API | 🟡 medium | T1071.001 | - | - |
-| 221 | BLUELIGHT RAT: File Discovery from Browser Process | 🟡 medium | T1083 | - | - |
-| 222 | BLUELIGHT RAT: Internet Explorer Drive-by Compromise | 🟡 medium | T1189 | - | - |
-| 223 | BLUELIGHT RAT: Registry Enumeration of Security Products | 🟡 medium | T1012 | - | - |
-| 224 | Caldera - Credential Search in Config and Environment Files (Windows) | 🟡 medium | T1552, T1552.001 | - | - |
-| 225 | Caldera - Data Collection from Local System via findstr and PowerShell (Windows) | 🟡 medium | T1005 | - | - |
-| 226 | Caldera - Data Collection from Network Shared Drive (Windows) | 🟡 medium | T1039 | - | - |
-| 227 | Caldera - Remote Data Staging via SMB Share Write | 🟡 medium | T1074, T1074.002 | - | - |
-| 228 | Clipboard Data Collection | 🟡 medium | T1115 | 5 | - |
-| 229 | Compiled HTML File Execution | 🟡 medium | T1218.001 | 8 | - |
-| 230 | Control Panel Item Execution | 🟡 medium | T1218 | 16 | - |
-| 231 | Credential File Discovery | 🟡 medium | T1552.001 | 17 | - |
-| 232 | Credential Manager: High-Frequency Credential Read | 🟡 medium | T1555.004 | - | - |
-| 233 | DLL Side-Loading from Suspicious Directory | 🟡 medium | T1574.002 | - | - |
-| 234 | Data Compression for Exfiltration via 7zip | 🟡 medium | T1560.001 | 12 | - |
-| 235 | Defacement via Desktop Wallpaper Change | 🟡 medium | T1491.001 | 4 | - |
-| 236 | Default File Association Hijack | 🟡 medium | T1546.001 | 1 | - |
-| 237 | Domain Admins Group Enumeration via net group | 🟡 medium | T1069.002 | - | - |
-| 238 | Domain Trust Discovery via Nltest | 🟡 medium | T1482 | 8 | - |
-| 239 | Executable Written to Remote Admin Share (Lateral Tool Transfer) | 🟡 medium | T1021.002, T1570 | - | - |
-| 240 | File Deletion of Security Tools | 🟡 medium | T1070.004 | 11 | - |
-| 241 | File and Directory Discovery via dir | 🟡 medium | T1083 | 9 | - |
-| 242 | Finger.exe Abuse for File Download | 🟡 medium | T1105 | 39 | - |
-| 243 | Hidden PowerShell Window Execution | 🟡 medium | T1564.003 | 3 | - |
-| 244 | Indirect Command Execution via Forfiles | 🟡 medium | T1202 | 5 | - |
-| 245 | JavaScript Execution via Node.js | 🟡 medium | T1059.007 | 2 | - |
-| 246 | Office Application Startup Persistence | 🟡 medium | T1137 | 1 | - |
-| 247 | PowerView / PowerSploit Domain Reconnaissance | 🟡 medium | T1087.002, T1482 | - | - |
-| 248 | Python Execution as Child of System Process | 🟡 medium | T1059.006 | 4 | - |
-| 249 | Query Registry for Security Products | 🟡 medium | T1518.001 | 11 | - |
-| 250 | SDelete Secure File Deletion | 🟡 medium | T1070.004 | 11 | - |
-| 251 | Scheduled Task XML Import | 🟡 medium | T1053.005 | - | - |
-| 252 | ScreenSaver Hijacking Persistence | 🟡 medium | T1546.002 | 1 | - |
-| 253 | Security Group Enumeration: Rapid Membership Queries | 🟡 medium | T1069.002, T1087.002 | - | - |
-| 254 | Service Permissions Weakness Discovery | 🟡 medium | T1574.011 | 2 | - |
-| 255 | Shortcut Modification for Persistence | 🟡 medium | T1547.009 | 2 | - |
-| 256 | Startup Folder Modification | 🟡 medium | T1547.001 | 20 | - |
-| 257 | Sysmon DNS Query to Suspicious TLDs | 🟡 medium | T1071.004 | 4 | - |
-| 258 | Sysmon Executable File Created or Detected | 🟡 medium | T1105, T1547.001 | - | - |
-| 259 | Sysmon LDAP Reconnaissance | 🟡 medium | T1087.002, T1069.002 | 39 | - |
-| 260 | Sysmon RDP Lateral Movement | 🟡 medium | T1021.001 | 4 | - |
-| 261 | System Shutdown or Reboot via shutdown.exe | 🟡 medium | T1529 | 16 | - |
-| 262 | Token Manipulation via RunAs | 🟡 medium | T1134.002 | 2 | - |
-| 263 | UAC Bypass via DiskCleanup | 🟡 medium | T1548.002 | 27 | - |
-| 264 | Unquoted Service Path Exploitation | 🟡 medium | T1574.009 | 1 | - |
-| 265 | Virtualization Sandbox Evasion Check | 🟡 medium | T1497 | 9 | - |
-| 266 | Visual Basic Script Compilation via vbc.exe | 🟡 medium | T1059.005 | 3 | - |
-| 267 | WiFi Password Extraction via Netsh | 🟡 medium | T1552.001 | 17 | - |
-| 268 | WinRM Lateral Movement via PowerShell | 🟡 medium | T1021.006 | 3 | - |
-| 269 | Windows Account Discovery Commands | 🟡 medium | T1087.001, T1087.002 | 35 | - |
-| 270 | Windows Account or Group Enumeration Spike | 🟡 medium | T1087, T1069 | - | - |
-| 271 | Windows Admin Share Access via Net Use | 🟡 medium | T1021.002 | 4 | - |
-| 272 | Windows Credential Manager Access via VaultCmd | 🟡 medium | T1555 | 8 | - |
-| 273 | Windows Data Staging for Exfiltration | 🟡 medium | T1074.001 | 3 | - |
-| 274 | Windows Kerberos Pre-Authentication Failure Spike | 🟡 medium | T1110 | - | - |
-| 275 | Windows LOLBin Usage: at | 🟡 medium | T1218 | 16 | - |
-| 276 | Windows LOLBin Usage: bitsadmin | 🟡 medium | T1218 | 16 | - |
-| 277 | Windows LOLBin Usage: certutil | 🟡 medium | T1218 | 16 | - |
-| 278 | Windows LOLBin Usage: cmd | 🟡 medium | T1218 | 16 | - |
-| 279 | Windows LOLBin Usage: cscript | 🟡 medium | T1218 | 16 | - |
-| 280 | Windows LOLBin Usage: ipconfig | 🟡 medium | T1218 | 16 | - |
-| 281 | Windows LOLBin Usage: mshta | 🟡 medium | T1218 | 16 | - |
-| 282 | Windows LOLBin Usage: net | 🟡 medium | T1218 | 16 | - |
-| 283 | Windows LOLBin Usage: net1 | 🟡 medium | T1218 | 16 | - |
-| 284 | Windows LOLBin Usage: powershell | 🟡 medium | T1218 | 16 | - |
-| 285 | Windows LOLBin Usage: regsvr32 | 🟡 medium | T1218 | 16 | - |
-| 286 | Windows LOLBin Usage: rundll32 | 🟡 medium | T1218 | 16 | - |
-| 287 | Windows LOLBin Usage: sc | 🟡 medium | T1218 | 16 | - |
-| 288 | Windows LOLBin Usage: schtasks | 🟡 medium | T1218 | 16 | - |
-| 289 | Windows LOLBin Usage: systeminfo | 🟡 medium | T1218 | 16 | - |
-| 290 | Windows LOLBin Usage: taskkill | 🟡 medium | T1218 | 16 | - |
-| 291 | Windows LOLBin Usage: tasklist | 🟡 medium | T1218 | 16 | - |
-| 292 | Windows LOLBin Usage: whoami | 🟡 medium | T1218 | 16 | - |
-| 293 | Windows LOLBin Usage: wmic | 🟡 medium | T1218 | 16 | - |
-| 294 | Windows LOLBin Usage: wscript | 🟡 medium | T1218 | 16 | - |
-| 295 | Windows MSBuild Execution for Code Bypass | 🟡 medium | T1127.001 | 2 | - |
-| 296 | Windows NTLM Authentication Failure Spike | 🟡 medium | T1110 | - | - |
-| 297 | Windows Network Share Discovery | 🟡 medium | T1135 | 12 | - |
-| 298 | Windows RDP Lateral Movement | 🟡 medium | T1021.001 | 4 | - |
-| 299 | Windows Remote System Discovery | 🟡 medium | T1018 | 22 | - |
-| 300 | Windows Scheduled Task Creation via Schtasks | 🟡 medium | T1053.005 | 12 | - |
-| 301 | Windows Screen Capture Activity | 🟡 medium | T1113 | 10 | - |
-| 302 | Windows Service Creation via SC | 🟡 medium | T1543.003 | 6 | - |
-| 303 | Windows Vault Enumeration | 🟡 medium | T1555 | 8 | - |
-| 304 | Caldera - Network Configuration Recon via ipconfig and route (Windows) | 🔵 low | T1016 | - | - |
-| 305 | Caldera - System Information Discovery via systeminfo and WMI (Windows) | 🔵 low | T1082 | - | - |
-| 306 | Caldera - System Network Configuration Discovery (Windows) | 🔵 low | T1016 | - | - |
-| 307 | Caldera - System Network Connections Discovery (Windows) | 🔵 low | T1049 | - | - |
-| 308 | Caldera - System Owner Discovery via whoami and query Commands (Windows) | 🔵 low | T1033 | - | - |
-| 309 | Caldera - System Owner and User Discovery (Windows) | 🔵 low | T1033 | - | - |
-| 310 | Caldera - WMIC OS and Hardware Enumeration (Windows) | 🔵 low | T1082 | - | - |
-| 311 | Lateral Tool Transfer via Robocopy | 🔵 low | T1570 | 2 | - |
-| 312 | Local Group Membership Discovery | 🔵 low | T1069.001 | 7 | - |
-| 313 | Network Share Enumeration via Net View | 🔵 low | T1135 | 12 | - |
-| 314 | Password Policy Discovery | 🔵 low | T1201 | 12 | - |
-| 315 | PowerShell Execution via Alternate Shell | 🔵 low | T1059.001 | 22 | - |
-| 316 | Process Discovery via Tasklist | 🔵 low | T1057 | 9 | - |
-| 317 | Software Discovery via WMIC | 🔵 low | T1518 | 6 | - |
+| 216 | AlwaysInstallElevated Exploitation | 🟡 medium | T1548.002 | 27 | - |
+| 217 | Application Shimming for Persistence | 🟡 medium | T1546.011 | 3 | - |
+| 218 | BITS Job Persistence | 🟡 medium | T1197 | 4 | - |
+| 219 | BLUELIGHT RAT: C2 via Microsoft Graph API | 🟡 medium | T1071.001 | - | - |
+| 220 | BLUELIGHT RAT: File Discovery from Browser Process | 🟡 medium | T1083 | - | - |
+| 221 | BLUELIGHT RAT: Internet Explorer Drive-by Compromise | 🟡 medium | T1189 | - | - |
+| 222 | BLUELIGHT RAT: Registry Enumeration of Security Products | 🟡 medium | T1012 | - | - |
+| 223 | Caldera - Credential Search in Config and Environment Files (Windows) | 🟡 medium | T1552, T1552.001 | - | - |
+| 224 | Caldera - Data Collection from Local System via findstr and PowerShell (Windows) | 🟡 medium | T1005 | - | - |
+| 225 | Caldera - Data Collection from Network Shared Drive (Windows) | 🟡 medium | T1039 | - | - |
+| 226 | Caldera - Remote Data Staging via SMB Share Write | 🟡 medium | T1074, T1074.002 | - | - |
+| 227 | Clipboard Data Collection | 🟡 medium | T1115 | 5 | - |
+| 228 | Compiled HTML File Execution | 🟡 medium | T1218.001 | 8 | - |
+| 229 | Control Panel Item Execution | 🟡 medium | T1218 | 16 | - |
+| 230 | Credential File Discovery | 🟡 medium | T1552.001 | 17 | - |
+| 231 | Credential Manager: High-Frequency Credential Read | 🟡 medium | T1555.004 | - | - |
+| 232 | DLL Side-Loading from Suspicious Directory | 🟡 medium | T1574.002 | - | - |
+| 233 | Data Compression for Exfiltration via 7zip | 🟡 medium | T1560.001 | 12 | - |
+| 234 | Defacement via Desktop Wallpaper Change | 🟡 medium | T1491.001 | 4 | - |
+| 235 | Default File Association Hijack | 🟡 medium | T1546.001 | 1 | - |
+| 236 | Domain Admins Group Enumeration via net group | 🟡 medium | T1069.002 | - | - |
+| 237 | Domain Trust Discovery via Nltest | 🟡 medium | T1482 | 8 | - |
+| 238 | Executable Written to Remote Admin Share (Lateral Tool Transfer) | 🟡 medium | T1021.002, T1570 | - | - |
+| 239 | File Deletion of Security Tools | 🟡 medium | T1070.004 | 11 | - |
+| 240 | File and Directory Discovery via dir | 🟡 medium | T1083 | 9 | - |
+| 241 | Finger.exe Abuse for File Download | 🟡 medium | T1105 | 39 | - |
+| 242 | Hidden PowerShell Window Execution | 🟡 medium | T1564.003 | 3 | - |
+| 243 | Indirect Command Execution via Forfiles | 🟡 medium | T1202 | 5 | - |
+| 244 | JavaScript Execution via Node.js | 🟡 medium | T1059.007 | 2 | - |
+| 245 | Office Application Startup Persistence | 🟡 medium | T1137 | 1 | - |
+| 246 | PowerView / PowerSploit Domain Reconnaissance | 🟡 medium | T1087.002, T1482 | - | - |
+| 247 | Python Execution as Child of System Process | 🟡 medium | T1059.006 | 4 | - |
+| 248 | Query Registry for Security Products | 🟡 medium | T1518.001 | 11 | - |
+| 249 | SDelete Secure File Deletion | 🟡 medium | T1070.004 | 11 | - |
+| 250 | Scheduled Task XML Import | 🟡 medium | T1053.005 | - | - |
+| 251 | ScreenSaver Hijacking Persistence | 🟡 medium | T1546.002 | 1 | - |
+| 252 | Security Group Enumeration: Rapid Membership Queries | 🟡 medium | T1069.002, T1087.002 | - | - |
+| 253 | Service Permissions Weakness Discovery | 🟡 medium | T1574.011 | 2 | - |
+| 254 | Shortcut Modification for Persistence | 🟡 medium | T1547.009 | 2 | - |
+| 255 | Startup Folder Modification | 🟡 medium | T1547.001 | 20 | - |
+| 256 | Sysmon DNS Query to Suspicious TLDs | 🟡 medium | T1071.004 | 4 | - |
+| 257 | Sysmon Executable File Created or Detected | 🟡 medium | T1105, T1547.001 | - | - |
+| 258 | Sysmon LDAP Reconnaissance | 🟡 medium | T1087.002, T1069.002 | 39 | - |
+| 259 | Sysmon RDP Lateral Movement | 🟡 medium | T1021.001 | 4 | - |
+| 260 | System Shutdown or Reboot via shutdown.exe | 🟡 medium | T1529 | 16 | - |
+| 261 | Token Manipulation via RunAs | 🟡 medium | T1134.002 | 2 | - |
+| 262 | UAC Bypass via DiskCleanup | 🟡 medium | T1548.002 | 27 | - |
+| 263 | Unquoted Service Path Exploitation | 🟡 medium | T1574.009 | 1 | - |
+| 264 | Virtualization Sandbox Evasion Check | 🟡 medium | T1497 | 9 | - |
+| 265 | Visual Basic Script Compilation via vbc.exe | 🟡 medium | T1059.005 | 3 | - |
+| 266 | WiFi Password Extraction via Netsh | 🟡 medium | T1552.001 | 17 | - |
+| 267 | WinRM Lateral Movement via PowerShell | 🟡 medium | T1021.006 | 3 | - |
+| 268 | Windows Account Discovery Commands | 🟡 medium | T1087.001, T1087.002 | 35 | - |
+| 269 | Windows Account or Group Enumeration Spike | 🟡 medium | T1087, T1069 | - | - |
+| 270 | Windows Admin Share Access via Net Use | 🟡 medium | T1021.002 | 4 | - |
+| 271 | Windows Credential Manager Access via VaultCmd | 🟡 medium | T1555 | 8 | - |
+| 272 | Windows Data Staging for Exfiltration | 🟡 medium | T1074.001 | 3 | - |
+| 273 | Windows Kerberos Pre-Authentication Failure Spike | 🟡 medium | T1110 | - | - |
+| 274 | Windows LOLBin Usage: at | 🟡 medium | T1218 | 16 | - |
+| 275 | Windows LOLBin Usage: bitsadmin | 🟡 medium | T1218 | 16 | - |
+| 276 | Windows LOLBin Usage: certutil | 🟡 medium | T1218 | 16 | - |
+| 277 | Windows LOLBin Usage: cmd | 🟡 medium | T1218 | 16 | - |
+| 278 | Windows LOLBin Usage: cscript | 🟡 medium | T1218 | 16 | - |
+| 279 | Windows LOLBin Usage: ipconfig | 🟡 medium | T1218 | 16 | - |
+| 280 | Windows LOLBin Usage: mshta | 🟡 medium | T1218 | 16 | - |
+| 281 | Windows LOLBin Usage: net | 🟡 medium | T1218 | 16 | - |
+| 282 | Windows LOLBin Usage: net1 | 🟡 medium | T1218 | 16 | - |
+| 283 | Windows LOLBin Usage: powershell | 🟡 medium | T1218 | 16 | - |
+| 284 | Windows LOLBin Usage: regsvr32 | 🟡 medium | T1218 | 16 | - |
+| 285 | Windows LOLBin Usage: rundll32 | 🟡 medium | T1218 | 16 | - |
+| 286 | Windows LOLBin Usage: sc | 🟡 medium | T1218 | 16 | - |
+| 287 | Windows LOLBin Usage: schtasks | 🟡 medium | T1218 | 16 | - |
+| 288 | Windows LOLBin Usage: systeminfo | 🟡 medium | T1218 | 16 | - |
+| 289 | Windows LOLBin Usage: taskkill | 🟡 medium | T1218 | 16 | - |
+| 290 | Windows LOLBin Usage: tasklist | 🟡 medium | T1218 | 16 | - |
+| 291 | Windows LOLBin Usage: whoami | 🟡 medium | T1218 | 16 | - |
+| 292 | Windows LOLBin Usage: wmic | 🟡 medium | T1218 | 16 | - |
+| 293 | Windows LOLBin Usage: wscript | 🟡 medium | T1218 | 16 | - |
+| 294 | Windows MSBuild Execution for Code Bypass | 🟡 medium | T1127.001 | 2 | - |
+| 295 | Windows NTLM Authentication Failure Spike | 🟡 medium | T1110 | - | - |
+| 296 | Windows Network Share Discovery | 🟡 medium | T1135 | 12 | - |
+| 297 | Windows RDP Lateral Movement | 🟡 medium | T1021.001 | 4 | - |
+| 298 | Windows Remote System Discovery | 🟡 medium | T1018 | 22 | - |
+| 299 | Windows Scheduled Task Creation via Schtasks | 🟡 medium | T1053.005 | 12 | - |
+| 300 | Windows Screen Capture Activity | 🟡 medium | T1113 | 10 | - |
+| 301 | Windows Service Creation via SC | 🟡 medium | T1543.003 | 6 | - |
+| 302 | Windows Vault Enumeration | 🟡 medium | T1555 | 8 | - |
+| 303 | Caldera - Network Configuration Recon via ipconfig and route (Windows) | 🔵 low | T1016 | - | - |
+| 304 | Caldera - System Information Discovery via systeminfo and WMI (Windows) | 🔵 low | T1082 | - | - |
+| 305 | Caldera - System Network Configuration Discovery (Windows) | 🔵 low | T1016 | - | - |
+| 306 | Caldera - System Network Connections Discovery (Windows) | 🔵 low | T1049 | - | - |
+| 307 | Caldera - System Owner Discovery via whoami and query Commands (Windows) | 🔵 low | T1033 | - | - |
+| 308 | Caldera - System Owner and User Discovery (Windows) | 🔵 low | T1033 | - | - |
+| 309 | Caldera - WMIC OS and Hardware Enumeration (Windows) | 🔵 low | T1082 | - | - |
+| 310 | Lateral Tool Transfer via Robocopy | 🔵 low | T1570 | 2 | - |
+| 311 | Local Group Membership Discovery | 🔵 low | T1069.001 | 7 | - |
+| 312 | Network Share Enumeration via Net View | 🔵 low | T1135 | 12 | - |
+| 313 | Password Policy Discovery | 🔵 low | T1201 | 12 | - |
+| 314 | PowerShell Execution via Alternate Shell | 🔵 low | T1059.001 | 22 | - |
+| 315 | Process Discovery via Tasklist | 🔵 low | T1057 | 9 | - |
+| 316 | Software Discovery via WMIC | 🔵 low | T1518 | 6 | - |
 
 ## Microsoft Sentinel Converted Queries
 
@@ -1572,4 +1571,4 @@ Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** (AML.T* te
 | OCI VCN Peering Connection Created | SC-7 | CAT II | medium |
 
 ---
-*Generated from 523 Sigma source rules routed to 546 top-level detection queries and 8 browser app queries, plus 60 Microsoft Sentinel conversions, 54 curated app/APM analytics, and 115 hunting queries*
+*Generated from 522 Sigma source rules routed to 545 top-level detection queries and 8 browser app queries, plus 60 Microsoft Sentinel conversions, 54 curated app/APM analytics, and 115 hunting queries*

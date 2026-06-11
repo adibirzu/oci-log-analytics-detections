@@ -12,9 +12,11 @@ logsource:
   product: oci
   service: audit
 detection:
-  sel_create_bucket:
-    event_type: com.oraclecloud.objectstorage.createbucket
-  condition: sel_create_bucket
+  sel_object_storage_exfil:
+    event_type:
+      - com.oraclecloud.objectstorage.createbucket
+      - com.oraclecloud.objectstorage.putobject
+  condition: sel_object_storage_exfil
 level: medium
 tags:
   - attack.exfiltration

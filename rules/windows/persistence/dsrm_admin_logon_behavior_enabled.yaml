@@ -1,0 +1,33 @@
+title: "DSRM Admin Logon Behavior Enabled for Persistence"
+id: 432e1322-cd7a-46b9-99c6-dc17fb775570
+status: experimental
+description: >
+  Detects enabling of DsrmAdminLogonBehavior (registry value 2) on a Domain
+  Controller, which lets the Directory Services Restore Mode local admin
+  authenticate over the network — a stealthy DC backdoor once the DSRM hash is
+  synced (e.g. via mimikatz lsadump::dcsync or set-ntlm).
+references:
+  - https://attack.mitre.org/techniques/T1556/
+  - https://attack.mitre.org/techniques/T1003/003/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+      - 'DsrmAdminLogonBehavior'
+      - 'add'
+  selection_path:
+    CommandLine|contains:
+      - 'Lsa'
+      - 'reg add'
+  condition: selection and selection_path
+level: high
+tags:
+  - attack.persistence
+  - attack.t1556
+falsepositives:
+  - Rare deliberate DSRM recovery configuration
+version: 1

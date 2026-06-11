@@ -1,0 +1,34 @@
+title: "AdminSDHolder ACL Modification for Persistence"
+id: cf3d8b61-5745-4573-8bb1-bb868fb69995
+status: experimental
+description: >
+  Detects modification of the AdminSDHolder container ACL (or dsacls against it)
+  to plant a backdoor that SDProp re-applies to all protected groups every 60
+  minutes, granting durable privileged access to Domain Admins and similar.
+references:
+  - https://attack.mitre.org/techniques/T1098/
+  - https://attack.mitre.org/techniques/T1222/001/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'AdminSDHolder'
+  selection_acl:
+    CommandLine|contains:
+      - 'dsacls'
+      - 'Add-DomainObjectAcl'
+      - '/G '
+      - 'GenericAll'
+      - 'Set-Acl'
+  condition: selection and selection_acl
+level: critical
+tags:
+  - attack.persistence
+  - attack.t1098
+falsepositives:
+  - Rare sanctioned AdminSDHolder delegation changes
+version: 1

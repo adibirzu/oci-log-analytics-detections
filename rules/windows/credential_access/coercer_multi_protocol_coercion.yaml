@@ -1,0 +1,30 @@
+title: "Coercer Multi-Protocol Authentication Coercion"
+id: 1cbf821e-317a-4f69-bf74-787dd6535b60
+status: experimental
+description: >
+  Detects the Coercer tool, which automates authentication coercion across
+  multiple RPC interfaces (MS-EFSRPC, MS-RPRN, MS-DFSNM, MS-FSRVP, MS-EVEN)
+  to force a target to authenticate to an attacker host for NTLM relay.
+references:
+  - https://attack.mitre.org/techniques/T1187/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'Coercer'
+      - 'coercer.py'
+      - 'EfsRpcEncryptFileSrv'
+      - 'MS-FSRVP'
+      - 'IsPathShadowCopied'
+  condition: selection
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1187
+falsepositives:
+  - Authorized coercion assessments
+version: 1

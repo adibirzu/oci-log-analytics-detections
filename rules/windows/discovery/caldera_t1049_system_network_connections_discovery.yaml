@@ -1,0 +1,39 @@
+title: Caldera - System Network Connections Discovery (Windows)
+id: 10b9adb3-5e6b-463c-9805-103fbfbfe2db
+status: experimental
+description: >
+  Detects enumeration of active network connections on Windows systems.
+  Caldera T1049 emulation runs netstat.exe and PowerShell Get-NetTCPConnection
+  to list established connections, listening ports, and routing tables for
+  network topology mapping after initial access.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_netstat:
+    Image|endswith: \netstat.exe
+    CommandLine|contains:
+      - '-an'
+      - '-ano'
+      - '-b'
+      - '-f'
+  sel_ps_connections:
+    CommandLine|contains:
+      - 'Get-NetTCPConnection'
+      - 'Get-NetUDPEndpoint'
+      - 'netstat -a'
+  sel_route:
+    Image|endswith: \route.exe
+    CommandLine|contains: 'print'
+  condition: sel_netstat or sel_ps_connections or sel_route
+level: low
+tags:
+  - attack.discovery
+  - attack.t1049
+falsepositives:
+  - Security monitoring agents
+  - Administrators diagnosing network connectivity issues
+  - IT helpdesk troubleshooting tools
+version: 1

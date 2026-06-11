@@ -1,0 +1,42 @@
+title: Caldera - LSASS Memory Dump via ProcDump or Task Manager (Caldera Emulation)
+id: 988e7beb-0cc9-4734-89a6-906aaf3cfec2
+status: experimental
+description: >
+  Detects LSASS credential dumping specifically as emulated by Caldera T1003.001
+  operations. Caldera's credential-access adversary profile leverages ProcDump,
+  Task Manager, or comsvcs.dll MiniDump to extract LSASS memory. This rule covers
+  the ProcDump command-line pattern and the Task Manager dump output file name,
+  complementing the existing lsass_memory_dump_via_comsvcs_dll.yaml.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_procdump:
+    Image|endswith:
+      - \procdump.exe
+      - \procdump64.exe
+    CommandLine|contains:
+      - 'lsass'
+      - '-ma '
+  sel_taskmgr_dump:
+    CommandLine|contains:
+      - 'lsass.dmp'
+      - 'lsass.exe.dmp'
+  sel_nanodump:
+    Image|endswith: \nanodump.exe
+  sel_avdump:
+    CommandLine|contains:
+      - 'avdump64.exe'
+      - 'avdump.exe'
+  condition: sel_procdump or sel_taskmgr_dump or sel_nanodump or sel_avdump
+level: critical
+tags:
+  - attack.credential_access
+  - attack.t1003
+  - attack.t1003.001
+falsepositives:
+  - Authorized memory forensics on production systems
+  - Incident response tooling collecting crash dumps
+version: 1

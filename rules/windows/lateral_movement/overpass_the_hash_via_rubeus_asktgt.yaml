@@ -1,0 +1,37 @@
+title: "Overpass-the-Hash via Rubeus asktgt"
+id: 22580978-36a5-4e45-a8e1-ae5996e3f7b6
+status: experimental
+description: >
+  Detects overpass-the-hash (pass-the-key), where a stolen NTLM hash or AES key
+  is used with Rubeus 'asktgt' to request a fresh TGT, converting an NTLM hash
+  into full Kerberos access. Indicators: asktgt with /rc4, /aes256, or /des and
+  a /user + /domain.
+references:
+  - https://attack.mitre.org/techniques/T1550/002/
+  - https://attack.mitre.org/techniques/T1550/003/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains|all:
+      - 'asktgt'
+      - '/user:'
+  selection_key:
+    CommandLine|contains:
+      - '/rc4:'
+      - '/aes256:'
+      - '/aes128:'
+      - '/des:'
+      - '/ntlm:'
+  condition: selection and selection_key
+level: high
+tags:
+  - attack.lateral_movement
+  - attack.t1550.002
+  - attack.credential_access
+falsepositives:
+  - Authorized Kerberos testing
+version: 1

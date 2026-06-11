@@ -1,0 +1,31 @@
+title: "PrinterBug / SpoolSample Authentication Coercion"
+id: c4d636f4-d14b-4d7e-a292-1e056a58355a
+status: experimental
+description: >
+  Detects exploitation of the MS-RPRN PrinterBug (SpoolSample / printerbug.py)
+  to coerce a target (often a DC) into authenticating to an attacker host. Used
+  to relay or to capture a TGT from an unconstrained-delegation host. Distinct
+  from the already-covered PetitPotam (MS-EFSRPC) coercion.
+references:
+  - https://attack.mitre.org/techniques/T1187/
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+      - 'SpoolSample'
+      - 'printerbug'
+      - 'dementor'
+      - 'RpcRemoteFindFirstPrinterChangeNotification'
+      - 'MS-RPRN'
+  condition: selection
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1187
+falsepositives:
+  - Authorized coercion testing
+version: 1

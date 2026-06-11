@@ -1,0 +1,38 @@
+title: Caldera - System Owner Discovery via whoami and query Commands (Windows)
+id: 2d35b034-e399-418f-bd0b-e46ba04353a4
+status: experimental
+description: >
+  Process-creation level detection of whoami.exe, query.exe, and net user for
+  identity and session enumeration. Caldera T1033 emulation immediately runs
+  whoami /all to determine privilege level and group memberships, and query user
+  to list active sessions. This binary-level rule complements the discovery-category
+  rule that uses CommandLine matching.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_whoami:
+    Image|endswith: \whoami.exe
+  sel_whoami_all:
+    Image|endswith: \whoami.exe
+    CommandLine|contains:
+      - '/all'
+      - '/priv'
+      - '/groups'
+  sel_query_user:
+    Image|endswith: \query.exe
+    CommandLine|contains:
+      - 'user'
+      - 'session'
+  condition: sel_whoami or sel_whoami_all or sel_query_user
+level: low
+tags:
+  - attack.discovery
+  - attack.t1033
+falsepositives:
+  - Login audit scripts
+  - Help desk tools checking session state
+  - Administrators verifying user context
+version: 1

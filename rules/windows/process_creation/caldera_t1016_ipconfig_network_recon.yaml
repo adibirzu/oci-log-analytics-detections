@@ -1,0 +1,39 @@
+title: Caldera - Network Configuration Recon via ipconfig and route (Windows)
+id: 4ac677e1-063f-4fda-b903-f991c475a4c3
+status: experimental
+description: >
+  Detects ipconfig and route commands used by Caldera T1016 discovery emulation
+  on Windows. The operation chains ipconfig /all, route print, and arp -a to
+  enumerate all interfaces, gateway routes, and ARP cache for network mapping.
+  This process_creation level rule complements the discovery/caldera_t1016 rule
+  with specific binary-level matching.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_ipconfig:
+    Image|endswith: \ipconfig.exe
+  sel_route_print:
+    Image|endswith: \route.exe
+    CommandLine|contains: 'print'
+  sel_arp_a:
+    Image|endswith: \arp.exe
+    CommandLine|contains: '-a'
+  sel_nbtstat:
+    Image|endswith: \nbtstat.exe
+    CommandLine|contains:
+      - '-n'
+      - '-r'
+      - '-s'
+  condition: sel_ipconfig or sel_route_print or sel_arp_a or sel_nbtstat
+level: low
+tags:
+  - attack.discovery
+  - attack.t1016
+falsepositives:
+  - Network support scripts
+  - Automated diagnostic tools
+  - Helpdesk collecting network configuration
+version: 1

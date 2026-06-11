@@ -1,0 +1,46 @@
+title: Caldera - Data Collection from Network Shared Drive (Windows)
+id: 9fe8f4b5-510f-437d-9d93-92b5f613d001
+status: experimental
+description: >
+  Detects bulk file collection from UNC/admin share paths on Windows systems.
+  Caldera T1039 emulation copies or moves files from mapped network drives and
+  UNC paths to a local staging directory before exfiltration. Patterns include
+  xcopy, robocopy, and PowerShell Copy-Item with remote share source paths.
+author: SOC Detection Engineering
+date: 2026/06/11
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  sel_xcopy_share:
+    Image|endswith: \xcopy.exe
+    CommandLine|contains: '\\'
+  sel_robocopy_share:
+    Image|endswith: \robocopy.exe
+    CommandLine|contains: '\\'
+  sel_copy_share:
+    CommandLine|contains:
+      - 'copy \\'
+      - 'xcopy \\'
+  sel_ps_copy_share:
+    CommandLine|contains:
+      - 'Copy-Item \\'
+      - 'cp \\'
+      - 'Get-ChildItem \\'
+  sel_staging_dest:
+    CommandLine|contains:
+      - 'C:\Temp'
+      - 'C:\Users\Public'
+      - 'C:\ProgramData'
+      - '%TEMP%'
+      - '%TMP%'
+  condition: (sel_xcopy_share or sel_robocopy_share or sel_copy_share or sel_ps_copy_share) and sel_staging_dest
+level: medium
+tags:
+  - attack.collection
+  - attack.t1039
+falsepositives:
+  - Authorized backup procedures reading from network shares
+  - Migration scripts copying data between shares
+  - Software deployment pulling packages from file servers
+version: 1

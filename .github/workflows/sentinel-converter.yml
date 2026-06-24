@@ -94,6 +94,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
 
+      - name: Sync Sentinel candidate corpus
+        # sentinel_candidates.json is a gitignored, synced artifact. The corpus
+        # dry-run needs it to resolve --top all; produce it with a blobless +
+        # sparse checkout of the official Azure-Sentinel repo (cheap in CI).
+        run: python scripts/sync_sentinel_kql.py
+
       - name: Run local Sentinel conversion report
         run: |
           python scripts/sentinel_conversion_workflow.py local \

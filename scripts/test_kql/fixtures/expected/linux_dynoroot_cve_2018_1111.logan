@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Command Line' like '*/etc/NetworkManager/dispatcher.d/*' and 'Command Line' like '*-dhclient*' and ('Command Line' != null and 'Command Line' != '') and not ('Process Name' like '*.exe')) | fields Time, 'Host Name (Server)', 'Process Name', 'Command Line', 'Command Line'

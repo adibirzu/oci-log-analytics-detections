@@ -1,0 +1,80 @@
+{
+  "title": "CiscoISE - Certificate has expired",
+  "description": "'Detects certificate expiration.'\n",
+  "query": "'Log Source' = 'SOC Application Logs' and ('Event ID' = '60167') | fields 'Source IP', 'Source IP', 'Host Name', 'Target User Name'",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "6107cba5-2974-4c22-8222-2a6f7bbea664",
+  "sentinel_source_path": "Solutions/Cisco ISE/Analytic Rules/CiscoISECertExpired.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Cisco ISE/Analytic Rules/CiscoISECertExpired.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "SyslogAma",
+      "data_types": []
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "CiscoISEEvent"
+  ],
+  "sentinel_category": "identity",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.identity"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "credential_access"
+    ],
+    "techniques": [
+      "T1552"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "cisco_ise",
+    "candidates": [
+      "SOC Application Logs"
+    ],
+    "original_tables": [
+      "CiscoISEEvent"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Cisco ISE/Analytic Rules/CiscoISECertExpired.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

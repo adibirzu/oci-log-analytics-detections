@@ -1,0 +1,77 @@
+{
+  "title": "Cisco Cloud Security - 'Blocked' User-Agents.",
+  "description": "'Shows User-Agent values which requests were blocked'\n",
+  "query": "('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (Action = 'Blocked') | stats count as count_ by 'User Agent' | sort -count_",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "22e5e573-409b-433f-91de-50d6f0ad5a9e",
+  "sentinel_source_path": "Solutions/CiscoUmbrella/Hunting Queries/CiscoUmbrellaBlockedUserAgents.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CiscoUmbrella/Hunting Queries/CiscoUmbrellaBlockedUserAgents.yaml",
+  "required_data_connectors": [],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "Cisco_Umbrella"
+  ],
+  "sentinel_category": "network",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.network"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1020"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "dns_security",
+    "candidates": [
+      "SOC WAF Security Logs",
+      "SOC Web Application Logs",
+      "SOC Network Firewall Logs"
+    ],
+    "original_tables": [
+      "Cisco_Umbrella"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/CiscoUmbrella/Hunting Queries/CiscoUmbrellaBlockedUserAgents.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

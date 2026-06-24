@@ -1,0 +1,81 @@
+{
+  "title": "check-for-shadowhammer-activity-download-domain",
+  "description": "This query was originally published in the threat analytics report, ShadowHammer supply chain attack\nOperation ShadowHammer was an attack against ASUS computer hardware, using the company's own update infrastructure to deliver malware to the company's products. The campaign ran from June to November, 2018. ASUS has since responded with updates that protect their Live Update system, and diagnostic tools to check affected systems.\nThe following query checks for activity associated with the ShadowHammer download domain over the past 30 days.\nReferences:\nhttps://www.vice.com/en_us/article/pan9wn/hackers-hijacked-asus-software-updates-to-install-backdoors-on-thousands-of-computers\nhttps://www.asus.com/News/hqfgVUyZ6uyAyJe1\n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Network Logs' or 'Log Source' = 'SOC Sysmon Network Logs') and ('Request URL' = 'asushotfix.com' or 'Destination IP' = '141.105.71.116')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "1217e1fd-ebbb-4fdc-8b18-81be69876b3a",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Command and Control/check-for-shadowhammer-activity-download-domain.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Command and Control/check-for-shadowhammer-activity-download-domain.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceNetworkEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceNetworkEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Network Logs",
+      "SOC Sysmon Network Logs"
+    ],
+    "original_tables": [
+      "DeviceNetworkEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Command and Control/check-for-shadowhammer-activity-download-domain.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

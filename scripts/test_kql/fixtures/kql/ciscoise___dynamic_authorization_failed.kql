@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and ('Event ID' = '5417') | stats count as TotalEvents by 'Source IP' | where TotalEvents > 10

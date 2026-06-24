@@ -1,0 +1,86 @@
+{
+  "title": "SUNBURST and SUPERNOVA backdoor hashes",
+  "description": "Identifies SolarWinds SUNBURST and SUPERNOVA backdoor file hash IOCs in DeviceFileEvents\nReferences:\n- https://www.fireeye.com/blog/threat-research/2020/12/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor.html\n- https://gist.github.com/olafhartong/71ffdd4cab4b6acd5cbcd1a0691ff82f\n",
+  "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (Hashes in ('b91ce2fa41029f6955bff20079468448', '02af7cec58b9a5da1c542b5a32151ba1', '2c4a910a1299cdae2a4e55988a2f102e', '846e27a652a5e1bfbd0ddd38a16dc865', '4f2eb62fa529c0283b28d05ddd311fae') or Hashes in ('56ceb6d0011d87b6e4d7023d7ef85676')) | eval HashAlgorithm = 'MD5'",
+  "level": "high",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "a3c144f9-8051-47d4-ac29-ffb0c312c910",
+  "sentinel_source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/SolarWinds_SUNBURST_&_SUPERNOVA_File-IOCs.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/SolarWinds_SUNBURST_&_SUPERNOVA_File-IOCs.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceFileEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceFileEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "persistence",
+      "initial_access"
+    ],
+    "techniques": [
+      "T1195",
+      "T1059",
+      "T1546"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceFileEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Analytic Rules/SolarWinds_SUNBURST_&_SUPERNOVA_File-IOCs.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

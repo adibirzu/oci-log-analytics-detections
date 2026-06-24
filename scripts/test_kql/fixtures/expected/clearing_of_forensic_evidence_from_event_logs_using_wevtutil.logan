@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Command Line' like '*WEVTUTIL*' and 'Command Line' like '*CL*') | timestats span = 5minute distinctcount('Command Line') as LogClearCount, unique('Command Line') as ClearedLogList by Entity | where LogClearCount > 10

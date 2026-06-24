@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Command Line' like '* localgroup administrators admin /add' or 'Command Line' like '*\\Win64.exe*') | sort -Time | head 100

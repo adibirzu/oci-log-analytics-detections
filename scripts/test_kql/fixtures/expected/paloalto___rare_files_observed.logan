@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (('Target Filename' != null and 'Target Filename' != '')) | stats count as RareFiles by 'Target Filename' | sort RareFiles | head 20

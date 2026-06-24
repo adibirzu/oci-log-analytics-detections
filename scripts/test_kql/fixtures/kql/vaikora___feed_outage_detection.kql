@@ -1,0 +1,1 @@
+('Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs') | stats count as Count | where Count = 0 | eval Alert = 'No Vaikora data ingested in the last 12 hours' | eval Suggestion = 'Check the VaikoraToAzureSecurityCenter Logic App run history and verify the Vaikora API key is valid.' | fields Alert, Suggestion

@@ -26,7 +26,11 @@ class CanonicalizationError(Exception):
 # ``==`` over ``=`` and so on.
 _MULTI_OPS = ("==", "!=", "<=", ">=", "=~", "!~", "&&", "||")
 _SINGLE_OPS = set("=<>+-*/")
-_PUNCTUATION = set(",()[]{};:")
+# Backslash is included as passthrough punctuation: some live-validated promoted
+# queries carry a literal '\' (e.g. a converter-emitted `\'` quote escape that the
+# OCI parser accepts). canonical() normalizes whitespace/quoting only and must not
+# crash on parser-valid input, so an otherwise-unrecognized '\' is preserved.
+_PUNCTUATION = set(",()[]{};:\\")
 
 
 def _tokenize(text: str) -> List[Tuple[str, str]]:

@@ -1,0 +1,83 @@
+{
+  "title": "Office ASR rule triggered from browser spawned office process.",
+  "description": "The attacker sends a spearphishing email to a user. The email contains a link which points to a website that eventually presents the user a download of an MS Office document. This document contains a malicious macro. The macro triggers one of the ASR rules. \nThis detection looks for Office ASR violations triggered by an Office document opened from a browser.\nNote: be aware that you need to have the proper ASR rules enabled for this detection to work. \n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (Action like '*Office*') and ('Parent Process Name' in ('iexplore.exe', 'chrome.exe', 'firefox.exe', 'msedge.exe') or 'Parent Process Name' in ('iexplore.exe', 'chrome.exe', 'firefox.exe', 'msedge.exe')) and (not('Process Name' like '*.docx' or 'Process Name' like '*.xlsx' or 'Process Name' like '*.pptx'))",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "30580043-2451-4d35-b49f-065728529f4a",
+  "sentinel_source_path": "Solutions/FalconFriday/Analytic Rules/OfficeASRFromBrowser.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/FalconFriday/Analytic Rules/OfficeASRFromBrowser.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "initial_access"
+    ],
+    "techniques": [
+      "T1566.002"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Logs",
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/FalconFriday/Analytic Rules/OfficeASRFromBrowser.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

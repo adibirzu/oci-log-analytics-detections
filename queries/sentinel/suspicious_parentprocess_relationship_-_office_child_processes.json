@@ -1,0 +1,83 @@
+{
+  "title": "Suspicious parentprocess relationship - Office child processes.",
+  "description": "The attacker sends a spearphishing email to a user. The email contains a link, which points to a website that eventually presents the user a download of an MS Office document. This document contains a malicious macro. The macro spawns a new child process providing initial access. This detection looks for suspicious parent-process chains starting with a browser which spawns an Office application which spawns something else.\n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' in ('iexplore.exe', 'chrome.exe', 'firefox.exe', 'msedge.exe') and 'Parent Process Name' in ('winword.exe', 'excel.exe', 'powerpnt.exe') and 'Process Name' not in ('winword.exe', 'excel.exe', 'powerpnt.exe') and 'Process Name' not in ('iexplore.exe', 'chrome.exe', 'firefox.exe', 'msedge.exe') and 'Process Name' not in ('MSOSYNC.exe', 'splwow64.exe', 'csc.exe', 'outlook.exe', 'AcroRd32.exe', 'Acrobat.exe', 'explorer.exe', 'DW20.exe', 'Microsoft.Mashup.Container.Loader.exe', 'Microsoft.Mashup.Container.NetFX40.exe', 'WerFault.exe', 'CLVIEW.exe')) | eval project_rename_ProcessStart_Timestamp = Time | fields project_rename_ProcessStart_Timestamp",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "5ee34fa1-64ed-48c7-afa2-794b244f6c60",
+  "sentinel_source_path": "Solutions/FalconFriday/Analytic Rules/SuspiciousParentProcessRelationship.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/FalconFriday/Analytic Rules/SuspiciousParentProcessRelationship.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceProcessEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceProcessEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "initial_access"
+    ],
+    "techniques": [
+      "T1566.002"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Logs",
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceProcessEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/FalconFriday/Analytic Rules/SuspiciousParentProcessRelationship.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

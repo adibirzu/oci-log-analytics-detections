@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Process Name' like '*shutdown.exe*')

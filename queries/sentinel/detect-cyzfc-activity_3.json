@@ -1,0 +1,81 @@
+{
+  "title": "detect-cyzfc-activity (3)",
+  "description": "These queries was originally published in the threat analytics report, Attacks on gov't, think tanks, NGOs.\nAs described further in Analysis of cyberattack on U.S. think tanks, non-profits, public sector by unidentified attackers, there was a very large spear-phishing campaign launched in November 2019.\nThe attackers would gain access to a target by having the user click on a link to a compromised website and download a .zip archive.\nOnce established on a target's device, the attackers used a malicious DLL named cyzfc.dat to execute additional payloads. They would call a function in the malicious DLL via the legitimate Windows process, rundll32.exe, to connect directly to their command-and-control (C2) servers.\nThe following queries detect activity associated with the malicious DLL, cyzfc.dat., used in this campaign.\nReference - https://docs.microsoft.com/windows-server/administration/windows-commands/rundll32\n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Command Line' like '*https://www.jmj.com/personal/nauerthn_state_gov*')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "5c9c8f5c-01cf-4670-9beb-ee90e0a4ec58",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Campaigns/detect-cyzfc-activity (3).yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/detect-cyzfc-activity (3).yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceProcessEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceProcessEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Logs",
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceProcessEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/detect-cyzfc-activity (3).yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

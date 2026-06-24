@@ -1,0 +1,79 @@
+{
+  "title": "Ransomware hits healthcare - Alternate Data Streams use",
+  "description": "Find use of Alternate Data Streams (ADS) for anti-forensic purposes.\nAlternate Data Streams execution.\n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Command Line' like '-q -s*' and 'Command Line' like '*-p*' and not(('Target Filename' like '*visual studio*' or 'Target Filename' like '*ide*'))) | timestats span = 1hour unique('Command Line') as set_ProcessCommandLine, unique('Target Filename') as set_FolderPath, unique('Command Line') as set_InitiatingProcessCommandLine by Entity",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "90985951-5998-45d3-831f-8fd3c66ac9f9",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Campaigns/Ransomware hits healthcare - Alternate Data Streams use.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/Ransomware hits healthcare - Alternate Data Streams use.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceProcessEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceProcessEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Logs",
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceProcessEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/Ransomware hits healthcare - Alternate Data Streams use.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

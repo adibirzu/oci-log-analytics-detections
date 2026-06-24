@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' = 'rundll32.exe' and ('Command Line' != null and 'Command Line' != '') and 'Process Name' in ('schtasks.exe') and 'Command Line' like '*Change*' and 'Command Line' like '*SystemRestore*' and 'Command Line' like '*disable*')

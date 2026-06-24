@@ -1,0 +1,84 @@
+{
+  "title": "Suspicious Tomcat Confluence Process Launch",
+  "description": "The query checks for suspicious Tomcat process launches associated with likely exploitation of Confluence - CVE-2022-26134.\n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' like 'tomcat*' and 'Command Line' like '*confluence*') and ((('Command Line' like '*certutil*' or 'Command Line' like '*whoami*' or 'Command Line' like '*nltest*' or 'Command Line' like '* dir *' or 'Command Line' like '*curl*' or 'Command Line' like '*ifconfig*' or 'Command Line' like '*cat *' or 'Command Line' like '*net user*' or 'Command Line' like '*net time /domain*' or 'Command Line' like '*tasklist*' or 'Command Line' like '*-c ls*' or 'Command Line' like '*ipconfig*' or 'Command Line' like '*arp*' or 'Command Line' like '*ping*' or 'Command Line' like '*net view*' or 'Command Line' like '*net group*' or 'Command Line' like '*netstat*' or 'Command Line' like '*wmic datafile*')) or ('Process Name' = 'powershell.exe' and 'Command Line' like '-e*'))",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "c5b3e559-7c44-442c-9e73-c753abb02c13",
+  "sentinel_source_path": "Solutions/Microsoft Defender XDR/Hunting Queries/Exploits/CVE-2022-26134-Confluence.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Hunting Queries/Exploits/CVE-2022-26134-Confluence.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceProcessEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceProcessEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "privilege_escalation"
+    ],
+    "techniques": [
+      "T1203"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Logs",
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceProcessEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Solutions/Microsoft Defender XDR/Hunting Queries/Exploits/CVE-2022-26134-Confluence.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Parent Process Name' = 'powershell.exe') | stats count as count_ by 'User Name', 'Command Line'

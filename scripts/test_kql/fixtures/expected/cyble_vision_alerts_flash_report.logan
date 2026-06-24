@@ -1,0 +1,1 @@
+('Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs') and (Service = 'flash_report') | eval MappedSeverity = Severity

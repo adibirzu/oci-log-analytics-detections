@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs') and (('User Agent' != null and 'User Agent' != '')) | stats count as count_ by 'User Agent', 'Source IP'

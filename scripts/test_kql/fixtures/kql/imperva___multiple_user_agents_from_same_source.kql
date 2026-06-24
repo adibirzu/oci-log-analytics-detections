@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') | timestats span = 5minute distinctcount('User Agent') as d_uas by 'Source IP' | where d_uas >= 10

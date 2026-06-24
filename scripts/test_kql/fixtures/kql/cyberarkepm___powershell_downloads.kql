@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Parent Process Name' = 'powershell.exe') and (('Command Line' like '*WebClient*' or 'Command Line' like '*DownloadString*' or 'Command Line' like '*DownloadFile*'))

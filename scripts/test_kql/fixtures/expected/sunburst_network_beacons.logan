@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Network Logs' or 'Log Source' = 'SOC Sysmon Network Logs') and (Action = 'ConnectionSuccess') and ('Request URL' in ('panhardware.com', 'databasegalore.com', 'avsvmcloud.com', 'freescanonline.com', 'thedoccloud.com', 'deftsecurity.com')) | eval HashAlgorithm = 'MD5'

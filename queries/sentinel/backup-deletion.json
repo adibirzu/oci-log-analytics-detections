@@ -1,0 +1,81 @@
+{
+  "title": "backup-deletion",
+  "description": "This query was originally published in the threat analytics report, Ransomware continues to hit healthcare, critical services. There is also a related blog.\nIn April of 2020, security researchers observed multiple ransomware campaigns using the same set of techniques.\nThe following query returns alerts raised when backup files were deleted.\nThe See also section below lists more queries related to techniques shared by these campaigns.\nReference - https://www.microsoft.com/security/blog/2020/04/28/ransomware-groups-continue-to-target-healthcare-critical-services-heres-how-to-reduce-risk/\n",
+  "query": "'Log Source' = 'SOC Application Logs' and ('Threat Name' = 'File backups were deleted')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "1df2054c-5c63-4a2c-943b-0069af45bd38",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Impact/backup-deletion.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Impact/backup-deletion.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "AlertInfo"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "AlertInfo"
+  ],
+  "sentinel_category": "m365",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.m365"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "defense_evasion",
+      "impact"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_alerts",
+    "candidates": [
+      "SOC Application Logs"
+    ],
+    "original_tables": [
+      "AlertInfo"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Impact/backup-deletion.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

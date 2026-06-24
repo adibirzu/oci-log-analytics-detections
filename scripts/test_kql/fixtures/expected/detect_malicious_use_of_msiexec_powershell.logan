@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'powershell.exe' and 'Command Line' like '*%temp%*')

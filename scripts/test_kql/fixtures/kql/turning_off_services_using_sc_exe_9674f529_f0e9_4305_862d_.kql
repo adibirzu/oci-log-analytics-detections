@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Command Line' like '*sc*' and 'Command Line' like '*config*' and 'Command Line' like '*disabled*') | timestats span = 5minute distinctcount('Command Line') as ScDisableCount, unique('Command Line') as ScDisableList by Entity | where ScDisableCount > 10

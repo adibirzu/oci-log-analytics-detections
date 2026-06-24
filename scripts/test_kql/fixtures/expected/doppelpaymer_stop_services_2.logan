@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Parent Process Name' like 'psexe*' and 'Process Name' = 'powershell.exe' and 'Command Line' like '*stop-service*' and 'Command Line' like '*sql*' and 'Command Line' like '*msexchange*')

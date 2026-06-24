@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (Action = 'org.disable_oauth_app_restrictions') | fields Time, Action, User, Country

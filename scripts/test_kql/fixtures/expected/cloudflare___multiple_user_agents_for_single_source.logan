@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs') and (('User Agent' != null and 'User Agent' != '')) | timestats span = 3minute distinctcount('User Agent') as d_ua by 'Source IP' | where d_ua > 10

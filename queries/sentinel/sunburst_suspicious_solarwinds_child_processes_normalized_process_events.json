@@ -1,0 +1,78 @@
+{
+  "title": "SUNBURST suspicious SolarWinds child processes (Normalized Process Events)",
+  "description": "Identifies suspicious child processes of SolarWinds.Orion.Core.BusinessLayer.dll that may be evidence of the SUNBURST backdoor\nReferences:\n- https://www.fireeye.com/blog/threat-research/2020/12/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor.html\n- https://gist.github.com/olafhartong/71ffdd4cab4b6acd5cbcd1a0691ff82f\nTo use this analytics rule, make sure you have deployed the [ASIM normalization parsers](https://aka.ms/ASimProcessEvent)'\n",
+  "query": "('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and ('Process Name' like '*solarwinds.businesslayerhost.exe') and (not(('Process Name' like '*\\\\\\\\SolarWinds\\\\\\\\Orion\\\\\\\\APM\\\\\\\\APMServiceControl.exe*' or 'Process Name' like '*\\\\\\\\SolarWinds\\\\\\\\Orion\\\\\\\\ExportToPDFCmd.Exe*' or 'Process Name' like '*\\\\\\\\SolarWinds.Credentials\\\\\\\\SolarWinds.Credentials.Orion.WebApi.exe*' or 'Process Name' like '*\\\\\\\\SolarWinds\\\\\\\\Orion\\\\\\\\Topology\\\\\\\\SolarWinds.Orion.Topology.Calculator.exe*' or 'Process Name' like '*\\\\\\\\SolarWinds\\\\\\\\Orion\\\\\\\\Database-Maint.exe*' or 'Process Name' like '*\\\\\\\\SolarWinds.Orion.ApiPoller.Service\\\\\\\\SolarWinds.Orion.ApiPoller.Service.exe*' or 'Process Name' like '*\\\\\\\\Windows\\\\\\\\SysWOW64\\\\\\\\WerFault.exe*')))",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "631d02df-ab51-46c1-8d72-32d0cfec0720",
+  "sentinel_source_path": "Detections/ASimProcess/imProcess_SolarWinds_SUNBURST_Process-IOCs.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/ASimProcess/imProcess_SolarWinds_SUNBURST_Process-IOCs.yaml",
+  "required_data_connectors": [],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "imProcessCreate"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "persistence"
+    ],
+    "techniques": [
+      "T1059",
+      "T1543"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "asim_process",
+    "candidates": [
+      "SOC Windows Sysmon Logs",
+      "Windows Security Events"
+    ],
+    "original_tables": [
+      "imProcessCreate"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/ASimProcess/imProcess_SolarWinds_SUNBURST_Process-IOCs.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

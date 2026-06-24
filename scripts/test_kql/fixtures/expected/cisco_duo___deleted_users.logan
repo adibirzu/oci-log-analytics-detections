@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (Action = 'user_delete') | fields Time, 'Source IP', 'User Name', 'Target User Name'

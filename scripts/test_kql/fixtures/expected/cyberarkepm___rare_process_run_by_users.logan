@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and (('Parent Process Name' != null and 'Parent Process Name' != '')) | stats count as count_ by 'Parent Process Name', 'User Name' | sort count_ | head 25

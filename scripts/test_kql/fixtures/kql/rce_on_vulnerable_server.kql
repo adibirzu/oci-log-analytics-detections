@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Command Line' like '*php-cgi.exe*') and (('Command Line' like '*curl -fsSL*' and 'Command Line' like '*/ldr.sh*' and 'Command Line' like '*wget -q -O*'))

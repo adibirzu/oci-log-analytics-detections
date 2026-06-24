@@ -1,0 +1,104 @@
+{
+  "title": "Midnight Blizzard - Script payload stored in Registry",
+  "description": "'This query identifies when a process execution command-line indicates that a registry value is written to allow for later execution a malicious script\n References: https://www.microsoft.com/security/blog/2021/03/04/goldmax-goldfinder-sibot-analyzing-nobelium-malware/'\n",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs' or 'Log Source' = 'Windows Event System Logs')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "00cb180c-08a8-4e55-a276-63fb1442d5b5",
+  "sentinel_source_path": "Detections/SecurityEvent/MidnightBlizzard_SuspiciousScriptRegistryWrite.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/SecurityEvent/MidnightBlizzard_SuspiciousScriptRegistryWrite.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "SecurityEvents",
+      "data_types": [
+        "SecurityEvent"
+      ]
+    },
+    {
+      "connector_id": "WindowsSecurityEvents",
+      "data_types": [
+        "SecurityEvent"
+      ]
+    },
+    {
+      "connector_id": "WindowsSecurityEvents",
+      "data_types": [
+        "SecurityEvents"
+      ]
+    },
+    {
+      "connector_id": "WindowsForwardedEvents",
+      "data_types": [
+        "WindowsEvent"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "SecurityEvent",
+    "WindowsEvent"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution"
+    ],
+    "techniques": [
+      "T1059"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "windows_security",
+    "candidates": [
+      "Windows Security Events",
+      "Windows Event Security Logs",
+      "Windows Event System Logs"
+    ],
+    "original_tables": [
+      "SecurityEvent",
+      "WindowsEvent"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/SecurityEvent/MidnightBlizzard_SuspiciousScriptRegistryWrite.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

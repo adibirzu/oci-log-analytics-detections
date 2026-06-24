@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (Action = 'admin_2fa_error') | fields Time, 'Source IP', 'Target User Name'

@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' in ('powershell.exe', 'powershell_ise.exe')) and ('Command Line' like '*-v 2*' or 'Command Line' like '*-v 2.0*' or 'Command Line' like '*-version 2*' or 'Command Line' like '*-version 2.0*')

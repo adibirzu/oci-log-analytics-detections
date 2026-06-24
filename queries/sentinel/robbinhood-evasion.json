@@ -1,0 +1,82 @@
+{
+  "title": "robbinhood-evasion",
+  "description": "This query was originally published in the threat analytics report, Ransomware continues to hit healthcare, critical services. There is also a related blog.\nRobbinhood is ransomware that has been involved in several high-profile incidents, including a 2019 attack on the city of Baltimore, Maryland. Robbinhood operators often employ a distinctive defense evasion technique, where they load a vulnerable driver on to a target and exploit it, in order to turn off security software -- essentially using the driver as malware.\nThe following query detects a late stage of this technique, when the operator is issuing commands to turn off the driver.\nFor a query that detects an earlier stage of this technique, see Detect loading of vulnerable drivers by Robbinhood ransomware campaign.\nReferences:\nhttps://www.microsoft.com/security/blog/2020/04/28/ransomware-groups-continue-to-target-healthcare-critical-services-heres-how-to-reduce-risk/\nhttps://www.microsoft.com/wdsi/threats/malware-encyclopedia-description?Name=Ransom:Win32/Robinhood.A&ThreatID=2147735370\nhttps://www.nytimes.com/2019/05/22/us/baltimore-ransomware.html\n",
+  "query": "('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' = 'winlogon.exe') and ('Process Name' = 'cmd.exe' and ('Command Line' like '*taskkill*' or 'Command Line' like '*net*' or 'Command Line' like '*robbin*' or 'Command Line' like '*vssadmin*' or 'Command Line' like '*bcdedit*' or 'Command Line' like '*wevtutil*'))",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "75f492b5-b4ab-446e-8a9f-0607fbee2baa",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Campaigns/robbinhood-evasion.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/robbinhood-evasion.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceProcessEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceProcessEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "defense_evasion"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "Microsoft Defender Endpoint Logs",
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceProcessEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/robbinhood-evasion.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

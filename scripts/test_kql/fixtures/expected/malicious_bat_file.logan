@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Windows Sysmon Logs' and ('Process Name' like '*.bat' and 'Target Filename' like '*Program Files (x86)\\Sun Technology Network\\Oracle Java SE*')

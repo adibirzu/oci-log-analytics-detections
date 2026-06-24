@@ -1,0 +1,1 @@
+('Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs') and (('Source IP' != null and 'Source IP' != '')) | stats count as count_ by 'Source IP' | sort count_ | head 10

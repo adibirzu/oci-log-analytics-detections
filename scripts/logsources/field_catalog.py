@@ -367,4 +367,21 @@ RESERVED_PARSER_FIELD_DISPLAY_NAMES = {
 }
 
 
+# ─── Wazuh source fields (registered from logsources.wazuh_sources) ───
+# Append Wazuh-specific custom fields and LONG type overrides at module load so
+# setup_log_sources creates them before the Wazuh parsers are built. wazuh_sources
+# has no imports, so this cannot create an import cycle.
+from logsources.wazuh_sources import (  # noqa: E402
+    WAZUH_CUSTOM_FIELDS,
+    WAZUH_LONG_FIELDS,
+)
+
+for _wazuh_field in WAZUH_CUSTOM_FIELDS:
+    if _wazuh_field not in CUSTOM_FIELDS:
+        CUSTOM_FIELDS.append(_wazuh_field)
+
+for _wazuh_long_field in WAZUH_LONG_FIELDS:
+    FIELD_DATA_TYPE_OVERRIDES[_wazuh_long_field] = "LONG"
+
+
 # ─── Linux Syslog Parser ────────────────────────────────────────

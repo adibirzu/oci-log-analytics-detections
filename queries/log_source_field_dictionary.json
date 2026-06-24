@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-24T13:43:36.188956+00:00",
+  "generated_at": "2026-06-24T20:41:12.799631+00:00",
   "summary": {
-    "total_fields": 306,
-    "parser_count": 19,
-    "source_count": 19,
+    "total_fields": 338,
+    "parser_count": 23,
+    "source_count": 23,
     "reserved_mapping_violations": 0,
-    "fields_with_query_usage": 151
+    "fields_with_query_usage": 168
   },
   "approved_builtins": [
     "Channel",
@@ -42,6 +42,18 @@
   "source_candidate_groups": {
     "oci_audit": [
       "OCI Audit Logs"
+    ],
+    "wazuh_alerts": [
+      "SOC Wazuh Alerts"
+    ],
+    "wazuh_vulnerabilities": [
+      "SOC Wazuh Vulnerabilities"
+    ],
+    "wazuh_inventory": [
+      "SOC Wazuh Inventory"
+    ],
+    "wazuh_sca": [
+      "SOC Wazuh SCA"
     ],
     "cloud_guard": [
       "SOC Cloud Guard Logs",
@@ -263,6 +275,34 @@
       "source_internal": "socMulticloudHealthSource",
       "source_display": "SOC Multicloud Health Logs",
       "field_count": 27
+    },
+    {
+      "parser_name": "socWazuhAlertsJsonParser",
+      "parser_display": "SOC Wazuh Alerts JSON Parser",
+      "source_internal": "socWazuhAlertsSource",
+      "source_display": "SOC Wazuh Alerts",
+      "field_count": 25
+    },
+    {
+      "parser_name": "socWazuhVulnJsonParser",
+      "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+      "source_internal": "socWazuhVulnSource",
+      "source_display": "SOC Wazuh Vulnerabilities",
+      "field_count": 14
+    },
+    {
+      "parser_name": "socWazuhInventoryJsonParser",
+      "parser_display": "SOC Wazuh Inventory JSON Parser",
+      "source_internal": "socWazuhInventorySource",
+      "source_display": "SOC Wazuh Inventory",
+      "field_count": 12
+    },
+    {
+      "parser_name": "socWazuhScaJsonParser",
+      "parser_display": "SOC Wazuh SCA JSON Parser",
+      "source_internal": "socWazuhScaSource",
+      "source_display": "SOC Wazuh SCA",
+      "field_count": 11
     }
   ],
   "sources": [
@@ -423,6 +463,38 @@
       "parser_name": "socMulticloudHealthJsonParser",
       "candidate_groups": [
         "multicloud_health"
+      ]
+    },
+    {
+      "source_internal": "socWazuhAlertsSource",
+      "source_display": "SOC Wazuh Alerts",
+      "parser_name": "socWazuhAlertsJsonParser",
+      "candidate_groups": [
+        "wazuh_alerts"
+      ]
+    },
+    {
+      "source_internal": "socWazuhVulnSource",
+      "source_display": "SOC Wazuh Vulnerabilities",
+      "parser_name": "socWazuhVulnJsonParser",
+      "candidate_groups": [
+        "wazuh_vulnerabilities"
+      ]
+    },
+    {
+      "source_internal": "socWazuhInventorySource",
+      "source_display": "SOC Wazuh Inventory",
+      "parser_name": "socWazuhInventoryJsonParser",
+      "candidate_groups": [
+        "wazuh_inventory"
+      ]
+    },
+    {
+      "source_internal": "socWazuhScaSource",
+      "source_display": "SOC Wazuh SCA",
+      "parser_name": "socWazuhScaJsonParser",
+      "candidate_groups": [
+        "wazuh_sca"
       ]
     }
   ],
@@ -632,6 +704,77 @@
         "waf_xml_external_entity_attack_blocked.json",
         "windows_defender_malware_or_remediation_event.json"
       ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Agent ID",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.agent.id"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 3,
+          "raw_json_path": "$.agent.id"
+        },
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 3,
+          "raw_json_path": "$.agent.id"
+        },
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 3,
+          "raw_json_path": "$.agent.id"
+        },
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 3,
+          "raw_json_path": "$.agent.id"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        },
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        },
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        },
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts",
+        "wazuh_inventory",
+        "wazuh_sca",
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        "004",
+        "003"
+      ],
+      "contract_datasets": [
+        "wazuh_alerts.jsonl",
+        "wazuh_inventory.jsonl",
+        "wazuh_sca.jsonl",
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -2438,7 +2581,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.CommandLine"
+        "$.CommandLine",
+        "$.data.win.eventdata.commandLine"
       ],
       "parsers": [
         {
@@ -2482,6 +2626,12 @@
           "parser_display": "SOC Sysmon Network JSON Parser",
           "sequence": 20,
           "raw_json_path": "$.CommandLine"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 18,
+          "raw_json_path": "$.data.win.eventdata.commandLine"
         }
       ],
       "sources": [
@@ -2512,6 +2662,10 @@
         {
           "source_internal": "socSysmonNetworkSource",
           "source_display": "SOC Sysmon Network Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
@@ -2519,6 +2673,7 @@
         "linux_syslog",
         "sysmon_network",
         "sysmon_operational",
+        "wazuh_alerts",
         "windows_event_security",
         "windows_powershell_operational",
         "windows_sysmon"
@@ -3095,6 +3250,40 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "Cores",
+      "kind": "custom",
+      "type": "LONG",
+      "raw_json_paths": [
+        "$.data.cpu.cores"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 5,
+          "raw_json_path": "$.data.cpu.cores"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_inventory"
+      ],
+      "example_values": [
+        4
+      ],
+      "contract_datasets": [
+        "wazuh_inventory.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "Correlation ID",
       "kind": "custom",
       "type": "STRING",
@@ -3194,6 +3383,42 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "CPU Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.data.cpu.name"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 6,
+          "raw_json_path": "$.data.cpu.name"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_inventory"
+      ],
+      "example_values": [
+        "AMD EPYC 9J14 96-Core Processor"
+      ],
+      "contract_datasets": [
+        "wazuh_inventory.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_inventory_hosts.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "CPU Percent",
       "kind": "custom",
       "type": "STRING",
@@ -3255,6 +3480,78 @@
       ],
       "contract_datasets": [],
       "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "CVE ID",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.vulnerability.cve"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 5,
+          "raw_json_path": "$.vulnerability.cve"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        "CVE-2024-30080"
+      ],
+      "contract_datasets": [
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_vuln_top_cves.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "CVSS Score",
+      "kind": "custom",
+      "type": "LONG",
+      "raw_json_paths": [
+        "$.vulnerability.score.base"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 8,
+          "raw_json_path": "$.vulnerability.score.base"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        9.8
+      ],
+      "contract_datasets": [
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_vuln_cvss_distribution.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -3472,6 +3769,38 @@
         "apps/apm_octo_db_spans.json",
         "apps/app_db_performance_correlation.json"
       ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Decoder Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.decoder.name"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 10,
+          "raw_json_path": "$.decoder.name"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [
+        "windows_eventchannel"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -4286,7 +4615,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.Channel"
+        "$.Channel",
+        "$.data.win.system.channel"
       ],
       "parsers": [
         {
@@ -4294,16 +4624,27 @@
           "parser_display": "SOC Sysmon Network JSON Parser",
           "sequence": 19,
           "raw_json_path": "$.Channel"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 15,
+          "raw_json_path": "$.data.win.system.channel"
         }
       ],
       "sources": [
         {
           "source_internal": "socSysmonNetworkSource",
           "source_display": "SOC Sysmon Network Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
-        "sysmon_network"
+        "sysmon_network",
+        "wazuh_alerts"
       ],
       "example_values": [
         "Microsoft-Windows-Sysmon/Operational"
@@ -4322,7 +4663,8 @@
       "type": "STRING",
       "raw_json_paths": [
         "$.EventID",
-        "$.logContent.data.event_id"
+        "$.logContent.data.event_id",
+        "$.data.win.system.eventID"
       ],
       "parsers": [
         {
@@ -4372,6 +4714,12 @@
           "parser_display": "SOC Network Firewall JSON Parser",
           "sequence": 24,
           "raw_json_path": "$.logContent.data.event_id"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 14,
+          "raw_json_path": "$.data.win.system.eventID"
         }
       ],
       "sources": [
@@ -4406,12 +4754,17 @@
         {
           "source_internal": "socNetworkFirewallSource",
           "source_display": "SOC Network Firewall Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
         "network_firewall",
         "sysmon_network",
         "sysmon_operational",
+        "wazuh_alerts",
         "windows_defender_operational",
         "windows_event_security",
         "windows_event_system",
@@ -4895,12 +5248,43 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "File Hash",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.syscheck.sha256_after"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 25,
+          "raw_json_path": "$.syscheck.sha256_after"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [],
+      "contract_datasets": [],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "File Path",
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
         "$.file.path",
-        "$.FilePath"
+        "$.FilePath",
+        "$.syscheck.path"
       ],
       "parsers": [
         {
@@ -4920,6 +5304,12 @@
           "parser_display": "SOC Application JSON Parser",
           "sequence": 110,
           "raw_json_path": "$.file.path"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 23,
+          "raw_json_path": "$.syscheck.path"
         }
       ],
       "sources": [
@@ -4934,6 +5324,10 @@
         {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
@@ -4941,6 +5335,7 @@
         "azure_log_analytics_custom",
         "cloud_guard_instance_security",
         "osquery_results",
+        "wazuh_alerts",
         "windows_defender_operational"
       ],
       "example_values": [
@@ -4952,7 +5347,40 @@
       "queries_using_it": [
         "cloud_guard_instance_security_high_severity_pivots.json",
         "cloud_guard_instance_security_raw_result_detail.json",
+        "hunting/wazuh_fim_events.json",
         "windows_defender_malware_or_remediation_event.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "FIM Event",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.syscheck.event"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 24,
+          "raw_json_path": "$.syscheck.event"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "hunting/wazuh_fim_events.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -6095,7 +6523,8 @@
         "$.hostname",
         "$.host.name",
         "$.host",
-        "$.Host Name"
+        "$.Host Name",
+        "$.agent.name"
       ],
       "parsers": [
         {
@@ -6205,6 +6634,30 @@
           "parser_display": "SOC Multicloud Health JSON Parser",
           "sequence": 10,
           "raw_json_path": "$.Host Name"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 4,
+          "raw_json_path": "$.agent.name"
+        },
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 4,
+          "raw_json_path": "$.agent.name"
+        },
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 4,
+          "raw_json_path": "$.agent.name"
+        },
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 4,
+          "raw_json_path": "$.agent.name"
         }
       ],
       "sources": [
@@ -6275,6 +6728,22 @@
         {
           "source_internal": "socMulticloudHealthSource",
           "source_display": "SOC Multicloud Health Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        },
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        },
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        },
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
         }
       ],
       "source_candidate_groups": [
@@ -6291,6 +6760,10 @@
         "sysmon_network",
         "sysmon_operational",
         "waf_security",
+        "wazuh_alerts",
+        "wazuh_inventory",
+        "wazuh_sca",
+        "wazuh_vulnerabilities",
         "webapp_security",
         "windows_defender_operational",
         "windows_event_security",
@@ -6311,7 +6784,9 @@
         "crm-portal-01",
         "octo-shop-vm-01",
         "genai-gw-01",
-        "web-server-eu-001"
+        "web-server-eu-001",
+        "winterfell",
+        "kingslanding"
       ],
       "contract_datasets": [
         "cloud_guard.jsonl",
@@ -6322,6 +6797,10 @@
         "multicloud_health.jsonl",
         "sysmon_network.jsonl",
         "sysmon_operational.jsonl",
+        "wazuh_alerts.jsonl",
+        "wazuh_inventory.jsonl",
+        "wazuh_sca.jsonl",
+        "wazuh_vulnerabilities.jsonl",
         "windows_defender_operational.jsonl",
         "windows_event_security.jsonl",
         "windows_event_system.jsonl",
@@ -6358,6 +6837,13 @@
         "hunting/multicloud_geo_health_regional_map.json",
         "hunting/multicloud_geo_health_tier_status.json",
         "hunting/multicloud_geo_health_unhealthy_regions.json",
+        "hunting/wazuh_fim_events.json",
+        "hunting/wazuh_hunting_recent_alerts.json",
+        "hunting/wazuh_inventory_hosts.json",
+        "hunting/wazuh_mitre_top_agents.json",
+        "hunting/wazuh_sca_failed_checks.json",
+        "hunting/wazuh_sca_score.json",
+        "hunting/wazuh_vuln_by_agent.json",
         "hunting/web_to_cloud_compromised_machines.json",
         "hunting/web_to_cloud_entry_point.json",
         "hunting/win_dns_query_entropy.json",
@@ -6608,6 +7094,40 @@
         "apps/apm_octo_compromised_vm_pivots.json",
         "apps/apm_octo_rule_compromised_vm_count.json"
       ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Hotfix",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.data.hotfix"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 12,
+          "raw_json_path": "$.data.hotfix"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_inventory"
+      ],
+      "example_values": [
+        "KB5039217"
+      ],
+      "contract_datasets": [
+        "wazuh_inventory.jsonl"
+      ],
+      "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -6892,6 +7412,40 @@
         "sentinel/oracle_-_multiple_server_errors_from_single_ip.json",
         "sentinel/tomcat_-_multiple_client_errors_from_single_ip_address.json",
         "sentinel/tomcat_-_multiple_server_errors_from_single_ip_address.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Image",
+      "kind": "built-in",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.data.win.eventdata.image"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 17,
+          "raw_json_path": "$.data.win.eventdata.image"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [
+        "C:\\Windows\\System32\\cmd.exe"
+      ],
+      "contract_datasets": [],
+      "queries_using_it": [
+        "hunting/goad_caldera_sandcat_activity.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -7833,6 +8387,74 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "Manager Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.manager.name"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 5,
+          "raw_json_path": "$.manager.name"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [
+        "oci-wazuh-demo-wazuh-aio"
+      ],
+      "contract_datasets": [
+        "wazuh_alerts.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Memory GB",
+      "kind": "custom",
+      "type": "LONG",
+      "raw_json_paths": [
+        "$.data.ram.total_gb"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 7,
+          "raw_json_path": "$.data.ram.total_gb"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_inventory"
+      ],
+      "example_values": [
+        32
+      ],
+      "contract_datasets": [
+        "wazuh_inventory.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "Memory Percent",
       "kind": "custom",
       "type": "STRING",
@@ -8019,7 +8641,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.mitre.tactic"
+        "$.mitre.tactic",
+        "$.rule.mitre.tactic"
       ],
       "parsers": [
         {
@@ -8033,6 +8656,12 @@
           "parser_display": "SOC Application JSON Parser",
           "sequence": 93,
           "raw_json_path": "$.mitre.tactic"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 12,
+          "raw_json_path": "$.rule.mitre.tactic"
         }
       ],
       "sources": [
@@ -8043,20 +8672,35 @@
         {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
         "application_logs",
         "azure_log_analytics_custom",
         "cloud_guard_instance_security",
-        "osquery_results"
+        "osquery_results",
+        "wazuh_alerts"
       ],
       "example_values": [
         "Command and Control",
-        "Credential Access"
+        "Credential Access",
+        [
+          "Execution"
+        ]
       ],
-      "contract_datasets": [],
-      "queries_using_it": [],
+      "contract_datasets": [
+        "wazuh_alerts.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_mitre_alerts_over_time.json",
+        "hunting/wazuh_mitre_recent_events.json",
+        "hunting/wazuh_mitre_rule_level_by_tactic.json",
+        "hunting/wazuh_mitre_top_tactics.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -8065,7 +8709,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.mitre.technique"
+        "$.mitre.technique",
+        "$.rule.mitre.technique"
       ],
       "parsers": [
         {
@@ -8079,6 +8724,12 @@
           "parser_display": "SOC Application JSON Parser",
           "sequence": 95,
           "raw_json_path": "$.mitre.technique"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 13,
+          "raw_json_path": "$.rule.mitre.technique"
         }
       ],
       "sources": [
@@ -8089,21 +8740,32 @@
         {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
         "application_logs",
         "azure_log_analytics_custom",
         "cloud_guard_instance_security",
-        "osquery_results"
+        "osquery_results",
+        "wazuh_alerts"
       ],
       "example_values": [
         "Non-Application Layer Protocol",
-        "Adversary-in-the-Middle"
+        "Adversary-in-the-Middle",
+        [
+          "Windows Command Shell"
+        ]
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "wazuh_alerts.jsonl"
+      ],
       "queries_using_it": [
-        "apps/oke_boopkit_attack_timeline.json"
+        "apps/oke_boopkit_attack_timeline.json",
+        "hunting/wazuh_mitre_attacks_by_technique.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -8113,7 +8775,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.mitre.technique_id"
+        "$.mitre.technique_id",
+        "$.rule.mitre.id"
       ],
       "parsers": [
         {
@@ -8133,6 +8796,12 @@
           "parser_display": "SOC GenAI Gateway JSON Parser",
           "sequence": 44,
           "raw_json_path": "$.mitre.technique_id"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 11,
+          "raw_json_path": "$.rule.mitre.id"
         }
       ],
       "sources": [
@@ -8147,6 +8816,10 @@
         {
           "source_internal": "socGenAiGatewaySource",
           "source_display": "SOC GenAI Gateway Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
@@ -8154,16 +8827,21 @@
         "azure_log_analytics_custom",
         "cloud_guard_instance_security",
         "genai_gateway",
-        "osquery_results"
+        "osquery_results",
+        "wazuh_alerts"
       ],
       "example_values": [
         "T1095",
         "T1557",
-        "T1059"
+        "T1059",
+        [
+          "T1059.003"
+        ]
       ],
       "contract_datasets": [
         "cloud_guard_instance_security.jsonl",
-        "genai_gateway.jsonl"
+        "genai_gateway.jsonl",
+        "wazuh_alerts.jsonl"
       ],
       "queries_using_it": [
         "apps/apm_octo_attack_timeline.json",
@@ -8173,7 +8851,11 @@
         "apps/oke_exec_and_node_escape.json",
         "apps/oke_kubernetes_attack_overview.json",
         "apps/oke_secrets_and_rbac_abuse.json",
-        "cloud_guard_instance_security_high_severity_pivots.json"
+        "cloud_guard_instance_security_high_severity_pivots.json",
+        "hunting/wazuh_mitre_attacks_by_technique.json",
+        "hunting/wazuh_mitre_recent_events.json",
+        "hunting/wazuh_mitre_top_agents.json",
+        "hunting/wazuh_mitre_total_detections_kpi.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -8318,7 +9000,8 @@
         "$.msg",
         "$.CommandLine",
         "$.problemName",
-        "$.message"
+        "$.message",
+        "$.full_log"
       ],
       "parsers": [
         {
@@ -8434,6 +9117,30 @@
           "parser_display": "SOC Multicloud Health JSON Parser",
           "sequence": 1,
           "raw_json_path": "$.msg"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 1,
+          "raw_json_path": "$.full_log"
+        },
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 1,
+          "raw_json_path": "$.full_log"
+        },
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 1,
+          "raw_json_path": "$.full_log"
+        },
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 1,
+          "raw_json_path": "$.full_log"
         }
       ],
       "sources": [
@@ -8512,6 +9219,22 @@
         {
           "source_internal": "socMulticloudHealthSource",
           "source_display": "SOC Multicloud Health Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        },
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        },
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        },
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
         }
       ],
       "source_candidate_groups": [
@@ -8530,6 +9253,10 @@
         "sysmon_operational",
         "vcn_flow",
         "waf_security",
+        "wazuh_alerts",
+        "wazuh_inventory",
+        "wazuh_sca",
+        "wazuh_vulnerabilities",
         "webapp_security",
         "windows_defender_operational",
         "windows_event_security",
@@ -8555,7 +9282,11 @@
         "GenAI gateway BLOCK: prompt-injection guardrail tripped on /v1/chat/completions",
         "VCN Flow ACCEPT: <IP_ADDRESS>:45010 -> <IP_ADDRESS>:443",
         "Network Firewall threat alert: <IP_ADDRESS> -> <IP_ADDRESS>",
-        "HEARTBEAT OK: web-server-eu-001 (OCI/eu-frankfurt-1) cpu=35.2% mem=48.7% uptime=720h status=healthy"
+        "HEARTBEAT OK: web-server-eu-001 (OCI/eu-frankfurt-1) cpu=35.2% mem=48.7% uptime=720h status=healthy",
+        "Windows command prompt started by an abnormal process on winterfell",
+        "CVE-2024-30080 affects Microsoft Windows Server 2019 Standard",
+        "syscollector inventory for kingslanding",
+        "SCA scan CIS Microsoft Windows Server 2019 Benchmark v2.0.0 on kingslanding"
       ],
       "contract_datasets": [
         "application_logs.jsonl",
@@ -8566,6 +9297,10 @@
         "linux_syslog.jsonl",
         "octo_apm_workshop_application_logs.jsonl",
         "sysmon_operational.jsonl",
+        "wazuh_alerts.jsonl",
+        "wazuh_inventory.jsonl",
+        "wazuh_sca.jsonl",
+        "wazuh_vulnerabilities.jsonl",
         "windows_defender_operational.jsonl",
         "windows_event_security.jsonl",
         "windows_event_system.jsonl",
@@ -9180,6 +9915,89 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "OS Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.agent.os.name",
+        "$.data.os.name"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 14,
+          "raw_json_path": "$.agent.os.name"
+        },
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 8,
+          "raw_json_path": "$.data.os.name"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        },
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_inventory",
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        "Microsoft Windows Server 2019 Standard"
+      ],
+      "contract_datasets": [
+        "wazuh_inventory.jsonl",
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_inventory_hosts.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "OS Version",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.data.os.version"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 9,
+          "raw_json_path": "$.data.os.version"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_inventory"
+      ],
+      "example_values": [
+        "10.0.17763.5329"
+      ],
+      "contract_datasets": [
+        "wazuh_inventory.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "OSQuery Finding",
       "kind": "custom",
       "type": "STRING",
@@ -9526,6 +10344,105 @@
       "queries_using_it": [
         "cloud_guard_instance_security_findings_by_pack_query.json"
       ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Package Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.vulnerability.package.name",
+        "$.data.program.name"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 9,
+          "raw_json_path": "$.vulnerability.package.name"
+        },
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 10,
+          "raw_json_path": "$.data.program.name"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        },
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_inventory",
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        "Microsoft Windows Server 2019 Standard",
+        "Mozilla Firefox (x64 en-US)"
+      ],
+      "contract_datasets": [
+        "wazuh_inventory.jsonl",
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_inventory_packages.json",
+        "hunting/wazuh_vuln_top_packages.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Package Version",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.vulnerability.package.version",
+        "$.data.program.version"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 10,
+          "raw_json_path": "$.vulnerability.package.version"
+        },
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 11,
+          "raw_json_path": "$.data.program.version"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        },
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_inventory",
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        "10.0.17763.5329",
+        "127.0"
+      ],
+      "contract_datasets": [
+        "wazuh_inventory.jsonl",
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -10636,7 +11553,8 @@
       "type": "STRING",
       "raw_json_paths": [
         "$.PID",
-        "$.ProcessId"
+        "$.ProcessId",
+        "$.data.win.eventdata.processId"
       ],
       "parsers": [
         {
@@ -10656,6 +11574,12 @@
           "parser_display": "SOC Linux Secure JSON Parser",
           "sequence": 11,
           "raw_json_path": "$.PID"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 21,
+          "raw_json_path": "$.data.win.eventdata.processId"
         }
       ],
       "sources": [
@@ -10670,17 +11594,23 @@
         {
           "source_internal": "socLinuxSecureSource",
           "source_display": "Linux Secure Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
         "linux_secure",
         "linux_syslog",
         "sysmon_operational",
+        "wazuh_alerts",
         "windows_sysmon"
       ],
       "example_values": [
         12345,
-        2048
+        2048,
+        "6624"
       ],
       "contract_datasets": [
         "linux_syslog.jsonl"
@@ -11560,6 +12490,38 @@
         "windows_defender_operational.jsonl",
         "windows_powershell_operational.jsonl"
       ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Provider Name",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.data.win.system.providerName"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 16,
+          "raw_json_path": "$.data.win.system.providerName"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [
+        "Microsoft-Windows-Sysmon"
+      ],
+      "contract_datasets": [],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -12884,6 +13846,82 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "Rule Description",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.rule.description"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 8,
+          "raw_json_path": "$.rule.description"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [
+        "Windows command prompt started by an abnormal process"
+      ],
+      "contract_datasets": [
+        "wazuh_alerts.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_hunting_recent_alerts.json",
+        "hunting/wazuh_hunting_top_rules.json",
+        "hunting/wazuh_mitre_recent_events.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Rule Groups",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.rule.groups"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 9,
+          "raw_json_path": "$.rule.groups"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [
+        [
+          "windows",
+          "sysmon",
+          "attack"
+        ]
+      ],
+      "contract_datasets": [
+        "wazuh_alerts.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "Rule Key",
       "kind": "custom",
       "type": "STRING",
@@ -12970,7 +14008,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.RuleName"
+        "$.RuleName",
+        "$.data.win.eventdata.ruleName"
       ],
       "parsers": [
         {
@@ -12978,19 +14017,31 @@
           "parser_display": "SOC Sysmon Network JSON Parser",
           "sequence": 15,
           "raw_json_path": "$.RuleName"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 22,
+          "raw_json_path": "$.data.win.eventdata.ruleName"
         }
       ],
       "sources": [
         {
           "source_internal": "socSysmonNetworkSource",
           "source_display": "SOC Sysmon Network Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
-        "sysmon_network"
+        "sysmon_network",
+        "wazuh_alerts"
       ],
       "example_values": [
-        "technique_id=T1071,technique_name=Application Layer Protocol"
+        "technique_id=T1071,technique_name=Application Layer Protocol",
+        "technique_id=T1059.003,technique_name=Windows Command Shell"
       ],
       "contract_datasets": [],
       "queries_using_it": [],
@@ -13031,6 +14082,255 @@
         "apps/apm_octo_attack_trace_correlation.json",
         "apps/apm_octo_payment_threats.json",
         "apps/oke_boopkit_attack_timeline.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "SCA Check Result",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.data.sca.check.result"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 10,
+          "raw_json_path": "$.data.sca.check.result"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_sca"
+      ],
+      "example_values": [
+        "failed"
+      ],
+      "contract_datasets": [
+        "wazuh_sca.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_sca_compliance.json",
+        "hunting/wazuh_sca_failed_checks.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "SCA Check Title",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.data.sca.check.title"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 9,
+          "raw_json_path": "$.data.sca.check.title"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_sca"
+      ],
+      "example_values": [
+        "Ensure 'Enforce password history' is set to '24 or more password(s)'"
+      ],
+      "contract_datasets": [
+        "wazuh_sca.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_sca_failed_checks.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "SCA Compliance",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.data.sca.check.compliance"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 11,
+          "raw_json_path": "$.data.sca.check.compliance"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_sca"
+      ],
+      "example_values": [
+        "PCI DSS 8.2.5; CIS 1.1.1"
+      ],
+      "contract_datasets": [
+        "wazuh_sca.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_sca_compliance.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "SCA Failed",
+      "kind": "custom",
+      "type": "LONG",
+      "raw_json_paths": [
+        "$.data.sca.failed"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 8,
+          "raw_json_path": "$.data.sca.failed"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_sca"
+      ],
+      "example_values": [
+        260
+      ],
+      "contract_datasets": [
+        "wazuh_sca.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "SCA Passed",
+      "kind": "custom",
+      "type": "LONG",
+      "raw_json_paths": [
+        "$.data.sca.passed"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 7,
+          "raw_json_path": "$.data.sca.passed"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_sca"
+      ],
+      "example_values": [
+        87
+      ],
+      "contract_datasets": [
+        "wazuh_sca.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "SCA Policy",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.data.sca.policy"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 5,
+          "raw_json_path": "$.data.sca.policy"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_sca"
+      ],
+      "example_values": [
+        "CIS Microsoft Windows Server 2019 Benchmark v2.0.0"
+      ],
+      "contract_datasets": [
+        "wazuh_sca.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_sca_score.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "SCA Score",
+      "kind": "custom",
+      "type": "LONG",
+      "raw_json_paths": [
+        "$.data.sca.score"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 6,
+          "raw_json_path": "$.data.sca.score"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_sca"
+      ],
+      "example_values": [
+        25
+      ],
+      "contract_datasets": [
+        "wazuh_sca.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_sca_score.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -14825,7 +16125,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.TargetFilename"
+        "$.TargetFilename",
+        "$.data.win.eventdata.targetFilename"
       ],
       "parsers": [
         {
@@ -14839,6 +16140,12 @@
           "parser_display": "SOC Sysmon Operational JSON Parser",
           "sequence": 16,
           "raw_json_path": "$.TargetFilename"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 19,
+          "raw_json_path": "$.data.win.eventdata.targetFilename"
         }
       ],
       "sources": [
@@ -14849,11 +16156,16 @@
         {
           "source_internal": "socSysmonOperationalSource",
           "source_display": "Windows Sysmon Operational Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
         "sysmon_network",
         "sysmon_operational",
+        "wazuh_alerts",
         "windows_sysmon"
       ],
       "example_values": [
@@ -15650,6 +16962,30 @@
           "parser_display": "SOC Multicloud Health JSON Parser",
           "sequence": 2,
           "raw_json_path": "$.Timestamp"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 2,
+          "raw_json_path": "$.timestamp"
+        },
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 2,
+          "raw_json_path": "$.timestamp"
+        },
+        {
+          "parser_name": "socWazuhInventoryJsonParser",
+          "parser_display": "SOC Wazuh Inventory JSON Parser",
+          "sequence": 2,
+          "raw_json_path": "$.timestamp"
+        },
+        {
+          "parser_name": "socWazuhScaJsonParser",
+          "parser_display": "SOC Wazuh SCA JSON Parser",
+          "sequence": 2,
+          "raw_json_path": "$.timestamp"
         }
       ],
       "sources": [
@@ -15728,6 +17064,22 @@
         {
           "source_internal": "socMulticloudHealthSource",
           "source_display": "SOC Multicloud Health Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        },
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        },
+        {
+          "source_internal": "socWazuhInventorySource",
+          "source_display": "SOC Wazuh Inventory"
+        },
+        {
+          "source_internal": "socWazuhScaSource",
+          "source_display": "SOC Wazuh SCA"
         }
       ],
       "source_candidate_groups": [
@@ -15746,6 +17098,10 @@
         "sysmon_operational",
         "vcn_flow",
         "waf_security",
+        "wazuh_alerts",
+        "wazuh_inventory",
+        "wazuh_sca",
+        "wazuh_vulnerabilities",
         "webapp_security",
         "windows_defender_operational",
         "windows_event_security",
@@ -15764,7 +17120,10 @@
         "2026-03-18T09:11:42.118Z",
         "2026-05-04T10:15:00.000Z",
         "2026-05-04T10:25:00.000Z",
-        "2026-03-10T09:00:00.000Z"
+        "2026-03-10T09:00:00.000Z",
+        "2026-06-24T20:02:06.581Z",
+        "2026-06-24T22:32:14.000Z",
+        "2026-06-24T22:31:47.000Z"
       ],
       "contract_datasets": [
         "application_logs.jsonl",
@@ -15780,6 +17139,10 @@
         "sysmon_operational.jsonl",
         "vcn_flow.jsonl",
         "waf_security.jsonl",
+        "wazuh_alerts.jsonl",
+        "wazuh_inventory.jsonl",
+        "wazuh_sca.jsonl",
+        "wazuh_vulnerabilities.jsonl",
         "webapp_security.jsonl",
         "windows_defender_operational.jsonl",
         "windows_event_security.jsonl",
@@ -16225,7 +17588,8 @@
       "type": "STRING",
       "raw_json_paths": [
         "$.User",
-        "$.user"
+        "$.user",
+        "$.data.win.eventdata.user"
       ],
       "parsers": [
         {
@@ -16293,6 +17657,12 @@
           "parser_display": "SOC Application JSON Parser",
           "sequence": 14,
           "raw_json_path": "$.user"
+        },
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 20,
+          "raw_json_path": "$.data.win.eventdata.user"
         }
       ],
       "sources": [
@@ -16339,6 +17709,10 @@
         {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
+        },
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
         }
       ],
       "source_candidate_groups": [
@@ -16348,6 +17722,7 @@
         "linux_syslog",
         "sysmon_network",
         "sysmon_operational",
+        "wazuh_alerts",
         "webapp_security",
         "windows_defender_operational",
         "windows_event_security",
@@ -16362,7 +17737,8 @@
         "SYSTEM",
         "arya",
         "anonymous",
-        "cersei"
+        "cersei",
+        "NORTH\\arya.stark"
       ],
       "contract_datasets": [
         "linux_secure.jsonl",
@@ -16718,11 +18094,46 @@
       "reserved_backing_field": ""
     },
     {
+      "display_name": "Vulnerability Category",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.vulnerability.category"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 13,
+          "raw_json_path": "$.vulnerability.category"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        "Packages"
+      ],
+      "contract_datasets": [
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
       "display_name": "Vulnerability ID",
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.vulnerabilityId"
+        "$.vulnerabilityId",
+        "$.vulnerability.cve"
       ],
       "parsers": [
         {
@@ -16730,21 +18141,143 @@
           "parser_display": "SOC Web Application JSON Parser",
           "sequence": 13,
           "raw_json_path": "$.vulnerabilityId"
+        },
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 6,
+          "raw_json_path": "$.vulnerability.cve"
         }
       ],
       "sources": [
         {
           "source_internal": "socWebAppSource",
           "source_display": "SOC Web Application Logs"
+        },
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
         }
       ],
       "source_candidate_groups": [
+        "wazuh_vulnerabilities",
         "webapp_security"
       ],
       "example_values": [
-        "CVE-2024-DEMO-001"
+        "CVE-2024-DEMO-001",
+        "CVE-2024-30080"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Vulnerability Severity",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.vulnerability.severity"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 7,
+          "raw_json_path": "$.vulnerability.severity"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        "Critical"
+      ],
+      "contract_datasets": [
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_vuln_critical_kpi.json",
+        "hunting/wazuh_vuln_high_kpi.json",
+        "hunting/wazuh_vuln_low_kpi.json",
+        "hunting/wazuh_vuln_medium_kpi.json",
+        "hunting/wazuh_vuln_top_cves.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Vulnerability Status",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.vulnerability.status"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 12,
+          "raw_json_path": "$.vulnerability.status"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        "Active"
+      ],
+      "contract_datasets": [
+        "wazuh_vulnerabilities.jsonl"
+      ],
+      "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Vulnerability Title",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.vulnerability.title"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhVulnJsonParser",
+          "parser_display": "SOC Wazuh Vulnerability JSON Parser",
+          "sequence": 11,
+          "raw_json_path": "$.vulnerability.title"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhVulnSource",
+          "source_display": "SOC Wazuh Vulnerabilities"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_vulnerabilities"
+      ],
+      "example_values": [
+        "Microsoft Message Queuing (MSMQ) Remote Code Execution Vulnerability"
+      ],
+      "contract_datasets": [
+        "wazuh_vulnerabilities.jsonl"
+      ],
       "queries_using_it": [],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -16871,6 +18404,81 @@
       "contract_datasets": [],
       "queries_using_it": [
         "apps/app_waf_signal_correlation.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Wazuh Rule ID",
+      "kind": "custom",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.rule.id"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 6,
+          "raw_json_path": "$.rule.id"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [
+        "92052"
+      ],
+      "contract_datasets": [
+        "wazuh_alerts.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_hunting_recent_alerts.json",
+        "hunting/wazuh_hunting_top_rules.json"
+      ],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Wazuh Rule Level",
+      "kind": "custom",
+      "type": "LONG",
+      "raw_json_paths": [
+        "$.rule.level"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWazuhAlertsJsonParser",
+          "parser_display": "SOC Wazuh Alerts JSON Parser",
+          "sequence": 7,
+          "raw_json_path": "$.rule.level"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWazuhAlertsSource",
+          "source_display": "SOC Wazuh Alerts"
+        }
+      ],
+      "source_candidate_groups": [
+        "wazuh_alerts"
+      ],
+      "example_values": [
+        4
+      ],
+      "contract_datasets": [
+        "wazuh_alerts.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/wazuh_hunting_level_distribution.json",
+        "hunting/wazuh_hunting_recent_alerts.json",
+        "hunting/wazuh_mitre_rule_level_by_tactic.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""

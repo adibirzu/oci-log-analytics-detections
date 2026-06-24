@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: MITRE Attacks by Technique",
+  "description": "Wazuh alert count grouped by MITRE ATT&CK technique id.",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Count by 'MITRE Technique ID', 'MITRE Technique' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "bar",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

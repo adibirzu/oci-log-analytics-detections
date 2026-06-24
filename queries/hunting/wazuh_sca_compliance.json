@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Compliance Mapping",
+  "description": "Failed SCA checks grouped by compliance framework (CIS/PCI).",
+  "query": "'Log Source' = 'SOC Wazuh SCA' and 'SCA Check Result' = 'failed' | stats count as Count by 'SCA Compliance' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

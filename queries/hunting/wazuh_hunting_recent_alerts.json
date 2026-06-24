@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Recent Alerts (All)",
+  "description": "Threat-hunting explorer: most recent Wazuh alerts across all GOAD agents.",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' | stats count as Events by 'Host Name', 'Wazuh Rule ID', 'Rule Description', 'Wazuh Rule Level' | sort -Events",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Events"
+    }
+  }
+}

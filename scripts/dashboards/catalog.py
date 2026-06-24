@@ -581,6 +581,50 @@ DASHBOARDS = {
             {"title": "Hunt: OCI Audit Retention Reduced", "query_file": "oci_audit_configuration_retention_reduced.json"},
         ]
     },
+    "SOC: Wazuh MITRE ATT&CK Dashboard": {
+        "description": "MITRE ATT&CK coverage for GOAD endpoints (winterfell/kingslanding) forwarded from Wazuh. KPI of MITRE-mapped detections, alert evolution by tactic, top tactics, attacks by technique, rule-level by tactic, top agents, and a recent-events drilldown — mirroring the Wazuh MITRE ATT&CK module.",
+        "widgets": [
+            {"title": "MITRE Detections (21d)", "query_file": "hunting/wazuh_mitre_total_detections_kpi.json"},
+            {"title": "Alerts Evolution Over Time", "query_file": "hunting/wazuh_mitre_alerts_over_time.json"},
+            {"title": "Top Tactics", "query_file": "hunting/wazuh_mitre_top_tactics.json"},
+            {"title": "MITRE Attacks by Technique", "query_file": "hunting/wazuh_mitre_attacks_by_technique.json"},
+            {"title": "Rule Level by Tactic", "query_file": "hunting/wazuh_mitre_rule_level_by_tactic.json"},
+            {"title": "Top Agents by MITRE Alerts", "query_file": "hunting/wazuh_mitre_top_agents.json"},
+            {"title": "Recent MITRE Events", "query_file": "hunting/wazuh_mitre_recent_events.json"},
+        ]
+    },
+    "SOC: Wazuh Vulnerability Detection Dashboard": {
+        "description": "Wazuh Vulnerability Detector findings for GOAD agents: Critical/High/Medium/Low KPIs, top CVEs, top vulnerable packages, per-agent counts, and CVSS score distribution — mirroring the Wazuh Vulnerability Detection module.",
+        "widgets": [
+            {"title": "Critical - Severity", "query_file": "hunting/wazuh_vuln_critical_kpi.json"},
+            {"title": "High - Severity", "query_file": "hunting/wazuh_vuln_high_kpi.json"},
+            {"title": "Medium - Severity", "query_file": "hunting/wazuh_vuln_medium_kpi.json"},
+            {"title": "Low - Severity", "query_file": "hunting/wazuh_vuln_low_kpi.json"},
+            {"title": "Top 5 CVEs", "query_file": "hunting/wazuh_vuln_top_cves.json"},
+            {"title": "Top 5 Packages", "query_file": "hunting/wazuh_vuln_top_packages.json"},
+            {"title": "Vulnerabilities by Agent", "query_file": "hunting/wazuh_vuln_by_agent.json"},
+            {"title": "CVSS Score Distribution", "query_file": "hunting/wazuh_vuln_cvss_distribution.json"},
+        ]
+    },
+    "SOC: Wazuh Inventory & Compliance Dashboard": {
+        "description": "Wazuh Syscollector inventory and Security Configuration Assessment for GOAD agents: hardware/OS inventory, installed packages, SCA policy score, failed CIS checks, and compliance (CIS/PCI) mapping — mirroring the Wazuh Inventory and SCA modules.",
+        "widgets": [
+            {"title": "System Inventory", "query_file": "hunting/wazuh_inventory_hosts.json"},
+            {"title": "Installed Packages", "query_file": "hunting/wazuh_inventory_packages.json"},
+            {"title": "SCA Policy Score", "query_file": "hunting/wazuh_sca_score.json"},
+            {"title": "Failed SCA Checks", "query_file": "hunting/wazuh_sca_failed_checks.json"},
+            {"title": "Compliance Mapping", "query_file": "hunting/wazuh_sca_compliance.json"},
+        ]
+    },
+    "SOC: Wazuh FIM & Threat Hunting Dashboard": {
+        "description": "Wazuh File Integrity Monitoring and a general threat-hunting explorer for GOAD agents: FIM change events, top firing rules, alert-level distribution, and a recent-alerts table — mirroring the Wazuh FIM and Threat Hunting modules.",
+        "widgets": [
+            {"title": "File Integrity Monitoring Events", "query_file": "hunting/wazuh_fim_events.json"},
+            {"title": "Top Firing Rules", "query_file": "hunting/wazuh_hunting_top_rules.json"},
+            {"title": "Alert Level Distribution", "query_file": "hunting/wazuh_hunting_level_distribution.json"},
+            {"title": "Recent Alerts (All)", "query_file": "hunting/wazuh_hunting_recent_alerts.json"},
+        ]
+    },
 }
 
 

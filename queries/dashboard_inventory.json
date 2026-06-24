@@ -1,24 +1,24 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-24T13:43:40.192232+00:00",
+  "generated_at": "2026-06-24T20:41:16.988957+00:00",
   "source": "scripts/deploy_dashboard.py:DASHBOARDS",
   "summary": {
-    "total_dashboards": 30,
-    "total_widgets": 506,
-    "advanced_visualization_widgets": 126,
+    "total_dashboards": 34,
+    "total_widgets": 530,
+    "advanced_visualization_widgets": 150,
     "visualization_types": {
-      "bar": 4,
+      "bar": 7,
       "hbar": 1,
-      "line": 9,
+      "line": 10,
       "link": 11,
       "map": 2,
-      "summary_table": 85,
+      "summary_table": 100,
       "table": 380,
-      "tile": 14
+      "tile": 19
     },
     "levels": {
       "critical": 125,
-      "high": 188,
+      "high": 212,
       "informational": 20,
       "low": 17,
       "medium": 156
@@ -28870,13 +28870,1408 @@
       ]
     },
     {
+      "name": "SOC: Wazuh MITRE ATT&CK Dashboard",
+      "description": "MITRE ATT&CK coverage for GOAD endpoints (winterfell/kingslanding) forwarded from Wazuh. KPI of MITRE-mapped detections, alert evolution by tactic, top tactics, attacks by technique, rule-level by tactic, top agents, and a recent-events drilldown \u2014 mirroring the Wazuh MITRE ATT&CK module.",
+      "widget_count": 7,
+      "widgets": [
+        {
+          "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
+          "dashboard_index": 25,
+          "widget_index": 0,
+          "title": "MITRE Detections (21d)",
+          "query_file": "hunting/wazuh_mitre_total_detections_kpi.json",
+          "query_title": "Wazuh: MITRE Detections (KPI)",
+          "description": "Total Wazuh alerts mapped to a MITRE ATT&CK technique across GOAD agents.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "Detections"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Technique ID",
+              "label": "Pivot by MITRE Technique ID"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
+          "dashboard_index": 25,
+          "widget_index": 1,
+          "title": "Alerts Evolution Over Time",
+          "query_file": "hunting/wazuh_mitre_alerts_over_time.json",
+          "query_title": "Wazuh: Alerts Evolution Over Time",
+          "description": "Wazuh MITRE alert volume bucketed by tactic for the trend view.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "line",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 6,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Tactic",
+              "label": "Pivot by MITRE Tactic"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
+          "dashboard_index": 25,
+          "widget_index": 2,
+          "title": "Top Tactics",
+          "query_file": "hunting/wazuh_mitre_top_tactics.json",
+          "query_title": "Wazuh: Top MITRE Tactics",
+          "description": "Wazuh alert count grouped by MITRE ATT&CK tactic.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Tactic",
+              "label": "Pivot by MITRE Tactic"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
+          "dashboard_index": 25,
+          "widget_index": 3,
+          "title": "MITRE Attacks by Technique",
+          "query_file": "hunting/wazuh_mitre_attacks_by_technique.json",
+          "query_title": "Wazuh: MITRE Attacks by Technique",
+          "description": "Wazuh alert count grouped by MITRE ATT&CK technique id.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "bar",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 6,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Technique ID",
+              "label": "Pivot by MITRE Technique ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Technique",
+              "label": "Pivot by MITRE Technique"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
+          "dashboard_index": 25,
+          "widget_index": 4,
+          "title": "Rule Level by Tactic",
+          "query_file": "hunting/wazuh_mitre_rule_level_by_tactic.json",
+          "query_title": "Wazuh: Rule Level by Tactic",
+          "description": "Wazuh alert severity (rule level) distribution per MITRE tactic.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Tactic",
+              "label": "Pivot by MITRE Tactic"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Wazuh Rule Level",
+              "label": "Pivot by Wazuh Rule Level"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
+          "dashboard_index": 25,
+          "widget_index": 5,
+          "title": "Top Agents by MITRE Alerts",
+          "query_file": "hunting/wazuh_mitre_top_agents.json",
+          "query_title": "Wazuh: Top Agents by MITRE Alerts",
+          "description": "GOAD agents ranked by number of MITRE-mapped Wazuh alerts.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Technique ID",
+              "label": "Pivot by MITRE Technique ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name",
+              "label": "Pivot by Host Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
+          "dashboard_index": 25,
+          "widget_index": 6,
+          "title": "Recent MITRE Events",
+          "query_file": "hunting/wazuh_mitre_recent_events.json",
+          "query_title": "Wazuh: Recent MITRE Events",
+          "description": "Most recent MITRE-mapped Wazuh alerts with technique, tactic, level and rule.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Events"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Technique ID",
+              "label": "Pivot by MITRE Technique ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "MITRE Tactic",
+              "label": "Pivot by MITRE Tactic"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Rule Description",
+              "label": "Pivot by Rule Description"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SOC: Wazuh Vulnerability Detection Dashboard",
+      "description": "Wazuh Vulnerability Detector findings for GOAD agents: Critical/High/Medium/Low KPIs, top CVEs, top vulnerable packages, per-agent counts, and CVSS score distribution \u2014 mirroring the Wazuh Vulnerability Detection module.",
+      "widget_count": 8,
+      "widgets": [
+        {
+          "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
+          "dashboard_index": 26,
+          "widget_index": 0,
+          "title": "Critical - Severity",
+          "query_file": "hunting/wazuh_vuln_critical_kpi.json",
+          "query_title": "Wazuh: Critical Vulnerabilities (KPI)",
+          "description": "Count of Critical-severity CVEs detected by Wazuh on GOAD agents.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "Critical"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Vulnerability Severity",
+              "label": "Pivot by Vulnerability Severity"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
+          "dashboard_index": 26,
+          "widget_index": 1,
+          "title": "High - Severity",
+          "query_file": "hunting/wazuh_vuln_high_kpi.json",
+          "query_title": "Wazuh: High Vulnerabilities (KPI)",
+          "description": "Count of High-severity CVEs detected by Wazuh.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "High"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Vulnerability Severity",
+              "label": "Pivot by Vulnerability Severity"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
+          "dashboard_index": 26,
+          "widget_index": 2,
+          "title": "Medium - Severity",
+          "query_file": "hunting/wazuh_vuln_medium_kpi.json",
+          "query_title": "Wazuh: Medium Vulnerabilities (KPI)",
+          "description": "Count of Medium-severity CVEs detected by Wazuh.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "Medium"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Vulnerability Severity",
+              "label": "Pivot by Vulnerability Severity"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
+          "dashboard_index": 26,
+          "widget_index": 3,
+          "title": "Low - Severity",
+          "query_file": "hunting/wazuh_vuln_low_kpi.json",
+          "query_title": "Wazuh: Low Vulnerabilities (KPI)",
+          "description": "Count of Low-severity CVEs detected by Wazuh.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "Low"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Vulnerability Severity",
+              "label": "Pivot by Vulnerability Severity"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
+          "dashboard_index": 26,
+          "widget_index": 4,
+          "title": "Top 5 CVEs",
+          "query_file": "hunting/wazuh_vuln_top_cves.json",
+          "query_title": "Wazuh: Top CVEs",
+          "description": "Most frequently detected CVEs across GOAD agents.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "CVE ID",
+              "label": "Pivot by CVE ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Vulnerability Severity",
+              "label": "Pivot by Vulnerability Severity"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
+          "dashboard_index": 26,
+          "widget_index": 5,
+          "title": "Top 5 Packages",
+          "query_file": "hunting/wazuh_vuln_top_packages.json",
+          "query_title": "Wazuh: Top Vulnerable Packages",
+          "description": "Packages with the most associated CVEs.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Package Name",
+              "label": "Pivot by Package Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
+          "dashboard_index": 26,
+          "widget_index": 6,
+          "title": "Vulnerabilities by Agent",
+          "query_file": "hunting/wazuh_vuln_by_agent.json",
+          "query_title": "Wazuh: Vulnerabilities by Agent",
+          "description": "CVE count per GOAD agent.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name",
+              "label": "Pivot by Host Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
+          "dashboard_index": 26,
+          "widget_index": 7,
+          "title": "CVSS Score Distribution",
+          "query_file": "hunting/wazuh_vuln_cvss_distribution.json",
+          "query_title": "Wazuh: CVSS Score Distribution",
+          "description": "Distribution of detected CVEs by CVSS base score.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "bar",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 6,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "CVSS Score",
+              "label": "Pivot by CVSS Score"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SOC: Wazuh Inventory & Compliance Dashboard",
+      "description": "Wazuh Syscollector inventory and Security Configuration Assessment for GOAD agents: hardware/OS inventory, installed packages, SCA policy score, failed CIS checks, and compliance (CIS/PCI) mapping \u2014 mirroring the Wazuh Inventory and SCA modules.",
+      "widget_count": 5,
+      "widgets": [
+        {
+          "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
+          "dashboard_index": 27,
+          "widget_index": 0,
+          "title": "System Inventory",
+          "query_file": "hunting/wazuh_inventory_hosts.json",
+          "query_title": "Wazuh: System Inventory",
+          "description": "Hardware and OS inventory per GOAD agent (cores, memory, CPU, OS).",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Records"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name",
+              "label": "Pivot by Host Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "CPU Name",
+              "label": "Pivot by CPU Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "OS Name",
+              "label": "Pivot by OS Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
+          "dashboard_index": 27,
+          "widget_index": 1,
+          "title": "Installed Packages",
+          "query_file": "hunting/wazuh_inventory_packages.json",
+          "query_title": "Wazuh: Installed Packages",
+          "description": "Installed software inventory across GOAD agents.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Package Name",
+              "label": "Pivot by Package Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
+          "dashboard_index": 27,
+          "widget_index": 2,
+          "title": "SCA Policy Score",
+          "query_file": "hunting/wazuh_sca_score.json",
+          "query_title": "Wazuh: SCA Policy Score",
+          "description": "Security Configuration Assessment score per policy and agent.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Checks"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name",
+              "label": "Pivot by Host Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "SCA Policy",
+              "label": "Pivot by SCA Policy"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "SCA Score",
+              "label": "Pivot by SCA Score"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
+          "dashboard_index": 27,
+          "widget_index": 3,
+          "title": "Failed SCA Checks",
+          "query_file": "hunting/wazuh_sca_failed_checks.json",
+          "query_title": "Wazuh: Failed SCA Checks",
+          "description": "Configuration checks that failed, by title and host.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "SCA Check Result",
+              "label": "Pivot by SCA Check Result"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name",
+              "label": "Pivot by Host Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "SCA Check Title",
+              "label": "Pivot by SCA Check Title"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
+          "dashboard_index": 27,
+          "widget_index": 4,
+          "title": "Compliance Mapping",
+          "query_file": "hunting/wazuh_sca_compliance.json",
+          "query_title": "Wazuh: Compliance Mapping",
+          "description": "Failed SCA checks grouped by compliance framework (CIS/PCI).",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "SCA Check Result",
+              "label": "Pivot by SCA Check Result"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "SCA Compliance",
+              "label": "Pivot by SCA Compliance"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "SOC: Wazuh FIM & Threat Hunting Dashboard",
+      "description": "Wazuh File Integrity Monitoring and a general threat-hunting explorer for GOAD agents: FIM change events, top firing rules, alert-level distribution, and a recent-alerts table \u2014 mirroring the Wazuh FIM and Threat Hunting modules.",
+      "widget_count": 4,
+      "widgets": [
+        {
+          "dashboard_name": "SOC: Wazuh FIM & Threat Hunting Dashboard",
+          "dashboard_index": 28,
+          "widget_index": 0,
+          "title": "File Integrity Monitoring Events",
+          "query_file": "hunting/wazuh_fim_events.json",
+          "query_title": "Wazuh: File Integrity Monitoring Events",
+          "description": "FIM/syscheck changes (added/modified/deleted) by path and agent.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "FIM Event",
+              "label": "Pivot by FIM Event"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name",
+              "label": "Pivot by Host Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "File Path",
+              "label": "Pivot by File Path"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh FIM & Threat Hunting Dashboard",
+          "dashboard_index": 28,
+          "widget_index": 1,
+          "title": "Top Firing Rules",
+          "query_file": "hunting/wazuh_hunting_top_rules.json",
+          "query_title": "Wazuh: Top Firing Rules",
+          "description": "Most frequently firing Wazuh rules across GOAD agents.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Wazuh Rule ID",
+              "label": "Pivot by Wazuh Rule ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Rule Description",
+              "label": "Pivot by Rule Description"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh FIM & Threat Hunting Dashboard",
+          "dashboard_index": 28,
+          "widget_index": 2,
+          "title": "Alert Level Distribution",
+          "query_file": "hunting/wazuh_hunting_level_distribution.json",
+          "query_title": "Wazuh: Alert Level Distribution",
+          "description": "Distribution of all Wazuh alerts by rule level (severity).",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "bar",
+          "visualization_options": {
+            "valueField": "Count"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 6,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Wazuh Rule Level",
+              "label": "Pivot by Wazuh Rule Level"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Wazuh FIM & Threat Hunting Dashboard",
+          "dashboard_index": 28,
+          "widget_index": 3,
+          "title": "Recent Alerts (All)",
+          "query_file": "hunting/wazuh_hunting_recent_alerts.json",
+          "query_title": "Wazuh: Recent Alerts (All)",
+          "description": "Threat-hunting explorer: most recent Wazuh alerts across all GOAD agents.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "wazuh",
+            "goad",
+            "hunting"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "wazuh",
+            "service": "goad"
+          },
+          "mitre_attack": {},
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Events"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name",
+              "label": "Pivot by Host Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Wazuh Rule ID",
+              "label": "Pivot by Wazuh Rule ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Rule Description",
+              "label": "Pivot by Rule Description"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Wazuh Rule Level",
+              "label": "Pivot by Wazuh Rule Level"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "SOC: Microsoft Sentinel Identity Converted Detections",
       "description": "Live-validated Microsoft Sentinel identity detections converted to OCI Log Analytics Logan QL.",
       "widget_count": 24,
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 0,
           "title": "Sentinel: Cisco Duo - AD sync failed",
           "query_file": "sentinel/cisco_duo_-_ad_sync_failed.json",
@@ -28948,7 +30343,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 1,
           "title": "Sentinel: CiscoISE - Attempt to delete local store logs",
           "query_file": "sentinel/ciscoise_-_attempt_to_delete_local_store_logs.json",
@@ -29041,7 +30436,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 2,
           "title": "Sentinel: Cisco Duo - Admin password reset",
           "query_file": "sentinel/cisco_duo_-_admin_password_reset.json",
@@ -29113,7 +30508,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 3,
           "title": "Sentinel: Cisco Duo - Admin user deleted",
           "query_file": "sentinel/cisco_duo_-_admin_user_deleted.json",
@@ -29185,7 +30580,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 4,
           "title": "Sentinel: CiscoISE - Backup failed",
           "query_file": "sentinel/ciscoise_-_backup_failed.json",
@@ -29273,7 +30668,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 5,
           "title": "Sentinel: CiscoISE - Certificate has expired",
           "query_file": "sentinel/ciscoise_-_certificate_has_expired.json",
@@ -29366,7 +30761,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 6,
           "title": "Sentinel: CiscoISE - ISE administrator password has been reset",
           "query_file": "sentinel/ciscoise_-_ise_administrator_password_has_been_reset.json",
@@ -29455,7 +30850,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 7,
           "title": "Sentinel: CiscoISE - Log collector was suspended",
           "query_file": "sentinel/ciscoise_-_log_collector_was_suspended.json",
@@ -29543,7 +30938,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 8,
           "title": "Sentinel: CiscoISE - Log files deleted",
           "query_file": "sentinel/ciscoise_-_log_files_deleted.json",
@@ -29636,7 +31031,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 9,
           "title": "Sentinel: Cisco Duo - Admin failure authentications",
           "query_file": "sentinel/cisco_duo_-_admin_failure_authentications.json",
@@ -29719,7 +31114,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 10,
           "title": "Sentinel: Cisco Duo - Admin failure authentications",
           "query_file": "sentinel/cisco_duo_-_admin_failure_authentications_385b0938-3922-48ab-a57a-.json",
@@ -29802,7 +31197,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 11,
           "title": "Sentinel: Cisco Duo - Admin user created",
           "query_file": "sentinel/cisco_duo_-_admin_user_created.json",
@@ -29875,7 +31270,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 12,
           "title": "Sentinel: Cisco Duo - Authentication error reasons",
           "query_file": "sentinel/cisco_duo_-_authentication_error_reasons.json",
@@ -29958,7 +31353,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 13,
           "title": "Sentinel: Cisco Duo - Authentication errors",
           "query_file": "sentinel/cisco_duo_-_authentication_errors.json",
@@ -30046,7 +31441,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 14,
           "title": "Sentinel: Cisco Duo - Delete actions",
           "query_file": "sentinel/cisco_duo_-_delete_actions.json",
@@ -30134,7 +31529,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 15,
           "title": "Sentinel: Cisco Duo - Deleted users",
           "query_file": "sentinel/cisco_duo_-_deleted_users.json",
@@ -30222,7 +31617,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 16,
           "title": "Sentinel: Cisco Duo - Fraud authentications",
           "query_file": "sentinel/cisco_duo_-_fraud_authentications.json",
@@ -30310,7 +31705,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 17,
           "title": "Sentinel: Cisco Duo - Multiple admin 2FA failures",
           "query_file": "sentinel/cisco_duo_-_multiple_admin_2fa_failures.json",
@@ -30388,7 +31783,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 18,
           "title": "Sentinel: Cisco Duo - Multiple user login failures",
           "query_file": "sentinel/cisco_duo_-_multiple_user_login_failures.json",
@@ -30471,7 +31866,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 19,
           "title": "Sentinel: Cisco Duo - Multiple users deleted",
           "query_file": "sentinel/cisco_duo_-_multiple_users_deleted.json",
@@ -30549,7 +31944,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 20,
           "title": "Sentinel: Cisco Duo - New users",
           "query_file": "sentinel/cisco_duo_-_new_users.json",
@@ -30638,7 +32033,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 21,
           "title": "Sentinel: CiscoISE - Attempts to suspend the log collector",
           "query_file": "sentinel/ciscoise_-_attempts_to_suspend_the_log_collector.json",
@@ -30714,7 +32109,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 22,
           "title": "Sentinel: CiscoISE - Authentication attempts to suspended user account",
           "query_file": "sentinel/ciscoise_-_authentication_attempts_to_suspended_user_account.json",
@@ -30791,7 +32186,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 25,
+          "dashboard_index": 29,
           "widget_index": 23,
           "title": "Sentinel: CiscoISE - Dynamic authorization failed",
           "query_file": "sentinel/ciscoise_-_dynamic_authorization_failed.json",
@@ -30879,7 +32274,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 0,
           "title": "Sentinel: ApexOne - Top sources with alerts",
           "query_file": "sentinel/apexone_-_top_sources_with_alerts.json",
@@ -30972,7 +32367,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 1,
           "title": "Sentinel: Known Nylon Typhoon Registry modifications patterns",
           "query_file": "sentinel/known_nylon_typhoon_registry_modifications_patterns.json",
@@ -31051,7 +32446,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 2,
           "title": "Sentinel: Detect Suspicious Commands Initiated by Webserver Processes",
           "query_file": "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
@@ -31150,7 +32545,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 3,
           "title": "Sentinel: McAfee ePO - Multiple threats on same host",
           "query_file": "sentinel/mcafee_epo_-_multiple_threats_on_same_host.json",
@@ -31242,7 +32637,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 4,
           "title": "Sentinel: Malicious Connection to LDAP port for CVE-2021-44228 vulnerability",
           "query_file": "sentinel/malicious_connection_to_ldap_port_for_cve-2021-44228_vulnerability.json",
@@ -31318,7 +32713,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 5,
           "title": "Sentinel: Cisco SE - User Logins",
           "query_file": "sentinel/cisco_se_-_user_logins.json",
@@ -31397,7 +32792,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 6,
           "title": "Sentinel: Dev-0530 File Extension Rename",
           "query_file": "sentinel/dev-0530_file_extension_rename.json",
@@ -31470,7 +32865,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 7,
           "title": "Sentinel: CyberArkEPM - MSBuild usage as LOLBin",
           "query_file": "sentinel/cyberarkepm_-_msbuild_usage_as_lolbin.json",
@@ -31559,7 +32954,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 8,
           "title": "Sentinel: Office ASR rule triggered from browser spawned office process.",
           "query_file": "sentinel/office_asr_rule_triggered_from_browser_spawned_office_process.json",
@@ -31643,7 +33038,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 9,
           "title": "Sentinel: Potential re-named sdelete usage (ASIM Version)",
           "query_file": "sentinel/potential_re-named_sdelete_usage_asim_version.json",
@@ -31729,7 +33124,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 10,
           "title": "Sentinel: Certutil (LOLBins and LOLScripts, Normalized Process Events)",
           "query_file": "sentinel/certutil_lolbins_and_lolscripts_normalized_process_events.json",
@@ -31808,7 +33203,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 11,
           "title": "Sentinel: Failed Logon Attempt",
           "query_file": "sentinel/failed_logon_attempt.json",
@@ -31893,7 +33288,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 12,
           "title": "Sentinel: NRT Base64 Encoded Windows Process Command-lines",
           "query_file": "sentinel/nrt_base64_encoded_windows_process_command-lines.json",
@@ -31980,7 +33375,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 13,
           "title": "Sentinel: Oracle suspicious command execution",
           "query_file": "sentinel/oracle_suspicious_command_execution.json",
@@ -32066,7 +33461,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 14,
           "title": "Sentinel: Suspicious Image Load related to IcedId",
           "query_file": "sentinel/suspicious_image_load_related_to_icedid.json",
@@ -32148,7 +33543,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 15,
           "title": "Sentinel: AD account with Don't Expire Password",
           "query_file": "sentinel/ad_account_with_don_t_expire_password.json",
@@ -32223,7 +33618,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 16,
           "title": "Sentinel: ApexOne - Attack Discovery Detection",
           "query_file": "sentinel/apexone_-_attack_discovery_detection.json",
@@ -32296,7 +33691,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 17,
           "title": "Sentinel: Cisco SE - Dropper activity on host",
           "query_file": "sentinel/cisco_se_-_dropper_activity_on_host.json",
@@ -32369,7 +33764,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 18,
           "title": "Sentinel: Cisco SE - Possible webshell",
           "query_file": "sentinel/cisco_se_-_possible_webshell.json",
@@ -32442,7 +33837,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 19,
           "title": "Sentinel: Dev-0270 WMIC  Discovery",
           "query_file": "sentinel/dev-0270_wmic_discovery.json",
@@ -32518,7 +33913,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 20,
           "title": "Sentinel: Disable or Modify Windows Defender",
           "query_file": "sentinel/disable_or_modify_windows_defender.json",
@@ -32597,7 +33992,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 21,
           "title": "Sentinel: Domain controller installation media creation",
           "query_file": "sentinel/domain_controller_installation_media_creation.json",
@@ -32672,7 +34067,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 22,
           "title": "Sentinel: Establishing internal proxies",
           "query_file": "sentinel/establishing_internal_proxies.json",
@@ -32747,7 +34142,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 26,
+          "dashboard_index": 30,
           "widget_index": 23,
           "title": "Sentinel: Identify Mango Sandstorm powershell commands",
           "query_file": "sentinel/identify_mango_sandstorm_powershell_commands.json",
@@ -32831,7 +34226,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 0,
           "title": "Sentinel: GCP IAM - Empty user agent",
           "query_file": "sentinel/gcp_iam_-_empty_user_agent.json",
@@ -32910,7 +34305,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 1,
           "title": "Sentinel: OCI - Event rule deleted",
           "query_file": "sentinel/oci_-_event_rule_deleted.json",
@@ -32988,7 +34383,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 2,
           "title": "Sentinel: Palo Alto Prisma Cloud - Opened alerts",
           "query_file": "sentinel/palo_alto_prisma_cloud_-_opened_alerts.json",
@@ -33061,7 +34456,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 3,
           "title": "Sentinel: OCI - Delete operations",
           "query_file": "sentinel/oci_-_delete_operations.json",
@@ -33139,7 +34534,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 4,
           "title": "Sentinel: OCI - Deleted users",
           "query_file": "sentinel/oci_-_deleted_users.json",
@@ -33217,7 +34612,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 5,
           "title": "Sentinel: OCI - Insecure metadata endpoint",
           "query_file": "sentinel/oci_-_insecure_metadata_endpoint.json",
@@ -33300,7 +34695,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 6,
           "title": "Sentinel: OCI - Launched instances",
           "query_file": "sentinel/oci_-_launched_instances.json",
@@ -33378,7 +34773,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 7,
           "title": "Sentinel: OCI - Multiple instances launched",
           "query_file": "sentinel/oci_-_multiple_instances_launched.json",
@@ -33461,7 +34856,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 8,
           "title": "Sentinel: OCI - Multiple instances terminated",
           "query_file": "sentinel/oci_-_multiple_instances_terminated.json",
@@ -33544,7 +34939,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 9,
           "title": "Sentinel: OCI - Updated instances",
           "query_file": "sentinel/oci_-_updated_instances.json",
@@ -33622,7 +35017,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 10,
           "title": "Sentinel: Palo Alto Prisma Cloud - Updated resources",
           "query_file": "sentinel/palo_alto_prisma_cloud_-_updated_resources.json",
@@ -33695,7 +35090,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 11,
           "title": "Sentinel: OCI - New users",
           "query_file": "sentinel/oci_-_new_users.json",
@@ -33774,7 +35169,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 27,
+          "dashboard_index": 31,
           "widget_index": 12,
           "title": "Sentinel: OCI - Terminated instances",
           "query_file": "sentinel/oci_-_terminated_instances.json",
@@ -33859,7 +35254,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 0,
           "title": "Sentinel: GWorkspace - Alert events",
           "query_file": "sentinel/gworkspace_-_alert_events.json",
@@ -33938,7 +35333,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 1,
           "title": "Sentinel: SlackAudit - User role changed to admin or owner",
           "query_file": "sentinel/slackaudit_-_user_role_changed_to_admin_or_owner.json",
@@ -34012,7 +35407,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 2,
           "title": "Sentinel: Box - Executable file in folder",
           "query_file": "sentinel/box_-_executable_file_in_folder.json",
@@ -34095,7 +35490,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 3,
           "title": "Sentinel: Email Top 10 Targeted Users (Spam)",
           "query_file": "sentinel/email_top_10_targeted_users_spam.json",
@@ -34179,7 +35574,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 4,
           "title": "Sentinel: Jira - Updated workflow schemes",
           "query_file": "sentinel/jira_-_updated_workflow_schemes.json",
@@ -34267,7 +35662,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 5,
           "title": "Sentinel: Azure DevOps Pull Request Policy Bypassing",
           "query_file": "sentinel/azure_devops_pull_request_policy_bypassing.json",
@@ -34339,7 +35734,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 6,
           "title": "Sentinel: GitHub OAuth App Restrictions Disabled",
           "query_file": "sentinel/github_oauth_app_restrictions_disabled_667e6a70-adc9-49b7-9cf3-.json",
@@ -34413,7 +35808,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 7,
           "title": "Sentinel: Trend Micro CAS - Ransomware infection",
           "query_file": "sentinel/trend_micro_cas_-_ransomware_infection.json",
@@ -34491,7 +35886,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 8,
           "title": "Sentinel: Hunt for TABL changes",
           "query_file": "sentinel/hunt_for_tabl_changes.json",
@@ -34564,7 +35959,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 9,
           "title": "Sentinel: Malicious URL Clicks by workload",
           "query_file": "sentinel/malicious_url_clicks_by_workload.json",
@@ -34643,7 +36038,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 10,
           "title": "Sentinel: Sticky Keys",
           "query_file": "sentinel/sticky_keys.json",
@@ -34719,7 +36114,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 11,
           "title": "Sentinel: Teams Malware ZAP",
           "query_file": "sentinel/teams_malware_zap.json",
@@ -34792,7 +36187,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 12,
           "title": "Sentinel: Box - File containing sensitive data",
           "query_file": "sentinel/box_-_file_containing_sensitive_data.json",
@@ -34875,7 +36270,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 13,
           "title": "Sentinel: GWorkspace - API Access Granted",
           "query_file": "sentinel/gworkspace_-_api_access_granted.json",
@@ -34948,7 +36343,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 14,
           "title": "Sentinel: GWorkspace - An Outbound Relay has been added to a G Suite Domain",
           "query_file": "sentinel/gworkspace_-_an_outbound_relay_has_been_added_to_a_g_suite_domain.json",
@@ -35020,7 +36415,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 15,
           "title": "Sentinel: GWorkspace - Suspended users",
           "query_file": "sentinel/gworkspace_-_suspended_users.json",
@@ -35092,7 +36487,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 16,
           "title": "Sentinel: GWorkspace - Two-step authentification disabled for a user",
           "query_file": "sentinel/gworkspace_-_two-step_authentification_disabled_for_a_user.json",
@@ -35164,7 +36559,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 17,
           "title": "Sentinel: SlackAudit - New User created",
           "query_file": "sentinel/slackaudit_-_new_user_created.json",
@@ -35236,7 +36631,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 18,
           "title": "Sentinel: Box - IP list for admin users",
           "query_file": "sentinel/box_-_ip_list_for_admin_users.json",
@@ -35325,7 +36720,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 19,
           "title": "Sentinel: Email Top 10 Targeted Users (Spam)",
           "query_file": "sentinel/email_top_10_targeted_users_spam_9e4b7553-1113-4d40-bb6b-.json",
@@ -35409,7 +36804,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 20,
           "title": "Sentinel: Email Top 15 Targeted Users (Spam) with Additional Details",
           "query_file": "sentinel/email_top_15_targeted_users_spam_with_additional_details.json",
@@ -35493,7 +36888,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 21,
           "title": "Sentinel: Email Top 15 Targeted Users (Spam) with Additional Details",
           "query_file": "sentinel/email_top_15_targeted_users_spam_with_additional_details_86f2b124-8caf-4b53-845a-.json",
@@ -35577,7 +36972,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 22,
           "title": "Sentinel: GWorkspace - Admin permissions granted",
           "query_file": "sentinel/gworkspace_-_admin_permissions_granted.json",
@@ -35649,7 +37044,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 28,
+          "dashboard_index": 32,
           "widget_index": 23,
           "title": "Sentinel: GWorkspace - User access has been changed",
           "query_file": "sentinel/gworkspace_-_user_access_has_been_changed.json",
@@ -35728,7 +37123,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 0,
           "title": "Sentinel: Critical Risks",
           "query_file": "sentinel/critical_risks.json",
@@ -35813,7 +37208,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 1,
           "title": "Sentinel: Cisco Cloud Security - Crypto Miner User-Agent Detected",
           "query_file": "sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
@@ -35917,7 +37312,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 2,
           "title": "Sentinel: Cloudflare - Client errors",
           "query_file": "sentinel/cloudflare_-_client_errors.json",
@@ -35999,7 +37394,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 3,
           "title": "Sentinel: Apache - Unexpected Post Requests",
           "query_file": "sentinel/apache_-_unexpected_post_requests.json",
@@ -36092,7 +37487,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 4,
           "title": "Sentinel: Google DNS - Domains with rare errors",
           "query_file": "sentinel/google_dns_-_domains_with_rare_errors.json",
@@ -36172,7 +37567,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 5,
           "title": "Sentinel: Cisco Cloud Security - Windows PowerShell User-Agent Detected",
           "query_file": "sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
@@ -36276,7 +37671,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 6,
           "title": "Sentinel: Cisco WSA - Access to unwanted site",
           "query_file": "sentinel/cisco_wsa_-_access_to_unwanted_site.json",
@@ -36356,7 +37751,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 7,
           "title": "Sentinel: Imperva - Forbidden HTTP request method in request",
           "query_file": "sentinel/imperva_-_forbidden_http_request_method_in_request.json",
@@ -36437,7 +37832,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 8,
           "title": "Sentinel: NGINX - Core Dump",
           "query_file": "sentinel/nginx_-_core_dump.json",
@@ -36517,7 +37912,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 9,
           "title": "Sentinel: Oracle - Error messages",
           "query_file": "sentinel/oracle_-_error_messages.json",
@@ -36591,7 +37986,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 10,
           "title": "Sentinel: Acronis - Multiple Inboxes with Malicious Content Detected",
           "query_file": "sentinel/acronis_-_multiple_inboxes_with_malicious_content_detected.json",
@@ -36676,7 +38071,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 11,
           "title": "Sentinel: Acronis - Multiple Endpoints Accessing Malicious URLs",
           "query_file": "sentinel/acronis_-_multiple_endpoints_accessing_malicious_urls.json",
@@ -36760,7 +38155,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 12,
           "title": "Sentinel: Acronis - Multiple Endpoints Infected by Ransomware",
           "query_file": "sentinel/acronis_-_multiple_endpoints_infected_by_ransomware.json",
@@ -36844,7 +38239,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 13,
           "title": "Sentinel: Apache - Apache 2.4.49 flaw CVE-2021-41773",
           "query_file": "sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
@@ -36937,7 +38332,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 14,
           "title": "Sentinel: Cisco Cloud Security - 'Blocked' User-Agents.",
           "query_file": "sentinel/cisco_cloud_security_-_blocked_user-agents.json",
@@ -37017,7 +38412,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 15,
           "title": "Sentinel: Cisco Cloud Security - Empty User Agent Detected",
           "query_file": "sentinel/cisco_cloud_security_-_empty_user_agent_detected.json",
@@ -37117,7 +38512,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 16,
           "title": "Sentinel: Cisco WSA - Multiple errors to URL",
           "query_file": "sentinel/cisco_wsa_-_multiple_errors_to_url.json",
@@ -37202,7 +38597,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 17,
           "title": "Sentinel: Cisco WSA - Rare URL with error",
           "query_file": "sentinel/cisco_wsa_-_rare_url_with_error.json",
@@ -37284,7 +38679,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 18,
           "title": "Sentinel: Google DNS - CVE-2021-34527 (PrintNightmare) external exploit",
           "query_file": "sentinel/google_dns_-_cve-2021-34527_printnightmare_external_exploit.json",
@@ -37364,7 +38759,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 19,
           "title": "Sentinel: Google DNS - Exchange online autodiscover abuse",
           "query_file": "sentinel/google_dns_-_exchange_online_autodiscover_abuse.json",
@@ -37446,7 +38841,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 20,
           "title": "Sentinel: Google DNS - Malicous Python packages",
           "query_file": "sentinel/google_dns_-_malicous_python_packages.json",
@@ -37526,7 +38921,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 21,
           "title": "Sentinel: Google DNS - Possible data exfiltration",
           "query_file": "sentinel/google_dns_-_possible_data_exfiltration.json",
@@ -37606,7 +39001,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 22,
           "title": "Sentinel: PaloAlto - Multiple Deny result by user",
           "query_file": "sentinel/paloalto_-_multiple_deny_result_by_user.json",
@@ -37687,7 +39082,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 33,
           "widget_index": 23,
           "title": "Sentinel: Tomcat - Catalina errors",
           "query_file": "sentinel/tomcat_-_catalina_errors.json",

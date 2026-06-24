@@ -142,6 +142,10 @@ def _default_parser_definitions() -> list[dict[str, Any]]:
         "VCN",
         "FW",
         "HEALTH",
+        "WAZUH_ALERTS",
+        "WAZUH_VULN",
+        "WAZUH_INV",
+        "WAZUH_SCA",
     ]
     definitions = []
     for prefix in prefixes:

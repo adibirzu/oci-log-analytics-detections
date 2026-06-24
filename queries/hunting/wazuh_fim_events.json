@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: File Integrity Monitoring Events",
+  "description": "FIM/syscheck changes (added/modified/deleted) by path and agent.",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' and 'FIM Event' != null | stats count as Count by 'Host Name', 'FIM Event', 'File Path' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

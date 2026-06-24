@@ -1,7 +1,7 @@
 {
-  "total_queries": 722,
-  "eligible_queries": 157,
-  "ineligible_queries": 565,
+  "total_queries": 746,
+  "eligible_queries": 180,
+  "ineligible_queries": 566,
   "specs": [
     {
       "query_file": "queries/accessibility_features_backdoor.json",
@@ -21148,6 +21148,762 @@
         "dimensions": [
           "Request URL",
           "Client IP"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_fim_events.json",
+      "title": "Wazuh: File Integrity Monitoring Events",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "Host Name",
+        "FIM Event",
+        "File Path"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' and 'FIM Event' != null | stats count as Count by 'Host Name', 'FIM Event', 'File Path' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "Host Name",
+          "FIM Event",
+          "File Path"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_hunting_level_distribution.json",
+      "title": "Wazuh: Alert Level Distribution",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "Wazuh Rule Level"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' | stats count as Count by 'Wazuh Rule Level' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "Wazuh Rule Level"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_hunting_recent_alerts.json",
+      "title": "Wazuh: Recent Alerts (All)",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Events",
+      "dimensions": [
+        "Host Name",
+        "Wazuh Rule ID",
+        "Rule Description"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' | stats count as Events by 'Host Name', 'Wazuh Rule ID', 'Rule Description', 'Wazuh Rule Level' | sort -Events",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "Host Name",
+          "Wazuh Rule ID",
+          "Rule Description"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_hunting_top_rules.json",
+      "title": "Wazuh: Top Firing Rules",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "Wazuh Rule ID",
+        "Rule Description"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' | stats count as Count by 'Wazuh Rule ID', 'Rule Description' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "Wazuh Rule ID",
+          "Rule Description"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_inventory_hosts.json",
+      "title": "Wazuh: System Inventory",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Records",
+      "dimensions": [
+        "Host Name",
+        "CPU Name",
+        "OS Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Inventory' | stats count as Records by 'Host Name', 'CPU Name', 'OS Name' | sort -Records",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Records",
+        "dimensions": [
+          "Host Name",
+          "CPU Name",
+          "OS Name"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_inventory_packages.json",
+      "title": "Wazuh: Installed Packages",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "Package Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Inventory' and 'Package Name' != null | stats count as Count by 'Package Name' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "Package Name"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_mitre_alerts_over_time.json",
+      "title": "Wazuh: Alerts Evolution Over Time",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "MITRE Tactic"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Tactic' != null | stats count as Count by 'MITRE Tactic' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "MITRE Tactic"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_mitre_attacks_by_technique.json",
+      "title": "Wazuh: MITRE Attacks by Technique",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "MITRE Technique ID",
+        "MITRE Technique"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Count by 'MITRE Technique ID', 'MITRE Technique' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "MITRE Technique ID",
+          "MITRE Technique"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_mitre_recent_events.json",
+      "title": "Wazuh: Recent MITRE Events",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Events",
+      "dimensions": [
+        "MITRE Technique ID",
+        "MITRE Tactic",
+        "Rule Description"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Events by 'MITRE Technique ID', 'MITRE Tactic', 'Rule Description' | sort -Events",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "MITRE Technique ID",
+          "MITRE Tactic",
+          "Rule Description"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_mitre_rule_level_by_tactic.json",
+      "title": "Wazuh: Rule Level by Tactic",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "MITRE Tactic",
+        "Wazuh Rule Level"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Tactic' != null | stats count as Count by 'MITRE Tactic', 'Wazuh Rule Level' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "MITRE Tactic",
+          "Wazuh Rule Level"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_mitre_top_agents.json",
+      "title": "Wazuh: Top Agents by MITRE Alerts",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "Host Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Count by 'Host Name' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "Host Name"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_mitre_top_tactics.json",
+      "title": "Wazuh: Top MITRE Tactics",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "MITRE Tactic"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Tactic' != null | stats count as Count by 'MITRE Tactic' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "MITRE Tactic"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_mitre_total_detections_kpi.json",
+      "title": "Wazuh: MITRE Detections (KPI)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Detections",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Detections",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Detections",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_sca_compliance.json",
+      "title": "Wazuh: Compliance Mapping",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "SCA Compliance"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh SCA' and 'SCA Check Result' = 'failed' | stats count as Count by 'SCA Compliance' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "SCA Compliance"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_sca_failed_checks.json",
+      "title": "Wazuh: Failed SCA Checks",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "Host Name",
+        "SCA Check Title"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh SCA' and 'SCA Check Result' = 'failed' | stats count as Count by 'Host Name', 'SCA Check Title' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "Host Name",
+          "SCA Check Title"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_sca_score.json",
+      "title": "Wazuh: SCA Policy Score",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Checks",
+      "dimensions": [
+        "Host Name",
+        "SCA Policy",
+        "SCA Score"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh SCA' | stats count as Checks by 'Host Name', 'SCA Policy', 'SCA Score' | sort -Checks",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Checks",
+        "dimensions": [
+          "Host Name",
+          "SCA Policy",
+          "SCA Score"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_vuln_by_agent.json",
+      "title": "Wazuh: Vulnerabilities by Agent",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "Host Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' | stats count as Count by 'Host Name' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "Host Name"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_vuln_critical_kpi.json",
+      "title": "Wazuh: Critical Vulnerabilities (KPI)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Critical",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' and 'Vulnerability Severity' = 'Critical' | stats count as Critical",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Critical",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_vuln_cvss_distribution.json",
+      "title": "Wazuh: CVSS Score Distribution",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "CVSS Score"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' | stats count as Count by 'CVSS Score' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "CVSS Score"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_vuln_high_kpi.json",
+      "title": "Wazuh: High Vulnerabilities (KPI)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "High",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' and 'Vulnerability Severity' = 'High' | stats count as High",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "High",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_vuln_low_kpi.json",
+      "title": "Wazuh: Low Vulnerabilities (KPI)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Low",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' and 'Vulnerability Severity' = 'Low' | stats count as Low",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Low",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_vuln_medium_kpi.json",
+      "title": "Wazuh: Medium Vulnerabilities (KPI)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Medium",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' and 'Vulnerability Severity' = 'Medium' | stats count as Medium",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Medium",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_vuln_top_cves.json",
+      "title": "Wazuh: Top CVEs",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "CVE ID",
+        "Vulnerability Severity"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' | stats count as Count by 'CVE ID', 'Vulnerability Severity' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "CVE ID",
+          "Vulnerability Severity"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/wazuh_vuln_top_packages.json",
+      "title": "Wazuh: Top Vulnerable Packages",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Count",
+      "dimensions": [
+        "Package Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' | stats count as Count by 'Package Name' | sort -Count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Count",
+        "dimensions": [
+          "Package Name"
         ],
         "severity": "high",
         "create_alarm_by_default": false

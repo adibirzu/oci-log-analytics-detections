@@ -14,6 +14,7 @@ from logsources.web_sources import *  # noqa: F401,F403
 from logsources.application_sources import *  # noqa: F401,F403
 from logsources.genai_gateway_sources import *  # noqa: F401,F403
 from logsources.cloud_native_sources import *  # noqa: F401,F403
+from logsources.wazuh_sources import *  # noqa: F401,F403
 
 
 NATIVE_SOURCE_ALTERNATIVES = {

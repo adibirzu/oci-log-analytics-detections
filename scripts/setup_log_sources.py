@@ -440,6 +440,8 @@ def main():
         print(f"    - {VCN_SOURCE_DISPLAY} ({VCN_SOURCE_INTERNAL})")
         print(f"    - {FW_SOURCE_DISPLAY} ({FW_SOURCE_INTERNAL})")
         print(f"    - {HEALTH_SOURCE_DISPLAY} ({HEALTH_SOURCE_INTERNAL})")
+        for _wz_internal, _wz_display, _wz_desc, _wz_parser in WAZUH_SOURCE_SPECS:
+            print(f"    - {_wz_display} ({_wz_internal})")
         return
 
     la_client = get_la_client(timeout=(10, LOG_ANALYTICS_READ_TIMEOUT_SECONDS))
@@ -624,6 +626,12 @@ def main():
                   HEALTH_PARSER_NAME, HEALTH_PARSER_DISPLAY, HEALTH_PARSER_DESC,
                   HEALTH_FIELD_MAPPINGS, field_map, HEALTH_EXAMPLE)
 
+    for _wz_name, _wz_display, _wz_desc, _wz_mappings, _wz_example in WAZUH_PARSER_SPECS:
+        print(f"\n--- {_wz_display} ---")
+        create_parser(la_client, namespace,
+                      _wz_name, _wz_display, _wz_desc,
+                      _wz_mappings, field_map, _wz_example)
+
     # Step 3: Create log sources
     print("\n" + "=" * 60)
     print("STEP 3: CREATE LOG SOURCES")
@@ -745,6 +753,10 @@ def main():
         HEALTH_SOURCE_INTERNAL, HEALTH_SOURCE_DISPLAY, HEALTH_SOURCE_DESC, HEALTH_PARSER_NAME
     )
 
+    for _wz_internal, _wz_display, _wz_desc, _wz_parser in WAZUH_SOURCE_SPECS:
+        print(f"\n--- {_wz_display} Source ---")
+        create_source_if_needed(_wz_internal, _wz_display, _wz_desc, _wz_parser)
+
     print("\n" + "=" * 60)
     print("SETUP COMPLETE")
     print("=" * 60)
@@ -769,6 +781,8 @@ def main():
     print(f"  - {VCN_SOURCE_DISPLAY}")
     print(f"  - {FW_SOURCE_DISPLAY}")
     print(f"  - {HEALTH_SOURCE_DISPLAY}")
+    for _wz_internal, _wz_display, _wz_desc, _wz_parser in WAZUH_SOURCE_SPECS:
+        print(f"  - {_wz_display}")
     print(f"  - OCI Audit Logs (built-in)")
     print(f"  - OCI Cloud Guard Problems (native, preferred when available)")
     print(f"  - Windows Sysmon Events (native, preferred when available)")

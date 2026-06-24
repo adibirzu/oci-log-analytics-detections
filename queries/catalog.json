@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-11T05:29:09.710882+00:00",
+  "generated_at": "2026-06-24T11:39:08.745344+00:00",
   "total_rules": 605,
   "total_base_rules": 545,
   "total_sentinel_queries": 60,
-  "total_app_queries": 62,
+  "total_app_queries": 67,
   "total_hunting": 115,
-  "total_content_items": 782,
+  "total_content_items": 787,
   "inventory": {
     "source_yaml_rules": 522,
     "source_rule_breakdown": {
@@ -18,17 +18,17 @@
     "generated_detection_queries": 605,
     "generated_base_detection_queries": 545,
     "generated_sentinel_queries": 60,
-    "generated_app_queries": 62,
-    "source_derived_app_queries": 8,
+    "generated_app_queries": 67,
+    "source_derived_app_queries": 13,
     "curated_app_queries": 54,
     "generated_hunting_queries": 115,
-    "generated_sigma_queries": 553,
-    "total_query_artifacts": 782,
+    "generated_sigma_queries": 558,
+    "total_query_artifacts": 787,
     "legacy_dirs": {
       "logandetectionqueries": 0,
       "logandetectionrules": 0
     },
-    "combined_mitre_techniques": 243,
+    "combined_mitre_techniques": 244,
     "combined_mitre_tactics": 14,
     "atlas_techniques": 10,
     "atlas_tactics": 10
@@ -532,6 +532,7 @@
     "T1580",
     "T1583",
     "T1583.003",
+    "T1592",
     "T1592.004",
     "T1595",
     "T1595.002",
@@ -23134,6 +23135,134 @@
       "content_lifecycle": "validated_locally",
       "detection_maturity": "curated",
       "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "Control Plane: Auth Brute Force",
+      "description": "Repeated authentication failures or rate-limit rejections (401/429) against /api/auth/* from a single client IP \u2014 indicates credential stuffing or login brute force. Correlates with the SEC-6 perimeter rate limiter.",
+      "level": "high",
+      "sigma_id": "cp-access-0001-bruteforce",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1110"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "atlas_techniques": [],
+      "atlas_tactics": [],
+      "references": [],
+      "file": "apps/cp_access_0001_bruteforce.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "Control Plane: Path Traversal Attempt",
+      "description": "Request URI contains path-traversal sequences (.. or encoded variants) \u2014 maps to the SEC-4 compliance-report traversal hardening. Any hit means a client is probing for directory escape.",
+      "level": "high",
+      "sigma_id": "cp-access-0002-traversal",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "mitre_tactics": [
+        "initial_access"
+      ],
+      "atlas_techniques": [],
+      "atlas_tactics": [],
+      "references": [],
+      "file": "apps/cp_access_0002_traversal.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "Control Plane: Oversized Payload Rejected",
+      "description": "Spike of HTTP 413 responses \u2014 the SEC-6 body-size boundary is rejecting oversized mutating payloads, which can indicate a resource-exhaustion or smuggling attempt against the ingestion edge.",
+      "level": "medium",
+      "sigma_id": "cp-access-0003-oversized",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1499"
+      ],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "atlas_techniques": [],
+      "atlas_tactics": [],
+      "references": [],
+      "file": "apps/cp_access_0003_oversized.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "Control Plane: Server Error Surge",
+      "description": "Elevated rate of 5xx responses across control-plane endpoints \u2014 availability/reliability signal that should correlate with the REL-2 watchdog and task-failure metrics.",
+      "level": "medium",
+      "sigma_id": "cp-access-0004-5xx-surge",
+      "source_derived": true,
+      "mitre_techniques": [],
+      "mitre_tactics": [
+        "impact"
+      ],
+      "atlas_techniques": [],
+      "atlas_tactics": [],
+      "references": [],
+      "file": "apps/cp_access_0004_5xx_surge.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "app"
+    },
+    {
+      "title": "Control Plane: API Schema Recon Probe",
+      "description": "Requests to the interactive docs / OpenAPI schema endpoints (/docs, /redoc, /openapi.json) which are disabled by default (SEC-2). Any 404 burst here indicates reconnaissance enumerating the API surface.",
+      "level": "low",
+      "sigma_id": "cp-access-0005-schema-recon",
+      "source_derived": true,
+      "mitre_techniques": [
+        "T1592"
+      ],
+      "mitre_tactics": [
+        "reconnaissance"
+      ],
+      "atlas_techniques": [],
+      "atlas_tactics": [],
+      "references": [],
+      "file": "apps/cp_access_0005_schema_recon.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "production",
+      "source_confidence": "high",
       "field_coverage": "not_evaluated",
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",

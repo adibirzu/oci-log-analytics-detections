@@ -1,0 +1,307 @@
+name: Sentinel Converter
+
+on:
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "config/mapping/**"
+      - "queries/**"
+      - ".github/workflows/sentinel-converter.yml"
+  push:
+    paths:
+      - "scripts/**"
+      - "config/mapping/**"
+      - "queries/**"
+      - ".github/workflows/sentinel-converter.yml"
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "OCI CLI profile for live validation"
+        required: true
+        default: "cap"
+      lookback:
+        description: "Live query lookback"
+        required: true
+        default: "24h"
+  schedule:
+    - cron: "17 3 * * 2"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sentinel-converter-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  unit:
+    name: Unit - operator and mapping tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      OCI_CONFIG_FILE: /dev/null
+      OCI_PROFILE: ci-no-oci
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Assert PR lane has no OCI credentials
+        run: |
+          test ! -f "$HOME/.oci/config"
+          test "${OCI_CONFIG_FILE}" = "/dev/null"
+
+      - name: Run converter unit tests
+        run: |
+          python -m pytest \
+            scripts/test_sentinel_converter.py \
+            scripts/test_sentinel_conversion_workflow.py \
+            scripts/test_sentinel_backlog_prioritize.py \
+            scripts/test_mapping_loader.py \
+            scripts/test_kql \
+            -q
+
+  integration:
+    name: Integration - dry-run corpus conversion
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: unit
+    permissions:
+      contents: read
+    env:
+      OCI_CONFIG_FILE: /dev/null
+      OCI_PROFILE: ci-no-oci
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run local Sentinel conversion report
+        run: |
+          python scripts/sentinel_conversion_workflow.py local \
+            --top all \
+            --timeout 20 \
+            --progress-interval -1 \
+            --workers 1
+
+  drift:
+    name: Drift - report, files, catalog, manifest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: unit
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      OCI_CONFIG_FILE: /dev/null
+      OCI_PROFILE: ci-no-oci
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Sentinel drift vs main
+        run: python scripts/sentinel_drift_check.py --baseline-ref origin/main
+
+      - name: Inventory reconciliation
+        run: python scripts/check_inventory_drift.py
+
+      - name: Sensitive-value scan for Sentinel artifacts
+        run: |
+          python scripts/scan_sensitive_values.py --json \
+            queries/sentinel \
+            queries/sentinel_conversion_report.json \
+            queries/sentinel_drift.json
+
+      - name: Write Sentinel drift summary
+        id: summary
+        run: |
+          python - <<'PY' > /tmp/sentinel-summary.md
+          import json
+          from pathlib import Path
+
+          drift = json.loads(Path("queries/sentinel_drift.json").read_text())
+          backlog = json.loads(Path("queries/sentinel_backlog_priority.json").read_text())
+          ds = drift["summary"]
+          bs = backlog.get("summary", {})
+          print("### Sentinel Converter")
+          print()
+          print(f"- Drift errors: {ds.get('error_count', 0)}")
+          print(f"- Promoted files: {ds.get('promoted_files', 0)}")
+          print(f"- Baseline records: {ds.get('baseline_records', 0)}")
+          print(f"- Backlog ranked: {bs.get('ranked_count', 0)}")
+          print(f"- Top blocker: `{bs.get('top_blocker', 'none')}`")
+          PY
+          cat /tmp/sentinel-summary.md >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "body<<EOF"
+            cat /tmp/sentinel-summary.md
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Comment Sentinel drift summary
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = "<!-- sentinel-converter-summary -->";
+            const summary = ${{ toJSON(steps.summary.outputs.body) }};
+            const body = `${marker}\n${summary}`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const comments = await github.rest.issues.listComments({ owner, repo, issue_number, per_page: 100 });
+            const existing = comments.data.find((comment) => comment.body?.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+  live:
+    name: Live - scheduled/manual OCI promotion lane
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    environment: live-oci
+    permissions:
+      contents: read
+    needs:
+      - integration
+      - drift
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Compute live validation cache key
+        id: live-key
+        env:
+          LOOKBACK: ${{ github.event.inputs.lookback || '24h' }}
+          OCI_PROFILE_INPUT: ${{ github.event.inputs.profile || 'cap' }}
+        run: |
+          KEY="$(python scripts/sentinel_conversion_workflow.py live-cache-key --lookback "${LOOKBACK}")"
+          echo "key=${KEY}-${OCI_PROFILE_INPUT}" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Live cache"
+            echo
+            echo "- Key: \`${KEY}-${OCI_PROFILE_INPUT}\`"
+            echo "- Lookback: \`${LOOKBACK}\`"
+            echo "- Invalidation inputs: Sentinel candidates/report, parser dictionary, mapping shards, converter/workflow/drift scripts, scripts/kql, lookback, OCI profile"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Configure OCI credentials
+        env:
+          OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
+          OCI_API_KEY_PEM: ${{ secrets.OCI_API_KEY_PEM }}
+        run: |
+          if [ -z "${OCI_CONFIG}" ] || [ -z "${OCI_API_KEY_PEM}" ]; then
+            echo "::error::OCI_CONFIG and OCI_API_KEY_PEM are required for live Sentinel validation."
+            exit 1
+          fi
+          umask 077
+          mkdir -p "$HOME/.oci"
+          printf '%s' "$OCI_CONFIG" > "$HOME/.oci/config"
+          printf '%s' "$OCI_API_KEY_PEM" > "$HOME/.oci/oci_api_key.pem"
+          chmod 600 "$HOME/.oci/config" "$HOME/.oci/oci_api_key.pem"
+
+      - name: Restore live validation cache
+        id: live-cache
+        uses: actions/cache@v4
+        with:
+          path: .sentinel-live-cache
+          key: ${{ steps.live-key.outputs.key }}
+
+      - name: Promote Sentinel conversions with live validation
+        if: steps.live-cache.outputs.cache-hit != 'true'
+        env:
+          OCI_PROFILE: ${{ github.event.inputs.profile || 'cap' }}
+          LOOKBACK: ${{ github.event.inputs.lookback || '24h' }}
+          LIVE_CACHE_KEY: ${{ steps.live-key.outputs.key }}
+        run: |
+          python scripts/sentinel_conversion_workflow.py promote \
+            --top all \
+            --lookback "${LOOKBACK}" \
+            --timeout 60 \
+            --progress-interval 0
+          python scripts/sentinel_drift_check.py --write-hashes
+          python scripts/scan_sensitive_values.py --json \
+            queries/sentinel \
+            queries/sentinel_conversion_report.json \
+            queries/sentinel_drift.json
+          mkdir -p .sentinel-live-cache
+          cp queries/sentinel_conversion_report.json .sentinel-live-cache/report.json
+          cp queries/sentinel_drift.json .sentinel-live-cache/drift.json
+          python - <<'PY' > .sentinel-live-cache/metadata.json
+          import json
+          import os
+          from datetime import datetime, timezone
+
+          print(json.dumps({
+              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "cache_key": os.environ["LIVE_CACHE_KEY"],
+              "lookback": os.environ["LOOKBACK"],
+              "oci_profile": os.environ["OCI_PROFILE"],
+              "contents": [
+                  "queries/sentinel_conversion_report.json",
+                  "queries/sentinel_drift.json",
+              ],
+          }, indent=2))
+          PY
+
+      - name: Reuse cached live validation evidence
+        if: steps.live-cache.outputs.cache-hit == 'true'
+        run: |
+          cp .sentinel-live-cache/report.json queries/sentinel_conversion_report.json
+          cp .sentinel-live-cache/drift.json queries/sentinel_drift.json
+          python scripts/sentinel_drift_check.py
+          python scripts/scan_sensitive_values.py --json \
+            queries/sentinel \
+            queries/sentinel_conversion_report.json \
+            queries/sentinel_drift.json
+
+      - name: Upload live Sentinel evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sentinel-live-evidence
+          path: |
+            queries/sentinel_conversion_report.json
+            queries/sentinel_drift.json
+            .sentinel-live-cache/metadata.json
+          if-no-files-found: warn

@@ -169,6 +169,26 @@ class TestFieldDictionary(unittest.TestCase):
 
         self.assertEqual(errors, ["queries/test.json: unknown query field 'Missing Field'"])
 
+    def test_oci_audit_hunting_queries_use_known_dictionary_fields(self):
+        """Regression for release checklist field coverage on native OCI Audit hunts."""
+        project_dir = Path(__file__).resolve().parent.parent
+        query_files = [
+            "queries/hunting/oci_api_burst_by_user.json",
+            "queries/hunting/oci_cross_compartment_activity.json",
+            "queries/hunting/oci_failed_action_spike.json",
+            "queries/hunting/oci_off_hours_activity.json",
+            "queries/hunting/oci_resource_deletion_wave.json",
+        ]
+        dictionary = build_field_dictionary(query_payloads=[], contracts={})
+
+        for relative_path in query_files:
+            with self.subTest(query_file=relative_path):
+                payload = json.loads((project_dir / relative_path).read_text(encoding="utf-8"))
+                self.assertEqual(
+                    validate_query_field_coverage(relative_path, payload, dictionary),
+                    [],
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

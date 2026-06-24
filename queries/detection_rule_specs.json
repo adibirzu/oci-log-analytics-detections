@@ -1,7 +1,7 @@
 {
-  "total_queries": 621,
-  "eligible_queries": 125,
-  "ineligible_queries": 496,
+  "total_queries": 722,
+  "eligible_queries": 155,
+  "ineligible_queries": 567,
   "specs": [
     {
       "query_file": "queries/accessibility_features_backdoor.json",
@@ -116,6 +116,151 @@
         "metric_name": "AD_Enumeration_via_ADFind",
         "dimensions": [],
         "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/adcs_esc1_subject_alternative_name_abuse_via_certipycertify.json",
+      "title": "ADCS ESC1: Subject Alternative Name Abuse via Certipy/Certify",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "ADCS_ESC1_Subject_Alternative_Name_Abuse_via_Certipy_Certify",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*certipy*' or 'Command Line' like '*Certify.exe*' or 'Command Line' like '*Certify *')) and (('Command Line' like '*req*' or 'Command Line' like '*request*')) and (('Command Line' like '*-upn*' or 'Command Line' like '*/altname*' or 'Command Line' like '*-altname*' or 'Command Line' like '*subject*' or 'Command Line' like '*-sid*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ADCS_ESC1_Subject_Alternative_Name_Abuse_via_Certipy_Certify",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/adcs_esc4_certificate_template_acl_modification_via_certipy.json",
+      "title": "ADCS ESC4: Certificate Template ACL Modification via Certipy",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "ADCS_ESC4_Certificate_Template_ACL_Modification_via_Certipy",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*certipy*' and 'Command Line' like '*template*')) and (('Command Line' like '*-write*' or 'Command Line' like '*-save-old*' or 'Command Line' like '*-configuration*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ADCS_ESC4_Certificate_Template_ACL_Modification_via_Certipy",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/adcs_esc6_editf_attributesubjectaltname2_flag_enabled_via_certutil.json",
+      "title": "ADCS ESC6: EDITF_ATTRIBUTESUBJECTALTNAME2 Flag Enabled via Certutil",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "ADCS_ESC6_EDITF_ATTRIBUTESUBJECTALTNAME2_Flag_Enabled_via_Certutil",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*setreg*' and 'Command Line' like '*EditFlags*')) or (('Command Line' like '*EDITF_ATTRIBUTESUBJECTALTNAME2*' or 'Command Line' like '*ATTRIBUTESUBJECTALTNAME2*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ADCS_ESC6_EDITF_ATTRIBUTESUBJECTALTNAME2_Flag_Enabled_via_Certutil",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/adcs_esc8_ntlm_relay_to_certificate_web_enrollment.json",
+      "title": "ADCS ESC8: NTLM Relay to Certificate Web Enrollment",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "ADCS_ESC8_NTLM_Relay_to_Certificate_Web_Enrollment",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*certipy relay*' or 'Command Line' like '*-target http*' or 'Command Line' like '*certsrv*' or 'Command Line' like '*certfnsh.asp*' or 'Command Line' like '*CertificateWebEnrollment*' or 'Command Line' like '*-template DomainController*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ADCS_ESC8_NTLM_Relay_to_Certificate_Web_Enrollment",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/adminsdholder_acl_modification_for_persistence.json",
+      "title": "AdminSDHolder ACL Modification for Persistence",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "AdminSDHolder_ACL_Modification_for_Persistence",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Command Line' like '*AdminSDHolder*') and (('Command Line' like '*dsacls*' or 'Command Line' like '*Add-DomainObjectAcl*' or 'Command Line' like '*/G *' or 'Command Line' like '*GenericAll*' or 'Command Line' like '*Set-Acl*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "AdminSDHolder_ACL_Modification_for_Persistence",
+        "dimensions": [],
+        "severity": "critical",
         "create_alarm_by_default": false
       }
     },
@@ -1116,6 +1261,876 @@
       }
     },
     {
+      "query_file": "queries/caldera_-_credential_search_in_config_and_environment_files_windows.json",
+      "title": "Caldera - Credential Search in Config and Environment Files (Windows)",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_Credential_Search_in_Config_and_Environment_Files_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\findstr.exe' and ('Command Line' like '*password*' or 'Command Line' like '*passwd*' or 'Command Line' like '*secret*' or 'Command Line' like '*apikey*' or 'Command Line' like '*api_key*' or 'Command Line' like '*token*')) and (('Command Line' like '*/s*' or 'Command Line' like '*/r*')) ) or ( (('Command Line' like '*Select-String*' or 'Command Line' like '*sls *' or 'Command Line' like '*Get-Content*')) and (('Command Line' like '*password*' or 'Command Line' like '*passwd*' or 'Command Line' like '*apikey*' or 'Command Line' like '*api_key*' or 'Command Line' like '*secret*')) ) or (('Command Line' like '*.env*' or 'Command Line' like '*config.json*' or 'Command Line' like '*appsettings.json*' or 'Command Line' like '*web.config*' or 'Command Line' like '*database.config*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Credential_Search_in_Config_and_Environment_Files_Windows",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_credential_search_in_files_via_grep_linux.json",
+      "title": "Caldera - Credential Search in Files via grep (Linux)",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_Credential_Search_in_Files_via_grep_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*grep -r password*' or msg like '*grep -ri password*' or msg like '*grep -r passwd*' or msg like '*grep -ri passwd*' or msg like '*grep -r secret*' or msg like '*grep -r apikey*' or msg like '*grep -r api_key*' or msg like '*grep -r token*')) or ((msg like '*grep -r /etc/*' or msg like '*grep -r /home/*' or msg like '*grep -r /root/*' or msg like '*grep -r /var/www/*' or msg like '*grep -r /opt/*')) or ((msg like '*cat /root/.bash_history*' or msg like '*cat /home/*' or msg like '*.bash_history*' or msg like '*cat /root/.mysql_history*')) or ((msg like '*cat /root/.netrc*' or msg like '*cat ~/.netrc*' or msg like '*cat /home/*' or msg like '*.netrc*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Credential_Search_in_Files_via_grep_Linux",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_data_collection_from_local_system_via_findstr_and_powershell_windows.json",
+      "title": "Caldera - Data Collection from Local System via findstr and PowerShell (Windows)",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_Data_Collection_from_Local_System_via_findstr_and_PowerShell_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\findstr.exe' and ('Command Line' like '*.docx*' or 'Command Line' like '*.xlsx*' or 'Command Line' like '*.pdf*' or 'Command Line' like '*.pst*' or 'Command Line' like '*.kdbx*')) or (('Command Line' like '*Get-ChildItem -Recurse*' or 'Command Line' like '*Get-Item -Path*' or 'Command Line' like '*dir /s /b*')) ) and ( (('Command Line' like '*\\\\Documents\\\\*' or 'Command Line' like '*\\\\Desktop\\\\*' or 'Command Line' like '*\\\\Downloads\\\\*' or 'Command Line' like '*\\\\AppData\\\\*')) or (('Command Line' like '*C:\\\\Temp*' or 'Command Line' like '*C:\\\\Users\\\\Public*' or 'Command Line' like '*C:\\\\ProgramData*')) ))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Data_Collection_from_Local_System_via_findstr_and_PowerShell_Windows",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_data_collection_from_network_shared_drive_linux.json",
+      "title": "Caldera - Data Collection from Network Shared Drive (Linux)",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_Data_Collection_from_Network_Shared_Drive_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*smbclient //*' or msg like '*smbclient -L*' or msg like '*smbclient -U*')) or ((msg like '*mount -t cifs*' or msg like '*mount -t nfs*' or msg like '*mount -t smbfs*' or msg like '*mount.cifs*')) or ((msg like '*ls /mnt/*' or msg like '*cp /mnt/*' or msg like '*find /mnt/*' or msg like '*find /media/*' or msg like '*rsync /mnt/*')) or ((msg like '*smb: \\\\\\\\> get*' or msg like '*smb: \\\\\\\\> mget*' or msg like '*smb: \\\\\\\\> lcd*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Data_Collection_from_Network_Shared_Drive_Linux",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_data_collection_from_network_shared_drive_windows.json",
+      "title": "Caldera - Data Collection from Network Shared Drive (Windows)",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_Data_Collection_from_Network_Shared_Drive_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\xcopy.exe' and 'Command Line' like '*\\\\\\\\*') or ('Process Name' like '*\\\\robocopy.exe' and 'Command Line' like '*\\\\\\\\*') or (('Command Line' like '*copy \\\\\\\\*' or 'Command Line' like '*xcopy \\\\\\\\*')) or (('Command Line' like '*Copy-Item \\\\\\\\*' or 'Command Line' like '*cp \\\\\\\\*' or 'Command Line' like '*Get-ChildItem \\\\\\\\*')) ) and (('Command Line' like '*C:\\\\Temp*' or 'Command Line' like '*C:\\\\Users\\\\Public*' or 'Command Line' like '*C:\\\\ProgramData*' or 'Command Line' like '*%TEMP%*' or 'Command Line' like '*%TMP%*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Data_Collection_from_Network_Shared_Drive_Windows",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_document_and_data_file_collection_from_linux_host.json",
+      "title": "Caldera - Document and Data File Collection from Linux Host",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_Document_and_Data_File_Collection_from_Linux_Host",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*find / -name *.pdf*' or msg like '*find / -name *.docx*' or msg like '*find / -name *.xlsx*' or msg like '*find /home -name *.doc*' or msg like '*find /home -name *.xls*' or msg like '*find /home -name *.kdbx*' or msg like '*find / -name *.pst*')) or ((msg like '*find / -name *.db*' or msg like '*find / -name *.sqlite*' or msg like '*find / -name *.sql*' or msg like '*find / -name *.bak*')) or ((msg like '*find / -name *.py*' or msg like '*find / -name *.rb*' or msg like '*find / -name *.php*' or msg like '*find / -name *.go*')) or ((msg like '*cp -r /home*' or msg like '*cp -r /root*' or msg like '*cp -r /srv*' or msg like '*cp -r /var/www*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Document_and_Data_File_Collection_from_Linux_Host",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_exfiltration_of_staged_data_over_c2_channel_linux.json",
+      "title": "Caldera - Exfiltration of Staged Data over C2 Channel (Linux)",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Caldera_Exfiltration_of_Staged_Data_over_C2_Channel_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (( ((msg like '*curl -X POST*' or msg like '*curl --upload-file*' or msg like '*curl -F*' or msg like '*curl -d @*' or msg like '*curl -T *')) or ((msg like '*wget --post-file*' or msg like '*wget --post-data*')) or ((msg like '*requests.post*' or msg like '*urllib.request.urlopen*' or msg like '*http.client.HTTPConnection*')) ) and ((msg like '*/tmp/*' or msg like '*/dev/shm/*' or msg like '*/var/tmp/*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Exfiltration_of_Staged_Data_over_C2_Channel_Linux",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_exfiltration_over_c2_channel_via_powershell_windows.json",
+      "title": "Caldera - Exfiltration over C2 Channel via PowerShell (Windows)",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Caldera_Exfiltration_over_C2_Channel_via_PowerShell_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*Invoke-RestMethod*' or 'Command Line' like '*iwr *' or 'Command Line' like '*irm *')) and (('Command Line' like '*-Method POST*' or 'Command Line' like '*-Method Put*' or 'Command Line' like '*-Method \"POST\"*')) and (('Command Line' like '*-Body*' or 'Command Line' like '*-InFile*' or 'Command Line' like '*-UploadFile*')) ) or ('Process Name' like '*\\\\curl.exe' and ('Command Line' like '*-X POST*' or 'Command Line' like '*--upload-file*' or 'Command Line' like '*-d @*' or 'Command Line' like '*-T *')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Exfiltration_over_C2_Channel_via_PowerShell_Windows",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_exfiltration_to_web_service_from_windows_endpoint.json",
+      "title": "Caldera - Exfiltration to Web Service from Windows Endpoint",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Caldera_Exfiltration_to_Web_Service_from_Windows_Endpoint",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*pastebin.com*' or 'Command Line' like '*paste.ee*' or 'Command Line' like '*transfer.sh*' or 'Command Line' like '*file.io*' or 'Command Line' like '*ix.io*' or 'Command Line' like '*0x0.st*')) or (('Command Line' like '*s3.amazonaws.com*' or 'Command Line' like '*storage.googleapis.com*' or 'Command Line' like '*blob.core.windows.net*' or 'Command Line' like '*objectstorage.oraclecloud.com*')) ) and (('Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*Invoke-RestMethod*' or 'Command Line' like '*curl.exe*' or 'Command Line' like '*wget.exe*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Exfiltration_to_Web_Service_from_Windows_Endpoint",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_exfiltration_to_web_service_via_curl_linux.json",
+      "title": "Caldera - Exfiltration to Web Service via curl (Linux)",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Caldera_Exfiltration_to_Web_Service_via_curl_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (( ((msg like '*paste.ee*' or msg like '*pastebin.com*' or msg like '*ghostbin.co*' or msg like '*transfer.sh*' or msg like '*file.io*' or msg like '*ix.io*' or msg like '*0x0.st*')) or ((msg like '*s3.amazonaws.com*' or msg like '*storage.googleapis.com*' or msg like '*blob.core.windows.net*' or msg like '*objectstorage.oraclecloud.com*')) ) or ( ((msg like '*curl -X PUT*' or msg like '*curl -X POST*' or msg like '*curl -T *' or msg like '*curl --upload-file*')) and ((msg like '*paste.ee*' or msg like '*pastebin.com*' or msg like '*ghostbin.co*' or msg like '*transfer.sh*' or msg like '*file.io*' or msg like '*ix.io*' or msg like '*0x0.st*')) ))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Exfiltration_to_Web_Service_via_curl_Linux",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_lateral_tool_transfer_via_scprsync_linux.json",
+      "title": "Caldera - Lateral Tool Transfer via scp/rsync (Linux)",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Caldera_Lateral_Tool_Transfer_via_scp_rsync_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*scp /tmp/*' or msg like '*scp /dev/shm/*' or msg like '*scp /var/tmp/*')) or ( ((msg like '*scp -i *' or msg like '*scp -r *' or msg like '*scp -P *')) and ((msg like '*scp /tmp/*' or msg like '*scp /dev/shm/*' or msg like '*scp /var/tmp/*')) ) or ((msg like '*rsync -avz*' or msg like '*rsync -e ssh*' or msg like '*rsync --rsh=ssh*')) or ((msg like '*curl -s | bash*' or msg like '*curl -sL | bash*' or msg like '*wget -q -O- |*' or msg like '*wget -q | bash*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Lateral_Tool_Transfer_via_scp_rsync_Linux",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_local_data_staging_in_writable_directories_linux.json",
+      "title": "Caldera - Local Data Staging in Writable Directories (Linux)",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_Local_Data_Staging_in_Writable_Directories_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*cp -r /etc*' or msg like '*cp -r /home*' or msg like '*cp -r /root*' or msg like '*cp -r /var/www*' or msg like '*cp /etc/passwd /tmp*' or msg like '*cp /etc/shadow /tmp*')) or ((msg like '*mv /etc/*' or msg like '*mv /home/*' or msg like '*mv /root/*')) or ((msg like '*/tmp/staging*' or msg like '*/tmp/loot*' or msg like '*/tmp/data*' or msg like '*/dev/shm/data*' or msg like '*/dev/shm/staging*' or msg like '*/var/tmp/staging*')) or ((msg like '*find / -name*' or msg like '*find /home -name*' or msg like '*find /etc -name*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Local_Data_Staging_in_Writable_Directories_Linux",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_lsass_memory_dump_via_procdump_or_task_manager_caldera_emulation.json",
+      "title": "Caldera - LSASS Memory Dump via ProcDump or Task Manager (Caldera Emulation)",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Caldera_LSASS_Memory_Dump_via_ProcDump_or_Task_Manager_Caldera_Emulation",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\\\procdump.exe' or 'Process Name' like '*\\\\procdump64.exe') and ('Command Line' like '*lsass*' or 'Command Line' like '*-ma *')) or (('Command Line' like '*lsass.dmp*' or 'Command Line' like '*lsass.exe.dmp*')) or ('Process Name' like '*\\\\nanodump.exe') or (('Command Line' like '*avdump64.exe*' or 'Command Line' like '*avdump.exe*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_LSASS_Memory_Dump_via_ProcDump_or_Task_Manager_Caldera_Emulation",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_network_configuration_recon_via_ipconfig_and_route_windows.json",
+      "title": "Caldera - Network Configuration Recon via ipconfig and route (Windows)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_Network_Configuration_Recon_via_ipconfig_and_route_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\ipconfig.exe') or ('Process Name' like '*\\\\route.exe' and 'Command Line' like '*print*') or ('Process Name' like '*\\\\arp.exe' and 'Command Line' like '*-a*') or ('Process Name' like '*\\\\nbtstat.exe' and ('Command Line' like '*-n*' or 'Command Line' like '*-r*' or 'Command Line' like '*-s*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Network_Configuration_Recon_via_ipconfig_and_route_Windows",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_remote_data_staging_via_smb_share_write.json",
+      "title": "Caldera - Remote Data Staging via SMB Share Write",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_Remote_Data_Staging_via_SMB_Share_Write",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*copy * \\\\\\\\*' or 'Command Line' like '*copy /Y \\\\\\\\*' or 'Command Line' like '*xcopy /s \\\\\\\\*')) or ('Process Name' like '*\\\\robocopy.exe' and 'Command Line' like '* \\\\\\\\*') or (('Command Line' like '*Copy-Item -Destination \\\\\\\\*' or 'Command Line' like '*Move-Item -Destination \\\\\\\\*')) ) and (('Command Line' like '*C:\\\\Temp*' or 'Command Line' like '*C:\\\\Users\\\\Public*' or 'Command Line' like '*C:\\\\ProgramData*' or 'Command Line' like '*%TEMP%*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_Remote_Data_Staging_via_SMB_Share_Write",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_smb_lateral_movement_via_impacket_from_linux.json",
+      "title": "Caldera - SMB Lateral Movement via Impacket from Linux",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Caldera_SMB_Lateral_Movement_via_Impacket_from_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*psexec.py*' or msg like '*smbexec.py*' or msg like '*wmiexec.py*' or msg like '*atexec.py*')) or ((msg like '*impacket*' or msg like '*smbclient.py*' or msg like '*secretsdump.py*')) or ((msg like '*-target-ip*' or msg like '*-dc-ip*' or msg like '*SMBDomain*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_SMB_Lateral_Movement_via_Impacket_from_Linux",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_system_information_discovery_via_native_linux_commands.json",
+      "title": "Caldera - System Information Discovery via Native Linux Commands",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_System_Information_Discovery_via_Native_Linux_Commands",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*uname -a*' or msg like '*uname -r*' or msg like '*uname -m*' or msg like '*cat /etc/os-release*' or msg like '*cat /proc/version*' or msg like '*lsb_release -a*' or msg like '*hostnamectl*')) or ((msg like '*lscpu*' or msg like '*lshw*' or msg like '*dmidecode*' or msg like '*cat /proc/cpuinfo*' or msg like '*cat /proc/meminfo*' or msg like '*free -m*')) or ((msg like '*lsblk*' or msg like '*df -h*' or msg like '*df -a*' or msg like '*fdisk -l*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_System_Information_Discovery_via_Native_Linux_Commands",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_system_information_discovery_via_systeminfo_and_wmi_windows.json",
+      "title": "Caldera - System Information Discovery via systeminfo and WMI (Windows)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_System_Information_Discovery_via_systeminfo_and_WMI_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\systeminfo.exe') or ('Process Name' like '*\\\\wmic.exe' and ('Command Line' like '*os get*' or 'Command Line' like '*computersystem get*' or 'Command Line' like '*cpu get*' or 'Command Line' like '*bios get*' or 'Command Line' like '*qfe list*')) or (('Command Line' like '*Get-ComputerInfo*' or 'Command Line' like '*Get-WmiObject Win32_OperatingSystem*' or 'Command Line' like '*Get-CimInstance Win32_OperatingSystem*' or 'Command Line' like '*Get-WmiObject Win32_ComputerSystem*' or 'Command Line' like '*Get-WmiObject Win32_BIOS*' or 'Command Line' like '*[System.Environment]::OSVersion*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_System_Information_Discovery_via_systeminfo_and_WMI_Windows",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_system_network_configuration_discovery_linux.json",
+      "title": "Caldera - System Network Configuration Discovery (Linux)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_System_Network_Configuration_Discovery_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ip addr*' or msg like '*ip route*' or msg like '*ip link*' or msg like '*ip neigh*' or msg like '*ip -4 addr*' or msg like '*ip -6 addr*')) or ((msg like '*ifconfig -a*' or msg like '*ifconfig eth*' or msg like '*ifconfig ens*' or msg like '*ifconfig lo*')) or ((msg like '*route -n*' or msg like '*route -e*' or msg like '*netstat -rn*' or msg like '*netstat -r *')) or ((msg like '*arp -a*' or msg like '*arp -n*' or msg like '*cat /proc/net/arp*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_System_Network_Configuration_Discovery_Linux",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_system_network_configuration_discovery_windows.json",
+      "title": "Caldera - System Network Configuration Discovery (Windows)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_System_Network_Configuration_Discovery_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\ipconfig.exe' and ('Command Line' like '*/all*' or 'Command Line' like '*/displaydns*' or 'Command Line' like '*/flushdns*')) or ('Process Name' like '*\\\\arp.exe' and 'Command Line' like '*-a*') or ('Process Name' like '*\\\\nslookup.exe') or (('Command Line' like '*Get-NetIPConfiguration*' or 'Command Line' like '*Get-NetIPAddress*' or 'Command Line' like '*Get-DnsClientServerAddress*' or 'Command Line' like '*Get-NetAdapter*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_System_Network_Configuration_Discovery_Windows",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_system_network_connections_discovery_linux.json",
+      "title": "Caldera - System Network Connections Discovery (Linux)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_System_Network_Connections_Discovery_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*netstat -an*' or msg like '*netstat -anp*' or msg like '*netstat -tulpn*' or msg like '*netstat -tunap*' or msg like '*netstat -plantu*' or msg like '*netstat -ntlp*')) or ((msg like '*ss -anp*' or msg like '*ss -tlnp*' or msg like '*ss -tunap*' or msg like '*ss -s *' or msg like '*ss -plnt*')) or ((msg like '*cat /proc/net/tcp*' or msg like '*cat /proc/net/udp*' or msg like '*cat /proc/net/tcp6*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_System_Network_Connections_Discovery_Linux",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_system_network_connections_discovery_windows.json",
+      "title": "Caldera - System Network Connections Discovery (Windows)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_System_Network_Connections_Discovery_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\netstat.exe' and ('Command Line' like '*-an*' or 'Command Line' like '*-ano*' or 'Command Line' like '*-b*' or 'Command Line' like '*-f*')) or (('Command Line' like '*Get-NetTCPConnection*' or 'Command Line' like '*Get-NetUDPEndpoint*' or 'Command Line' like '*netstat -a*')) or ('Process Name' like '*\\\\route.exe' and 'Command Line' like '*print*'))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_System_Network_Connections_Discovery_Windows",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_system_owner_and_identity_discovery_via_idwhoami_linux.json",
+      "title": "Caldera - System Owner and Identity Discovery via id/whoami (Linux)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_System_Owner_and_Identity_Discovery_via_id_whoami_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*id -u*' or msg like '*id -g*' or msg like '*id -G*' or msg like '*id -Z*')) or ((msg like '*whoami*' or msg like '*logname*')) or ((msg like '*echo $USER*' or msg like '*echo $LOGNAME*' or msg like '*echo $UID*' or msg like '*cat /etc/passwd*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_System_Owner_and_Identity_Discovery_via_id_whoami_Linux",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_system_owner_and_user_discovery_windows.json",
+      "title": "Caldera - System Owner and User Discovery (Windows)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_System_Owner_and_User_Discovery_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\whoami.exe') or ('Process Name' like '*\\\\query.exe' and ('Command Line' like '*user*' or 'Command Line' like '*session*')) or (('Command Line' like '*Get-LocalUser*' or 'Command Line' like '*Get-LocalGroup*' or 'Command Line' like '*[System.Security.Principal.WindowsIdentity]::GetCurrent*' or 'Command Line' like '*$env:USERNAME*')) or (('Process Name' like '*\\\\net.exe' or 'Process Name' like '*\\\\net1.exe') and 'Command Line' like '*user*'))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_System_Owner_and_User_Discovery_Windows",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_system_owner_discovery_via_whoami_and_query_commands_windows.json",
+      "title": "Caldera - System Owner Discovery via whoami and query Commands (Windows)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_System_Owner_Discovery_via_whoami_and_query_Commands_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\whoami.exe') or ('Process Name' like '*\\\\whoami.exe' and ('Command Line' like '*/all*' or 'Command Line' like '*/priv*' or 'Command Line' like '*/groups*')) or ('Process Name' like '*\\\\query.exe' and ('Command Line' like '*user*' or 'Command Line' like '*session*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_System_Owner_Discovery_via_whoami_and_query_Commands_Windows",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_winrm_lateral_movement_via_evil-winrm_from_linux.json",
+      "title": "Caldera - WinRM Lateral Movement via Evil-WinRM from Linux",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Caldera_WinRM_Lateral_Movement_via_Evil_WinRM_from_Linux",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*evil-winrm*' or msg like '*evil_winrm*')) or ((msg like '*winrm.Protocol*' or msg like '*winrm.Session*' or msg like '*pywinrm*')) or ( ((msg like '*:5985*' or msg like '*:5986*')) and ((msg like '*-u *' or msg like '*-p *' or msg like '*-H *' or msg like '*--hash*')) ))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_WinRM_Lateral_Movement_via_Evil_WinRM_from_Linux",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/caldera_-_wmic_os_and_hardware_enumeration_windows.json",
+      "title": "Caldera - WMIC OS and Hardware Enumeration (Windows)",
+      "severity": "low",
+      "eligible": false,
+      "metric_name": "Caldera_WMIC_OS_and_Hardware_Enumeration_Windows",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*os get*') or ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*computersystem get*') or ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*cpu get*') or ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*product get*') or ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*nic get*'))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_WMIC_OS_and_Hardware_Enumeration_Windows",
+        "dimensions": [],
+        "severity": "low",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/calderaopenaev_-_exfiltration_via_oci_object_storage_bulk_upload_with_new_bucket.json",
+      "title": "Caldera/OpenAEV - Exfiltration via OCI Object Storage Bulk Upload with New Bucket",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_OpenAEV_Exfiltration_via_OCI_Object_Storage_Bulk_Upload_with_New_Bucket",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.objectstorage.createbucket' or 'Event Type' = 'com.oraclecloud.objectstorage.putobject')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_OpenAEV_Exfiltration_via_OCI_Object_Storage_Bulk_Upload_with_New_Bucket",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/calderaopenaev_-_transfer_data_to_cloud_account_via_oci_object_storage.json",
+      "title": "Caldera/OpenAEV - Transfer Data to Cloud Account via OCI Object Storage",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Caldera_OpenAEV_Transfer_Data_to_Cloud_Account_via_OCI_Object_Storage",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.objectstorage.putobject'))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Caldera_OpenAEV_Transfer_Data_to_Cloud_Account_via_OCI_Object_Storage",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/certifried_cve-2022-26923_machine_account_dnshostname_abuse.json",
+      "title": "Certifried (CVE-2022-26923): Machine Account dNSHostName Abuse",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Certifried_CVE_2022_26923_Machine_Account_dNSHostName_Abuse",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*dNSHostName*' or 'Command Line' like '*dnshostname*')) and (('Command Line' like '*certipy*' or 'Command Line' like '*-template Machine*' or 'Command Line' like '*account update*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Certifried_CVE_2022_26923_Machine_Account_dNSHostName_Abuse",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/clickfix_fake_captcha_powershell_execution.json",
       "title": "ClickFix Fake CAPTCHA PowerShell Execution",
       "severity": "critical",
@@ -1791,6 +2806,35 @@
       }
     },
     {
+      "query_file": "queries/coercer_multi-protocol_authentication_coercion.json",
+      "title": "Coercer Multi-Protocol Authentication Coercion",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Coercer_Multi_Protocol_Authentication_Coercion",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Coercer*' or 'Command Line' like '*coercer.py*' or 'Command Line' like '*EfsRpcEncryptFileSrv*' or 'Command Line' like '*MS-FSRVP*' or 'Command Line' like '*IsPathShadowCopied*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Coercer_Multi_Protocol_Authentication_Coercion",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/com_object_hijacking_via_registry.json",
       "title": "COM Object Hijacking via Registry",
       "severity": "high",
@@ -1845,6 +2889,64 @@
         "metric_name": "Compiled_HTML_File_Execution",
         "dimensions": [],
         "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/computer_account_creation_for_delegation_abuse_machineaccountquota.json",
+      "title": "Computer Account Creation for Delegation Abuse (MachineAccountQuota)",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Computer_Account_Creation_for_Delegation_Abuse_MachineAccountQuota",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*New-MachineAccount*' or 'Command Line' like '*addcomputer.py*' or 'Command Line' like '*addcomputer*' or 'Command Line' like '*PowerMad*' or 'Command Line' like '*-computer-name*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Computer_Account_Creation_for_Delegation_Abuse_MachineAccountQuota",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/constrained_delegation_s4u2proxy_abuse_via_rubeus.json",
+      "title": "Constrained Delegation S4U2Proxy Abuse via Rubeus",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Constrained_Delegation_S4U2Proxy_Abuse_via_Rubeus",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*s4u*' and 'Command Line' like '*/impersonateuser*')) or (('Command Line' like '*/msdsspn*' or 'Command Line' like '*/altservice*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Constrained_Delegation_S4U2Proxy_Abuse_via_Rubeus",
+        "dimensions": [],
+        "severity": "high",
         "create_alarm_by_default": false
       }
     },
@@ -2114,6 +3216,35 @@
       }
     },
     {
+      "query_file": "queries/dcshadow_rogue_domain_controller_registration.json",
+      "title": "DCShadow Rogue Domain Controller Registration",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "DCShadow_Rogue_Domain_Controller_Registration",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*lsadump::dcshadow*' or 'Command Line' like '*dcshadow*' or 'Command Line' like '*/push*')) and (('Command Line' like '*/object:*' or 'Command Line' like '*/attribute:*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "DCShadow_Rogue_Domain_Controller_Registration",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/dcsync_attack_via_replication_request.json",
       "title": "DCSync Attack via Replication Request",
       "severity": "critical",
@@ -2176,6 +3307,36 @@
       }
     },
     {
+      "query_file": "queries/dcsync_enablement_replication_rights_granted_via_directory_change_5136.json",
+      "title": "DCSync Enablement: Replication Rights Granted via Directory Change (5136)",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "DCSync_Enablement_Replication_Rights_Granted_via_Directory_Change_5136",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '5136' and ('Properties' like '*1131f6aa-9c07-11d1-f79f-00c04fc2dcd2*' or 'Properties' like '*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2*' or 'Properties' like '*89e95b76-444d-4c62-991a-0facbeda640c*')))",
+      "reasons": [
+        "field not mapped in demo sources: Properties",
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "DCSync_Enablement_Replication_Rights_Granted_via_Directory_Change_5136",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/defacement_via_desktop_wallpaper_change.json",
       "title": "Defacement via Desktop Wallpaper Change",
       "severity": "medium",
@@ -2230,6 +3391,35 @@
         "metric_name": "Default_File_Association_Hijack",
         "dimensions": [],
         "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/dfscoerce_ms-dfsnm_authentication_coercion.json",
+      "title": "DFSCoerce MS-DFSNM Authentication Coercion",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "DFSCoerce_MS_DFSNM_Authentication_Coercion",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*dfscoerce*' or 'Command Line' like '*NetrDfsRemoveStdRoot*' or 'Command Line' like '*NetrDfsAddStdRoot*' or 'Command Line' like '*MS-DFSNM*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "DFSCoerce_MS_DFSNM_Authentication_Coercion",
+        "dimensions": [],
+        "severity": "high",
         "create_alarm_by_default": false
       }
     },
@@ -2379,6 +3569,35 @@
       }
     },
     {
+      "query_file": "queries/domain_admins_group_enumeration_via_net_group.json",
+      "title": "Domain Admins Group Enumeration via net group",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Domain_Admins_Group_Enumeration_via_net_group",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*group*' and 'Command Line' like '*/domain*')) and (('Command Line' like '*Domain Admins*' or 'Command Line' like '*Enterprise Admins*' or 'Command Line' like '*Domain Controllers*' or 'Command Line' like '*Schema Admins*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Domain_Admins_Group_Enumeration_via_net_group",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/domain_trust_discovery_via_nltest.json",
       "title": "Domain Trust Discovery via Nltest",
       "severity": "medium",
@@ -2431,6 +3650,35 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "DPAPI_Master_Key_Extraction",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/dsrm_admin_logon_behavior_enabled_for_persistence.json",
+      "title": "DSRM Admin Logon Behavior Enabled for Persistence",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "DSRM_Admin_Logon_Behavior_Enabled_for_Persistence",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*DsrmAdminLogonBehavior*' and 'Command Line' like '*add*')) and (('Command Line' like '*Lsa*' or 'Command Line' like '*reg add*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "DSRM_Admin_Logon_Behavior_Enabled_for_Persistence",
         "dimensions": [],
         "severity": "high",
         "create_alarm_by_default": false
@@ -2491,6 +3739,35 @@
         "metric_name": "ETW_Provider_Disabled",
         "dimensions": [],
         "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/executable_written_to_remote_admin_share_lateral_tool_transfer.json",
+      "title": "Executable Written to Remote Admin Share (Lateral Tool Transfer)",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Executable_Written_to_Remote_Admin_Share_Lateral_Tool_Transfer",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*copy *' or 'Command Line' like '*xcopy*' or 'Command Line' like '*robocopy*' or 'Command Line' like '*Copy-Item*' or 'Command Line' like '*move *')) and (('Command Line' like '*ADMIN$*' or 'Command Line' like '*C$*' or 'Command Line' like '*IPC$*')) and (('Command Line' like '*.exe*' or 'Command Line' like '*.dll*' or 'Command Line' like '*.bat*' or 'Command Line' like '*.ps1*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Executable_Written_to_Remote_Admin_Share_Lateral_Tool_Transfer",
+        "dimensions": [],
+        "severity": "medium",
         "create_alarm_by_default": false
       }
     },
@@ -2611,6 +3888,348 @@
       }
     },
     {
+      "query_file": "queries/genai_gateway_adversarial_evasion.json",
+      "title": "GenAI Gateway: Adversarial / Obfuscated Guardrail Evasion (AML.T0043)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "GenAI Identity",
+        "API Key ID",
+        "Client IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC GenAI Gateway Logs' and 'Guardrail Category' = 'evasion_obfuscation' | stats count as Hits, distinctcount('GenAI Model') as Models, max('Prompt Risk Score') as MaxRisk by 'GenAI Identity', 'API Key ID', 'Client IP' | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "GenAI Identity",
+          "API Key ID",
+          "Client IP"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/genai_gateway_denial_of_ml_service.json",
+      "title": "GenAI Gateway: Denial of ML Service / Inference Flood (AML.T0029 / AML.T0046)",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "ThrottledCalls",
+      "dimensions": [
+        "Client IP",
+        "API Key ID"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC GenAI Gateway Logs' and ('Response Code' = '429' or 'Guardrail Action' = 'THROTTLE') | stats count as ThrottledCalls, sum('GenAI Total Tokens') as Tokens, distinctcount('Trace ID') as Sessions by 'Client IP', 'API Key ID' | sort -ThrottledCalls",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ThrottledCalls",
+        "dimensions": [
+          "Client IP",
+          "API Key ID"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/genai_gateway_inference_exfiltration.json",
+      "title": "GenAI Gateway: Bulk Inference Exfiltration / Model Extraction (AML.T0024)",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "Calls",
+      "dimensions": [
+        "API Key ID",
+        "GenAI Identity",
+        "Client IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC GenAI Gateway Logs' and ('GenAI Operation' = 'chat.completions' or 'GenAI Operation' = 'completions' or 'GenAI Operation' = 'embeddings') | stats count as Calls, sum('GenAI Total Tokens') as Tokens, distinctcount('GenAI Model') as Models by 'API Key ID', 'GenAI Identity', 'Client IP' | sort -Tokens",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Calls",
+        "dimensions": [
+          "API Key ID",
+          "GenAI Identity",
+          "Client IP"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/genai_gateway_jailbreak_blocked.json",
+      "title": "GenAI Gateway: LLM Jailbreak Detected (AML.T0054)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "GenAI Identity",
+        "API Key ID",
+        "Client IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC GenAI Gateway Logs' and ('Guardrail Category' = 'jailbreak' or 'Jailbreak Detected' = 'true') | stats count as Hits, distinctcount('Trace ID') as Sessions, max('Prompt Risk Score') as MaxRisk by 'GenAI Identity', 'API Key ID', 'Client IP' | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "GenAI Identity",
+          "API Key ID",
+          "Client IP"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/genai_gateway_model_provenance_failure.json",
+      "title": "GenAI Gateway: ML Supply-Chain / Model Provenance Failure (AML.T0010)",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "Loads",
+      "dimensions": [
+        "GenAI Model",
+        "Model Source",
+        "Host Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC GenAI Gateway Logs' and ('Model Signature Valid' = 'false' or 'Guardrail Category' = 'provenance') | stats count as Loads, distinctcount('Model Source') as Sources by 'GenAI Model', 'Model Source', 'Host Name' | sort -Loads",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Loads",
+        "dimensions": [
+          "GenAI Model",
+          "Model Source",
+          "Host Name"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/genai_gateway_model_theft_export.json",
+      "title": "GenAI Gateway: Full Model Access / Weight Export (AML.T0044)",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "ExportAttempts",
+      "dimensions": [
+        "GenAI Identity",
+        "API Key ID",
+        "Client IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC GenAI Gateway Logs' and ('GenAI Operation' = 'model.export' or 'Request URL' like '*/export*' or 'Request URL' like '*weights*' or 'Request URL' like '*/models/download*') | stats count as ExportAttempts, distinctcount('GenAI Model') as Models by 'GenAI Identity', 'API Key ID', 'Client IP' | sort -ExportAttempts",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ExportAttempts",
+        "dimensions": [
+          "GenAI Identity",
+          "API Key ID",
+          "Client IP"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/genai_gateway_prompt_injection_blocked.json",
+      "title": "GenAI Gateway: LLM Prompt Injection Detected (AML.T0051)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "GenAI Identity",
+        "API Key ID",
+        "Client IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC GenAI Gateway Logs' and ('Guardrail Category' = 'prompt_injection' or 'Injection Detected' = 'true') | stats count as Hits, distinctcount('GenAI Model') as Models, max('Prompt Risk Score') as MaxRisk by 'GenAI Identity', 'API Key ID', 'Client IP' | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "GenAI Identity",
+          "API Key ID",
+          "Client IP"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/genai_gateway_sensitive_data_leak.json",
+      "title": "GenAI Gateway: LLM Sensitive-Information Disclosure (AML.T0057)",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "GenAI Identity",
+        "API Key ID",
+        "Client IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC GenAI Gateway Logs' and ('Guardrail Category' = 'sensitive_disclosure' or 'Data Leak Detected' = 'true') | stats count as Hits, distinctcount('GenAI Model') as Models, max('Prompt Risk Score') as MaxRisk by 'GenAI Identity', 'API Key ID', 'Client IP' | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "GenAI Identity",
+          "API Key ID",
+          "Client IP"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/genai_gateway_unauthorized_inference.json",
+      "title": "GenAI Gateway: Unauthorized / Rejected Inference Access (AML.T0040)",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "RejectedCalls",
+      "dimensions": [
+        "GenAI Identity",
+        "API Key ID",
+        "Client IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC GenAI Gateway Logs' and ('Response Code' = '401' or 'Response Code' = '403') | stats count as RejectedCalls, distinctcount('GenAI Model') as Models by 'GenAI Identity', 'API Key ID', 'Client IP' | sort -RejectedCalls",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "RejectedCalls",
+        "dimensions": [
+          "GenAI Identity",
+          "API Key ID",
+          "Client IP"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/gmsa_managed_password_read_attempt.json",
+      "title": "gMSA Managed Password Read Attempt",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "gMSA_Managed_Password_Read_Attempt",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*msDS-ManagedPassword*' or 'Command Line' like '*GMSAPasswordReader*' or 'Command Line' like '*Get-ADServiceAccount*' or 'Command Line' like '*ConvertFrom-ADManagedPasswordBlob*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "gMSA_Managed_Password_Read_Attempt",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/golden_ticket_anomaly.json",
       "title": "Golden Ticket: RC4 Encrypted TGT Request",
       "severity": "critical",
@@ -2640,6 +4259,64 @@
           "Event ID"
         ],
         "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/gpo_abuse_via_sharpgpoabuse.json",
+      "title": "GPO Abuse via SharpGPOAbuse",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "GPO_Abuse_via_SharpGPOAbuse",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*SharpGPOAbuse*' or 'Command Line' like '*--AddComputerTask*' or 'Command Line' like '*--AddUserTask*' or 'Command Line' like '*--AddLocalAdmin*' or 'Command Line' like '*--GPOName*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "GPO_Abuse_via_SharpGPOAbuse",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/gpo_scheduled_task_written_to_sysvol.json",
+      "title": "GPO Scheduled Task Written to SYSVOL",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "GPO_Scheduled_Task_Written_to_SYSVOL",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*SYSVOL*' or 'Command Line' like '*Policies*')) and (('Command Line' like '*ScheduledTasks.xml*' or 'Command Line' like '*Preferences*' or 'Command Line' like '*GPT.INI*' or 'Command Line' like '*gPCMachineExtensionNames*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "GPO_Scheduled_Task_Written_to_SYSVOL",
+        "dimensions": [],
+        "severity": "high",
         "create_alarm_by_default": false
       }
     },
@@ -2725,6 +4402,64 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "Image_File_Execution_Options_Debugger",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/impacket_atexec_remote_scheduled_task_execution.json",
+      "title": "Impacket atexec Remote Scheduled Task Execution",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Impacket_atexec_Remote_Scheduled_Task_Execution",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Parent Process Name' like '*svchost.exe' or 'Parent Process Name' like '*taskeng.exe')) and (('Command Line' like '*cmd.exe*' and 'Command Line' like '*2>&1*')) and (('Command Line' like '*ADMIN$*' or 'Command Line' like '*Temp*' or 'Command Line' like '*2>&1*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Impacket_atexec_Remote_Scheduled_Task_Execution",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/impacket_wmiexec_remote_command_execution.json",
+      "title": "Impacket wmiexec Remote Command Execution",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Impacket_wmiexec_Remote_Command_Execution",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Parent Process Name' like '*WmiPrvSE.exe') and (('Command Line' like '*1>*' or 'Command Line' like '*2>&1*' or 'Command Line' like '*1>*')) ) or (('Command Line' like '*cmd.exe*' and 'Command Line' like '*ADMIN$*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Impacket_wmiexec_Remote_Command_Execution",
         "dimensions": [],
         "severity": "high",
         "create_alarm_by_default": false
@@ -3023,6 +4758,35 @@
         "metric_name": "Keylogging_via_PowerShell_Get_Keystrokes",
         "dimensions": [],
         "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/laps_clear-text_local_admin_password_read_attempt.json",
+      "title": "LAPS Clear-Text Local Admin Password Read Attempt",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "LAPS_Clear_Text_Local_Admin_Password_Read_Attempt",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*ms-Mcs-AdmPwd*' or 'Command Line' like '*Get-AdmPwdPassword*' or 'Command Line' like '*LAPSToolkit*' or 'Command Line' like '*pyLAPS*' or 'Command Line' like '*Get-LAPSADPassword*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "LAPS_Clear_Text_Local_Admin_Password_Read_Attempt",
+        "dimensions": [],
+        "severity": "high",
         "create_alarm_by_default": false
       }
     },
@@ -3561,7 +5325,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*LD_PRELOAD=*' or msg like '*ld.so.preload*')))",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*LD_PRELOAD=*' or msg like '*/etc/ld.so.preload*' or msg like '*ld.so.preload*')))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -3648,7 +5412,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*> /etc/passwd*' or msg like '*> /etc/shadow*')) or ((msg like '*tee /etc/passwd*' or msg like '*tee -a /etc/passwd*' or msg like '*sed -i.*/etc/passwd*' or msg like '*sed -i.*/etc/shadow*')))",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*>> /etc/passwd*' or msg like '*> /etc/passwd*' or msg like '*>> /etc/shadow*' or msg like '*> /etc/shadow*')) or ((msg like '*tee /etc/passwd*' or msg like '*tee -a /etc/passwd*' or msg like '*sed -i.*/etc/passwd*' or msg like '*sed -i.*/etc/shadow*')))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -4710,6 +6474,35 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "NTDS_dit_Database_Copy_Attempt",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/ntlmrelayx_ntlm_relay_execution_indicators.json",
+      "title": "ntlmrelayx NTLM Relay Execution Indicators",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "ntlmrelayx_NTLM_Relay_Execution_Indicators",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*ntlmrelayx*' or 'Command Line' like '*ntlmrelayx.py*')) or ( (('Command Line' like '*-smb2support*' or 'Command Line' like '*--delegate-access*' or 'Command Line' like '*-socks*' or 'Command Line' like '*--escalate-user*')) and (('Command Line' like '*ntlmrelayx*' or 'Command Line' like '*ntlmrelayx.py*')) ))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ntlmrelayx_NTLM_Relay_Execution_Indicators",
         "dimensions": [],
         "severity": "critical",
         "create_alarm_by_default": false
@@ -7301,6 +9094,35 @@
       }
     },
     {
+      "query_file": "queries/overpass-the-hash_via_rubeus_asktgt.json",
+      "title": "Overpass-the-Hash via Rubeus asktgt",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Overpass_the_Hash_via_Rubeus_asktgt",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*asktgt*' and 'Command Line' like '*/user:*')) and (('Command Line' like '*/rc4:*' or 'Command Line' like '*/aes256:*' or 'Command Line' like '*/aes128:*' or 'Command Line' like '*/des:*' or 'Command Line' like '*/ntlm:*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Overpass_the_Hash_via_Rubeus_asktgt",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/parent_pid_spoofing.json",
       "title": "Parent PID Spoofing",
       "severity": "high",
@@ -7324,6 +9146,35 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "Parent_PID_Spoofing",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/pass-the-cert__unpac-the-hash_via_certipy_auth.json",
+      "title": "Pass-the-Cert / UnPAC-the-Hash via Certipy auth",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Pass_the_Cert_UnPAC_the_Hash_via_Certipy_auth",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*certipy*' and 'Command Line' like '*auth*')) and (('Command Line' like '*-pfx*' or 'Command Line' like '*.pfx*')) ) or (('Command Line' like '*asktgt*' and 'Command Line' like '*/getcredentials*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Pass_the_Cert_UnPAC_the_Hash_via_Certipy_auth",
         "dimensions": [],
         "severity": "high",
         "create_alarm_by_default": false
@@ -7568,6 +9419,35 @@
       }
     },
     {
+      "query_file": "queries/powerview__powersploit_domain_reconnaissance.json",
+      "title": "PowerView / PowerSploit Domain Reconnaissance",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "PowerView_PowerSploit_Domain_Reconnaissance",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Get-DomainUser*' or 'Command Line' like '*Get-DomainComputer*' or 'Command Line' like '*Get-DomainGroup*' or 'Command Line' like '*Get-NetUser*' or 'Command Line' like '*Get-NetComputer*' or 'Command Line' like '*Get-ObjectAcl*' or 'Command Line' like '*Find-InterestingDomainAcl*' or 'Command Line' like '*Get-DomainTrust*' or 'Command Line' like '*Invoke-ACLScanner*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "PowerView_PowerSploit_Domain_Reconnaissance",
+        "dimensions": [],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/print_processor_persistence.json",
       "title": "Print Processor Persistence",
       "severity": "high",
@@ -7591,6 +9471,35 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "Print_Processor_Persistence",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/printerbug__spoolsample_authentication_coercion.json",
+      "title": "PrinterBug / SpoolSample Authentication Coercion",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "PrinterBug_SpoolSample_Authentication_Coercion",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*SpoolSample*' or 'Command Line' like '*printerbug*' or 'Command Line' like '*dementor*' or 'Command Line' like '*RpcRemoteFindFirstPrinterChangeNotification*' or 'Command Line' like '*MS-RPRN*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "PrinterBug_SpoolSample_Authentication_Coercion",
         "dimensions": [],
         "severity": "high",
         "create_alarm_by_default": false
@@ -7773,6 +9682,35 @@
       }
     },
     {
+      "query_file": "queries/psexec-style_remote_service_installation_event_7045.json",
+      "title": "PsExec-style Remote Service Installation (Event 7045)",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "PsExec_style_Remote_Service_Installation_Event_7045",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '7045') and ( (('Service Name' like '*PSEXESVC*' or 'Service Name' like '*PAExec*' or 'Service Name' like '*RemCom*' or 'Service Name' like '*csexec*')) or (('Service File Name' like '*ADMIN$*' or 'Service File Name' like '*Temp*' or 'Service File Name' like '*system32*' or 'Service File Name' like '*.bat*')) ))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "PsExec_style_Remote_Service_Installation_Event_7045",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/psexec_service_installation.json",
       "title": "PsExec Service Installation",
       "severity": "high",
@@ -7883,6 +9821,65 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "Ransomware_File_Extension_Indicators",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/rbcd_configuration_via_powershell__powerview.json",
+      "title": "RBCD Configuration via PowerShell / PowerView",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "RBCD_Configuration_via_PowerShell_PowerView",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*PrincipalsAllowedToDelegateToAccount*' or 'Command Line' like '*msDS-AllowedToActOnBehalfOfOtherIdentity*' or 'Command Line' like '*Set-ADComputer*' or 'Command Line' like '*Get-ADComputer*')) and (('Command Line' like '*AllowedToAct*' or 'Command Line' like '*DelegateTo*' or 'Command Line' like '*rbcd*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "RBCD_Configuration_via_PowerShell_PowerView",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/rbcd_msds-allowedtoactonbehalfofotheridentity_modified_event_5136.json",
+      "title": "RBCD: msDS-AllowedToActOnBehalfOfOtherIdentity Modified (Event 5136)",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "RBCD_msDS_AllowedToActOnBehalfOfOtherIdentity_Modified_Event_5136",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '5136' and ('Properties' like '*3f78c3e5-f79a-46bd-a0b8-9d18116ddc79*' or 'Properties' like '*msDS-AllowedToActOnBehalfOfOtherIdentity*')))",
+      "reasons": [
+        "field not mapped in demo sources: Properties",
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "RBCD_msDS_AllowedToActOnBehalfOfOtherIdentity_Modified_Event_5136",
         "dimensions": [],
         "severity": "critical",
         "create_alarm_by_default": false
@@ -8504,6 +10501,36 @@
       }
     },
     {
+      "query_file": "queries/shadow_credentials_msds-keycredentiallink_modified_event_5136.json",
+      "title": "Shadow Credentials: msDS-KeyCredentialLink Modified (Event 5136)",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Shadow_Credentials_msDS_KeyCredentialLink_Modified_Event_5136",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '5136' and ('Properties' like '*5b47d60f-6090-40b2-9f37-2a4de88f3063*' or 'Properties' like '*msDS-KeyCredentialLink*')))",
+      "reasons": [
+        "field not mapped in demo sources: Properties",
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Shadow_Credentials_msDS_KeyCredentialLink_Modified_Event_5136",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/sharprdp_lateral_movement.json",
       "title": "SharpRDP Lateral Movement",
       "severity": "high",
@@ -8558,6 +10585,122 @@
         "metric_name": "Shortcut_Modification_for_Persistence",
         "dimensions": [],
         "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/sid_history_added_or_failed_events_47654766.json",
+      "title": "SID History Added or Failed (Events 4765/4766)",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "SID_History_Added_or_Failed_Events_4765_4766",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ((('Event ID' = '4765' or 'Event ID' = '4766')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "SID_History_Added_or_Failed_Events_4765_4766",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/sid_history_injection_via_mimikatz.json",
+      "title": "SID History Injection via mimikatz",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "SID_History_Injection_via_mimikatz",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*sid::patch*' or 'Command Line' like '*sid::add*' or 'Command Line' like '*misc::addsid*' or 'Command Line' like '*Add-ADGroupMember -SIDHistory*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "SID_History_Injection_via_mimikatz",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/silver_ticket_forged_kerberos_service_ticket.json",
+      "title": "Silver Ticket: Forged Kerberos Service Ticket",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Silver_Ticket_Forged_Kerberos_Service_Ticket",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*kerberos::golden*' and 'Command Line' like '*/service:*')) and (('Command Line' like '*/target:*' or 'Command Line' like '*/rc4:*' or 'Command Line' like '*/aes256:*')) ) or (('Command Line' like '*rubeus silver*' or 'Command Line' like '*asktgs /service*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Silver_Ticket_Forged_Kerberos_Service_Ticket",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/skeleton_key_domain_backdoor_via_mimikatz.json",
+      "title": "Skeleton Key Domain Backdoor via mimikatz",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Skeleton_Key_Domain_Backdoor_via_mimikatz",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*misc::skeleton*' or 'Command Line' like '*skeleton key*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Skeleton_Key_Domain_Backdoor_via_mimikatz",
+        "dimensions": [],
+        "severity": "critical",
         "create_alarm_by_default": false
       }
     },
@@ -10192,6 +12335,64 @@
       }
     },
     {
+      "query_file": "queries/targeted_as-rep_roasting_donotrequirepreauth_set.json",
+      "title": "Targeted AS-REP Roasting: DoNotRequirePreAuth Set",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Targeted_AS_REP_Roasting_DoNotRequirePreAuth_Set",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*DoesNotRequirePreAuth*' or 'Command Line' like '*DONT_REQ_PREAUTH*' or 'Command Line' like '*DONT_REQUIRE_PREAUTH*')) or (('Command Line' like '*useraccountcontrol*' and 'Command Line' like '*4194304*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Targeted_AS_REP_Roasting_DoNotRequirePreAuth_Set",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/targeted_kerberoasting_spn_set_on_user_account.json",
+      "title": "Targeted Kerberoasting: SPN Set on User Account",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Targeted_Kerberoasting_SPN_Set_on_User_Account",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*serviceprincipalname*' or 'Command Line' like '*targetedKerberoast*' or 'Command Line' like '*Set-DomainObject*')) and (('Command Line' like '*Set-ADUser*' or 'Command Line' like '*-ServicePrincipalName*' or 'Command Line' like '*targetedKerberoast*' or 'Command Line' like '*serviceprincipalname*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Targeted_Kerberoasting_SPN_Set_on_User_Account",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/template_injection_via_microsoft_office.json",
       "title": "Template Injection via Microsoft Office",
       "severity": "high",
@@ -10244,6 +12445,35 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "Time_Provider_DLL_Persistence",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/timeroasting_computer_account_hash_harvest_via_ntp.json",
+      "title": "Timeroasting: Computer Account Hash Harvest via NTP",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Timeroasting_Computer_Account_Hash_Harvest_via_NTP",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*timeroast*' or 'Command Line' like '*timeroasting*' or 'Command Line' like '*sntp_roast*' or 'Command Line' like '*MS-SNTP*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Timeroasting_Computer_Account_Hash_Harvest_via_NTP",
         "dimensions": [],
         "severity": "high",
         "create_alarm_by_default": false
@@ -10447,6 +12677,35 @@
         "enabled": false,
         "namespace": "oci_log_analytics_detections",
         "metric_name": "UAC_Bypass_via_Fodhelper",
+        "dimensions": [],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/unconstrained_delegation_tgt_capture_via_rubeus_monitor.json",
+      "title": "Unconstrained Delegation TGT Capture via Rubeus monitor",
+      "severity": "high",
+      "eligible": false,
+      "metric_name": "Unconstrained_Delegation_TGT_Capture_via_Rubeus_monitor",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*monitor /interval*' or 'Command Line' like '*rubeus monitor*' or 'Command Line' like '*triage*')) or (('Command Line' like '*dump*' and 'Command Line' like '*/service:krbtgt*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Unconstrained_Delegation_TGT_Capture_via_Rubeus_monitor",
         "dimensions": [],
         "severity": "high",
         "create_alarm_by_default": false
@@ -11273,7 +13532,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*ppid=ruby*' or msg like '*ppid=uvicorn*' or msg like '*ppid=gunicorn*' or msg like '*ppid=nginx*' or msg like '*ppid=httpd*')) and ((msg like '*exe=\"/bin/bash\"*' or msg like '*exe=\"/bin/sh\"*' or msg like '*exe=\"/bin/dash\"*' or msg like '*exe=\"/usr/bin/bash\"*' or msg like '*exe=\"/usr/bin/sh\"*')) and ((msg like '*;*' or msg like '*|*' or msg like '*&&*' or msg like '*`*' or msg like '*$(*' or msg like '*whoami*' or msg like '*/etc/passwd*' or msg like '*/etc/shadow*')))",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ppid=python*' or msg like '*ppid=python3*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*ppid=ruby*' or msg like '*ppid=uvicorn*' or msg like '*ppid=gunicorn*' or msg like '*ppid=nginx*' or msg like '*ppid=httpd*')) and ((msg like '*exe=\"/bin/bash\"*' or msg like '*exe=\"/bin/sh\"*' or msg like '*exe=\"/bin/dash\"*' or msg like '*exe=\"/usr/bin/bash\"*' or msg like '*exe=\"/usr/bin/sh\"*')) and ((msg like '*;*' or msg like '*|*' or msg like '*&&*' or msg like '*`*' or msg like '*$(*' or msg like '*whoami*' or msg like '*/etc/passwd*' or msg like '*/etc/shadow*')))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -13854,6 +16113,35 @@
       }
     },
     {
+      "query_file": "queries/zerologon_cve-2020-1472_netlogon_exploitation.json",
+      "title": "Zerologon (CVE-2020-1472) Netlogon Exploitation",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Zerologon_CVE_2020_1472_Netlogon_Exploitation",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*zerologon*' or 'Command Line' like '*cve-2020-1472*' or 'Command Line' like '*set_empty_pw*' or 'Command Line' like '*lsadump::zerologon*' or 'Command Line' like '*reinstall_original_pw*')))",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "high",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Zerologon_CVE_2020_1472_Netlogon_Exploitation",
+        "dimensions": [],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/apps/apm_attack_to_waf_correlation.json",
       "title": "APM: Browser Attack to WAF Block Correlation",
       "severity": "high",
@@ -15424,6 +17712,239 @@
           "Client IP",
           "Service Name",
           "URI Path"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/atlas_adversarial_input_evasion_markers.json",
+      "title": "ATLAS: Adversarial / Obfuscated Input to ML Endpoint (AML.T0043)",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "Client IP",
+        "Service Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and ('Request URL' like '*/v1/chat*' or 'Request URL' like '*/llm/*' or 'Request URL' like '*/ai/*' or 'Request URL' like '*/generate*' or 'Request URL' like '*/predict*' or 'Request URL' like '*/invoke*') and ('Span Attributes' like '*\\\\u200b*' or 'Span Attributes' like '*\\\\u202e*' or 'Span Attributes' like '*base64:*' or 'Span Attributes' like '*fromCharCode*' or 'Span Attributes' like '*[[SEP]]*' or 'Span Attributes' like '*<|im_start|>*' or 'Query String' like '*%E2%80%8B*' or 'Query String' like '*base64,*') | stats count as Hits, distinctcount('Request URL') as Routes by 'Client IP', 'Service Name' | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "Client IP",
+          "Service Name"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/atlas_llm_jailbreak_attempt.json",
+      "title": "ATLAS: LLM Jailbreak Attempt Against Application (AML.T0054)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "Client IP",
+        "Service Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and ('Request URL' like '*/v1/chat*' or 'Request URL' like '*/llm/*' or 'Request URL' like '*/ai/*' or 'Request URL' like '*/generate*' or 'Request URL' like '*/invoke*') and ('Span Attributes' like '*do anything now*' or 'Span Attributes' like '*developer mode*' or 'Span Attributes' like '*jailbreak*' or 'Span Attributes' like '*ignore your guidelines*' or 'Span Attributes' like '*without any restrictions*' or 'Span Attributes' like '*roleplay as*' or 'Span Attributes' like '*pretend you are*' or 'Query String' like '*jailbreak*' or 'Request URL' like '*dan_mode*') | stats count as Hits, distinctcount('Trace ID') as Sessions by 'Client IP', 'Service Name' | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "Client IP",
+          "Service Name"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/atlas_llm_sensitive_data_disclosure.json",
+      "title": "ATLAS: LLM Sensitive-Information Disclosure Attempt (AML.T0057)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "Client IP",
+        "Service Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and ('Request URL' like '*/v1/chat*' or 'Request URL' like '*/llm/*' or 'Request URL' like '*/ai/*' or 'Request URL' like '*/generate*' or 'Request URL' like '*/invoke*') and ('Span Attributes' like '*reveal your system prompt*' or 'Span Attributes' like '*repeat the words above*' or 'Span Attributes' like '*print your instructions*' or 'Span Attributes' like '*show me your prompt*' or 'Span Attributes' like '*what is your api key*' or 'Span Attributes' like '*reveal the secret*' or 'Span Attributes' like '*your training data*' or 'Span Attributes' like '*list your tools*' or 'Query String' like '*system_prompt*') | stats count as Hits, distinctcount('Request URL') as Routes by 'Client IP', 'Service Name' | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "Client IP",
+          "Service Name"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/atlas_ml_inference_api_bulk_extraction.json",
+      "title": "ATLAS: Bulk Extraction via ML Inference API (AML.T0024 / AML.T0040)",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "Calls",
+      "dimensions": [
+        "Client IP",
+        "Service Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and ('Request URL' like '*/v1/chat*' or 'Request URL' like '*/v1/completions*' or 'Request URL' like '*/v1/embeddings*' or 'Request URL' like '*/llm/*' or 'Request URL' like '*/ai/*' or 'Request URL' like '*/generate*' or 'Request URL' like '*/predict*' or 'Request URL' like '*/invoke*') | stats count as Calls, distinctcount('Request URL') as DistinctRoutes, distinctcount('Trace ID') as Sessions by 'Client IP', 'Service Name' | sort -Calls",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Calls",
+        "dimensions": [
+          "Client IP",
+          "Service Name"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/atlas_ml_inference_unauthorized_access.json",
+      "title": "ATLAS: Unauthorized ML Inference API Access (AML.T0040)",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "RejectedCalls",
+      "dimensions": [
+        "Client IP",
+        "Service Name",
+        "Response Code"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and ('Request URL' like '*/v1/chat*' or 'Request URL' like '*/v1/completions*' or 'Request URL' like '*/v1/embeddings*' or 'Request URL' like '*/llm/*' or 'Request URL' like '*/ai/*' or 'Request URL' like '*/generate*' or 'Request URL' like '*/predict*' or 'Request URL' like '*/invoke*') and ('Response Code' = 401 or 'Response Code' = 403 or 'Response Code' = 429) | stats count as RejectedCalls, distinctcount('Request URL') as Routes by 'Client IP', 'Service Name', 'Response Code' | sort -RejectedCalls",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "RejectedCalls",
+        "dimensions": [
+          "Client IP",
+          "Service Name",
+          "Response Code"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/atlas_ml_service_denial_request_flood.json",
+      "title": "ATLAS: Denial of ML Service / Inference Flood (AML.T0029 / AML.T0046)",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "Calls",
+      "dimensions": [
+        "Client IP",
+        "Service Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and ('Request URL' like '*/v1/chat*' or 'Request URL' like '*/v1/completions*' or 'Request URL' like '*/v1/embeddings*' or 'Request URL' like '*/llm/*' or 'Request URL' like '*/ai/*' or 'Request URL' like '*/generate*' or 'Request URL' like '*/predict*' or 'Request URL' like '*/invoke*') | stats count as Calls, distinctcount('Trace ID') as Sessions by 'Client IP', 'Service Name' | sort -Calls",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Calls",
+        "dimensions": [
+          "Client IP",
+          "Service Name"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/apps/atlas_prompt_injection_via_app_request.json",
+      "title": "ATLAS: LLM Prompt Injection in Application Request (AML.T0051)",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Hits",
+      "dimensions": [
+        "Client IP",
+        "Service Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and ('Request URL' like '*/v1/chat*' or 'Request URL' like '*/v1/completions*' or 'Request URL' like '*/llm/*' or 'Request URL' like '*/ai/*' or 'Request URL' like '*/generate*' or 'Request URL' like '*/invoke*') and ('Span Attributes' like '*ignore previous instructions*' or 'Span Attributes' like '*ignore all previous*' or 'Span Attributes' like '*disregard the above*' or 'Span Attributes' like '*disregard all prior*' or 'Span Attributes' like '*system prompt*' or 'Span Attributes' like '*you are now*' or 'Query String' like '*ignore*previous*' or 'Request URL' like '*ignore*instructions*') | stats count as Hits, distinctcount('Request URL') as Routes by 'Client IP', 'Service Name' | sort -Hits",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Hits",
+        "dimensions": [
+          "Client IP",
+          "Service Name"
         ],
         "severity": "high",
         "create_alarm_by_default": false
@@ -17329,6 +19850,37 @@
       }
     },
     {
+      "query_file": "queries/hunting/linux_outbound_connection_frequency.json",
+      "title": "Linux Unusual Outbound Connection Frequency",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "connection_count",
+      "dimensions": [
+        "Host Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (msg like '*CONNECT*' or msg like '*TCP*') | stats count as connection_count, distinctcount('Destination IP') as unique_destinations by 'Host Name' | where connection_count > 500 or unique_destinations > 50 | sort -connection_count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "connection_count",
+        "dimensions": [
+          "Host Name"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/hunting/linux_persistence_score.json",
       "title": "Linux Persistence Indicator Score (Combined Methods)",
       "severity": "high",
@@ -17360,6 +19912,39 @@
       }
     },
     {
+      "query_file": "queries/hunting/linux_process_from_unusual_path.json",
+      "title": "Linux Process Execution from Unusual Paths",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "exec_count",
+      "dimensions": [
+        "Process Name",
+        "Command Line"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ('Command Line' like '*/tmp/*' or 'Command Line' like '*/dev/shm/*' or 'Command Line' like '*/var/tmp/*' or 'Command Line' like '*/run/user/*') | stats count as exec_count, distinctcount('Host Name') as host_spread by 'Process Name', 'Command Line' | where exec_count > 1 | sort -host_spread",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "exec_count",
+        "dimensions": [
+          "Process Name",
+          "Command Line"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/hunting/linux_rare_process.json",
       "title": "Linux Rare Process Detection (Stacking)",
       "severity": "medium",
@@ -17385,6 +19970,70 @@
         "metric_name": "executions",
         "dimensions": [
           "Process Name"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/linux_rare_process_by_host.json",
+      "title": "Linux Rare Process Execution by Host",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "exec_count",
+      "dimensions": [
+        "Process Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and 'Process Name' != null | stats distinctcount('Host Name') as host_count, count as exec_count by 'Process Name' | where host_count <= 2 and exec_count > 1 | sort -exec_count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "exec_count",
+        "dimensions": [
+          "Process Name"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/linux_user_privilege_change_correlation.json",
+      "title": "Linux User Privilege Change Correlation",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "actions",
+      "dimensions": [
+        "Host Name",
+        "User"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and ('Process Name' in ('sudo', 'su', 'pkexec') or msg like '*/etc/shadow*' or msg like '*/etc/passwd*' or msg like '*useradd*') | stats count as actions, distinctcount('Process Name') as distinct_procs, earliest(Time) as first_seen, latest(Time) as last_seen by 'Host Name', User | where distinct_procs >= 2 | sort -actions",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "actions",
+        "dimensions": [
+          "Host Name",
+          "User"
         ],
         "severity": "medium",
         "create_alarm_by_default": false
@@ -17762,6 +20411,39 @@
       }
     },
     {
+      "query_file": "queries/hunting/oci_api_burst_by_user.json",
+      "title": "OCI API Call Burst by User",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "api_calls",
+      "dimensions": [
+        "Principal Name",
+        "Event Type"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' | stats count as api_calls by 'Principal Name', 'Event Type' | where api_calls > 100 | sort -api_calls",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "api_calls",
+        "dimensions": [
+          "Principal Name",
+          "Event Type"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/hunting/oci_console_brute_force.json",
       "title": "OCI Console Login Brute Force (Frequency Analysis)",
       "severity": "high",
@@ -17789,6 +20471,68 @@
           "User Name"
         ],
         "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/oci_cross_compartment_activity.json",
+      "title": "OCI Cross-Compartment Activity Anomaly",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "total_actions",
+      "dimensions": [
+        "Principal Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' | stats distinctcount('Compartment Name') as compartment_count, count as total_actions by 'Principal Name' | where compartment_count > 5 | sort -compartment_count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "total_actions",
+        "dimensions": [
+          "Principal Name"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/oci_failed_action_spike.json",
+      "title": "OCI Failed Action Spike by Source IP",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "total",
+      "dimensions": [
+        "Source IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' | stats count as total, sum(if(Status = 'Failure', 1, 0)) as failures by 'Source IP' | eval fail_rate = failures * 100 / total | where fail_rate > 50 and total > 10 | sort -fail_rate",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "total",
+        "dimensions": [
+          "Source IP"
+        ],
+        "severity": "medium",
         "create_alarm_by_default": false
       }
     },
@@ -17890,6 +20634,41 @@
       }
     },
     {
+      "query_file": "queries/hunting/oci_off_hours_activity.json",
+      "title": "OCI Off-Hours Administrative Activity",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "actions",
+      "dimensions": [
+        "Principal Name",
+        "day",
+        "hour"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like '*create*' or 'Event Type' like '*delete*' or 'Event Type' like '*update*') | eval hour = formatDate(Time, 'HH') | eval day = formatDate(Time, 'E') | where hour < '06' or hour > '22' or day = 'Sat' or day = 'Sun' | stats count as actions by 'Principal Name', day, hour | sort -actions",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "actions",
+        "dimensions": [
+          "Principal Name",
+          "day",
+          "hour"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/hunting/oci_privilege_escalation_chain.json",
       "title": "OCI Privilege Escalation Chain Detection",
       "severity": "critical",
@@ -17917,6 +20696,37 @@
           "User Name"
         ],
         "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/oci_resource_deletion_wave.json",
+      "title": "OCI Resource Deletion Wave",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "deletions",
+      "dimensions": [
+        "Principal Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like '*delete*' or 'Event Type' like '*terminate*') and Status = 'Success' | stats count as deletions, distinctcount('Resource Type') as resource_types by 'Principal Name' | where deletions > 10 | sort -deletions",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "deletions",
+        "dimensions": [
+          "Principal Name"
+        ],
+        "severity": "medium",
         "create_alarm_by_default": false
       }
     },
@@ -17950,6 +20760,139 @@
           "Source IP"
         ],
         "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/oci_unusual_api_caller.json",
+      "title": "OCI Unusual API Caller - First Seen User-Agent",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "call_count",
+      "dimensions": [
+        "User Agent"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' | stats earliest(Time) as first_seen, count as call_count by 'User Agent' | where call_count < 5 | sort -first_seen",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "call_count",
+        "dimensions": [
+          "User Agent"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/octo_chaos_stale_state.json",
+      "title": "Octo Chaos \u2014 Stale Scenario State",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Octo_Chaos_Stale_Scenario_State",
+      "dimensions": [
+        "Chaos Target"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'octo-chaos-audit' and Event = 'chaos.apply' | stats latest(ts) as applied_at, latest(Chaos Scenario) as scenario, latest('Chaos TTL Seconds') as ttl by 'Chaos Target' | eval expires_at = applied_at + ttl | eval now = toepoch(current_timestamp) | where expires_at < now",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Octo_Chaos_Stale_Scenario_State",
+        "dimensions": [
+          "Chaos Target"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/octo_checkout_db_slowness.json",
+      "title": "Octo Checkout \u2014 DB Slowness Correlated With Chaos",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "Octo_Checkout_DB_Slowness_Correlated_With_Chaos",
+      "dimensions": [
+        "Service"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and 'Workflow ID' = 'checkout' | stats pct('DB Elapsed ms', 95) as p95, countif('HTTP Status Code' >= 500) as errors, countif('Chaos Injected' = 'true') as chaos_events by Service | sort -p95",
+      "reasons": [
+        "unsupported scheduled-search aggregate: countif",
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Octo_Checkout_DB_Slowness_Correlated_With_Chaos",
+        "dimensions": [
+          "Service"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/octo_waf_vs_app_errors.json",
+      "title": "Octo WAF Detections vs App 5xx",
+      "severity": "medium",
+      "eligible": false,
+      "metric_name": "events",
+      "dimensions": [
+        "Client IP",
+        "URL Path"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'SOC Application Logs' or 'Log Source' = 'SOC WAF Security Logs') and ('WAF Action' != null or 'HTTP Status Code' >= 500) | stats count as events, countif('WAF Action' != null) as waf, countif('HTTP Status Code' >= 500) as app5xx by 'Client IP', 'URL Path' | where waf > 0 and app5xx > 0 | sort -events",
+      "reasons": [
+        "unsupported scheduled-search aggregate: countif"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "events",
+        "dimensions": [
+          "Client IP",
+          "URL Path"
+        ],
+        "severity": "medium",
         "create_alarm_by_default": false
       }
     },
@@ -18720,6 +21663,134 @@
           "Destination Port"
         ],
         "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/win_dns_query_entropy.json",
+      "title": "Windows High-Entropy DNS Queries",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "query_count",
+      "dimensions": [
+        "Host Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'SOC Windows Sysmon Logs') and 'Query Name' != null | eval domain_length = length('Query Name') | stats count as query_count, avg(domain_length) as avg_length, max(domain_length) as max_length by 'Host Name' | where avg_length > 40 or max_length > 60 | sort -avg_length",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "query_count",
+        "dimensions": [
+          "Host Name"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/win_lateral_movement_timeline.json",
+      "title": "Windows Lateral Movement Timeline",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "events",
+      "dimensions": [
+        "Host Name",
+        "User"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' in ('psexec.exe', 'psexesvc.exe', 'winrs.exe', 'winrm.cmd') or 'Destination Port' in ('445', '5985', '5986', '3389') or 'Pipe Name' like '*PSEXEC*') | stats count as events, distinctcount('Destination IP') as targets, earliest(Time) as start_time, latest(Time) as end_time by 'Host Name', User | where targets >= 2 | sort -targets",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "events",
+        "dimensions": [
+          "Host Name",
+          "User"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/win_lolbin_frequency_anomaly.json",
+      "title": "Windows LOLBin Usage Frequency Anomaly",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "lolbin_count",
+      "dimensions": [
+        "Host Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'SOC Windows Sysmon Logs') and 'Process Name' in ('certutil.exe', 'mshta.exe', 'regsvr32.exe', 'rundll32.exe', 'wscript.exe', 'cscript.exe', 'msbuild.exe', 'bitsadmin.exe', 'wmic.exe', 'installutil.exe') | stats count as lolbin_count, distinctcount('Process Name') as distinct_lolbins by 'Host Name' | where lolbin_count > 20 or distinct_lolbins >= 4 | sort -lolbin_count",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "lolbin_count",
+        "dimensions": [
+          "Host Name"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/win_rare_parent_child_process.json",
+      "title": "Windows Rare Parent-Child Process Relationships",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "occurrence",
+      "dimensions": [
+        "Parent Process Name",
+        "Process Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'SOC Windows Sysmon Logs') and 'Process Name' != null and 'Parent Process Name' != null | stats count as occurrence, distinctcount('Host Name') as host_count by 'Parent Process Name', 'Process Name' | where occurrence <= 3 and host_count <= 2 | sort occurrence",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "occurrence",
+        "dimensions": [
+          "Parent Process Name",
+          "Process Name"
+        ],
+        "severity": "medium",
         "create_alarm_by_default": false
       }
     },

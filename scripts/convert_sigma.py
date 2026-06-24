@@ -28,6 +28,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from query_artifacts import GENERATED_QUERY_ARTIFACT_FILENAMES  # noqa: E402
+from sigma_converter.maintenance import (  # noqa: E402
+    print_stats as _print_stats,
+    query_syntax_issues,
+    refresh_catalogs,
+    sweep_stale_duplicates,
+    validate_queries as _validate_queries,
+)
 
 CONFIG_PATH = 'config/sigma_oci_mapping.yaml'
 RULES_DIR = 'rules'
@@ -646,234 +653,23 @@ def convert_rule(rule_path, field_map, logsource_map):
 
 def print_stats(output_path):
     """Print statistics about generated queries."""
-    queries = []
-    for path in iter_query_files(output_path):
-        with open(path) as fh:
-            data = json.load(fh)
-        if not data.get('sigma_id'):
-            continue
-        queries.append(data)
-
-    print(f"\n{'=' * 60}")
-    print(f"Detection Rule Statistics")
-    print(f"{'=' * 60}")
-    print(f"  Total rules: {len(queries)}")
-
-    # By logsource
-    sources = {}
-    for q in queries:
-        src = q.get('logsource', {}).get('product', 'unknown')
-        sources[src] = sources.get(src, 0) + 1
-    print(f"\n  By platform:")
-    for src, count in sorted(sources.items(), key=lambda x: -x[1]):
-        print(f"    {src:20s} {count}")
-
-    # By severity
-    levels = {}
-    for q in queries:
-        lvl = q.get('level', 'unknown')
-        levels[lvl] = levels.get(lvl, 0) + 1
-    print(f"\n  By severity:")
-    for lvl in ['critical', 'high', 'medium', 'low', 'informational']:
-        if lvl in levels:
-            stig = LEVEL_TO_STIG_CAT.get(lvl, '')
-            print(f"    {lvl:15s} ({stig:6s}) {levels[lvl]}")
-
-    # STIG coverage
-    stig_rules = [q for q in queries if q.get('stig_ids')]
-    print(f"\n  STIG-tagged rules: {len(stig_rules)}")
-
-    # MITRE coverage
-    techniques = set()
-    tactics = set()
-    for q in queries:
-        ma = q.get('mitre_attack', {})
-        techniques.update(ma.get('techniques', []))
-        tactics.update(ma.get('tactics', []))
-    print(f"  MITRE ATT&CK techniques: {len(techniques)}")
-    print(f"  MITRE ATT&CK tactics: {len(tactics)}")
-    for t in sorted(tactics):
-        print(f"    - {t}")
-
-
-def query_syntax_issues(query):
-    """Return a list of OCL syntax issues for a single generated query string.
-
-    Extracted from ``validate_queries`` so the per-query checks are unit-testable
-    in isolation (e.g. regression tests that regenerate the Windows named-pipe
-    rules and assert the emitted LAQL stays parseable). An empty list means the
-    query passed every structural check.
-    """
-    issues = []
-    # A query must be anchored on a scoping filter. Log Source is the common
-    # case, but cross-source correlation/hunting analytics legitimately anchor
-    # on a strong identifier field (Trace ID, Client/Source/Destination IP).
-    # Allow any number of leading group-open parens before the anchor so
-    # multi-level grouping like ((('Log Source' = ...))) is not flagged.
-    anchor = r"'(Log Source|Trace ID|Client IP|Source IP|Destination IP)'"
-    if not re.match(rf"^\(*\s*{anchor}\s*(=|in)\s*", query):
-        issues.append("missing Log Source prefix")
-    # Count parentheses outside of quoted strings, and detect structural
-    # double spaces the same way. Several subtleties matter:
-    #   * a quote is a string delimiter only when it is NOT escaped. A quote is
-    #     escaped iff preceded by an ODD number of backslashes, so "\'" is a
-    #     literal quote inside a LIKE pattern but "\\'" (escaped backslash) is a
-    #     real delimiter -- tracking only the single previous char gets this
-    #     wrong. This keeps literal parens in patterns like '*SLEEP(*' from
-    #     desyncing the counter while still closing strings correctly;
-    #   * parenthesis depth must never go negative: a closing paren before its
-    #     opener (e.g. "(...)) ... (") is malformed even if the final depth
-    #     happens to net back to zero;
-    #   * a quote left open at end-of-string means the rest of the query was
-    #     wrongly treated as quoted, which would mask unbalanced parens or
-    #     double spaces -- flag it explicitly;
-    #   * spaces inside a LIKE literal (e.g. mimikatz '*SID      :*') are
-    #     intentional and must not count as structural double spaces.
-    in_quote = False
-    paren_depth = 0
-    depth_went_negative = False
-    backslashes = 0
-    prev = ""
-    double_space = False
-    for ch in query:
-        if ch == "'":
-            if backslashes % 2 == 0:
-                in_quote = not in_quote
-            backslashes = 0
-        else:
-            if not in_quote:
-                if ch == '(':
-                    paren_depth += 1
-                elif ch == ')':
-                    paren_depth -= 1
-                    if paren_depth < 0:
-                        depth_went_negative = True
-                elif ch == ' ' and prev == ' ':
-                    double_space = True
-            backslashes = backslashes + 1 if ch == "\\" else 0
-        prev = ch
-    if paren_depth != 0 or depth_went_negative:
-        issues.append("unbalanced parentheses")
-    if in_quote:
-        issues.append("unterminated quoted string")
-    if double_space:
-        issues.append("double spaces")
-    return issues
+    _print_stats(output_path, iter_query_files=iter_query_files, level_to_stig_cat=LEVEL_TO_STIG_CAT)
 
 
 def validate_queries(output_path):
     """Validate OCL syntax of generated queries."""
-    errors = 0
-    total = 0
-    for path in iter_query_files(output_path):
-        with open(path) as fh:
-            q = json.load(fh)
-        query = q.get('query', '')
-        total += 1
-        issues = query_syntax_issues(query)
-        if issues:
-            rel_path = path.relative_to(output_path).as_posix()
-            print(f"  WARN {rel_path}: {', '.join(issues)}")
-            errors += 1
-    print(f"\n  Validated {total} queries, {errors} warnings")
+    _validate_queries(output_path, iter_query_files=iter_query_files)
 
 
-def _refresh_catalogs(output_root):
-    """Re-emit catalog/manifest/dashboard-inventory JSONs after a sweep.
-
-    The orphan sweep deletes stale query files; the catalogs embed those
-    filenames and otherwise drift out of sync. We invoke the existing
-    generators in-process so a single ``python3 scripts/convert_sigma.py``
-    leaves every downstream artifact internally consistent.
-
-    Failures are NOT masked: if any refresh exits non-zero we print the
-    captured stdout/stderr, collect the failure, and after running the
-    full set raise ``RuntimeError`` so the caller sees the breakage.
-    Silently swallowing returncodes was the previous bug — drift would
-    re-appear at the next deploy with no audit trail.
-    """
-    import subprocess
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    failures = []
-    for cmd_args, label in (
-        (['scripts/generate_catalog.py'], 'catalog'),
-        (['scripts/export_for_multicloud.py', '--manifest-only'], 'manifest'),
-        (['scripts/deploy_dashboard.py', '--export-inventory'], 'dashboard inventory'),
-    ):
-        try:
-            result = subprocess.run(
-                ['python3', *cmd_args],
-                cwd=base,
-                check=False,
-                capture_output=True,
-                text=True,
-            )
-        except (OSError, subprocess.SubprocessError) as exc:
-            failures.append((label, f"spawn error: {exc}"))
-            print(f"ERROR: {label} refresh could not start: {exc}", file=sys.stderr)
-            continue
-        if result.returncode != 0:
-            stderr_tail = (result.stderr or '').strip().splitlines()[-10:]
-            stdout_tail = (result.stdout or '').strip().splitlines()[-10:]
-            # Flush stdout first so the ERROR line can't get re-ordered
-            # behind buffered "Refreshed …" output when piped (2>&1 | tail).
-            sys.stdout.flush()
-            print(
-                f"ERROR: {label} refresh exited {result.returncode}",
-                file=sys.stderr, flush=True,
-            )
-            for line in stdout_tail:
-                print(f"  stdout: {line}", file=sys.stderr, flush=True)
-            for line in stderr_tail:
-                print(f"  stderr: {line}", file=sys.stderr, flush=True)
-            failures.append((label, f"exit {result.returncode}"))
-            continue
-        print(f"Refreshed {label}", flush=True)
-    if failures:
-        raise RuntimeError(
-            "Catalog refresh failed: "
-            + ", ".join(f"{label}={detail}" for label, detail in failures)
-        )
+def _refresh_catalogs(_output_root):
+    """Re-emit catalog/manifest/dashboard-inventory JSONs after a sweep."""
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    refresh_catalogs(base_dir)
 
 
 def _sweep_stale_duplicates(output_root, written_by_sigma):
-    """Delete query files that share a sigma_id with a freshly generated file.
-
-    When a Sigma rule is renamed or moved, ``resolve_output_relative_path``
-    chooses the canonical filename for the new title. The previous filename
-    survives on disk as an orphan whose Log Source filter, field map, or
-    detection logic may already be stale. Smoke tests treat the orphan as a
-    real detection and may even deploy it. This sweep keeps exactly one
-    query file per ``sigma_id`` — the one the converter just wrote.
-
-    Files marked ``do_not_overwrite: true`` in their JSON are preserved
-    even when they share a ``sigma_id`` with a regenerated file. Several
-    curated demo-tuned queries (``mimikatz_command_indicators.json``,
-    ``cmd_suspicious_child_process.json``, etc.) are pinned by tests in
-    ``scripts/test_query_audit.py`` and must not be swept just because the
-    Sigma source got regenerated under a slightly different filename.
-    """
-    canonical = {sid: os.path.realpath(p) for sid, p in written_by_sigma.items()}
-    removed = []
-    for path in iter_query_files(output_root):
-        try:
-            with open(path) as fh:
-                data = json.load(fh)
-        except (OSError, json.JSONDecodeError):
-            continue
-        sid = data.get('sigma_id')
-        if not sid or sid not in canonical:
-            continue
-        if os.path.realpath(path) == canonical[sid]:
-            continue
-        if data.get('do_not_overwrite'):
-            continue
-        try:
-            os.remove(path)
-            removed.append(str(path))
-        except OSError:
-            pass
-    return removed
+    """Delete stale duplicate query files that share a refreshed sigma_id."""
+    return sweep_stale_duplicates(output_root, written_by_sigma, iter_query_files=iter_query_files)
 
 
 def main():

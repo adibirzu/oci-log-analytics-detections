@@ -1,0 +1,1082 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-06-13T09:13:14.406807+00:00",
+  "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+  "summary": {
+    "promoted_files": 60,
+    "report_promoted_count": 60,
+    "report_live_validation_passed": 60,
+    "baseline_records": 0,
+    "synthetic_live_hit_count": 20,
+    "promoted_without_synthetic_hit": 40,
+    "synthetic_hit_gate_required": false,
+    "drift_count": 0,
+    "error_count": 0
+  },
+  "current": [
+    {
+      "path": "queries/sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
+      "title": "Apache - Apache 2.4.49 flaw CVE-2021-41773",
+      "sentinel_id": "767f9dc4-3b01-11ec-8d3d-0242ac130003",
+      "output_file": "sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "40417901dc26756a1fe508581b586e6af8c5500538dbdb943596191badab7bc6"
+    },
+    {
+      "path": "queries/sentinel/apache_-_unexpected_post_requests.json",
+      "title": "Apache - Unexpected Post Requests",
+      "sentinel_id": "c21ea046-3ae7-11ec-8d3d-0242ac130003",
+      "output_file": "sentinel/apache_-_unexpected_post_requests.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "2a73ea593c9cdcfd7a74eb34426211e591e0eb11c0a062be605245fd61416532"
+    },
+    {
+      "path": "queries/sentinel/apexone_-_top_sources_with_alerts.json",
+      "title": "ApexOne - Top sources with alerts",
+      "sentinel_id": "8bb86556-67b4-11ec-90d6-0242ac120003",
+      "output_file": "sentinel/apexone_-_top_sources_with_alerts.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "c0c9a2fdf5d59c5c190ea0c0038dbda06ea45a73ae8076d6fb9bfd82ac01e1b8"
+    },
+    {
+      "path": "queries/sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
+      "title": "Cisco Cloud Security - Crypto Miner User-Agent Detected",
+      "sentinel_id": "b619d1f1-7f39-4c7e-bf9e-afbb46457997",
+      "output_file": "sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "f969f0e775b5e406ef3370e60a1ffa076b22916a8a900acfc91983beffb49487"
+    },
+    {
+      "path": "queries/sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
+      "title": "Cisco Cloud Security - Windows PowerShell User-Agent Detected",
+      "sentinel_id": "b12b3dab-d973-45af-b07e-e29bb34d8db9",
+      "output_file": "sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "725c9f3f0b60a19df0c74f09274a838cc3d170f6656b97ec6c04bcece51b520b"
+    },
+    {
+      "path": "queries/sentinel/cisco_duo_-_admin_password_reset.json",
+      "title": "Cisco Duo - Admin password reset",
+      "sentinel_id": "413e49a5-b107-4698-8428-46b89308bd22",
+      "output_file": "sentinel/cisco_duo_-_admin_password_reset.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "da42c8d26fc0da6ee098d5ba1feb7262b5ab295e3a8668afd204c96c8eff58fa"
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_connection_to_known_c2_server.json",
+      "title": "Cisco SE - Connection to known C2 server",
+      "sentinel_id": "0f788a93-dc88-4f80-89ef-bef7cd0fef05",
+      "output_file": "sentinel/cisco_se_-_connection_to_known_c2_server.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "3864f1499230bdef29a37eebe79dff30c52669e6762ebe821fe8595cae821814"
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_dropper_activity_on_host.json",
+      "title": "Cisco SE - Dropper activity on host",
+      "sentinel_id": "b6df3e11-de70-4779-ac9a-276c454a9025",
+      "output_file": "sentinel/cisco_se_-_dropper_activity_on_host.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "a7e4062c0207618ac3e1a78163dcb3adcd06c98e28709af2d625433b1a889ff5"
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_generic_ioc.json",
+      "title": "Cisco SE - Generic IOC",
+      "sentinel_id": "bccdbc39-31d3-4e2b-9df2-e4c9eecba825",
+      "output_file": "sentinel/cisco_se_-_generic_ioc.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "0aac0b312a8590b45630084f50d7cebb3d73fe1e12aa4923a216b4be7a4f94da"
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_malware_execusion_on_host.json",
+      "title": "Cisco SE - Malware execusion on host",
+      "sentinel_id": "aea4468e-6322-48b6-bd83-f9d300cce855",
+      "output_file": "sentinel/cisco_se_-_malware_execusion_on_host.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "a34d2e023c0b00d5c96dbfb7c1b9e94d68cd6b839869763bda29bda645022e2a"
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_possible_webshell.json",
+      "title": "Cisco SE - Possible webshell",
+      "sentinel_id": "d2c97cc9-1ccc-494d-bad4-564700451a2b",
+      "output_file": "sentinel/cisco_se_-_possible_webshell.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "84590462c01d252295f836ee1271364449df1c636bdeb86a0ca47910321afc89"
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_ransomware_activity.json",
+      "title": "Cisco SE - Ransomware Activity",
+      "sentinel_id": "c9629114-0f49-4b50-9f1b-345287b2eebf",
+      "output_file": "sentinel/cisco_se_-_ransomware_activity.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "d159b87714820a2ec868d626ebb51e1cc1b18876d2dffa5b369510db887410e9"
+    },
+    {
+      "path": "queries/sentinel/critical_risks.json",
+      "title": "Critical Risks",
+      "sentinel_id": "1eebfaf3-40e1-4bc2-9f42-049b7b8ceb60",
+      "output_file": "sentinel/critical_risks.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "4738ce9213217220940b21f7b78197dbed6a4c6bf6b2354518b850e376c78b94"
+    },
+    {
+      "path": "queries/sentinel/cve-2019-0808-c2.json",
+      "title": "cve-2019-0808-c2",
+      "sentinel_id": "0be1295f-b417-477b-95d1-82ce7c43fa03",
+      "output_file": "sentinel/cve-2019-0808-c2.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "da0afa021d9f319161a7502450250c275f4aaaccdf122fb15d4d7575ec442e92"
+    },
+    {
+      "path": "queries/sentinel/cve-2019-0808-nufsys-file_creation.json",
+      "title": "cve-2019-0808-nufsys-file creation",
+      "sentinel_id": "447cdff3-2bfc-4f7a-b718-048d6d0ebd87",
+      "output_file": "sentinel/cve-2019-0808-nufsys-file_creation.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "0c1bea2a66f2514e751f95afa30c2f003aec216df85c60223002feb132829573"
+    },
+    {
+      "path": "queries/sentinel/cve-2019-0808-set-scheduled-task.json",
+      "title": "cve-2019-0808-set-scheduled-task",
+      "sentinel_id": "80cb5ddb-baf2-4eb2-9751-8f77c072eb4d",
+      "output_file": "sentinel/cve-2019-0808-set-scheduled-task.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "a15d150a26a00a0087dcbc906f10e962160e179fb5a10b7772148274f40260a1"
+    },
+    {
+      "path": "queries/sentinel/cyberarkepm_-_possible_execution_of_powershell_empire.json",
+      "title": "CyberArkEPM - Possible execution of Powershell Empire",
+      "sentinel_id": "eddfd1fd-71df-4cc3-b050-287643bee398",
+      "output_file": "sentinel/cyberarkepm_-_possible_execution_of_powershell_empire.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "af34d2a4febe2a6d336ba294403f185d5054418a74cfc430f4a964a4518d6cca"
+    },
+    {
+      "path": "queries/sentinel/cyberarkepm_-_unexpected_executable_extension.json",
+      "title": "CyberArkEPM - Unexpected executable extension",
+      "sentinel_id": "911d5b75-a1ce-4f13-a839-9c2474768696",
+      "output_file": "sentinel/cyberarkepm_-_unexpected_executable_extension.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "33453cbab188b7092691ec095151db6feb8e30de276da08614461b24713f3f2c"
+    },
+    {
+      "path": "queries/sentinel/deimos-component-execution.json",
+      "title": "deimos-component-execution",
+      "sentinel_id": "0e86928c-cc9f-494c-a79e-04f647eb5ef8",
+      "output_file": "sentinel/deimos-component-execution.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "e77b774dbc934e7666c75a00930d42e460a0b1e37c8bc7f9bda605c6697c1718"
+    },
+    {
+      "path": "queries/sentinel/deimos_component_execution.json",
+      "title": "Deimos Component Execution",
+      "sentinel_id": "c25a8cd4-5b4a-45a8-9ba0-3b753a652f6b",
+      "output_file": "sentinel/deimos_component_execution.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "23c479a1fdceb55a7eb2c35484ab79465797ef6a4f4655a05561a39a7e57f4d1"
+    },
+    {
+      "path": "queries/sentinel/detect-malicious-rar-extraction.json",
+      "title": "detect-malicious-rar-extraction",
+      "sentinel_id": "dac6bcd8-35c9-4937-88e8-3b1c00dcebe2",
+      "output_file": "sentinel/detect-malicious-rar-extraction.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "efde093d1a9fc91f49d8259df71c4fe344e0b5cce054cc0ea303195a82b6efaa"
+    },
+    {
+      "path": "queries/sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
+      "title": "Detect Suspicious Commands Initiated by Webserver Processes",
+      "sentinel_id": "fa2f7d8a-6726-465a-aa72-6f6e3d4c99d7",
+      "output_file": "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "f0b16f76cc4070786182b0642ab79477ec5dcfe1047b2614f37a0f92df05548a"
+    },
+    {
+      "path": "queries/sentinel/dev-0530_file_extension_rename.json",
+      "title": "Dev-0530 File Extension Rename",
+      "sentinel_id": "d82eb796-d1eb-43c8-a813-325ce3417cef",
+      "output_file": "sentinel/dev-0530_file_extension_rename.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "b9f7a7273f1aa1662f81277cab0d0a0b87485a7d0a7c9b00aaea5ce84a753775"
+    },
+    {
+      "path": "queries/sentinel/discord_download_invoked_from_cmd_line.json",
+      "title": "Discord download invoked from cmd line",
+      "sentinel_id": "e7dd442a-0af8-48eb-8358-9e91f4911849",
+      "output_file": "sentinel/discord_download_invoked_from_cmd_line.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "c0f4611270242c579d7bc7eb28e5014dbac0e066d9d51a9e4218cb11bf2ee712"
+    },
+    {
+      "path": "queries/sentinel/doppelpaymer_stop_services.json",
+      "title": "Doppelpaymer Stop Services",
+      "sentinel_id": "5bdc1504-880c-4b30-a39c-7c746535928d",
+      "output_file": "sentinel/doppelpaymer_stop_services.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "39c6d508aaa9309ad660bbc8f886f7613b542586ef607eda34e2d8c333ec4063"
+    },
+    {
+      "path": "queries/sentinel/dopplepaymer_procdump.json",
+      "title": "DopplePaymer Procdump",
+      "sentinel_id": "1be34fb9-f81b-47ae-84fb-465e6686d76c",
+      "output_file": "sentinel/dopplepaymer_procdump.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "3e457665d7e9d130e5861ef5fd5544788519f2d0df62d8ac7f3e6a9715c7de26"
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_cve-2021-34527_printnightmare_external_exploit.json",
+      "title": "Google DNS - CVE-2021-34527 (PrintNightmare) external exploit",
+      "sentinel_id": "e632e73a-06c4-47f6-8bed-b2498aa6e30f",
+      "output_file": "sentinel/google_dns_-_cve-2021-34527_printnightmare_external_exploit.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "a95cf74fd8bd340da6d08d6d56721651a69359a72ed2235ac7a4b18a91634daf"
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_cve-2021-40444_exploitation.json",
+      "title": "Google DNS - CVE-2021-40444 exploitation",
+      "sentinel_id": "6758c671-e9ee-495d-b6b0-92ffd08a8c3b",
+      "output_file": "sentinel/google_dns_-_cve-2021-40444_exploitation.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "88a45c68aa84a72ee66954a99edddcafc73d7a36504e1799931f473cc46b1cca"
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_exchange_online_autodiscover_abuse.json",
+      "title": "Google DNS - Exchange online autodiscover abuse",
+      "sentinel_id": "424c2aca-5367-4247-917a-5d0f7035e40e",
+      "output_file": "sentinel/google_dns_-_exchange_online_autodiscover_abuse.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "8111fdea211cf19ccc0a17c9ffc8bbad27440449734eb31c5ca7995bcd47b9da"
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_malicous_python_packages.json",
+      "title": "Google DNS - Malicous Python packages",
+      "sentinel_id": "75491db8-eaf7-40bb-a46a-279872cc82f5",
+      "output_file": "sentinel/google_dns_-_malicous_python_packages.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "6aec1aa73423de0c2ab74c53f4398f8e844a1c67e070b42062a15083f8c939c0"
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_possible_data_exfiltration.json",
+      "title": "Google DNS - Possible data exfiltration",
+      "sentinel_id": "705bed63-668f-4508-9d2d-26faf4010700",
+      "output_file": "sentinel/google_dns_-_possible_data_exfiltration.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "aed047a4d51f367af5b1d9ea916a320805af56f333bb0b6766fc9ea23224e905"
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_unc2452_nobelium_apt_group_activity.json",
+      "title": "Google DNS - UNC2452 (Nobelium) APT Group activity",
+      "sentinel_id": "22a613ea-c338-4f91-bbd3-3be97b00ebf9",
+      "output_file": "sentinel/google_dns_-_unc2452_nobelium_apt_group_activity.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "733bc8a561bca524d0b9d6bb9bb98128133994deb3bf9b713bf422d6a53310ba"
+    },
+    {
+      "path": "queries/sentinel/gworkspace_-_admin_permissions_granted.json",
+      "title": "GWorkspace - Admin permissions granted",
+      "sentinel_id": "03f25156-6172-11ec-90d6-0242ac120003",
+      "output_file": "sentinel/gworkspace_-_admin_permissions_granted.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "489305484bdad7c733d2c86687b7b781289de611e140768ae8f67000fad16f0d"
+    },
+    {
+      "path": "queries/sentinel/gworkspace_-_alert_events.json",
+      "title": "GWorkspace - Alert events",
+      "sentinel_id": "e369d246-5da8-11ec-bf63-0242ac130002",
+      "output_file": "sentinel/gworkspace_-_alert_events.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "ba693f34519192dee9bd27d6de338fbceb1d82de758962f0b81df2287ae37911"
+    },
+    {
+      "path": "queries/sentinel/imperva_-_malicious_user_agent.json",
+      "title": "Imperva - Malicious user agent",
+      "sentinel_id": "905794a9-bc46-42b9-974d-5a2dd58110c5",
+      "output_file": "sentinel/imperva_-_malicious_user_agent.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "412a9b67a95ee1473a78df79f727abc216b9c77212590c76a1460e37e06aff45"
+    },
+    {
+      "path": "queries/sentinel/imperva_-_top_destinations_with_blocked_requests.json",
+      "title": "Imperva - Top destinations with blocked requests",
+      "sentinel_id": "e360c980-b515-4c27-921c-19d411bd059d",
+      "output_file": "sentinel/imperva_-_top_destinations_with_blocked_requests.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "63d2225d4d7fd0e20fbfdbef7e0cc4cd3ea648baaaab03f1f6826005f00cbdf8"
+    },
+    {
+      "path": "queries/sentinel/imperva_-_top_sources_with_blocked_requests.json",
+      "title": "Imperva - Top sources with blocked requests",
+      "sentinel_id": "ec5b9eb6-f43a-40fc-ae65-2af9ae1e77ae",
+      "output_file": "sentinel/imperva_-_top_sources_with_blocked_requests.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "a4bd00d2c5dce9e8a4a7f4d4d2990ad099e22c151cda0a97ae03a6576a0afb24"
+    },
+    {
+      "path": "queries/sentinel/insider-threat-detection-queries_12.json",
+      "title": "insider-threat-detection-queries (12)",
+      "sentinel_id": "e86221a2-7961-440a-a759-8c7a1fbe40b2",
+      "output_file": "sentinel/insider-threat-detection-queries_12.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "732557e7070243bff4c6f38007cc241952d8db10d5bf1fbe665d02022ce0bb55"
+    },
+    {
+      "path": "queries/sentinel/insider-threat-detection-queries_16.json",
+      "title": "insider-threat-detection-queries (16)",
+      "sentinel_id": "2d4f4889-ef25-4e3c-9ece-2275e55e8332",
+      "output_file": "sentinel/insider-threat-detection-queries_16.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "134d53ba5d22b4beca9925f9761798535303c2fb20380977ad6fc78bb5f168e0"
+    },
+    {
+      "path": "queries/sentinel/insider-threat-detection-queries_4.json",
+      "title": "insider-threat-detection-queries (4)",
+      "sentinel_id": "1b6d19d5-c1f9-43b0-8db6-1c44c3c965b3",
+      "output_file": "sentinel/insider-threat-detection-queries_4.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "fd1aa01b3e118510ecb8a2f4188490ccd06a2ae2e5b9a702c7a5a87da54a0b4b"
+    },
+    {
+      "path": "queries/sentinel/java_executing_cmd_to_run_powershell.json",
+      "title": "Java Executing cmd to run Powershell",
+      "sentinel_id": "2c81c0a0-9823-4a14-b21a-2b4acd3335d2",
+      "output_file": "sentinel/java_executing_cmd_to_run_powershell.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "25cda0b78f8b1e36b7ec8c0fa61a54d8985003c9f97ce7d4ce1bc59c0d9ec42c"
+    },
+    {
+      "path": "queries/sentinel/jse-launched-by-word.json",
+      "title": "jse-launched-by-word",
+      "sentinel_id": "da127884-b65b-4ccf-b178-320d9cac3e15",
+      "output_file": "sentinel/jse-launched-by-word.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "0b0f261b5d80076bd6200df2570ca7171571a7e478be72c53bc3691d7aceb568"
+    },
+    {
+      "path": "queries/sentinel/lemonduck-component-download-structure.json",
+      "title": "LemonDuck-component-download-structure",
+      "sentinel_id": "036bf8d8-954c-467a-8573-76f0fce614ff",
+      "output_file": "sentinel/lemonduck-component-download-structure.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "58358ddc995fa9ac55cc90f62caaceb2192695770839567ac70f9e6c495a5e3c"
+    },
+    {
+      "path": "queries/sentinel/lemonduck-component-names.json",
+      "title": "LemonDuck-component-names",
+      "sentinel_id": "bcb5f147-863a-4972-aec9-48f67cc24727",
+      "output_file": "sentinel/lemonduck-component-names.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "2981def4f9876f67a19763c2754954b87275cc026019fc9c7e85399bf9293d0d"
+    },
+    {
+      "path": "queries/sentinel/locate-dll-created-locally_nobelium.json",
+      "title": "locate-dll-created-locally[Nobelium]",
+      "sentinel_id": "644a6cea-7662-45db-89d0-a9136a9a5da6",
+      "output_file": "sentinel/locate-dll-created-locally_nobelium.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "6c33a05d134e7ca58d97d1fa6627f536bc827c67410cb5b3d587b214ed0f139f"
+    },
+    {
+      "path": "queries/sentinel/locate-dll-loaded-in-memory_nobelium.json",
+      "title": "locate-dll-loaded-in-memory[Nobelium]",
+      "sentinel_id": "bfea1fee-aa17-467d-b285-932d5a45ca53",
+      "output_file": "sentinel/locate-dll-loaded-in-memory_nobelium.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "6c33a05d134e7ca58d97d1fa6627f536bc827c67410cb5b3d587b214ed0f139f"
+    },
+    {
+      "path": "queries/sentinel/lsass_credential_dumping_with_procdump.json",
+      "title": "LSASS Credential Dumping with Procdump",
+      "sentinel_id": "c332b840-61e4-462e-a201-0e2d69bad45d",
+      "output_file": "sentinel/lsass_credential_dumping_with_procdump.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "1a0705e2be12a9d3eb2b66fdef10b763d7f7cc34c3a32f3a80bac4ab1a79f874"
+    },
+    {
+      "path": "queries/sentinel/mcafee_epo_-_deployment_failed.json",
+      "title": "McAfee ePO - Deployment failed",
+      "sentinel_id": "155243f4-d962-4717-8a7b-b15b6d112660",
+      "output_file": "sentinel/mcafee_epo_-_deployment_failed.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "697d9f2c30d12d2be305ad7c6e56868565ef8e797040dc0c27ffa0d1d8e02f38"
+    },
+    {
+      "path": "queries/sentinel/mcafee_epo_-_multiple_threats_on_same_host.json",
+      "title": "McAfee ePO - Multiple threats on same host",
+      "sentinel_id": "f53e5168-afdb-4fad-b29a-bb9cb71ec460",
+      "output_file": "sentinel/mcafee_epo_-_multiple_threats_on_same_host.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "29252d592c04d02f5a79d7089f5d6b7d60f9980b2a485b78a39b32761e6c8e9b"
+    },
+    {
+      "path": "queries/sentinel/mcafee_epo_-_threat_was_not_blocked.json",
+      "title": "McAfee ePO - Threat was not blocked",
+      "sentinel_id": "6d70a26a-c119-45b7-b4c6-44ac4fd1bcb7",
+      "output_file": "sentinel/mcafee_epo_-_threat_was_not_blocked.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "6995fd5d15114572d8a0e1a0c60a7bd61645d4fc62bee391d39a6642dd9b344f"
+    },
+    {
+      "path": "queries/sentinel/nginx_-_core_dump.json",
+      "title": "NGINX - Core Dump",
+      "sentinel_id": "9a7f5a97-354b-4eac-b407-a1cc7fc4b4ec",
+      "output_file": "sentinel/nginx_-_core_dump.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "473929413f0e34e51fa5ba7d18dbd9729c091f1e216dd2d5d0932f02c4968b0a"
+    },
+    {
+      "path": "queries/sentinel/nrt_base64_encoded_windows_process_command-lines.json",
+      "title": "NRT Base64 Encoded Windows Process Command-lines",
+      "sentinel_id": "c3e5dbaa-a540-408c-8b36-68bdfb3df088",
+      "output_file": "sentinel/nrt_base64_encoded_windows_process_command-lines.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "1dc874a824b31750af60aa63f541347e7dd464654d9850eb589fc0627eef65d6"
+    },
+    {
+      "path": "queries/sentinel/office-apps-launching-wscipt.json",
+      "title": "office-apps-launching-wscipt",
+      "sentinel_id": "1d438d7a-be4b-4bee-a116-fac9a2a621c7",
+      "output_file": "sentinel/office-apps-launching-wscipt.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "120ed17ecfc12ed9c6ad681a70e79d9d427aad35bf19c84afd75c040bf3bf452"
+    },
+    {
+      "path": "queries/sentinel/office_apps_launching_wscipt.json",
+      "title": "Office Apps Launching Wscipt",
+      "sentinel_id": "174de33b-107b-4cd8-a85d-b4025a35453f",
+      "output_file": "sentinel/office_apps_launching_wscipt.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "120ed17ecfc12ed9c6ad681a70e79d9d427aad35bf19c84afd75c040bf3bf452"
+    },
+    {
+      "path": "queries/sentinel/oracle_-_command_in_uri.json",
+      "title": "Oracle - Command in URI",
+      "sentinel_id": "6ae36a5e-573f-11ec-bf63-0242ac130002",
+      "output_file": "sentinel/oracle_-_command_in_uri.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "f899355b54e329510e9b425eaa6a836e637265787f75acfbeda2db7facb1fc40"
+    },
+    {
+      "path": "queries/sentinel/powercat-download.json",
+      "title": "powercat-download",
+      "sentinel_id": "12793a73-e49d-4b3d-bb87-e4d4a326d610",
+      "output_file": "sentinel/powercat-download.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "523d842547264e56900d21a53a119a249de6b0150bc85c9b906bcb12c0481ddf"
+    },
+    {
+      "path": "queries/sentinel/recon-with-rundll.json",
+      "title": "recon-with-rundll",
+      "sentinel_id": "c720f607-7f7b-41c8-bed9-2d9a240d965c",
+      "output_file": "sentinel/recon-with-rundll.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "d2dd645398968e6167165e67571ed99c81d600d5c9c285023f0efefefd45d78d"
+    },
+    {
+      "path": "queries/sentinel/teardrop_memory-only_dropper.json",
+      "title": "TEARDROP memory-only dropper",
+      "sentinel_id": "738702fd-0a66-42c7-8586-e30f0583f8fe",
+      "output_file": "sentinel/teardrop_memory-only_dropper.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "2584bae8854ff4017ec6c9f03499c9cae8a8503f80f2014b9f93d2b41eba500f"
+    },
+    {
+      "path": "queries/sentinel/vmware-lpe-2022-22960.json",
+      "title": "VMWare-LPE-2022-22960",
+      "sentinel_id": "1d468d49-ffea-4daf-ba6b-72525ec17b61",
+      "output_file": "sentinel/vmware-lpe-2022-22960.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "685546d62debeaeccb9c7ab17f6921dba51f49924a8567fbeee5deec43f71f94"
+    },
+    {
+      "path": "queries/sentinel/vulerabilities.json",
+      "title": "Vulerabilities",
+      "sentinel_id": "d096643d-6789-4c74-8893-dd3fc8a94069",
+      "output_file": "sentinel/vulerabilities.json",
+      "live_validation_status": "passed",
+      "parser_schema_hash": "2d16af2d9d15f3ed1639ea95290790baad1c1bdc079cac0eac56d5258d28c179",
+      "query_hash": "c5fe9c1a093b570d693ff2e1153eba8e7d8859492ac959cab18b8e0efd1171ad"
+    }
+  ],
+  "synthetic_hit_gaps": [
+    {
+      "path": "queries/sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
+      "title": "Apache - Apache 2.4.49 flaw CVE-2021-41773",
+      "sentinel_id": "767f9dc4-3b01-11ec-8d3d-0242ac130003",
+      "source_path": "Solutions/ApacheHTTPServer/Analytic Rules/ApacheCVE-2021-41773.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Load Balancer Access Logs",
+      "required_fields": [
+        "HTTP Request Method",
+        "HTTP Status Code",
+        "Request URL"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/apache_-_unexpected_post_requests.json",
+      "title": "Apache - Unexpected Post Requests",
+      "sentinel_id": "c21ea046-3ae7-11ec-8d3d-0242ac130003",
+      "source_path": "Solutions/ApacheHTTPServer/Hunting Queries/ApacheUnexpectedPostRequests.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Load Balancer Access Logs",
+      "required_fields": [
+        "HTTP Request Method",
+        "HTTP Status Code",
+        "Request URL"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/apexone_-_top_sources_with_alerts.json",
+      "title": "ApexOne - Top sources with alerts",
+      "sentinel_id": "8bb86556-67b4-11ec-90d6-0242ac120003",
+      "source_path": "Solutions/Trend Micro Apex One/Hunting Queries/TMApexOneTopSources.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Source IP"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
+      "title": "Cisco Cloud Security - Crypto Miner User-Agent Detected",
+      "sentinel_id": "b619d1f1-7f39-4c7e-bf9e-afbb46457997",
+      "source_path": "Solutions/CiscoUmbrella/Analytic Rules/CiscoUmbrellaCryptoMinerUserAgentDetected.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Destination IP",
+        "Event Type",
+        "Request URL",
+        "Source IP",
+        "User Agent"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
+      "title": "Cisco Cloud Security - Windows PowerShell User-Agent Detected",
+      "sentinel_id": "b12b3dab-d973-45af-b07e-e29bb34d8db9",
+      "source_path": "Solutions/CiscoUmbrella/Analytic Rules/CiscoUmbrellaPowershellUserAgentDetected.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Destination IP",
+        "Event Type",
+        "Request URL",
+        "Source IP",
+        "User Agent"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cisco_duo_-_admin_password_reset.json",
+      "title": "Cisco Duo - Admin password reset",
+      "sentinel_id": "413e49a5-b107-4698-8428-46b89308bd22",
+      "source_path": "Solutions/CiscoDuoSecurity/Analytic Rules/CiscoDuoAdminPasswordReset.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Application Logs",
+      "required_fields": [
+        "Action"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_connection_to_known_c2_server.json",
+      "title": "Cisco SE - Connection to known C2 server",
+      "sentinel_id": "0f788a93-dc88-4f80-89ef-bef7cd0fef05",
+      "source_path": "Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEC2Connection.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Description"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_dropper_activity_on_host.json",
+      "title": "Cisco SE - Dropper activity on host",
+      "sentinel_id": "b6df3e11-de70-4779-ac9a-276c454a9025",
+      "source_path": "Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEDropperActivity.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Description"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_generic_ioc.json",
+      "title": "Cisco SE - Generic IOC",
+      "sentinel_id": "bccdbc39-31d3-4e2b-9df2-e4c9eecba825",
+      "source_path": "Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEGenIoC.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Description"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_malware_execusion_on_host.json",
+      "title": "Cisco SE - Malware execusion on host",
+      "sentinel_id": "aea4468e-6322-48b6-bd83-f9d300cce855",
+      "source_path": "Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEMalwareExecution.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Description"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cisco_se_-_possible_webshell.json",
+      "title": "Cisco SE - Possible webshell",
+      "sentinel_id": "d2c97cc9-1ccc-494d-bad4-564700451a2b",
+      "source_path": "Solutions/Cisco Secure Endpoint/Analytic Rules/CiscoSEWebshell.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Description"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/critical_risks.json",
+      "title": "Critical Risks",
+      "sentinel_id": "1eebfaf3-40e1-4bc2-9f42-049b7b8ceb60",
+      "source_path": "Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Risks.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Event ID",
+        "Provider"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cve-2019-0808-c2.json",
+      "title": "cve-2019-0808-c2",
+      "sentinel_id": "0be1295f-b417-477b-95d1-82ce7c43fa03",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/Privilege escalation/cve-2019-0808-c2.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Sysmon Network Logs",
+      "required_fields": [
+        "Destination IP",
+        "Request URL"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cve-2019-0808-set-scheduled-task.json",
+      "title": "cve-2019-0808-set-scheduled-task",
+      "sentinel_id": "80cb5ddb-baf2-4eb2-9751-8f77c072eb4d",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/Privilege escalation/cve-2019-0808-set-scheduled-task.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Command Line",
+        "Process Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cyberarkepm_-_possible_execution_of_powershell_empire.json",
+      "title": "CyberArkEPM - Possible execution of Powershell Empire",
+      "sentinel_id": "eddfd1fd-71df-4cc3-b050-287643bee398",
+      "source_path": "Solutions/CyberArkEPM/Analytic Rules/CyberArkEPMPossibleExecutionOfPowershellEmpire.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Command Line",
+        "Event Type"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/cyberarkepm_-_unexpected_executable_extension.json",
+      "title": "CyberArkEPM - Unexpected executable extension",
+      "sentinel_id": "911d5b75-a1ce-4f13-a839-9c2474768696",
+      "source_path": "Solutions/CyberArkEPM/Analytic Rules/CyberArkEPMUnexpectedExecutableExtension.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Event Type",
+        "Parent Process Name",
+        "User Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/deimos-component-execution.json",
+      "title": "deimos-component-execution",
+      "sentinel_id": "0e86928c-cc9f-494c-a79e-04f647eb5ef8",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/Campaigns/Jupyter-Solarmaker/deimos-component-execution.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Action",
+        "Command Line",
+        "Parent Process Name",
+        "Properties"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/deimos_component_execution.json",
+      "title": "Deimos Component Execution",
+      "sentinel_id": "c25a8cd4-5b4a-45a8-9ba0-3b753a652f6b",
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/Campaign/Jupyter-Solarmaker/DeimosComponentExecution.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Action",
+        "Command Line",
+        "Host Name (Server)",
+        "Parent Process Name",
+        "Properties"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_cve-2021-34527_printnightmare_external_exploit.json",
+      "title": "Google DNS - CVE-2021-34527 (PrintNightmare) external exploit",
+      "sentinel_id": "e632e73a-06c4-47f6-8bed-b2498aa6e30f",
+      "source_path": "Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSPrintNightmare.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Query Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_cve-2021-40444_exploitation.json",
+      "title": "Google DNS - CVE-2021-40444 exploitation",
+      "sentinel_id": "6758c671-e9ee-495d-b6b0-92ffd08a8c3b",
+      "source_path": "Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSCVE-2021-40444.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Query Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_exchange_online_autodiscover_abuse.json",
+      "title": "Google DNS - Exchange online autodiscover abuse",
+      "sentinel_id": "424c2aca-5367-4247-917a-5d0f7035e40e",
+      "source_path": "Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSExchangeAutodiscoverAbuse.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Query Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_malicous_python_packages.json",
+      "title": "Google DNS - Malicous Python packages",
+      "sentinel_id": "75491db8-eaf7-40bb-a46a-279872cc82f5",
+      "source_path": "Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSMaliciousPythonPackages.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Query Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_possible_data_exfiltration.json",
+      "title": "Google DNS - Possible data exfiltration",
+      "sentinel_id": "705bed63-668f-4508-9d2d-26faf4010700",
+      "source_path": "Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSDataExfiltration.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Query Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/google_dns_-_unc2452_nobelium_apt_group_activity.json",
+      "title": "Google DNS - UNC2452 (Nobelium) APT Group activity",
+      "sentinel_id": "22a613ea-c338-4f91-bbd3-3be97b00ebf9",
+      "source_path": "Solutions/GoogleCloudPlatformDNS/Analytic Rules/GCPDNSUNC2452AptActivity.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Query Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/gworkspace_-_admin_permissions_granted.json",
+      "title": "GWorkspace - Admin permissions granted",
+      "sentinel_id": "03f25156-6172-11ec-90d6-0242ac120003",
+      "source_path": "Solutions/GoogleWorkspaceReports/Analytic Rules/GWorkspaceAdminPermissionsGranted.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Application Logs",
+      "required_fields": [
+        "Description"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/gworkspace_-_alert_events.json",
+      "title": "GWorkspace - Alert events",
+      "sentinel_id": "e369d246-5da8-11ec-bf63-0242ac130002",
+      "source_path": "Solutions/GoogleWorkspaceReports/Analytic Rules/GWorkspaceAlertEvents.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Application Logs",
+      "required_fields": [
+        "Event Type"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/imperva_-_malicious_user_agent.json",
+      "title": "Imperva - Malicious user agent",
+      "sentinel_id": "905794a9-bc46-42b9-974d-5a2dd58110c5",
+      "source_path": "Solutions/ImpervaCloudWAF/Analytic Rules/ImpervaMaliciousUA.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Source IP",
+        "User Agent"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/imperva_-_top_sources_with_blocked_requests.json",
+      "title": "Imperva - Top sources with blocked requests",
+      "sentinel_id": "ec5b9eb6-f43a-40fc-ae65-2af9ae1e77ae",
+      "source_path": "Solutions/ImpervaCloudWAF/Hunting Queries/ImpervaSourceBlocked.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Action",
+        "Source IP"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/insider-threat-detection-queries_12.json",
+      "title": "insider-threat-detection-queries (12)",
+      "sentinel_id": "e86221a2-7961-440a-a759-8c7a1fbe40b2",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/General queries/insider-threat-detection-queries (12).yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Action"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/insider-threat-detection-queries_16.json",
+      "title": "insider-threat-detection-queries (16)",
+      "sentinel_id": "2d4f4889-ef25-4e3c-9ece-2275e55e8332",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/General queries/insider-threat-detection-queries (16).yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Account Name",
+        "Process Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/insider-threat-detection-queries_4.json",
+      "title": "insider-threat-detection-queries (4)",
+      "sentinel_id": "1b6d19d5-c1f9-43b0-8db6-1c44c3c965b3",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/General queries/insider-threat-detection-queries (4).yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Action"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/jse-launched-by-word.json",
+      "title": "jse-launched-by-word",
+      "sentinel_id": "da127884-b65b-4ccf-b178-320d9cac3e15",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/Execution/jse-launched-by-word.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Command Line",
+        "Parent Process Name",
+        "Process Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/mcafee_epo_-_deployment_failed.json",
+      "title": "McAfee ePO - Deployment failed",
+      "sentinel_id": "155243f4-d962-4717-8a7b-b15b6d112660",
+      "source_path": "Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPODeploymentFailed.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Event ID"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/mcafee_epo_-_multiple_threats_on_same_host.json",
+      "title": "McAfee ePO - Multiple threats on same host",
+      "sentinel_id": "f53e5168-afdb-4fad-b29a-bb9cb71ec460",
+      "source_path": "Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOMultipleThreatsSameHost.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Source IP",
+        "Threat Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/mcafee_epo_-_threat_was_not_blocked.json",
+      "title": "McAfee ePO - Threat was not blocked",
+      "sentinel_id": "6d70a26a-c119-45b7-b4c6-44ac4fd1bcb7",
+      "source_path": "Solutions/McAfee ePolicy Orchestrator/Analytic Rules/McAfeeEPOThreatNotBlocked.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Action"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/nginx_-_core_dump.json",
+      "title": "NGINX - Core Dump",
+      "sentinel_id": "9a7f5a97-354b-4eac-b407-a1cc7fc4b4ec",
+      "source_path": "Solutions/NGINX HTTP Server/Analytic Rules/NGINXCoreDump.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Load Balancer Access Logs",
+      "required_fields": [
+        "Description",
+        "Event Type"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/office-apps-launching-wscipt.json",
+      "title": "office-apps-launching-wscipt",
+      "sentinel_id": "1d438d7a-be4b-4bee-a116-fac9a2a621c7",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/Execution/office-apps-launching-wscipt.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Command Line",
+        "Parent Process Name",
+        "Process Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/recon-with-rundll.json",
+      "title": "recon-with-rundll",
+      "sentinel_id": "c720f607-7f7b-41c8-bed9-2d9a240d965c",
+      "source_path": "Hunting Queries/Microsoft 365 Defender/Command and Control/recon-with-rundll.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Sysmon Network Logs",
+      "required_fields": [
+        "Command Line",
+        "Destination IP",
+        "Destination Port",
+        "Parent Process Name",
+        "Request URL"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/teardrop_memory-only_dropper.json",
+      "title": "TEARDROP memory-only dropper",
+      "sentinel_id": "738702fd-0a66-42c7-8586-e30f0583f8fe",
+      "source_path": "Solutions/Microsoft Defender XDR/Analytic Rules/SolarWinds_TEARDROP_Process-IOCs.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Windows Sysmon Logs",
+      "required_fields": [
+        "Action",
+        "Parent Process Name",
+        "Process Name"
+      ],
+      "gap_reasons": []
+    },
+    {
+      "path": "queries/sentinel/vulerabilities.json",
+      "title": "Vulerabilities",
+      "sentinel_id": "d096643d-6789-4c74-8893-dd3fc8a94069",
+      "source_path": "Solutions/RidgeSecurity/Analytic Rules/RidgeSecurity_Vulnerabilities.yaml",
+      "synthetic_plan_status": "synthetic_ready",
+      "selected_source": "SOC Network Firewall Logs",
+      "required_fields": [
+        "Event ID",
+        "Provider"
+      ],
+      "gap_reasons": []
+    }
+  ],
+  "drift": []
+}

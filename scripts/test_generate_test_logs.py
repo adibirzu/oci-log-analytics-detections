@@ -204,13 +204,13 @@ class TestGenerateTestLogs(unittest.TestCase):
         vcn_knock_ports = [
             event.get("Destination Port")
             for event in vcn_events
-            if event.get("Source IP") == "10.42.0.7"
+            if event.get("Source IP") == "198.51.100.7"
             and event.get("Destination IP") == "192.0.2.55"
         ]
         firewall_knock_ports = [
             event.get("Destination Port")
             for event in firewall_events
-            if event.get("Source IP") == "10.42.0.7"
+            if event.get("Source IP") == "198.51.100.7"
             and event.get("Destination IP") == "192.0.2.55"
         ]
 
@@ -290,7 +290,7 @@ class TestGenerateTestLogs(unittest.TestCase):
         self.assertTrue(any(event.get("payment.interception.detected") is True for event in attack_events))
         self.assertTrue(any(event.get("payment.redirect.detected") is True for event in attack_events))
         self.assertTrue(any(event.get("payment.redirect.url") for event in attack_events))
-        self.assertTrue(any(event.get("cloud.instance.id", "").startswith("ocid1.instance.") for event in attack_events))
+        self.assertTrue(any(event.get("cloud.instance.id", "").startswith("<DEMO_ATTACK_") for event in attack_events))
         self.assertTrue(any(event.get("osquery.query") for event in attack_events))
         self.assertTrue(any(event.get("oci.api_gateway.request_id") == "gw-req_octo_attack_001" for event in attack_events))
         self.assertTrue(any(event.get("oci.api_gateway.action") == "allow" for event in attack_events))

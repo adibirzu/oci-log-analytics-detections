@@ -60,10 +60,11 @@
     },
     {
       "expected_logan_ql": "'Log Source' = 'Windows Sysmon Events' and 'Event ID' = '1' and 'Process Name' like '*\\\\powershell.exe' and 'Command Line' like '* -enc *' | stats count as count by 'Host Name', 'User Name', 'Command Line' | sort -count | head 100",
-      "explanation": "SPL source constraints become the Logan base search; stats/sort are retained as pipe commands.",
+      "explanation": "SPL source constraints become the Logan base search; field predicates map to OCI display fields; stats/sort/head are retained as pipe commands.",
       "id": "spl-powershell-encoded",
       "pattern_ids": [
         "spl-filter-to-search-where",
+        "spl-transform-pipeline",
         "sort-limit-top"
       ],
       "source_language": "splunk_spl",
@@ -72,7 +73,7 @@
       "synthetic_log_shape": "Windows Sysmon Events with host, user, process, and command line fields.",
       "title": "Splunk SPL Encoded PowerShell",
       "warnings": [
-        "SPL conversion is heuristic unless a backend parser plugin is configured."
+        "SPL conversion covers common pipeline commands; macros, subsearches, rex/spath extraction, joins, and transactions require manual handling."
       ]
     },
     {
@@ -184,17 +185,20 @@
       ]
     },
     {
-      "expected_logan_ql": "'Log Source' = 'OCI VCN Flow Logs' | lookup threat_ips 'Source IP' | where threat is not null | stats count as count by 'Source IP', threat",
-      "explanation": "Lookups require a pre-created OCI lookup table; the frontend must surface that dependency.",
+      "expected_logan_ql": "'Log Source' = 'OCI VCN Flow Logs' and 'Source IP' is not null | lookup threat_ips 'Source IP' | where 'Threat Name' is not null | timestats span=5m count as hits by 'Source IP' | head 100",
+      "explanation": "Lookups require a pre-created OCI lookup table; simple null filters are retained; count-based SPL timechart maps to Logan timestats.",
       "id": "spl-threat-ip-lookup",
       "pattern_ids": [
-        "lookup-watchlist"
+        "spl-filter-to-search-where",
+        "spl-transform-pipeline",
+        "lookup-watchlist",
+        "sort-limit-top"
       ],
       "source_language": "splunk_spl",
-      "source_query": "index=network src_ip=* | lookup threat_ips ip as src_ip OUTPUT threat | where isnotnull(threat) | stats count by src_ip threat",
+      "source_query": "index=network src_ip=* | lookup threat_ips ip as src_ip OUTPUT threat | where isnotnull(threat) | timechart span=5m count as hits by src_ip",
       "support_level": "lossy",
       "synthetic_log_shape": "VCN flow logs with Source IP plus an OCI lookup table named threat_ips.",
-      "title": "Splunk Threat IP Lookup",
+      "title": "Splunk Threat IP Lookup Timechart",
       "warnings": [
         "lossy_lookup: requires OCI lookup table threat_ips"
       ]
@@ -262,6 +266,6 @@
       "warnings": []
     }
   ],
-  "generated_at": "2026-05-19T08:07:47Z",
+  "generated_at": "2026-06-12T15:26:27Z",
   "schema_version": "1.0.0"
 }

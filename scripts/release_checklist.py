@@ -81,7 +81,13 @@ def _run_step(name: str, command: list[str], timeout: int = 2400) -> dict:
         }
 
 
-def build_steps(include_live: bool, skip_tests: bool, lookback: str, query_timeout: int) -> list[tuple[str, list[str], int]]:
+def build_steps(
+    include_live: bool,
+    skip_tests: bool,
+    lookback: str,
+    query_timeout: int,
+    require_sentinel_synthetic_hits: bool = False,
+) -> list[tuple[str, list[str], int]]:
     python = sys.executable
     steps: list[tuple[str, list[str], int]] = [
         ("log source dry run", [python, str(SCRIPTS_DIR / "setup_log_sources.py"), "--dry-run"], 300),
@@ -107,6 +113,7 @@ def build_steps(include_live: bool, skip_tests: bool, lookback: str, query_timeo
         ("dashboard inventory export", [python, str(SCRIPTS_DIR / "deploy_dashboard.py"), "--export-inventory"], 300),
         ("octo apm workshop bundle validation", [python, str(SCRIPTS_DIR / "octo_apm_workshop.py"), "--validate-bundle"], 300),
         ("sentinel strict status", [python, str(SCRIPTS_DIR / "sentinel_conversion_workflow.py"), "status", "--json", "--strict"], 300),
+        ("sentinel drift check", [python, str(SCRIPTS_DIR / "sentinel_drift_check.py")], 300),
         ("dashboard dry run", [python, str(SCRIPTS_DIR / "deploy_dashboard.py"), "--dry-run", "--skip-live-validation"], 300),
         # Drift check runs AFTER all generators that produce its inputs
         # (catalog.json, dashboard_inventory.json). sentinel_conversion_report.json
@@ -116,6 +123,16 @@ def build_steps(include_live: bool, skip_tests: bool, lookback: str, query_timeo
         ("sensitive value scan", [python, str(SCRIPTS_DIR / "scan_sensitive_values.py")], 300),
         ("compileall scripts", [python, "-m", "compileall", "-q", "scripts"], 300),
     ]
+    if require_sentinel_synthetic_hits:
+        drift_index = next(index for index, step in enumerate(steps) if step[0] == "sentinel drift check")
+        steps.insert(
+            drift_index + 1,
+            (
+                "sentinel synthetic-hit drift check",
+                [python, str(SCRIPTS_DIR / "sentinel_drift_check.py"), "--require-synthetic-hits"],
+                300,
+            ),
+        )
     if not skip_tests:
         steps.append(("pytest", [python, "-m", "pytest", "-q"], 1200))
     if include_live:
@@ -172,6 +189,11 @@ def main() -> int:
     parser.add_argument("--skip-tests", action="store_true", help="Skip unittest discovery")
     parser.add_argument("--lookback", default="21d", help="Live verification lookback when --include-live is set")
     parser.add_argument("--query-timeout", type=int, default=60, help="Live query timeout when --include-live is set")
+    parser.add_argument(
+        "--require-sentinel-synthetic-hits",
+        action="store_true",
+        help="Require every promoted Sentinel artifact to have non-empty synthetic live-hit evidence.",
+    )
     parser.add_argument("--report", help="Optional release evidence JSON path")
     parser.add_argument("--handoff-summary", action="store_true", help="Write docs/health/latest-handoff.json after a passing run")
     parser.add_argument("--handoff-out", default=str(HEALTH_DIR / "latest-handoff.json"), help="Handoff summary path when --handoff-summary is set")
@@ -185,7 +207,13 @@ def main() -> int:
     print("=" * 70)
     print("OCI Log Analytics Detection Engine Release Checklist")
     print("=" * 70)
-    for name, command, timeout in build_steps(args.include_live, args.skip_tests, args.lookback, args.query_timeout):
+    for name, command, timeout in build_steps(
+        args.include_live,
+        args.skip_tests,
+        args.lookback,
+        args.query_timeout,
+        args.require_sentinel_synthetic_hits,
+    ):
         print(f"\n[{len(results) + 1}] {name}")
         result = _run_step(name, command, timeout=timeout)
         results.append(result)
@@ -199,6 +227,7 @@ def main() -> int:
         "version": "1.0",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "include_live": args.include_live,
+        "require_sentinel_synthetic_hits": args.require_sentinel_synthetic_hits,
         "overall_status": "PASS" if all(result["ok"] for result in results) else "FAIL",
         "steps": results,
         "advisories": {

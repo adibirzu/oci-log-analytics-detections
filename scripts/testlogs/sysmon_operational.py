@@ -557,7 +557,7 @@ def generate_sysmon_operational():
         "c2.attacker.top", "data.exfil.pw", "dns.tunnel.cc",
         "command.control.tk", "stealer.bad.bit",
         "a7f3c91d4e8b2a6c0f9d5e1b3a7c9d2.dnsexfil.example",
-        "9f8e7d6c5b4a39281726354433221100.dnsexfil.example",
+        "exfilchunk.dnsexfil.example",
     ]
     normal_domains = [
         "www.google.com", "login.microsoftonline.com", "api.github.com",

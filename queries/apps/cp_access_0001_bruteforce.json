@@ -1,0 +1,33 @@
+{
+  "title": "Control Plane: Auth Brute Force",
+  "description": "Repeated authentication failures or rate-limit rejections (401/429) against /api/auth/* from a single client IP \u2014 indicates credential stuffing or login brute force. Correlates with the SEC-6 perimeter rate limiter.",
+  "query": "('Log Source' = 'SOC Control Plane Access Logs' or 'Log Source' = 'Control Plane Access Logs') and ('URI Path' like '/api/auth/%') and ('Status Code' = 401 or 'Status Code' = 429) | stats count as attempts by 'Source IP' | where attempts > 10",
+  "sigma_id": "cp-access-0001-bruteforce",
+  "level": "high",
+  "tags": [
+    "attack.credential_access",
+    "attack.t1110",
+    "owasp.a07",
+    "control-plane.auth"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "credential_access"
+    ],
+    "techniques": [
+      "T1110"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "control-plane",
+    "candidates": [
+      "SOC Control Plane Access Logs",
+      "Control Plane Access Logs"
+    ]
+  },
+  "falsepositives": [
+    "A legitimate operator mistyping the token repeatedly",
+    "Automated health probes hitting auth endpoints"
+  ]
+}

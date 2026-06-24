@@ -24,6 +24,7 @@ GENERATED_QUERY_ARTIFACT_FILENAMES = {
     "sentinel_candidates.json",
     "sentinel_backlog_priority.json",
     "sentinel_conversion_report.json",
+    "sentinel_drift.json",
     "sentinel_feed_dependencies.json",
     "sentinel_synthetic_live_results.json",
     "sentinel_synthetic_plan.json",

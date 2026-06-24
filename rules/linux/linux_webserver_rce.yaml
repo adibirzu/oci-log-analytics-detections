@@ -15,9 +15,10 @@ logsource:
   service: auditd
 detection:
   sel_parent_web:
+    # 'ppid=python' already substring-matches 'ppid=python3', so the explicit
+    # python3 term is redundant — dropped to save a scan pass.
     message|contains:
     - 'ppid=python'
-    - 'ppid=python3'
     - 'ppid=node'
     - 'ppid=java'
     - 'ppid=php'

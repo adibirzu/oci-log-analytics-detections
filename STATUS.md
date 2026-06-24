@@ -10,12 +10,12 @@ Date: 2026-05-18
   - 545 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
 - Microsoft Sentinel converted queries: 590 live OCI parser-passing queries
-- Curated analytics: 169
+- Curated analytics: 193
   - 54 app telemetry analytics
-  - 115 hunting analytics
-- Total query artifacts/content items: 1312
-- Dashboards: 30
-- Saved searches: 506 active dashboard saved searches; 1312 total content items
+  - 139 hunting analytics
+- Total query artifacts/content items: 1336
+- Dashboards: 34
+- Saved searches: 530 active dashboard saved searches; 1336 total content items
 - Sentinel live validation: 590 / 607 locally clean conversions; 17 live failures remain in `queries/sentinel_conversion_report.json`
 - Sentinel synthetic live-hit check: **20 / 20 ready Logan QL queries HIT** in the `cap` profile with a 24-hour lookback after uploading Sentinel-shaped synthetic logs.
 - Latest full live dashboard deployment: **441 widgets across 29 dashboards** in the `cap` profile with a 21-day lookback — 0 render/query errors; live `parse_validate_all_queries` 681/681 PASS.

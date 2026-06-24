@@ -1,7 +1,7 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-06-24T13:41:48.900378+00:00",
+  "generated_at": "2026-06-24T20:40:34.078806+00:00",
   "stats": {
     "total_rules": 538,
     "total_sigma_rules": 522,
@@ -9095,8 +9095,8 @@
     }
   ],
   "dashboards": {
-    "total": 30,
-    "saved_searches": 506,
+    "total": 34,
+    "saved_searches": 530,
     "names": [
       "SOC Overview Dashboard",
       "SOC: OCI STIG Compliance Dashboard",
@@ -9123,6 +9123,10 @@
       "SOC: APT Detection Dashboard",
       "SOC: Browser Attack Detection Dashboard",
       "SOC: oci-coordinator Hunt Showcase Dashboard",
+      "SOC: Wazuh MITRE ATT&CK Dashboard",
+      "SOC: Wazuh Vulnerability Detection Dashboard",
+      "SOC: Wazuh Inventory & Compliance Dashboard",
+      "SOC: Wazuh FIM & Threat Hunting Dashboard",
       "SOC: Microsoft Sentinel Identity Converted Detections",
       "SOC: Microsoft Sentinel Endpoint Converted Detections",
       "SOC: Microsoft Sentinel Azure Cloud Converted Detections",

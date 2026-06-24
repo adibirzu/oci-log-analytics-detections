@@ -8,10 +8,11 @@ logsource:
   service: audit
 detection:
   sel1:
+    # '> /etc/passwd' already substring-matches '>> /etc/passwd' (likewise for
+    # shadow), so the '>>' variants are redundant. Dropping them halves the
+    # leading-wildcard scan passes for an identical match set.
     message|contains:
-    - '>> /etc/passwd'
     - '> /etc/passwd'
-    - '>> /etc/shadow'
     - '> /etc/shadow'
   sel2:
     message|contains:

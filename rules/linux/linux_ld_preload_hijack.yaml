@@ -8,9 +8,10 @@ logsource:
   service: audit
 detection:
   selection:
+    # 'ld.so.preload' already substring-matches '/etc/ld.so.preload', so the
+    # path-qualified variant is redundant — dropped to save a scan pass.
     message|contains:
     - LD_PRELOAD=
-    - /etc/ld.so.preload
     - ld.so.preload
   condition: selection
 level: high

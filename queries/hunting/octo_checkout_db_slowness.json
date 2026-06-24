@@ -1,7 +1,7 @@
 {
   "title": "Octo Checkout \u2014 DB Slowness Correlated With Chaos",
   "description": "Surfaces p95 DB latency spikes on the Octo checkout workflow and splits them by whether a chaos scenario was active. Used by the coordinator db-slow-remediation playbook.",
-  "query": "'Log Source' = 'SOC Application Logs' and 'Workflow ID' = 'checkout' | stats pct('DB Elapsed ms', 95) as p95, countif('HTTP Status Code' >= 500) as errors, countif('Chaos Injected' = 'true') as chaos_events by Service | sort -p95",
+  "query": "'Log Source' = 'SOC Application Logs' and 'Workflow ID' = 'checkout' | eval is5xx = if('HTTP Status Code' >= 500, 1, 0) | eval ischaos = if('Chaos Injected' = 'true', 1, 0) | stats avg('DB Elapsed ms') as avg_db_ms, sum(is5xx) as errors, sum(ischaos) as chaos_events by Service | sort -avg_db_ms",
   "type": "hunting",
   "category": "performance",
   "mitre_attack": {

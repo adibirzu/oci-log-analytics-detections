@@ -577,6 +577,108 @@
     "minimum_events": 25,
     "optional": true
   },
+  "wazuh_alerts.jsonl": {
+    "description": "SOC Wazuh Alerts (wazuh-alerts 4.x) must expose the rule engine, MITRE ATT&CK, agent identity, and Windows eventdata fields the socWazuhAlertsJsonParser maps. FIM/syscheck variants carry syscheck.* instead of data.win.*.",
+    "required_fields": [
+      "timestamp",
+      "agent",
+      "manager",
+      "rule",
+      "decoder",
+      "full_log"
+    ],
+    "required_nested_fields": [
+      "agent.id",
+      "agent.name",
+      "manager.name",
+      "rule.id",
+      "rule.level",
+      "rule.description",
+      "rule.groups",
+      "rule.mitre.id",
+      "rule.mitre.tactic",
+      "rule.mitre.technique"
+    ],
+    "field_patterns": {
+      "timestamp": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
+    "minimum_events": 400
+  },
+  "wazuh_vulnerabilities.jsonl": {
+    "description": "SOC Wazuh Vulnerabilities (Vulnerability Detector) must expose CVE, severity, CVSS base score, affected package, and agent identity the socWazuhVulnJsonParser maps.",
+    "required_fields": [
+      "timestamp",
+      "agent",
+      "vulnerability",
+      "full_log"
+    ],
+    "required_nested_fields": [
+      "agent.id",
+      "agent.name",
+      "agent.os.name",
+      "vulnerability.cve",
+      "vulnerability.severity",
+      "vulnerability.score.base",
+      "vulnerability.package.name",
+      "vulnerability.package.version",
+      "vulnerability.title",
+      "vulnerability.status",
+      "vulnerability.category"
+    ],
+    "field_patterns": {
+      "timestamp": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
+    "minimum_events": 50
+  },
+  "wazuh_inventory.jsonl": {
+    "description": "SOC Wazuh Inventory (Syscollector) must expose hardware (cores/CPU/RAM), OS, and package/hotfix fields the socWazuhInventoryJsonParser maps.",
+    "required_fields": [
+      "timestamp",
+      "agent",
+      "data",
+      "full_log"
+    ],
+    "required_nested_fields": [
+      "agent.id",
+      "agent.name",
+      "data.cpu.cores",
+      "data.cpu.name",
+      "data.ram.total_gb",
+      "data.os.name",
+      "data.os.version",
+      "data.program.name",
+      "data.program.version",
+      "data.hotfix"
+    ],
+    "field_patterns": {
+      "timestamp": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
+    "minimum_events": 40
+  },
+  "wazuh_sca.jsonl": {
+    "description": "SOC Wazuh SCA (Security Configuration Assessment) must expose policy, score, pass/fail counts, and per-check result/compliance fields the socWazuhScaJsonParser maps.",
+    "required_fields": [
+      "timestamp",
+      "agent",
+      "data",
+      "full_log"
+    ],
+    "required_nested_fields": [
+      "agent.id",
+      "agent.name",
+      "data.sca.policy",
+      "data.sca.score",
+      "data.sca.passed",
+      "data.sca.failed",
+      "data.sca.check.title",
+      "data.sca.check.result",
+      "data.sca.check.compliance"
+    ],
+    "field_patterns": {
+      "timestamp": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
+    "minimum_events": 40
+  },
   "genai_gateway.jsonl": {
     "description": "SOC GenAI Gateway logs expose LLM/AI-gateway telemetry used by the MITRE ATLAS detections (prompt/completion, guardrail decision, model provenance, ATLAS technique tagging).",
     "required_fields": [

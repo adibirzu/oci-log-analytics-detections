@@ -3561,7 +3561,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*LD_PRELOAD=*' or msg like '*/etc/ld.so.preload*' or msg like '*ld.so.preload*')))",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*LD_PRELOAD=*' or msg like '*ld.so.preload*')))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -3648,7 +3648,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*>> /etc/passwd*' or msg like '*> /etc/passwd*' or msg like '*>> /etc/shadow*' or msg like '*> /etc/shadow*')) or ((msg like '*tee /etc/passwd*' or msg like '*tee -a /etc/passwd*' or msg like '*sed -i.*/etc/passwd*' or msg like '*sed -i.*/etc/shadow*')))",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*> /etc/passwd*' or msg like '*> /etc/shadow*')) or ((msg like '*tee /etc/passwd*' or msg like '*tee -a /etc/passwd*' or msg like '*sed -i.*/etc/passwd*' or msg like '*sed -i.*/etc/shadow*')))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],
@@ -11273,7 +11273,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ppid=python*' or msg like '*ppid=python3*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*ppid=ruby*' or msg like '*ppid=uvicorn*' or msg like '*ppid=gunicorn*' or msg like '*ppid=nginx*' or msg like '*ppid=httpd*')) and ((msg like '*exe=\"/bin/bash\"*' or msg like '*exe=\"/bin/sh\"*' or msg like '*exe=\"/bin/dash\"*' or msg like '*exe=\"/usr/bin/bash\"*' or msg like '*exe=\"/usr/bin/sh\"*')) and ((msg like '*;*' or msg like '*|*' or msg like '*&&*' or msg like '*`*' or msg like '*$(*' or msg like '*whoami*' or msg like '*/etc/passwd*' or msg like '*/etc/shadow*')))",
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*ppid=ruby*' or msg like '*ppid=uvicorn*' or msg like '*ppid=gunicorn*' or msg like '*ppid=nginx*' or msg like '*ppid=httpd*')) and ((msg like '*exe=\"/bin/bash\"*' or msg like '*exe=\"/bin/sh\"*' or msg like '*exe=\"/bin/dash\"*' or msg like '*exe=\"/usr/bin/bash\"*' or msg like '*exe=\"/usr/bin/sh\"*')) and ((msg like '*;*' or msg like '*|*' or msg like '*&&*' or msg like '*`*' or msg like '*$(*' or msg like '*whoami*' or msg like '*/etc/passwd*' or msg like '*/etc/shadow*')))",
       "reasons": [
         "query does not expose an explicit aggregate metric alias"
       ],

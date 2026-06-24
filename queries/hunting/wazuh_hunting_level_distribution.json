@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Alert Level Distribution",
+  "description": "Distribution of all Wazuh alerts by rule level (severity).",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' | stats count as Count by 'Wazuh Rule Level' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "bar",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

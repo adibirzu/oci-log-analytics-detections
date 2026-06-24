@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Medium Vulnerabilities (KPI)",
+  "description": "Count of Medium-severity CVEs detected by Wazuh.",
+  "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' and 'Vulnerability Severity' = 'Medium' | stats count as Medium",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "tile",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "dataField": "Medium"
+    }
+  }
+}

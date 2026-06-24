@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: CVSS Score Distribution",
+  "description": "Distribution of detected CVEs by CVSS base score.",
+  "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' | stats count as Count by 'CVSS Score' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "bar",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Alerts Evolution Over Time",
+  "description": "Wazuh MITRE alert volume bucketed by tactic for the trend view.",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Tactic' != null | stats count as Count by 'MITRE Tactic' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "line",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

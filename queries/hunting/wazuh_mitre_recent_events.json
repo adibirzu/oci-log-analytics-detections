@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Recent MITRE Events",
+  "description": "Most recent MITRE-mapped Wazuh alerts with technique, tactic, level and rule.",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Events by 'Host Name', 'MITRE Technique ID', 'MITRE Tactic', 'Wazuh Rule ID', 'Rule Description' | sort -Events",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Events"
+    }
+  }
+}

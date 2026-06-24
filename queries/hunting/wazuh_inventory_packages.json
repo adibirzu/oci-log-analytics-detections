@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Installed Packages",
+  "description": "Installed software inventory across GOAD agents.",
+  "query": "'Log Source' = 'SOC Wazuh Inventory' and 'Package Name' != null | stats count as Count by 'Package Name' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

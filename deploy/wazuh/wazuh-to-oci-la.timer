@@ -1,0 +1,16 @@
+# systemd timer: run the forwarder every 15 minutes (overlaps the 20m lookback).
+# Install to /etc/systemd/system/wazuh-to-oci-la.timer then:
+#   systemctl daemon-reload && systemctl enable --now wazuh-to-oci-la.timer
+[Unit]
+Description=Run wazuh-to-oci-la every 15 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+# Spread load if multiple hosts run this; deterministic per-host.
+RandomizedDelaySec=60
+Persistent=true
+Unit=wazuh-to-oci-la.service
+
+[Install]
+WantedBy=timers.target

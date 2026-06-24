@@ -8,7 +8,7 @@ Date: 2026-05-18
 
 - The app is a Next.js App Router project under `webapp/`.
 - The only browser product surface is `/forge`; root HTML requests redirect there.
-- Allowed API routes are `/api/forge/session`, `/api/forge/convert`, and `/api/health`.
+- Allowed API routes are `/api/forge/session`, `/api/forge/convert`, `/api/forge/artifacts`, and `/api/health`.
 - Local development reads artifacts from the repository root by default.
 - Container deployments stage a minimal read-only artifact bundle with `webapp/deploy/oke/stage-detections-runtime.sh`.
 
@@ -17,6 +17,7 @@ Date: 2026-05-18
 - `queries/logan_ql_reference_catalog.json`
 - `queries/cross_ql_mapping_patterns.json`
 - `queries/conversion_examples.json`
+- `queries/ql_conversion_capability_matrix.json`
 - `queries/catalog.json`
 - `queries/dashboard_inventory.json`
 - `test_data/manifest.json`

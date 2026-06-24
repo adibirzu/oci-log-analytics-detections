@@ -244,6 +244,10 @@ APP_FIELD_MAPPINGS = [
     ("Downstream Component", "$.payment.processor.name", 221),
     ("Downstream Component", "$.java_apm_service_name", 222),
     ("Downstream Component", "$.payment_processor_name", 223),
+    ("Action",              "$.action", 224),
+    ("Description",         "$.description", 225),
+    ("Event Type",          "$.event.type", 226),
+    ("Event Type",          "$.eventType", 227),
 ]
 OCTO_APM_FIELD_DISPLAY_NAMES = (
     "Service",
@@ -562,6 +566,10 @@ APP_EXAMPLE = {
     "oci.api_gateway.rate_limit.limit": 120,
     "oci.api_gateway.rate_limit.remaining": 87,
     "oci.api_gateway.threat_signal": "attack_lab_probe",
+    "action": "ALLOW",
+    "description": "Application security event",
+    "event": {"type": "application_event"},
+    "eventType": "application_event",
     "message": "Browser telemetry recorded suspicious request",
 }
 

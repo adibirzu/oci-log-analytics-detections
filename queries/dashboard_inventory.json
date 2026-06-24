@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-09T21:02:05.999629+00:00",
+  "generated_at": "2026-06-24T09:55:59.652889+00:00",
   "source": "scripts/deploy_dashboard.py:DASHBOARDS",
   "summary": {
     "total_dashboards": 29,
@@ -39,7 +39,7 @@
           "query_title": "Cloud: Critical OCI Audit Events (l21d)",
           "description": "Tile count of destructive or high-risk OCI control-plane actions (delete/terminate/remove) across the audit log. Headline KPI for the Cloud/Identity attack story on the SOC command center.",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "demo_command_center",
@@ -114,7 +114,7 @@
           "query_title": "Coordinator Scenarios: Total Hits (l7d)",
           "description": "Total number of events matching any of the 15 oci-coordinator hunting scenarios over the last 7 days. Combines Linux audit/syslog, OCI Audit, APM application, and web/WAF sources.",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "coordinator_showcase",
@@ -339,7 +339,7 @@
           "query_title": "Attack Activity Timeline by Log Source (l21d)",
           "description": "Cross-domain attack-volume timeline over the 21-day demo window, bucketed hourly and split by Log Source so analysts can see when each attack story (cloud audit, Linux, Windows, WAF, network) lit up and drill into the spike.",
           "level": "informational",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "demo_command_center",
@@ -478,7 +478,7 @@
           "query_title": "Top Attacker Source IPs - OCI Audit (l21d)",
           "description": "Ranks external source IPs by destructive/anomalous OCI control-plane activity, with the count of distinct event types each IP touched. Click a row to pivot into Log Explorer scoped to that Source IP for the full identity-attack drilldown.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "demo_command_center",
@@ -545,7 +545,7 @@
           "query_title": "Geographic Health: Regional Status on Global Map",
           "description": "Displays multicloud instance health status by region with geographic coordinates for global map visualization. Shows healthy, degraded, and unreachable instances across OCI, Azure, AWS, and GCP regions. Use with the Map visualization type in OCI Log Analytics.",
           "level": "informational",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "operations.health",
@@ -1080,7 +1080,7 @@
           "query_title": "OWASP Multi-Stage Web Attack Chain (Combined Methods)",
           "description": "Correlates web attack indicators across WAF, Load Balancer, and application logs to identify multi-stage attack chains. An IP that triggers WAF blocks, generates auth failures, and accesses sensitive endpoints is likely executing a coordinated attack campaign. Uses combined methods (Threat Hunter's Cookbook: Combined Methods - multi-stage grouping).",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -1156,7 +1156,7 @@
           "query_title": "WAF Multi-Attack Vector Scoring (Combined Methods)",
           "description": "Calculates a threat score per source IP based on the diversity of attack types (SQL injection, XSS, path traversal, command injection, SSRF). An IP triggering multiple different CRS rule categories indicates a sophisticated attacker using multiple techniques. Uses combined scoring (Threat Hunter's Cookbook: Combined Methods).",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -12286,7 +12286,7 @@
           "query_title": "SSH Brute Force Detection (Frequency Analysis)",
           "description": "Identifies SSH brute force attacks by counting failed login attempts per source IP. Uses frequency analysis (Threat Hunter's Cookbook: Sorting/Stacking method) to surface IPs with more than 5 failed attempts, indicating automated credential guessing.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -12345,7 +12345,7 @@
           "query_title": "OCI Console Login Brute Force (Frequency Analysis)",
           "description": "Detects brute force or credential stuffing against OCI Console by counting failed login attempts per user. Uses frequency analysis (Threat Hunter's Cookbook: Sorting/Stacking method) to identify accounts with more than 3 failed attempts in the time window.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -12412,7 +12412,7 @@
           "query_title": "Windows Rare Process Detection (Stacking)",
           "description": "Identifies rarely-seen processes on Windows endpoints. Uses the rare value hunting technique (Threat Hunter's Cookbook: Sorting/Stacking method) to surface processes that appear fewer than 80 times across the active search window, which keeps the demo resilient for a 14-day dataset and repeated reingestion while still highlighting uncommon attacker tooling.",
           "level": "medium",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.execution",
@@ -12471,7 +12471,7 @@
           "query_title": "Linux Rare Process Detection (Stacking)",
           "description": "Identifies rarely-seen processes on Linux endpoints. Uses the rare value hunting technique (Threat Hunter's Cookbook: Sorting/Stacking method) to surface processes that appear fewer than 100 times across the active search window, which keeps the demo resilient for a 14-day dataset and repeated reingestion while still surfacing uncommon tooling.",
           "level": "medium",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.execution",
@@ -12530,7 +12530,7 @@
           "query_title": "Windows Suspiciously Long Command Line (Field Analysis)",
           "description": "Flags processes with unusually long command lines (>500 chars). Attackers frequently use long command lines for encoded payloads, obfuscated scripts, and base64-encoded commands. Uses eval-based field creation (Threat Hunter's Cookbook: Searching/Filtering method with field creation).",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.execution",
@@ -12601,7 +12601,7 @@
           "query_title": "OCI IAM Rapid Configuration Changes (Anomaly Detection)",
           "description": "Detects users making a high volume of IAM changes in a short time window. A burst of identity changes (policy updates, user creation, group modifications) from a single principal may indicate account compromise or insider threat. Uses frequency analysis with threshold (Threat Hunter's Cookbook: Forecasting/Anomaly Detection method).",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.persistence",
@@ -12673,7 +12673,7 @@
           "query_title": "Windows Lateral Movement Tool Cluster (Grouping)",
           "description": "Groups lateral movement tool usage by host to identify systems being used as pivot points. When multiple lateral movement tools (PsExec, RDP, WinRM, remote shares) appear on the same host, it strongly suggests active lateral movement. Uses grouping/clustering (Threat Hunter's Cookbook: Grouping method).",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.lateral_movement",
@@ -12742,7 +12742,7 @@
           "query_title": "Linux Multi-Stage Attack Indicators (Combined Methods)",
           "description": "Detects hosts exhibiting multiple attack stage indicators: initial access (SSH failures), persistence (authorized_keys, crontab), execution (reverse shells, downloads). When 3+ different indicator types appear on the same host, it suggests an active multi-stage attack. Uses combined methods (Threat Hunter's Cookbook: Combined Methods - multi-stage grouping).",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -12805,7 +12805,7 @@
           "query_title": "OCI Resource Destruction Spike (Anomaly Detection)",
           "description": "Identifies principals performing an abnormally high number of destructive operations (delete, terminate). A spike in resource destruction from a single user may indicate a compromised account performing sabotage, ransomware-style destruction, or an insider threat. Uses threshold-based anomaly detection (Threat Hunter's Cookbook: Forecasting/Anomaly Detection method).",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.impact",
@@ -12875,7 +12875,7 @@
           "query_title": "Windows Credential Access Tool Cluster (Grouping)",
           "description": "Groups credential access tool indicators by host and user to identify active credential harvesting campaigns. When multiple credential dumping techniques (Mimikatz, LSASS access, Kerberoasting, NTDS.dit) appear on the same host, it indicates systematic credential theft. Uses grouping (Threat Hunter's Cookbook: Grouping method).",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.credential_access",
@@ -12939,7 +12939,7 @@
           "query_title": "OCI Multiple Users from Same IP (Grouping)",
           "description": "Detects a single IP address being used to authenticate as multiple different OCI users. This pattern may indicate credential stuffing, shared compromised infrastructure, or an attacker testing multiple stolen credentials from the same origin. Uses distinct count grouping (Threat Hunter's Cookbook: Grouping method).",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -13009,7 +13009,7 @@
           "query_title": "Linux Persistence Indicator Score (Combined Methods)",
           "description": "Calculates a persistence risk score per host by counting distinct persistence mechanism indicators (crontab, systemd, authorized_keys, shell profiles, at-jobs, sudoers). A host with multiple persistence vectors indicates thorough attacker entrenchment. Uses combined scoring (Threat Hunter's Cookbook: Combined Methods - risk scoring).",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.persistence",
@@ -13075,7 +13075,7 @@
           "query_title": "Windows Process from Unusual Path (Rare Value Analysis)",
           "description": "Identifies processes executing from non-standard paths commonly used by attackers (Temp, Public, AppData, Downloads). Legitimate software typically runs from Program Files or System32. Uses rare path analysis (Threat Hunter's Cookbook: Sorting/Stacking + Field Analysis).",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.execution",
@@ -13141,7 +13141,7 @@
           "query_title": "OCI After-Hours IAM Activity (Time-Based Anomaly)",
           "description": "Detects IAM configuration changes made outside normal business hours (before 06:00 or after 22:00 UTC). Identity changes at unusual hours may indicate a compromised account being used when legitimate users are not monitoring. Uses time-based anomaly detection (Threat Hunter's Cookbook: Forecasting/Anomaly Detection - temporal patterns).",
           "level": "medium",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.persistence",
@@ -13206,7 +13206,7 @@
           "query_title": "Windows Defense Evasion Score (Combined Methods)",
           "description": "Calculates a defense evasion risk score per host by counting distinct evasion indicators: event log clearing, AMSI bypass, firewall modification, UAC bypass, process hollowing. Hosts exhibiting multiple evasion techniques indicate sophisticated attackers actively disabling security controls. Uses combined scoring (Threat Hunter's Cookbook: Combined Methods - risk scoring).",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.defense_evasion",
@@ -19575,7 +19575,7 @@
           "query_title": "WAF Attack Frequency by Source IP (Frequency Analysis)",
           "description": "Identifies source IPs generating the most WAF block events. Uses frequency analysis (Threat Hunter's Cookbook: Sorting/Stacking) to surface prolific attackers targeting the web application. IPs with high block counts indicate automated attack tools.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -19643,7 +19643,7 @@
           "query_title": "SQL Injection Pattern Stacking (Rare Value Detection)",
           "description": "Stacks unique SQL injection payloads observed in WAF events to identify attack tool signatures and novel injection techniques. Rare payloads may indicate custom exploits or new attack vectors. Uses rare value stacking (Threat Hunter's Cookbook: Sorting/Stacking).",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -19711,7 +19711,7 @@
           "query_title": "Web Application Brute Force Detection (Frequency Analysis)",
           "description": "Identifies IPs performing brute force attacks against web login endpoints by counting 401/403 responses. Uses frequency analysis (Threat Hunter's Cookbook: Sorting/Stacking) to surface credential stuffing and brute force campaigns.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.credential_access",
@@ -19781,7 +19781,7 @@
           "query_title": "Web Directory Scanning IP Clustering (Anomaly Detection)",
           "description": "Clusters IPs performing directory enumeration by counting distinct 404-generating paths. A high number of unique 404 paths from a single IP indicates systematic directory/file scanning using tools like dirb, gobuster, or ffuf.",
           "level": "medium",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.reconnaissance",
@@ -19854,7 +19854,7 @@
           "query_title": "WAF Multi-Attack Vector Scoring (Combined Methods)",
           "description": "Calculates a threat score per source IP based on the diversity of attack types (SQL injection, XSS, path traversal, command injection, SSRF). An IP triggering multiple different CRS rule categories indicates a sophisticated attacker using multiple techniques. Uses combined scoring (Threat Hunter's Cookbook: Combined Methods).",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -19935,7 +19935,7 @@
           "query_title": "Web Attack Geographic Anomaly (Rare Country Detection)",
           "description": "Identifies attack traffic originating from unusual countries by stacking WAF events by country code. Rare countries with high attack volumes may indicate targeted campaigns from specific threat actor regions.",
           "level": "medium",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -20003,7 +20003,7 @@
           "query_title": "OWASP Multi-Stage Web Attack Chain (Combined Methods)",
           "description": "Correlates web attack indicators across WAF, Load Balancer, and application logs to identify multi-stage attack chains. An IP that triggers WAF blocks, generates auth failures, and accesses sensitive endpoints is likely executing a coordinated attack campaign. Uses combined methods (Threat Hunter's Cookbook: Combined Methods - multi-stage grouping).",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.initial_access",
@@ -20079,7 +20079,7 @@
           "query_title": "Web Scanner Tool Identification (User Agent Stacking)",
           "description": "Stacks user agents across all web traffic to identify automated scanning tools, attack frameworks, and bot traffic. Non-browser user agents generating high request volumes from a small set of source IPs indicate active reconnaissance or automated exploitation.",
           "level": "medium",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "attack.reconnaissance",
@@ -24259,7 +24259,7 @@
           "query_title": "Geographic Health: Regional Status on Global Map",
           "description": "Displays multicloud instance health status by region with geographic coordinates for global map visualization. Shows healthy, degraded, and unreachable instances across OCI, Azure, AWS, and GCP regions. Use with the Map visualization type in OCI Log Analytics.",
           "level": "informational",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "operations.health",
@@ -24332,7 +24332,7 @@
           "query_title": "Geographic Health: Cloud Provider Summary",
           "description": "Summarizes instance health by cloud provider (OCI, Azure, AWS, GCP) showing total instances, healthy/degraded/unreachable counts, and provider-level fleet distribution.",
           "level": "informational",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "operations.health",
@@ -24400,7 +24400,7 @@
           "query_title": "Geographic Health: Instance Detail with Coordinates",
           "description": "Shows individual instance health status with geographic coordinates, cloud provider, region, role, and key metrics. Each row represents the latest heartbeat from an instance \u2014 suitable for map pin placement.",
           "level": "informational",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "operations.health",
@@ -24465,7 +24465,7 @@
           "query_title": "Geographic Health: Unhealthy Regions Alert",
           "description": "Identifies regions with degraded or unreachable instances across all cloud providers. Highlights regions needing immediate attention for operational response.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "operations.health",
@@ -24534,7 +24534,7 @@
           "query_title": "Geographic Health: Service Tier Status",
           "description": "Shows health status grouped by service tier (frontend, application, database, cache, compute, orchestration, observability) across all cloud providers and regions.",
           "level": "informational",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "operations.health",
@@ -27559,7 +27559,7 @@
           "query_title": "Coordinator Scenarios: Total Hits (l7d)",
           "description": "Total number of events matching any of the 15 oci-coordinator hunting scenarios over the last 7 days. Combines Linux audit/syslog, OCI Audit, APM application, and web/WAF sources.",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "coordinator_showcase",
@@ -27605,7 +27605,7 @@
           "query_title": "Coordinator Scenarios: Affected Hosts (l7d)",
           "description": "Distinct host count across all 15 oci-coordinator hunt scenarios. Surfaces blast radius \u2014 how many unique hosts triggered at least one critical-severity scenario over the last 7 days.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "coordinator_showcase",
@@ -27657,7 +27657,7 @@
           "query_title": "Coordinator Scenarios: Critical Alerts (l7d)",
           "description": "Tile count of CAT I / critical hunt scenarios observed. All 15 scenarios in the oci-coordinator showcase carry critical severity, so this equals the total scenario hits.",
           "level": "critical",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "coordinator_showcase",
@@ -27703,7 +27703,7 @@
           "query_title": "Coordinator Scenarios: Distinct Processes Observed (l7d)",
           "description": "Distinct count of process names observed across the 15 oci-coordinator hunting scenarios. Higher cardinality signals broader attacker toolchain breadth across the kill-chain.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "coordinator_showcase",
@@ -27755,7 +27755,7 @@
           "query_title": "Coordinator Scenarios: Log Source \u2192 Process (l7d)",
           "description": "Sunburst rollup of scenario hits grouped by Log Source then Process Name. Compact attacker-toolchain view without eval/case (parser-native fields only) \u2014 useful for spotting which process families drive each log-source's noise.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "coordinator_showcase",
@@ -27807,7 +27807,7 @@
           "query_title": "Coordinator Scenarios: Log Source Breakdown (l7d)",
           "description": "Bar chart of scenario hits grouped by Log Source. Identifies which telemetry stream (Linux audit, APM, Web, OCI Audit) is generating the most threat-hunt noise so analysts pivot to the right log first.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "coordinator_showcase",
@@ -27856,7 +27856,7 @@
           "query_title": "Coordinator Scenarios: Attack Timeline (l7d)",
           "description": "Histogram of scenario hits per hour across the last 7 days. Spot bursts of activity and pivot timing between scenarios.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "coordinator_showcase",
@@ -27903,7 +27903,7 @@
           "query_title": "Coordinator Scenarios: Top Affected Hosts (l7d)",
           "description": "Horizontal bar chart of hosts ranked by number of scenario hits across the 15 oci-coordinator hunts. Spot stations under sustained attack or pivot points.",
           "level": "high",
-          "type": "curated",
+          "type": "hunting",
           "sigma_id": "",
           "tags": [
             "coordinator_showcase",

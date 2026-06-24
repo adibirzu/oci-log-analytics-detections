@@ -27,11 +27,11 @@ PROJECT_DIR = Path(__file__).resolve().parent.parent.parent
 OUTPUT_DIR = PROJECT_DIR / 'test_data'
 QUERIES_DIR = PROJECT_DIR / 'queries'
 OCI_USERS = [
-    ("ocid1.user.oc1..aaa1", "admin@corp.example.com", "natv"),
-    ("ocid1.user.oc1..aaa2", "sre-lead@corp.example.com", "natv"),
-    ("ocid1.user.oc1..aaa3", "dev-ops@corp.example.com", "federation"),
-    ("ocid1.user.oc1..aaa4", "rogue-admin@corp.example.com", "natv"),
-    ("ocid1.user.oc1..aaa5", "compromised-svc@corp.example.com", "natv"),
+    ("<DEMO_USER_ADMIN_OCID>", "admin@corp.example.com", "natv"),
+    ("<DEMO_USER_SRE_LEAD_OCID>", "sre-lead@corp.example.com", "natv"),
+    ("<DEMO_USER_DEVOPS_OCID>", "dev-ops@corp.example.com", "federation"),
+    ("<DEMO_USER_ROGUE_ADMIN_OCID>", "rogue-admin@corp.example.com", "natv"),
+    ("<DEMO_USER_COMPROMISED_SERVICE_OCID>", "compromised-svc@corp.example.com", "natv"),
 ]
 SUSPICIOUS_IPS = ["45.33.32.156", "185.220.101.1", "91.92.109.18", "194.5.249.7"]
 CORPORATE_IPS = ["10.0.0.5", "10.0.1.10", "172.16.0.50", "192.168.1.100"]

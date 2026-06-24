@@ -172,6 +172,7 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
             "dashboard inventory export",
             "octo apm workshop bundle validation",
             "sentinel strict status",
+            "sentinel drift check",
             "dashboard dry run",
             "inventory drift check",
             "sensitive value scan",
@@ -180,10 +181,24 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
         ]
         for name in expected:
             self.assertIn(name, names)
+        self.assertNotIn("sentinel synthetic-hit drift check", names)
 
         self.assertLess(self.step_index(steps, "dashboard inventory export"), self.step_index(steps, "dashboard dry run"))
+        self.assertLess(self.step_index(steps, "sentinel strict status"), self.step_index(steps, "sentinel drift check"))
+        self.assertLess(self.step_index(steps, "sentinel drift check"), self.step_index(steps, "dashboard dry run"))
         self.assertLess(self.step_index(steps, "inventory drift check"), self.step_index(steps, "sensitive value scan"))
         self.assertLess(self.step_index(steps, "sensitive value scan"), self.step_index(steps, "pytest"))
+
+    def test_sentinel_synthetic_hit_gate_is_explicit_opt_in(self):
+        local_steps = build_steps(False, False, "21d", 60)
+        self.assertNotIn("sentinel synthetic-hit drift check", [step[0] for step in local_steps])
+
+        strict_steps = build_steps(False, False, "21d", 60, True)
+        strict_idx = self.step_index(strict_steps, "sentinel synthetic-hit drift check")
+
+        self.assertLess(self.step_index(strict_steps, "sentinel drift check"), strict_idx)
+        self.assertLess(strict_idx, self.step_index(strict_steps, "dashboard dry run"))
+        self.assertIn("--require-synthetic-hits", strict_steps[strict_idx][1])
 
     def test_pytest_is_the_release_test_command(self):
         steps = build_steps(False, False, "21d", 60)

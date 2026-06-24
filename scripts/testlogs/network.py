@@ -26,11 +26,11 @@ def vcn_flow_event(src_ip, dst_ip, src_port, dst_port, protocol="6", action="ACC
     start_time = iso_to_epoch_seconds(event_time)
     end_time = start_time + 60
     flow_id = flow_id or f"flow-{uuid.uuid4().hex[:16]}"
-    vnic_id = vnic_id or f"ocid1.vnic.oc1..{uuid.uuid4().hex[:32]}"
-    subnet_id = subnet_id or f"ocid1.subnet.oc1..{uuid.uuid4().hex[:32]}"
+    vnic_id = vnic_id or f"<DEMO_VNIC_OCID_{uuid.uuid4().hex[:8]}>"
+    subnet_id = subnet_id or f"<DEMO_SUBNET_OCID_{uuid.uuid4().hex[:8]}>"
     data = {
         "version": "1",
-        "vcnId": f"ocid1.vcn.oc1..{uuid.uuid4().hex[:32]}",
+        "vcnId": f"<DEMO_VCN_OCID_{uuid.uuid4().hex[:8]}>",
         "subnetId": subnet_id,
         "vnicId": vnic_id,
         "flowId": flow_id,
@@ -59,9 +59,9 @@ def vcn_flow_event(src_ip, dst_ip, src_port, dst_port, protocol="6", action="ACC
         "oracle": {
             "compartmentid": COMPARTMENT_ID,
             "ingestedtime": event_time,
-            "loggroupid": "ocid1.loggroup.oc1..socdemo",
-            "logid": "ocid1.log.oc1..vcnflowdemo",
-            "tenantid": "ocid1.tenancy.oc1..example",
+            "loggroupid": "<DEMO_LOG_GROUP_OCID>",
+            "logid": "<DEMO_VCN_FLOW_LOG_OCID>",
+            "tenantid": "<DEMO_TENANCY_OCID>",
         },
         "regionId": "us-phoenix-1",
         "source": "vcn-flow-logs",
@@ -179,7 +179,7 @@ def generate_vcn_flow_events():
     # knock followed by SSH, plus a failing attacker with the wrong order.
     for i, port in enumerate([7000, 8000, 9000, 22]):
         events.append(vcn_flow_event(
-            "10.42.0.7",
+            "198.51.100.7",
             "192.0.2.55",
             54321 + i,
             port,
@@ -286,9 +286,9 @@ def network_firewall_event(log_type, src_ip, dst_ip, src_port, dst_port,
             "oracle": {
                 "compartmentid": COMPARTMENT_ID,
                 "ingestedtime": event_time,
-                "loggroupid": "ocid1.loggroup.oc1..socdemo",
-                "logid": "ocid1.log.oc1..networkfirewalldemo",
-                "tenantid": "ocid1.tenancy.oc1..example",
+                "loggroupid": "<DEMO_LOG_GROUP_OCID>",
+                "logid": "<DEMO_NETWORK_FIREWALL_LOG_OCID>",
+                "tenantid": "<DEMO_TENANCY_OCID>",
             },
             "source": "network-firewall",
             "specversion": "1.0",
@@ -414,7 +414,7 @@ def generate_network_firewall_events():
     for i, port in enumerate([7000, 8000, 9000, 22]):
         events.append(network_firewall_event(
             "traffic",
-            "10.42.0.7",
+            "198.51.100.7",
             "192.0.2.55",
             54321 + i,
             port,

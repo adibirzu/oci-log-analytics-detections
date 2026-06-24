@@ -94,6 +94,12 @@ FW_FIELD_MAPPINGS = [
     ("Direction",            "$.logContent.data.direction",  17),
     ("Session ID",           "$.logContent.data.sessionid",  18),
     ("Trace ID",             "$.Trace ID",                   19),
+    ("Event Type",           "$.logContent.data.log_type",   20),
+    ("Request URL",          "$.logContent.data.url",        21),
+    ("User Agent",           "$.logContent.data.user_agent", 22),
+    ("Query Name",           "$.logContent.data.query_name", 23),
+    ("Event ID",             "$.logContent.data.event_id",   24),
+    ("Provider",             "$.logContent.type",            25),
 ]
 FW_EXAMPLE = {
     "datetime": 1777890300000,
@@ -115,6 +121,10 @@ FW_EXAMPLE = {
             "category": "data-theft",
             "severity": "critical",
             "sessionid": "1234567890",
+            "url": "/download/payload",
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; PowerShell)",
+            "query_name": "example-c2.invalid",
+            "event_id": "fw-threat-001",
         },
     },
     "Trace ID": "trace_w2c_entry_001",

@@ -1,20 +1,20 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-06-04T17:21:58.343394+00:00",
+  "generated_at": "2026-06-24T12:52:03.622037+00:00",
   "stats": {
-    "total_rules": 470,
-    "total_sigma_rules": 454,
+    "total_rules": 538,
+    "total_sigma_rules": 522,
     "platforms": {
-      "windows": 263,
-      "oci": 139,
-      "linux": 68
+      "windows": 316,
+      "oci": 141,
+      "linux": 81
     },
     "severity": {
-      "critical": 90,
-      "high": 201,
-      "medium": 131,
-      "low": 18,
+      "critical": 107,
+      "high": 228,
+      "medium": 144,
+      "low": 29,
       "informational": 30
     },
     "stig_tagged": 24,
@@ -46,6 +46,7 @@
       "T1047",
       "T1048",
       "T1048.003",
+      "T1049",
       "T1053.002",
       "T1053.003",
       "T1053.005",
@@ -75,7 +76,9 @@
       "T1071",
       "T1071.001",
       "T1071.004",
+      "T1074",
       "T1074.001",
+      "T1074.002",
       "T1078",
       "T1082",
       "T1083",
@@ -103,8 +106,10 @@
       "T1134.001",
       "T1134.002",
       "T1134.004",
+      "T1134.005",
       "T1135",
       "T1136.001",
+      "T1136.002",
       "T1136.003",
       "T1137",
       "T1140",
@@ -118,6 +123,8 @@
       "T1203",
       "T1204",
       "T1204.002",
+      "T1207",
+      "T1210",
       "T1218",
       "T1218.001",
       "T1218.003",
@@ -129,6 +136,7 @@
       "T1220",
       "T1221",
       "T1482",
+      "T1484.001",
       "T1485",
       "T1486",
       "T1489",
@@ -175,6 +183,7 @@
       "T1550.002",
       "T1550.003",
       "T1550.004",
+      "T1552",
       "T1552.001",
       "T1552.004",
       "T1552.005",
@@ -185,10 +194,13 @@
       "T1555.003",
       "T1555.004",
       "T1556",
+      "T1556.001",
       "T1556.007",
       "T1557",
+      "T1557.001",
       "T1558",
       "T1558.001",
+      "T1558.002",
       "T1558.003",
       "T1558.004",
       "T1560.001",
@@ -311,6 +323,88 @@
         "discovery"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\AdFind.exe'))"
+    },
+    {
+      "filename": "adcs_esc1_subject_alternative_name_abuse_via_certipycertify.json",
+      "title": "ADCS ESC1: Subject Alternative Name Abuse via Certipy/Certify",
+      "sigma_id": "50fe3f50-4618-4135-b444-21f2b7b4e08e",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1649"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*certipy*' or 'Command Line' like '*Certify.exe*' or 'Command Line' like '*Certify *')) and (('Command Line' like '*req*' or 'Command Line' like '*request*')) and (('Command Line' like '*-upn*' or 'Command Line' like '*/altname*' or 'Command Line' like '*-altname*' or 'Command Line' like '*subject*' or 'Command Line' like '*-sid*')))"
+    },
+    {
+      "filename": "adcs_esc4_certificate_template_acl_modification_via_certipy.json",
+      "title": "ADCS ESC4: Certificate Template ACL Modification via Certipy",
+      "sigma_id": "3c4135df-ed29-41e8-a90a-3a662d586d56",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1649"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*certipy*' and 'Command Line' like '*template*')) and (('Command Line' like '*-write*' or 'Command Line' like '*-save-old*' or 'Command Line' like '*-configuration*')))"
+    },
+    {
+      "filename": "adcs_esc6_editf_attributesubjectaltname2_flag_enabled_via_certutil.json",
+      "title": "ADCS ESC6: EDITF_ATTRIBUTESUBJECTALTNAME2 Flag Enabled via Certutil",
+      "sigma_id": "4fb239f7-b0e6-472e-8e4e-1575b6bcbf1f",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1649"
+      ],
+      "mitre_tactics": [
+        "defense_evasion",
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*setreg*' and 'Command Line' like '*EditFlags*')) or (('Command Line' like '*EDITF_ATTRIBUTESUBJECTALTNAME2*' or 'Command Line' like '*ATTRIBUTESUBJECTALTNAME2*')))"
+    },
+    {
+      "filename": "adcs_esc8_ntlm_relay_to_certificate_web_enrollment.json",
+      "title": "ADCS ESC8: NTLM Relay to Certificate Web Enrollment",
+      "sigma_id": "4dbd9e56-4007-402c-96ae-3a3c886b6203",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1649",
+        "T1557.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*certipy relay*' or 'Command Line' like '*-target http*' or 'Command Line' like '*certsrv*' or 'Command Line' like '*certfnsh.asp*' or 'Command Line' like '*CertificateWebEnrollment*' or 'Command Line' like '*-template DomainController*')))"
+    },
+    {
+      "filename": "adminsdholder_acl_modification_for_persistence.json",
+      "title": "AdminSDHolder ACL Modification for Persistence",
+      "sigma_id": "cf3d8b61-5745-4573-8bb1-bb868fb69995",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Command Line' like '*AdminSDHolder*') and (('Command Line' like '*dsacls*' or 'Command Line' like '*Add-DomainObjectAcl*' or 'Command Line' like '*/G *' or 'Command Line' like '*GenericAll*' or 'Command Line' like '*Set-Acl*')))"
     },
     {
       "filename": "alternate_data_stream_execution.json",
@@ -937,6 +1031,493 @@
       "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '4625')) | stats count as Failures, distinctcount('Source Address') as UniqueSources by User, Entity | where Failures > 3 | sort -Failures"
     },
     {
+      "filename": "caldera_-_credential_search_in_config_and_environment_files_windows.json",
+      "title": "Caldera - Credential Search in Config and Environment Files (Windows)",
+      "sigma_id": "5f9ce881-f953-423e-8a6f-ce8749e56b5f",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1552",
+        "T1552.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\findstr.exe' and ('Command Line' like '*password*' or 'Command Line' like '*passwd*' or 'Command Line' like '*secret*' or 'Command Line' like '*apikey*' or 'Command Line' like '*api_key*' or 'Command Line' like '*token*')) and (('Command Line' like '*/s*' or 'Command Line' like '*/r*')) ) or ( (('Command Line' like '*Select-String*' or 'Command Line' like '*sls *' or 'Command Line' like '*Get-Content*')) and (('Command Line' like '*password*' or 'Command Line' like '*passwd*' or 'Command Line' like '*apikey*' or 'Command Line' like '*api_key*' or 'Command Line' like '*secret*')) ) or (('Command Line' like '*.env*' or 'Command Line' like '*config.json*' or 'Command Line' like '*appsettings.json*' or 'Command Line' like '*web.config*' or 'Command Line' like '*database.config*')))"
+    },
+    {
+      "filename": "caldera_-_credential_search_in_files_via_grep_linux.json",
+      "title": "Caldera - Credential Search in Files via grep (Linux)",
+      "sigma_id": "bd4bfb83-f68b-4688-b240-2fe5629a7ea8",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1552",
+        "T1552.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*grep -r password*' or msg like '*grep -ri password*' or msg like '*grep -r passwd*' or msg like '*grep -ri passwd*' or msg like '*grep -r secret*' or msg like '*grep -r apikey*' or msg like '*grep -r api_key*' or msg like '*grep -r token*')) or ((msg like '*grep -r /etc/*' or msg like '*grep -r /home/*' or msg like '*grep -r /root/*' or msg like '*grep -r /var/www/*' or msg like '*grep -r /opt/*')) or ((msg like '*cat /root/.bash_history*' or msg like '*cat /home/*' or msg like '*.bash_history*' or msg like '*cat /root/.mysql_history*')) or ((msg like '*cat /root/.netrc*' or msg like '*cat ~/.netrc*' or msg like '*cat /home/*' or msg like '*.netrc*')))"
+    },
+    {
+      "filename": "caldera_-_data_collection_from_local_system_via_findstr_and_powershell_windows.json",
+      "title": "Caldera - Data Collection from Local System via findstr and PowerShell (Windows)",
+      "sigma_id": "29a99d76-e1b8-47f4-b522-48dbbfeec148",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1005"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\findstr.exe' and ('Command Line' like '*.docx*' or 'Command Line' like '*.xlsx*' or 'Command Line' like '*.pdf*' or 'Command Line' like '*.pst*' or 'Command Line' like '*.kdbx*')) or (('Command Line' like '*Get-ChildItem -Recurse*' or 'Command Line' like '*Get-Item -Path*' or 'Command Line' like '*dir /s /b*')) ) and ( (('Command Line' like '*\\\\Documents\\\\*' or 'Command Line' like '*\\\\Desktop\\\\*' or 'Command Line' like '*\\\\Downloads\\\\*' or 'Command Line' like '*\\\\AppData\\\\*')) or (('Command Line' like '*C:\\\\Temp*' or 'Command Line' like '*C:\\\\Users\\\\Public*' or 'Command Line' like '*C:\\\\ProgramData*')) ))"
+    },
+    {
+      "filename": "caldera_-_data_collection_from_network_shared_drive_linux.json",
+      "title": "Caldera - Data Collection from Network Shared Drive (Linux)",
+      "sigma_id": "10d80508-d684-4070-a0ea-ee78fab09c50",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1039"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*smbclient //*' or msg like '*smbclient -L*' or msg like '*smbclient -U*')) or ((msg like '*mount -t cifs*' or msg like '*mount -t nfs*' or msg like '*mount -t smbfs*' or msg like '*mount.cifs*')) or ((msg like '*ls /mnt/*' or msg like '*cp /mnt/*' or msg like '*find /mnt/*' or msg like '*find /media/*' or msg like '*rsync /mnt/*')) or ((msg like '*smb: \\\\\\\\> get*' or msg like '*smb: \\\\\\\\> mget*' or msg like '*smb: \\\\\\\\> lcd*')))"
+    },
+    {
+      "filename": "caldera_-_data_collection_from_network_shared_drive_windows.json",
+      "title": "Caldera - Data Collection from Network Shared Drive (Windows)",
+      "sigma_id": "9fe8f4b5-510f-437d-9d93-92b5f613d001",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1039"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\xcopy.exe' and 'Command Line' like '*\\\\\\\\*') or ('Process Name' like '*\\\\robocopy.exe' and 'Command Line' like '*\\\\\\\\*') or (('Command Line' like '*copy \\\\\\\\*' or 'Command Line' like '*xcopy \\\\\\\\*')) or (('Command Line' like '*Copy-Item \\\\\\\\*' or 'Command Line' like '*cp \\\\\\\\*' or 'Command Line' like '*Get-ChildItem \\\\\\\\*')) ) and (('Command Line' like '*C:\\\\Temp*' or 'Command Line' like '*C:\\\\Users\\\\Public*' or 'Command Line' like '*C:\\\\ProgramData*' or 'Command Line' like '*%TEMP%*' or 'Command Line' like '*%TMP%*')))"
+    },
+    {
+      "filename": "caldera_-_document_and_data_file_collection_from_linux_host.json",
+      "title": "Caldera - Document and Data File Collection from Linux Host",
+      "sigma_id": "fcd2d7ce-5c2c-41ce-ad44-e82a4befd6e2",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1005"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*find / -name *.pdf*' or msg like '*find / -name *.docx*' or msg like '*find / -name *.xlsx*' or msg like '*find /home -name *.doc*' or msg like '*find /home -name *.xls*' or msg like '*find /home -name *.kdbx*' or msg like '*find / -name *.pst*')) or ((msg like '*find / -name *.db*' or msg like '*find / -name *.sqlite*' or msg like '*find / -name *.sql*' or msg like '*find / -name *.bak*')) or ((msg like '*find / -name *.py*' or msg like '*find / -name *.rb*' or msg like '*find / -name *.php*' or msg like '*find / -name *.go*')) or ((msg like '*cp -r /home*' or msg like '*cp -r /root*' or msg like '*cp -r /srv*' or msg like '*cp -r /var/www*')))"
+    },
+    {
+      "filename": "caldera_-_exfiltration_of_staged_data_over_c2_channel_linux.json",
+      "title": "Caldera - Exfiltration of Staged Data over C2 Channel (Linux)",
+      "sigma_id": "223f8064-ae93-4d43-a978-2dda7a205f65",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1041"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (( ((msg like '*curl -X POST*' or msg like '*curl --upload-file*' or msg like '*curl -F*' or msg like '*curl -d @*' or msg like '*curl -T *')) or ((msg like '*wget --post-file*' or msg like '*wget --post-data*')) or ((msg like '*requests.post*' or msg like '*urllib.request.urlopen*' or msg like '*http.client.HTTPConnection*')) ) and ((msg like '*/tmp/*' or msg like '*/dev/shm/*' or msg like '*/var/tmp/*')))"
+    },
+    {
+      "filename": "caldera_-_exfiltration_over_c2_channel_via_powershell_windows.json",
+      "title": "Caldera - Exfiltration over C2 Channel via PowerShell (Windows)",
+      "sigma_id": "df51539f-a49a-4c31-8633-25bd6a1525a2",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1041"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*Invoke-RestMethod*' or 'Command Line' like '*iwr *' or 'Command Line' like '*irm *')) and (('Command Line' like '*-Method POST*' or 'Command Line' like '*-Method Put*' or 'Command Line' like '*-Method \"POST\"*')) and (('Command Line' like '*-Body*' or 'Command Line' like '*-InFile*' or 'Command Line' like '*-UploadFile*')) ) or ('Process Name' like '*\\\\curl.exe' and ('Command Line' like '*-X POST*' or 'Command Line' like '*--upload-file*' or 'Command Line' like '*-d @*' or 'Command Line' like '*-T *')))"
+    },
+    {
+      "filename": "caldera_-_exfiltration_to_web_service_from_windows_endpoint.json",
+      "title": "Caldera - Exfiltration to Web Service from Windows Endpoint",
+      "sigma_id": "d768a458-8aed-499e-9493-2f4d548e90d5",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1567"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*pastebin.com*' or 'Command Line' like '*paste.ee*' or 'Command Line' like '*transfer.sh*' or 'Command Line' like '*file.io*' or 'Command Line' like '*ix.io*' or 'Command Line' like '*0x0.st*')) or (('Command Line' like '*s3.amazonaws.com*' or 'Command Line' like '*storage.googleapis.com*' or 'Command Line' like '*blob.core.windows.net*' or 'Command Line' like '*objectstorage.oraclecloud.com*')) ) and (('Command Line' like '*Invoke-WebRequest*' or 'Command Line' like '*Invoke-RestMethod*' or 'Command Line' like '*curl.exe*' or 'Command Line' like '*wget.exe*')))"
+    },
+    {
+      "filename": "caldera_-_exfiltration_to_web_service_via_curl_linux.json",
+      "title": "Caldera - Exfiltration to Web Service via curl (Linux)",
+      "sigma_id": "c605c2e5-4c0d-4192-8b24-ed160ca9483b",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1567"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (( ((msg like '*paste.ee*' or msg like '*pastebin.com*' or msg like '*ghostbin.co*' or msg like '*transfer.sh*' or msg like '*file.io*' or msg like '*ix.io*' or msg like '*0x0.st*')) or ((msg like '*s3.amazonaws.com*' or msg like '*storage.googleapis.com*' or msg like '*blob.core.windows.net*' or msg like '*objectstorage.oraclecloud.com*')) ) or ( ((msg like '*curl -X PUT*' or msg like '*curl -X POST*' or msg like '*curl -T *' or msg like '*curl --upload-file*')) and ((msg like '*paste.ee*' or msg like '*pastebin.com*' or msg like '*ghostbin.co*' or msg like '*transfer.sh*' or msg like '*file.io*' or msg like '*ix.io*' or msg like '*0x0.st*')) ))"
+    },
+    {
+      "filename": "caldera_-_lateral_tool_transfer_via_scprsync_linux.json",
+      "title": "Caldera - Lateral Tool Transfer via scp/rsync (Linux)",
+      "sigma_id": "0fb4827e-92fd-45af-94c7-4e6c1c16b6e7",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1570"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*scp /tmp/*' or msg like '*scp /dev/shm/*' or msg like '*scp /var/tmp/*')) or ( ((msg like '*scp -i *' or msg like '*scp -r *' or msg like '*scp -P *')) and ((msg like '*scp /tmp/*' or msg like '*scp /dev/shm/*' or msg like '*scp /var/tmp/*')) ) or ((msg like '*rsync -avz*' or msg like '*rsync -e ssh*' or msg like '*rsync --rsh=ssh*')) or ((msg like '*curl -s | bash*' or msg like '*curl -sL | bash*' or msg like '*wget -q -O- |*' or msg like '*wget -q | bash*')))"
+    },
+    {
+      "filename": "caldera_-_local_data_staging_in_writable_directories_linux.json",
+      "title": "Caldera - Local Data Staging in Writable Directories (Linux)",
+      "sigma_id": "8a7bfa9d-2839-45a0-b9af-9a13f300a2e4",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1074",
+        "T1074.001"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*cp -r /etc*' or msg like '*cp -r /home*' or msg like '*cp -r /root*' or msg like '*cp -r /var/www*' or msg like '*cp /etc/passwd /tmp*' or msg like '*cp /etc/shadow /tmp*')) or ((msg like '*mv /etc/*' or msg like '*mv /home/*' or msg like '*mv /root/*')) or ((msg like '*/tmp/staging*' or msg like '*/tmp/loot*' or msg like '*/tmp/data*' or msg like '*/dev/shm/data*' or msg like '*/dev/shm/staging*' or msg like '*/var/tmp/staging*')) or ((msg like '*find / -name*' or msg like '*find /home -name*' or msg like '*find /etc -name*')))"
+    },
+    {
+      "filename": "caldera_-_lsass_memory_dump_via_procdump_or_task_manager_caldera_emulation.json",
+      "title": "Caldera - LSASS Memory Dump via ProcDump or Task Manager (Caldera Emulation)",
+      "sigma_id": "988e7beb-0cc9-4734-89a6-906aaf3cfec2",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1003",
+        "T1003.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\\\procdump.exe' or 'Process Name' like '*\\\\procdump64.exe') and ('Command Line' like '*lsass*' or 'Command Line' like '*-ma *')) or (('Command Line' like '*lsass.dmp*' or 'Command Line' like '*lsass.exe.dmp*')) or ('Process Name' like '*\\\\nanodump.exe') or (('Command Line' like '*avdump64.exe*' or 'Command Line' like '*avdump.exe*')))"
+    },
+    {
+      "filename": "caldera_-_network_configuration_recon_via_ipconfig_and_route_windows.json",
+      "title": "Caldera - Network Configuration Recon via ipconfig and route (Windows)",
+      "sigma_id": "4ac677e1-063f-4fda-b903-f991c475a4c3",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1016"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\ipconfig.exe') or ('Process Name' like '*\\\\route.exe' and 'Command Line' like '*print*') or ('Process Name' like '*\\\\arp.exe' and 'Command Line' like '*-a*') or ('Process Name' like '*\\\\nbtstat.exe' and ('Command Line' like '*-n*' or 'Command Line' like '*-r*' or 'Command Line' like '*-s*')))"
+    },
+    {
+      "filename": "caldera_-_remote_data_staging_via_smb_share_write.json",
+      "title": "Caldera - Remote Data Staging via SMB Share Write",
+      "sigma_id": "365f9437-df92-478a-ad78-27f5326433e8",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1074",
+        "T1074.002"
+      ],
+      "mitre_tactics": [
+        "collection"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*copy * \\\\\\\\*' or 'Command Line' like '*copy /Y \\\\\\\\*' or 'Command Line' like '*xcopy /s \\\\\\\\*')) or ('Process Name' like '*\\\\robocopy.exe' and 'Command Line' like '* \\\\\\\\*') or (('Command Line' like '*Copy-Item -Destination \\\\\\\\*' or 'Command Line' like '*Move-Item -Destination \\\\\\\\*')) ) and (('Command Line' like '*C:\\\\Temp*' or 'Command Line' like '*C:\\\\Users\\\\Public*' or 'Command Line' like '*C:\\\\ProgramData*' or 'Command Line' like '*%TEMP%*')))"
+    },
+    {
+      "filename": "caldera_-_smb_lateral_movement_via_impacket_from_linux.json",
+      "title": "Caldera - SMB Lateral Movement via Impacket from Linux",
+      "sigma_id": "8684eabc-c162-4b68-b8d3-cbb19b154e11",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1021.002"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*psexec.py*' or msg like '*smbexec.py*' or msg like '*wmiexec.py*' or msg like '*atexec.py*')) or ((msg like '*impacket*' or msg like '*smbclient.py*' or msg like '*secretsdump.py*')) or ((msg like '*-target-ip*' or msg like '*-dc-ip*' or msg like '*SMBDomain*')))"
+    },
+    {
+      "filename": "caldera_-_system_information_discovery_via_native_linux_commands.json",
+      "title": "Caldera - System Information Discovery via Native Linux Commands",
+      "sigma_id": "de9ed5f4-092c-4e8b-96a7-bbb6f958549e",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1082"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*uname -a*' or msg like '*uname -r*' or msg like '*uname -m*' or msg like '*cat /etc/os-release*' or msg like '*cat /proc/version*' or msg like '*lsb_release -a*' or msg like '*hostnamectl*')) or ((msg like '*lscpu*' or msg like '*lshw*' or msg like '*dmidecode*' or msg like '*cat /proc/cpuinfo*' or msg like '*cat /proc/meminfo*' or msg like '*free -m*')) or ((msg like '*lsblk*' or msg like '*df -h*' or msg like '*df -a*' or msg like '*fdisk -l*')))"
+    },
+    {
+      "filename": "caldera_-_system_information_discovery_via_systeminfo_and_wmi_windows.json",
+      "title": "Caldera - System Information Discovery via systeminfo and WMI (Windows)",
+      "sigma_id": "545caaf5-2e0c-4078-b249-6cec2cd95b9e",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1082"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\systeminfo.exe') or ('Process Name' like '*\\\\wmic.exe' and ('Command Line' like '*os get*' or 'Command Line' like '*computersystem get*' or 'Command Line' like '*cpu get*' or 'Command Line' like '*bios get*' or 'Command Line' like '*qfe list*')) or (('Command Line' like '*Get-ComputerInfo*' or 'Command Line' like '*Get-WmiObject Win32_OperatingSystem*' or 'Command Line' like '*Get-CimInstance Win32_OperatingSystem*' or 'Command Line' like '*Get-WmiObject Win32_ComputerSystem*' or 'Command Line' like '*Get-WmiObject Win32_BIOS*' or 'Command Line' like '*[System.Environment]::OSVersion*')))"
+    },
+    {
+      "filename": "caldera_-_system_network_configuration_discovery_linux.json",
+      "title": "Caldera - System Network Configuration Discovery (Linux)",
+      "sigma_id": "9b43077e-df83-4b5a-b672-ab8657b2db86",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1016"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*ip addr*' or msg like '*ip route*' or msg like '*ip link*' or msg like '*ip neigh*' or msg like '*ip -4 addr*' or msg like '*ip -6 addr*')) or ((msg like '*ifconfig -a*' or msg like '*ifconfig eth*' or msg like '*ifconfig ens*' or msg like '*ifconfig lo*')) or ((msg like '*route -n*' or msg like '*route -e*' or msg like '*netstat -rn*' or msg like '*netstat -r *')) or ((msg like '*arp -a*' or msg like '*arp -n*' or msg like '*cat /proc/net/arp*')))"
+    },
+    {
+      "filename": "caldera_-_system_network_configuration_discovery_windows.json",
+      "title": "Caldera - System Network Configuration Discovery (Windows)",
+      "sigma_id": "afd8e429-4606-414c-895c-271a2078320d",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1016"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\ipconfig.exe' and ('Command Line' like '*/all*' or 'Command Line' like '*/displaydns*' or 'Command Line' like '*/flushdns*')) or ('Process Name' like '*\\\\arp.exe' and 'Command Line' like '*-a*') or ('Process Name' like '*\\\\nslookup.exe') or (('Command Line' like '*Get-NetIPConfiguration*' or 'Command Line' like '*Get-NetIPAddress*' or 'Command Line' like '*Get-DnsClientServerAddress*' or 'Command Line' like '*Get-NetAdapter*')))"
+    },
+    {
+      "filename": "caldera_-_system_network_connections_discovery_linux.json",
+      "title": "Caldera - System Network Connections Discovery (Linux)",
+      "sigma_id": "c3fe4b7a-dc87-4617-9397-6b2a5efaf31c",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1049"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*netstat -an*' or msg like '*netstat -anp*' or msg like '*netstat -tulpn*' or msg like '*netstat -tunap*' or msg like '*netstat -plantu*' or msg like '*netstat -ntlp*')) or ((msg like '*ss -anp*' or msg like '*ss -tlnp*' or msg like '*ss -tunap*' or msg like '*ss -s *' or msg like '*ss -plnt*')) or ((msg like '*cat /proc/net/tcp*' or msg like '*cat /proc/net/udp*' or msg like '*cat /proc/net/tcp6*')))"
+    },
+    {
+      "filename": "caldera_-_system_network_connections_discovery_windows.json",
+      "title": "Caldera - System Network Connections Discovery (Windows)",
+      "sigma_id": "10b9adb3-5e6b-463c-9805-103fbfbfe2db",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1049"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\netstat.exe' and ('Command Line' like '*-an*' or 'Command Line' like '*-ano*' or 'Command Line' like '*-b*' or 'Command Line' like '*-f*')) or (('Command Line' like '*Get-NetTCPConnection*' or 'Command Line' like '*Get-NetUDPEndpoint*' or 'Command Line' like '*netstat -a*')) or ('Process Name' like '*\\\\route.exe' and 'Command Line' like '*print*'))"
+    },
+    {
+      "filename": "caldera_-_system_owner_and_identity_discovery_via_idwhoami_linux.json",
+      "title": "Caldera - System Owner and Identity Discovery via id/whoami (Linux)",
+      "sigma_id": "a26c3909-5e36-4ba7-909d-fe7fb683b1f8",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1033"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*id -u*' or msg like '*id -g*' or msg like '*id -G*' or msg like '*id -Z*')) or ((msg like '*whoami*' or msg like '*logname*')) or ((msg like '*echo $USER*' or msg like '*echo $LOGNAME*' or msg like '*echo $UID*' or msg like '*cat /etc/passwd*')))"
+    },
+    {
+      "filename": "caldera_-_system_owner_and_user_discovery_windows.json",
+      "title": "Caldera - System Owner and User Discovery (Windows)",
+      "sigma_id": "df034b80-b4db-4f74-a7ed-292bd361aa5a",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1033"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\whoami.exe') or ('Process Name' like '*\\\\query.exe' and ('Command Line' like '*user*' or 'Command Line' like '*session*')) or (('Command Line' like '*Get-LocalUser*' or 'Command Line' like '*Get-LocalGroup*' or 'Command Line' like '*[System.Security.Principal.WindowsIdentity]::GetCurrent*' or 'Command Line' like '*$env:USERNAME*')) or (('Process Name' like '*\\\\net.exe' or 'Process Name' like '*\\\\net1.exe') and 'Command Line' like '*user*'))"
+    },
+    {
+      "filename": "caldera_-_system_owner_discovery_via_whoami_and_query_commands_windows.json",
+      "title": "Caldera - System Owner Discovery via whoami and query Commands (Windows)",
+      "sigma_id": "2d35b034-e399-418f-bd0b-e46ba04353a4",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1033"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\whoami.exe') or ('Process Name' like '*\\\\whoami.exe' and ('Command Line' like '*/all*' or 'Command Line' like '*/priv*' or 'Command Line' like '*/groups*')) or ('Process Name' like '*\\\\query.exe' and ('Command Line' like '*user*' or 'Command Line' like '*session*')))"
+    },
+    {
+      "filename": "caldera_-_winrm_lateral_movement_via_evil-winrm_from_linux.json",
+      "title": "Caldera - WinRM Lateral Movement via Evil-WinRM from Linux",
+      "sigma_id": "5edfb7b0-e60e-40a9-a4d5-fad31796e4a7",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "linux",
+      "service": "syslog",
+      "mitre_techniques": [
+        "T1021.006"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'Linux Secure Logs' or 'Log Source' = 'Linux Syslog Logs' or 'Log Source' = 'Linux Audit Logs') and (((msg like '*evil-winrm*' or msg like '*evil_winrm*')) or ((msg like '*winrm.Protocol*' or msg like '*winrm.Session*' or msg like '*pywinrm*')) or ( ((msg like '*:5985*' or msg like '*:5986*')) and ((msg like '*-u *' or msg like '*-p *' or msg like '*-H *' or msg like '*--hash*')) ))"
+    },
+    {
+      "filename": "caldera_-_wmic_os_and_hardware_enumeration_windows.json",
+      "title": "Caldera - WMIC OS and Hardware Enumeration (Windows)",
+      "sigma_id": "bf31a6d7-a546-4afc-8277-a847952f2447",
+      "level": "low",
+      "stig_category": "CAT III",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1082"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*os get*') or ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*computersystem get*') or ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*cpu get*') or ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*product get*') or ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*nic get*'))"
+    },
+    {
+      "filename": "calderaopenaev_-_exfiltration_via_oci_object_storage_bulk_upload_with_new_bucket.json",
+      "title": "Caldera/OpenAEV - Exfiltration via OCI Object Storage Bulk Upload with New Bucket",
+      "sigma_id": "38aa72e0-d1db-445c-af93-e91b8f4a5244",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1567"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and ((('Event Type' = 'com.oraclecloud.objectstorage.createbucket' or 'Event Type' = 'com.oraclecloud.objectstorage.putobject')))"
+    },
+    {
+      "filename": "calderaopenaev_-_transfer_data_to_cloud_account_via_oci_object_storage.json",
+      "title": "Caldera/OpenAEV - Transfer Data to Cloud Account via OCI Object Storage",
+      "sigma_id": "a76fa96b-fe6c-41d2-b806-8f9c1d169424",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "oci",
+      "service": "audit",
+      "mitre_techniques": [
+        "T1537"
+      ],
+      "mitre_tactics": [
+        "exfiltration"
+      ],
+      "query": "'Log Source' = 'OCI Audit Logs' and (('Event Type' = 'com.oraclecloud.objectstorage.putobject'))"
+    },
+    {
+      "filename": "certifried_cve-2022-26923_machine_account_dnshostname_abuse.json",
+      "title": "Certifried (CVE-2022-26923): Machine Account dNSHostName Abuse",
+      "sigma_id": "94eef4eb-e835-450a-bd8f-777117a34f90",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1649",
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*dNSHostName*' or 'Command Line' like '*dnshostname*')) and (('Command Line' like '*certipy*' or 'Command Line' like '*-template Machine*' or 'Command Line' like '*account update*')))"
+    },
+    {
       "filename": "clickfix_fake_captcha_powershell_execution.json",
       "title": "ClickFix Fake CAPTCHA PowerShell Execution",
       "sigma_id": "logan-clickfix-fake-captcha-powershell",
@@ -1195,6 +1776,22 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\cmstp.exe' and 'Command Line' like '*/s*'))"
     },
     {
+      "filename": "coercer_multi-protocol_authentication_coercion.json",
+      "title": "Coercer Multi-Protocol Authentication Coercion",
+      "sigma_id": "1cbf821e-317a-4f69-bf74-787dd6535b60",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1187"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Coercer*' or 'Command Line' like '*coercer.py*' or 'Command Line' like '*EfsRpcEncryptFileSrv*' or 'Command Line' like '*MS-FSRVP*' or 'Command Line' like '*IsPathShadowCopied*')))"
+    },
+    {
       "filename": "com_object_hijacking_via_registry.json",
       "title": "COM Object Hijacking via Registry",
       "sigma_id": "30de24d1-7812-4846-9eca-ab9ff7e1c88a",
@@ -1225,6 +1822,40 @@
         "defense_evasion"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\hh.exe' and 'Command Line' like '*.chm*'))"
+    },
+    {
+      "filename": "computer_account_creation_for_delegation_abuse_machineaccountquota.json",
+      "title": "Computer Account Creation for Delegation Abuse (MachineAccountQuota)",
+      "sigma_id": "2abd42ec-ece4-45b0-8d96-13f0f324cf77",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1136.002",
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "persistence",
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*New-MachineAccount*' or 'Command Line' like '*addcomputer.py*' or 'Command Line' like '*addcomputer*' or 'Command Line' like '*PowerMad*' or 'Command Line' like '*-computer-name*')))"
+    },
+    {
+      "filename": "constrained_delegation_s4u2proxy_abuse_via_rubeus.json",
+      "title": "Constrained Delegation S4U2Proxy Abuse via Rubeus",
+      "sigma_id": "c03c1664-b95a-4b36-b59a-c8b3858711fd",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1558.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*s4u*' and 'Command Line' like '*/impersonateuser*')) or (('Command Line' like '*/msdsspn*' or 'Command Line' like '*/altservice*')))"
     },
     {
       "filename": "control_panel_item_execution.json",
@@ -1371,6 +2002,22 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*\\\\mmc.exe' and ('Process Name' like '*\\\\cmd.exe' or 'Process Name' like '*\\\\powershell.exe')))"
     },
     {
+      "filename": "dcshadow_rogue_domain_controller_registration.json",
+      "title": "DCShadow Rogue Domain Controller Registration",
+      "sigma_id": "59ac966e-8b7d-48a4-b4af-0af2301a711b",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1207"
+      ],
+      "mitre_tactics": [
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*lsadump::dcshadow*' or 'Command Line' like '*dcshadow*' or 'Command Line' like '*/push*')) and (('Command Line' like '*/object:*' or 'Command Line' like '*/attribute:*')))"
+    },
+    {
       "filename": "dcsync_attack_via_replication_request.json",
       "title": "DCSync Attack via Replication Request",
       "sigma_id": "4e67285e-e578-40ea-b7aa-1a9e45d9bfdf",
@@ -1403,6 +2050,24 @@
       "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '4662' and ('Properties' like '*1131f6aa-9c07-11d1-f79f-00c04fc2dcd2*' or 'Properties' like '*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2*' or 'Properties' like '*89e95b76-444d-4c62-991a-0facbeda640c*')) and not ('Subject User Name' like '*$')) | stats count as Requests by User | sort -Requests"
     },
     {
+      "filename": "dcsync_enablement_replication_rights_granted_via_directory_change_5136.json",
+      "title": "DCSync Enablement: Replication Rights Granted via Directory Change (5136)",
+      "sigma_id": "0ae80906-31fb-45b7-b27e-1c7f43287871",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1098",
+        "T1003.006"
+      ],
+      "mitre_tactics": [
+        "persistence",
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '5136' and ('Properties' like '*1131f6aa-9c07-11d1-f79f-00c04fc2dcd2*' or 'Properties' like '*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2*' or 'Properties' like '*89e95b76-444d-4c62-991a-0facbeda640c*')))"
+    },
+    {
       "filename": "defacement_via_desktop_wallpaper_change.json",
       "title": "Defacement via Desktop Wallpaper Change",
       "sigma_id": "014caac1-79d2-4eaa-ad2d-2a5fb1bc2190",
@@ -1433,6 +2098,22 @@
         "persistence"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Process Name' like '*\\\\assoc.exe' or 'Process Name' like '*\\\\ftype.exe')))"
+    },
+    {
+      "filename": "dfscoerce_ms-dfsnm_authentication_coercion.json",
+      "title": "DFSCoerce MS-DFSNM Authentication Coercion",
+      "sigma_id": "3f8d769a-77b1-465b-956b-7540c1614005",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1187"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*dfscoerce*' or 'Command Line' like '*NetrDfsRemoveStdRoot*' or 'Command Line' like '*NetrDfsAddStdRoot*' or 'Command Line' like '*MS-DFSNM*')))"
     },
     {
       "filename": "disable_windows_firewall_via_netsh.json",
@@ -1515,6 +2196,22 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*.exe' and ('Process Name' like '*\\\\Temp\\\\*' or 'Process Name' like '*\\\\AppData\\\\Local\\\\Temp\\\\*' or 'Process Name' like '*\\\\Downloads\\\\*' or 'Process Name' like '*\\\\Desktop\\\\*')) and not (('Process Name' like '*\\\\Windows\\\\Temp\\\\setup*' or 'Process Name' like '*\\\\Microsoft\\\\*')))"
     },
     {
+      "filename": "domain_admins_group_enumeration_via_net_group.json",
+      "title": "Domain Admins Group Enumeration via net group",
+      "sigma_id": "d641fca3-e406-4a88-9277-1b509e865eb5",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1069.002"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*group*' and 'Command Line' like '*/domain*')) and (('Command Line' like '*Domain Admins*' or 'Command Line' like '*Enterprise Admins*' or 'Command Line' like '*Domain Controllers*' or 'Command Line' like '*Schema Admins*')))"
+    },
+    {
       "filename": "domain_trust_discovery_via_nltest.json",
       "title": "Domain Trust Discovery via Nltest",
       "sigma_id": "152fec77-1574-4ded-a36d-ec9656a8f371",
@@ -1547,6 +2244,22 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*dpapi::masterkey*' or 'Command Line' like '*sekurlsa::dpapi*' or 'Command Line' like '*Protect\\\\S-1-*')))"
     },
     {
+      "filename": "dsrm_admin_logon_behavior_enabled_for_persistence.json",
+      "title": "DSRM Admin Logon Behavior Enabled for Persistence",
+      "sigma_id": "432e1322-cd7a-46b9-99c6-dc17fb775570",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1556"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*DsrmAdminLogonBehavior*' and 'Command Line' like '*add*')) and (('Command Line' like '*Lsa*' or 'Command Line' like '*reg add*')))"
+    },
+    {
       "filename": "email_collection_via_powershell.json",
       "title": "Email Collection via PowerShell",
       "sigma_id": "45994aca-9e84-4d45-98db-972a1b77bd25",
@@ -1577,6 +2290,23 @@
         "defense_evasion"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*logman*' and 'Command Line' like '*stop*' and 'Command Line' like '*EventLog*')))"
+    },
+    {
+      "filename": "executable_written_to_remote_admin_share_lateral_tool_transfer.json",
+      "title": "Executable Written to Remote Admin Share (Lateral Tool Transfer)",
+      "sigma_id": "e7c4587b-3ff8-4ee0-ba82-48c8702a1649",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1021.002",
+        "T1570"
+      ],
+      "mitre_tactics": [
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*copy *' or 'Command Line' like '*xcopy*' or 'Command Line' like '*robocopy*' or 'Command Line' like '*Copy-Item*' or 'Command Line' like '*move *')) and (('Command Line' like '*ADMIN$*' or 'Command Line' like '*C$*' or 'Command Line' like '*IPC$*')) and (('Command Line' like '*.exe*' or 'Command Line' like '*.dll*' or 'Command Line' like '*.bat*' or 'Command Line' like '*.ps1*')))"
     },
     {
       "filename": "file_and_directory_discovery_via_dir.json",
@@ -1643,6 +2373,22 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*PetitPotam*' or 'Command Line' like '*petitpotam*' or 'Command Line' like '*EfsRpcOpenFileRaw*')))"
     },
     {
+      "filename": "gmsa_managed_password_read_attempt.json",
+      "title": "gMSA Managed Password Read Attempt",
+      "sigma_id": "d24c2870-c7e5-40bf-aa73-47acaf467e64",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1555"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*msDS-ManagedPassword*' or 'Command Line' like '*GMSAPasswordReader*' or 'Command Line' like '*Get-ADServiceAccount*' or 'Command Line' like '*ConvertFrom-ADManagedPasswordBlob*')))"
+    },
+    {
       "filename": "golden_ticket_anomaly.json",
       "title": "Golden Ticket: RC4 Encrypted TGT Request",
       "sigma_id": "golden-t1558-001",
@@ -1658,6 +2404,39 @@
         "persistence"
       ],
       "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ((('Event ID' = '4768' or 'Event ID' = '4770') and 'Ticket Encryption Type' = '0x17')) | stats count as Requests by User, 'Event ID' | sort -Requests"
+    },
+    {
+      "filename": "gpo_abuse_via_sharpgpoabuse.json",
+      "title": "GPO Abuse via SharpGPOAbuse",
+      "sigma_id": "776df7de-2549-410b-b89b-973006bf30dd",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1484.001"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*SharpGPOAbuse*' or 'Command Line' like '*--AddComputerTask*' or 'Command Line' like '*--AddUserTask*' or 'Command Line' like '*--AddLocalAdmin*' or 'Command Line' like '*--GPOName*')))"
+    },
+    {
+      "filename": "gpo_scheduled_task_written_to_sysvol.json",
+      "title": "GPO Scheduled Task Written to SYSVOL",
+      "sigma_id": "a215a400-3d47-4a25-863a-aa0dc21fd929",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1484.001",
+        "T1053.005"
+      ],
+      "mitre_tactics": [
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*SYSVOL*' or 'Command Line' like '*Policies*')) and (('Command Line' like '*ScheduledTasks.xml*' or 'Command Line' like '*Preferences*' or 'Command Line' like '*GPT.INI*' or 'Command Line' like '*gPCMachineExtensionNames*')))"
     },
     {
       "filename": "group_policy_preferences_password_extraction.json",
@@ -1706,6 +2485,40 @@
         "persistence"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Image File Execution Options*' and 'Command Line' like '*Debugger*')))"
+    },
+    {
+      "filename": "impacket_atexec_remote_scheduled_task_execution.json",
+      "title": "Impacket atexec Remote Scheduled Task Execution",
+      "sigma_id": "407543f0-898a-4b2c-bfb3-804bb2a0ede6",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1053.005"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Parent Process Name' like '*svchost.exe' or 'Parent Process Name' like '*taskeng.exe')) and (('Command Line' like '*cmd.exe*' and 'Command Line' like '*2>&1*')) and (('Command Line' like '*ADMIN$*' or 'Command Line' like '*Temp*' or 'Command Line' like '*2>&1*')))"
+    },
+    {
+      "filename": "impacket_wmiexec_remote_command_execution.json",
+      "title": "Impacket wmiexec Remote Command Execution",
+      "sigma_id": "5d6e1e00-5567-4ddc-8940-b98f69512243",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1047"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Parent Process Name' like '*WmiPrvSE.exe') and (('Command Line' like '*1>*' or 'Command Line' like '*2>&1*' or 'Command Line' like '*1>*')) ) or (('Command Line' like '*cmd.exe*' and 'Command Line' like '*ADMIN$*')))"
     },
     {
       "filename": "indirect_command_execution_via_forfiles.json",
@@ -1867,6 +2680,22 @@
         "collection"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Get-Keystrokes*' or 'Command Line' like '*SetWindowsHookEx*' or 'Command Line' like '*GetAsyncKeyState*' or 'Command Line' like '*keylog*')))"
+    },
+    {
+      "filename": "laps_clear-text_local_admin_password_read_attempt.json",
+      "title": "LAPS Clear-Text Local Admin Password Read Attempt",
+      "sigma_id": "ff473b72-ba36-43e4-9bec-e940499899cd",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1555"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*ms-Mcs-AdmPwd*' or 'Command Line' like '*Get-AdmPwdPassword*' or 'Command Line' like '*LAPSToolkit*' or 'Command Line' like '*pyLAPS*' or 'Command Line' like '*Get-LAPSADPassword*')))"
     },
     {
       "filename": "lateral_movement_logon_pattern.json",
@@ -2810,6 +3639,22 @@
         "credential_access"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\ntdsutil.exe' and 'Command Line' like '*ifm*') or ('Process Name' like '*\\\\esentutl.exe' and 'Command Line' like '*ntds*') ))"
+    },
+    {
+      "filename": "ntlmrelayx_ntlm_relay_execution_indicators.json",
+      "title": "ntlmrelayx NTLM Relay Execution Indicators",
+      "sigma_id": "f8e84b18-04c3-474c-8977-a54c0c8e9827",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1557.001"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*ntlmrelayx*' or 'Command Line' like '*ntlmrelayx.py*')) or ( (('Command Line' like '*-smb2support*' or 'Command Line' like '*--delegate-access*' or 'Command Line' like '*-socks*' or 'Command Line' like '*--escalate-user*')) and (('Command Line' like '*ntlmrelayx*' or 'Command Line' like '*ntlmrelayx.py*')) ))"
     },
     {
       "filename": "oci_action_addusertogroup.json",
@@ -4323,6 +5168,23 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*\\\\Microsoft\\\\Word\\\\STARTUP*' or 'Command Line' like '*\\\\Microsoft\\\\Excel\\\\XLSTART*' or 'Command Line' like '*AddIns*')))"
     },
     {
+      "filename": "overpass-the-hash_via_rubeus_asktgt.json",
+      "title": "Overpass-the-Hash via Rubeus asktgt",
+      "sigma_id": "22580978-36a5-4e45-a8e1-ae5996e3f7b6",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1550.002"
+      ],
+      "mitre_tactics": [
+        "lateral_movement",
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*asktgt*' and 'Command Line' like '*/user:*')) and (('Command Line' like '*/rc4:*' or 'Command Line' like '*/aes256:*' or 'Command Line' like '*/aes128:*' or 'Command Line' like '*/des:*' or 'Command Line' like '*/ntlm:*')))"
+    },
+    {
       "filename": "parent_pid_spoofing.json",
       "title": "Parent PID Spoofing",
       "sigma_id": "f7b73317-0177-4f69-829c-ebf338ce3ac7",
@@ -4337,6 +5199,23 @@
         "privilege_escalation"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*PROC_THREAD_ATTRIBUTE_PARENT_PROCESS*' or 'Command Line' like '*ppid*')))"
+    },
+    {
+      "filename": "pass-the-cert__unpac-the-hash_via_certipy_auth.json",
+      "title": "Pass-the-Cert / UnPAC-the-Hash via Certipy auth",
+      "sigma_id": "88a0571b-8529-43f5-a264-ab3d93678fbe",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1550.003",
+        "T1649"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*certipy*' and 'Command Line' like '*auth*')) and (('Command Line' like '*-pfx*' or 'Command Line' like '*.pfx*')) ) or (('Command Line' like '*asktgt*' and 'Command Line' like '*/getcredentials*')))"
     },
     {
       "filename": "pass-the-ticket_via_rubeus.json",
@@ -4469,6 +5348,23 @@
       "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ('Event ID' = '4688') and ( (('Command Line' like '*invoke-webrequest*' or 'Command Line' like '*downloadstring*' or 'Command Line' like '*downloadfile*' or 'Command Line' like '*iwr *' or 'Command Line' like '*wget *' or 'Command Line' like '*curl *' or 'Command Line' like '*net.webclient*' or 'Command Line' like '*start-bitstransfer*')) or (('Command Line' like '*-enc*' or 'Command Line' like '*-encodedcommand*' or 'Command Line' like '*frombase64string*' or 'Command Line' like '*tobase64string*')) or (('Command Line' like '*amsiutils*' or 'Command Line' like '*amsiinitfailed*' or 'Command Line' like '*reflection.assembly*' or 'Command Line' like '*setvalue($null,$true)*')) or (('Command Line' like '*get-credential*' or 'Command Line' like '*mimikatz*' or 'Command Line' like '*sekurlsa*' or 'Command Line' like '*lsadump*' or 'Command Line' like '*invoke-mimikatz*' or 'Command Line' like '*get-gpppassword*' or 'Command Line' like '*find-localadminaccess*')) or (('Command Line' like '*get-domainuser*' or 'Command Line' like '*get-domaingroup*' or 'Command Line' like '*get-domaincomputer*' or 'Command Line' like '*get-netuser*' or 'Command Line' like '*get-netgroup*' or 'Command Line' like '*get-netcomputer*' or 'Command Line' like '*invoke-sharefinder*' or 'Command Line' like '*invoke-kerberoast*' or 'Command Line' like '*invoke-bloodhound*')) ) | stats count as Detections by 'Command Line' | sort -Detections"
     },
     {
+      "filename": "powerview__powersploit_domain_reconnaissance.json",
+      "title": "PowerView / PowerSploit Domain Reconnaissance",
+      "sigma_id": "410cbc30-ae35-4ff4-a358-ae0dcc3c1db8",
+      "level": "medium",
+      "stig_category": "CAT II",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1087.002",
+        "T1482"
+      ],
+      "mitre_tactics": [
+        "discovery"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Get-DomainUser*' or 'Command Line' like '*Get-DomainComputer*' or 'Command Line' like '*Get-DomainGroup*' or 'Command Line' like '*Get-NetUser*' or 'Command Line' like '*Get-NetComputer*' or 'Command Line' like '*Get-ObjectAcl*' or 'Command Line' like '*Find-InterestingDomainAcl*' or 'Command Line' like '*Get-DomainTrust*' or 'Command Line' like '*Invoke-ACLScanner*')))"
+    },
+    {
       "filename": "print_processor_persistence.json",
       "title": "Print Processor Persistence",
       "sigma_id": "0905efd5-d0c6-40de-a470-79d8fd1c0887",
@@ -4483,6 +5379,22 @@
         "persistence"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Print Processors*' and 'Command Line' like '*reg*' and 'Command Line' like '*add*')))"
+    },
+    {
+      "filename": "printerbug__spoolsample_authentication_coercion.json",
+      "title": "PrinterBug / SpoolSample Authentication Coercion",
+      "sigma_id": "c4d636f4-d14b-4d7e-a292-1e056a58355a",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1187"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*SpoolSample*' or 'Command Line' like '*printerbug*' or 'Command Line' like '*dementor*' or 'Command Line' like '*RpcRemoteFindFirstPrinterChangeNotification*' or 'Command Line' like '*MS-RPRN*')))"
     },
     {
       "filename": "printnightmare_exploitation_attempt.json",
@@ -4582,6 +5494,24 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*VirtualAllocEx*' or 'Command Line' like '*WriteProcessMemory*' or 'Command Line' like '*CreateRemoteThread*' or 'Command Line' like '*NtMapViewOfSection*')))"
     },
     {
+      "filename": "psexec-style_remote_service_installation_event_7045.json",
+      "title": "PsExec-style Remote Service Installation (Event 7045)",
+      "sigma_id": "c5603452-cf16-4a99-8cad-e792c22c3200",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1569.002",
+        "T1021.002"
+      ],
+      "mitre_tactics": [
+        "execution",
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '7045') and ( (('Service Name' like '*PSEXESVC*' or 'Service Name' like '*PAExec*' or 'Service Name' like '*RemCom*' or 'Service Name' like '*csexec*')) or (('Service File Name' like '*ADMIN$*' or 'Service File Name' like '*Temp*' or 'Service File Name' like '*system32*' or 'Service File Name' like '*.bat*')) ))"
+    },
+    {
       "filename": "psexec_service_installation.json",
       "title": "PsExec Service Installation",
       "sigma_id": "73756cad-86bb-4ecd-9eda-0e018645328f",
@@ -4644,6 +5574,38 @@
         "impact"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*.encrypted*' or 'Command Line' like '*.locked*' or 'Command Line' like '*.crypted*' or 'Command Line' like '*.enc*' or 'Command Line' like '*.crypt*')))"
+    },
+    {
+      "filename": "rbcd_configuration_via_powershell__powerview.json",
+      "title": "RBCD Configuration via PowerShell / PowerView",
+      "sigma_id": "64217fa4-bfe6-446a-a3aa-bcd76b7846d2",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*PrincipalsAllowedToDelegateToAccount*' or 'Command Line' like '*msDS-AllowedToActOnBehalfOfOtherIdentity*' or 'Command Line' like '*Set-ADComputer*' or 'Command Line' like '*Get-ADComputer*')) and (('Command Line' like '*AllowedToAct*' or 'Command Line' like '*DelegateTo*' or 'Command Line' like '*rbcd*')))"
+    },
+    {
+      "filename": "rbcd_msds-allowedtoactonbehalfofotheridentity_modified_event_5136.json",
+      "title": "RBCD: msDS-AllowedToActOnBehalfOfOtherIdentity Modified (Event 5136)",
+      "sigma_id": "cb96dce3-0170-4e00-96ae-239948a05f1f",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '5136' and ('Properties' like '*3f78c3e5-f79a-46bd-a0b8-9d18116ddc79*' or 'Properties' like '*msDS-AllowedToActOnBehalfOfOtherIdentity*')))"
     },
     {
       "filename": "rdp_session_hijacking_via_tscon.json",
@@ -4984,6 +5946,24 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*Whisker*' or 'Command Line' like '*whisker*' or 'Command Line' like '*KeyCredential*' or 'Command Line' like '*shadowcred*')))"
     },
     {
+      "filename": "shadow_credentials_msds-keycredentiallink_modified_event_5136.json",
+      "title": "Shadow Credentials: msDS-KeyCredentialLink Modified (Event 5136)",
+      "sigma_id": "7e9ca45b-3cd3-419c-886d-d803c3001e4c",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1556",
+        "T1098"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "persistence"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and (('Event ID' = '5136' and ('Properties' like '*5b47d60f-6090-40b2-9f37-2a4de88f3063*' or 'Properties' like '*msDS-KeyCredentialLink*')))"
+    },
+    {
       "filename": "sharprdp_lateral_movement.json",
       "title": "SharpRDP Lateral Movement",
       "sigma_id": "c14b23f9-e3cd-4abb-9d07-8ff112654c25",
@@ -5014,6 +5994,71 @@
         "persistence"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*WScript.Shell*' and 'Command Line' like '*CreateShortcut*')))"
+    },
+    {
+      "filename": "sid_history_added_or_failed_events_47654766.json",
+      "title": "SID History Added or Failed (Events 4765/4766)",
+      "sigma_id": "ddbc36d3-20f3-4341-a315-17563fed65a2",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "security",
+      "mitre_techniques": [
+        "T1134.005"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and ((('Event ID' = '4765' or 'Event ID' = '4766')))"
+    },
+    {
+      "filename": "sid_history_injection_via_mimikatz.json",
+      "title": "SID History Injection via mimikatz",
+      "sigma_id": "dc9708d2-5506-4c7c-9c0b-af75ec0738bb",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1134.005"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*sid::patch*' or 'Command Line' like '*sid::add*' or 'Command Line' like '*misc::addsid*' or 'Command Line' like '*Add-ADGroupMember -SIDHistory*')))"
+    },
+    {
+      "filename": "silver_ticket_forged_kerberos_service_ticket.json",
+      "title": "Silver Ticket: Forged Kerberos Service Ticket",
+      "sigma_id": "3996bf3c-392e-47d5-b3f5-331bffe11c35",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1558.002"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( (('Command Line' like '*kerberos::golden*' and 'Command Line' like '*/service:*')) and (('Command Line' like '*/target:*' or 'Command Line' like '*/rc4:*' or 'Command Line' like '*/aes256:*')) ) or (('Command Line' like '*rubeus silver*' or 'Command Line' like '*asktgs /service*')))"
+    },
+    {
+      "filename": "skeleton_key_domain_backdoor_via_mimikatz.json",
+      "title": "Skeleton Key Domain Backdoor via mimikatz",
+      "sigma_id": "97da42b0-3460-4e71-8e32-c90246dac513",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1556.001"
+      ],
+      "mitre_tactics": [
+        "credential_access",
+        "defense_evasion"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*misc::skeleton*' or 'Command Line' like '*skeleton key*')))"
     },
     {
       "filename": "software_discovery_via_wmic.json",
@@ -5939,6 +6984,38 @@
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Process Name' like '*\\\\shutdown.exe' and ('Command Line' like '*/s*' or 'Command Line' like '*/r*' or 'Command Line' like '*/f*')))"
     },
     {
+      "filename": "targeted_as-rep_roasting_donotrequirepreauth_set.json",
+      "title": "Targeted AS-REP Roasting: DoNotRequirePreAuth Set",
+      "sigma_id": "055a6f54-47dd-43a1-a93f-53f679272eff",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1558.004"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*DoesNotRequirePreAuth*' or 'Command Line' like '*DONT_REQ_PREAUTH*' or 'Command Line' like '*DONT_REQUIRE_PREAUTH*')) or (('Command Line' like '*useraccountcontrol*' and 'Command Line' like '*4194304*')))"
+    },
+    {
+      "filename": "targeted_kerberoasting_spn_set_on_user_account.json",
+      "title": "Targeted Kerberoasting: SPN Set on User Account",
+      "sigma_id": "441f774f-e038-4117-8fb1-2c6dc07f893b",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1558.003"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*serviceprincipalname*' or 'Command Line' like '*targetedKerberoast*' or 'Command Line' like '*Set-DomainObject*')) and (('Command Line' like '*Set-ADUser*' or 'Command Line' like '*-ServicePrincipalName*' or 'Command Line' like '*targetedKerberoast*' or 'Command Line' like '*serviceprincipalname*')))"
+    },
+    {
       "filename": "template_injection_via_microsoft_office.json",
       "title": "Template Injection via Microsoft Office",
       "sigma_id": "05481d56-9a0e-430b-8efb-ebbf52c1d2b6",
@@ -5969,6 +7046,22 @@
         "persistence"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*TimeProviders*' and 'Command Line' like '*DllName*' and 'Command Line' like '*reg*')))"
+    },
+    {
+      "filename": "timeroasting_computer_account_hash_harvest_via_ntp.json",
+      "title": "Timeroasting: Computer Account Hash Harvest via NTP",
+      "sigma_id": "ed405880-b1dc-4b84-895f-1109be41cc23",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1558"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*timeroast*' or 'Command Line' like '*timeroasting*' or 'Command Line' like '*sntp_roast*' or 'Command Line' like '*MS-SNTP*')))"
     },
     {
       "filename": "timestomping_via_powershell.json",
@@ -6081,6 +7174,22 @@
         "privilege_escalation"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (('Parent Process Name' like '*\\\\fodhelper.exe') and not ('Process Name' like '*\\\\fodhelper.exe'))"
+    },
+    {
+      "filename": "unconstrained_delegation_tgt_capture_via_rubeus_monitor.json",
+      "title": "Unconstrained Delegation TGT Capture via Rubeus monitor",
+      "sigma_id": "af4af474-cd38-46b5-a5e9-5a7430c34b40",
+      "level": "high",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1558"
+      ],
+      "mitre_tactics": [
+        "credential_access"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*monitor /interval*' or 'Command Line' like '*rubeus monitor*' or 'Command Line' like '*triage*')) or (('Command Line' like '*dump*' and 'Command Line' like '*/service:krbtgt*')))"
     },
     {
       "filename": "unquoted_service_path_exploitation.json",
@@ -7965,11 +9074,29 @@
         "defense_evasion"
       ],
       "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and (( ('Process Name' like '*\\\\wmic.exe' and 'Command Line' like '*/format:*') or ('Process Name' like '*\\\\msxsl.exe') ))"
+    },
+    {
+      "filename": "zerologon_cve-2020-1472_netlogon_exploitation.json",
+      "title": "Zerologon (CVE-2020-1472) Netlogon Exploitation",
+      "sigma_id": "18a2d14d-9301-4478-81cf-918f67a5a575",
+      "level": "critical",
+      "stig_category": "CAT I",
+      "platform": "windows",
+      "service": "",
+      "mitre_techniques": [
+        "T1068",
+        "T1210"
+      ],
+      "mitre_tactics": [
+        "privilege_escalation",
+        "lateral_movement"
+      ],
+      "query": "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ((('Command Line' like '*zerologon*' or 'Command Line' like '*cve-2020-1472*' or 'Command Line' like '*set_empty_pw*' or 'Command Line' like '*lsadump::zerologon*' or 'Command Line' like '*reinstall_original_pw*')))"
     }
   ],
   "dashboards": {
     "total": 29,
-    "saved_searches": 438,
+    "saved_searches": 441,
     "names": [
       "SOC Overview Dashboard",
       "SOC: OCI STIG Compliance Dashboard",

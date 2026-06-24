@@ -5,7 +5,7 @@
 ## Scope
 
 - **Only exposed product surface:** `/forge`
-- **API surface:** `/api/forge/session`, `/api/forge/convert`, and `/api/health`
+- **API surface:** `/api/forge/session`, `/api/forge/convert`, `/api/forge/artifacts`, and `/api/health`
 - **Artifact source:** parent repository root by default, or `LOGAN_DETECTIONS_REPO` when explicitly set
 - **Public repository link:** `https://github.com/adibirzu/oci-log-analytics-detections`
 - **Production host targets:** `https://convert.octodemo.cloud` and `https://forge.octodemo.cloud`

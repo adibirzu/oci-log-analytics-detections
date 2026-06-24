@@ -46,8 +46,8 @@ SOURCE_CAPABILITIES: list[dict[str, Any]] = [
         "label": "Splunk SPL",
         "status": "partial",
         "backend_entrypoint": "scripts/logan_workbench_convert.py",
-        "conversion_path": "deterministic_pattern_mapping",
-        "next_capabilities": ["SPL parser", "subsearch and lookup dependency modeling"],
+        "conversion_path": "bounded_pipeline_parser_to_logan",
+        "next_capabilities": ["macro expansion workflow", "subsearch materialization validation", "transaction duration/maxpause parity"],
     },
     {
         "language": "elastic_lucene",

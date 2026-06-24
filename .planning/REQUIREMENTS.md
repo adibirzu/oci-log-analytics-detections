@@ -54,11 +54,11 @@ Baseline (from `queries/sentinel_conversion_report.json`): 4,452 candidates, 25 
 
 ### Converter Refactor and Test Harness
 
-- [ ] **REF-01**: `scripts/convert_sentinel_kql.py` is reduced to a thin facade (≤ 800 lines) over a new `scripts/kql/` subpackage containing `lexer.py`, `ast_nodes.py`, `pipeline.py`, `mapping_loader.py`, `operators/<op>.py`, `functions/<fn>.py`, and `emitter.py`, dispatched through an `OPERATOR_REGISTRY` mapping.
-- [ ] **REF-02**: A Logan QL canonicalizer (`scripts/kql/canonical.py`) tokenizes converter output, sorts commutative comparisons, and normalizes quoting and whitespace so converter tests assert on canonical form rather than exact strings.
-- [ ] **REF-03**: KQL expressions are classified as TIER-1 (lossless), TIER-2 (transform with documented rewrite), or TIER-3 (unsupported, SKIPPED with structured reason); the classifier output is included in `queries/sentinel_conversion_report.json`.
-- [ ] **REF-04**: `requirements-dev.txt` introduces `pytest >= 8.3` and `hypothesis >= 6.150` (test-only — runtime deps in `requirements.txt` are unchanged); `scripts/test_kql/` mirrors the new subpackage tree with `fixtures/{kql,expected}/` directories.
-- [ ] **REF-05**: Existing tests in `scripts/test_sentinel_converter.py` stay green throughout the refactor (behavior-preserving — REF-01..03 land without changing converter output for the current promoted set).
+- [x] **REF-01**: `scripts/convert_sentinel_kql.py` is reduced to a thin facade (≤ 800 lines) over a new `scripts/kql/` subpackage containing `lexer.py`, `ast_nodes.py`, `pipeline.py`, `mapping_loader.py`, `operators/<op>.py`, `functions/<fn>.py`, and `emitter.py`, dispatched through an `OPERATOR_REGISTRY` mapping.
+- [x] **REF-02**: A Logan QL canonicalizer (`scripts/kql/canonical.py`) tokenizes converter output, sorts commutative comparisons, and normalizes quoting and whitespace so converter tests assert on canonical form rather than exact strings.
+- [x] **REF-03**: KQL expressions are classified as TIER-1 (lossless), TIER-2 (transform with documented rewrite), or TIER-3 (unsupported, SKIPPED with structured reason); the classifier output is included in `queries/sentinel_conversion_report.json`.
+- [x] **REF-04**: `requirements-dev.txt` introduces `pytest >= 8.3` and `hypothesis >= 6.150` (test-only — runtime deps in `requirements.txt` are unchanged); `scripts/test_kql/` mirrors the new subpackage tree with `fixtures/{kql,expected}/` directories.
+- [x] **REF-05**: Existing tests in `scripts/test_sentinel_converter.py` stay green throughout the refactor (behavior-preserving — REF-01..03 land without changing converter output for the current promoted set).
 
 ### Mapping Configuration and Field Coverage
 
@@ -66,23 +66,23 @@ Baseline (from `queries/sentinel_conversion_report.json`): 4,452 candidates, 25 
 - [x] **MAP-02**: `scripts/kql/mapping_loader.py` loads shards in deterministic order with a strict YAML loader that fails the build on duplicate keys; the first strict-load run is a documented, possibly-noisy task.
 - [x] **MAP-03**: A collision lint pass detects many-to-one Sentinel-to-Logan column fan-outs (e.g., nine user-name fields mapping to `User Name`) and emits `lossy_mapping_collision:<a>+<b>→<col>` skip reasons; output written to `queries/mapping_collisions.json`.
 - [x] **MAP-04**: Every mapped field carries a role tag from `{subject, target, initiator, resource, time, hash, network}` so role-mismatched comparisons (e.g., `subject == target`) can be detected by the converter.
-- [ ] **MAP-05**: Bulk Sentinel field additions land for `SubjectAccount`, `SubjectDomainName`, `SubjectLogonId`, `SubjectUserSid`, `SubjectUserName`, `InitiatingProcessAccountDomain`, `InitiatingProcessAccountName`, `InitiatingProcessSHA256`, `InitiatingProcessId`, `MailboxOwnerUPN`, `OfficeWorkload`, `OrganizationName`, `ClientInfoString`, `UserType`, `ParentProcessName`, `ProcessId`, `Exe`, `LocalFile`, `ActingProcessFileInternalName`, plus a `Logon_Type` → `LogonType` alias.
-- [ ] **MAP-06**: Every new mapping points to a key already present in `queries/log_source_field_dictionary.json` or carries a documented parser-source contract reference (see PARSER-01).
+- [x] **MAP-05**: Bulk Sentinel field additions land for `SubjectAccount`, `SubjectDomainName`, `SubjectLogonId`, `SubjectUserSid`, `SubjectUserName`, `InitiatingProcessAccountDomain`, `InitiatingProcessAccountName`, `InitiatingProcessSHA256`, `InitiatingProcessId`, `MailboxOwnerUPN`, `OfficeWorkload`, `OrganizationName`, `ClientInfoString`, `UserType`, `ParentProcessName`, `ProcessId`, `Exe`, `LocalFile`, `ActingProcessFileInternalName`, plus a `Logon_Type` → `LogonType` alias.
+- [x] **MAP-06**: Every new mapping points to a key already present in `queries/log_source_field_dictionary.json` or carries a documented parser-source contract reference (see PARSER-01).
 
 ### KQL Operator Parity
 
-- [ ] **OP-01**: `extend` with scalar functions (`iff`, `tostring`, `toint`, `tolong`, `tolower`, `toupper`) translates to OCL `eval` with the n-ary `if(...)` form.
-- [ ] **OP-02**: Single-use `let` constant inlining is supported (multi-use and let-as-function remain SKIPPED with structured reason).
-- [ ] **OP-03**: `bin(TimeGenerated, span)` translates to `timestats span=` against the matching time field; mixed-bin chains are SKIPPED.
-- [ ] **OP-04**: `project`, `project-away`, `top N by`, `distinct`, `countif`, and `column_ifexists` (gated on MAP-05 completeness) translate to their OCL equivalents.
-- [ ] **OP-05**: KQL `set timeout=...`, `set truncationmaxsize=...`, and `set query_take_max_records=...` directives are stripped silently rather than emitted as field-mapping failures.
-- [ ] **OP-06**: Lossy emission is forbidden: `parse_command_line`, `parse with literal anchors`, true regex `matches regex`, `mv-expand`, `bag_unpack`, `series_*`, `geo_*`, cross-table `join`, `_GetWatchlist`, and `evaluate plugin(...)` remain SKIPPED with structured reasons; the converter must not silently rewrite them to weaker OCL equivalents.
+- [x] **OP-01**: `extend` with scalar functions (`iff`, `tostring`, `toint`, `tolong`, `tolower`, `toupper`) translates to OCL `eval` with the n-ary `if(...)` form.
+- [x] **OP-02**: Single-use `let` constant inlining is supported (multi-use and let-as-function remain SKIPPED with structured reason).
+- [x] **OP-03**: `bin(TimeGenerated, span)` translates to `timestats span=` against the matching time field; mixed-bin chains are SKIPPED.
+- [x] **OP-04**: `project`, `project-away`, `top N by`, `distinct`, `countif`, and `column_ifexists` (gated on MAP-05 completeness) translate to their OCL equivalents.
+- [x] **OP-05**: KQL `set timeout=...`, `set truncationmaxsize=...`, and `set query_take_max_records=...` directives are stripped silently rather than emitted as field-mapping failures.
+- [x] **OP-06**: Lossy emission is forbidden: `parse_command_line`, `parse with literal anchors`, true regex `matches regex`, `mv-expand`, `bag_unpack`, `series_*`, `geo_*`, cross-table `join`, `_GetWatchlist`, and `evaluate plugin(...)` remain SKIPPED with structured reasons; the converter must not silently rewrite them to weaker OCL equivalents.
 
 ### Parser-Side Field Extraction
 
-- [ ] **PARSER-01**: Each Sentinel field that requires extraction beyond OCL field mapping (e.g., `EventData` children like `ObjectDN`, `ActingProcessFileInternalName`, certain `Office*` workload sub-fields) carries a documented parser readiness assessment under `docs/parser_readiness/<field>.md` capturing: source log type, current parser, gap, proposed extraction strategy, and SOC parser change scope.
-- [ ] **PARSER-02**: At least the `EventData` ObjectDN/ObjectName/AttributeLDAPDisplayName trio is added to the relevant SOC parser (or a new parser definition under `config/parsers/`) and verified end-to-end against a synthetic fixture.
-- [ ] **PARSER-03**: Fields whose extraction requires SOC parser changes outside this milestone's scope are marked `parser_change_required: true` in the mapping shards and SKIPPED with `parser_readiness:pending` reason until PARSER-02-style work lands.
+- [x] **PARSER-01**: Each Sentinel field that requires extraction beyond OCL field mapping (e.g., `EventData` children like `ObjectDN`, `ActingProcessFileInternalName`, certain `Office*` workload sub-fields) carries a documented parser readiness assessment under `docs/parser_readiness/<field>.md` capturing: source log type, current parser, gap, proposed extraction strategy, and SOC parser change scope.
+- [x] **PARSER-02**: At least the `EventData` ObjectDN/ObjectName/AttributeLDAPDisplayName trio is added to the relevant SOC parser (or a new parser definition under `config/parsers/`) and verified end-to-end against a synthetic fixture.
+- [x] **PARSER-03**: Fields whose extraction requires SOC parser changes outside this milestone's scope are marked `parser_change_required: true` in the mapping shards and SKIPPED with `parser_readiness:pending` reason until PARSER-02-style work lands.
 
 ### Backlog Prioritization
 
@@ -93,19 +93,19 @@ Baseline (from `queries/sentinel_conversion_report.json`): 4,452 candidates, 25 
 
 ### Drift and Synthetic-Hit Gates
 
-- [ ] **DRIFT-01**: `scripts/sentinel_drift_check.py` diffs the current `queries/sentinel_conversion_report.json` against the `main:` baseline plus per-file `live_validation_status` and Logan QL body hashes; writes `queries/sentinel_drift.json` and exits non-zero on regression.
-- [ ] **DRIFT-02**: Every promoted artifact in `queries/sentinel/*.json` records a `parser_schema_hash` derived deterministically from `queries/log_source_field_dictionary.json`; drift in this hash without an explicit promotion run flags as a drift incident.
-- [ ] **DRIFT-03**: `scripts/release_checklist.py` adds a `live_synthetic_hit_count > 0` gate — every promoted Sentinel artifact must pair with a synthetic-log fixture producing at least one row.
-- [ ] **DRIFT-04**: `queries/sentinel_conversion_report.json` separates `live_validation_passed_with_rows` from `live_validation_passed_zero_rows` in the summary so zero-row passes do not inflate promotion claims.
+- [x] **DRIFT-01**: `scripts/sentinel_drift_check.py` diffs the current `queries/sentinel_conversion_report.json` against the `main:` baseline plus per-file `live_validation_status` and Logan QL body hashes; writes `queries/sentinel_drift.json` and exits non-zero on regression.
+- [x] **DRIFT-02**: Every promoted artifact in `queries/sentinel/*.json` records a `parser_schema_hash` derived deterministically from `queries/log_source_field_dictionary.json`; drift in this hash without an explicit promotion run flags as a drift incident.
+- [ ] **DRIFT-03**: `scripts/sentinel_drift_check.py --require-synthetic-hits` is implemented, but current live evidence covers 20 / 60 promoted Sentinel files. `queries/sentinel_drift.json` lists the remaining 40 under `synthetic_hit_gaps`; all 40 are now `synthetic_ready` live-validation targets.
+- [x] **DRIFT-04**: `queries/sentinel_conversion_report.json` separates `live_validation_passed_with_rows` from `live_validation_passed_zero_rows` in the summary so zero-row passes do not inflate promotion claims.
 
 ### CI and Live-Validation Lane
 
-- [ ] **CI-01**: `.github/workflows/sentinel-converter.yml` runs four jobs on PRs that touch `scripts/`, `config/mapping/`, or `queries/`: `unit` (operator tests, no OCI), `integration` (dry-run full corpus, no live calls), `drift` (vs `main` baseline), and `live` (manual `workflow_dispatch` or scheduled cron, OCI secrets, delta-only).
-- [ ] **CI-02**: The CI summary comment posts the backlog-priority delta and drift-detector results on every PR.
-- [ ] **CI-03**: The Sentinel workflow's classifier treats `429 / RequestThrottled / TooManyRequests` as `live_environment` defect (retry-eligible) rather than `live_validation` failure (promotion-blocking).
-- [ ] **CI-04**: Live calls in CI are cached on `(logan_ql_hash, parser_schema_hash, lookback)` with a configurable TTL so re-runs against unchanged candidates do not burn API budget.
-- [ ] **CI-05**: `scripts/scan_sensitive_values.py` runs over `queries/sentinel/*.json` and `queries/sentinel_conversion_report.json` after promotion (not just before commit) with extended patterns covering OCIDs, public IPs, compartment names, and tenancy host suffixes.
-- [ ] **CI-06**: `scripts/check_inventory_drift.py` is extended to cover Sentinel JSON ↔ conversion report ↔ catalog ↔ manifest reconciliation so drift in any of those four artifacts fails the PR.
+- [x] **CI-01**: `.github/workflows/sentinel-converter.yml` runs four jobs on PRs that touch `scripts/`, `config/mapping/`, or `queries/`: `unit` (operator tests, no OCI), `integration` (dry-run full corpus, no live calls), `drift` (vs `main` baseline), and `live` (manual `workflow_dispatch` or scheduled cron, OCI secrets, delta-only).
+- [x] **CI-02**: The CI summary comment posts the backlog-priority delta and drift-detector results on every same-repository PR; all PRs receive the same content in the Actions step summary.
+- [x] **CI-03**: The Sentinel workflow's classifier treats `429 / RequestThrottled / TooManyRequests` as `live_environment` defect (retry-eligible) rather than `live_validation` failure (promotion-blocking).
+- [x] **CI-04**: Live calls in CI are cached on `(logan_ql_hash, parser_schema_hash, lookback)` with a configurable TTL so re-runs against unchanged candidates do not burn API budget.
+- [x] **CI-05**: `scripts/scan_sensitive_values.py` runs over `queries/sentinel/*.json` and `queries/sentinel_conversion_report.json` after promotion (not just before commit) with extended patterns covering OCIDs, public IPs, compartment names, and tenancy host suffixes.
+- [x] **CI-06**: `scripts/check_inventory_drift.py` and `scripts/sentinel_drift_check.py` cover Sentinel JSON ↔ conversion report ↔ catalog reconciliation; `queries/manifest.json` remains an export artifact that does not currently include Sentinel payloads.
 
 ## v3.0 Requirements - Logan QL Conversion Workbench
 
@@ -113,38 +113,38 @@ Baseline: this repo remains the canonical producer of OCI Log Analytics detectio
 
 ### Workbench User Experience
 
-- [ ] **WB-01**: The integrated `webapp/` frontend provides a source language selector and editor for Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI Log Analytics QL passthrough.
-- [ ] **WB-02**: The workbench shows OCI Log Analytics QL output with formatting, copy, export, and warning states alongside a source-to-target explanation panel.
-- [ ] **WB-03**: The workbench includes 10-20 validated example conversions across the supported source languages, with expected OCI QL and warning metadata.
+- [x] **WB-01**: The integrated `webapp/` frontend provides a source language selector and editor for Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI Log Analytics QL passthrough.
+- [x] **WB-02**: The workbench shows OCI Log Analytics QL output with formatting, copy, export, and warning states alongside a source-to-target explanation panel.
+- [x] **WB-03**: The workbench includes 10-20 validated example conversions across the supported source languages, with expected OCI QL and warning metadata.
 
 ### OCI Reference Catalog
 
-- [ ] **REFCAT-01**: This repo generates `queries/logan_ql_reference_catalog.json` from official OCI Log Analytics documentation URLs, including command names, source URLs, retrieval timestamp, syntax summary, examples when available, and command category metadata.
-- [ ] **REFCAT-02**: The integrated `webapp/` command/reference menu consumes the generated catalog rather than hand-authored React data, and includes query-search fundamentals plus command-reference entries.
-- [ ] **REFCAT-03**: Catalog refresh tests fail when required command metadata is missing, provenance is absent, or generated menu data is edited manually.
+- [x] **REFCAT-01**: This repo generates `queries/logan_ql_reference_catalog.json` from official OCI Log Analytics documentation URLs, including command names, source URLs, retrieval timestamp, syntax summary, examples when available, and command category metadata.
+- [x] **REFCAT-02**: The integrated `webapp/` command/reference menu consumes the generated catalog rather than hand-authored React data, and includes query-search fundamentals plus command-reference entries.
+- [x] **REFCAT-03**: Catalog refresh tests fail when required command metadata is missing, provenance is absent, or generated menu data is edited manually.
 
 ### Cross-QL Conversion Patterns
 
-- [ ] **XQL-01**: This repo generates a cross-QL pattern library covering filters, field references, boolean logic, time windows, aggregation, projection, eval/extend, regex/extraction, lookup/watchlist semantics, joins/correlation, sort/top, and unsupported constructs for Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI QL.
-- [ ] **XQL-02**: Conversion responses include structured explanations mapping source clauses to OCI Log Analytics commands, target fields, parser assumptions, support level, and warning messages.
-- [ ] **XQL-03**: Lossy or unsupported source constructs produce explicit warnings or blocked conversions; the workbench must not silently emit weaker OCI QL.
+- [x] **XQL-01**: This repo generates a cross-QL pattern library covering filters, field references, boolean logic, time windows, aggregation, projection, eval/extend, regex/extraction, lookup/watchlist semantics, joins/correlation, sort/top, and unsupported constructs for Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI QL.
+- [x] **XQL-02**: Conversion responses include structured explanations mapping source clauses to OCI Log Analytics commands, target fields, parser assumptions, support level, and warning messages.
+- [x] **XQL-03**: Lossy or unsupported source constructs produce explicit warnings or blocked conversions; the workbench must not silently emit weaker OCI QL.
 
 ### Producer/Consumer API Contract
 
-- [ ] **API-01**: This repo defines versioned JSON schemas under `schemas/logan_workbench/` for workbench artifacts, conversion requests, conversion responses, examples, warnings, and reference catalog entries.
-- [ ] **API-02**: The integrated `webapp/` frontend validates imported artifacts against the generated schemas at build time or startup and fails clearly when versions drift.
-- [ ] **API-03**: Sentinel and Sigma examples reuse this repo's existing converter/mapping paths; `webapp/` does not duplicate converter generation logic.
+- [x] **API-01**: This repo defines versioned JSON schemas under `schemas/logan_workbench/` for workbench artifacts, conversion requests, conversion responses, examples, warnings, and reference catalog entries.
+- [x] **API-02**: The integrated `webapp/` frontend validates imported artifacts against the generated schemas at build time or startup and fails clearly when versions drift.
+- [x] **API-03**: Sentinel and Sigma examples reuse this repo's existing converter/mapping paths; `webapp/` does not duplicate converter generation logic.
 
 ### Documentation and Mapping Guidance
 
-- [ ] **DOC-01**: `docs/logan_workbench_mapping_guide.md` explains how to map Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and generic source-query constructs to OCI Log Analytics QL with support-level notes.
-- [ ] **DOC-02**: The integrated `/forge` page presents mapping guidance contextually through the command menu, examples, and explanation panel rather than as a standalone marketing page.
+- [x] **DOC-01**: `docs/logan_workbench_mapping_guide.md` explains how to map Splunk SPL, Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and generic source-query constructs to OCI Log Analytics QL with support-level notes.
+- [x] **DOC-02**: The integrated `/forge` page presents mapping guidance contextually through the command menu, examples, and explanation panel rather than as a standalone marketing page.
 
 ### Validation, Security, and Release Gates
 
-- [ ] **QA-01**: Producer-side tests validate generated schemas, command catalog, mapping patterns, examples, and conversion warning behavior.
-- [ ] **QA-02**: Workbench examples and synthetic logs contain no credentials, OCIDs, public IPs, tenancy-specific names, or unredacted live payloads; sensitive-value scanning covers the new artifacts.
-- [ ] **QA-03**: `webapp/` gates include build, typecheck, lint, accessibility-sensitive browser checks, mobile/desktop layout checks, and the editor-to-output-to-copy/export flow.
+- [x] **QA-01**: Producer-side tests validate generated schemas, command catalog, mapping patterns, examples, and conversion warning behavior.
+- [x] **QA-02**: Workbench examples and synthetic logs contain no credentials, OCIDs, public IPs, tenancy-specific names, or unredacted live payloads; sensitive-value scanning covers the new artifacts.
+- [x] **QA-03**: `webapp/` gates include build, typecheck, lint, accessibility-sensitive browser checks, mobile/desktop layout checks, and the editor-to-output-to-copy/export flow.
 
 ## v2 Requirements (deferred — superseded or follow-on)
 
@@ -211,63 +211,63 @@ Baseline: this repo remains the canonical producer of OCI Log Analytics detectio
 | SEC-01 | Phase 5 | Complete |
 | SEC-02 | Phase 5 | Complete |
 | SEC-03 | Phase 5 | Complete |
-| REF-01 | Phase 6 | Pending |
-| REF-02 | Phase 6 | Pending |
-| REF-03 | Phase 6 | Pending |
-| REF-04 | Phase 6 | Pending |
-| REF-05 | Phase 6 | Pending |
-| MAP-01 | Phase 7 | Pending |
-| MAP-02 | Phase 7 | Pending |
-| MAP-03 | Phase 7 | Pending |
-| MAP-04 | Phase 7 | Pending |
-| MAP-05 | Phase 9 | Pending |
-| MAP-06 | Phase 9 | Pending |
-| OP-01 | Phase 9 | Pending |
-| OP-02 | Phase 9 | Pending |
-| OP-03 | Phase 9 | Pending |
-| OP-04 | Phase 9 | Pending |
-| OP-05 | Phase 9 | Pending |
-| OP-06 | Phase 9 | Pending |
-| PARSER-01 | Phase 9 | Pending |
-| PARSER-02 | Phase 9 | Pending |
-| PARSER-03 | Phase 9 | Pending |
+| REF-01 | Phase 6 | Complete |
+| REF-02 | Phase 6 | Complete |
+| REF-03 | Phase 6 | Complete |
+| REF-04 | Phase 6 | Complete |
+| REF-05 | Phase 6 | Complete |
+| MAP-01 | Phase 7 | Complete |
+| MAP-02 | Phase 7 | Complete |
+| MAP-03 | Phase 7 | Complete |
+| MAP-04 | Phase 7 | Complete |
+| MAP-05 | Phase 9 | Complete |
+| MAP-06 | Phase 9 | Complete |
+| OP-01 | Phase 9 | Complete |
+| OP-02 | Phase 9 | Complete |
+| OP-03 | Phase 9 | Complete |
+| OP-04 | Phase 9 | Complete |
+| OP-05 | Phase 9 | Complete |
+| OP-06 | Phase 9 | Complete |
+| PARSER-01 | Phase 9 | Complete |
+| PARSER-02 | Phase 9 | Complete |
+| PARSER-03 | Phase 9 | Complete |
 | PRI-01 | Phase 8 | Complete |
 | PRI-02 | Phase 8 | Complete |
 | PRI-03 | Phase 8 | Complete |
 | PRI-04 | Phase 8 | Complete |
-| DRIFT-01 | Phase 10 | Pending |
-| DRIFT-02 | Phase 10 | Pending |
+| DRIFT-01 | Phase 10 | Complete |
+| DRIFT-02 | Phase 10 | Complete |
 | DRIFT-03 | Phase 10 | Pending |
-| DRIFT-04 | Phase 10 | Pending |
-| CI-01 | Phase 11 | Pending |
-| CI-02 | Phase 11 | Pending |
-| CI-03 | Phase 11 | Pending |
-| CI-04 | Phase 11 | Pending |
-| CI-05 | Phase 11 | Pending |
-| CI-06 | Phase 11 | Pending |
-| WB-01 | Phase 15 | Pending |
-| WB-02 | Phase 15 | Pending |
-| WB-03 | Phase 16 | Pending |
-| REFCAT-01 | Phase 13 | Pending |
-| REFCAT-02 | Phase 13 | Pending |
-| REFCAT-03 | Phase 13 | Pending |
-| XQL-01 | Phase 14 | Pending |
-| XQL-02 | Phase 14 | Pending |
-| XQL-03 | Phase 14 | Pending |
-| API-01 | Phase 12 | Pending |
-| API-02 | Phase 12 | Pending |
-| API-03 | Phase 12 | Pending |
-| DOC-01 | Phase 14 | Pending |
-| DOC-02 | Phase 15 | Pending |
-| QA-01 | Phase 16 | Pending |
-| QA-02 | Phase 16 | Pending |
-| QA-03 | Phase 15 | Pending |
+| DRIFT-04 | Phase 10 | Complete |
+| CI-01 | Phase 11 | Complete |
+| CI-02 | Phase 11 | Complete |
+| CI-03 | Phase 11 | Complete |
+| CI-04 | Phase 11 | Complete |
+| CI-05 | Phase 11 | Complete |
+| CI-06 | Phase 11 | Complete |
+| WB-01 | Phase 15 | Complete |
+| WB-02 | Phase 15 | Complete |
+| WB-03 | Phase 16 | Complete |
+| REFCAT-01 | Phase 13 | Complete |
+| REFCAT-02 | Phase 13 | Complete |
+| REFCAT-03 | Phase 13 | Complete |
+| XQL-01 | Phase 14 | Complete |
+| XQL-02 | Phase 14 | Complete |
+| XQL-03 | Phase 14 | Complete |
+| API-01 | Phase 12 | Complete |
+| API-02 | Phase 12 | Complete |
+| API-03 | Phase 12 | Complete |
+| DOC-01 | Phase 14 | Complete |
+| DOC-02 | Phase 15 | Complete |
+| QA-01 | Phase 16 | Complete |
+| QA-02 | Phase 16 | Complete |
+| QA-03 | Phase 15 | Complete |
 
 **Coverage:**
 - v1 requirements: 25 total — all Complete (Phases 1–5)
-- v2.0 requirements: 32 total — Pending (Phases 6–11)
-- v3.0 requirements: 17 total — Pending (Phases 12–16)
-- Mapped to phases: 49 (every v2.0 and v3.0 REQ-ID maps to exactly one phase)
+- v2.0 requirements: 34 total — 33 Complete, 1 Pending (DRIFT-03 live synthetic-hit evidence)
+- v3.0 requirements: 17 total — all Complete (Phases 12–16)
+- Mapped to phases: 51 (every v2.0 and v3.0 REQ-ID maps to exactly one phase)
 - Unmapped: 0
 - Orphaned phases: 0
 

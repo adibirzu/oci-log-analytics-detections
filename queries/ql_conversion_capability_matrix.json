@@ -13,7 +13,7 @@
     ],
     "third_party_rule_content": "excluded"
   },
-  "generated_at": "2026-05-28T14:51:49Z",
+  "generated_at": "2026-06-12T15:26:27Z",
   "generated_by": "scripts/analyze_ql_conversion_coverage.py",
   "schema_version": "1.0.0",
   "source_capabilities": [
@@ -41,12 +41,13 @@
     },
     {
       "backend_entrypoint": "scripts/logan_workbench_convert.py",
-      "conversion_path": "deterministic_pattern_mapping",
+      "conversion_path": "bounded_pipeline_parser_to_logan",
       "label": "Splunk SPL",
       "language": "splunk_spl",
       "next_capabilities": [
-        "SPL parser",
-        "subsearch and lookup dependency modeling"
+        "macro expansion workflow",
+        "subsearch materialization validation",
+        "transaction duration/maxpause parity"
       ],
       "status": "partial"
     },

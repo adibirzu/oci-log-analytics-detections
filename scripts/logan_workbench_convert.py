@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -27,6 +26,7 @@ for candidate in (PROJECT_ROOT, SCRIPTS_DIR):
 from scripts.convert_sigma import convert_rule, load_config  # noqa: E402
 from scripts.kql._facade_impl import convert_kql_to_logan, load_mapping_config  # noqa: E402
 from scripts.ql import elastic as elastic_converter  # noqa: E402
+from scripts.ql import splunk as splunk_converter  # noqa: E402
 
 
 LANGUAGES = {
@@ -179,54 +179,7 @@ def convert_sentinel_kql(query: str) -> dict[str, Any]:
 
 
 def convert_splunk_spl(query: str) -> dict[str, Any]:
-    lowered = query.lower()
-    warnings = [warning("heuristic_spl", "SPL conversion uses deterministic pattern mapping; validate advanced SPL manually.")]
-    if "`" in query or "$" in query:
-        warnings.append(warning("spl_macro", "SPL macro or token syntax was detected and ignored."))
-    if " join " in lowered or " transaction " in lowered:
-        return response(
-            source_language="splunk_spl",
-            source_query=query,
-            logan_query="",
-            support_level="unsupported",
-            explanation="SPL joins and transactions require backend correlation logic and are not safely rewritten.",
-            warnings=[warning("unsupported_join_or_transaction", "join/transaction semantics are blocked.", "error")],
-        )
-
-    source = "Windows Sysmon Events" if "sysmon" in lowered or "eventcode=1" in lowered else "SOC Application Logs"
-    predicates = [f"'Log Source' = '{source}'"]
-    if re.search(r"\beventcode\s*=\s*1\b", query, flags=re.IGNORECASE):
-        predicates.append("'Event ID' = '1'")
-    if "powershell.exe" in lowered:
-        predicates.append("'Process Name' like '*\\\\powershell.exe'")
-    if "encodedcommand" in lowered or " -enc " in lowered:
-        predicates.append("('Command Line' like '* -enc *' or 'Command Line' like '* -EncodedCommand *')")
-    if "src_ip" in lowered:
-        source = "OCI VCN Flow Logs"
-        predicates = [f"'Log Source' = '{source}'"]
-
-    logan = " and ".join(predicates)
-    if "lookup" in lowered:
-        logan += " | lookup threat_ips 'Source IP'"
-        warnings.append(warning("lossy_lookup", "Ensure an OCI lookup table named threat_ips exists before using this query."))
-    if "| stats" in lowered:
-        if "src_ip" in lowered:
-            logan += " | stats count as count by 'Source IP'"
-        else:
-            logan += " | stats count as count by 'Host Name', 'User Name', 'Command Line'"
-    if "sort -" in lowered:
-        logan += " | sort -count"
-    logan += " | head 100" if "| head" not in lowered else ""
-
-    return response(
-        source_language="splunk_spl",
-        source_query=query,
-        logan_query=logan,
-        support_level="lossy" if any(item["code"] == "lossy_lookup" for item in warnings) else "partial",
-        explanation="Mapped common SPL search, stats, lookup, and sort constructs into Logan QL patterns.",
-        warnings=warnings,
-    )
-
+    return splunk_converter.convert_splunk_spl(query)
 
 
 def convert_oci_logan(query: str) -> dict[str, Any]:

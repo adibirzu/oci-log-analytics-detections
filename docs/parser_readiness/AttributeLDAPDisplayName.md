@@ -3,7 +3,6 @@
 **Status:** pending parser extraction
 **Phase:** 9
 
-`AttributeLDAPDisplayName` is present in directory-service EventData and needs parser extraction before it can be used safely. The shard maps it to the real `Object Type` field and marks it `parser_change_required: true`.
+`AttributeLDAPDisplayName` is present in directory-service EventData. The shard maps it to the real `Object Type` field, and the SOC Windows Event Security JSON parser extracts it from `$.EventData.AttributeLDAPDisplayName`.
 
-Required next step: add EventData parser extraction for `AttributeLDAPDisplayName`, refresh the field dictionary, and validate with synthetic and live OCI evidence.
-
+Verification: `scripts/test_setup_log_sources.py` covers the parser JSON path and example payload. Live OCI validation still belongs to the normal promotion/deployment gates.

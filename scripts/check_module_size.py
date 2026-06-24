@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Module-size gate for scripts/*.py.
+"""Module-size gate for scripts/**/*.py.
 
-CI gate that fails if any scripts/*.py file NOT in ALLOWLIST exceeds 800 lines.
+CI gate that fails if any scripts/**/*.py file NOT in ALLOWLIST exceeds 800 lines.
 Files in ALLOWLIST are pre-existing violations that existed when this gate was
 introduced (2025-06-10). They do NOT block the build, but are printed as
 warnings so contributors know they need to shrink.
@@ -27,14 +27,8 @@ LIMIT = 800
 # DO NOT ADD NEW ENTRIES — shrink this list instead.
 ALLOWLIST: frozenset[str] = frozenset(
     {
-        # generate_test_logs.py, setup_log_sources.py, and deploy_dashboard.py were
-        # refactored below the 800-line ceiling (split into the testlogs/, logsources/,
-        # and dashboards/ packages) and removed from this list on 2026-06-10.
-        "sentinel_conversion_workflow.py", # 1188 lines — Sentinel workflow
-        "test_sentinel_converter.py",      #  978 lines — Sentinel converter tests
-        "oci_config.py",                   #  977 lines — OCI config helper
-        "convert_sigma.py",                #  977 lines — Sigma → OCL conversion
-        "sentinel_synthetic_logs.py",      #  923 lines — Sentinel synthetic log gen
+        # This allowlist is currently empty. Keep it that way; split oversized
+        # modules into focused packages instead of adding new exceptions.
     }
 )
 
@@ -43,8 +37,8 @@ def check() -> int:
     violations: list[tuple[str, int]] = []
     allowlist_warnings: list[tuple[str, int]] = []
 
-    for py_file in sorted(SCRIPTS_DIR.glob("*.py")):
-        name = py_file.name
+    for py_file in sorted(SCRIPTS_DIR.rglob("*.py")):
+        name = py_file.relative_to(SCRIPTS_DIR).as_posix()
         lines = sum(1 for _ in py_file.open())
         if lines <= LIMIT:
             continue

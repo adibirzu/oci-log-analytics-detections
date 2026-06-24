@@ -99,6 +99,9 @@ class TestSetupLogSources(unittest.TestCase):
             "API Gateway Rate Limit": {"$.oci.api_gateway.rate_limit.limit"},
             "API Gateway Rate Remaining": {"$.oci.api_gateway.rate_limit.remaining"},
             "API Gateway Threat Signal": {"$.oci.api_gateway.threat_signal"},
+            "Action": {"$.action"},
+            "Description": {"$.description"},
+            "Event Type": {"$.event.type", "$.eventType"},
         }
         mappings_by_field = {}
         for field_name, json_path, _sequence in APP_FIELD_MAPPINGS:
@@ -122,6 +125,57 @@ class TestSetupLogSources(unittest.TestCase):
         for field_name in OCTO_APM_FIELD_DISPLAY_NAMES:
             self.assertIn(field_name, CUSTOM_FIELDS)
             self.assertIn(field_name, mapped_fields)
+
+    def test_windows_event_security_parser_extracts_eventdata_directory_fields(self):
+        from logsources.endpoint_sources import WINSEC_EXAMPLE, WINSEC_FIELD_MAPPINGS
+
+        mappings_by_field = {}
+        for field_name, json_path, _sequence in WINSEC_FIELD_MAPPINGS:
+            mappings_by_field.setdefault(field_name, set()).add(json_path)
+
+        self.assertIn("$.EventData.ObjectDN", mappings_by_field["Target Object"])
+        self.assertIn("$.EventData.ObjectName", mappings_by_field["Target Object"])
+        self.assertIn("$.EventData.AttributeLDAPDisplayName", mappings_by_field["Object Type"])
+        self.assertEqual(WINSEC_EXAMPLE["EventData"]["AttributeLDAPDisplayName"], "servicePrincipalName")
+
+    def test_sentinel_synthetic_gap_aliases_are_backed_by_parser_mappings(self):
+        from logsources.cloud_native_sources import FW_FIELD_MAPPINGS
+        from logsources.endpoint_sources import SYSNET_FIELD_MAPPINGS, WINDOWS_FIELD_MAPPINGS
+        from logsources.web_sources import LB_FIELD_MAPPINGS
+
+        def by_field(mappings):
+            grouped = {}
+            for field_name, json_path, _sequence in mappings:
+                grouped.setdefault(field_name, set()).add(json_path)
+            return grouped
+
+        windows = by_field(WINDOWS_FIELD_MAPPINGS)
+        self.assertIn("$.SourceIp", windows["Source IP"])
+        self.assertIn("$.Action", windows["Action"])
+        self.assertIn("$.ThreatName", windows["Threat Name"])
+        self.assertIn("$.Properties", windows["Properties"])
+        self.assertIn("$.EventType", windows["Event Type"])
+        self.assertIn("$.User", windows["User Name"])
+        self.assertIn("$.User", windows["Account Name"])
+
+        sysnet = by_field(SYSNET_FIELD_MAPPINGS)
+        self.assertIn("$.CommandLine", sysnet["Command Line"])
+        self.assertIn("$.ParentImage", sysnet["Parent Process Name"])
+        self.assertIn("$.RequestUrl", sysnet["Request URL"])
+
+        lb = by_field(LB_FIELD_MAPPINGS)
+        self.assertIn("$.httpMethod", lb["HTTP Request Method"])
+        self.assertIn("$.statusCode", lb["HTTP Status Code"])
+        self.assertIn("$.eventType", lb["Event Type"])
+        self.assertIn("$.description", lb["Description"])
+
+        firewall = by_field(FW_FIELD_MAPPINGS)
+        self.assertIn("$.logContent.data.log_type", firewall["Event Type"])
+        self.assertIn("$.logContent.data.url", firewall["Request URL"])
+        self.assertIn("$.logContent.data.user_agent", firewall["User Agent"])
+        self.assertIn("$.logContent.data.query_name", firewall["Query Name"])
+        self.assertIn("$.logContent.data.event_id", firewall["Event ID"])
+        self.assertIn("$.logContent.type", firewall["Provider"])
 
     def test_octo_apm_workshop_scope_is_minimal_and_required_field_first(self):
         fields = custom_fields_for_octo_apm_workshop()

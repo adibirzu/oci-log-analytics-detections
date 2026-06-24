@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Logan QL Conversion Workbench
 status: in_progress
-last_updated: "2026-05-18T05:30:00Z"
-last_activity: "2026-05-18 - Forge frontend deployed to OKE and OKE telemetry runbook captured for OCI Kubernetes Monitoring metadata/metrics troubleshooting"
+last_updated: "2026-06-11T09:48:00Z"
+last_activity: "2026-06-11 - Completed Phase 9, Phase 11, and v3.0 local implementation; Phase 10 remains open only for DRIFT-03 live synthetic-hit evidence on the remaining promoted Sentinel artifacts"
 progress:
-  total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 16
+  completed_phases: 15
+  total_plans: 70
+  completed_plans: 69
+  percent: 94
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-17)
 
 **Core value:** Every committed detection, query, dashboard, parser mapping, and generated artifact must remain deployable and verifiable against OCI Log Analytics without leaking tenant-specific data.
-**Current focus:** v3.0 - Logan QL Conversion Workbench; maintain the integrated `webapp/` frontend for cross-QL conversion into OCI Log Analytics QL while this repo generates the command catalog, mapping patterns, examples, and schemas that the frontend consumes. v2.0 Phase 9+ work remains open history and must not be treated as completed by this milestone switch.
+**Current focus:** Close the final Phase 10 DRIFT-03 live synthetic-hit evidence gap while maintaining the integrated `webapp/` frontend for cross-QL conversion into OCI Log Analytics QL. Phase 9, Phase 11, and v3.0 producer/webapp work are locally complete; live OCI validation remains explicit and profile-driven.
 
 ## Current Position
 
-Phase: 12 (frontend-boundary-and-artifact-api-contract) - In progress
+Phase: 10 (drift-detector-and-synthetic-hit-promotion-gate) - In progress
 Plan: —
-Status: Forge webapp is being consolidated under `webapp/`; OKE deployment remains targeted at the existing Octo APM LB on convert.octodemo.cloud with bundled read-only producer artifacts unless API Gateway backend secrets are present
-Last activity: 2026-05-18 - Deployed Forge to OKE, validated external health, and documented reusable ONM/OKE telemetry troubleshooting for future clusters/products
+Status: Local release gates pass with `scripts/sentinel_drift_check.py` wired into `scripts/release_checklist.py`. Strict `--require-synthetic-hits` mode is implemented and intentionally not default because current live evidence covers 20 / 60 promoted Sentinel artifacts; `queries/sentinel_drift.json` tracks the remaining 40 and all are now `synthetic_ready` live-validation targets.
+Last activity: 2026-06-11 - Added parser schema hashes to promoted Sentinel artifacts, added drift automation and CI workflow, completed EventData parser extraction for ObjectDN/ObjectName/AttributeLDAPDisplayName, refreshed generated artifacts, and passed the full local release checklist.
 
 ## Performance Metrics
 
@@ -46,11 +46,22 @@ Last activity: 2026-05-18 - Deployed Forge to OKE, validated external health, an
 | 3 | 3 | - | - |
 | 4 | 4 | - | - |
 | 5 | 3 | - | - |
+| 6 | 10 | - | - |
+| 7 | 4 | - | - |
+| 8 | 3 | - | - |
+| 9 | 11 | - | - |
+| 10 | 3/4 | - | - |
+| 11 | 6 | - | - |
+| 12 | 3 | - | - |
+| 13 | 3 | - | - |
+| 14 | 4 | - | - |
+| 15 | 3 | - | - |
+| 16 | 3 | - | - |
 
 **Recent Trend:**
 
-- Last 5 plans: 04-03, 04-04, 05-01, 05-02, 05-03
-- Trend: complete
+- Last 5 plans: Phase 12 artifact/API contract, Phase 13 reference catalog, Phase 14 mapping patterns, Phase 15 workbench UX, Phase 16 examples/gates
+- Trend: local implementation complete except Phase 10 DRIFT-03 live synthetic-hit evidence
 
 ## Accumulated Context
 
@@ -69,11 +80,12 @@ Decisions are logged in `.planning/PROJECT.md`.
 - 2026-05-17: v3.0 initially scoped as a sibling frontend workbench; superseded on 2026-05-18 by the user decision to move the UI into this long-term repo.
 - 2026-05-18: `webapp/` is the maintained Forge frontend source of truth; the old `LoganSecurityDashboardv0` project is historical only.
 - 2026-05-17: The v3.0 OCI command menu must be generated from official Oracle Log Analytics docs with provenance instead of being hand-authored in frontend components.
+- 2026-06-11: Phase 10's strict synthetic-hit gate must remain opt-in until every promoted Sentinel artifact has non-empty live synthetic-hit evidence; local drift/hash/report checks can run without live OCI access.
 
 ### Pending Todos
 
-- Plan the remaining Phase 9 operator parity and field mapping bulk expansion work via `$gsd-plan-phase 9`; do not treat the 2026-05-17 promotion/test pass as full Phase 9 completion.
-- Optional: decide whether Phase 10-style synthetic-hit promotion metadata should be backfilled for the 20 candidates that returned rows in `queries/sentinel_synthetic_live_results.json`; current canonical promotion still uses live parser validation.
+- Run a live synthetic upload/validation pass for the 40 `synthetic_ready` promoted Sentinel artifacts listed in `queries/sentinel_drift.json`, then rerun `scripts/sentinel_drift_check.py --require-synthetic-hits`.
+- After strict synthetic hits are complete, make the strict gate the default local release behavior and mark DRIFT-03 / Phase 10 complete.
 - If running `python3 scripts/release_checklist.py --include-live`, expect it to rewrite generated artifacts. Use a clean or intentionally staged worktree first.
 - Keep `webapp/` docs, deploy scripts, and security controls aligned with the generated artifact contract.
 - Use `docs/OKE_OBSERVABILITY_RUNBOOK.md` when deploying Forge or diagnosing OCI Kubernetes Monitoring telemetry on other OKE clusters; keep the runbook placeholder-safe and free of tenant-specific values.
@@ -83,7 +95,7 @@ Decisions are logged in `.planning/PROJECT.md`.
 - Live OCI validation requires explicit profile/environment access and should not be assumed for local-only tasks. The 2026-05-17 production validation used `OCI_PROFILE=cap`.
 - RESOLVED 2026-06-05: `scripts/convert_sigma.py --validate` now reports **0 warnings** over 678 queries (previously 20). The validator was hardened (escaped-quote parity, negative-paren-depth, unterminated-quote detection) and all local gates are green.
 - Phase 7 strict YAML loader found no duplicate keys in the generated shard layout; future mapping edits must go through `config/mapping/` and regenerate `config/sentinel_oci_mapping.yaml`.
-- CI secrets handling for fork PRs (Phase 11) needs a short security-review spike before the `live` job is wired.
+- The Phase 11 workflow is wired locally, but the first remote scheduled/manual live run still needs GitHub Actions execution with OCI secrets to populate the live cache.
 - `docs/health/*.json` evidence is ignored by git; live evidence files exist locally for the 2026-05-16 pass but require explicit archival if they must be shared.
 - v3.0 now lives in this repo. Phase work must avoid duplicating converter generation logic in `webapp/` and must keep tenant-specific values out of examples, docs, and UI output.
 

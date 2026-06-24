@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T08:07:47Z",
+  "generated_at": "2026-06-12T15:26:27Z",
   "patterns": [
     {
       "example_ids": [
@@ -8,13 +8,38 @@
       "id": "spl-filter-to-search-where",
       "logan_commands": [
         "search",
-        "where"
+        "where",
+        "head"
       ],
-      "oci_mapping": "Use a Logan base search for log source constraints and pipe into where for derived predicates.",
-      "source_construct": "search predicates, index, sourcetype, where",
+      "oci_mapping": "Choose the OCI Log Source from source hints, map field predicates to display fields, map raw terms to Original Log Content, and emit where for simple null/equality filters.",
+      "source_construct": "base search predicates, index, sourcetype, raw search terms, and simple where predicates",
       "source_language": "splunk_spl",
-      "support_level": "supported",
-      "warning_behavior": "Warn when SPL macros, subsearches, or accelerated data models are present."
+      "support_level": "partial",
+      "warning_behavior": "Warn when SPL macros, dashboard tokens, boolean precedence, subsearches, or eval-only where expressions need manual review."
+    },
+    {
+      "example_ids": [
+        "spl-powershell-encoded",
+        "spl-threat-ip-lookup"
+      ],
+      "id": "spl-transform-pipeline",
+      "logan_commands": [
+        "stats",
+        "timestats",
+        "eval",
+        "fields",
+        "rename",
+        "top",
+        "distinct",
+        "link",
+        "sort",
+        "head"
+      ],
+      "oci_mapping": "Map count/sum/distinct stats to stats, count timechart or _time bins to timestats, table/fields to fields, top/sort/head directly, named-capture rex and JSON spath to eval extraction steps, simple transaction grouping to link, and dedup to distinct with a lossy warning.",
+      "source_construct": "stats, timechart, bin/bucket _time, table, fields, rename, top, dedup, sort, head, rex, spath, transaction",
+      "source_language": "splunk_spl",
+      "support_level": "partial",
+      "warning_behavior": "Warn on multivalue aggregations, dedup first-event semantics, extraction parser dependencies, transaction duration loss, and runtime commands that cannot be represented by a single Logan query."
     },
     {
       "example_ids": [
@@ -173,13 +198,14 @@
       ],
       "id": "join-correlation",
       "logan_commands": [
-        "stats"
+        "stats",
+        "link"
       ],
-      "oci_mapping": "Prefer source-side parser enrichment or dashboard-level correlation. Only convert simple same-source aggregations.",
+      "oci_mapping": "Prefer source-side parser enrichment or dashboard-level correlation. Convert simple same-source SPL transaction grouping to Logan link only when stable grouping fields exist.",
       "source_construct": "joins, transactions, sequences, correlations",
       "source_language": "cross_ql",
       "support_level": "unsupported",
-      "warning_behavior": "Block true cross-table joins and sequence semantics with unsupported_join_or_sequence."
+      "warning_behavior": "Block true cross-table joins and sequence semantics with unsupported_join_or_sequence; mark transaction-to-link conversion lossy."
     },
     {
       "example_ids": [
@@ -214,7 +240,8 @@
     },
     {
       "example_ids": [
-        "spl-powershell-encoded"
+        "spl-powershell-encoded",
+        "spl-threat-ip-lookup"
       ],
       "id": "sort-limit-top",
       "logan_commands": [

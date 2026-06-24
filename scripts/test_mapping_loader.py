@@ -73,8 +73,9 @@ def test_map05_field_cluster_is_present_or_parser_pending() -> None:
     }
 
     assert expected <= set(mapping["fields"])
-    for field in ("ObjectDN", "ObjectName", "AttributeLDAPDisplayName", "EventData"):
-        assert mapping["field_specs"][field]["parser_change_required"] is True
+    for field in ("ObjectDN", "ObjectName", "AttributeLDAPDisplayName"):
+        assert not mapping["field_specs"][field].get("parser_change_required", False)
+    assert mapping["field_specs"]["EventData"]["parser_change_required"] is True
 
 
 def test_duplicate_yaml_key_fails_with_structured_reason(tmp_path: Path) -> None:

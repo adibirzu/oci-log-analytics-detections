@@ -100,6 +100,7 @@ CUSTOM_FIELDS = [
     "Detector ID",
     # WAF / Web Application fields
     "Action",
+    "Event Type",
     "HTTP Method",
     "HTTP Request Method",
     "Request URL",

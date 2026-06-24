@@ -96,6 +96,10 @@ LB_FIELD_MAPPINGS = [
     ("Content Type",             "$.contentType",            18),
     ("Referrer",                 "$.referer",                19),
     ("Trace ID",                 "$.traceId",                20),
+    ("HTTP Request Method",      "$.httpMethod",             21),
+    ("HTTP Status Code",         "$.statusCode",             22),
+    ("Event Type",               "$.eventType",              23),
+    ("Description",              "$.description",            24),
 ]
 LB_EXAMPLE = {
     "timeCreated": "2026-02-15T14:30:00.000Z",
@@ -115,6 +119,8 @@ LB_EXAMPLE = {
     "lbName": "seven-kingdoms-portal-lb",
     "listenerName": "http-listener",
     "contentType": "application/x-www-form-urlencoded",
+    "eventType": "lb_access",
+    "description": "Load balancer access request",
     "referer": "https://sevenkingdoms.example.com/vulnerable/login",
     "traceId": "trace_demo_lb_001",
     "msg": "POST /vulnerable/login 401 - Hydra/9.0",

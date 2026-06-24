@@ -31,7 +31,7 @@ GENAI_MODELS = [
 
 # Trusted provenance baseline for self-hosted/registry models.
 TRUSTED_MODEL_SOURCE = "registry://octo-model-registry/llama-3-70b-instruct"
-TRUSTED_MODEL_HASH = "sha256:1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f809"
+TRUSTED_MODEL_HASH = "<TRUSTED_MODEL_HASH>"
 
 # Benign callers (corporate identities + API key IDs).
 BENIGN_CALLERS = [

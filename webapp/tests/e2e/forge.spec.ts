@@ -144,6 +144,7 @@ test.describe("Forge conversion workbench", () => {
 
         const response = await conversionResponse
         expect(response.ok()).toBe(true)
+        expect(response.headers()["x-request-id"]).toMatch(/^[0-9a-f-]{36}$/)
         const payload = (await response.json()) as ConversionResponse
 
         expect(payload.backend).toBe("Bundled read-only converter")
@@ -170,6 +171,7 @@ test.describe("Forge conversion API CSRF", () => {
     const response = await request.post("/api/forge/convert", { data: apiPayload })
 
     expect(response.status()).toBe(403)
+    expect(response.headers()["x-request-id"]).toMatch(/^[0-9a-f-]{36}$/)
     expect(await response.json()).toEqual({ error: "csrf token is missing or invalid" })
   })
 
@@ -188,6 +190,7 @@ test.describe("Forge conversion API CSRF", () => {
     const payload = (await response.json()) as ConversionResponse
 
     expect(response.ok()).toBe(true)
+    expect(response.headers()["x-request-id"]).toMatch(/^[0-9a-f-]{36}$/)
     expect(payload.metadata.backend_script).toBe(backendScript)
     expect(payload.logan_query).toContain("SOC Application Logs")
   })
@@ -209,6 +212,7 @@ test.describe("Forge conversion API CSRF", () => {
       const payload = (await response.json()) as ConversionResponse
 
       expect(response.ok()).toBe(true)
+      expect(response.headers()["x-request-id"]).toMatch(/^[0-9a-f-]{36}$/)
       expect(payload.metadata.execution_mode).toBe("bundled_python_script")
       expect(payload.logan_query).toContain("Original Log Content")
     } finally {

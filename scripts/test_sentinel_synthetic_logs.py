@@ -15,11 +15,16 @@ from sentinel_synthetic_logs import (  # noqa: E402
     build_synthetic_event,
     build_synthetic_plan,
     choose_source_contract,
+    export_target_plan,
     extract_predicate_values,
     extract_query_sources,
     extract_required_fields,
     load_source_contracts,
+    load_sentinel_ids_file,
+    load_sentinel_target_keys_file,
+    merge_live_results,
     promote_live_results,
+    select_ready_candidates,
 )
 
 
@@ -154,6 +159,7 @@ class TestSentinelSyntheticLogs(unittest.TestCase):
         self.assertNotEqual(event["TimeCreated"], "2026-01-01T00:00:00.000Z")
         self.assertEqual(event["metadata"]["time"], event["TimeCreated"])
         self.assertTrue(event["sentinelSynthetic"])
+        self.assertEqual(event["sourcePath"], "")
 
     def test_safe_live_error_redacts_oci_identifiers(self):
         text = (
@@ -260,6 +266,166 @@ class TestSentinelSyntheticLogs(unittest.TestCase):
             report = json.loads(report_path.read_text(encoding="utf-8"))
             self.assertEqual(report["summary"]["promoted_count"], 1)
             self.assertEqual(report["summary"]["live_validation_passed"], 1)
+
+    def test_select_ready_candidates_can_filter_promoted_gap_ids(self):
+        plan = {
+            "candidates": [
+                {"sentinel_id": "ready-one", "source_path": "A.yaml", "status": "synthetic_ready"},
+                {"sentinel_id": "ready-two", "source_path": "B.yaml", "status": "synthetic_ready"},
+                {"sentinel_id": "ready-two", "source_path": "C.yaml", "status": "synthetic_ready"},
+                {"sentinel_id": "gap-one", "source_path": "D.yaml", "status": "field_gap"},
+            ]
+        }
+
+        selected = select_ready_candidates(plan, {"ready-two", "gap-one"})
+
+        self.assertEqual([candidate["sentinel_id"] for candidate in selected], ["ready-two", "ready-two"])
+        exact = select_ready_candidates(plan, target_keys={("ready-two", "C.yaml")})
+        self.assertEqual([candidate["source_path"] for candidate in exact], ["C.yaml"])
+
+    def test_load_sentinel_ids_file_reads_ready_gaps_from_drift_report(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "sentinel_drift.json"
+            path.write_text(json.dumps({
+                "synthetic_hit_gaps": [
+                    {"sentinel_id": "ready-one", "synthetic_plan_status": "synthetic_ready"},
+                    {"sentinel_id": "field-gap", "synthetic_plan_status": "field_gap"},
+                ]
+            }), encoding="utf-8")
+
+            self.assertEqual(load_sentinel_ids_file(path), {"ready-one"})
+            self.assertEqual(load_sentinel_target_keys_file(path), {("ready-one", "")})
+
+    def test_export_target_plan_writes_only_selected_ready_rows(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            plan_path = root / "plan.json"
+            data_dir = root / "data"
+            out_plan = root / "target_plan.json"
+            out_data = root / "target_data"
+            data_dir.mkdir()
+            plan_path.write_text(json.dumps({
+                "source": {"name": "Microsoft Sentinel"},
+                "candidates": [
+                    {
+                        "title": "Ready One",
+                        "sentinel_id": "ready-one",
+                        "source_path": "A.yaml",
+                        "status": "synthetic_ready",
+                        "selected_source": "SOC Windows Sysmon Logs",
+                        "synthetic_file": "soc_windows_sysmon_logs.jsonl",
+                    },
+                    {
+                        "title": "Ready Two",
+                        "sentinel_id": "ready-two",
+                        "source_path": "B.yaml",
+                        "status": "synthetic_ready",
+                        "selected_source": "SOC Windows Sysmon Logs",
+                        "synthetic_file": "soc_windows_sysmon_logs.jsonl",
+                    },
+                    {
+                        "title": "Ready Two Duplicate",
+                        "sentinel_id": "ready-two",
+                        "source_path": "C.yaml",
+                        "status": "synthetic_ready",
+                        "selected_source": "SOC Windows Sysmon Logs",
+                        "synthetic_file": "soc_windows_sysmon_logs.jsonl",
+                    },
+                    {
+                        "title": "Field Gap",
+                        "sentinel_id": "field-gap",
+                        "status": "field_gap",
+                    },
+                ],
+            }), encoding="utf-8")
+            (data_dir / "soc_windows_sysmon_logs.jsonl").write_text(
+                json.dumps({"sentinelId": "ready-one", "sourcePath": "A.yaml", "value": 1}) + "\n" +
+                json.dumps({"sentinelId": "ready-two", "sourcePath": "B.yaml", "value": 2}) + "\n" +
+                json.dumps({"sentinelId": "ready-two", "sourcePath": "C.yaml", "value": 3}) + "\n",
+                encoding="utf-8",
+            )
+
+            result = export_target_plan(
+                plan_path=plan_path,
+                data_dir=data_dir,
+                out_plan_path=out_plan,
+                out_data_dir=out_data,
+                sentinel_ids={"field-gap"},
+                target_keys={("ready-two", "B.yaml")},
+            )
+
+            self.assertEqual(result["selected"], 1)
+            self.assertEqual(result["missing_rows"], [])
+            target_rows = (out_data / "soc_windows_sysmon_logs.jsonl").read_text(encoding="utf-8").splitlines()
+            self.assertEqual(len(target_rows), 1)
+            self.assertEqual(json.loads(target_rows[0])["sentinelId"], "ready-two")
+            self.assertEqual(json.loads(target_rows[0])["sourcePath"], "B.yaml")
+            target_plan = json.loads(out_plan.read_text(encoding="utf-8"))
+            self.assertEqual(target_plan["summary"]["synthetic_ready"], 1)
+            self.assertEqual(target_plan["files"], [{"filename": "soc_windows_sysmon_logs.jsonl", "events": 1}])
+
+    def test_merge_live_results_preserves_existing_and_overwrites_matching_keys(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            base = root / "base.json"
+            new = root / "new.json"
+            out = root / "merged.json"
+            base.write_text(json.dumps({
+                "lookback": "24h",
+                "timeout": 60,
+                "results": [
+                    {
+                        "title": "Existing Hit",
+                        "sentinel_id": "existing",
+                        "source_path": "A.yaml",
+                        "ok": True,
+                        "rows": 1,
+                        "empty": False,
+                    },
+                    {
+                        "title": "Overwritten Empty",
+                        "sentinel_id": "replace",
+                        "source_path": "B.yaml",
+                        "ok": True,
+                        "rows": 0,
+                        "empty": True,
+                    },
+                ],
+            }), encoding="utf-8")
+            new.write_text(json.dumps({
+                "lookback": "48h",
+                "timeout": 90,
+                "results": [
+                    {
+                        "title": "Replacement Hit",
+                        "sentinel_id": "replace",
+                        "source_path": "B.yaml",
+                        "ok": True,
+                        "rows": 2,
+                        "empty": False,
+                    },
+                    {
+                        "title": "New Failure",
+                        "sentinel_id": "failed",
+                        "source_path": "C.yaml",
+                        "ok": False,
+                        "rows": 0,
+                        "empty": False,
+                    },
+                ],
+            }), encoding="utf-8")
+
+            result = merge_live_results(base_path=base, new_path=new, out_path=out)
+
+            self.assertEqual(result["merged_results"], 3)
+            self.assertEqual(result["passed"], 2)
+            self.assertEqual(result["failed"], 1)
+            merged = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(merged["lookback"], "48h")
+            self.assertEqual(merged["timeout"], 90)
+            by_key = {(item["sentinel_id"], item["source_path"]): item for item in merged["results"]}
+            self.assertEqual(by_key[("replace", "B.yaml")]["rows"], 2)
+            self.assertIn(("existing", "A.yaml"), by_key)
 
 
 if __name__ == "__main__":

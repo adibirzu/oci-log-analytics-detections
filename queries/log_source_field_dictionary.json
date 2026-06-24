@@ -1,23 +1,31 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-11T05:29:09.540956+00:00",
+  "generated_at": "2026-06-13T09:13:09.682109+00:00",
   "summary": {
-    "total_fields": 304,
+    "total_fields": 306,
     "parser_count": 19,
     "source_count": 19,
     "reserved_mapping_violations": 0,
-    "fields_with_query_usage": 145
+    "fields_with_query_usage": 147
   },
   "approved_builtins": [
     "Channel",
+    "Client IP",
+    "Compartment Name",
+    "Compartment OCID",
     "Count",
     "Entity",
+    "Event ID",
+    "Event Name",
     "Event Type",
     "Image",
     "Log Source",
     "Original Log Content",
+    "Principal ID",
+    "Principal Name",
     "Provider",
     "Resource Name",
+    "Response Code",
     "Severity",
     "Status",
     "Time",
@@ -135,7 +143,7 @@
       "parser_display": "SOC Windows Sysmon JSON Parser",
       "source_internal": "socWindowsSysmonSource",
       "source_display": "SOC Windows Sysmon Logs",
-      "field_count": 35
+      "field_count": 42
     },
     {
       "parser_name": "socCloudGuardJsonParser",
@@ -156,7 +164,7 @@
       "parser_display": "SOC Windows Event Security JSON Parser",
       "source_internal": "socWinEventSecuritySource",
       "source_display": "Windows Event Security Logs",
-      "field_count": 32
+      "field_count": 35
     },
     {
       "parser_name": "socWinEventSystemJsonParser",
@@ -198,7 +206,7 @@
       "parser_display": "SOC Sysmon Network JSON Parser",
       "source_internal": "socSysmonNetworkSource",
       "source_display": "SOC Sysmon Network Logs",
-      "field_count": 19
+      "field_count": 22
     },
     {
       "parser_name": "socWafSecurityJsonParser",
@@ -212,7 +220,7 @@
       "parser_display": "SOC Load Balancer Access JSON Parser",
       "source_internal": "socLbAccessSource",
       "source_display": "SOC Load Balancer Access Logs",
-      "field_count": 20
+      "field_count": 24
     },
     {
       "parser_name": "socWebAppJsonParser",
@@ -226,7 +234,7 @@
       "parser_display": "SOC Application JSON Parser",
       "source_internal": "socApplicationSource",
       "source_display": "SOC Application Logs",
-      "field_count": 223
+      "field_count": 227
     },
     {
       "parser_name": "socGenAiGatewayJsonParser",
@@ -247,7 +255,7 @@
       "parser_display": "SOC Network Firewall JSON Parser",
       "source_internal": "socNetworkFirewallSource",
       "source_display": "SOC Network Firewall Logs",
-      "field_count": 19
+      "field_count": 25
     },
     {
       "parser_name": "socMulticloudHealthJsonParser",
@@ -456,9 +464,16 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
+        "$.User",
         "$.AccountName"
       ],
       "parsers": [
+        {
+          "parser_name": "socWindowsSysmonJsonParser",
+          "parser_display": "SOC Windows Sysmon JSON Parser",
+          "sequence": 42,
+          "raw_json_path": "$.User"
+        },
         {
           "parser_name": "socSysmonNetworkJsonParser",
           "parser_display": "SOC Sysmon Network JSON Parser",
@@ -468,17 +483,27 @@
       ],
       "sources": [
         {
+          "source_internal": "socWindowsSysmonSource",
+          "source_display": "SOC Windows Sysmon Logs"
+        },
+        {
           "source_internal": "socSysmonNetworkSource",
           "source_display": "SOC Sysmon Network Logs"
         }
       ],
       "source_candidate_groups": [
-        "sysmon_network"
+        "sysmon_network",
+        "sysmon_operational",
+        "windows_sysmon"
       ],
       "example_values": [
+        "CORP\\admin",
         "admin"
       ],
-      "contract_datasets": [],
+      "contract_datasets": [
+        "linux_secure.jsonl",
+        "windows_event_security.jsonl"
+      ],
       "queries_using_it": [
         "sentinel/insider-threat-detection-queries_16.json"
       ],
@@ -497,6 +522,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socWindowsSysmonJsonParser",
+          "parser_display": "SOC Windows Sysmon JSON Parser",
+          "sequence": 37,
+          "raw_json_path": "$.Action"
+        },
+        {
           "parser_name": "socWindowsDefenderOperationalJsonParser",
           "parser_display": "SOC Windows Defender Operational JSON Parser",
           "sequence": 11,
@@ -506,6 +537,12 @@
           "parser_name": "socWafSecurityJsonParser",
           "parser_display": "SOC WAF Security JSON Parser",
           "sequence": 3,
+          "raw_json_path": "$.action"
+        },
+        {
+          "parser_name": "socApplicationJsonParser",
+          "parser_display": "SOC Application JSON Parser",
+          "sequence": 224,
           "raw_json_path": "$.action"
         },
         {
@@ -523,12 +560,20 @@
       ],
       "sources": [
         {
+          "source_internal": "socWindowsSysmonSource",
+          "source_display": "SOC Windows Sysmon Logs"
+        },
+        {
           "source_internal": "socWindowsDefenderOperationalSource",
           "source_display": "Windows Defender Operational Logs"
         },
         {
           "source_internal": "socWafSecuritySource",
           "source_display": "SOC WAF Security Logs"
+        },
+        {
+          "source_internal": "socApplicationSource",
+          "source_display": "SOC Application Logs"
         },
         {
           "source_internal": "socVcnFlowSource",
@@ -540,14 +585,19 @@
         }
       ],
       "source_candidate_groups": [
+        "application_logs",
+        "azure_log_analytics_custom",
         "network_firewall",
+        "sysmon_operational",
         "vcn_flow",
         "waf_security",
-        "windows_defender_operational"
+        "windows_defender_operational",
+        "windows_sysmon"
       ],
       "example_values": [
         "Detected",
         "BLOCK",
+        "ALLOW",
         "ACCEPT",
         "alert"
       ],
@@ -2194,7 +2244,7 @@
     },
     {
       "display_name": "Client IP",
-      "kind": "custom",
+      "kind": "built-in",
       "type": "STRING",
       "raw_json_paths": [
         "$.clientAddress",
@@ -2420,6 +2470,12 @@
           "parser_display": "SOC Sysmon Operational JSON Parser",
           "sequence": 19,
           "raw_json_path": "$.CommandLine"
+        },
+        {
+          "parser_name": "socSysmonNetworkJsonParser",
+          "parser_display": "SOC Sysmon Network JSON Parser",
+          "sequence": 20,
+          "raw_json_path": "$.CommandLine"
         }
       ],
       "sources": [
@@ -2446,6 +2502,10 @@
         {
           "source_internal": "socSysmonOperationalSource",
           "source_display": "Windows Sysmon Operational Logs"
+        },
+        {
+          "source_internal": "socSysmonNetworkSource",
+          "source_display": "SOC Sysmon Network Logs"
         }
       ],
       "source_candidate_groups": [
@@ -2461,7 +2521,8 @@
         "powershell.exe -enc SQBFAFgA",
         "",
         "powershell.exe -NoProfile -ExecutionPolicy Bypass",
-        "cmd.exe /c whoami"
+        "cmd.exe /c whoami",
+        "rundll32.exe url.dll,FileProtocolHandler <URL>"
       ],
       "contract_datasets": [
         "sysmon_operational.jsonl",
@@ -3305,7 +3366,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.Description"
+        "$.Description",
+        "$.description"
       ],
       "parsers": [
         {
@@ -3313,20 +3375,45 @@
           "parser_display": "SOC Windows Sysmon JSON Parser",
           "sequence": 21,
           "raw_json_path": "$.Description"
+        },
+        {
+          "parser_name": "socLbAccessJsonParser",
+          "parser_display": "SOC Load Balancer Access JSON Parser",
+          "sequence": 24,
+          "raw_json_path": "$.description"
+        },
+        {
+          "parser_name": "socApplicationJsonParser",
+          "parser_display": "SOC Application JSON Parser",
+          "sequence": 225,
+          "raw_json_path": "$.description"
         }
       ],
       "sources": [
         {
           "source_internal": "socWindowsSysmonSource",
           "source_display": "SOC Windows Sysmon Logs"
+        },
+        {
+          "source_internal": "socLbAccessSource",
+          "source_display": "SOC Load Balancer Access Logs"
+        },
+        {
+          "source_internal": "socApplicationSource",
+          "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
+        "application_logs",
+        "azure_log_analytics_custom",
+        "lb_access",
         "sysmon_operational",
         "windows_sysmon"
       ],
       "example_values": [
-        "Windows PowerShell"
+        "Windows PowerShell",
+        "Load balancer access request",
+        "Application security event"
       ],
       "contract_datasets": [],
       "queries_using_it": [],
@@ -4049,10 +4136,11 @@
     },
     {
       "display_name": "Event ID",
-      "kind": "custom",
+      "kind": "built-in",
       "type": "STRING",
       "raw_json_paths": [
-        "$.EventID"
+        "$.EventID",
+        "$.logContent.data.event_id"
       ],
       "parsers": [
         {
@@ -4096,6 +4184,12 @@
           "parser_display": "SOC Sysmon Network JSON Parser",
           "sequence": 3,
           "raw_json_path": "$.EventID"
+        },
+        {
+          "parser_name": "socNetworkFirewallJsonParser",
+          "parser_display": "SOC Network Firewall JSON Parser",
+          "sequence": 24,
+          "raw_json_path": "$.logContent.data.event_id"
         }
       ],
       "sources": [
@@ -4126,9 +4220,14 @@
         {
           "source_internal": "socSysmonNetworkSource",
           "source_display": "SOC Sysmon Network Logs"
+        },
+        {
+          "source_internal": "socNetworkFirewallSource",
+          "source_display": "SOC Network Firewall Logs"
         }
       ],
       "source_candidate_groups": [
+        "network_firewall",
         "sysmon_network",
         "sysmon_operational",
         "windows_defender_operational",
@@ -4143,7 +4242,8 @@
         "7045",
         "4104",
         "1116",
-        3
+        3,
+        "fw-threat-001"
       ],
       "contract_datasets": [
         "sysmon_network.jsonl",
@@ -4264,6 +4364,200 @@
       "example_values": [],
       "contract_datasets": [],
       "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "Event Type",
+      "kind": "built-in",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.EventType",
+        "$.eventType",
+        "$.event.type",
+        "$.logContent.data.log_type"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWindowsSysmonJsonParser",
+          "parser_display": "SOC Windows Sysmon JSON Parser",
+          "sequence": 40,
+          "raw_json_path": "$.EventType"
+        },
+        {
+          "parser_name": "socLbAccessJsonParser",
+          "parser_display": "SOC Load Balancer Access JSON Parser",
+          "sequence": 23,
+          "raw_json_path": "$.eventType"
+        },
+        {
+          "parser_name": "socApplicationJsonParser",
+          "parser_display": "SOC Application JSON Parser",
+          "sequence": 226,
+          "raw_json_path": "$.event.type"
+        },
+        {
+          "parser_name": "socApplicationJsonParser",
+          "parser_display": "SOC Application JSON Parser",
+          "sequence": 227,
+          "raw_json_path": "$.eventType"
+        },
+        {
+          "parser_name": "socNetworkFirewallJsonParser",
+          "parser_display": "SOC Network Firewall JSON Parser",
+          "sequence": 20,
+          "raw_json_path": "$.logContent.data.log_type"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWindowsSysmonSource",
+          "source_display": "SOC Windows Sysmon Logs"
+        },
+        {
+          "source_internal": "socLbAccessSource",
+          "source_display": "SOC Load Balancer Access Logs"
+        },
+        {
+          "source_internal": "socApplicationSource",
+          "source_display": "SOC Application Logs"
+        },
+        {
+          "source_internal": "socNetworkFirewallSource",
+          "source_display": "SOC Network Firewall Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "application_logs",
+        "azure_log_analytics_custom",
+        "lb_access",
+        "network_firewall",
+        "sysmon_operational",
+        "windows_sysmon"
+      ],
+      "example_values": [
+        "ProcessCreate",
+        "lb_access",
+        "application_event",
+        "threat"
+      ],
+      "contract_datasets": [
+        "network_firewall.jsonl",
+        "oci_audit.jsonl"
+      ],
+      "queries_using_it": [
+        "calderaopenaev_-_exfiltration_via_oci_object_storage_bulk_upload_with_new_bucket.json",
+        "calderaopenaev_-_transfer_data_to_cloud_account_via_oci_object_storage.json",
+        "hunting/cloud_identity_aitm_token_abuse.json",
+        "hunting/demo_cloud_critical_kpi.json",
+        "hunting/demo_top_attacker_ips.json",
+        "hunting/oci_after_hours_iam_activity.json",
+        "hunting/oci_api_burst_by_user.json",
+        "hunting/oci_console_brute_force.json",
+        "hunting/oci_iam_rapid_changes.json",
+        "hunting/oci_multi_user_same_ip.json",
+        "hunting/oci_off_hours_activity.json",
+        "hunting/oci_privilege_escalation_chain.json",
+        "hunting/oci_resource_deletion_wave.json",
+        "hunting/oci_resource_destruction_spike.json",
+        "hunting/timeseries_login_anomaly.json",
+        "hunting/web_to_cloud_cloud_abuse.json",
+        "hunting/web_to_cloud_compromised_identity.json",
+        "oci_action_addusertogroup.json",
+        "oci_action_attachinternetgateway.json",
+        "oci_action_createbucket.json",
+        "oci_action_creategroup.json",
+        "oci_action_createinstance.json",
+        "oci_action_createinternetgateway.json",
+        "oci_action_createkey.json",
+        "oci_action_createpolicy.json",
+        "oci_action_createroutetable.json",
+        "oci_action_createsecuritylist.json",
+        "oci_action_createsubnet.json",
+        "oci_action_createuser.json",
+        "oci_action_createvcn.json",
+        "oci_action_deletebucket.json",
+        "oci_action_deletegroup.json",
+        "oci_action_deleteinternetgateway.json",
+        "oci_action_deletekey.json",
+        "oci_action_deletepolicy.json",
+        "oci_action_deletesubnet.json",
+        "oci_action_deleteuser.json",
+        "oci_action_deletevcn.json",
+        "oci_action_detachinternetgateway.json",
+        "oci_action_removeuserfromgroup.json",
+        "oci_action_startinstance.json",
+        "oci_action_stopinstance.json",
+        "oci_action_terminateinstance.json",
+        "oci_action_updatebucket.json",
+        "oci_action_updatepolicy.json",
+        "oci_action_updateroutetable.json",
+        "oci_action_updatesecuritylist.json",
+        "oci_api_key_uploaded.json",
+        "oci_audit_configuration_changed.json",
+        "oci_audit_configuration_retention_reduced.json",
+        "oci_auth_token_created.json",
+        "oci_autonomous_database_terminated.json",
+        "oci_bastion_session_created.json",
+        "oci_boot_volume_backup_created_by_non-admin.json",
+        "oci_cloud_infrastructure_discovery.json",
+        "oci_cloud_shell_session_started.json",
+        "oci_compartment_deleted.json",
+        "oci_compute_instance_terminated.json",
+        "oci_console_login_failure.json",
+        "oci_console_login_from_suspicious_ip_range.json",
+        "oci_console_login_from_unusual_ip.json",
+        "oci_cross-region_data_copy.json",
+        "oci_customer_secret_key_created.json",
+        "oci_database_backup_exported.json",
+        "oci_database_system_terminated.json",
+        "oci_drg_attachment_created.json",
+        "oci_dynamic_group_created.json",
+        "oci_dynamic_group_created_with_broad_matching.json",
+        "oci_federated_identity_provider_modified.json",
+        "oci_function_invoked.json",
+        "oci_iam_admin_policy_created_with_manage_all.json",
+        "oci_iam_policy_modified.json",
+        "oci_identity_provider_created.json",
+        "oci_instance_console_connection_created.json",
+        "oci_instance_metadata_service_accessed.json",
+        "oci_kms_key_scheduled_for_deletion.json",
+        "oci_kms_key_version_disabled.json",
+        "oci_local_peering_gateway_created.json",
+        "oci_log_archival_policy_disabled.json",
+        "oci_log_group_deleted.json",
+        "oci_mfa_fatigue_attack_indicators.json",
+        "oci_network_firewall_policy_modified.json",
+        "oci_network_load_balancer_deleted.json",
+        "oci_network_security_group_rule_added_for_all_protocols.json",
+        "oci_network_security_group_updated.json",
+        "oci_notification_subscription_created.json",
+        "oci_object_storage_bucket_made_public.json",
+        "oci_object_storage_pre-authenticated_request_created.json",
+        "oci_object_storage_replication_policy_created.json",
+        "oci_password_spraying_attack.json",
+        "oci_policy_allows_manage_all_resources.json",
+        "oci_route_table_update.json",
+        "oci_security_list_allows_all_protocols.json",
+        "oci_service_gateway_created.json",
+        "oci_user_capabilities_escalation.json",
+        "oci_user_mfa_not_enabled.json",
+        "oci_user_password_reset_by_admin.json",
+        "oci_vault_key_rotation_overdue.json",
+        "oci_vault_secret_deleted.json",
+        "oci_vault_secret_version_deprecated.json",
+        "oci_vcn_flow_log_disabled.json",
+        "oci_vcn_peering_connection_created.json",
+        "oci_vcn_security_list_open_to_world.json",
+        "oci_waf_configuration_updated.json",
+        "oci_waf_policy_deleted.json",
+        "sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
+        "sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
+        "sentinel/cyberarkepm_-_possible_execution_of_powershell_empire.json",
+        "sentinel/cyberarkepm_-_unexpected_executable_extension.json",
+        "sentinel/gworkspace_-_alert_events.json",
+        "sentinel/nginx_-_core_dump.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -6170,10 +6464,17 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
+        "$.httpMethod",
         "$.http.request.method",
         "$.http.method"
       ],
       "parsers": [
+        {
+          "parser_name": "socLbAccessJsonParser",
+          "parser_display": "SOC Load Balancer Access JSON Parser",
+          "sequence": 21,
+          "raw_json_path": "$.httpMethod"
+        },
         {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
@@ -6189,20 +6490,27 @@
       ],
       "sources": [
         {
+          "source_internal": "socLbAccessSource",
+          "source_display": "SOC Load Balancer Access Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
         "application_logs",
-        "azure_log_analytics_custom"
+        "azure_log_analytics_custom",
+        "lb_access"
       ],
       "example_values": [
+        "POST",
         "GET"
       ],
       "contract_datasets": [
         "application_logs.jsonl",
-        "genai_gateway.jsonl"
+        "genai_gateway.jsonl",
+        "lb_access.jsonl"
       ],
       "queries_using_it": [
         "sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
@@ -6216,11 +6524,18 @@
       "kind": "custom",
       "type": "LONG",
       "raw_json_paths": [
+        "$.statusCode",
         "$.http.status_code",
         "$.http.response.status_code",
         "$.http_status_code"
       ],
       "parsers": [
+        {
+          "parser_name": "socLbAccessJsonParser",
+          "parser_display": "SOC Load Balancer Access JSON Parser",
+          "sequence": 22,
+          "raw_json_path": "$.statusCode"
+        },
         {
           "parser_name": "socApplicationJsonParser",
           "parser_display": "SOC Application JSON Parser",
@@ -6242,20 +6557,29 @@
       ],
       "sources": [
         {
+          "source_internal": "socLbAccessSource",
+          "source_display": "SOC Load Balancer Access Logs"
+        },
+        {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
         }
       ],
       "source_candidate_groups": [
         "application_logs",
-        "azure_log_analytics_custom"
+        "azure_log_analytics_custom",
+        "lb_access"
       ],
       "example_values": [
+        "401",
         200
       ],
       "contract_datasets": [
         "application_logs.jsonl",
-        "genai_gateway.jsonl"
+        "genai_gateway.jsonl",
+        "lb_access.jsonl",
+        "octo_apm_workshop_application_logs.jsonl",
+        "webapp_security.jsonl"
       ],
       "queries_using_it": [
         "hunting/octo_checkout_db_slowness.json",
@@ -8190,7 +8514,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.ObjectType"
+        "$.ObjectType",
+        "$.EventData.AttributeLDAPDisplayName"
       ],
       "parsers": [
         {
@@ -8198,6 +8523,12 @@
           "parser_display": "SOC Windows Event Security JSON Parser",
           "sequence": 22,
           "raw_json_path": "$.ObjectType"
+        },
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 35,
+          "raw_json_path": "$.EventData.AttributeLDAPDisplayName"
         }
       ],
       "sources": [
@@ -8209,7 +8540,9 @@
       "source_candidate_groups": [
         "windows_event_security"
       ],
-      "example_values": [],
+      "example_values": [
+        "servicePrincipalName"
+      ],
       "contract_datasets": [],
       "queries_using_it": [],
       "dashboards_using_it": [],
@@ -9039,6 +9372,12 @@
           "parser_display": "SOC Sysmon Operational JSON Parser",
           "sequence": 21,
           "raw_json_path": "$.ParentImage"
+        },
+        {
+          "parser_name": "socSysmonNetworkJsonParser",
+          "parser_display": "SOC Sysmon Network JSON Parser",
+          "sequence": 21,
+          "raw_json_path": "$.ParentImage"
         }
       ],
       "sources": [
@@ -9049,6 +9388,10 @@
         {
           "source_internal": "socSysmonOperationalSource",
           "source_display": "Windows Sysmon Operational Logs"
+        },
+        {
+          "source_internal": "socSysmonNetworkSource",
+          "source_display": "SOC Sysmon Network Logs"
         }
       ],
       "source_candidate_groups": [
@@ -10504,6 +10847,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socWindowsSysmonJsonParser",
+          "parser_display": "SOC Windows Sysmon JSON Parser",
+          "sequence": 39,
+          "raw_json_path": "$.Properties"
+        },
+        {
           "parser_name": "socWinEventSecurityJsonParser",
           "parser_display": "SOC Windows Event Security JSON Parser",
           "sequence": 23,
@@ -10512,14 +10861,22 @@
       ],
       "sources": [
         {
+          "source_internal": "socWindowsSysmonSource",
+          "source_display": "SOC Windows Sysmon Logs"
+        },
+        {
           "source_internal": "socWinEventSecuritySource",
           "source_display": "Windows Event Security Logs"
         }
       ],
       "source_candidate_groups": [
-        "windows_event_security"
+        "sysmon_operational",
+        "windows_event_security",
+        "windows_sysmon"
       ],
-      "example_values": [],
+      "example_values": [
+        "Synthetic Sentinel properties"
+      ],
       "contract_datasets": [],
       "queries_using_it": [
         "dcsync_directory_replication.json",
@@ -10597,7 +10954,8 @@
       "raw_json_paths": [
         "$.Provider",
         "$.payment.gateway.provider",
-        "$.payment_gateway_provider"
+        "$.payment_gateway_provider",
+        "$.logContent.type"
       ],
       "parsers": [
         {
@@ -10629,6 +10987,12 @@
           "parser_display": "SOC Application JSON Parser",
           "sequence": 181,
           "raw_json_path": "$.payment_gateway_provider"
+        },
+        {
+          "parser_name": "socNetworkFirewallJsonParser",
+          "parser_display": "SOC Network Firewall JSON Parser",
+          "sequence": 25,
+          "raw_json_path": "$.logContent.type"
         }
       ],
       "sources": [
@@ -10647,11 +11011,16 @@
         {
           "source_internal": "socApplicationSource",
           "source_display": "SOC Application Logs"
+        },
+        {
+          "source_internal": "socNetworkFirewallSource",
+          "source_display": "SOC Network Firewall Logs"
         }
       ],
       "source_candidate_groups": [
         "application_logs",
         "azure_log_analytics_custom",
+        "network_firewall",
         "sysmon_operational",
         "windows_defender_operational",
         "windows_powershell_operational",
@@ -10660,7 +11029,8 @@
       "example_values": [
         "Microsoft-Windows-Sysmon",
         "Microsoft-Windows-PowerShell",
-        "Microsoft-Windows-Windows Defender"
+        "Microsoft-Windows-Windows Defender",
+        "com.oraclecloud.networkfirewall.logs"
       ],
       "contract_datasets": [
         "windows_defender_operational.jsonl",
@@ -10675,7 +11045,8 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.QueryName"
+        "$.QueryName",
+        "$.logContent.data.query_name"
       ],
       "parsers": [
         {
@@ -10683,21 +11054,33 @@
           "parser_display": "SOC Sysmon Operational JSON Parser",
           "sequence": 13,
           "raw_json_path": "$.QueryName"
+        },
+        {
+          "parser_name": "socNetworkFirewallJsonParser",
+          "parser_display": "SOC Network Firewall JSON Parser",
+          "sequence": 23,
+          "raw_json_path": "$.logContent.data.query_name"
         }
       ],
       "sources": [
         {
           "source_internal": "socSysmonOperationalSource",
           "source_display": "Windows Sysmon Operational Logs"
+        },
+        {
+          "source_internal": "socNetworkFirewallSource",
+          "source_display": "SOC Network Firewall Logs"
         }
       ],
       "source_candidate_groups": [
+        "network_firewall",
         "sysmon_network",
         "sysmon_operational",
         "windows_sysmon"
       ],
       "example_values": [
-        "evil-c2.duckdns.org"
+        "evil-c2.duckdns.org",
+        "example-c2.invalid"
       ],
       "contract_datasets": [],
       "queries_using_it": [
@@ -11251,11 +11634,19 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
+        "$.RequestUrl",
         "$.requestUrl",
         "$.http.url.path",
-        "$.http.path"
+        "$.http.path",
+        "$.logContent.data.url"
       ],
       "parsers": [
+        {
+          "parser_name": "socSysmonNetworkJsonParser",
+          "parser_display": "SOC Sysmon Network JSON Parser",
+          "sequence": 22,
+          "raw_json_path": "$.RequestUrl"
+        },
         {
           "parser_name": "socWafSecurityJsonParser",
           "parser_display": "SOC WAF Security JSON Parser",
@@ -11291,9 +11682,19 @@
           "parser_display": "SOC GenAI Gateway JSON Parser",
           "sequence": 8,
           "raw_json_path": "$.http.path"
+        },
+        {
+          "parser_name": "socNetworkFirewallJsonParser",
+          "parser_display": "SOC Network Firewall JSON Parser",
+          "sequence": 21,
+          "raw_json_path": "$.logContent.data.url"
         }
       ],
       "sources": [
+        {
+          "source_internal": "socSysmonNetworkSource",
+          "source_display": "SOC Sysmon Network Logs"
+        },
         {
           "source_internal": "socWafSecuritySource",
           "source_display": "SOC WAF Security Logs"
@@ -11313,6 +11714,10 @@
         {
           "source_internal": "socGenAiGatewaySource",
           "source_display": "SOC GenAI Gateway Logs"
+        },
+        {
+          "source_internal": "socNetworkFirewallSource",
+          "source_display": "SOC Network Firewall Logs"
         }
       ],
       "source_candidate_groups": [
@@ -11320,15 +11725,19 @@
         "azure_log_analytics_custom",
         "genai_gateway",
         "lb_access",
+        "network_firewall",
+        "sysmon_network",
         "waf_security",
         "webapp_security"
       ],
       "example_values": [
+        "<URL>",
         "/vulnerable/search?q=1' OR '1'='1",
         "/vulnerable/login",
         "/vulnerable/api/users/1",
         "/crm/orders/42",
-        "/v1/chat/completions"
+        "/v1/chat/completions",
+        "/download/payload"
       ],
       "contract_datasets": [
         "application_logs.jsonl",
@@ -11519,7 +11928,7 @@
     },
     {
       "display_name": "Response Code",
-      "kind": "custom",
+      "kind": "built-in",
       "type": "STRING",
       "raw_json_paths": [
         "$.responseCode",
@@ -13045,8 +13454,8 @@
       "type": "STRING",
       "raw_json_paths": [
         "$.SourceIP",
-        "$.source.ip",
         "$.SourceIp",
+        "$.source.ip",
         "$.data.sourceAddress",
         "$.logContent.data.src"
       ],
@@ -13056,6 +13465,12 @@
           "parser_display": "SOC Linux Syslog JSON Parser",
           "sequence": 9,
           "raw_json_path": "$.SourceIP"
+        },
+        {
+          "parser_name": "socWindowsSysmonJsonParser",
+          "parser_display": "SOC Windows Sysmon JSON Parser",
+          "sequence": 36,
+          "raw_json_path": "$.SourceIp"
         },
         {
           "parser_name": "socCloudGuardInstanceSecurityJsonParser",
@@ -13100,6 +13515,10 @@
           "source_display": "SOC Linux Syslog Logs"
         },
         {
+          "source_internal": "socWindowsSysmonSource",
+          "source_display": "SOC Windows Sysmon Logs"
+        },
+        {
           "source_internal": "socCloudGuardInstanceSecuritySource",
           "source_display": "SOC Cloud Guard Instance Security Logs"
         },
@@ -13133,7 +13552,9 @@
         "network_firewall",
         "osquery_results",
         "sysmon_network",
-        "vcn_flow"
+        "sysmon_operational",
+        "vcn_flow",
+        "windows_sysmon"
       ],
       "example_values": [
         "<IP_ADDRESS>"
@@ -13158,6 +13579,7 @@
         "hunting/flf_new_user_persistence.json",
         "hunting/flf_port_knocking_sequence.json",
         "hunting/melts_attack_signal_overview.json",
+        "hunting/oci_failed_action_spike.json",
         "hunting/oci_iam_fusion_activity_correlation.json",
         "hunting/oci_iam_rapid_changes.json",
         "hunting/oci_multi_user_same_ip.json",
@@ -13839,7 +14261,9 @@
       "kind": "custom",
       "type": "STRING",
       "raw_json_paths": [
-        "$.TargetObject"
+        "$.TargetObject",
+        "$.EventData.ObjectDN",
+        "$.EventData.ObjectName"
       ],
       "parsers": [
         {
@@ -13847,6 +14271,18 @@
           "parser_display": "SOC Windows Sysmon JSON Parser",
           "sequence": 29,
           "raw_json_path": "$.TargetObject"
+        },
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 33,
+          "raw_json_path": "$.EventData.ObjectDN"
+        },
+        {
+          "parser_name": "socWinEventSecurityJsonParser",
+          "parser_display": "SOC Windows Event Security JSON Parser",
+          "sequence": 34,
+          "raw_json_path": "$.EventData.ObjectName"
         },
         {
           "parser_name": "socSysmonOperationalJsonParser",
@@ -13861,6 +14297,10 @@
           "source_display": "SOC Windows Sysmon Logs"
         },
         {
+          "source_internal": "socWinEventSecuritySource",
+          "source_display": "Windows Event Security Logs"
+        },
+        {
           "source_internal": "socSysmonOperationalSource",
           "source_display": "Windows Sysmon Operational Logs"
         }
@@ -13868,9 +14308,12 @@
       "source_candidate_groups": [
         "sysmon_network",
         "sysmon_operational",
+        "windows_event_security",
         "windows_sysmon"
       ],
-      "example_values": [],
+      "example_values": [
+        "CN=Admin,CN=Users,DC=sevenkingdoms,DC=local"
+      ],
       "contract_datasets": [],
       "queries_using_it": [
         "bluelight_registry_enumeration.json"
@@ -14167,6 +14610,12 @@
       ],
       "parsers": [
         {
+          "parser_name": "socWindowsSysmonJsonParser",
+          "parser_display": "SOC Windows Sysmon JSON Parser",
+          "sequence": 38,
+          "raw_json_path": "$.ThreatName"
+        },
+        {
           "parser_name": "socWindowsDefenderOperationalJsonParser",
           "parser_display": "SOC Windows Defender Operational JSON Parser",
           "sequence": 9,
@@ -14181,6 +14630,10 @@
       ],
       "sources": [
         {
+          "source_internal": "socWindowsSysmonSource",
+          "source_display": "SOC Windows Sysmon Logs"
+        },
+        {
           "source_internal": "socWindowsDefenderOperationalSource",
           "source_display": "Windows Defender Operational Logs"
         },
@@ -14191,9 +14644,12 @@
       ],
       "source_candidate_groups": [
         "network_firewall",
-        "windows_defender_operational"
+        "sysmon_operational",
+        "windows_defender_operational",
+        "windows_sysmon"
       ],
       "example_values": [
+        "Synthetic Sentinel Threat",
         "Trojan:Win32/Example",
         "Suspicious Data Exfiltration"
       ],
@@ -15183,7 +15639,8 @@
         "$.userAgent",
         "$.user_agent.original",
         "$.http.user_agent",
-        "$.user_agent"
+        "$.user_agent",
+        "$.logContent.data.user_agent"
       ],
       "parsers": [
         {
@@ -15227,6 +15684,12 @@
           "parser_display": "SOC GenAI Gateway JSON Parser",
           "sequence": 6,
           "raw_json_path": "$.user_agent"
+        },
+        {
+          "parser_name": "socNetworkFirewallJsonParser",
+          "parser_display": "SOC Network Firewall JSON Parser",
+          "sequence": 22,
+          "raw_json_path": "$.logContent.data.user_agent"
         }
       ],
       "sources": [
@@ -15249,6 +15712,10 @@
         {
           "source_internal": "socGenAiGatewaySource",
           "source_display": "SOC GenAI Gateway Logs"
+        },
+        {
+          "source_internal": "socNetworkFirewallSource",
+          "source_display": "SOC Network Firewall Logs"
         }
       ],
       "source_candidate_groups": [
@@ -15256,6 +15723,7 @@
         "azure_log_analytics_custom",
         "genai_gateway",
         "lb_access",
+        "network_firewall",
         "waf_security",
         "webapp_security"
       ],
@@ -15264,7 +15732,8 @@
         "Mozilla/5.0 (compatible; Hydra/9.0)",
         "python-requests/2.28.0",
         "Mozilla/5.0 (compatible; demo-browser)",
-        "python-openai/1.30.1"
+        "python-openai/1.30.1",
+        "Mozilla/5.0 (Windows NT 10.0; PowerShell)"
       ],
       "contract_datasets": [
         "lb_access.jsonl"
@@ -15318,6 +15787,65 @@
       ],
       "contract_datasets": [],
       "queries_using_it": [],
+      "dashboards_using_it": [],
+      "reserved_backing_field": ""
+    },
+    {
+      "display_name": "User Name",
+      "kind": "built-in",
+      "type": "STRING",
+      "raw_json_paths": [
+        "$.User"
+      ],
+      "parsers": [
+        {
+          "parser_name": "socWindowsSysmonJsonParser",
+          "parser_display": "SOC Windows Sysmon JSON Parser",
+          "sequence": 41,
+          "raw_json_path": "$.User"
+        }
+      ],
+      "sources": [
+        {
+          "source_internal": "socWindowsSysmonSource",
+          "source_display": "SOC Windows Sysmon Logs"
+        }
+      ],
+      "source_candidate_groups": [
+        "sysmon_operational",
+        "windows_sysmon"
+      ],
+      "example_values": [
+        "CORP\\admin"
+      ],
+      "contract_datasets": [
+        "linux_secure.jsonl",
+        "windows_event_security.jsonl"
+      ],
+      "queries_using_it": [
+        "hunting/cloud_identity_aitm_token_abuse.json",
+        "hunting/compromised_machines_and_data_2025_2026.json",
+        "hunting/demo_top_attacker_ips.json",
+        "hunting/exfiltration_after_initial_access_2025_2026.json",
+        "hunting/melts_attack_path_link.json",
+        "hunting/melts_attack_signal_overview.json",
+        "hunting/melts_attack_timeline.json",
+        "hunting/oci_after_hours_iam_activity.json",
+        "hunting/oci_console_brute_force.json",
+        "hunting/oci_iam_fusion_activity_correlation.json",
+        "hunting/oci_iam_rapid_changes.json",
+        "hunting/oci_multi_user_same_ip.json",
+        "hunting/oci_privilege_escalation_chain.json",
+        "hunting/oci_resource_destruction_spike.json",
+        "hunting/web_to_cloud_attack_path_link.json",
+        "hunting/web_to_cloud_attack_timeline.json",
+        "hunting/web_to_cloud_cloud_abuse.json",
+        "hunting/web_to_cloud_compromised_identity.json",
+        "hunting/web_to_cloud_exfiltration.json",
+        "hunting/web_to_cloud_mitre_sunburst.json",
+        "oci_password_spraying_attack.json",
+        "sentinel/cyberarkepm_-_unexpected_executable_extension.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },

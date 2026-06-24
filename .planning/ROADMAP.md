@@ -14,14 +14,14 @@ This roadmap turns the existing OCI Log Analytics detection repository into a GS
 - [x] **Phase 6: KQL Subpackage Extraction and Canonicalizer** - Behavior-preserving refactor of the Sentinel converter and golden-fixture test harness.
 - [x] **Phase 7: Mapping Config Sharding and Collision Lint** - Shard `sentinel_oci_mapping.yaml`, add strict loader, role tags, and collision lint.
 - [x] **Phase 8: Backlog Prioritizer and Cohort Overlay** - Rank unmapped Sentinel candidates by MITRE coverage × converter difficulty so Phases 9–10 work against cohorts, not throwaways.
-- [ ] **Phase 9: Operator Parity and Field Mapping Bulk Expansion** - Land `extend`/`let`/`bin`/`project` family operators, parser-side extraction, and bulk Sentinel field additions in parallel cohort work.
-- [ ] **Phase 10: Drift Detector and Synthetic-Hit Promotion Gate** - Prevent silent regressions and zero-row false passes once promotion scales.
-- [ ] **Phase 11: CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split** - Wire converter + drift + scan + inventory checks into CI; isolate live OCI calls to manual/scheduled jobs.
-- [ ] **Phase 12: Frontend Boundary and Artifact/API Contract** - Define the integrated `webapp/` target, generated artifact set, schemas, and conversion request/response contract.
-- [ ] **Phase 13: Official OCI Logan QL Reference Catalog** - Generate the workbench command menu from official OCI Log Analytics documentation with provenance and tests.
-- [ ] **Phase 14: Cross-QL Conversion Pattern Library** - Build deterministic mapping patterns and explanations from Splunk, Sentinel, Elastic/Lucene/KQL, Sigma, and OCI passthrough into OCI Log Analytics QL.
-- [ ] **Phase 15: Integrated Workbench UX** - Implement the real converter workbench surface in `webapp/` using generated artifacts.
-- [ ] **Phase 16: Examples, Validation, and Release Gates** - Validate 10-20 conversions, scan workbench artifacts, and wire producer plus `webapp/` gates.
+- [x] **Phase 9: Operator Parity and Field Mapping Bulk Expansion** - Land `extend`/`let`/`bin`/`project` family operators, parser-side extraction, and bulk Sentinel field additions in parallel cohort work.
+- [ ] **Phase 10: Drift Detector and Synthetic-Hit Promotion Gate** - Prevent silent regressions and zero-row false passes once promotion scales. Local drift/report/hash gates are complete; DRIFT-03 remains pending until the remaining promoted Sentinel artifacts receive non-empty live synthetic-hit evidence. Current gap split: all 40 remaining gaps are `synthetic_ready` live-validation targets.
+- [x] **Phase 11: CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split** - Wire converter + drift + scan + inventory checks into CI; isolate live OCI calls to manual/scheduled jobs.
+- [x] **Phase 12: Frontend Boundary and Artifact/API Contract** - Define the integrated `webapp/` target, generated artifact set, schemas, and conversion request/response contract.
+- [x] **Phase 13: Official OCI Logan QL Reference Catalog** - Generate the workbench command menu from official OCI Log Analytics documentation with provenance and tests.
+- [x] **Phase 14: Cross-QL Conversion Pattern Library** - Build deterministic mapping patterns and explanations from Splunk, Sentinel, Elastic/Lucene/KQL, Sigma, and OCI passthrough into OCI Log Analytics QL.
+- [x] **Phase 15: Integrated Workbench UX** - Implement the real converter workbench surface in `webapp/` using generated artifacts.
+- [x] **Phase 16: Examples, Validation, and Release Gates** - Validate 10-20 conversions, scan workbench artifacts, and wire producer plus `webapp/` gates.
 
 ## Phase Details
 
@@ -115,14 +115,14 @@ Plans:
 
 ## Milestone v2.0 — Sentinel KQL Parity to Logan QL
 
-Phases 6–11 deliver KQL operator parity, mapping completeness, drift protection, and CI lane separation. Phase numbering continues from v1.0. Baseline counters from `queries/sentinel_conversion_report.json`: 4,452 candidates, 25 attempted, **8 promoted**, 10 live-failed, 17 skipped. Target promoted_count by end of Phase 10: **50–100 queries** (conservative; research notes 7/10 current live failures close after Phase 9 mapping work).
+Phases 6–11 deliver KQL operator parity, mapping completeness, drift protection, and CI lane separation. Phase numbering continues from v1.0. Baseline counters from `queries/sentinel_conversion_report.json`: 4,452 candidates, 25 attempted, **8 promoted**, 10 live-failed, 17 skipped. Current counters: 4,452 candidates, 100 attempted, **60 promoted/live-passed**, 2 live-failed, and 40 local skips in the current cohort. Phase 10 remains open only for strict live synthetic-hit evidence: 20 / 60 promoted artifacts currently have non-empty live-hit evidence; the missing 40 are tracked in `queries/sentinel_drift.json`.
 
 - [x] **Phase 6:** KQL Subpackage Extraction and Canonicalizer
 - [x] **Phase 7:** Mapping Config Sharding and Collision Lint
 - [x] **Phase 8:** Backlog Prioritizer and Cohort Overlay
-- [ ] **Phase 9:** Operator Parity and Field Mapping Bulk Expansion
+- [x] **Phase 9:** Operator Parity and Field Mapping Bulk Expansion
 - [ ] **Phase 10:** Drift Detector and Synthetic-Hit Promotion Gate
-- [ ] **Phase 11:** CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split
+- [x] **Phase 11:** CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split
 
 ### Phase 6: KQL Subpackage Extraction and Canonicalizer
 
@@ -239,11 +239,11 @@ Plans:
 
 Phases 12-16 define and deliver the integrated `webapp/` workbench for converting Splunk SPL, Microsoft Sentinel KQL, Elastic/Lucene/KQL, Sigma/YAML, and OCI passthrough examples into OCI Log Analytics QL. This repository remains the producer of generated command-reference, mapping-pattern, example, and schema artifacts; `webapp/` consumes those artifacts and implements the user-facing editor/output experience.
 
-- [ ] **Phase 12:** Frontend Boundary and Artifact/API Contract
-- [ ] **Phase 13:** Official OCI Logan QL Reference Catalog
-- [ ] **Phase 14:** Cross-QL Conversion Pattern Library
-- [ ] **Phase 15:** Integrated Workbench UX
-- [ ] **Phase 16:** Examples, Validation, and Release Gates
+- [x] **Phase 12:** Frontend Boundary and Artifact/API Contract
+- [x] **Phase 13:** Official OCI Logan QL Reference Catalog
+- [x] **Phase 14:** Cross-QL Conversion Pattern Library
+- [x] **Phase 15:** Integrated Workbench UX
+- [x] **Phase 16:** Examples, Validation, and Release Gates
 
 ### Phase 12: Frontend Boundary and Artifact/API Contract
 
@@ -337,15 +337,15 @@ Phases 12-16 define and deliver the integrated `webapp/` workbench for convertin
 | 6. KQL Subpackage Extraction and Canonicalizer | 10/10 | Complete | 2026-05-16 |
 | 7. Mapping Config Sharding and Collision Lint | 4/4 | Complete | 2026-05-17 |
 | 8. Backlog Prioritizer and Cohort Overlay | 3/3 | Complete | 2026-05-17 |
-| 9. Operator Parity and Field Mapping Bulk Expansion | 0/? | Not started | - |
-| 10. Drift Detector and Synthetic-Hit Promotion Gate | 0/? | Not started | - |
-| 11. CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split | 0/? | Not started | - |
-| 12. Frontend Boundary and Artifact/API Contract | 0/? | Not started | - |
-| 13. Official OCI Logan QL Reference Catalog | 0/? | Not started | - |
-| 14. Cross-QL Conversion Pattern Library | 0/? | Not started | - |
-| 15. Sibling Workbench UX Integration | 0/? | Not started | - |
-| 16. Examples, Validation, and Release Gates | 0/? | Not started | - |
+| 9. Operator Parity and Field Mapping Bulk Expansion | 11/11 | Complete | 2026-06-11 |
+| 10. Drift Detector and Synthetic-Hit Promotion Gate | 3/4 | In progress | - |
+| 11. CI Workflow with PR Dry-Run vs Scheduled-Live Lane Split | 6/6 | Complete | 2026-06-11 |
+| 12. Frontend Boundary and Artifact/API Contract | 3/3 | Complete | 2026-06-11 |
+| 13. Official OCI Logan QL Reference Catalog | 3/3 | Complete | 2026-06-11 |
+| 14. Cross-QL Conversion Pattern Library | 4/4 | Complete | 2026-06-11 |
+| 15. Integrated Workbench UX | 3/3 | Complete | 2026-06-11 |
+| 16. Examples, Validation, and Release Gates | 3/3 | Complete | 2026-06-11 |
 
 ---
 *Roadmap created: 2026-05-14*
-*Last updated: 2026-05-17 - v3.0 Logan QL Conversion Workbench phases added*
+*Last updated: 2026-06-11 - remaining v2/v3 phases reconciled; Phase 10 DRIFT-03 live synthetic-hit evidence remains pending*

@@ -7,9 +7,10 @@ This document describes the Microsoft Sentinel KQL to OCI Log Analytics / Logan 
 ## Current Baseline
 
 - Official Microsoft Sentinel candidates available: 4,452
-- Current canonical live report: 25 attempted, 8 promoted, 10 live failures
-- Current promoted surface: 8 endpoint queries in `queries/sentinel/`, each live parser-passing and synthetic-row-backed
-- Current Sentinel dashboard surface: 1 Endpoint Converted Detections dashboard with 8 widgets
+- Current canonical live report: 100 attempted, 60 promoted/live-passed, 2 live failures, 40 local skips in the current cohort
+- Current promoted surface: 60 queries in `queries/sentinel/`, each live parser-passing
+- Current synthetic live-hit evidence: 20 / 60 promoted queries have non-empty live-hit evidence; `queries/sentinel_drift.json` lists the remaining 40 under `synthetic_hit_gaps`
+- Current remaining synthetic-hit split: all 40 promoted gaps are `synthetic_ready` and can be live-validated directly
 - Previous full-promotion run failed uniformly with `query validation exceeded 20s`; use the synthetic parser loop for small batches before scaling again
 
 The canonical machine-readable status is `queries/sentinel_conversion_report.json`. The static operator review page is `docs/sentinel_converter.html`.
@@ -29,6 +30,7 @@ The canonical machine-readable status is `queries/sentinel_conversion_report.jso
 | `queries/sentinel_conversion_report.json` | Conversion report with skip and live-failure reasons |
 | `queries/sentinel_synthetic_plan.json` | Generated synthetic-log readiness and OCI parser/source gap report |
 | `queries/sentinel_synthetic_live_results.json` | Generated live query result evidence for synthetic-ready candidates |
+| `queries/sentinel_drift.json` | Offline drift report with parser-schema hashes, promoted-file reconciliation, and `synthetic_hit_gaps` |
 | `test_data/sentinel_synthetic/*.jsonl` | Generated Sentinel synthetic NDJSON grouped by parser-ready OCI source |
 | `docs/sentinel_converter.html` | Static web review page built from the latest conversion report |
 
@@ -113,6 +115,30 @@ python3 scripts/sentinel_synthetic_logs.py upload --dry-run
 python3 scripts/sentinel_synthetic_logs.py upload
 python3 scripts/sentinel_synthetic_logs.py validate-live --limit 8 --timeout 60 --lookback 24h
 python3 scripts/sentinel_synthetic_logs.py promote-validated --clean-output
+```
+
+To target only the promoted queries that still lack synthetic-hit evidence and are already `synthetic_ready`, regenerate drift first and use the drift report as an ID filter:
+
+```bash
+python3 scripts/sentinel_drift_check.py
+python3 scripts/sentinel_synthetic_logs.py export-targets \
+  --sentinel-ids-file queries/sentinel_drift.json \
+  --out-plan /tmp/sentinel_gap_plan.json \
+  --out-data-dir /tmp/sentinel_gap_data
+python3 scripts/sentinel_synthetic_logs.py upload \
+  --plan /tmp/sentinel_gap_plan.json \
+  --data-dir /tmp/sentinel_gap_data
+python3 scripts/sentinel_synthetic_logs.py validate-live \
+  --plan /tmp/sentinel_gap_plan.json \
+  --out /tmp/sentinel_gap_live_results.json \
+  --limit 0 \
+  --timeout 60 \
+  --lookback 24h
+python3 scripts/sentinel_synthetic_logs.py merge-live-results \
+  --new /tmp/sentinel_gap_live_results.json \
+  --out queries/sentinel_synthetic_live_results.json
+python3 scripts/sentinel_drift_check.py --require-synthetic-hits
+python3 scripts/release_checklist.py --require-sentinel-synthetic-hits
 ```
 
 After synthetic logs are processed by OCI Log Analytics, live validation should be run per small group. Only queries that pass live validation and return the expected synthetic evidence should be promoted with `sentinel_synthetic_logs.py promote-validated`; do not copy planner output into `queries/sentinel/`.

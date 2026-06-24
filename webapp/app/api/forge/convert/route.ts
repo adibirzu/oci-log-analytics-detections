@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process"
+import { randomUUID } from "node:crypto"
 import path from "node:path"
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
@@ -154,6 +155,35 @@ function rateLimit(request: NextRequest) {
   }
 }
 
+type RateLimitState = ReturnType<typeof rateLimit>
+
+type ForgeConversionTelemetry = {
+  requestId: string
+  outcome: "success" | "blocked" | "error"
+  status: number
+  durationMs: number
+  errorCode?: string
+  sourceLanguage?: z.output<typeof conversionRequestSchema>["sourceLanguage"]
+  supportLevel?: z.output<typeof conversionResponseSchema>["support_level"]
+  backendMode?: "bundled_python_script" | "remote_api_gateway"
+  warningCount?: number
+  rateLimitRemaining?: number
+}
+
+function elapsedMs(startedAt: number): number {
+  return Math.max(0, Date.now() - startedAt)
+}
+
+function logConversionTelemetry(details: ForgeConversionTelemetry): void {
+  console.info(
+    "forge_conversion",
+    JSON.stringify({
+      event: "forge_conversion",
+      ...details,
+    }),
+  )
+}
+
 function isAllowedOrigin(request: NextRequest): boolean {
   const origin = request.headers.get("origin")
   if (!origin) {
@@ -188,9 +218,12 @@ function verifyCsrf(request: NextRequest): boolean {
   return secFetchSite === "same-origin" || secFetchSite === "none" || !secFetchSite || isTrustedInternalRequest(request)
 }
 
-function withSecurityHeaders(response: NextResponse, limitState?: ReturnType<typeof rateLimit>) {
+function withSecurityHeaders(response: NextResponse, limitState?: RateLimitState, requestId?: string) {
   response.headers.set("Cache-Control", "no-store")
   response.headers.set("X-Content-Type-Options", "nosniff")
+  if (requestId) {
+    response.headers.set("X-Request-ID", requestId)
+  }
   if (limitState) {
     response.headers.set("X-RateLimit-Limit", String(RATE_LIMIT))
     response.headers.set("X-RateLimit-Remaining", String(limitState.remaining))
@@ -199,7 +232,7 @@ function withSecurityHeaders(response: NextResponse, limitState?: ReturnType<typ
   return response
 }
 
-function jsonError(message: string, status: number, limitState?: ReturnType<typeof rateLimit>) {
+function jsonError(message: string, status: number, limitState?: RateLimitState, requestId?: string) {
   return withSecurityHeaders(
     NextResponse.json(
       {
@@ -208,6 +241,7 @@ function jsonError(message: string, status: number, limitState?: ReturnType<type
       { status },
     ),
     limitState,
+    requestId,
   )
 }
 
@@ -318,34 +352,90 @@ async function runLocalScript(payload: z.output<typeof conversionRequestSchema>)
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = randomUUID()
+  const startedAt = Date.now()
+
   if (!isAllowedOrigin(request)) {
-    return jsonError("origin is not allowed", 403)
+    logConversionTelemetry({
+      requestId,
+      outcome: "blocked",
+      status: 403,
+      durationMs: elapsedMs(startedAt),
+      errorCode: "origin_not_allowed",
+    })
+    return jsonError("origin is not allowed", 403, undefined, requestId)
   }
   if (!verifyCsrf(request)) {
-    return jsonError("csrf token is missing or invalid", 403)
+    logConversionTelemetry({
+      requestId,
+      outcome: "blocked",
+      status: 403,
+      durationMs: elapsedMs(startedAt),
+      errorCode: "csrf_invalid",
+    })
+    return jsonError("csrf token is missing or invalid", 403, undefined, requestId)
   }
 
   const limitState = rateLimit(request)
   if (!limitState.allowed) {
-    return jsonError("rate limit exceeded", 429, limitState)
+    logConversionTelemetry({
+      requestId,
+      outcome: "blocked",
+      status: 429,
+      durationMs: elapsedMs(startedAt),
+      errorCode: "rate_limited",
+      rateLimitRemaining: limitState.remaining,
+    })
+    return jsonError("rate limit exceeded", 429, limitState, requestId)
   }
 
   let payload: z.output<typeof conversionRequestSchema>
   try {
     payload = conversionRequestSchema.parse(await request.json())
   } catch {
-    return jsonError("invalid conversion request", 400, limitState)
+    logConversionTelemetry({
+      requestId,
+      outcome: "blocked",
+      status: 400,
+      durationMs: elapsedMs(startedAt),
+      errorCode: "invalid_request",
+      rateLimitRemaining: limitState.remaining,
+    })
+    return jsonError("invalid conversion request", 400, limitState, requestId)
   }
 
   try {
     const proxied = await proxyToBackend(payload)
-    const response = NextResponse.json(publicConversionResponse(proxied ?? (await runLocalScript(payload))))
-    return withSecurityHeaders(response, limitState)
+    const publicResponse = publicConversionResponse(proxied ?? (await runLocalScript(payload)))
+    const backendMode =
+      publicResponse.metadata.execution_mode === "remote_api_gateway" ? "remote_api_gateway" : "bundled_python_script"
+
+    logConversionTelemetry({
+      requestId,
+      outcome: "success",
+      status: 200,
+      durationMs: elapsedMs(startedAt),
+      sourceLanguage: payload.sourceLanguage,
+      supportLevel: publicResponse.support_level,
+      backendMode,
+      warningCount: publicResponse.warnings.length,
+      rateLimitRemaining: limitState.remaining,
+    })
+    const response = NextResponse.json(publicResponse)
+    return withSecurityHeaders(response, limitState, requestId)
   } catch (error) {
+    logConversionTelemetry({
+      requestId,
+      outcome: "error",
+      status: 502,
+      durationMs: elapsedMs(startedAt),
+      errorCode: "conversion_backend_failed",
+      sourceLanguage: payload.sourceLanguage,
+      rateLimitRemaining: limitState.remaining,
+    })
     if (process.env.NODE_ENV !== "production") {
-      return jsonError(error instanceof Error ? error.message : "conversion backend failed", 502, limitState)
+      return jsonError(error instanceof Error ? error.message : "conversion backend failed", 502, limitState, requestId)
     }
-    console.error("Forge conversion failed", error)
-    return jsonError("conversion backend failed", 502, limitState)
+    return jsonError("conversion backend failed", 502, limitState, requestId)
   }
 }

@@ -17,6 +17,9 @@
     "ranking": "quality-first",
     "live_validation_requested": true,
     "live_validation_passed": 60,
+    "live_validation_passed_with_rows": 0,
+    "live_validation_passed_zero_rows": 0,
+    "live_validation_passed_unknown_rows": 60,
     "live_validation_failed": 2,
     "tier_distribution": {
       "tier_1": 60,

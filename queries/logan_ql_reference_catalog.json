@@ -16,7 +16,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html",
       "summary": "Starts an OCI Log Analytics search with source and field predicates.",
@@ -38,7 +38,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/where.html",
       "summary": "Filters the current result set with a boolean expression.",
@@ -60,7 +60,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/stats.html",
       "summary": "Aggregates records and groups by selected dimensions.",
@@ -82,7 +82,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/timestats.html",
       "summary": "Aggregates records into time buckets for trend and spike detection.",
@@ -104,7 +104,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/eval.html",
       "summary": "Calculates a new field from existing fields and expressions.",
@@ -126,7 +126,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/fields.html",
       "summary": "Keeps or orders the selected fields in the output.",
@@ -148,7 +148,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/sort.html",
       "summary": "Sorts the current result set by one or more fields.",
@@ -170,7 +170,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/top.html",
       "summary": "Returns the most frequent values for a field or aggregation.",
@@ -192,7 +192,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/distinct.html",
       "summary": "Returns unique values for selected fields.",
@@ -214,7 +214,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/regex.html",
       "summary": "Matches or extracts values with a regular expression where supported by Logan QL.",
@@ -236,7 +236,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/lookup.html",
       "summary": "Invokes a field-value lookup for enrichment or filtering.",
@@ -258,7 +258,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/link.html",
       "summary": "Groups related log records into transaction-style linked events.",
@@ -280,7 +280,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/sequence.html",
       "summary": "Identifies ordered event patterns inside linked event groups.",
@@ -302,7 +302,7 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/rename.html",
       "summary": "Renames output fields for downstream display or grouping.",
@@ -324,14 +324,14 @@
         "official_command_reference": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/command-reference.html",
         "official_query_search": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
       },
-      "retrieved_at": "2026-05-19T08:07:47Z",
+      "retrieved_at": "2026-06-12T15:26:27Z",
       "source_title": "OCI Log Analytics Query Language Command Reference",
       "source_url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/head.html",
       "summary": "Limits the result set to the first N rows.",
       "syntax": "| head 100"
     }
   ],
-  "generated_at": "2026-05-19T08:07:47Z",
+  "generated_at": "2026-06-12T15:26:27Z",
   "required_commands": [
     "search",
     "where",

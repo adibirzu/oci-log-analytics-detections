@@ -36,12 +36,15 @@ def cloud_guard_event(problem_type, resource_type="Instance", severity="HIGH",
         "compartmentName": "security-test",
         "problemName": problem_type,
         "resourceType": resource_type,
-        "resourceId": f"ocid1.{resource_type.lower()}.oc1..{uuid.uuid4().hex[:32]}",
+        # Synthetic OCID: contract-required `ocid1.` prefix on the non-production
+        # `demo` realm, so it satisfies the parser contract without ever matching
+        # the real-OCID redaction gate (which keys on the `.oc1.` realm segment).
+        "resourceId": f"ocid1.{resource_type.lower()}.demo.iad.{uuid.uuid4().hex[:8]}synthetic",
         "resourceName": resource_name,
         "riskLevel": severity,
         "riskScore": risk_score_map.get(severity.upper(), 50),
         "detectorId": "ACTIVITY_DETECTOR",
-        "detectorRuleId": f"ocid1.cloudguarddetectorrecipe.oc1..{uuid.uuid4().hex[:32]}",
+        "detectorRuleId": f"<DEMO_CLOUD_GUARD_DETECTOR_OCID_{uuid.uuid4().hex[:8]}>",
         "region": "us-phoenix-1",
         "timeFirstDetected": ts(offset),
         "timeLastDetected": ts(offset + 1),
@@ -155,8 +158,11 @@ def generate_cloud_guard_instance_security_events():
             "timestamp": timestamp,
             "message": finding,
             "hostname": host,
-            "instanceOcid": f"ocid1.instance.oc1..examplecgis{index:02d}",
-            "cloud.instance.id": f"ocid1.instance.oc1..examplecgis{index:02d}",
+            # Synthetic OCID: keeps the contract-required `ocid1.instance.` prefix
+            # while using the non-production `demo` realm so it never matches the
+            # real-OCID redaction gate (which keys on the `.oc1.` realm segment).
+            "instanceOcid": f"ocid1.instance.demo.iad.cgis{index:02d}synthetic",
+            "cloud.instance.id": f"ocid1.instance.demo.iad.cgis{index:02d}synthetic",
             "region": "us-ashburn-1",
             "riskLevel": severity.upper(),
             "severity": severity,
@@ -181,7 +187,7 @@ def generate_cloud_guard_instance_security_events():
                 "command_line": command,
             },
             "file": {"path": file_path},
-            "source": {"ip": "10.0.10.42"},
+            "source": {"ip": "198.51.100.42"},
             "destination": {"ip": "198.51.100.77", "port": 4444},
             "mitre": {
                 "tactic": "Defense Evasion" if severity == "critical" else "Persistence",

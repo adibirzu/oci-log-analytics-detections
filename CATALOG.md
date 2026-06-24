@@ -1,6 +1,6 @@
 # Detection Rule Catalog
 
-> **545 base detection queries** + **60 Microsoft Sentinel conversions** + **67 app/APM queries** + **115 hunting queries**
+> **545 base detection queries** + **60 Microsoft Sentinel conversions** + **62 app/APM queries** + **115 hunting queries**
 
 ## Summary
 
@@ -8,7 +8,7 @@
 |-----------------|-------|-------|
 | Base detection queries | 545 | Sigma-derived detections in `queries/` |
 | Microsoft Sentinel conversions | 60 | Source-derived converted detections in `queries/sentinel/` |
-| App/APM queries | 67 | 13 Sigma-derived browser detections + 54 curated analytics in `queries/apps/` |
+| App/APM queries | 62 | 8 Sigma-derived browser detections + 54 curated analytics in `queries/apps/` |
 | Hunting queries | 115 | Curated analytics and correlation content in `queries/hunting/` |
 
 **Source YAML rules:** 522 total (cloud: 102, linux: 80, web: 38, windows: 302)
@@ -33,14 +33,13 @@
 
 ## MITRE ATT&CK Coverage
 
-**244 techniques** across **14 tactics**
+**243 techniques** across **14 tactics**
 
-### Reconnaissance (5 techniques)
+### Reconnaissance (4 techniques)
 
 | Technique | Rules |
 |-----------|-------|
 | T1083 | Web Directory Enumeration Detected |
-| T1592 | Control Plane: API Schema Recon Probe |
 | T1592.004 | APM: Browser Fingerprinting via Canvas/WebGL/AudioContext |
 | T1595 | Suspicious or Empty User Agent Detected |
 | T1595.002 | Web Directory Enumeration Detected, Web Vulnerability Scanner Detected, +2 more |
@@ -87,7 +86,7 @@
 | T1185 | APM: Clickjacking - Missing Frame Protection Headers, APM: CSRF Token Missing or Invalid on State-Changing Request |
 | T1187 | Google DNS - Exchange online autodiscover abuse |
 | T1189 | BLUELIGHT RAT: Internet Explorer Drive-by Compromise, WAF CORS Bypass Attempt Blocked, +14 more |
-| T1190 | API Endpoint Unauthorized Access Attempts, APM: SQL Injection Attack in Request, +45 more |
+| T1190 | API Endpoint Unauthorized Access Attempts, APM: SQL Injection Attack in Request, +44 more |
 | T1195 | Google DNS - Malicous Python packages, McAfee ePO - Multiple threats on same host, McAfee ePO - Threat was not blocked |
 | T1202 | ApexOne - Top sources with alerts |
 | T1203 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), +2 more |
@@ -417,7 +416,7 @@
 | T1098 | Certifried (CVE-2022-26923): Machine Account dNSHostName Abuse, DCSync Enablement: Replication Rights Granted via Directory Change (5136), Shadow Credentials: msDS-KeyCredentialLink Modified (Event 5136) |
 | T1098.001 | OCI Customer Secret Key Created |
 | T1105 | BLUELIGHT APT37 Kill Chain Correlation |
-| T1110 | Cloud Guard Problem: IAM User Console Password Old, WAF Rate Limiting Triggered, +10 more |
+| T1110 | Cloud Guard Problem: IAM User Console Password Old, WAF Rate Limiting Triggered, +9 more |
 | T1110.001 | Brute Force: Failed Logon Spike per Account, Linux SSH Failed Login, +5 more |
 | T1110.003 | Brute Force: Failed Logon Spike per Account, OCI Password Spraying Attack, +3 more |
 | T1110.004 | FLF: Credential Stuffing Pattern |
@@ -705,7 +704,7 @@
 | T1491.001 | Defacement via Desktop Wallpaper Change |
 | T1496 | Cryptominer Deployment Indicators, Linux Cryptominer Activity Detected, +3 more |
 | T1498 | Imperva - Top destinations with blocked requests, Imperva - Top sources with blocked requests |
-| T1499 | GenAI Gateway: Denial of ML Service / Inference Flood (AML.T0029 / AML.T0046), Web Application Server Error Spike, +6 more |
+| T1499 | GenAI Gateway: Denial of ML Service / Inference Flood (AML.T0029 / AML.T0046), Web Application Server Error Spike, +5 more |
 | T1529 | System Shutdown or Reboot via shutdown.exe |
 | T1531 | Account Access Removal, OCI Action: DeleteGroup, +3 more |
 | T1561 | Disk Wipe via Format Command |
@@ -1412,20 +1411,15 @@ Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** (AML.T* te
 | 51 | ATLAS: Unauthorized ML Inference API Access (AML.T0040) | Curated application analytics | 🟡 medium | - |
 | 52 | ATLAS: Denial of ML Service / Inference Flood (AML.T0029 / AML.T0046) | Curated application analytics | 🟡 medium | T1499 |
 | 53 | ATLAS: LLM Prompt Injection in Application Request (AML.T0051) | Curated application analytics | 🟠 high | - |
-| 54 | Control Plane: Auth Brute Force | Source-derived browser detection | 🟠 high | T1110 |
-| 55 | Control Plane: Path Traversal Attempt | Source-derived browser detection | 🟠 high | T1190 |
-| 56 | Control Plane: Oversized Payload Rejected | Source-derived browser detection | 🟡 medium | T1499 |
-| 57 | Control Plane: Server Error Surge | Source-derived browser detection | 🟡 medium | - |
-| 58 | Control Plane: API Schema Recon Probe | Source-derived browser detection | 🔵 low | T1592 |
-| 59 | OKE: Boopkit Attack Timeline | Curated application analytics | 🔴 critical | - |
-| 60 | OKE: eBPF Rootkit Activity | Curated application analytics | 🔴 critical | - |
-| 61 | OKE: Exec and Node Escape | Curated application analytics | 🟠 high | - |
-| 62 | OKE: Kubernetes Attack Overview | Curated application analytics | 🟠 high | - |
-| 63 | OKE: Kubernetes Attack Path Link | Curated application analytics | 🟠 high | - |
-| 64 | OKE: Privileged Workload Creation | Curated application analytics | 🔴 critical | - |
-| 65 | OKE: Boopkit eBPF Rootkit Detection Rule | Curated application analytics | 🔴 critical | - |
-| 66 | OKE: Privileged Kubernetes Workload Detection Rule | Curated application analytics | 🔴 critical | - |
-| 67 | OKE: Secrets and RBAC Abuse | Curated application analytics | 🔴 critical | - |
+| 54 | OKE: Boopkit Attack Timeline | Curated application analytics | 🔴 critical | - |
+| 55 | OKE: eBPF Rootkit Activity | Curated application analytics | 🔴 critical | - |
+| 56 | OKE: Exec and Node Escape | Curated application analytics | 🟠 high | - |
+| 57 | OKE: Kubernetes Attack Overview | Curated application analytics | 🟠 high | - |
+| 58 | OKE: Kubernetes Attack Path Link | Curated application analytics | 🟠 high | - |
+| 59 | OKE: Privileged Workload Creation | Curated application analytics | 🔴 critical | - |
+| 60 | OKE: Boopkit eBPF Rootkit Detection Rule | Curated application analytics | 🔴 critical | - |
+| 61 | OKE: Privileged Kubernetes Workload Detection Rule | Curated application analytics | 🔴 critical | - |
+| 62 | OKE: Secrets and RBAC Abuse | Curated application analytics | 🔴 critical | - |
 
 ## Hunting Queries
 
@@ -1577,4 +1571,4 @@ Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** (AML.T* te
 | OCI VCN Peering Connection Created | SC-7 | CAT II | medium |
 
 ---
-*Generated from 522 Sigma source rules routed to 545 top-level detection queries and 13 browser app queries, plus 60 Microsoft Sentinel conversions, 54 curated app/APM analytics, and 115 hunting queries*
+*Generated from 522 Sigma source rules routed to 545 top-level detection queries and 8 browser app queries, plus 60 Microsoft Sentinel conversions, 54 curated app/APM analytics, and 115 hunting queries*

@@ -17,6 +17,7 @@ from sentinel_workflow.reporting import (
     build_next_query_backlog,
     build_status,
     build_triage,
+    classify_next_query_candidate,
     load_promoted_query_counts,
     load_sentinel_dashboard_counts,
     print_next_query_backlog,

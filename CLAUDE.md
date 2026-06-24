@@ -13,15 +13,18 @@ This repo is **scoped to OCI Log Analytics**: query generation from Sigma/Sentin
 | Source rules | `rules/**` | hand-authored |
 | Sigma-derived queries | `queries/*.json`, `queries/apps/*.json` | `scripts/convert_sigma.py` |
 | Sentinel-derived queries | `queries/sentinel/*.json` | `scripts/sentinel_conversion_workflow.py` |
-| Curated app analytics | `queries/apps/*.json` (38 curated) | hand-authored |
-| Hunting analytics | `queries/hunting/*.json` (87) | hand-authored |
+| Curated app analytics | `queries/apps/*.json` (~62 app queries) | hand-authored |
+| Hunting analytics | `queries/hunting/*.json` (115) | hand-authored |
 | Catalog | `queries/catalog.json`, `CATALOG.md` | `scripts/generate_catalog.py` |
-| Dashboard inventory | `queries/dashboard_inventory.json` | `scripts/deploy_dashboard.py` |
+| Dashboard inventory | `queries/dashboard_inventory.json` (29 dashboards) | `scripts/deploy_dashboard.py` |
 | Field/source dictionary | `queries/log_source_field_dictionary.json` | `scripts/field_dictionary.py` |
 | Detection rule specs | `queries/detection_rule_specs.json` | `scripts/detection_rule_creator.py` |
 | Sentinel conversion report | `queries/sentinel_conversion_report.json` | Sentinel workflow |
 | Multicloud export | `queries/manifest.json` | `scripts/export_for_multicloud.py --manifest-only` |
+| Synthetic test data (**gitignored**) | `test_data/*.jsonl` | `scripts/generate_test_logs.py`, `scripts/testlogs/**`, `scripts/populate_dashboard_data_14d.py` |
 | Forge webapp | `webapp/**` | Next.js app consuming generated artifacts |
+
+Catalog totals (regenerated, see `queries/catalog.json`): 605 rules · 60 Sentinel · ~62 app · 115 hunting · 782 content items.
 
 ## Hard rules
 
@@ -31,8 +34,9 @@ This repo is **scoped to OCI Log Analytics**: query generation from Sigma/Sentin
 4. **Dashboard placement uses the 12-column algorithm** in `scripts/deploy_dashboard.py:resolve_widget_layout()`. Set `width`/`height` only — do not hand-author `row`/`column`.
 5. **App/APM analytics stay on `SOC Application Logs`** and must pass `scripts/test_app_query_contract.py`.
 6. **README/STATUS counts must reconcile with `queries/catalog.json`** before commit.
-7. **No public IPs, OCIDs, credentials, or tenancy specifics** in committed files (global rule — see `~/.claude/CLAUDE.md`).
+7. **No public IPs, OCIDs, credentials, or tenancy specifics** in committed files (global rule — see `~/.claude/CLAUDE.md`). Enforce with `scripts/scan_sensitive_values.py` (must print `OK - no sensitive values found`). Synthetic OCID fixtures in tests are allowed only as all-`a` / `demo`-realm forms marked `# scanner-fixture`.
 8. **Forge-only exposure**: keep `/forge`, `/api/forge/*`, `/api/health`, and required static assets as the exposed webapp surface.
+9. **Synthetic test data is disposable and gitignored.** `test_data/**` is never committed — generators stamp it with the active profile's real compartment OCID at runtime. Synthetic OCIDs in *generators* (`scripts/testlogs/**`) must use the non-production `demo` realm (`ocid1.<type>.demo.<region>.<id>`): this satisfies the `^ocid1\.` parser contracts in `config/synthetic_log_contracts.json` while never matching the real-OCID redaction gate (which keys on the `.oc1.` realm). Validate with `scripts/validate_synthetic_logs.py` (must report 0 contract errors).
 
 ## Workflow
 
@@ -40,6 +44,7 @@ This repo is **scoped to OCI Log Analytics**: query generation from Sigma/Sentin
 2. **Add Sentinel rule** → run `scripts/sentinel_conversion_workflow.py local` → review `sentinel_conversion_report.json` → only promote with `promote` after live validation passes.
 3. **Add/edit dashboard** → edit `DASHBOARDS` in `scripts/deploy_dashboard.py` → run live-query validation → `scripts/release_checklist.py` before promoting to a live profile.
 4. **Counts changed** → run `scripts/generate_catalog.py` → update README/STATUS to match.
+5. **Generate + ingest demo data (last N days)** → `scripts/populate_dashboard_data_14d.py` orchestrates generate → validate → ingest → deploy → readiness (default 14 days). To stay offline use `--skip-ingest --skip-deploy --skip-readiness`. For a live tenancy, set `OCI_PROFILE` (e.g. `cap` staging) and run components directly: `scripts/setup_log_sources.py` (create/refresh custom sources, idempotent), then `scripts/ingest_test_data.py --mode direct` (omit `--validate`, which is pre-flight-only and exits before upload). `emdemo` is production — never ingest there outside the LogAnalytics compartment.
 
 ## Agents (`.claude/agents/`)
 
@@ -57,5 +62,7 @@ Use `code-reviewer` and `security-reviewer` (global) for cross-cutting passes; u
 
 - `scripts/release_checklist.py` — local gates + optional live profile verification (`--include-live`)
 - `scripts/parse_validate_all_queries.py` — fast live `parse_query` gate over every `queries/**` query (syntax + field/source validity, no data needed); runs under `--include-live` and writes `docs/health/parse-validate-all.json`. Use this to isolate broken queries (ERROR) from no-data (the execution smoke test's MISS). `eval`/`if` accept only equality/comparison — no `case`, `decode`, `coalesce`, or `like` inside `eval`.
+- `scripts/validate_synthetic_logs.py` — synthetic `test_data/**` contract gate (field/pattern/nesting per `config/synthetic_log_contracts.json`); must report 0 errors before ingest.
+- `scripts/scan_sensitive_values.py` — no real OCIDs/IPs/namespaces/credentials in tracked files; must print `OK - no sensitive values found`.
 - `docs/health/all-dashboard-verify.json` — latest live dashboard health
-- Live baseline: `<OCI_PROFILE_CAP>` shows 351/351 dashboard widgets HIT, 0 MISS, 0 ERROR; `parse_validate_all_queries.py` shows 678/678 queries PASS
+- Live baseline (`<OCI_PROFILE_CAP>` staging): 29 dashboards / 441 saved searches deploy clean. A few free-text Linux detections (`msg like '*…*'`) are inherently **scan-bound** — cost is linear in the number of leading-wildcard `like` terms (~5s/term, flat across lookback windows), not in the time range. After dead-term trimming the heaviest are ~48s (`web_server_process_spawning_shell_with_injection_characters_linux`) and ~33s (`linux_password_file_direct_modification`) at 14d. Keep them indexable where possible; for the residual, run the deploy gate with `--query-timeout 90` (or `--skip-live-validation` — content is parse-valid and the gate is all-or-nothing). Reconcile dashboard/query counts with `queries/catalog.json` + `queries/dashboard_inventory.json` after changes.

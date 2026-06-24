@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs') and (('Rule Key' != null and 'Rule Key' != '') or ('Attack Type' != null and 'Attack Type' != '')) and ('WAF Action' = 'Allow') | eval CompleteUrl = concat('Destination Hostname', 'URL Path')

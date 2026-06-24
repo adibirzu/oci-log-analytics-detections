@@ -1,0 +1,78 @@
+{
+  "title": "Private Key Files",
+  "description": "Private Key Files.\nThis query identifies file operation with files having.\nOne of the extensions commonly used to save a private.\nKey.  The risk is that if an attacker were to obtain.\nThe file, they could brute force any password on it.\nAnd potentially obtain a powerful certificate.  To do.\nThis, they would only need to obtain read access to.\nThe file.\nThe risk associated with these files is heavily.\nDetermined by the value of the certificate.  For example,.\nLoss of a self-signed certificate created by Adobe Acrobat.\nIs significantly less impactful than loss of a website.\nSSL certificate.\nRecommendation: Know where these files are, and if possible.\nBack them up and remove them.  You might also consider.\nCreating an informational alert.\n",
+  "query": "'Log Source' = 'SOC Windows Sysmon Logs' and ('Process Name' like '*.pfx' or 'Process Name' like '*.pfn' or 'Process Name' like '*.p12')",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "2ca01fd3-afb5-4050-8a1d-6b821bdab080",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Credential Access/Private Key Files.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Credential Access/Private Key Files.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceFileEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceFileEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceFileEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Credential Access/Private Key Files.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

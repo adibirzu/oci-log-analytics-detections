@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and (('Command Line' like '*accepteula*' and 'Command Line' like '*-s*' and 'Command Line' like '*-r*' and 'Command Line' like '*-q*')) and (not ('Process Name' like '*sdelete.exe')) and (not ('Command Line' like '*sdelete*'))

@@ -1,0 +1,1 @@
+('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and (Description like '*Behavior Monitoring*') and (Action = '2' or Action = '3') | timestats span = 10minute count as count_ by 'Source IP' | where count_ > 5

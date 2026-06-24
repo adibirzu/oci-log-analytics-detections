@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Network Logs' or 'Log Source' = 'SOC Sysmon Network Logs') and ('Request URL' in ('open.betaoffice.net', 'outlook.updateoffices.net', 'load.newappssystems.com', 'syn.servebbs.com', 'cortanazone.com', 'cortanasyn.com', 'ristineho.com', 'syn.servebbs.com'))

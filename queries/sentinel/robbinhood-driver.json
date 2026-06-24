@@ -1,0 +1,81 @@
+{
+  "title": "robbinhood-driver",
+  "description": "This query was originally published in the threat analytics report, Ransomware continues to hit healthcare, critical services. There is also a related blog.\nRobbinhood is ransomware that has been involved in several high-profile incidents, including a 2019 attack on the city of Baltimore, Maryland. Robbinhood operators often employ a distinctive defense evasion technique, where they load a vulnerable driver on to a target and exploit it, in order to turn off security software -- essentially using the driver as malware.\nThe following query detects if a device contains the vulnerable drivers. These are often, but not always, implanted on the target by operators seeking to use this technique to turn off security software.\nFor a query that detects a later stage of this technique, see Detect security evasion related to the Robbinhood ransomware campaign.\nReferences:\nhttps://www.microsoft.com/security/blog/2020/04/28/ransomware-groups-continue-to-target-healthcare-critical-services-heres-how-to-reduce-risk/\nhttps://www.microsoft.com/wdsi/threats/malware-encyclopedia-description?Name=Ransom:Win32/Robinhood.A&ThreatID=2147735370\nhttps://www.nytimes.com/2019/05/22/us/baltimore-ransomware.html\n",
+  "query": "'Log Source' = 'SOC Windows Sysmon Logs' and (Hashes in ('0b15b5cc64caf0c6ad9bd759eb35383b1f718edf3d7ab4cd912d0d8c1826edf8', '31f4cfb4c71da44120752721103a16512444c13c2ac2d857a7e6f13cb679b427'))",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "cd718abb-96e4-436e-9a6c-63c09d40cc5c",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Campaigns/robbinhood-driver.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/robbinhood-driver.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "DeviceFileEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "DeviceFileEvents"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "defense_evasion"
+    ],
+    "techniques": []
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_endpoint",
+    "candidates": [
+      "SOC Windows Sysmon Logs"
+    ],
+    "original_tables": [
+      "DeviceFileEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Campaigns/robbinhood-driver.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'net.exe' and 'Command Line' like '*stop*') | timestats span = 2minute distinctcount('Command Line') as netStopCount, unique('Command Line') as NetStopList by Entity | where netStopCount > 10

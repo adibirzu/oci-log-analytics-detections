@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and ('Target Filename' like '*.exe' or 'Target Object' like '*.exe')

@@ -1,0 +1,80 @@
+{
+  "title": "Discord download invoked from cmd line (ASIM Version)",
+  "description": "'This hunting query looks for hosts that have attempted to interact with the Discord CDN. This activity is not normally invoked from the command line and could indicate C2, exfiltration, or malware delivery activity.'\n",
+  "query": "('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Security Events') and (('Process Name' like '*powershell.exe*' or 'Process Name' like '*powershell_ise.exe*' or 'Process Name' like '*cmd.exe*') or 'Command Line' like '*powershell*') and (('Command Line' like '*cdn.discordapp.com*' or 'Command Line' like '*moc.ppadrocsid.ndc*')) | fields Time, 'Host Name', User, 'Process Name', 'Command Line'",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "3169dc83-9e97-452c-afcc-baebdb0ddf7c",
+  "sentinel_source_path": "Hunting Queries/ASimProcess/Discorddownloadinvokedfromcmdline(ASIMVersion).yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/ASimProcess/Discorddownloadinvokedfromcmdline(ASIMVersion).yaml",
+  "required_data_connectors": [],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "imProcess"
+  ],
+  "sentinel_category": "endpoint",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.endpoint"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "command_and_control",
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1204",
+      "T1102",
+      "T1567"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "asim_process",
+    "candidates": [
+      "SOC Windows Sysmon Logs",
+      "Windows Security Events"
+    ],
+    "original_tables": [
+      "imProcess"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/ASimProcess/Discorddownloadinvokedfromcmdline(ASIMVersion).yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

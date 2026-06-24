@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'ping.exe') and ('Parent Process Name' = 'cmd.exe') and (('Command Line' like '*calc.exe*') and ('Command Line' like '*-n 6*') and ('Command Line' like '*127.0.0.1*')) | fields Time, 'Command Line', 'Command Line', 'Parent Process Name', Entity

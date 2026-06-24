@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' = 'msiexec.exe' and ('Command Line' like '*privilege::*' or 'Command Line' like '*sekurlsa*' or 'Command Line' like '*token::*'))

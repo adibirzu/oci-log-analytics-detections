@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (Status in ('NXDOMAIN', 'SERVFAIL', 'REFUSED')) | timestats span = 10minute count as count_ by 'Source IP' | where count_ > 10

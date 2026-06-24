@@ -1,0 +1,1 @@
+('Log Source' = 'Azure Common Security Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (Provider = 'Acronis') and ('Event ID' in ('MaliciousURLDetectedInM365MailboxBackup', 'MalwareDetectedInM365MailboxBackup', 'MaliciousEmailDetectedPerceptionPointWarning')) | stats count as MaliciousContent by 'Host Name (Server)'

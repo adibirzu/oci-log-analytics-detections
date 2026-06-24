@@ -1,7 +1,7 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-06-24T12:52:03.622037+00:00",
+  "generated_at": "2026-06-24T13:28:43.585644+00:00",
   "stats": {
     "total_rules": 538,
     "total_sigma_rules": 522,
@@ -9095,8 +9095,8 @@
     }
   ],
   "dashboards": {
-    "total": 29,
-    "saved_searches": 441,
+    "total": 30,
+    "saved_searches": 506,
     "names": [
       "SOC Overview Dashboard",
       "SOC: OCI STIG Compliance Dashboard",
@@ -9125,6 +9125,7 @@
       "SOC: oci-coordinator Hunt Showcase Dashboard",
       "SOC: Microsoft Sentinel Identity Converted Detections",
       "SOC: Microsoft Sentinel Endpoint Converted Detections",
+      "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
       "SOC: Microsoft Sentinel M365 Converted Detections",
       "SOC: Microsoft Sentinel Network Converted Detections"
     ]

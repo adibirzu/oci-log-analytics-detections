@@ -1,0 +1,83 @@
+{
+  "title": "Malicious URL Clicks by workload",
+  "description": "Visualises click attempts on malicious URLs, grouped by workload (such as Exchange, Teams, SharePoint, Copilot etc.), to help analysts understand which workloads are most targeted.\nBased on Defender for Office 365 workbook: https://techcommunity.microsoft.com/blog/microsoftdefenderforoffice365blog/part-2-build-custom-email-security-reports-and-dashboards-with-workbooks-in-micr/4411303\n",
+  "query": "('Log Source' = 'Microsoft Defender Email Logs' or 'Log Source' = 'Microsoft 365 Audit Logs') and (('Threat Category' != null and 'Threat Category' != '')) | stats count as count_ by Workload",
+  "level": "medium",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "c2b4ef3a-216d-4506-8b35-6a1b0f2a3bf7",
+  "sentinel_source_path": "Hunting Queries/Microsoft 365 Defender/Email and Collaboration Queries/URL/Malicious URL Clicks by workload.yml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Email and Collaboration Queries/URL/Malicious URL Clicks by workload.yml",
+  "required_data_connectors": [
+    {
+      "connector_id": "MicrosoftThreatProtection",
+      "data_types": [
+        "UrlClickEvents"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "UrlClickEvents"
+  ],
+  "sentinel_category": "m365",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.m365"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "initial_access"
+    ],
+    "techniques": [
+      "T1566"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "defender_email",
+    "candidates": [
+      "Microsoft Defender Email Logs",
+      "Microsoft 365 Audit Logs"
+    ],
+    "original_tables": [
+      "UrlClickEvents"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Hunting Queries/Microsoft 365 Defender/Email and Collaboration Queries/URL/Malicious URL Clicks by workload.yml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

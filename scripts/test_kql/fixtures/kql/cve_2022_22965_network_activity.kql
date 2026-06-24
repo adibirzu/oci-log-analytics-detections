@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Network Logs' or 'Log Source' = 'SOC Sysmon Network Logs') and (Action = 'NetworkSignatureInspected') and (Properties like '*.jsp?cmd=*') | stats unique(Properties) as set_AdditionalFields, min(Time) as min_2, max(Time) as max_3 by Entity, 'Host Name (Server)'

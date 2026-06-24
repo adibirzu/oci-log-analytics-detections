@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Email Logs' or 'Log Source' = 'Microsoft 365 Audit Logs') and ('Threat Category' != '' and Workload = 'Teams') | stats count as count_ by 'Request URL', 'Threat Category', Action, Workload | eval ClickCount = count_ | fields 'Request URL', 'Threat Category', Action, Workload, ClickCount | sort -ClickCount | head 20

@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft 365 Cloud App Events' or 'Log Source' = 'SOC Application Logs') and (Action = 'UserSubmission' or Action = 'AdminSubmission') | stats count as count_ by Action

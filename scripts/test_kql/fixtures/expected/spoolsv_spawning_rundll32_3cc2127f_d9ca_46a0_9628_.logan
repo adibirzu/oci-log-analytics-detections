@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' like '*spoolsv.exe*') and ('Parent Process Name' = 'rundll32.exe') and (('Command Line' = null or 'Command Line' = '') or 'Command Line' like '*rundll32.exe') and ('Process Name' not in ('WerFault.exe'))

@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'taskkill.exe') | timestats span = 2minute distinctcount('Command Line') as taskKillCount, unique('Command Line') as TaskKillList by Entity | where taskKillCount > 10

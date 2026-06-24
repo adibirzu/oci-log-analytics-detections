@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (Action = 'user_create') | fields Time, 'Source IP', 'User Name', 'Target User Name'

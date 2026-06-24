@@ -1,0 +1,125 @@
+{
+  "title": "DNS events related to ToR proxies  (ASIM DNS Schema)",
+  "description": "'Identifies IP addresses performing DNS lookups associated with common ToR proxies.\nThis analytic rule uses [ASIM](https://aka.ms/AboutASIM) and supports any built-in or custom source that supports the ASIM DNS schema'\n",
+  "query": "('Log Source' = 'Azure Log Analytics Custom Logs' or 'Log Source' = 'SOC Application Logs')",
+  "level": "low",
+  "source_type": "microsoft_sentinel",
+  "sentinel_id": "3fe3c520-04f1-44b8-8398-782ed21435f8",
+  "sentinel_source_path": "Detections/ASimDNS/imDNS_TorProxies.yaml",
+  "sentinel_source_url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/ASimDNS/imDNS_TorProxies.yaml",
+  "required_data_connectors": [
+    {
+      "connector_id": "DNS",
+      "data_types": [
+        "DnsEvents"
+      ]
+    },
+    {
+      "connector_id": "AzureFirewall",
+      "data_types": [
+        "AzureDiagnostics"
+      ]
+    },
+    {
+      "connector_id": "Zscaler",
+      "data_types": [
+        "CommonSecurityLog"
+      ]
+    },
+    {
+      "connector_id": "InfobloxNIOS",
+      "data_types": [
+        "Syslog"
+      ]
+    },
+    {
+      "connector_id": "GCPDNSDataConnector",
+      "data_types": [
+        "GCP_DNS_CL"
+      ]
+    },
+    {
+      "connector_id": "NXLogDnsLogs",
+      "data_types": [
+        "NXLog_DNS_Server_CL"
+      ]
+    },
+    {
+      "connector_id": "CiscoUmbrellaDataConnector",
+      "data_types": [
+        "Cisco_Umbrella_dns_CL"
+      ]
+    },
+    {
+      "connector_id": "Corelight",
+      "data_types": [
+        "Corelight_CL"
+      ]
+    }
+  ],
+  "conversion_status": "promoted",
+  "conversion_confidence": "medium",
+  "source_confidence": "high",
+  "live_validation_status": "passed",
+  "sentinel_tables": [
+    "_Im_Dns"
+  ],
+  "sentinel_category": "azure_custom",
+  "tags": [
+    "microsoft_sentinel",
+    "sentinel.azure_custom"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1048"
+    ]
+  },
+  "logsource": {
+    "product": "microsoft_sentinel",
+    "service": "sentinel_workspace_custom",
+    "candidates": [
+      "Azure Log Analytics Custom Logs",
+      "SOC Application Logs"
+    ],
+    "original_tables": [
+      "_Im_Dns"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft Sentinel source rule",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/63ff8eedc58e7df0d22eba05ca73c92b59a66634/Detections/ASimDNS/imDNS_TorProxies.yaml"
+    },
+    {
+      "name": "Microsoft Sentinel repository",
+      "url": "https://github.com/Azure/Azure-Sentinel"
+    },
+    {
+      "name": "Azure/Azure-Sentinel license",
+      "url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+    }
+  ],
+  "attribution": {
+    "source": "Microsoft Sentinel",
+    "repository": "Azure/Azure-Sentinel",
+    "license": "MIT",
+    "license_url": "https://github.com/Azure/Azure-Sentinel/blob/master/LICENSE"
+  },
+  "dashboard": {
+    "visualizationType": "table",
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "ask_ai_prompts": [
+      "Summarize the Microsoft Sentinel converted detection results and identify the highest-risk pivots."
+    ]
+  },
+  "detection_maturity": "source_converted",
+  "field_coverage": "mapped_subset",
+  "test_data_coverage": "not_evaluated",
+  "scheduled_rule_eligibility": "not_evaluated",
+  "parser_schema_hash": "df9b912b12f98dc02dde0932055f43b964b7cf0933c04c87d2aad3c99358b8c3"
+}

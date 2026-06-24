@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'reg.exe' and 'Command Line' like '*EnableBDEWithNoTPM*' and ('Command Line' like '*true*' or 'Command Line' like '*1*')) and (('Command Line' like '*C:\\\\Windows\\\\*' and 'Command Line' like '*.bat*'))

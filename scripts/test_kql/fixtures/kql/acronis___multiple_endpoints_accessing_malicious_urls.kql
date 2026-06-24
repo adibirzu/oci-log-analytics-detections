@@ -1,0 +1,1 @@
+('Log Source' = 'Azure Common Security Logs' or 'Log Source' = 'SOC Network Firewall Logs') and (Provider = 'Acronis') and ('Event ID' = 'MaliciousUrlDetected') | stats count as MaliciousUrlDetected by 'Host Name (Server)'

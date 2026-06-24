@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (('Source IP' != null and 'Source IP' != '')) and (('User Name' != null and 'User Name' != '')) | stats unique('Source IP') as ip_list by 'User Name'

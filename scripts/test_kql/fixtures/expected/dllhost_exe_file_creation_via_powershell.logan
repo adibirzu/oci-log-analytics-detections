@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Parent Process Name' = 'powershell.exe') and (('Command Line' like '*$file=*' and 'Command Line' like '*dllhost.exe*' and 'Command Line' like '*Invoke-WebRequest*' and 'Command Line' like '*-OutFile*'))

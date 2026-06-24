@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (Action = 'user_login') | stats unique('Source IP') as set_SrcIpAddr by 'User Name'

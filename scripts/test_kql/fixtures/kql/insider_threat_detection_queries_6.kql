@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Network Logs' or 'Log Source' = 'SOC Sysmon Network Logs') and ('Account Name' = 'FORMER_EMPLOYEE_NAME') | fields Time, 'Host Name (Server)', 'Account Name' | sort -Time

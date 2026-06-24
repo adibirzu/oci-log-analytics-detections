@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and (Action in ('role_change_to_admin', 'role_change_to_owner'))

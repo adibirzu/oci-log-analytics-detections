@@ -1,0 +1,1 @@
+'Log Source' = 'SOC Application Logs' and ('Event ID' in ('5400', '5401', '5412', '12508', '12514', '12516')) | stats count as count_ by 'Target User Name' | sort -count_

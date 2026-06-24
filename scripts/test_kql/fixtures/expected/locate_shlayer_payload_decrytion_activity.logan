@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft Defender Endpoint Logs' or 'Log Source' = 'SOC Windows Sysmon Logs') and ('Process Name' = 'openssl' and 'Command Line' like '*-base64*' and 'Command Line' like '*-out*' and 'Command Line' like '*-nosalt*' and ('Command Line' like '*-aes256*' or 'Command Line' like '*-aes-256*'))

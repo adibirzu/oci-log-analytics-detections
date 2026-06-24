@@ -1,0 +1,1 @@
+('Log Source' = 'Microsoft 365 Cloud App Events' or 'Log Source' = 'SOC Application Logs') and (Action = 'QuarantineReleaseMessage') | timestats span = 1day count as count_ | eval project_rename_Releases = count_ | fields project_rename_Releases

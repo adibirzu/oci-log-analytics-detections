@@ -1,0 +1,1 @@
+('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Load Balancer Access Logs') and ('HTTP Status Code' >= 400 and 'HTTP Status Code' <= 499) | timestats span = 5minute count as MultipleClientErrors by 'Source IP' | where MultipleClientErrors > 100

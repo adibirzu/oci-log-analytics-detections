@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-24T13:29:18.744098+00:00",
+  "generated_at": "2026-06-24T13:43:36.188956+00:00",
   "summary": {
     "total_fields": 306,
     "parser_count": 19,
@@ -3360,7 +3360,8 @@
       "contract_datasets": [],
       "queries_using_it": [
         "apps/apm_octo_db_spans.json",
-        "apps/apm_octo_span_latency_hotspots.json"
+        "apps/apm_octo_span_latency_hotspots.json",
+        "hunting/octo_checkout_db_slowness.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -16586,11 +16587,15 @@
         "hunting/melts_attack_signal_overview.json",
         "hunting/melts_attack_timeline.json",
         "hunting/oci_after_hours_iam_activity.json",
+        "hunting/oci_api_burst_by_user.json",
         "hunting/oci_console_brute_force.json",
+        "hunting/oci_cross_compartment_activity.json",
         "hunting/oci_iam_fusion_activity_correlation.json",
         "hunting/oci_iam_rapid_changes.json",
         "hunting/oci_multi_user_same_ip.json",
+        "hunting/oci_off_hours_activity.json",
         "hunting/oci_privilege_escalation_chain.json",
+        "hunting/oci_resource_deletion_wave.json",
         "hunting/oci_resource_destruction_spike.json",
         "hunting/web_to_cloud_attack_path_link.json",
         "hunting/web_to_cloud_attack_timeline.json",

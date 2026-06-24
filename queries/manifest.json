@@ -1,7 +1,7 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-06-24T13:28:43.585644+00:00",
+  "generated_at": "2026-06-24T13:41:48.900378+00:00",
   "stats": {
     "total_rules": 538,
     "total_sigma_rules": 522,

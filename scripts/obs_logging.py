@@ -153,8 +153,47 @@ def get_logger(name: str) -> logging.Logger:
     return logger
 
 
+class _BoundLoggerAdapter(logging.LoggerAdapter):
+    """LoggerAdapter that MERGES call-site ``extra`` with the bound context.
+
+    The stock ``logging.LoggerAdapter.process()`` overwrites ``kwargs['extra']``
+    with the adapter's own ``self.extra``, so any call-site
+    ``bound_logger.info(msg, extra={...})`` is silently dropped. This subclass
+    instead merges, in increasing precedence:
+
+      1. the bound context captured by :func:`bind`
+      2. a call-site ``extra={"context": {...}}`` (namespaced form)
+      3. call-site ``extra={"k": v}`` flat keys
+
+    Everything is folded into a single ``{"context": {...}}`` payload, which is
+    what :func:`_extra_fields` reads, so both logging styles keep working and no
+    structured field is lost.
+    """
+
+    def process(self, msg: Any, kwargs: dict[str, Any]) -> tuple[Any, dict[str, Any]]:
+        merged: dict[str, Any] = {}
+        if isinstance(self.extra, Mapping):
+            bound = self.extra.get("context")
+            if isinstance(bound, Mapping):
+                merged.update(bound)
+        call_extra = kwargs.get("extra")
+        if isinstance(call_extra, Mapping):
+            call_context = call_extra.get("context")
+            if isinstance(call_context, Mapping):
+                merged.update(call_context)
+            for key, value in call_extra.items():
+                if key != "context":
+                    merged[key] = value
+        kwargs["extra"] = {"context": merged}
+        return msg, kwargs
+
+
 def bind(logger: logging.Logger | logging.LoggerAdapter, **fields: Any) -> logging.LoggerAdapter:
     """Return a ``LoggerAdapter`` that injects ``fields`` as structured kv pairs.
+
+    Call-site ``extra=`` is preserved and merged with the bound fields (see
+    :class:`_BoundLoggerAdapter`), so ``bind(log, a=1).info(msg, extra={"b": 2})``
+    emits both ``a`` and ``b``.
 
     Example::
 
@@ -168,4 +207,4 @@ def bind(logger: logging.Logger | logging.LoggerAdapter, **fields: Any) -> loggi
             base_fields.update(existing)
         logger = logger.logger
     base_fields.update(fields)
-    return logging.LoggerAdapter(logger, {"context": base_fields})
+    return _BoundLoggerAdapter(logger, {"context": base_fields})

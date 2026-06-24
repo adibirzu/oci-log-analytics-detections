@@ -130,6 +130,27 @@ def test_extra_context_namespace_emitted(capsys):
     assert "widget=w1" in err
 
 
+def test_bound_logger_preserves_callsite_extra_flat(capsys):
+    """Regression: bind() must not drop call-site extra={...} flat fields."""
+    log = obs_logging.get_logger("obs_test.bindextra1")
+    blog = obs_logging.bind(log, profile="cap")
+    blog.info("upload", extra={"total": 4, "alerts": 1})
+    err = capsys.readouterr().err
+    assert "profile=cap" in err   # bound field survives
+    assert "total=4" in err       # call-site flat field survives
+    assert "alerts=1" in err
+
+
+def test_bound_logger_preserves_callsite_extra_context(capsys):
+    """Regression: bind() must merge call-site extra={'context': {...}} too."""
+    log = obs_logging.get_logger("obs_test.bindextra2")
+    blog = obs_logging.bind(log, run="r1")
+    blog.warning("retry", extra={"context": {"attempt": 3}})
+    err = capsys.readouterr().err
+    assert "run=r1" in err
+    assert "attempt=3" in err
+
+
 def test_plain_format_is_human_friendly(monkeypatch, capsys):
     mod = _reload_with_env(monkeypatch, OCI_LOG_FORMAT="plain")
     try:

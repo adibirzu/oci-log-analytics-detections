@@ -1,0 +1,26 @@
+#!/bin/sh
+# Wazuh integrator hook -> OCI Log Analytics (real-time forwarding).
+#
+# Install:
+#   cp custom-oci-la /var/ossec/integrations/custom-oci-la
+#   chmod 750 /var/ossec/integrations/custom-oci-la
+#   chown root:wazuh /var/ossec/integrations/custom-oci-la
+# Then add to /var/ossec/etc/ossec.conf:
+#   <integration>
+#     <name>custom-oci-la</name>
+#     <alert_format>json</alert_format>
+#     <level>3</level>            <!-- forward alerts at/above this rule level -->
+#   </integration>
+# and: systemctl restart wazuh-manager
+#
+# Wazuh invokes this script with $1 = path to the alert JSON file. We pipe that
+# file through the forwarder in file mode (single-shot upload of that alert).
+# Credentials/target come from the EnvironmentFile sourced below.
+
+ALERT_FILE="$1"
+ENV_FILE="/etc/wazuh-to-oci-la.env"
+INSTALL_DIR="/opt/wazuh-to-oci-la"
+
+[ -f "$ENV_FILE" ] && . "$ENV_FILE" && export OCI_PROFILE WAZUH_INDEXER_URL WAZUH_INDEXER_USER WAZUH_INDEXER_PASSWORD WAZUH_INDEXER_VERIFY_TLS OCI_LOG_LEVEL OCI_RUN_ID OCI_REGION OCI_AUTH_MODE 2>/dev/null
+
+exec /usr/bin/python3 "${INSTALL_DIR}/scripts/wazuh_to_oci_la.py" --mode file --file "$ALERT_FILE"

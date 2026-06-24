@@ -1,7 +1,7 @@
 {
   "title": "Wazuh: Recent MITRE Events",
   "description": "Most recent MITRE-mapped Wazuh alerts with technique, tactic, level and rule.",
-  "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Events by 'Host Name', 'MITRE Technique ID', 'MITRE Tactic', 'Wazuh Rule ID', 'Rule Description' | sort -Events",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Events by 'MITRE Technique ID', 'MITRE Tactic', 'Rule Description' | sort -Events",
   "type": "hunting",
   "level": "high",
   "tags": [

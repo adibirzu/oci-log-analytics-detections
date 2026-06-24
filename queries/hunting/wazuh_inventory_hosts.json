@@ -1,7 +1,7 @@
 {
   "title": "Wazuh: System Inventory",
   "description": "Hardware and OS inventory per GOAD agent (cores, memory, CPU, OS).",
-  "query": "'Log Source' = 'SOC Wazuh Inventory' | stats count as Records by 'Host Name', 'Cores', 'Memory GB', 'CPU Name', 'OS Name' | sort -Records",
+  "query": "'Log Source' = 'SOC Wazuh Inventory' | stats count as Records by 'Host Name', 'CPU Name', 'OS Name' | sort -Records",
   "type": "hunting",
   "level": "high",
   "tags": [

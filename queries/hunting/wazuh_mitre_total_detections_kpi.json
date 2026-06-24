@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: MITRE Detections (KPI)",
+  "description": "Total Wazuh alerts mapped to a MITRE ATT&CK technique across GOAD agents.",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Detections",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "tile",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "dataField": "Detections"
+    }
+  }
+}

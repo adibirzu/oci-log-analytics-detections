@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Rule Level by Tactic",
+  "description": "Wazuh alert severity (rule level) distribution per MITRE tactic.",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Tactic' != null | stats count as Count by 'MITRE Tactic', 'Wazuh Rule Level' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

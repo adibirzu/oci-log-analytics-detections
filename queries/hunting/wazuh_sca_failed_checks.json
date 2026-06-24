@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Failed SCA Checks",
+  "description": "Configuration checks that failed, by title and host.",
+  "query": "'Log Source' = 'SOC Wazuh SCA' and 'SCA Check Result' = 'failed' | stats count as Count by 'Host Name', 'SCA Check Title' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

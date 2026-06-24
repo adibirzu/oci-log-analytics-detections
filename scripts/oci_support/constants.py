@@ -21,6 +21,18 @@ SOURCE_CANDIDATE_GROUPS = {
     "oci_audit": [
         "OCI Audit Logs",
     ],
+    "wazuh_alerts": [
+        "SOC Wazuh Alerts",
+    ],
+    "wazuh_vulnerabilities": [
+        "SOC Wazuh Vulnerabilities",
+    ],
+    "wazuh_inventory": [
+        "SOC Wazuh Inventory",
+    ],
+    "wazuh_sca": [
+        "SOC Wazuh SCA",
+    ],
     # SOC source first: native OCI Cloud Guard Problems parser does not extract
     # the ``problemName`` JSON field that detections queries on, so test data
     # must land in SOC Cloud Guard Logs whose parser maps it to ``Problem Name``.
@@ -141,6 +153,10 @@ TEST_DATA_FILES = [
     "vcn_flow.jsonl",
     "network_firewall.jsonl",
     "multicloud_health.jsonl",
+    "wazuh_alerts.jsonl",
+    "wazuh_vulnerabilities.jsonl",
+    "wazuh_inventory.jsonl",
+    "wazuh_sca.jsonl",
 ]
 
 CORE_SOC_STREAMS = [

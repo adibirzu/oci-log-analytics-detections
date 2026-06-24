@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: SCA Policy Score",
+  "description": "Security Configuration Assessment score per policy and agent.",
+  "query": "'Log Source' = 'SOC Wazuh SCA' | stats count as Checks by 'Host Name', 'SCA Policy', 'SCA Score' | sort -Checks",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Checks"
+    }
+  }
+}

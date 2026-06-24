@@ -45,6 +45,10 @@ from testlogs.sysmon_network import *  # noqa: F401,F403
 from testlogs.web import *  # noqa: F401,F403
 from testlogs.application import *  # noqa: F401,F403
 from testlogs.genai_gateway import *  # noqa: F401,F403
+from testlogs.wazuh_alerts import *  # noqa: F401,F403
+from testlogs.wazuh_vulnerabilities import *  # noqa: F401,F403
+from testlogs.wazuh_inventory import *  # noqa: F401,F403
+from testlogs.wazuh_sca import *  # noqa: F401,F403
 
 
 def main():
@@ -88,6 +92,12 @@ def main():
     vcn_flow_events = generate_vcn_flow_events()
     network_firewall_events = generate_network_firewall_events()
 
+    # Generate events — Wazuh GOAD endpoint telemetry (4 sources)
+    wazuh_alerts_events = generate_wazuh_alerts_events()
+    wazuh_vuln_events = generate_wazuh_vulnerabilities_events()
+    wazuh_inventory_events = generate_wazuh_inventory_events()
+    wazuh_sca_events = generate_wazuh_sca_events()
+
     generated_sets = {
         "oci_audit.jsonl": oci_events,
         "cloud_guard.jsonl": cg_events,
@@ -108,6 +118,10 @@ def main():
         "genai_gateway.jsonl": genai_gateway_events,
         "vcn_flow.jsonl": vcn_flow_events,
         "network_firewall.jsonl": network_firewall_events,
+        "wazuh_alerts.jsonl": wazuh_alerts_events,
+        "wazuh_vulnerabilities.jsonl": wazuh_vuln_events,
+        "wazuh_inventory.jsonl": wazuh_inventory_events,
+        "wazuh_sca.jsonl": wazuh_sca_events,
     }
 
     # Write NDJSON files

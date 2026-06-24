@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Top CVEs",
+  "description": "Most frequently detected CVEs across GOAD agents.",
+  "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' | stats count as Count by 'CVE ID', 'Vulnerability Severity' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

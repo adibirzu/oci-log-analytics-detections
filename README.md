@@ -23,15 +23,15 @@ This repository ships both source authoring content and generated OCI query asse
   - 545 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
 - **Microsoft Sentinel converted queries:** 590 live OCI parser-passing queries
-- **Curated analytics:** 169
+- **Curated analytics:** 193
   - 54 app telemetry analytics in `queries/apps/`
-  - 115 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 1312
+  - 139 hunting analytics in `queries/hunting/`
+- **Total query artifacts/content items:** 1336
 - **Source rule breakdown:** Windows (302), Cloud/OCI (102), Linux (80), Web/WAF (38)
 - **Combined MITRE ATT&CK coverage:** 279 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Atomic Red Team coverage:** 280 / 397 testable rules have ART mappings (70.5%)
-- **Dashboard inventory:** 30 dashboards with 506 active dashboard saved searches and 126 advanced visualization widgets
+- **Dashboard inventory:** 34 dashboards with 530 active dashboard saved searches and 150 advanced visualization widgets
 - **Generated demo data:** 221,173 events across 20 NDJSON files in the latest local `test_data/manifest.json`
 - **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
 

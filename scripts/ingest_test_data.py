@@ -213,6 +213,38 @@ UPLOAD_MANIFEST = [
         "content_type": "application/octet-stream",
         "description": "Multicloud health heartbeats (OCI, Azure, GCP — geographic map visualization)"
     },
+    {
+        "filename": "wazuh_alerts.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["wazuh_alerts"],
+        "upload_name": "soc-test-wazuh-alerts",
+        "stream_key": "soc-detection-wazuh-alerts",
+        "content_type": "application/octet-stream",
+        "description": "Wazuh GOAD alerts (MITRE ATT&CK, FIM, Windows Sysmon) for winterfell/kingslanding"
+    },
+    {
+        "filename": "wazuh_vulnerabilities.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["wazuh_vulnerabilities"],
+        "upload_name": "soc-test-wazuh-vuln",
+        "stream_key": "soc-detection-wazuh-vulnerabilities",
+        "content_type": "application/octet-stream",
+        "description": "Wazuh Vulnerability Detector findings (CVE/CVSS/package) per GOAD agent"
+    },
+    {
+        "filename": "wazuh_inventory.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["wazuh_inventory"],
+        "upload_name": "soc-test-wazuh-inventory",
+        "stream_key": "soc-detection-wazuh-inventory",
+        "content_type": "application/octet-stream",
+        "description": "Wazuh Syscollector inventory (hardware/OS/packages) per GOAD agent"
+    },
+    {
+        "filename": "wazuh_sca.jsonl",
+        "source_candidates": SOURCE_CANDIDATE_GROUPS["wazuh_sca"],
+        "upload_name": "soc-test-wazuh-sca",
+        "stream_key": "soc-detection-wazuh-sca",
+        "content_type": "application/octet-stream",
+        "description": "Wazuh Security Configuration Assessment (CIS/PCI) per GOAD agent"
+    },
 ]
 
 OPTIONAL_UPLOAD_MANIFEST = [

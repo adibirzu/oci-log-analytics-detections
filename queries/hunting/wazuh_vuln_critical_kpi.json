@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Critical Vulnerabilities (KPI)",
+  "description": "Count of Critical-severity CVEs detected by Wazuh on GOAD agents.",
+  "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' and 'Vulnerability Severity' = 'Critical' | stats count as Critical",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "tile",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "dataField": "Critical"
+    }
+  }
+}

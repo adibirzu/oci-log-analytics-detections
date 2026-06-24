@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Top Agents by MITRE Alerts",
+  "description": "GOAD agents ranked by number of MITRE-mapped Wazuh alerts.",
+  "query": "'Log Source' = 'SOC Wazuh Alerts' and 'MITRE Technique ID' != null | stats count as Count by 'Host Name' | sort -Count",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "valueField": "Count"
+    }
+  }
+}

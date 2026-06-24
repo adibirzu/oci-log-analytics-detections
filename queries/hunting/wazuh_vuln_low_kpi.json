@@ -1,0 +1,26 @@
+{
+  "title": "Wazuh: Low Vulnerabilities (KPI)",
+  "description": "Count of Low-severity CVEs detected by Wazuh.",
+  "query": "'Log Source' = 'SOC Wazuh Vulnerabilities' and 'Vulnerability Severity' = 'Low' | stats count as Low",
+  "type": "hunting",
+  "level": "high",
+  "tags": [
+    "wazuh",
+    "goad",
+    "hunting"
+  ],
+  "logsource": {
+    "product": "wazuh",
+    "service": "goad"
+  },
+  "dashboard": {
+    "visualizationType": "tile",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "dataField": "Low"
+    }
+  }
+}

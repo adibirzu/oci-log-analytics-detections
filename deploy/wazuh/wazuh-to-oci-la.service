@@ -1,0 +1,22 @@
+# systemd oneshot: pull recent Wazuh indexer docs and forward to OCI Log Analytics.
+# Install to /etc/systemd/system/wazuh-to-oci-la.service (paired with the .timer).
+# Adjust INSTALL_DIR (where setup-wazuh-forwarder.sh placed the repo subset) and User.
+[Unit]
+Description=Forward Wazuh indexer data to OCI Log Analytics
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=wazuh-forwarder
+EnvironmentFile=/etc/wazuh-to-oci-la.env
+WorkingDirectory=/opt/wazuh-to-oci-la
+# --lookback should be >= the timer interval so windows overlap slightly and no
+# events are missed between runs (dedupe is handled by LA ingestion time).
+ExecStart=/usr/bin/python3 /opt/wazuh-to-oci-la/scripts/wazuh_to_oci_la.py --mode indexer --lookback 20m
+# Never echo secrets; the script already logs to stderr via obs_logging.
+Nice=10
+TimeoutStartSec=600
+
+[Install]
+WantedBy=multi-user.target

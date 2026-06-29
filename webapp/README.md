@@ -19,6 +19,7 @@ The app does not duplicate query generation. It reads:
 - `queries/ql_conversion_capability_matrix.json`
 - `queries/catalog.json`
 - `queries/dashboard_inventory.json`
+- `queries/siem_log_examples.json`
 - `test_data/manifest.json`
 - `scripts/logan_workbench_convert.py`
 
@@ -38,13 +39,14 @@ Verification:
 cd webapp
 pnpm typecheck
 pnpm lint
+pnpm test:unit:coverage
 pnpm build
 pnpm e2e
 ```
 
 ## GitHub Pages Static Build
 
-GitHub Pages can host the Forge page only as a static/read-only build. Static mode does not include the Next.js API routes, CSRF session endpoint, Python converter, or backend deployment actions. It supports bundled example conversions and raw OCI Logan QL passthrough in the browser.
+GitHub Pages can host the Forge page only as a static/read-only build. Static mode does not include the Next.js API routes, CSRF session endpoint, Python converter, or backend deployment actions. It supports bundled example conversions, raw OCI Logan QL passthrough, and the read-only Log Samples parser workspace in the browser.
 
 ```bash
 cd webapp
@@ -61,6 +63,7 @@ The static export is written to `webapp/out`. The `Forge GitHub Pages` workflow 
 - `FORGE_TRUSTED_PROXY_HOPS` makes `X-Forwarded-For` trust **opt-in**. It is the number of trusted reverse-proxy hops (e.g. OCI LB + ingress) that sit in front of the app and append to `X-Forwarded-For`; the rate limiter then keys on the entry that many positions from the **right** (the address your proxy inserted), so a client cannot bypass the limit by spoofing leftmost values. **When unset (or `0`) the app does NOT trust `X-Forwarded-For` at all and every request shares one rate-limit bucket (fail-closed).** Set it to the real proxy depth of the deployment — and ensure the app is only reachable through those proxies — to get per-client limiting.
 - Production backend writes must go through `LOGAN_FORGE_BACKEND_URL`, intended to be an API Gateway endpoint protected by WAF. Without that secret, the app uses the bundled read-only converter script.
 - No tenancy names, OCIDs, IP addresses, or secret values are rendered in the UI. Deployment scripts read environment variables and local OCI profiles at execution time only.
+- Log Samples exports contain explicit `<PLACEHOLDER>` values and reserved documentation addresses; they are not copied from a live tenancy.
 
 ## Deployment
 

@@ -1,0 +1,32 @@
+{
+  "specversion": "1.0",
+  "type": "com.oraclecloud.apigateway.access",
+  "source": "<API_GATEWAY_NAME>",
+  "subject": "<DEPLOYMENT_NAME>",
+  "id": "<LOG_ENTRY_UUID>",
+  "time": "2026-06-29T09:20:00.000Z",
+  "oracle": {
+    "compartmentid": "<COMPARTMENT_OCID>",
+    "ingestedtime": "2026-06-29T09:20:01.000Z",
+    "loggroupid": "<LOG_GROUP_OCID>",
+    "logid": "<LOG_OCID>",
+    "resourceid": "<API_DEPLOYMENT_OCID>",
+    "tenantid": "<TENANCY_OCID>"
+  },
+  "data": {
+    "httpMethod": "GET",
+    "requestUri": "<REQUEST_PATH>",
+    "serverProtocol": "HTTP/1.1",
+    "bodyBytesSent": 128,
+    "gatewayId": "<API_GATEWAY_OCID>",
+    "httpUserAgent": "<USER_AGENT>",
+    "message": "GET <REQUEST_PATH> HTTP/1.1",
+    "opcRequestId": "<REQUEST_ID>",
+    "remoteAddr": "<CLIENT_IP>",
+    "httpReferrer": "<REFERRER_URL>",
+    "requestDuration": 0.016,
+    "status": 401,
+    "deploymentId": "<API_DEPLOYMENT_OCID>",
+    "gatewayDisplayName": "<API_GATEWAY_NAME>"
+  }
+}

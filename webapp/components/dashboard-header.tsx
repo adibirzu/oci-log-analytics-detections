@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import { useSearchParams } from "next/navigation"
 import { ChevronsLeft, ChevronsRight, Github, LayoutGrid } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -12,6 +13,8 @@ const repositoryUrl = "https://github.com/adibirzu/oci-log-analytics-detections"
 
 export function DashboardHeader() {
   const { toggleSidebar, state } = useSidebar()
+  const searchParams = useSearchParams()
+  const isLogSamples = searchParams.get("view") === "log-samples"
 
   return (
     <header className="sticky top-0 z-10 flex h-[60px] items-center gap-4 border-b border-border bg-surface-sunken/85 px-6 backdrop-blur-md">
@@ -40,11 +43,11 @@ export function DashboardHeader() {
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-3">
           <div className="hidden min-w-0 sm:block">
-            <div className="truncate font-display text-sm font-semibold tracking-tight">Forge</div>
-            <div className="truncate text-xs text-muted-foreground">Detection conversion console</div>
+            <div className="truncate font-display text-sm font-semibold tracking-tight">{isLogSamples ? "Log Samples" : "Forge"}</div>
+            <div className="truncate text-xs text-muted-foreground">{isLogSamples ? "OCI Logging parser library" : "Detection conversion console"}</div>
           </div>
           <span className="hidden h-7 w-px bg-border-strong/60 sm:block" aria-hidden="true" />
-          <div className="truncate text-xs font-medium text-muted-foreground">OCI Log Analytics QL</div>
+          <div className="truncate text-xs font-medium text-muted-foreground">{isLogSamples ? "OCI Logging + Logan detections" : "OCI Log Analytics QL"}</div>
         </div>
       </div>
       <Button asChild variant="outline" size="sm">

@@ -1,0 +1,58 @@
+{
+  "specversion": "1.0",
+  "type": "com.oraclecloud.workloadprotection.cloudguardtarget.recipelog",
+  "source": "<CLOUD_GUARD_TARGET_OCID>",
+  "subject": "CLAM",
+  "id": "<LOG_ENTRY_UUID>",
+  "time": "2026-06-29T09:22:02.000Z",
+  "oracle": {
+    "compartmentid": "<COMPARTMENT_OCID>",
+    "ingestedtime": "2026-06-29T09:22:02.000Z",
+    "logid": "<LOG_OCID>",
+    "tenantid": "<TENANCY_OCID>"
+  },
+  "data": {
+    "message": {
+      "datetime": 1782724922000,
+      "logContent": {
+        "data": {
+          "executionTime": "2026-06-29T09:21:58Z",
+          "message": "CLAM executed on <INSTANCE_OCID>, result 1/1",
+          "result": {
+            "clamscanexitcode": "",
+            "dataread": "",
+            "datascanned": "",
+            "engineversion": "",
+            "errormessage": "Cron file does not exist.",
+            "infectedfiles": "0",
+            "instanceid": "<INSTANCE_OCID>",
+            "knownviruses": "0",
+            "lastupdated": "2026-06-29T09:21:40Z",
+            "logfilelastmodified": "",
+            "quarantinefiles": "false",
+            "scanneddirectories": "0",
+            "scannedfiles": "0",
+            "secssincelastrun": "",
+            "secssincelastsuccess": "",
+            "submittedmetricscount": "0",
+            "time": ""
+          },
+          "resultGroupId": "<RESULT_GROUP_ID>"
+        },
+        "id": "<INNER_LOG_ENTRY_UUID>",
+        "oracle": {
+          "compartmentid": "<COMPARTMENT_OCID>",
+          "ingestedtime": "2026-06-29T09:22:02.000Z",
+          "logid": "<LOG_OCID>",
+          "tenantid": "<TENANCY_OCID>"
+        },
+        "source": "<CLOUD_GUARD_TARGET_OCID>",
+        "specversion": "1.0",
+        "subject": "CLAM",
+        "time": "2026-06-29T09:22:02.000Z",
+        "type": "com.oraclecloud.workloadprotection.cloudguardtarget.recipelog"
+      },
+      "regionId": "<OCI_REGION>"
+    }
+  }
+}

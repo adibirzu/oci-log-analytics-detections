@@ -1,0 +1,24 @@
+{
+  "specversion": "1.0",
+  "type": "com.oraclecloud.functions.application.functioninvoke",
+  "source": "<FUNCTION_APPLICATION_NAME>",
+  "subject": "<FUNCTION_NAME>",
+  "id": "<LOG_ENTRY_UUID>",
+  "time": "2026-06-29T09:21:00.000Z",
+  "oracle": {
+    "logid": "<LOG_OCID>",
+    "loggroupid": "<LOG_GROUP_OCID>",
+    "compartmentid": "<COMPARTMENT_OCID>",
+    "tenantid": "<TENANCY_OCID>",
+    "ingestedtime": "2026-06-29T09:21:01.000Z"
+  },
+  "data": {
+    "applicationId": "<FUNCTION_APPLICATION_OCID>",
+    "containerId": "<FUNCTION_CONTAINER_ID>",
+    "functionId": "<FUNCTION_OCID>",
+    "requestId": "<REQUEST_ID>",
+    "opcRequestId": "<REQUEST_ID>",
+    "src": "STDERR",
+    "message": "<FUNCTION_LOG_MESSAGE>"
+  }
+}

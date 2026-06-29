@@ -1,9 +1,10 @@
 import path from "node:path"
+import { fileURLToPath } from "node:url"
 import { defineConfig, devices } from "@playwright/test"
 
 const port = Number(process.env.PLAYWRIGHT_PORT ?? 3012)
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${port}`
-const repoRoot = path.resolve(__dirname, "..")
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const trustedInternalHosts = "logan-forge-lb.logan-forge.svc,logan-forge-lb.logan-forge.svc.cluster.local"
 
 export default defineConfig({

@@ -21,6 +21,7 @@ GENERATED_QUERY_ARTIFACT_FILENAMES = {
     "osquery_pack_bundle.json",
     "ql_conversion_capability_matrix.json",
     "siem_discovery_inventory.json",
+    "siem_log_examples.json",
     "sentinel_candidates.json",
     "sentinel_backlog_priority.json",
     "sentinel_conversion_report.json",

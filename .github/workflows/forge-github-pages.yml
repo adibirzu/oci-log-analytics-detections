@@ -11,6 +11,7 @@ on:
       - "queries/cross_ql_mapping_patterns.json"
       - "queries/conversion_examples.json"
       - "queries/ql_conversion_capability_matrix.json"
+      - "queries/siem_log_examples.json"
       - ".github/workflows/forge-github-pages.yml"
 
 permissions:

@@ -1,0 +1,41 @@
+{
+  "specversion": "1.0",
+  "type": "com.oraclecloud.loadbalancer.waf",
+  "source": "<LOAD_BALANCER_NAME>",
+  "subject": "",
+  "id": "<LOG_ENTRY_UUID>",
+  "time": "2026-06-29T09:18:00.000Z",
+  "oracle": {
+    "compartmentid": "<COMPARTMENT_OCID>",
+    "ingestedtime": "2026-06-29T09:18:01.000Z",
+    "loggroupid": "<LOG_GROUP_OCID>",
+    "logid": "<LOG_OCID>",
+    "resourceid": "<WAF_OCID>",
+    "tenantid": "<TENANCY_OCID>"
+  },
+  "data": {
+    "action": "BLOCK",
+    "clientAddr": "<CLIENT_IP>",
+    "countryCode": "<COUNTRY_CODE>",
+    "host": "<HOST_NAME>",
+    "listenerPort": "443",
+    "request": {
+      "httpVersion": "HTTP/1.1",
+      "id": "<REQUEST_ID>",
+      "method": "GET",
+      "path": "<REQUEST_PATH>"
+    },
+    "requestProtection": {
+      "matchedData": "<MATCHED_REQUEST_DATA>",
+      "matchedIds": "<PROTECTION_RULE_ID>",
+      "matchedRules": "<PROTECTION_RULE_NAME>"
+    },
+    "response": {
+      "code": "403",
+      "size": "256"
+    },
+    "responseProtection": {},
+    "responseProvider": "requestProtection/<PROTECTION_RULE_NAME>",
+    "timestamp": "2026-06-29T09:18:00Z"
+  }
+}

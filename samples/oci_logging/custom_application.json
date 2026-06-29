@@ -1,0 +1,31 @@
+{
+  "specversion": "1.0",
+  "type": "com.example.application.security",
+  "source": "<HOST_NAME>",
+  "subject": "<APPLICATION_LOG_PATH>",
+  "id": "<LOG_ENTRY_UUID>",
+  "time": "2026-06-29T09:24:00.000Z",
+  "datacontenttype": "application/json",
+  "oracle": {
+    "compartmentid": "<COMPARTMENT_OCID>",
+    "ingestedtime": "2026-06-29T09:24:01.000Z",
+    "loggroupid": "<LOG_GROUP_OCID>",
+    "logid": "<LOG_OCID>",
+    "tenantid": "<TENANCY_OCID>"
+  },
+  "data": {
+    "timestamp": "2026-06-29T09:24:00.000Z",
+    "service": "<SERVICE_NAME>",
+    "environment": "<DEPLOYMENT_ENVIRONMENT>",
+    "severity": "high",
+    "eventType": "authentication_failure",
+    "message": "Authentication attempt rejected",
+    "traceId": "<TRACE_ID>",
+    "requestId": "<REQUEST_ID>",
+    "clientIp": "<CLIENT_IP>",
+    "httpMethod": "POST",
+    "requestPath": "<LOGIN_PATH>",
+    "statusCode": 401,
+    "userId": "<USER_ID>"
+  }
+}

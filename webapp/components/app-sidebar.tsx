@@ -2,9 +2,10 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import {
   ExternalLink,
+  FileJson2,
   Github,
   Hammer,
   HeartPulse,
@@ -25,13 +26,21 @@ const repositoryUrl = "https://github.com/adibirzu/oci-log-analytics-detections"
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const isActive = (path: string) => pathname === path
+  const searchParams = useSearchParams()
+  const activeView = searchParams.get("view")
 
   const menus = [
     {
       title: "Forge",
       icon: Hammer,
       href: "/forge",
+      active: pathname === "/forge" && activeView !== "log-samples",
+    },
+    {
+      title: "Log Samples",
+      icon: FileJson2,
+      href: "/forge?view=log-samples&tab=raw",
+      active: pathname === "/forge" && activeView === "log-samples",
     },
   ]
 
@@ -53,7 +62,7 @@ export function AppSidebar() {
       <SidebarContent className="p-2">
         {menus.map((menu) => (
           <SidebarMenuItem key={menu.href}>
-            <SidebarMenuButton asChild size="lg" tooltip={menu.title} isActive={isActive(menu.href)}>
+            <SidebarMenuButton asChild size="lg" tooltip={menu.title} isActive={menu.active}>
               <Link href={menu.href}>
                 <menu.icon className="size-5" />
                 <span className="group-data-[collapsible=icon]:hidden">{menu.title}</span>

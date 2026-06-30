@@ -2,7 +2,9 @@
 
 import { useSearchParams } from "next/navigation"
 
+import { DeploymentWorkspace } from "@/components/deployment/deployment-workspace"
 import { LogSamplesWorkspace } from "@/components/log-samples/log-samples-workspace"
+import type { DeploymentContentSummary } from "@/lib/deployment-content"
 import { ForgeWorkbench } from "@/components/logan-workbench/forge-workbench"
 import type {
   LoganCommand,
@@ -20,6 +22,8 @@ interface ForgeSurfaceProps {
   generatedAt: string | null
   siemCatalog: SiemLogExamplesCatalog | null
   siemError: string | null
+  deploymentSummary: DeploymentContentSummary | null
+  deploymentError: string | null
 }
 
 export function ForgeSurface({
@@ -30,12 +34,18 @@ export function ForgeSurface({
   generatedAt,
   siemCatalog,
   siemError,
+  deploymentSummary,
+  deploymentError,
 }: ForgeSurfaceProps) {
   const searchParams = useSearchParams()
   const view = searchParams.get("view")
 
   if (view === "log-samples") {
     return <LogSamplesWorkspace catalog={siemCatalog} error={siemError} />
+  }
+
+  if (view === "deployment") {
+    return <DeploymentWorkspace summary={deploymentSummary} error={deploymentError} />
   }
 
   return (

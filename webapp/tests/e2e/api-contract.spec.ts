@@ -161,6 +161,20 @@ test.describe("GET /api/forge/artifacts — contract", () => {
   })
 })
 
+// ── /api/forge/deployment-package ───────────────────────────────────────────
+
+test.describe("GET /api/forge/deployment-package — contract", () => {
+  test("returns a generated Resource Manager package without tenant data", async ({ request }) => {
+    const response = await request.get("/api/forge/deployment-package")
+
+    expect(response.status()).toBe(200)
+    expect(response.headers()["content-type"]).toContain("application/zip")
+    expect(response.headers()["content-disposition"]).toContain("oci-log-analytics-deployment.zip")
+    expect(response.headers()["cache-control"]).toBe("no-store")
+    expect((await response.body()).subarray(0, 2).toString()).toBe("PK")
+  })
+})
+
 // ── Exposed-surface boundary ─────────────────────────────────────────────────
 
 test.describe("Exposed-surface boundary — middleware enforcement", () => {

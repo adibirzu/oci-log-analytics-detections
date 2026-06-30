@@ -1,5 +1,5 @@
-title: "SOC Detection Rules Stack"
-description: "Deploy OCI Log Analytics SOC detection infrastructure including streams, service connectors, log sources, and dashboards."
+title: "OCI Log Analytics Detection Content Stack"
+description: "Deploy supported OCI Log Analytics detection infrastructure, log sources, dashboards, and saved searches after reviewing the plan."
 schemaVersion: 1.1.0
 version: "1.0.0"
 locale: "en"
@@ -30,6 +30,7 @@ variableGroups:
     variables:
       - deploy_log_sources
       - deploy_dashboards
+      - deploy_dashboard_cleanup
       - ingest_test_data
 
 variables:

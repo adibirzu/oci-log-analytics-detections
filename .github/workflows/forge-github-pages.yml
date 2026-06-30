@@ -24,6 +24,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  pages-preflight:
+    name: GitHub Pages availability
+    runs-on: ubuntu-latest
+    outputs:
+      pages_enabled: ${{ steps.pages.outputs.enabled }}
+    steps:
+      - name: Verify GitHub Pages is enabled
+        id: pages
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            try {
+              await github.rest.repos.getPages({ owner, repo });
+              core.setOutput("enabled", "true");
+              await core.summary
+                .addHeading("GitHub Pages preflight")
+                .addRaw("GitHub Pages is enabled. The static Forge export will be deployed.")
+                .write();
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              core.setOutput("enabled", "false");
+              core.warning("GitHub Pages is not enabled; the static export will be built but deployment is skipped.");
+              await core.summary
+                .addHeading("GitHub Pages preflight")
+                .addRaw("Static Forge export built successfully, but deployment was skipped because GitHub Pages is disabled. Enable Pages with GitHub Actions as the source in repository Settings > Pages, then rerun this workflow.")
+                .write();
+            }
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -55,7 +84,10 @@ jobs:
           path: webapp/out
 
   deploy:
-    needs: build
+    needs:
+      - build
+      - pages-preflight
+    if: needs.pages-preflight.outputs.pages_enabled == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

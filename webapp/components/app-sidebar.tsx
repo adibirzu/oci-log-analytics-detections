@@ -9,6 +9,7 @@ import {
   Github,
   Hammer,
   HeartPulse,
+  UploadCloud,
 } from "lucide-react"
 
 import {
@@ -34,13 +35,19 @@ export function AppSidebar() {
       title: "Forge",
       icon: Hammer,
       href: "/forge",
-      active: pathname === "/forge" && activeView !== "log-samples",
+      active: pathname === "/forge" && activeView !== "log-samples" && activeView !== "deployment",
     },
     {
       title: "Log Samples",
       icon: FileJson2,
       href: "/forge?view=log-samples&tab=raw",
       active: pathname === "/forge" && activeView === "log-samples",
+    },
+    {
+      title: "Deploy to OCI",
+      icon: UploadCloud,
+      href: "/forge?view=deployment",
+      active: pathname === "/forge" && activeView === "deployment",
     },
   ]
 

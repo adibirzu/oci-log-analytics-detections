@@ -16,6 +16,24 @@ This repository is scoped to OCI Log Analytics query, dashboard, and Forge webap
 
 The integrated UI lives in `webapp/` and consumes generated artifacts from this repository instead of duplicating query generation or dashboard deployment logic. External API, MCP, and cross-platform integrations follow the same generated-artifact contract. Runtime helpers such as Streaming, Service Connector Hub, Resource Manager, and manifest export support the demo and deployment path, but the canonical product surface remains `rules/**`, `queries/**`, `test_data/manifest.json`, `scripts/deploy_dashboard.py`, and `webapp/`.
 
+## Project Scope and Deployment Boundary
+
+This project is a detection-content and OCI Log Analytics delivery repository. It authors and converts detection queries, validates their field and source contracts, produces parser-safe examples, and packages dashboard/saved-search deployment content. It is not a hosted SIEM and it never stores a customer's OCI credentials, tenancy values, raw production logs, or management-plane access in Forge.
+
+For a customer deployment, Forge prepares the committed Resource Manager package and opens OCI Resource Manager. The customer selects the target compartment, reviews the Terraform plan, and applies it with their own OCI session and IAM permissions. This boundary keeps tenancy selection, approval, and privileged writes inside the OCI Console. See [DEPLOYMENT.md](docs/DEPLOYMENT.md) and [stack/README.md](stack/README.md) for the supported workflow and prerequisites.
+
+## Start Here: OCI Security Migration
+
+This is a migration accelerator for teams moving security analytics into OCI Log Analytics or using it as a high-fidelity analysis layer before a third-party SIEM. It is designed to help customers establish parser-ready telemetry, deploy a governed detection baseline, and extend coverage without coupling the repository to a specific tenancy.
+
+1. Read the [migration and security guide](docs/MIGRATION_AND_SECURITY_GUIDE.md) to select log sources, a rollout wave, and initial use cases.
+2. Use the [SIEM log samples](queries/siem_log_examples.json) or Forge **Log Samples** to develop downstream parsers from redacted OCI Logging envelopes and normalized detection events.
+3. Use Forge **Deploy to OCI** to obtain the Resource Manager package; review and apply it from the customer's OCI tenancy.
+4. Validate sources and parser fields, then enable dashboards and detections in small, observable waves.
+5. Use Log Analytics to normalize, enrich, correlate, and suppress noise before forwarding the selected security signal to a cost-sensitive SIEM.
+
+The [documentation hub](docs/README.md) is the maintained wiki-style entry point for operators, SOC teams, contributors, and integration owners.
+
 ## Current Inventory
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
 
@@ -48,6 +66,8 @@ Canonical inventory and supporting documentation:
 - `docs/DEMO_WORKFLOW.md` — operator/demo walkthrough
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit report
 - `docs/WEBAPP.md` — integrated Forge webapp contract, security posture, and deployment notes
+- `docs/MIGRATION_AND_SECURITY_GUIDE.md` — customer migration, use-case, and SIEM-forwarding playbook
+- `docs/README.md` — documentation hub and workflow index
 - `CONTRIBUTING.md` — contributor workflow and validation expectations
 
 ## Architecture
@@ -234,6 +254,8 @@ docs/                           # Additional documentation
 ```
 
 ## Deployment
+
+For customer-facing deployment, start with [DEPLOYMENT.md](docs/DEPLOYMENT.md). It documents the Forge-to-Resource-Manager handoff, the package boundary, the GitHub Pages deployment preflight, and the scheduled Sentinel validation preflight. The commands below are operator/development workflows and require an explicitly configured OCI environment; they are not a substitute for reviewing a Resource Manager plan in the target tenancy.
 
 ### Target Environment
 This project deploys to the **OCI-DEMO Landing Zone** MAIN compartments:

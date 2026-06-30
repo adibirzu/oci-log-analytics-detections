@@ -37,6 +37,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
       # test_data/ is gitignored, so a fresh checkout has none. A few integration
       # tests assert the ingest manifest exactly matches the generated synthetic
       # datasets, which come from two offline generators (no --validate => no OCI):
@@ -52,6 +57,12 @@ jobs:
 
       - name: SIEM log examples drift check
         run: python scripts/generate_siem_log_examples.py --check
+
+      - name: Validate Resource Manager stack
+        run: |
+          terraform -chdir=stack fmt -check -recursive
+          terraform -chdir=stack init -backend=false
+          terraform -chdir=stack validate
 
       # --- Gate 2: Sigma -> OCL conversion validates with zero warnings ---
       # convert_sigma.py --validate regenerates the queries and validates them;

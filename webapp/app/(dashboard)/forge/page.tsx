@@ -1,13 +1,15 @@
 import { Suspense } from "react"
 
 import { ForgeSurface } from "@/components/forge-surface"
+import { getDeploymentContent } from "@/lib/deployment-content"
 import { getLoganWorkbenchArtifacts } from "@/lib/logan-workbench-artifacts"
 import { getSiemLogExamples } from "@/lib/siem-log-examples"
 
 export default async function ForgePage() {
-  const [artifacts, siemExamples] = await Promise.all([
+  const [artifacts, siemExamples, deploymentContent] = await Promise.all([
     getLoganWorkbenchArtifacts(),
     getSiemLogExamples(),
+    getDeploymentContent(),
   ])
 
   return (
@@ -20,6 +22,8 @@ export default async function ForgePage() {
         generatedAt={artifacts.generatedAt}
         siemCatalog={siemExamples.catalog}
         siemError={siemExamples.error}
+        deploymentSummary={deploymentContent.summary}
+        deploymentError={deploymentContent.error}
       />
     </Suspense>
   )

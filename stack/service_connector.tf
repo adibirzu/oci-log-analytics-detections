@@ -22,8 +22,8 @@ resource "oci_sch_service_connector" "soc_detection" {
 
     dimensions {
       dimension_value {
-        kind = "static"
-        path = "logSourceName"
+        kind  = "static"
+        path  = "logSourceName"
         value = each.value.log_source
       }
     }

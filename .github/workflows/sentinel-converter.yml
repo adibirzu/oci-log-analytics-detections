@@ -191,17 +191,46 @@ jobs:
               await github.rest.issues.createComment({ owner, repo, issue_number, body });
             }
 
+  live-preflight:
+    name: Live OCI credential preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    environment: live-oci
+    outputs:
+      credentials_available: ${{ steps.credentials.outputs.available }}
+    steps:
+      - name: Verify live OCI credentials are configured
+        id: credentials
+        env:
+          OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
+          OCI_API_KEY_PEM: ${{ secrets.OCI_API_KEY_PEM }}
+        run: |
+          if [ -z "${OCI_CONFIG}" ] || [ -z "${OCI_API_KEY_PEM}" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Live OCI promotion skipped"
+              echo
+              echo "The scheduled/manual live lane did not run because OCI_CONFIG and OCI_API_KEY_PEM are not configured for the live-oci environment."
+              echo "Add both secrets, then rerun the workflow when live validation is intended."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "available=true" >> "$GITHUB_OUTPUT"
+          echo "### Live OCI promotion preflight passed" >> "$GITHUB_STEP_SUMMARY"
+
   live:
     name: Live - scheduled/manual OCI promotion lane
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    if: needs.live-preflight.outputs.credentials_available == 'true'
     environment: live-oci
     permissions:
       contents: read
     needs:
       - integration
       - drift
+      - live-preflight
     steps:
       - uses: actions/checkout@v4
 

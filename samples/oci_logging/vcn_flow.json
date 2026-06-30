@@ -1,0 +1,33 @@
+{
+  "specversion": "1.0",
+  "type": "com.oraclecloud.vcn.flowlogs.DataEvent",
+  "source": "<VNIC_OCID>",
+  "id": "<LOG_ENTRY_UUID>",
+  "time": "2026-06-29T09:16:00.000Z",
+  "oracle": {
+    "compartmentid": "<COMPARTMENT_OCID>",
+    "ingestedtime": "2026-06-29T09:16:05.000Z",
+    "loggroupid": "<LOG_GROUP_OCID>",
+    "logid": "<LOG_OCID>",
+    "tenantid": "<TENANCY_OCID>",
+    "vniccompartmentocid": "<VNIC_COMPARTMENT_OCID>",
+    "vnicocid": "<VNIC_OCID>",
+    "vnicsubnetocid": "<SUBNET_OCID>"
+  },
+  "data": {
+    "version": 2,
+    "action": "REJECT",
+    "bytesOut": 8192,
+    "destinationAddress": "<DESTINATION_IP>",
+    "destinationPort": 22,
+    "endTime": 1782724619,
+    "flowid": "<FLOW_ID>",
+    "packets": 64,
+    "protocol": 6,
+    "protocolName": "TCP",
+    "sourceAddress": "<SOURCE_IP>",
+    "sourcePort": 49152,
+    "startTime": 1782724560,
+    "status": "OK"
+  }
+}

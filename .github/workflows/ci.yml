@@ -50,6 +50,9 @@ jobs:
       - name: Pytest
         run: python -m pytest scripts/ -q
 
+      - name: SIEM log examples drift check
+        run: python scripts/generate_siem_log_examples.py --check
+
       # --- Gate 2: Sigma -> OCL conversion validates with zero warnings ---
       # convert_sigma.py --validate regenerates the queries and validates them;
       # it exits non-zero on warnings/errors. No OCI access required.

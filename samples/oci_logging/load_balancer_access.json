@@ -1,0 +1,36 @@
+{
+  "specversion": "1.0",
+  "type": "com.oraclecloud.loadbalancer.access",
+  "source": "<LOAD_BALANCER_NAME>",
+  "id": "<LOG_ENTRY_UUID>",
+  "time": "2026-06-29T09:17:00.000Z",
+  "oracle": {
+    "compartmentid": "<COMPARTMENT_OCID>",
+    "ingestedtime": "2026-06-29T09:17:01.000Z",
+    "loggroupid": "<LOG_GROUP_OCID>",
+    "logid": "<LOG_OCID>",
+    "resourceid": "<LOAD_BALANCER_OCID>",
+    "tenantid": "<TENANCY_OCID>"
+  },
+  "data": {
+    "timestamp": "2026-06-29T09:17:00+00:00",
+    "clientAdd": "<CLIENT_IP>:<CLIENT_PORT>",
+    "forwardedForAddr": "<FORWARDED_FOR_IP>",
+    "host": "<HOST_NAME>",
+    "backendAddr": "<BACKEND_IP>:<BACKEND_PORT>",
+    "requestProcessingTime": "0.021",
+    "backendConnectTime": "0.004",
+    "backendProcessingTime": "0.016",
+    "lbStatusCode": "401",
+    "backendStatusCode": "401",
+    "receivedBytes": "512",
+    "sentBytes": "256",
+    "request": "POST <LOGIN_PATH> HTTP/1.1",
+    "sslCipher": "ECDHE-RSA-AES256-GCM-SHA384",
+    "listenerName": "<LISTENER_NAME>",
+    "sslProtocol": "TLSv1.2",
+    "userAgent": "<USER_AGENT>",
+    "requestId": "<REQUEST_ID>",
+    "responseProvider": "<BACKEND_IP>:<BACKEND_PORT>"
+  }
+}

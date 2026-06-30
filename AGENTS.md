@@ -19,6 +19,7 @@ The integrated `webapp/`, API wrappers, MCP, and cross-platform integrations mus
 | Dashboard inventory | `queries/dashboard_inventory.json` | `scripts/deploy_dashboard.py` |
 | Field/source dictionary | `queries/log_source_field_dictionary.json` | `scripts/field_dictionary.py` |
 | Detection rule specs | `queries/detection_rule_specs.json` | `scripts/detection_rule_creator.py` |
+| SIEM log examples | `queries/siem_log_examples.json` | `scripts/generate_siem_log_examples.py` |
 | Sentinel conversion report | `queries/sentinel_conversion_report.json` | Sentinel workflow |
 | Multicloud export | `queries/manifest.json` | `scripts/export_for_multicloud.py --manifest-only` |
 | Forge webapp | `webapp/**` | Next.js app consuming generated artifacts |

@@ -12,6 +12,7 @@ This repository is scoped to OCI Log Analytics query, dashboard, and Forge webap
 - validate query metadata, log-source mappings, and dashboard inventory
 - create OCI Log Analytics dashboards and embedded saved searches only after validation passes
 - ship the integrated Forge webapp for cross-QL conversion into OCI Log Analytics QL
+- publish redacted OCI Logging and Log Analytics detection-event examples for third-party SIEM parser development
 
 The integrated UI lives in `webapp/` and consumes generated artifacts from this repository instead of duplicating query generation or dashboard deployment logic. External API, MCP, and cross-platform integrations follow the same generated-artifact contract. Runtime helpers such as Streaming, Service Connector Hub, Resource Manager, and manifest export support the demo and deployment path, but the canonical product surface remains `rules/**`, `queries/**`, `test_data/manifest.json`, `scripts/deploy_dashboard.py`, and `webapp/`.
 
@@ -40,6 +41,7 @@ Canonical inventory and supporting documentation:
 - `queries/catalog.json` — canonical machine-readable inventory
 - `queries/dashboard_inventory.json` — generated dashboard/widget/saved-search inventory
 - `queries/manifest.json` — export artifact for downstream integrations
+- `queries/siem_log_examples.json` — generated parser examples for ten OCI services and ten Log Analytics detections
 - `docs/ARCHITECTURE.md` — source/generation/deployment architecture
 - `docs/INTEGRATION_SCHEMA.md` — generated artifact schema contract
 - `CATALOG.md` — human-readable catalog
@@ -105,6 +107,7 @@ Treat the following as the canonical output contract for the integrated Forge we
 - `queries/apps/*.json` for mixed app telemetry content
 - `queries/hunting/*.json` for hunting queries
 - `queries/manifest.json` as the generated export/integration artifact
+- `queries/siem_log_examples.json` for placeholder-safe OCI Logging samples, normalized detection events, and parser metadata
 - `test_data/manifest.json` for generated demo dataset counts
 
 Notes:
@@ -331,7 +334,7 @@ python3 scripts/export_for_multicloud.py    # Export to ~/dev/multicloudoperatio
 ```
 
 ### Forge Webapp
-`webapp/` is the maintained Forge UI for this project. It exposes the `/forge` workbench, links to `https://github.com/adibirzu/oci-log-analytics-detections`, and consumes `queries/logan_ql_reference_catalog.json`, `queries/cross_ql_mapping_patterns.json`, `queries/conversion_examples.json`, `queries/catalog.json`, `queries/dashboard_inventory.json`, and `test_data/manifest.json`.
+`webapp/` is the maintained Forge UI for this project. It exposes the `/forge` workbench and the query-aware `/forge?view=log-samples` parser workspace, links to `https://github.com/adibirzu/oci-log-analytics-detections`, and consumes generated artifacts including `queries/logan_ql_reference_catalog.json`, `queries/cross_ql_mapping_patterns.json`, `queries/conversion_examples.json`, `queries/catalog.json`, `queries/dashboard_inventory.json`, `queries/siem_log_examples.json`, and `test_data/manifest.json`.
 
 The webapp deployment manifests and helper scripts live under `webapp/deploy/oke/`. Production traffic is routed through the existing Octo APM load balancer at `convert.octodemo.cloud`, with backend write actions expected to sit behind API Gateway and WAF.
 

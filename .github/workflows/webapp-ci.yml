@@ -7,10 +7,22 @@ on:
   push:
     paths:
       - 'webapp/**'
+      - 'queries/siem_log_examples.json'
+      - 'config/siem_log_examples.json'
+      - 'samples/oci_logging/**'
+      - 'schemas/siem_log_examples.schema.json'
+      - 'scripts/generate_siem_log_examples.py'
+      - 'scripts/test_generate_siem_log_examples.py'
       - '.github/workflows/webapp-ci.yml'
   pull_request:
     paths:
       - 'webapp/**'
+      - 'queries/siem_log_examples.json'
+      - 'config/siem_log_examples.json'
+      - 'samples/oci_logging/**'
+      - 'schemas/siem_log_examples.schema.json'
+      - 'scripts/generate_siem_log_examples.py'
+      - 'scripts/test_generate_siem_log_examples.py'
       - '.github/workflows/webapp-ci.yml'
 
 permissions:
@@ -60,30 +72,35 @@ jobs:
         working-directory: webapp
         run: pnpm lint
 
-      # --- Step 4: production build ---
+      # --- Step 4: unit tests and coverage ---
+      - name: Unit tests (80% minimum coverage)
+        working-directory: webapp
+        run: pnpm test:unit:coverage
+
+      # --- Step 5: production build ---
       # Verifies the Next.js app compiles end-to-end; also exercises any
       # build-time data fetching (artifact loading from queries/).
       - name: Build
         working-directory: webapp
         run: pnpm build
 
-      # --- Step 5: Playwright browser install ---
+      # --- Step 6: Playwright browser install ---
       # Install Chromium only — the api-contract tests are browser-agnostic HTTP
       # request tests so a single browser is sufficient and fastest.
       - name: Install Playwright browsers (Chromium only)
         working-directory: webapp
         run: pnpm exec playwright install --with-deps chromium
 
-      # --- Step 6: API-contract e2e tests ---
+      # --- Step 7: browser and API-contract e2e tests ---
       # playwright.config.ts auto-starts `next dev` as the web server when
       # PLAYWRIGHT_BASE_URL is unset.  CI=true enables retries:2 and
       # forbids test.only usage.  Tests cover /api/health, /api/forge/session,
       # /api/forge/artifacts, and the middleware surface boundary.
-      - name: API-contract e2e tests
+      - name: Webapp e2e tests
         working-directory: webapp
         env:
           CI: true
-        run: pnpm exec playwright test tests/e2e/api-contract.spec.ts
+        run: pnpm e2e
 
       # Upload the Playwright HTML report on failure so test failures are
       # diagnosable without re-running locally.

@@ -1,0 +1,217 @@
+{
+  "schema_version": "1.0.0",
+  "raw_samples": [
+    {
+      "id": "oci_audit",
+      "service": "OCI Audit",
+      "category": "Audit event",
+      "template": "samples/oci_logging/oci_audit.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Audit/Reference/logeventreference.htm",
+      "envelope_type": "CloudEvents 0.1 Audit event envelope",
+      "repository_coverage": "envelope",
+      "repository_dataset": "test_data/oci_audit.jsonl",
+      "description": "Control-plane activity including identity, request, response, and resource context."
+    },
+    {
+      "id": "vcn_flow",
+      "service": "VCN Flow",
+      "category": "Flow log",
+      "template": "samples/oci_logging/vcn_flow.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Logging/Reference/details_for_vcn_flow_logs.htm",
+      "envelope_type": "OCI Logging CloudEvents 1.0 logContent",
+      "repository_coverage": "envelope",
+      "repository_dataset": "test_data/vcn_flow.jsonl",
+      "description": "Accepted or rejected network flow observed for a VNIC."
+    },
+    {
+      "id": "load_balancer_access",
+      "service": "Load Balancer",
+      "category": "Access log",
+      "template": "samples/oci_logging/load_balancer_access.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Logging/Reference/details_for_load_balancer_logs.htm",
+      "envelope_type": "OCI Logging CloudEvents 1.0 logContent",
+      "repository_coverage": "payload",
+      "repository_dataset": "test_data/lb_access.jsonl",
+      "description": "Request, backend, TLS, byte-count, and processing-time information."
+    },
+    {
+      "id": "waf",
+      "service": "WAF",
+      "category": "Web application firewall log",
+      "template": "samples/oci_logging/waf.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Logging/Reference/details_for_lbwaf.htm",
+      "envelope_type": "OCI Logging CloudEvents 1.0 logContent",
+      "repository_coverage": "payload",
+      "repository_dataset": "test_data/waf_security.jsonl",
+      "description": "WAF action, request, response, and matched protection-rule context."
+    },
+    {
+      "id": "network_firewall_threat",
+      "service": "Network Firewall",
+      "category": "Threat log",
+      "template": "samples/oci_logging/network_firewall_threat.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Logging/Reference/details_for_networkfirewall.htm",
+      "envelope_type": "OCI Logging CloudEvents 1.0 logContent",
+      "repository_coverage": "envelope",
+      "repository_dataset": "test_data/network_firewall.jsonl",
+      "description": "Threat-session decision, rule, direction, endpoints, and signature context."
+    },
+    {
+      "id": "api_gateway_access",
+      "service": "API Gateway",
+      "category": "Access log",
+      "template": "samples/oci_logging/api_gateway_access.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Logging/Reference/details_for_api_gateway.htm",
+      "envelope_type": "OCI Logging CloudEvents 1.0 logContent",
+      "repository_coverage": "gap",
+      "repository_dataset": null,
+      "description": "API deployment request, response, gateway, and latency context."
+    },
+    {
+      "id": "functions_invoke",
+      "service": "Functions",
+      "category": "Invocation log",
+      "template": "samples/oci_logging/functions_invoke.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Logging/Reference/details_for_functions.htm",
+      "envelope_type": "OCI Logging CloudEvents 1.0 logContent",
+      "repository_coverage": "gap",
+      "repository_dataset": null,
+      "description": "Function invocation stream, request identifier, container, and application context."
+    },
+    {
+      "id": "cloud_guard_raw",
+      "service": "Cloud Guard",
+      "category": "Instance Security raw log",
+      "template": "samples/oci_logging/cloud_guard_raw.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Logging/Reference/details_for_cloud-guard.htm",
+      "envelope_type": "OCI Logging CloudEvents 1.0 logContent",
+      "repository_coverage": "payload",
+      "repository_dataset": "test_data/cloud_guard_instance_security.jsonl",
+      "description": "Cloud Guard Instance Security query execution and result context."
+    },
+    {
+      "id": "object_storage_access",
+      "service": "Object Storage",
+      "category": "Read/write access log",
+      "template": "samples/oci_logging/object_storage_access.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Logging/Reference/details_for_object_storage.htm",
+      "envelope_type": "OCI Logging CloudEvents 1.0 logContent",
+      "repository_coverage": "gap",
+      "repository_dataset": null,
+      "description": "Bucket or object request with principal, authentication, and response context."
+    },
+    {
+      "id": "custom_application",
+      "service": "Custom Application",
+      "category": "Unified application log",
+      "template": "samples/oci_logging/custom_application.json",
+      "official_doc_url": "https://docs.oracle.com/en-us/iaas/Content/Logging/Reference/top_level_logging_format.htm",
+      "envelope_type": "OCI Logging CloudEvents 1.0 custom logContent",
+      "repository_coverage": "custom",
+      "repository_dataset": "test_data/application_logs.jsonl",
+      "description": "Application security event carried in the OCI Logging unified envelope."
+    }
+  ],
+  "detections": [
+    {
+      "id": "oci_console_brute_force",
+      "display_title": "OCI Console Brute Force",
+      "query_file": "queries/hunting/oci_console_brute_force.json",
+      "log_sources": ["OCI Audit Logs"],
+      "primary_raw_sample_ids": ["oci_audit"],
+      "matched_count": 8,
+      "entities": [{"type": "user", "value": "<USER_NAME>"}],
+      "evidence": {"failed_attempts": 8, "user_name": "<USER_NAME>"}
+    },
+    {
+      "id": "oci_iam_rapid_changes",
+      "display_title": "IAM Rapid Configuration Changes",
+      "query_file": "queries/hunting/oci_iam_rapid_changes.json",
+      "log_sources": ["OCI Audit Logs"],
+      "primary_raw_sample_ids": ["oci_audit"],
+      "matched_count": 12,
+      "entities": [{"type": "user", "value": "<USER_NAME>"}, {"type": "ip", "value": "<SOURCE_IP>"}],
+      "evidence": {"iam_changes": 12, "unique_actions": 5}
+    },
+    {
+      "id": "oci_privilege_escalation_chain",
+      "display_title": "OCI Privilege Escalation Chain",
+      "query_file": "queries/hunting/oci_privilege_escalation_chain.json",
+      "log_sources": ["OCI Audit Logs"],
+      "primary_raw_sample_ids": ["oci_audit"],
+      "matched_count": 9,
+      "entities": [{"type": "user", "value": "<USER_NAME>"}],
+      "evidence": {"iam_ops": 9, "unique_actions": 4}
+    },
+    {
+      "id": "oci_resource_destruction_spike",
+      "display_title": "OCI Resource Destruction Spike",
+      "query_file": "queries/hunting/oci_resource_destruction_spike.json",
+      "log_sources": ["OCI Audit Logs"],
+      "primary_raw_sample_ids": ["oci_audit"],
+      "matched_count": 7,
+      "entities": [{"type": "user", "value": "<USER_NAME>"}, {"type": "ip", "value": "<SOURCE_IP>"}],
+      "evidence": {"destructive_actions": 7, "unique_action_types": 3}
+    },
+    {
+      "id": "cloud_identity_token_abuse",
+      "display_title": "Cloud Identity Token Abuse",
+      "query_file": "queries/hunting/cloud_identity_aitm_token_abuse.json",
+      "log_sources": ["OCI Audit Logs"],
+      "primary_raw_sample_ids": ["oci_audit", "object_storage_access"],
+      "matched_count": 6,
+      "entities": [{"type": "user", "value": "<USER_NAME>"}, {"type": "ip", "value": "<SOURCE_IP>"}],
+      "evidence": {"events": 6, "event_types": ["<LOGIN_EVENT_TYPE>", "<TOKEN_EVENT_TYPE>"]}
+    },
+    {
+      "id": "waf_multi_attack_scoring",
+      "display_title": "WAF Multi-Attack Vector Scoring",
+      "query_file": "queries/hunting/waf_multi_attack_scoring.json",
+      "log_sources": ["OCI WAF Logs"],
+      "primary_raw_sample_ids": ["waf"],
+      "matched_count": 15,
+      "entities": [{"type": "ip", "value": "<CLIENT_IP>"}],
+      "evidence": {"total_blocks": 15, "unique_rules": 4, "attack_types": 3, "threat_score": 65}
+    },
+    {
+      "id": "waf_attack_frequency",
+      "display_title": "WAF Attack Frequency by Source",
+      "query_file": "queries/hunting/waf_attack_frequency_by_source.json",
+      "log_sources": ["OCI WAF Logs"],
+      "primary_raw_sample_ids": ["waf"],
+      "matched_count": 18,
+      "entities": [{"type": "ip", "value": "<CLIENT_IP>"}],
+      "evidence": {"blocked_requests": 18, "targeted_urls": ["<REQUEST_PATH>"]}
+    },
+    {
+      "id": "web_application_brute_force",
+      "display_title": "Web Application Brute Force",
+      "query_file": "queries/hunting/web_brute_force_frequency.json",
+      "log_sources": ["OCI Load Balancer Access Logs"],
+      "primary_raw_sample_ids": ["load_balancer_access"],
+      "matched_count": 14,
+      "entities": [{"type": "ip", "value": "<CLIENT_IP>"}],
+      "evidence": {"failed_attempts": 14, "targeted_endpoints": ["<LOGIN_PATH>"]}
+    },
+    {
+      "id": "c2_flow_connections",
+      "display_title": "C2 Flow Connections",
+      "query_file": "queries/hunting/c2_flow_connections_kpi.json",
+      "log_sources": ["SOC VCN Flow Logs", "SOC Network Firewall Logs"],
+      "primary_raw_sample_ids": ["vcn_flow", "network_firewall_threat"],
+      "matched_count": 11,
+      "entities": [{"type": "ip", "value": "<SOURCE_IP>"}, {"type": "ip", "value": "<DESTINATION_IP>"}],
+      "evidence": {"c2_flows": 11, "destination_port": 443}
+    },
+    {
+      "id": "web_to_cloud_attack_timeline",
+      "display_title": "Web-to-Cloud Correlated Attack Timeline",
+      "query_file": "queries/hunting/web_to_cloud_attack_timeline.json",
+      "log_sources": ["OCI WAF Logs", "OCI Load Balancer Access Logs", "SOC Application Logs", "SOC VCN Flow Logs", "SOC Network Firewall Logs", "OCI Audit Logs"],
+      "primary_raw_sample_ids": ["waf", "load_balancer_access", "custom_application", "vcn_flow", "network_firewall_threat", "oci_audit"],
+      "matched_count": 21,
+      "entities": [{"type": "ip", "value": "<CLIENT_IP>"}, {"type": "trace", "value": "<TRACE_ID>"}],
+      "evidence": {"events": 21, "stages": ["initial_access", "credential_access", "command_and_control", "exfiltration"]}
+    }
+  ]
+}

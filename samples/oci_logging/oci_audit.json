@@ -1,0 +1,52 @@
+{
+  "eventType": "com.oraclecloud.consolesignon.login",
+  "cloudEventsVersion": "0.1",
+  "eventTypeVersion": "2.0",
+  "source": "ConsoleSignOn",
+  "eventId": "<EVENT_UUID>",
+  "eventTime": "2026-06-29T09:15:30.000Z",
+  "contentType": "application/json",
+  "data": {
+    "eventGroupingId": "<EVENT_GROUPING_ID>",
+    "eventName": "ConsoleLogin",
+    "compartmentId": "<COMPARTMENT_OCID>",
+    "compartmentName": "<COMPARTMENT_NAME>",
+    "resourceName": "<RESOURCE_NAME>",
+    "resourceId": "<RESOURCE_OCID>",
+    "availabilityDomain": "<AVAILABILITY_DOMAIN>",
+    "freeformTags": null,
+    "definedTags": null,
+    "identity": {
+      "principalName": "<USER_NAME>",
+      "principalId": "<USER_OCID>",
+      "authType": "natv",
+      "callerName": null,
+      "callerId": null,
+      "tenantId": "<TENANCY_OCID>",
+      "ipAddress": "<SOURCE_IP>",
+      "credentials": null
+    },
+    "request": {
+      "id": "<REQUEST_ID>",
+      "action": "Login",
+      "parameters": {},
+      "headers": {
+        "User-Agent": ["<USER_AGENT>"],
+        "opc-request-id": ["<REQUEST_ID>"]
+      }
+    },
+    "response": {
+      "status": "401",
+      "responseTime": "2026-06-29T09:15:30.120Z",
+      "headers": {
+        "opc-request-id": ["<REQUEST_ID>"]
+      },
+      "payload": null,
+      "message": "Authentication failed"
+    },
+    "stateChange": {
+      "previous": null,
+      "current": null
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import type React from "react"
+import { Suspense } from "react"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
@@ -8,10 +9,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <SidebarProvider defaultOpen>
       <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
+        <Suspense fallback={null}>
+          <AppSidebar />
+        </Suspense>
         <SidebarInset>
-          <div className="flex flex-col">
-            <DashboardHeader />
+          <div className="flex min-w-0 flex-col">
+            <Suspense fallback={<div className="h-[60px] border-b border-border bg-surface-sunken" />}>
+              <DashboardHeader />
+            </Suspense>
             {children}
           </div>
         </SidebarInset>

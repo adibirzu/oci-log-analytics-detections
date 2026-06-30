@@ -2,6 +2,7 @@
   "name": "oci-log-analytics-detections-webapp",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@10.26.1",
   "scripts": {
     "build": "next build",
@@ -11,6 +12,8 @@
     "e2e:headed": "playwright test --headed",
     "lint": "eslint .",
     "start": "next start",
+    "test:unit": "node --experimental-strip-types --test tests/unit/*.test.ts",
+    "test:unit:coverage": "node --experimental-strip-types --experimental-test-coverage --test-coverage-branches=80 --test-coverage-functions=80 --test-coverage-lines=80 --test tests/unit/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

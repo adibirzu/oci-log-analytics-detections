@@ -204,12 +204,12 @@ def source_for_query(query: str) -> str:
     lowered = query.lower()
     if "sysmon" in lowered or re.search(r"\beventcode\s*=\s*1\b", lowered):
         return "Windows Sysmon Events"
+    if "wineventlog:security" in lowered or "eventcode=4688" in lowered:
+        return "Windows Security Events"
     if any(marker in lowered for marker in ("index=network", "src_ip", "dest_ip", "destination_ip", "network_traffic")):
         return "OCI VCN Flow Logs"
     if any(marker in lowered for marker in ("http", "uri", "url", "status=", "status_code")):
         return "SOC Application Logs"
-    if "wineventlog:security" in lowered or "eventcode=4688" in lowered:
-        return "Windows Security Events"
     return "SOC Application Logs"
 
 

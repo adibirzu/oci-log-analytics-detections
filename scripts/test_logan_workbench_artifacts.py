@@ -250,6 +250,18 @@ class LoganWorkbenchConverterTests(unittest.TestCase):
         self.assertTrue(response["logan_query"].endswith("| head 25"))
         self.assertEqual(response["metadata"]["converted_commands"], ["search", "where", "stats", "table", "sort", "head"])
 
+    def test_splunk_windows_security_sourcetype_wins_over_generic_network_fields(self):
+        response = self.run_converter(
+            {
+                "source_language": "splunk_spl",
+                "source_query": "index=security sourcetype=WinEventLog:Security EventCode=4625 src_ip=* | stats count by user",
+            }
+        )
+
+        self.assertEqual(response["support_level"], "partial")
+        self.assertIn("'Log Source' = 'Windows Security Events'", response["logan_query"])
+        self.assertNotIn("'Log Source' = 'OCI VCN Flow Logs'", response["logan_query"])
+
     def test_splunk_timechart_and_lookup_surface_dependencies(self):
         response = self.run_converter(
             {

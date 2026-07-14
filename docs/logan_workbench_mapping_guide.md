@@ -88,7 +88,16 @@ detections.
 Reference links:
 
 - <https://help.splunk.com/en/splunk-enterprise/spl-search-reference/10.4/introduction/welcome-to-the-search-reference>
+- <https://help.splunk.com/en/splunk-enterprise/search/spl-search-reference/10.4/quick-reference/splunk-spl-for-sql-users>
+- <https://help.splunk.com/en/splunk-enterprise/search/spl-search-reference/10.4/quick-reference/splunk-quick-reference-guide>
 - <https://www.stationx.net/splunk-cheat-sheet/>
+
+The next expansion candidates are deterministic, single-pipeline commands whose
+semantics can be represented by real OCI Log Analytics fields: a restricted
+function allow-list for `eval`, simple `chart` aggregation, and `rare`/frequency
+hunting patterns. Commands that depend on Splunk indexes, acceleration, mutable
+lookup state, macros, or cross-dataset execution stay dependency-gated or
+unsupported until an OCI-equivalent contract is validated.
 
 ### Elastic Lucene / KQL / EQL / ES|QL / TOML
 

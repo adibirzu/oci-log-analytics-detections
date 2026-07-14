@@ -296,6 +296,24 @@ function publicConversionResponse(response: z.output<typeof conversionResponseSc
   }
 }
 
+function withRemoteBackendFallback(response: z.output<typeof conversionResponseSchema>) {
+  return {
+    ...response,
+    warnings: [
+      ...response.warnings,
+      {
+        code: "remote_backend_fallback",
+        message: "The optional remote conversion backend was unavailable. This result was produced by Forge's bundled read-only converter; review partial or lossy mappings before promotion.",
+        severity: "warning" as const,
+      },
+    ],
+    metadata: {
+      ...response.metadata,
+      remote_backend_fallback: true,
+    },
+  }
+}
+
 async function runLocalScript(payload: z.output<typeof conversionRequestSchema>) {
   const detectionsRepoPath = process.env.LOGAN_DETECTIONS_REPO
     ? path.resolve(process.env.LOGAN_DETECTIONS_REPO)
@@ -405,8 +423,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const proxied = await proxyToBackend(payload)
-    const publicResponse = publicConversionResponse(proxied ?? (await runLocalScript(payload)))
+    let conversion = await proxyToBackend(payload)
+    if (!conversion) {
+      conversion = await runLocalScript(payload)
+    }
+    const publicResponse = publicConversionResponse(conversion)
     const backendMode =
       publicResponse.metadata.execution_mode === "remote_api_gateway" ? "remote_api_gateway" : "bundled_python_script"
 
@@ -424,6 +445,27 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json(publicResponse)
     return withSecurityHeaders(response, limitState, requestId)
   } catch (error) {
+    if (process.env.LOGAN_FORGE_BACKEND_URL) {
+      try {
+        const localResponse = await runLocalScript(payload)
+        const publicResponse = publicConversionResponse(withRemoteBackendFallback(localResponse))
+
+        logConversionTelemetry({
+          requestId,
+          outcome: "success",
+          status: 200,
+          durationMs: elapsedMs(startedAt),
+          sourceLanguage: payload.sourceLanguage,
+          supportLevel: publicResponse.support_level,
+          backendMode: "bundled_python_script",
+          warningCount: publicResponse.warnings.length,
+          rateLimitRemaining: limitState.remaining,
+        })
+        return withSecurityHeaders(NextResponse.json(publicResponse), limitState, requestId)
+      } catch {
+        // Preserve the original safe 502 response below when both converters fail.
+      }
+    }
     logConversionTelemetry({
       requestId,
       outcome: "error",

@@ -89,6 +89,35 @@ test.describe("GET /api/forge/session — contract", () => {
   })
 })
 
+// ── POST /api/forge/convert — remote-backend fallback ──────────────────────
+
+test.describe("POST /api/forge/convert — remote-backend fallback", () => {
+  test("uses the bundled converter when the optional remote backend is unavailable", async ({ request }) => {
+    const session = await request.get("/api/forge/session")
+    const { csrfToken } = (await session.json()) as { csrfToken: string }
+
+    const response = await request.post("/api/forge/convert", {
+      headers: { "x-logan-forge-csrf": csrfToken },
+      data: {
+        sourceLanguage: "splunk_spl",
+        sourceQuery: "index=windows sourcetype=WinEventLog:Sysmon EventCode=1 | stats count by host",
+      },
+    })
+
+    expect(response.status()).toBe(200)
+    const payload = (await response.json()) as {
+      backend: string
+      logan_query: string
+      metadata: Record<string, unknown>
+      warnings: Array<{ code: string }>
+    }
+    expect(payload.backend).toBe("Bundled read-only converter")
+    expect(payload.logan_query).toContain("Windows Sysmon Events")
+    expect(payload.metadata.execution_mode).toBe("bundled_python_script")
+    expect(payload.warnings.some((warning) => warning.code === "remote_backend_fallback")).toBe(true)
+  })
+})
+
 // ── /api/forge/artifacts ─────────────────────────────────────────────────────
 
 test.describe("GET /api/forge/artifacts — contract", () => {

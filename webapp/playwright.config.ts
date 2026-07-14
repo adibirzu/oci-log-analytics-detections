@@ -37,6 +37,9 @@ export default defineConfig({
         timeout: 120_000,
         env: {
           LOGAN_DETECTIONS_REPO: repoRoot,
+          // Exercise the production fallback boundary: an unavailable optional
+          // remote converter must fall back to the bundled read-only converter.
+          LOGAN_FORGE_BACKEND_URL: "http://127.0.0.1:1",
           FORGE_TRUSTED_INTERNAL_HOSTS: trustedInternalHosts,
           // Exercise the production-like "one trusted reverse proxy" mode so the
           // rate-limit test verifies the right-anchored X-Forwarded-For keying.

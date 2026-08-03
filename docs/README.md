@@ -6,6 +6,7 @@ This directory is the wiki-style guide to using, operating, extending, and deplo
 
 | Need | Read | Outcome |
 | --- | --- | --- |
+| Find, run, customize, and validate queries | [Using Log Analytics Queries](LOG_ANALYTICS_QUERY_USAGE.md) | Console, OCL, repository, and live-validation workflow |
 | Plan a migration or SIEM-forwarding design | [Migration and Security Guide](MIGRATION_AND_SECURITY_GUIDE.md) | A phased telemetry, detection, and export plan |
 | Deploy the supported package | [Deployment Guide](DEPLOYMENT.md) | Resource Manager plan/apply with customer-owned identity |
 | Build third-party SIEM parsers | [`queries/siem_log_examples.json`](../queries/siem_log_examples.json) and [Webapp Guide](WEBAPP.md) | Placeholder-safe OCI envelopes and normalized detection events |
@@ -17,6 +18,7 @@ This directory is the wiki-style guide to using, operating, extending, and deplo
 
 | Need | Read | Outcome |
 | --- | --- | --- |
+| Understand OCL and query validation | [Using Log Analytics Queries](LOG_ANALYTICS_QUERY_USAGE.md) | Correct field typing, authoring, and validation boundaries |
 | Understand repository boundaries | [Architecture](ARCHITECTURE.md) | Correct source/generated/deployment separation |
 | Add or change a detection | [Contributing](../CONTRIBUTING.md) | Regenerated and validated content |
 | Convert Sentinel content | [Sentinel Conversion](SENTINEL_CONVERSION.md) | Parser-safe, live-validated promotion workflow |

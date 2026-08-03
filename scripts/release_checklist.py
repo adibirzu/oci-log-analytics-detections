@@ -94,6 +94,7 @@ def build_steps(
         ("synthetic log contract validation", [python, str(SCRIPTS_DIR / "validate_synthetic_logs.py")], 300),
         ("threat-intel candidate inventory", [python, str(SCRIPTS_DIR / "content_discovery.py")], 300),
         ("field dictionary validation", [python, str(SCRIPTS_DIR / "field_dictionary.py"), "--validate-query-fields"], 300),
+        ("query performance audit", [python, str(SCRIPTS_DIR / "query_performance_audit.py"), "--strict"], 300),
         ("siem discovery schema validation", [python, str(SCRIPTS_DIR / "siem_discovery_report.py"), "sentinel"], 300),
         (
             "migration plan/report validation",

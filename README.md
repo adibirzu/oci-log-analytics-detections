@@ -33,6 +33,7 @@ This is a migration accelerator for teams moving security analytics into OCI Log
 5. Use Log Analytics to normalize, enrich, correlate, and suppress noise before forwarding the selected security signal to a cost-sensitive SIEM.
 
 The [documentation hub](docs/README.md) is the maintained wiki-style entry point for operators, SOC teams, contributors, and integration owners.
+For hands-on use, start with [Using OCI Log Analytics Queries](docs/LOG_ANALYTICS_QUERY_USAGE.md) to select an artifact, run it in Log Explorer, customize OCL safely, and validate it locally or against an approved OCI target.
 
 ## Current Inventory
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
@@ -61,6 +62,7 @@ Canonical inventory and supporting documentation:
 - `queries/manifest.json` — export artifact for downstream integrations
 - `queries/siem_log_examples.json` — generated parser examples for ten OCI services and ten Log Analytics detections
 - `docs/ARCHITECTURE.md` — source/generation/deployment architecture
+- `docs/LOG_ANALYTICS_QUERY_USAGE.md` — analyst and operator guide for selecting, running, customizing, validating, and saving queries
 - `docs/INTEGRATION_SCHEMA.md` — generated artifact schema contract
 - `CATALOG.md` — human-readable catalog
 - `docs/DEMO_WORKFLOW.md` — operator/demo walkthrough

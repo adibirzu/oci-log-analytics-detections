@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-24T20:41:16.595824+00:00",
+  "generated_at": "2026-07-15T07:18:12.418835+00:00",
   "total_rules": 1135,
   "total_base_rules": 545,
   "total_sentinel_queries": 590,
   "total_app_queries": 62,
-  "total_hunting": 139,
-  "total_content_items": 1336,
+  "total_hunting": 140,
+  "total_content_items": 1337,
   "inventory": {
     "source_yaml_rules": 522,
     "source_rule_breakdown": {
@@ -21,9 +21,9 @@
     "generated_app_queries": 62,
     "source_derived_app_queries": 8,
     "curated_app_queries": 54,
-    "generated_hunting_queries": 139,
+    "generated_hunting_queries": 140,
     "generated_sigma_queries": 553,
-    "total_query_artifacts": 1336,
+    "total_query_artifacts": 1337,
     "legacy_dirs": {
       "logandetectionqueries": 0,
       "logandetectionrules": 0
@@ -78329,6 +78329,28 @@
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "OCI VCN: External Egress Traffic",
+      "description": "Shows accepted VCN flow records whose destination is outside private, loopback, link-local, and multicast IPv4 ranges. Use this baseline to review internet-bound traffic, then pivot by source, destination, port, and transferred bytes. This query intentionally scopes to outbound traffic; it does not classify private endpoints reached through a public address or IPv6 traffic.",
+      "level": "informational",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1071",
+        "T1041"
+      ],
+      "references": [],
+      "file": "hunting/oci_vcn_external_egress_traffic.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "not_evaluated",
       "content_surface": "hunting"
     },

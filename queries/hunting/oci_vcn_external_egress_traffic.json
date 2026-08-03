@@ -1,0 +1,34 @@
+{
+  "title": "OCI VCN: External Egress Traffic",
+  "description": "Shows accepted VCN flow records whose destination is outside private, loopback, link-local, and multicast IPv4 ranges. Use this baseline to review internet-bound traffic, then pivot by source, destination, port, and transferred bytes. This query intentionally scopes to outbound traffic; it does not classify private endpoints reached through a public address or IPv6 traffic.",
+  "query": "'Log Source' = 'SOC VCN Flow Logs' and 'Action' = 'ACCEPT' and 'Destination IP' is not null and not ('Destination IP' like '10.*' or 'Destination IP' like '172.16.*' or 'Destination IP' like '172.17.*' or 'Destination IP' like '172.18.*' or 'Destination IP' like '172.19.*' or 'Destination IP' like '172.20.*' or 'Destination IP' like '172.21.*' or 'Destination IP' like '172.22.*' or 'Destination IP' like '172.23.*' or 'Destination IP' like '172.24.*' or 'Destination IP' like '172.25.*' or 'Destination IP' like '172.26.*' or 'Destination IP' like '172.27.*' or 'Destination IP' like '172.28.*' or 'Destination IP' like '172.29.*' or 'Destination IP' like '172.30.*' or 'Destination IP' like '172.31.*' or 'Destination IP' like '192.168.*' or 'Destination IP' like '127.*' or 'Destination IP' like '169.254.*' or 'Destination IP' like '224.*' or 'Destination IP' like '225.*' or 'Destination IP' like '226.*' or 'Destination IP' like '227.*' or 'Destination IP' like '228.*' or 'Destination IP' like '229.*' or 'Destination IP' like '230.*' or 'Destination IP' like '231.*' or 'Destination IP' like '232.*' or 'Destination IP' like '233.*' or 'Destination IP' like '234.*' or 'Destination IP' like '235.*' or 'Destination IP' like '236.*' or 'Destination IP' like '237.*' or 'Destination IP' like '238.*' or 'Destination IP' like '239.*') | stats count as Flows, sum('Bytes Sent') as BytesSent, sum('Bytes Received') as BytesReceived, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Source IP', 'Destination IP', 'Destination Port', Protocol | sort -BytesSent | head 100",
+  "type": "hunting",
+  "level": "informational",
+  "tags": ["oci", "vcn_flow", "network", "egress", "external_traffic"],
+  "logsource": {
+    "product": "oci",
+    "service": "vcn_flow_logs",
+    "candidates": ["SOC VCN Flow Logs"]
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {"timePeriod": "l24h"},
+    "visualizationOptions": {
+      "groupBy": ["Source IP", "Destination IP", "Destination Port"],
+      "valueField": "BytesSent"
+    },
+    "ask_ai_prompts": [
+      "Which private source IPs sent the most data to external destinations?",
+      "Which external destinations are newly contacted or use unusual ports?"
+    ]
+  },
+  "mitre_attack": {
+    "tactics": ["command_and_control", "exfiltration"],
+    "techniques": ["T1071", "T1041"]
+  },
+  "falsepositives": [
+    "Approved SaaS, software updates, OCI public endpoints, and internet-facing application dependencies"
+  ],
+  "notes": "The IPv4 prefix filter is deliberately transparent and parser-portable. For exact CIDR classification, enrich flows with a maintained private-network lookup before promoting this hunting query to an alert."
+}

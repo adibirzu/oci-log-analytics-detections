@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-24T20:41:16.014781+00:00",
+  "generated_at": "2026-09-01T12:41:14.739507+00:00",
   "source": "config/osquery/packs",
   "parser_paths": {
     "cloud_guard_instance_security": "scripts/setup_log_sources.py:CGIS_FIELD_MAPPINGS",

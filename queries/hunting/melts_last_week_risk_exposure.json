@@ -1,0 +1,42 @@
+{
+  "title": "MELTS: Last-Week Risk Exposure",
+  "description": "Seven-day risk rollup for the MELTS campaign. Shows which compromised hosts, cloud identities, and destination systems create the highest business risk when endpoint, network, cloud audit, and security-state logs are viewed together.",
+  "query": "('Trace ID' = 'trace_clickfix_2026_001' or 'Trace ID' = 'trace_toolshell_sp_001' or 'Trace ID' = 'trace_rmm_2025_001' or 'Trace ID' = 'trace_aitm_token_2026_001' or 'Threat Name' = 'ClickFix Clipboard Execution' or 'Threat Name' = 'CrashFix Python RAT' or 'Threat Name' = 'RMM Tool Abuse' or 'Threat Name' = 'AiTM Token Replay' or 'Request URL' like '*spinstall0.aspx*' or 'Command Line' like '*ClickFix*' or 'Command Line' like '*CrashFix*' or 'Process Name' like '*ScreenConnect*' or 'Process Name' like '*AnyDesk*' or 'Process Name' like '*AteraAgent*' or 'User Name' = 'codeofconduct-reader@corp.example.com') | stats count as Signals, distinctcount('Log Source') as Sources, distinctcount('Destination IP') as Destinations by 'Trace ID', 'Host Name (Server)', 'User Name', 'Threat Name' | sort -Signals",
+  "type": "hunting",
+  "level": "critical",
+  "tags": ["melts", "risk_exposure", "last_week", "threat_hunting", "attack_path"],
+  "logsource": {
+    "product": "multi_source",
+    "service": "log_analytics",
+    "candidates": ["SOC Windows Sysmon Logs", "Windows Security Events", "SOC Sysmon Network Logs", "SOC WAF Security Logs", "SOC Load Balancer Access Logs", "SOC Web Application Logs", "SOC Application Logs", "OCI Audit Logs", "SOC VCN Flow Logs", "SOC Network Firewall Logs", "SOC GenAI Gateway Logs", "OCI Cloud Guard Problems"]
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {"timePeriod": "l7d"},
+    "layout": {"width": 12, "height": 5},
+    "visualizationOptions": {
+      "valueField": "Signals",
+      "groupBy": ["Trace ID", "Host Name (Server)", "User Name", "Threat Name"]
+    },
+    "ask_ai_prompts": [
+      "Rank the last-week MELTS attack paths by host, identity, and destination risk.",
+      "Which containment action reduces the largest number of active signals?"
+    ]
+  },
+  "references": [
+    {
+      "name": "Microsoft: Storm-2949 turned compromised identity into cloud-wide breach",
+      "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"
+    },
+    {
+      "name": "Microsoft: Compromised and malicious applications investigation",
+      "url": "https://learn.microsoft.com/security/operations/incident-response-playbook-compromised-malicious-app"
+    }
+  ],
+  "mitre_attack": {
+    "tactics": ["initial_access", "execution", "credential_access", "discovery", "collection", "command_and_control", "exfiltration"],
+    "techniques": ["T1566", "T1059", "T1218", "T1219", "T1528", "T1530", "T1071.001", "T1041"]
+  },
+  "falsepositives": ["Approved purple-team replay of the MELTS attack week"]
+}

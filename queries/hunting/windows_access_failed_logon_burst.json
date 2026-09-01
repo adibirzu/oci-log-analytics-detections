@@ -1,0 +1,17 @@
+{
+  "title": "Windows Failed Logon Burst by Source",
+  "description": "Alert-ready search for more than 10 Security Event 4625 failures from one source address in the five-minute scheduled-search window.",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4625' | stats count as FailedLogons by 'Source Address', 'Target User Name', 'Host Name (Server)' | where FailedLogons > 10 | sort -FailedLogons",
+  "type": "hunting",
+  "hunting_type": "frequency",
+  "level": "high",
+  "tags": ["attack.credential_access", "attack.t1110"],
+  "mitre_attack": {"tactics": ["credential_access"], "techniques": ["T1110"]},
+  "logsource": {"product": "windows", "service": "security", "candidates": ["Windows Security Events", "Windows Event Security Logs"]},
+  "falsepositives": ["Expired credentials", "Misconfigured services", "Authorized password testing"],
+  "detection_rule": {"schedule": "5m", "lookback": "5m", "condition": "FailedLogons > 10"},
+  "dashboard": {"visualizationType": "summary_table", "showTitle": true, "timeSelection": {"timePeriod": "l5m"}, "visualizationOptions": {"groupBy": ["Source Address", "Target User Name", "Host Name (Server)"], "valueField": "FailedLogons"}},
+  "detection_maturity": "validated_locally",
+  "test_data_coverage": "covered",
+  "live_validation_status": "not_run"
+}

@@ -24,6 +24,7 @@ class TestWindowsEventLogSynthetic(unittest.TestCase):
             {
                 "windows_event_security.jsonl",
                 "windows_event_system.jsonl",
+                "windows_event_application.jsonl",
                 "windows_powershell_operational.jsonl",
                 "windows_defender_operational.jsonl",
                 "sysmon_operational.jsonl",

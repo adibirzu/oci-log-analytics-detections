@@ -13,22 +13,32 @@ Before the demo, refresh the tenancy with the current dashboard-first path:
 
 ```bash
 python3 scripts/setup_log_sources.py
-python3 scripts/generate_dashboard_data.py --days 21 --geo-interval 15 --validate
+python3 scripts/prepare_threat_hunting_demo.py --days 21 --strict
 python3 scripts/ingest_test_data.py --validate
 python3 scripts/ingest_test_data.py --mode direct
 python3 scripts/deploy_dashboard.py --cleanup --query-lookback 21d --query-timeout 90
 python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --json docs/health/verify-default-21d-final.json
 ```
 
+The preparation wrapper writes `docs/health/threat-hunting-demo-readiness.json`, the reusable local handoff for future TH demos. It records the generated log manifest summary, dashboard inventory summary, requested dashboard dry-runs, local validation scope, and the boundary that live OCI ingestion/import needs separate approval.
+
+Run the read-only live preflight before executing the mutation steps:
+
+```bash
+python3 scripts/preflight_threat_hunting_demo.py
+```
+
+The preflight writes `docs/health/threat-hunting-live-preflight.json` and keeps the live command plan placeholder-only until the target OCI profile, compartment, namespace, log group, source/entity mapping, upload/deploy window, and stop conditions are approved.
+
 Validated on `2026-05-12` for local generation and live dashboard deployment:
 
 - `221,078` synthetic events generated across `17` files in the latest local 21-day dataset
 - `16/16` standard files pass ingest pre-flight validation and direct upload; the scoped Octo APM workshop JSONL is uploaded by the workshop wrapper
 - `29` dashboards and `441` active saved searches resolve from generated inventory after the C2, FreeLabFriday, web-to-cloud, browser, APT, application telemetry, 2025-2026 MELTS, Sentinel, and Octo APM updates
-- `<OCI_PROFILE_CAP>` has parser/source setup complete, the updated Octo application/APM dataset uploaded, and the current `441` dashboard-widget baseline deployed and live-validated (parse 681/681 PASS)
-- Live health is validated with a 21-day lookback after full cleanup redeploys. Regenerate `docs/health/verify-<profile>-21d-final.json` and `docs/health/verify-default-21d-final.json` after deploying the current `22`-dashboard inventory.
+- `<OCI_PROFILE_CAP>` has older parser/source setup and dashboard evidence; redeploy and reverify before treating the current `536` configured dashboard-widget baseline as live.
+- Live health is validated with a 21-day lookback after full cleanup redeploys. Regenerate `docs/health/verify-<profile>-21d-final.json` and `docs/health/verify-default-21d-final.json` after deploying the current `34`-dashboard inventory.
 
-The current repository configuration resolves to `29` dashboards and `441` active saved searches. The Octo APM workshop, C2, FreeLabFriday, web-to-cloud, and 2025-2026 drilldown widgets request `l21d` so the full three-week incident remains visible after ingest.
+The current repository configuration resolves to `34` dashboards and `536` active saved searches. The Octo APM workshop, C2, FreeLabFriday, web-to-cloud, and 2025-2026 drilldown widgets request `l21d` so the full three-week incident remains visible after ingest.
 
 Use this path before recreating dashboards. `deploy_dashboard.py` validates the generated inventory and every unique dashboard query in OCI Log Analytics before importing dashboards or embedded saved searches.
 
@@ -41,7 +51,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 | Control Plane | `https://<DEMO_CONTROL_PLANE_HOST>` |
 | Log Analytics | <OBSERVABILITY_COMPARTMENT> compartment → Dashboards |
 | Test data generated | 221,078 local events across 17 NDJSON datasets |
-| Dashboards configured | 29 SOC/demo dashboards + 441 active saved searches |
+| Dashboards configured | 34 SOC/demo dashboards + 536 active saved searches |
 
 ---
 
@@ -58,7 +68,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 **Talking Points:**
 - "This is a unified SOC overview pulling security events from OCI Audit, Windows Sysmon, Linux, Cloud Guard, and WAF — all in one dashboard."
 - "Each widget represents a detection rule converted from industry-standard Sigma format into OCI Log Analytics Query Language."
-- "The repo currently ships 454 source rules, 476 Sigma-derived OCI query artifacts, 47 curated app/APM analytics, 98 hunting analytics, and 231 MITRE ATT&CK techniques across 14 tactics."
+- "The repo currently ships 522 source rules, 553 Sigma-derived OCI query artifacts, 54 curated app/APM analytics, 146 hunting analytics, 590 live parser-passing Microsoft Sentinel conversions, and 279 MITRE ATT&CK techniques across 14 tactics."
 
 4. **Click into** `SOC: Console Login Failures` — show the OCL query behind it
 5. **Show** the hunting widget: `Hunt: SSH Brute Force` — highlight the frequency analysis pattern:
@@ -381,7 +391,7 @@ python3 scripts/query_audit.py --lookback 24h --eligible-only --out /tmp/eligibl
 
 ### Refresh Dashboards
 ```bash
-python3 scripts/deploy_dashboard.py --cleanup  # Recreate all 29 dashboards after OCI query validation
+python3 scripts/deploy_dashboard.py --cleanup  # Recreate all 34 dashboards after OCI query validation
 python3 scripts/generate_catalog.py            # Regenerate catalog
 ```
 

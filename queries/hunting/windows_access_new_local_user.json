@@ -1,0 +1,17 @@
+{
+  "title": "Windows New Local User Created",
+  "description": "Alert-ready search for Security Event 4720, indicating that a user account was created on a monitored Windows host.",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4720' | stats count as UsersCreated by 'Target User Name', 'Subject User Name', 'Host Name (Server)' | sort -UsersCreated",
+  "type": "hunting",
+  "hunting_type": "persistence",
+  "level": "high",
+  "tags": ["attack.persistence", "attack.t1136.001"],
+  "mitre_attack": {"tactics": ["persistence"], "techniques": ["T1136.001"]},
+  "logsource": {"product": "windows", "service": "security", "candidates": ["Windows Security Events", "Windows Event Security Logs"]},
+  "falsepositives": ["Approved local account provisioning"],
+  "detection_rule": {"schedule": "5m", "lookback": "5m", "condition": "UsersCreated > 0"},
+  "dashboard": {"visualizationType": "summary_table", "showTitle": true, "timeSelection": {"timePeriod": "l24h"}, "visualizationOptions": {"groupBy": ["Target User Name", "Subject User Name", "Host Name (Server)"], "valueField": "UsersCreated"}},
+  "detection_maturity": "validated_locally",
+  "test_data_coverage": "covered",
+  "live_validation_status": "not_run"
+}

@@ -1,0 +1,25 @@
+{
+  "title": "OCI Log Analytics Windows Access Monitoring",
+  "nodes": [
+    {"id": "channels", "label": "Windows Event Log\nSecurity · System · Application", "kind": "compute", "group": "Authorized Windows Server", "layer": "Workloads", "x": 80, "y": 180},
+    {"id": "agent", "label": "Oracle Management Agent\nLog Analytics plug-in", "kind": "observability", "group": "Authorized Windows Server", "layer": "Observability", "x": 330, "y": 180},
+    {"id": "association", "label": "Host (Windows) entity\n3 native source associations", "kind": "security", "group": "OCI control plane", "layer": "Security", "x": 580, "y": 180},
+    {"id": "logan", "label": "OCI Log Analytics\nparse · fields · log group", "service": "log-analytics", "kind": "observability", "group": "OCI operational plane", "layer": "Observability", "x": 830, "y": 180},
+    {"id": "content", "label": "5 saved searches\nWindows access dashboard", "kind": "observability", "group": "Analyst content", "layer": "Observability", "x": 1080, "y": 80},
+    {"id": "schedule", "label": "5-minute scheduled searches\nnumeric metric + up to 3 dimensions", "kind": "observability", "group": "Detection rules", "layer": "Observability", "x": 1080, "y": 220},
+    {"id": "monitor", "label": "OCI Monitoring\nlogan_windows_access", "service": "monitoring", "kind": "observability", "group": "OCI operational plane", "layer": "Observability", "x": 1330, "y": 220},
+    {"id": "alarm", "label": "Disabled alarm canary\nthen reviewed enablement", "kind": "security", "group": "Response controls", "layer": "Security", "x": 1580, "y": 220},
+    {"id": "notify", "label": "OCI Notifications\nSOC response owner", "service": "notifications", "kind": "observability", "group": "Response", "layer": "Observability", "x": 1830, "y": 220}
+  ],
+  "edges": [
+    {"from": "channels", "to": "agent", "type": "telemetry", "label": "Windows Event API"},
+    {"from": "agent", "to": "association", "type": "telemetry", "label": "HTTPS 443"},
+    {"from": "association", "to": "logan", "type": "control", "label": "entity · source · log group"},
+    {"from": "logan", "to": "content", "type": "telemetry", "label": "query and visualize"},
+    {"from": "logan", "to": "schedule", "type": "telemetry", "label": "saved search result"},
+    {"from": "schedule", "to": "monitor", "type": "telemetry", "label": "custom metric"},
+    {"from": "monitor", "to": "alarm", "type": "control", "label": "MQL evaluation"},
+    {"from": "alarm", "to": "notify", "type": "response", "label": "approved destination"},
+    {"from": "content", "to": "alarm", "type": "control", "label": "analyst validation before enablement"}
+  ]
+}

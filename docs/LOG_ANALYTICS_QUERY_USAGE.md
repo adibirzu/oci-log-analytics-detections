@@ -28,6 +28,13 @@ MITRE technique, or use case. Do not copy a query from
 `queries/detection_rule_specs.json`; that file is a generated downstream
 representation. Use the query JSON named by its `query_file` property instead.
 
+If you are migrating a hunt from another SIEM, start with
+`CROSS_SIEM_DETECTION_CATALOG.md`. Choose the behavioral family, open the
+mapped Logan artifact, and validate its fields and source in your tenancy. The
+catalog links to official Splunk, Sentinel, QRadar, LogRhythm, ArcSight, and
+Elastic libraries, but deliberately does not reproduce restricted vendor rule
+bodies or imply that public catalogs reveal comparable customer usage counts.
+
 For example, inspect a query and print only its runnable OCL:
 
 ```bash
@@ -363,6 +370,58 @@ Do not hand-author generated dashboard inventory or duplicate deployment logic
 in the webapp. Change dashboard definitions in `scripts/deploy_dashboard.py`,
 then regenerate `queries/dashboard_inventory.json`.
 
+For Logan dashboards, choose the visualization based on the query shape:
+
+- Use `tile` for one readiness or severity number, such as the MELTS datasource
+  coverage KPI.
+- Use `summary_table` for grouped `stats` output such as risk exposure,
+  affected assets, identity pivots, and APM/log correlation.
+- Use `line` only for `timestats` output and include `timeField`,
+  `seriesField`, and `valueField` in dashboard metadata.
+- Use `link` when analysts need an attack path. Put the Link sections to show
+  in `dashboard.visualizationOptions.dashboardOptions`, for example `Tiles` and
+  `Main Table`. Put tile-in-link XML in
+  `dashboard.visualizationOptions.tileLayoutXml`, and ensure every
+  `<tile field="...">` is emitted by the query through an alias such as
+  `eventstats ... as Events`.
+
+The 2025-2026 MELTS dashboard uses this pattern for threat hunting:
+
+```text
+MELTS: Datasource Coverage       -> tile
+MELTS: Signal Overview           -> summary_table
+MELTS: Attack Timeline           -> line
+MELTS: Attack Path Link          -> link + Tiles + Main Table
+MELTS: Last-Week Risk Exposure   -> summary_table
+MELTS: APM Log Trace Correlation -> summary_table
+```
+
+To prepare a focused last-week dataset locally:
+
+```bash
+python3 scripts/prepare_threat_hunting_demo.py
+```
+
+The command also writes `docs/health/threat-hunting-demo-readiness.json`, a tenant-safe local report with the generated log manifest summary, dashboard inventory summary, requested dashboard dry-run list, and local command sequence. Use `--report-json <path>` to write a different report file or `--no-report` to skip report generation.
+
+For a stricter local readiness run before a demo or handoff:
+
+```bash
+python3 scripts/prepare_threat_hunting_demo.py --strict
+```
+
+Live upload or dashboard import remains a tenancy mutation. Before doing it,
+resolve and approve the exact OCI profile, compartment, Log Analytics namespace,
+log group, and source/entity mapping.
+
+Use the read-only live preflight to capture that boundary:
+
+```bash
+python3 scripts/preflight_threat_hunting_demo.py
+```
+
+It writes `docs/health/threat-hunting-live-preflight.json` with local artifact checks, environment readiness, dashboard coverage, and the placeholder-only live command plan.
+
 ## 10. Author or change repository queries
 
 Use the canonical source for the query surface:
@@ -403,4 +462,6 @@ custom parser contract.
 - [Architecture](ARCHITECTURE.md)
 - [Monitoring](MONITORING.md)
 - [Threat Hunting Walkthrough](THREAT_HUNTING_WALKTHROUGH.md)
+- [Cross-SIEM Detection Catalog](CROSS_SIEM_DETECTION_CATALOG.md)
+- [Cloud Identity Campaign Hunting Workflow](CLOUD_IDENTITY_CAMPAIGN_WORKFLOW.md)
 - [Contributing](../CONTRIBUTING.md)

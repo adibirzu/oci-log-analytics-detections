@@ -9,6 +9,7 @@ GENERATED_QUERY_ARTIFACT_FILENAMES = {
     "catalog.json",
     "content_candidates.json",
     "conversion_examples.json",
+    "cross_siem_detection_catalog.json",
     "cross_ql_mapping_patterns.json",
     "dashboard_inventory.json",
     "detection_rule_specs.json",

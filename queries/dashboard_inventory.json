@@ -1,25 +1,25 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-24T20:41:16.988957+00:00",
+  "generated_at": "2026-09-01T12:41:15.842689+00:00",
   "source": "scripts/deploy_dashboard.py:DASHBOARDS",
   "summary": {
-    "total_dashboards": 34,
-    "total_widgets": 530,
-    "advanced_visualization_widgets": 150,
+    "total_dashboards": 35,
+    "total_widgets": 541,
+    "advanced_visualization_widgets": 161,
     "visualization_types": {
       "bar": 7,
       "hbar": 1,
       "line": 10,
       "link": 11,
       "map": 2,
-      "summary_table": 100,
+      "summary_table": 110,
       "table": 380,
-      "tile": 19
+      "tile": 20
     },
     "levels": {
-      "critical": 125,
-      "high": 212,
-      "informational": 20,
+      "critical": 129,
+      "high": 218,
+      "informational": 21,
       "low": 17,
       "medium": 156
     }
@@ -10687,13 +10687,438 @@
       ]
     },
     {
+      "name": "SOC: Windows Access Monitoring",
+      "description": "Fast-track Windows access monitoring for failed logon bursts, RDP after hours, Administrator use, local account creation, and privileged local-group additions.",
+      "widget_count": 5,
+      "widgets": [
+        {
+          "dashboard_name": "SOC: Windows Access Monitoring",
+          "dashboard_index": 9,
+          "widget_index": 0,
+          "title": "Access: Failed Logon Burst",
+          "query_file": "hunting/windows_access_failed_logon_burst.json",
+          "query_title": "Windows Failed Logon Burst by Source",
+          "description": "Alert-ready search for more than 10 Security Event 4625 failures from one source address in the five-minute scheduled-search window.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "attack.credential_access",
+            "attack.t1110"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "windows",
+            "service": "security",
+            "candidates": [
+              "Windows Security Events",
+              "Windows Event Security Logs"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "credential_access"
+            ],
+            "techniques": [
+              "T1110"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "groupBy": [
+              "Source Address",
+              "Target User Name",
+              "Host Name (Server)"
+            ],
+            "valueField": "FailedLogons"
+          },
+          "time_selection": {
+            "timePeriod": "l5m"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event ID",
+              "label": "Pivot by Event ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source Address",
+              "label": "Pivot by Source Address"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Target User Name",
+              "label": "Pivot by Target User Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name (Server)",
+              "label": "Pivot by Host Name (Server)"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Windows Access Monitoring",
+          "dashboard_index": 9,
+          "widget_index": 1,
+          "title": "Access: RDP After Hours",
+          "query_file": "hunting/windows_access_rdp_after_hours.json",
+          "query_title": "Windows Successful RDP Logon Outside Business Hours",
+          "description": "Alert-ready search for successful RemoteInteractive logons (Security Event 4624, logon type 10) outside the configured 08:00-18:00 query timezone.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "attack.lateral_movement",
+            "attack.t1021.001"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "windows",
+            "service": "security",
+            "candidates": [
+              "Windows Security Events",
+              "Windows Event Security Logs"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "lateral_movement"
+            ],
+            "techniques": [
+              "T1021.001"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "groupBy": [
+              "Target User Name",
+              "Source Address",
+              "Host Name (Server)"
+            ],
+            "valueField": "RDPLogons"
+          },
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event ID",
+              "label": "Pivot by Event ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Logon Type",
+              "label": "Pivot by Logon Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Target User Name",
+              "label": "Pivot by Target User Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source Address",
+              "label": "Pivot by Source Address"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name (Server)",
+              "label": "Pivot by Host Name (Server)"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Windows Access Monitoring",
+          "dashboard_index": 9,
+          "widget_index": 2,
+          "title": "Access: Administrator Logon",
+          "query_file": "hunting/windows_access_administrator_logon.json",
+          "query_title": "Windows Administrator Logon",
+          "description": "Alert-ready search for successful logons by the built-in Administrator account. Extend the approved-account filter for renamed or localized administrator accounts.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "attack.privilege_escalation",
+            "attack.t1078"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "windows",
+            "service": "security",
+            "candidates": [
+              "Windows Security Events",
+              "Windows Event Security Logs"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "privilege_escalation",
+              "defense_evasion"
+            ],
+            "techniques": [
+              "T1078"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "groupBy": [
+              "Target User Name",
+              "Logon Type",
+              "Host Name (Server)"
+            ],
+            "valueField": "AdministratorLogons"
+          },
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event ID",
+              "label": "Pivot by Event ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Target User Name",
+              "label": "Pivot by Target User Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Logon Type",
+              "label": "Pivot by Logon Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name (Server)",
+              "label": "Pivot by Host Name (Server)"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Windows Access Monitoring",
+          "dashboard_index": 9,
+          "widget_index": 3,
+          "title": "Access: New Local User",
+          "query_file": "hunting/windows_access_new_local_user.json",
+          "query_title": "Windows New Local User Created",
+          "description": "Alert-ready search for Security Event 4720, indicating that a user account was created on a monitored Windows host.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "attack.persistence",
+            "attack.t1136.001"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "windows",
+            "service": "security",
+            "candidates": [
+              "Windows Security Events",
+              "Windows Event Security Logs"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "persistence"
+            ],
+            "techniques": [
+              "T1136.001"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "groupBy": [
+              "Target User Name",
+              "Subject User Name",
+              "Host Name (Server)"
+            ],
+            "valueField": "UsersCreated"
+          },
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event ID",
+              "label": "Pivot by Event ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Target User Name",
+              "label": "Pivot by Target User Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Subject User Name",
+              "label": "Pivot by Subject User Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name (Server)",
+              "label": "Pivot by Host Name (Server)"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: Windows Access Monitoring",
+          "dashboard_index": 9,
+          "widget_index": 4,
+          "title": "Access: Privileged Group Add",
+          "query_file": "hunting/windows_access_privileged_group_add.json",
+          "query_title": "Windows User Added to Administrators or Remote Desktop Users",
+          "description": "Alert-ready search for Security Event 4732 additions to the local Administrators or Remote Desktop Users groups.",
+          "level": "critical",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "attack.persistence",
+            "attack.privilege_escalation",
+            "attack.t1098"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "windows",
+            "service": "security",
+            "candidates": [
+              "Windows Security Events",
+              "Windows Event Security Logs"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "persistence",
+              "privilege_escalation"
+            ],
+            "techniques": [
+              "T1098"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "groupBy": [
+              "User",
+              "Target User Name",
+              "Host Name (Server)"
+            ],
+            "valueField": "GroupAdds"
+          },
+          "time_selection": {
+            "timePeriod": "l24h"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event ID",
+              "label": "Pivot by Event ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Target User Name",
+              "label": "Pivot by Target User Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Host Name (Server)",
+              "label": "Pivot by Host Name (Server)"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "SOC: GOAD Caldera Operations Dashboard",
       "description": "Maps the 5 Caldera adversary operations from c7_run_caldera_operations.sh (Discovery, Credential Access, Lateral Movement, Collection, Exfiltration) to detection rules firing on the 10 GOAD + Apex AD Windows hosts (kingslanding, winterfell, meereen, castelblack, braavos, hq-dc01, eu-dc01, eu-app01, apac-dc01, apac-db01). Each Caldera operation phase maps to a row of detection tiles plus two host-scoped hunting tiles (sandcat agent activity + multi-stage attack chain) that filter to the 11 lab Entities so red-team noise stays scoped and BLUE drilldowns stay attributable to a specific Caldera op.",
       "widget_count": 23,
       "widgets": [
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 0,
           "title": "Op1 Discovery: AD Enum (AdFind)",
           "query_file": "ad_enumeration_via_adfind.json",
@@ -10755,7 +11180,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 1,
           "title": "Op1 Discovery: BloodHound",
           "query_file": "bloodhound_ad_enumeration.json",
@@ -10817,7 +11242,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 2,
           "title": "Op1 Discovery: Domain Trust (nltest)",
           "query_file": "domain_trust_discovery_via_nltest.json",
@@ -10884,7 +11309,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 3,
           "title": "Op1 Discovery: Net View Shares",
           "query_file": "network_share_enumeration_via_net_view.json",
@@ -10951,7 +11376,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 4,
           "title": "Op1 Discovery: Win Share Enum",
           "query_file": "windows_network_share_discovery.json",
@@ -11018,7 +11443,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 5,
           "title": "Op2 CredAccess: Kerberoast RC4",
           "query_file": "kerberoasting_rc4_ticket_request.json",
@@ -11089,7 +11514,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 6,
           "title": "Op2 CredAccess: AS-REP Roasting",
           "query_file": "as-rep_roasting_via_rubeus.json",
@@ -11151,7 +11576,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 7,
           "title": "Op2 CredAccess: LSASS via comsvcs",
           "query_file": "lsass_memory_dump_via_comsvcs_dll.json",
@@ -11213,7 +11638,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 8,
           "title": "Op2 CredAccess: DCSync (Non-DC)",
           "query_file": "dcsync_directory_replication.json",
@@ -11284,7 +11709,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 9,
           "title": "Op2 CredAccess: Mimikatz Indicators",
           "query_file": "mimikatz_command_and_module_indicators_in_process_logs.json",
@@ -11354,7 +11779,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 10,
           "title": "Op3 Lateral: PSExec Remote Exec",
           "query_file": "windows_psexec_remote_execution.json",
@@ -11423,7 +11848,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 11,
           "title": "Op3 Lateral: WinRM (PowerShell)",
           "query_file": "winrm_lateral_movement_via_powershell.json",
@@ -11485,7 +11910,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 12,
           "title": "Op3 Lateral: Admin Share (net use)",
           "query_file": "windows_admin_share_access_via_net_use.json",
@@ -11552,7 +11977,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 13,
           "title": "Op3 Lateral: Pass-the-Ticket",
           "query_file": "pass_the_ticket_logon.json",
@@ -11615,7 +12040,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 14,
           "title": "Op3 Lateral: Tool Transfer (robocopy)",
           "query_file": "lateral_tool_transfer_via_robocopy.json",
@@ -11682,7 +12107,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 15,
           "title": "Op4 Collection: 7-Zip Archive",
           "query_file": "data_compression_for_exfiltration_via_7zip.json",
@@ -11749,7 +12174,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 16,
           "title": "Op4 Collection: Screen Capture",
           "query_file": "windows_screen_capture_activity.json",
@@ -11816,7 +12241,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 17,
           "title": "Op4 Collection: Data Staging",
           "query_file": "windows_data_staging_for_exfiltration.json",
@@ -11885,7 +12310,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 18,
           "title": "Op5 Exfil: BITS Job Abuse",
           "query_file": "windows_bits_job_abuse_for_persistence.json",
@@ -11954,7 +12379,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 19,
           "title": "Op5 Exfil: PowerShell Download Cradle",
           "query_file": "windows_powershell_download_cradle.json",
@@ -12025,7 +12450,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 20,
           "title": "Op5 Exfil: Large HTTP Response",
           "query_file": "unusually_large_http_response_data_exfiltration.json",
@@ -12094,7 +12519,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 21,
           "title": "Hunt: Sandcat Agent Activity (GOAD/Apex)",
           "query_file": "hunting/goad_caldera_sandcat_activity.json",
@@ -12196,7 +12621,7 @@
         },
         {
           "dashboard_name": "SOC: GOAD Caldera Operations Dashboard",
-          "dashboard_index": 9,
+          "dashboard_index": 10,
           "widget_index": 22,
           "title": "Hunt: Caldera Attack Chain (GOAD/Apex)",
           "query_file": "hunting/goad_caldera_attack_chain.json",
@@ -12279,7 +12704,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 0,
           "title": "Hunt: SSH Brute Force (Frequency)",
           "query_file": "hunting/ssh_brute_force_frequency.json",
@@ -12338,7 +12763,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 1,
           "title": "Hunt: OCI Console Brute Force",
           "query_file": "hunting/oci_console_brute_force.json",
@@ -12405,7 +12830,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 2,
           "title": "Hunt: Windows Rare Processes",
           "query_file": "hunting/windows_rare_process.json",
@@ -12464,7 +12889,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 3,
           "title": "Hunt: Linux Rare Processes",
           "query_file": "hunting/linux_rare_process.json",
@@ -12523,7 +12948,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 4,
           "title": "Hunt: Long Command Lines",
           "query_file": "hunting/windows_long_command_line.json",
@@ -12594,7 +13019,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 5,
           "title": "Hunt: OCI IAM Rapid Changes",
           "query_file": "hunting/oci_iam_rapid_changes.json",
@@ -12666,7 +13091,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 6,
           "title": "Hunt: Lateral Movement Cluster",
           "query_file": "hunting/windows_lateral_movement_cluster.json",
@@ -12735,7 +13160,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 7,
           "title": "Hunt: Linux Multi-Stage Attack",
           "query_file": "hunting/linux_multi_stage_attack.json",
@@ -12798,7 +13223,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 8,
           "title": "Hunt: OCI Destruction Spike",
           "query_file": "hunting/oci_resource_destruction_spike.json",
@@ -12868,7 +13293,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 9,
           "title": "Hunt: Credential Access Cluster",
           "query_file": "hunting/windows_credential_access_cluster.json",
@@ -12932,7 +13357,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 10,
           "title": "Hunt: Multi-User Same IP",
           "query_file": "hunting/oci_multi_user_same_ip.json",
@@ -13002,7 +13427,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 11,
           "title": "Hunt: Linux Persistence Score",
           "query_file": "hunting/linux_persistence_score.json",
@@ -13068,7 +13493,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 12,
           "title": "Hunt: Unusual Process Paths",
           "query_file": "hunting/windows_process_unusual_path.json",
@@ -13134,7 +13559,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 13,
           "title": "Hunt: After-Hours IAM Activity",
           "query_file": "hunting/oci_after_hours_iam_activity.json",
@@ -13199,7 +13624,7 @@
         },
         {
           "dashboard_name": "SOC: Threat Hunting Dashboard",
-          "dashboard_index": 10,
+          "dashboard_index": 11,
           "widget_index": 14,
           "title": "Hunt: Defense Evasion Score",
           "query_file": "hunting/windows_defense_evasion_score.json",
@@ -13272,7 +13697,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 0,
           "title": "Net: C2 Beacon Candidates",
           "query_file": "sysmon_c2_beacon_-_periodic_outbound_https.json",
@@ -13347,7 +13772,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 1,
           "title": "Net: Lateral Movement - SMB",
           "query_file": "sysmon_lateral_movement_via_smb.json",
@@ -13417,7 +13842,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 2,
           "title": "Net: Lateral Movement - WinRM",
           "query_file": "sysmon_lateral_movement_via_winrm.json",
@@ -13489,7 +13914,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 3,
           "title": "Net: RDP Lateral Movement",
           "query_file": "sysmon_rdp_lateral_movement.json",
@@ -13557,7 +13982,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 4,
           "title": "Net: DNS Tunnel Indicators",
           "query_file": "sysmon_dns_tunneling_via_network_connection.json",
@@ -13629,7 +14054,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 5,
           "title": "Net: LOLBin Outbound Traffic",
           "query_file": "sysmon_suspicious_outbound_connection_from_lolbin.json",
@@ -13701,7 +14126,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 6,
           "title": "Net: Kerberoasting Network",
           "query_file": "sysmon_kerberoasting_network_indicator.json",
@@ -13769,7 +14194,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 7,
           "title": "Net: LDAP Reconnaissance",
           "query_file": "sysmon_ldap_reconnaissance.json",
@@ -13839,7 +14264,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 8,
           "title": "File: Executable Dropped",
           "query_file": "sysmon_executable_file_created_or_detected.json",
@@ -13925,7 +14350,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 9,
           "title": "Net: Cobalt Strike C2",
           "query_file": "sysmon_cobalt_strike_c2_network_indicators.json",
@@ -14000,7 +14425,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 10,
           "title": "Net: Mimikatz Network",
           "query_file": "sysmon_mimikatz_network_activity.json",
@@ -14070,7 +14495,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 11,
           "title": "Pipe: Cobalt Strike Pipes",
           "query_file": "sysmon_cobalt_strike_named_pipe.json",
@@ -14136,7 +14561,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 12,
           "title": "Pipe: PsExec Pipes",
           "query_file": "sysmon_psexec_named_pipe.json",
@@ -14202,7 +14627,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 13,
           "title": "Pipe: Mimikatz Pipes",
           "query_file": "sysmon_mimikatz_named_pipe.json",
@@ -14266,7 +14691,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 14,
           "title": "Pipe: Suspicious C2 Pipes",
           "query_file": "sysmon_suspicious_named_pipe_pattern.json",
@@ -14332,7 +14757,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 15,
           "title": "DNS: Data Exfiltration",
           "query_file": "sysmon_dns_data_exfiltration.json",
@@ -14403,7 +14828,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 16,
           "title": "DNS: C2 Framework Domains",
           "query_file": "sysmon_dns_query_to_known_c2_framework_domains.json",
@@ -14467,7 +14892,7 @@
         },
         {
           "dashboard_name": "SOC: Sysmon Network and Lateral Movement Dashboard",
-          "dashboard_index": 11,
+          "dashboard_index": 12,
           "widget_index": 17,
           "title": "DNS: Suspicious TLDs",
           "query_file": "sysmon_dns_query_to_suspicious_tlds.json",
@@ -14536,7 +14961,7 @@
       "widgets": [
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 0,
           "title": "Top C2 DNS Domains",
           "query_file": "hunting/c2_top_dns_domains.json",
@@ -14614,7 +15039,7 @@
         },
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 1,
           "title": "Beacon Activity Timeline",
           "query_file": "hunting/c2_beacon_activity_timeline.json",
@@ -14714,7 +15139,7 @@
         },
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 2,
           "title": "DNS Beacon Queries",
           "query_file": "hunting/c2_dns_beacon_queries_kpi.json",
@@ -14809,7 +15234,7 @@
         },
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 3,
           "title": "C2 Destination IPs",
           "query_file": "hunting/c2_destination_ips.json",
@@ -14912,7 +15337,7 @@
         },
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 4,
           "title": "C2 Communication Topology",
           "query_file": "hunting/c2_communication_topology.json",
@@ -15014,7 +15439,7 @@
         },
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 5,
           "title": "DNS Beacon Sources",
           "query_file": "hunting/c2_dns_beacon_sources.json",
@@ -15101,7 +15526,7 @@
         },
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 6,
           "title": "Unique C2 Domains",
           "query_file": "hunting/c2_unique_domains_kpi.json",
@@ -15175,7 +15600,7 @@
         },
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 7,
           "title": "C2 Flow Connections",
           "query_file": "hunting/c2_flow_connections_kpi.json",
@@ -15274,7 +15699,7 @@
         },
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 8,
           "title": "HTTPS Beaconing (Port 443)",
           "query_file": "hunting/c2_https_beaconing.json",
@@ -15374,7 +15799,7 @@
         },
         {
           "dashboard_name": "C2 & Beaconing Detection",
-          "dashboard_index": 12,
+          "dashboard_index": 13,
           "widget_index": 9,
           "title": "Affected Hosts",
           "query_file": "hunting/c2_affected_hosts_kpi.json",
@@ -15472,7 +15897,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: FreeLabFriday Threat Hunting Dashboard",
-          "dashboard_index": 13,
+          "dashboard_index": 14,
           "widget_index": 0,
           "title": "FLF: DNS C2 Patterns",
           "query_file": "hunting/flf_dns_c2_pattern_analysis.json",
@@ -15561,7 +15986,7 @@
         },
         {
           "dashboard_name": "SOC: FreeLabFriday Threat Hunting Dashboard",
-          "dashboard_index": 13,
+          "dashboard_index": 14,
           "widget_index": 1,
           "title": "FLF: BITS Exfiltration",
           "query_file": "hunting/flf_bits_exfiltration.json",
@@ -15662,7 +16087,7 @@
         },
         {
           "dashboard_name": "SOC: FreeLabFriday Threat Hunting Dashboard",
-          "dashboard_index": 13,
+          "dashboard_index": 14,
           "widget_index": 2,
           "title": "FLF: Cloud Service Exfiltration",
           "query_file": "hunting/flf_cloud_service_exfiltration.json",
@@ -15765,7 +16190,7 @@
         },
         {
           "dashboard_name": "SOC: FreeLabFriday Threat Hunting Dashboard",
-          "dashboard_index": 13,
+          "dashboard_index": 14,
           "widget_index": 3,
           "title": "FLF: Domain Fronting CDN C2",
           "query_file": "hunting/flf_domain_fronting_cdn_c2.json",
@@ -15872,7 +16297,7 @@
         },
         {
           "dashboard_name": "SOC: FreeLabFriday Threat Hunting Dashboard",
-          "dashboard_index": 13,
+          "dashboard_index": 14,
           "widget_index": 4,
           "title": "FLF: vsagent HTTP Beaconing",
           "query_file": "hunting/flf_vsagent_http_beaconing.json",
@@ -15956,7 +16381,7 @@
         },
         {
           "dashboard_name": "SOC: FreeLabFriday Threat Hunting Dashboard",
-          "dashboard_index": 13,
+          "dashboard_index": 14,
           "widget_index": 5,
           "title": "FLF: Credential Stuffing",
           "query_file": "hunting/flf_credential_stuffing_pattern.json",
@@ -16056,7 +16481,7 @@
         },
         {
           "dashboard_name": "SOC: FreeLabFriday Threat Hunting Dashboard",
-          "dashboard_index": 13,
+          "dashboard_index": 14,
           "widget_index": 6,
           "title": "FLF: New User Persistence",
           "query_file": "hunting/flf_new_user_persistence.json",
@@ -16145,7 +16570,7 @@
         },
         {
           "dashboard_name": "SOC: FreeLabFriday Threat Hunting Dashboard",
-          "dashboard_index": 13,
+          "dashboard_index": 14,
           "widget_index": 7,
           "title": "FLF: Port Knocking Sequence",
           "query_file": "hunting/flf_port_knocking_sequence.json",
@@ -16245,12 +16670,94 @@
     {
       "name": "SOC: 2025-2026 Threat Hunting Dashboard",
       "description": "MELTS-driven threat-hunting dashboard for 2025-2026 attack tradecraft: ClickFix/CrashFix, SharePoint ToolShell, RMM abuse, AiTM token replay, compromised-machine drilldowns, and exfiltration evidence.",
-      "widget_count": 12,
+      "widget_count": 18,
       "widgets": [
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
+          "dashboard_index": 15,
           "widget_index": 0,
+          "title": "MELTS: Datasource Coverage",
+          "query_file": "hunting/melts_datasource_coverage_kpi.json",
+          "query_title": "MELTS: Datasource Coverage KPI",
+          "description": "Single KPI showing how many Logan log sources contributed evidence to the active MELTS attack window. Use it to detect missing ingestion coverage before starting the hunt.",
+          "level": "informational",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "melts",
+            "coverage",
+            "kpi",
+            "last_week"
+          ],
+          "references": [],
+          "logsource": {
+            "product": "multi_source",
+            "service": "log_analytics"
+          },
+          "mitre_attack": {},
+          "visualization_type": "tile",
+          "visualization_options": {
+            "dataField": "DataSources",
+            "unit": "sources"
+          },
+          "time_selection": {
+            "timePeriod": "l7d"
+          },
+          "layout": {
+            "width": 3,
+            "height": 3
+          },
+          "ask_ai_prompts": [
+            "Identify any expected MELTS datasource that is missing from the last-week hunt."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Trace ID",
+              "label": "Pivot by Trace ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Threat Name",
+              "label": "Pivot by Threat Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Request URL",
+              "label": "Pivot by Request URL"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Command Line",
+              "label": "Pivot by Command Line"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Process Name",
+              "label": "Pivot by Process Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Name",
+              "label": "Pivot by User Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
+          "dashboard_index": 15,
+          "widget_index": 1,
           "title": "MELTS: Signal Overview",
           "query_file": "hunting/melts_attack_signal_overview.json",
           "query_title": "MELTS: 2025-2026 Attack Signal Overview",
@@ -16371,8 +16878,8 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 1,
+          "dashboard_index": 15,
+          "widget_index": 2,
           "title": "MELTS: Attack Timeline",
           "query_file": "hunting/melts_attack_timeline.json",
           "query_title": "MELTS: 2025-2026 Attack Timeline",
@@ -16468,12 +16975,12 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 2,
+          "dashboard_index": 15,
+          "widget_index": 3,
           "title": "MELTS: Attack Path Link",
           "query_file": "hunting/melts_attack_path_link.json",
           "query_title": "MELTS: Attack Path Link Drilldown",
-          "description": "Link analysis for the 2025-2026 campaign. Groups trace IDs to log sources so analysts can pivot from entry point to host execution, cloud abuse, C2, and exfiltration evidence.",
+          "description": "Link analysis for the 2025-2026 campaign. Groups trace IDs to log sources and stages so analysts can pivot from entry point to host execution, cloud abuse, C2, exfiltration, and the MELTS signal class behind the evidence.",
           "level": "critical",
           "type": "hunting",
           "sigma_id": "",
@@ -16510,14 +17017,15 @@
               "Trace ID"
             ],
             "linkBy": [
-              "Log Source"
+              "Log Source",
+              "Attack Stage"
             ],
             "valueField": "Count",
             "dashboardOptions": [
               "Tiles",
               "Main Table"
             ],
-            "tileLayoutXml": "<summary><container background-color=\"#F4F6F7\"><table><row><column><tiles layout=\"table\" columns=\"4\" background-color=\"#EAF2F8\"><tile field=\"PeakEvents\" color=\"#1B4F72\" font-size=\"large\"><title align=\"bottom\"><title-text>Peak Path</title-text></title></tile><tile field=\"Events\" color=\"#7D3C98\" font-size=\"large\"><title align=\"bottom\"><title-text>Evidence</title-text></title></tile><tile field=\"Traces\" color=\"#117A65\" font-size=\"large\"><title align=\"bottom\"><title-text>Traces</title-text></title></tile><tile field=\"Sources\" color=\"#B03A2E\" font-size=\"large\"><title align=\"bottom\"><title-text>Log Sources</title-text></title></tile></tiles></column></row></table></container></summary>"
+            "tileLayoutXml": "<summary><container background-color=\"#F4F6F7\"><table><row><column><tiles layout=\"table\" columns=\"5\" background-color=\"#EAF2F8\"><tile field=\"PeakEvents\" color=\"#1B4F72\" font-size=\"large\"><title align=\"bottom\"><title-text>Peak Path</title-text></title></tile><tile field=\"Events\" color=\"#7D3C98\" font-size=\"large\"><title align=\"bottom\"><title-text>Evidence</title-text></title></tile><tile field=\"Traces\" color=\"#117A65\" font-size=\"large\"><title align=\"bottom\"><title-text>Traces</title-text></title></tile><tile field=\"Sources\" color=\"#B03A2E\" font-size=\"large\"><title align=\"bottom\"><title-text>Sources</title-text></title></tile><tile field=\"Stages\" color=\"#7E5109\" font-size=\"large\"><title align=\"bottom\"><title-text>Stages</title-text></title></tile></tiles></column></row><row><column><tiles id=\"analyst-pivots\" layout=\"table\" columns=\"3\"><tile type=\"text\" value=\"Pivot on Trace ID to reconstruct the attack path across APM, endpoint, network, cloud audit, and security-state logs.\" color=\"#1F2937\"><title align=\"bottom\"><title-text>Trace Workflow</title-text></title></tile><tile type=\"link\" value=\"Show containment checklist\" href=\"show(id=containment-pivots, expand=bottom, bounding-box=true)\" color=\"#B03A2E\"><title align=\"bottom\"><title-text>Drilldown</title-text></title></tile><tile type=\"text\" value=\"Use Main Table for the linked evidence rows; copy Trace ID into Log Explorer for raw events.\" color=\"#117A65\"><title align=\"bottom\"><title-text>Next Pivot</title-text></title></tile></tiles><tiles id=\"containment-pivots\" hidden=\"true\" layout=\"table\" columns=\"4\"><tile type=\"text\" value=\"Disable abused identity\"><title align=\"bottom\"><title-text>Identity</title-text></title></tile><tile type=\"text\" value=\"Isolate host\"><title align=\"bottom\"><title-text>Endpoint</title-text></title></tile><tile type=\"text\" value=\"Block C2/exfil\"><title align=\"bottom\"><title-text>Network</title-text></title></tile><tile type=\"text\" value=\"Preserve trace logs\"><title align=\"bottom\"><title-text>Evidence</title-text></title></tile></tiles></column></row></table></container></summary>"
           },
           "time_selection": {
             "timePeriod": "l21d"
@@ -16576,8 +17084,245 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 3,
+          "dashboard_index": 15,
+          "widget_index": 4,
+          "title": "MELTS: Last-Week Risk Exposure",
+          "query_file": "hunting/melts_last_week_risk_exposure.json",
+          "query_title": "MELTS: Last-Week Risk Exposure",
+          "description": "Seven-day risk rollup for the MELTS campaign. Shows which compromised hosts, cloud identities, and destination systems create the highest business risk when endpoint, network, cloud audit, and security-state logs are viewed together.",
+          "level": "critical",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "melts",
+            "risk_exposure",
+            "last_week",
+            "threat_hunting",
+            "attack_path"
+          ],
+          "references": [
+            {
+              "name": "Microsoft: Storm-2949 turned compromised identity into cloud-wide breach",
+              "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"
+            },
+            {
+              "name": "Microsoft: Compromised and malicious applications investigation",
+              "url": "https://learn.microsoft.com/security/operations/incident-response-playbook-compromised-malicious-app"
+            }
+          ],
+          "logsource": {
+            "product": "multi_source",
+            "service": "log_analytics",
+            "candidates": [
+              "SOC Windows Sysmon Logs",
+              "Windows Security Events",
+              "SOC Sysmon Network Logs",
+              "SOC WAF Security Logs",
+              "SOC Load Balancer Access Logs",
+              "SOC Web Application Logs",
+              "SOC Application Logs",
+              "OCI Audit Logs",
+              "SOC VCN Flow Logs",
+              "SOC Network Firewall Logs",
+              "SOC GenAI Gateway Logs",
+              "OCI Cloud Guard Problems"
+            ]
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access",
+              "execution",
+              "credential_access",
+              "discovery",
+              "collection",
+              "command_and_control",
+              "exfiltration"
+            ],
+            "techniques": [
+              "T1566",
+              "T1059",
+              "T1218",
+              "T1219",
+              "T1528",
+              "T1530",
+              "T1071.001",
+              "T1041"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Signals",
+            "groupBy": [
+              "Trace ID",
+              "Host Name (Server)",
+              "User Name",
+              "Threat Name"
+            ]
+          },
+          "time_selection": {
+            "timePeriod": "l7d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Rank the last-week MELTS attack paths by host, identity, and destination risk.",
+            "Which containment action reduces the largest number of active signals?"
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Trace ID",
+              "label": "Pivot by Trace ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Threat Name",
+              "label": "Pivot by Threat Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Request URL",
+              "label": "Pivot by Request URL"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Command Line",
+              "label": "Pivot by Command Line"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Process Name",
+              "label": "Pivot by Process Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Name",
+              "label": "Pivot by User Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
+          "dashboard_index": 15,
+          "widget_index": 5,
+          "title": "MELTS: APM Log Trace Correlation",
+          "query_file": "hunting/melts_apm_log_trace_correlation.json",
+          "query_title": "MELTS: APM Log Trace Correlation",
+          "description": "APM-oriented Logan query for the MELTS campaign. Uses SOC Application Logs to join request, span, workflow, metric, and security fields by Trace ID so analysts can see whether the attack affected service health while it progressed.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "melts",
+            "apm",
+            "logs",
+            "traces",
+            "metrics",
+            "soc_application_logs"
+          ],
+          "references": [
+            {
+              "name": "Oracle Log Analytics: Link visualization",
+              "url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/link-visualization.html"
+            }
+          ],
+          "logsource": {
+            "product": "application",
+            "service": "soc_application_logs"
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access",
+              "execution",
+              "impact"
+            ],
+            "techniques": [
+              "T1190",
+              "T1059",
+              "T1499"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "valueField": "Events",
+            "groupBy": [
+              "Trace ID",
+              "Service Name",
+              "APM Domain"
+            ]
+          },
+          "time_selection": {
+            "timePeriod": "l7d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Correlate the attack Trace ID with service, span, workflow, and metric evidence.",
+            "Did the security event coincide with service latency or error symptoms?"
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Trace ID",
+              "label": "Pivot by Trace ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Attack ID",
+              "label": "Pivot by Attack ID"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Attack Stage",
+              "label": "Pivot by Attack Stage"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Response Time Ms",
+              "label": "Pivot by Response Time Ms"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Workflow Step",
+              "label": "Pivot by Workflow Step"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Metric Name",
+              "label": "Pivot by Metric Name"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
+          "dashboard_index": 15,
+          "widget_index": 6,
           "title": "ClickFix: Clipboard PowerShell",
           "query_file": "hunting/clickfix_clipboard_powershell_execution.json",
           "query_title": "ClickFix: Clipboard PowerShell Execution",
@@ -16680,8 +17425,8 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 4,
+          "dashboard_index": 15,
+          "widget_index": 7,
           "title": "ClickFix: LOLBin Payloads",
           "query_file": "hunting/clickfix_lolbin_payload_execution.json",
           "query_title": "ClickFix: LOLBin Payload Execution",
@@ -16778,8 +17523,8 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 5,
+          "dashboard_index": 15,
+          "widget_index": 8,
           "title": "CrashFix: Python RAT",
           "query_file": "hunting/crashfix_python_rat_activity.json",
           "query_title": "CrashFix: Python RAT Activity",
@@ -16876,8 +17621,8 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 6,
+          "dashboard_index": 15,
+          "widget_index": 9,
           "title": "SharePoint: ToolShell Attempts",
           "query_file": "hunting/sharepoint_toolshell_exploitation.json",
           "query_title": "SharePoint ToolShell: Exploitation Attempts",
@@ -16978,8 +17723,8 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 7,
+          "dashboard_index": 15,
+          "widget_index": 10,
           "title": "SharePoint: Webshell Post-Exploit",
           "query_file": "hunting/sharepoint_toolshell_webshell_post_exploit.json",
           "query_title": "SharePoint ToolShell: Webshell Post-Exploit",
@@ -17080,8 +17825,8 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 8,
+          "dashboard_index": 15,
+          "widget_index": 11,
           "title": "RMM: Post-Compromise Activity",
           "query_file": "hunting/rmm_post_compromise_activity.json",
           "query_title": "RMM: Post-Compromise Remote Access Activity",
@@ -17177,8 +17922,8 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 9,
+          "dashboard_index": 15,
+          "widget_index": 12,
           "title": "Cloud Identity: AiTM Token Abuse",
           "query_file": "hunting/cloud_identity_aitm_token_abuse.json",
           "query_title": "Cloud Identity: AiTM Token Abuse",
@@ -17281,8 +18026,277 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 10,
+          "dashboard_index": 15,
+          "widget_index": 13,
+          "title": "Cloud Identity: Control-Plane Takeover",
+          "query_file": "hunting/cloud_identity_control_plane_takeover.json",
+          "query_title": "Cloud Identity to Control-Plane Takeover",
+          "description": "Correlates successful sign-in, broad discovery, new credentials, and access to high-value cloud resources by one identity.",
+          "level": "critical",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "cloud_identity",
+            "control_plane",
+            "credential_persistence",
+            "attack.t1078",
+            "attack.t1098",
+            "attack.t1526"
+          ],
+          "references": [
+            {
+              "name": "Microsoft: Storm-2949 identity-led cloud-wide breach",
+              "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"
+            }
+          ],
+          "logsource": {
+            "product": "oci",
+            "service": "audit"
+          },
+          "mitre_attack": {
+            "tactics": [
+              "initial_access",
+              "persistence",
+              "discovery",
+              "collection"
+            ],
+            "techniques": [
+              "T1078",
+              "T1098",
+              "T1526",
+              "T1530"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "groupBy": [
+              "User Name",
+              "Source IP"
+            ],
+            "valueField": "ActionTypes"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Reconstruct the identity's sign-in, discovery, persistence, and collection sequence.",
+            "Which actions deviate from this identity's normal administrative role?"
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Resource Name",
+              "label": "Pivot by Resource Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Name",
+              "label": "Pivot by User Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
+          "dashboard_index": 15,
+          "widget_index": 14,
+          "title": "Cloud: Discovery Burst",
+          "query_file": "hunting/cloud_control_plane_discovery_burst.json",
+          "query_title": "Cloud Control-Plane Discovery Burst",
+          "description": "Finds a principal rapidly enumerating multiple OCI service families, a common precursor to privilege expansion, lateral movement, or collection.",
+          "level": "high",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "cloud_discovery",
+            "control_plane",
+            "attack.t1526"
+          ],
+          "references": [
+            {
+              "name": "Microsoft: Storm-2949 identity-led cloud-wide breach",
+              "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"
+            }
+          ],
+          "logsource": {
+            "product": "oci",
+            "service": "audit"
+          },
+          "mitre_attack": {
+            "tactics": [
+              "discovery"
+            ],
+            "techniques": [
+              "T1526"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "groupBy": [
+              "User Name",
+              "Source IP"
+            ],
+            "valueField": "ServiceQueries"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "Which service families did this identity enumerate and in what order?",
+            "Compare this discovery burst with the principal's normal inventory activity."
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Name",
+              "label": "Pivot by User Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
+          "dashboard_index": 15,
+          "widget_index": 15,
+          "title": "Cloud: Secret and Object Collection",
+          "query_file": "hunting/cloud_secret_and_object_collection.json",
+          "query_title": "Cloud Secret and Object Collection",
+          "description": "Surfaces identities accessing secrets and object data after cloud discovery, emphasizing behavior that can precede data theft or credential compromise.",
+          "level": "critical",
+          "type": "hunting",
+          "sigma_id": "",
+          "tags": [
+            "cloud_collection",
+            "secrets",
+            "object_storage",
+            "attack.t1530",
+            "attack.t1555"
+          ],
+          "references": [
+            {
+              "name": "Microsoft: Storm-2949 identity-led cloud-wide breach",
+              "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"
+            }
+          ],
+          "logsource": {
+            "product": "oci",
+            "service": "audit"
+          },
+          "mitre_attack": {
+            "tactics": [
+              "credential_access",
+              "collection"
+            ],
+            "techniques": [
+              "T1555",
+              "T1530"
+            ]
+          },
+          "visualization_type": "summary_table",
+          "visualization_options": {
+            "groupBy": [
+              "User Name",
+              "Source IP"
+            ],
+            "valueField": "Resources"
+          },
+          "time_selection": {
+            "timePeriod": "l21d"
+          },
+          "layout": {
+            "width": 12,
+            "height": 5
+          },
+          "ask_ai_prompts": [
+            "List the secrets and objects collected by each identity and source IP.",
+            "Which accesses followed discovery or credential changes in the same time window?"
+          ],
+          "advanced_visualization": true,
+          "drilldowns": [
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Event Type",
+              "label": "Pivot by Event Type"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Resource Name",
+              "label": "Pivot by Resource Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "User Name",
+              "label": "Pivot by User Name"
+            },
+            {
+              "type": "log_explorer_field_pivot",
+              "field": "Source IP",
+              "label": "Pivot by Source IP"
+            }
+          ],
+          "dashboard_quality": {
+            "score": 100,
+            "checks": {
+              "no_overlap": true,
+              "supported_visualization": true,
+              "widget_returns_rows_in_cap": "not_run",
+              "field_contract_coverage": "not_evaluated",
+              "visualization_task_fit": "not_scored"
+            }
+          }
+        },
+        {
+          "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
+          "dashboard_index": 15,
+          "widget_index": 16,
           "title": "Exfil: After Initial Access",
           "query_file": "hunting/exfiltration_after_initial_access_2025_2026.json",
           "query_title": "2025-2026: Exfiltration After Initial Access",
@@ -17379,8 +18393,8 @@
         },
         {
           "dashboard_name": "SOC: 2025-2026 Threat Hunting Dashboard",
-          "dashboard_index": 14,
-          "widget_index": 11,
+          "dashboard_index": 15,
+          "widget_index": 17,
           "title": "Compromised Machines and Data",
           "query_file": "hunting/compromised_machines_and_data_2025_2026.json",
           "query_title": "2025-2026: Compromised Machines and Data",
@@ -17482,7 +18496,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 0,
           "title": "WAF: SQL Injection Blocked",
           "query_file": "waf_sql_injection_attack_blocked.json",
@@ -17551,7 +18565,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 1,
           "title": "WAF: SQL Injection Allowed",
           "query_file": "waf_sql_injection_attack_allowed_through.json",
@@ -17620,7 +18634,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 2,
           "title": "WAF: XSS Attack Blocked",
           "query_file": "waf_cross-site_scripting_attack_blocked.json",
@@ -17692,7 +18706,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 3,
           "title": "WAF: Path Traversal Blocked",
           "query_file": "waf_path_traversal_attack_blocked.json",
@@ -17766,7 +18780,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 4,
           "title": "WAF: Command Injection Blocked",
           "query_file": "waf_command_injection_attack_blocked.json",
@@ -17840,7 +18854,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 5,
           "title": "WAF: SSRF Attack Blocked",
           "query_file": "waf_server-side_request_forgery_blocked.json",
@@ -17909,7 +18923,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 6,
           "title": "WAF: XXE Attack Blocked",
           "query_file": "waf_xml_external_entity_attack_blocked.json",
@@ -17986,7 +19000,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 7,
           "title": "WAF: SSTI Attack Blocked",
           "query_file": "waf_server-side_template_injection_blocked.json",
@@ -18055,7 +19069,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 8,
           "title": "WAF: Log4Shell Blocked",
           "query_file": "waf_log4shell_cve-2021-44228_attack_blocked.json",
@@ -18134,7 +19148,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 9,
           "title": "WAF: NoSQL Injection Blocked",
           "query_file": "waf_nosql_injection_attack_blocked.json",
@@ -18206,7 +19220,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 10,
           "title": "WAF: LDAP Injection Blocked",
           "query_file": "waf_ldap_injection_attack_blocked.json",
@@ -18273,7 +19287,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 11,
           "title": "WAF: Web Shell Upload Blocked",
           "query_file": "waf_web_shell_upload_attempt_blocked.json",
@@ -18352,7 +19366,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 12,
           "title": "WAF: Protocol Attack Blocked",
           "query_file": "waf_protocol_attack_blocked.json",
@@ -18424,7 +19438,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 13,
           "title": "WAF: Rate Limiting Triggered",
           "query_file": "waf_rate_limiting_triggered.json",
@@ -18486,7 +19500,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 14,
           "title": "WAF: CORS Bypass Blocked",
           "query_file": "waf_cors_bypass_attempt_blocked.json",
@@ -18553,7 +19567,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 15,
           "title": "LB: Vulnerability Scanner",
           "query_file": "web_vulnerability_scanner_detected.json",
@@ -18615,7 +19629,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 16,
           "title": "LB: Brute Force Login",
           "query_file": "web_application_brute_force_login_attempt.json",
@@ -18684,7 +19698,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 17,
           "title": "LB: Directory Enumeration",
           "query_file": "web_directory_enumeration_detected.json",
@@ -18754,7 +19768,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 18,
           "title": "LB: Sensitive Data Access",
           "query_file": "sensitive_data_endpoint_access.json",
@@ -18824,7 +19838,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 19,
           "title": "LB: HTTP Method Abuse",
           "query_file": "suspicious_http_method_usage.json",
@@ -18886,7 +19900,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 20,
           "title": "LB: Large Response Exfil",
           "query_file": "unusually_large_http_response_data_exfiltration.json",
@@ -18955,7 +19969,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 21,
           "title": "LB: Server Errors",
           "query_file": "web_application_server_error_spike.json",
@@ -19017,7 +20031,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 22,
           "title": "LB: API Unauthorized",
           "query_file": "api_endpoint_unauthorized_access_attempts.json",
@@ -19086,7 +20100,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 23,
           "title": "LB: Suspicious User Agent",
           "query_file": "suspicious_or_empty_user_agent_detected.json",
@@ -19148,7 +20162,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 24,
           "title": "App: IDOR Detected",
           "query_file": "insecure_direct_object_reference_detected.json",
@@ -19215,7 +20229,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 25,
           "title": "App: Privilege Escalation",
           "query_file": "web_application_privilege_escalation.json",
@@ -19282,7 +20296,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 26,
           "title": "App: Auth Bypass",
           "query_file": "web_application_authentication_bypass.json",
@@ -19351,7 +20365,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 27,
           "title": "App: Insecure Deserialization",
           "query_file": "insecure_deserialization_attack_detected.json",
@@ -19425,7 +20439,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 28,
           "title": "App: Session Hijacking",
           "query_file": "web_application_session_hijacking_indicators.json",
@@ -19494,7 +20508,7 @@
         },
         {
           "dashboard_name": "SOC: Web Application Security Dashboard",
-          "dashboard_index": 15,
+          "dashboard_index": 16,
           "widget_index": 29,
           "title": "App: Mass Assignment",
           "query_file": "mass_assignment_attack_detected.json",
@@ -19568,7 +20582,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Web Threat Hunting Dashboard",
-          "dashboard_index": 16,
+          "dashboard_index": 17,
           "widget_index": 0,
           "title": "Hunt: WAF Attack by Source IP",
           "query_file": "hunting/waf_attack_frequency_by_source.json",
@@ -19636,7 +20650,7 @@
         },
         {
           "dashboard_name": "SOC: Web Threat Hunting Dashboard",
-          "dashboard_index": 16,
+          "dashboard_index": 17,
           "widget_index": 1,
           "title": "Hunt: SQLi Pattern Stacking",
           "query_file": "hunting/waf_sqli_pattern_stacking.json",
@@ -19704,7 +20718,7 @@
         },
         {
           "dashboard_name": "SOC: Web Threat Hunting Dashboard",
-          "dashboard_index": 16,
+          "dashboard_index": 17,
           "widget_index": 2,
           "title": "Hunt: Web Brute Force",
           "query_file": "hunting/web_brute_force_frequency.json",
@@ -19774,7 +20788,7 @@
         },
         {
           "dashboard_name": "SOC: Web Threat Hunting Dashboard",
-          "dashboard_index": 16,
+          "dashboard_index": 17,
           "widget_index": 3,
           "title": "Hunt: Directory Scan Cluster",
           "query_file": "hunting/web_directory_scan_clustering.json",
@@ -19847,7 +20861,7 @@
         },
         {
           "dashboard_name": "SOC: Web Threat Hunting Dashboard",
-          "dashboard_index": 16,
+          "dashboard_index": 17,
           "widget_index": 4,
           "title": "Hunt: Multi-Attack Scoring",
           "query_file": "hunting/waf_multi_attack_scoring.json",
@@ -19928,7 +20942,7 @@
         },
         {
           "dashboard_name": "SOC: Web Threat Hunting Dashboard",
-          "dashboard_index": 16,
+          "dashboard_index": 17,
           "widget_index": 5,
           "title": "Hunt: Attack Geo Anomaly",
           "query_file": "hunting/web_attack_geo_anomaly.json",
@@ -19996,7 +21010,7 @@
         },
         {
           "dashboard_name": "SOC: Web Threat Hunting Dashboard",
-          "dashboard_index": 16,
+          "dashboard_index": 17,
           "widget_index": 6,
           "title": "Hunt: OWASP Multi-Stage",
           "query_file": "hunting/web_owasp_multi_stage_attack.json",
@@ -20072,7 +21086,7 @@
         },
         {
           "dashboard_name": "SOC: Web Threat Hunting Dashboard",
-          "dashboard_index": 16,
+          "dashboard_index": 17,
           "widget_index": 7,
           "title": "Hunt: Scanner Tool Stacking",
           "query_file": "hunting/web_scanner_tool_stacking.json",
@@ -20147,7 +21161,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 0,
           "title": "W2C: Correlated Timeline",
           "query_file": "hunting/web_to_cloud_attack_timeline.json",
@@ -20256,7 +21270,7 @@
         },
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 1,
           "title": "W2C: Entry Point and SSRF",
           "query_file": "hunting/web_to_cloud_entry_point.json",
@@ -20349,7 +21363,7 @@
         },
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 2,
           "title": "W2C: Compromised Machines",
           "query_file": "hunting/web_to_cloud_compromised_machines.json",
@@ -20445,7 +21459,7 @@
         },
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 3,
           "title": "W2C: Compromised Identity",
           "query_file": "hunting/web_to_cloud_compromised_identity.json",
@@ -20537,7 +21551,7 @@
         },
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 4,
           "title": "W2C: VCN Egress",
           "query_file": "hunting/web_to_cloud_vcn_egress.json",
@@ -20632,7 +21646,7 @@
         },
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 5,
           "title": "W2C: Network Firewall C2",
           "query_file": "hunting/web_to_cloud_firewall_c2.json",
@@ -20728,7 +21742,7 @@
         },
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 6,
           "title": "W2C: OCI Audit Cloud Abuse",
           "query_file": "hunting/web_to_cloud_cloud_abuse.json",
@@ -20820,7 +21834,7 @@
         },
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 7,
           "title": "W2C: Exfiltrated Data",
           "query_file": "hunting/web_to_cloud_exfiltration.json",
@@ -20917,7 +21931,7 @@
         },
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 8,
           "title": "W2C: Attack Path Link",
           "query_file": "hunting/web_to_cloud_attack_path_link.json",
@@ -21023,7 +22037,7 @@
         },
         {
           "dashboard_name": "SOC: Web-to-Cloud Threat Hunting Dashboard",
-          "dashboard_index": 17,
+          "dashboard_index": 18,
           "widget_index": 9,
           "title": "W2C: MITRE Stage Breakdown",
           "query_file": "hunting/web_to_cloud_mitre_sunburst.json",
@@ -21125,7 +22139,7 @@
       "widgets": [
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 0,
           "title": "App: Error Rate by Service",
           "query_file": "apps/app_error_rate_by_service.json",
@@ -21202,7 +22216,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 1,
           "title": "App: Slow Requests (>2s)",
           "query_file": "apps/app_slow_requests.json",
@@ -21275,7 +22289,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 2,
           "title": "App: Request Rate by Endpoint",
           "query_file": "apps/app_request_rate_by_endpoint.json",
@@ -21347,7 +22361,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 3,
           "title": "App: Service Health Timeline",
           "query_file": "apps/app_service_health_timeline.json",
@@ -21413,7 +22427,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 4,
           "title": "App: OWASP Attack Detection",
           "query_file": "apps/app_owasp_attack_detection.json",
@@ -21488,7 +22502,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 5,
           "title": "App: WAF Signal Correlation",
           "query_file": "apps/app_waf_signal_correlation.json",
@@ -21571,7 +22585,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 6,
           "title": "App: SQLi + XSS Detection",
           "query_file": "apps/app_sqli_xss_detection.json",
@@ -21647,7 +22661,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 7,
           "title": "App: Auth Brute Force",
           "query_file": "apps/app_auth_brute_force.json",
@@ -21717,7 +22731,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 8,
           "title": "App: Security Attack by IP",
           "query_file": "apps/app_security_attack_by_ip.json",
@@ -21787,7 +22801,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 9,
           "title": "App: Cross-Service Trace Correlation",
           "query_file": "apps/app_cross_service_trace_correlation.json",
@@ -21846,7 +22860,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 10,
           "title": "App: Order Sync Pipeline",
           "query_file": "apps/app_order_sync_pipeline.json",
@@ -21921,7 +22935,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Application 360 Monitoring Dashboard",
-          "dashboard_index": 18,
+          "dashboard_index": 19,
           "widget_index": 11,
           "title": "App: DB Performance Correlation",
           "query_file": "apps/app_db_performance_correlation.json",
@@ -21998,7 +23012,7 @@
       "widgets": [
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 0,
           "title": "Octo APM: RED Metrics",
           "query_file": "apps/apm_octo_red_metrics.json",
@@ -22084,7 +23098,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 1,
           "title": "Octo APM: Request Timeline",
           "query_file": "apps/apm_octo_request_timeline.json",
@@ -22161,7 +23175,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 2,
           "title": "Octo APM: Span Hotspots",
           "query_file": "apps/apm_octo_span_latency_hotspots.json",
@@ -22247,7 +23261,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 3,
           "title": "Octo APM: Trace Logs Correlation",
           "query_file": "apps/apm_octo_trace_logs_correlation.json",
@@ -22334,7 +23348,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 4,
           "title": "Octo APM: Trace Investigation Tiles",
           "query_file": "apps/apm_octo_trace_investigation_tiles.json",
@@ -22435,7 +23449,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 5,
           "title": "Octo APM: Span Link Analysis",
           "query_file": "apps/apm_octo_span_link.json",
@@ -22532,7 +23546,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 6,
           "title": "Octo APM: Error Logs",
           "query_file": "apps/apm_octo_error_logs.json",
@@ -22619,7 +23633,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 7,
           "title": "Octo APM: Metric Samples",
           "query_file": "apps/apm_octo_metric_samples.json",
@@ -22704,7 +23718,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 8,
           "title": "Octo APM: Database Spans",
           "query_file": "apps/apm_octo_db_spans.json",
@@ -22790,7 +23804,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 9,
           "title": "Octo APM: Java Sidecar Errors",
           "query_file": "apps/apm_octo_java_sidecar_errors.json",
@@ -22879,7 +23893,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 10,
           "title": "Octo APM: API Gateway Edge Decisions",
           "query_file": "apps/apm_octo_api_gateway_edge.json",
@@ -22968,7 +23982,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 11,
           "title": "Octo APM: Attack Timeline",
           "query_file": "apps/apm_octo_attack_timeline.json",
@@ -23051,7 +24065,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 12,
           "title": "Octo APM: Attack Path Link",
           "query_file": "apps/apm_octo_attack_path_link.json",
@@ -23141,7 +24155,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 13,
           "title": "Octo APM: Attack Trace Correlation",
           "query_file": "apps/apm_octo_attack_trace_correlation.json",
@@ -23227,7 +24241,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 14,
           "title": "Octo APM: Payment Threats",
           "query_file": "apps/apm_octo_payment_threats.json",
@@ -23314,7 +24328,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 15,
           "title": "Octo APM: OSQuery Host Evidence",
           "query_file": "apps/apm_octo_osquery_findings.json",
@@ -23403,7 +24417,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: Octo APM Demo Dashboard",
-          "dashboard_index": 19,
+          "dashboard_index": 20,
           "widget_index": 16,
           "title": "Octo APM: Compromised VM Pivots",
           "query_file": "apps/apm_octo_compromised_vm_pivots.json",
@@ -23497,7 +24511,7 @@
       "widgets": [
         {
           "dashboard_name": "OCI-DEMO: OKE Kubernetes Attack Dashboard",
-          "dashboard_index": 20,
+          "dashboard_index": 21,
           "widget_index": 0,
           "title": "OKE: Boopkit Attack Timeline",
           "query_file": "apps/oke_boopkit_attack_timeline.json",
@@ -23582,7 +24596,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: OKE Kubernetes Attack Dashboard",
-          "dashboard_index": 20,
+          "dashboard_index": 21,
           "widget_index": 1,
           "title": "OKE: Kubernetes Attack Overview",
           "query_file": "apps/oke_kubernetes_attack_overview.json",
@@ -23667,7 +24681,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: OKE Kubernetes Attack Dashboard",
-          "dashboard_index": 20,
+          "dashboard_index": 21,
           "widget_index": 2,
           "title": "OKE: Privileged Workload Creation",
           "query_file": "apps/oke_privileged_workload_creation.json",
@@ -23753,7 +24767,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: OKE Kubernetes Attack Dashboard",
-          "dashboard_index": 20,
+          "dashboard_index": 21,
           "widget_index": 3,
           "title": "OKE: Secrets and RBAC Abuse",
           "query_file": "apps/oke_secrets_and_rbac_abuse.json",
@@ -23839,7 +24853,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: OKE Kubernetes Attack Dashboard",
-          "dashboard_index": 20,
+          "dashboard_index": 21,
           "widget_index": 4,
           "title": "OKE: Exec and Node Escape",
           "query_file": "apps/oke_exec_and_node_escape.json",
@@ -23924,7 +24938,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: OKE Kubernetes Attack Dashboard",
-          "dashboard_index": 20,
+          "dashboard_index": 21,
           "widget_index": 5,
           "title": "OKE: eBPF Rootkit Activity",
           "query_file": "apps/oke_ebpf_rootkit_activity.json",
@@ -24010,7 +25024,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: OKE Kubernetes Attack Dashboard",
-          "dashboard_index": 20,
+          "dashboard_index": 21,
           "widget_index": 6,
           "title": "OKE: Kubernetes Attack Path Link",
           "query_file": "apps/oke_kubernetes_attack_path_link.json",
@@ -24082,7 +25096,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: OKE Kubernetes Attack Dashboard",
-          "dashboard_index": 20,
+          "dashboard_index": 21,
           "widget_index": 7,
           "title": "OKE: Boopkit Rule Count",
           "query_file": "apps/oke_rule_boopkit_ebpf_rootkit_count.json",
@@ -24164,7 +25178,7 @@
         },
         {
           "dashboard_name": "OCI-DEMO: OKE Kubernetes Attack Dashboard",
-          "dashboard_index": 20,
+          "dashboard_index": 21,
           "widget_index": 8,
           "title": "OKE: Privileged Workload Rule Count",
           "query_file": "apps/oke_rule_privileged_workload_count.json",
@@ -24252,7 +25266,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Geographic Health Dashboard",
-          "dashboard_index": 21,
+          "dashboard_index": 22,
           "widget_index": 0,
           "title": "Geo: Regional Health Map",
           "query_file": "hunting/multicloud_geo_health_regional_map.json",
@@ -24325,7 +25339,7 @@
         },
         {
           "dashboard_name": "SOC: Geographic Health Dashboard",
-          "dashboard_index": 21,
+          "dashboard_index": 22,
           "widget_index": 1,
           "title": "Geo: Cloud Provider Summary",
           "query_file": "hunting/multicloud_geo_health_by_provider.json",
@@ -24393,7 +25407,7 @@
         },
         {
           "dashboard_name": "SOC: Geographic Health Dashboard",
-          "dashboard_index": 21,
+          "dashboard_index": 22,
           "widget_index": 2,
           "title": "Geo: Instance Detail",
           "query_file": "hunting/multicloud_geo_health_instance_detail.json",
@@ -24458,7 +25472,7 @@
         },
         {
           "dashboard_name": "SOC: Geographic Health Dashboard",
-          "dashboard_index": 21,
+          "dashboard_index": 22,
           "widget_index": 3,
           "title": "Geo: Unhealthy Regions",
           "query_file": "hunting/multicloud_geo_health_unhealthy_regions.json",
@@ -24527,7 +25541,7 @@
         },
         {
           "dashboard_name": "SOC: Geographic Health Dashboard",
-          "dashboard_index": 21,
+          "dashboard_index": 22,
           "widget_index": 4,
           "title": "Geo: Service Tier Status",
           "query_file": "hunting/multicloud_geo_health_tier_status.json",
@@ -24594,7 +25608,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 0,
           "title": "BLUELIGHT: Total Detections (24h)",
           "query_file": "hunting/bluelight_total_detections_kpi.json",
@@ -24711,7 +25725,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 1,
           "title": "BLUELIGHT: Top Affected Hosts",
           "query_file": "hunting/bluelight_top_affected_hosts.json",
@@ -24805,7 +25819,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 2,
           "title": "BLUELIGHT: MITRE Tactics x Techniques",
           "query_file": "hunting/bluelight_mitre_tactics_sunburst.json",
@@ -24895,7 +25909,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 3,
           "title": "BLUELIGHT: Kill Chain Timeline",
           "query_file": "hunting/bluelight_kill_chain_timeline.json",
@@ -24990,7 +26004,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 4,
           "title": "BLUELIGHT: Attack Path (per Host)",
           "query_file": "hunting/bluelight_attack_path_link.json",
@@ -25103,7 +26117,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 5,
           "title": "APT37: Drive-by Compromise",
           "query_file": "bluelight_drive_by_compromise.json",
@@ -25188,7 +26202,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 6,
           "title": "APT37: Browser Child Process",
           "query_file": "bluelight_browser_child_process.json",
@@ -25272,7 +26286,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 7,
           "title": "APT37: Obfuscated Commandline",
           "query_file": "bluelight_obfuscated_commandline.json",
@@ -25350,7 +26364,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 8,
           "title": "APT37: Graph API C2",
           "query_file": "bluelight_graph_api_c2.json",
@@ -25435,7 +26449,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 9,
           "title": "APT37: WMI System Discovery",
           "query_file": "bluelight_system_discovery.json",
@@ -25519,7 +26533,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 10,
           "title": "APT37: Registry Enumeration",
           "query_file": "bluelight_registry_enumeration.json",
@@ -25598,7 +26612,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 11,
           "title": "APT37: File Discovery",
           "query_file": "bluelight_file_discovery.json",
@@ -25682,7 +26696,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 12,
           "title": "APT37: Screen Capture",
           "query_file": "bluelight_screen_capture.json",
@@ -25760,7 +26774,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 13,
           "title": "APT37: Browser Credential Theft",
           "query_file": "bluelight_browser_credential_theft.json",
@@ -25844,7 +26858,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 14,
           "title": "APT37: Ingress Tool Transfer",
           "query_file": "bluelight_ingress_tool_transfer.json",
@@ -25923,7 +26937,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 15,
           "title": "APT37: OneDrive Exfiltration",
           "query_file": "bluelight_onedrive_exfiltration.json",
@@ -26008,7 +27022,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 16,
           "title": "YARA: PDB Path Indicators",
           "query_file": "bluelight_yara_pdb_strings.json",
@@ -26093,7 +27107,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 17,
           "title": "YARA: System Recon JSON",
           "query_file": "bluelight_yara_system_recon.json",
@@ -26172,7 +27186,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 18,
           "title": "YARA: Cookie Theft (Chrome/Edge)",
           "query_file": "bluelight_yara_cookie_theft.json",
@@ -26253,7 +27267,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 19,
           "title": "YARA: Keylogger Staging",
           "query_file": "bluelight_yara_keylogger.json",
@@ -26328,7 +27342,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 20,
           "title": "YARA: Google App C2",
           "query_file": "bluelight_yara_google_c2.json",
@@ -26411,7 +27425,7 @@
         },
         {
           "dashboard_name": "SOC: APT Detection Dashboard",
-          "dashboard_index": 22,
+          "dashboard_index": 23,
           "widget_index": 21,
           "title": "Hunt: BLUELIGHT Kill Chain",
           "query_file": "hunting/bluelight_apt37_kill_chain.json",
@@ -26496,7 +27510,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 0,
           "title": "APM: Total Browser Attacks (24h)",
           "query_file": "apps/apm_total_attacks_kpi.json",
@@ -26584,7 +27598,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 1,
           "title": "APM: OWASP Attack Mix by Service",
           "query_file": "apps/apm_owasp_breakdown_sunburst.json",
@@ -26655,7 +27669,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 2,
           "title": "APM: Browser Attack -> WAF Correlation",
           "query_file": "apps/apm_attack_to_waf_correlation.json",
@@ -26731,7 +27745,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 3,
           "title": "APM: Trace Correlation (APM x WAF)",
           "query_file": "apps/apm_trace_correlation_link.json",
@@ -26818,7 +27832,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 4,
           "title": "Browser: XSS Attack Detection",
           "query_file": "apps/apm_xss_attack_detection.json",
@@ -26899,7 +27913,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 5,
           "title": "Browser: SQL Injection Detection",
           "query_file": "apps/apm_sqli_attack_detection.json",
@@ -26976,7 +27990,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 6,
           "title": "Browser: CSRF Violation",
           "query_file": "apps/apm_csrf_violation_detection.json",
@@ -27058,7 +28072,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 7,
           "title": "Browser: Session Hijacking",
           "query_file": "apps/apm_session_hijacking_detection.json",
@@ -27143,7 +28157,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 8,
           "title": "Browser: Clickjacking Detection",
           "query_file": "apps/apm_clickjacking_detection.json",
@@ -27225,7 +28239,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 9,
           "title": "Browser: DOM-Based Attacks",
           "query_file": "apps/apm_dom_attack_detection.json",
@@ -27308,7 +28322,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 10,
           "title": "Browser: Suspicious JS Patterns",
           "query_file": "apps/apm_suspicious_js_patterns.json",
@@ -27396,7 +28410,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 11,
           "title": "Browser: Fingerprinting Detection",
           "query_file": "apps/apm_browser_fingerprinting.json",
@@ -27473,7 +28487,7 @@
         },
         {
           "dashboard_name": "SOC: Browser Attack Detection Dashboard",
-          "dashboard_index": 23,
+          "dashboard_index": 24,
           "widget_index": 12,
           "title": "Hunt: Browser Attack Frequency",
           "query_file": "hunting/browser_attack_frequency_analysis.json",
@@ -27552,7 +28566,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 0,
           "title": "Total Hunt Hits (l7d)",
           "query_file": "hunting/coordinator_total_hits_kpi.json",
@@ -27598,7 +28612,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 1,
           "title": "Affected Hosts (l7d)",
           "query_file": "hunting/coordinator_affected_hosts_kpi.json",
@@ -27650,7 +28664,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 2,
           "title": "Critical Alerts (l7d)",
           "query_file": "hunting/coordinator_critical_alerts_kpi.json",
@@ -27696,7 +28710,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 3,
           "title": "MITRE Techniques (l7d)",
           "query_file": "hunting/coordinator_mitre_techniques_kpi.json",
@@ -27748,7 +28762,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 4,
           "title": "MITRE Tactic \u2192 Technique",
           "query_file": "hunting/coordinator_mitre_sunburst.json",
@@ -27800,7 +28814,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 5,
           "title": "Per-Scenario Breakdown",
           "query_file": "hunting/coordinator_scenario_breakdown.json",
@@ -27849,7 +28863,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 6,
           "title": "Attack Timeline (1h bins)",
           "query_file": "hunting/coordinator_attack_timeline.json",
@@ -27896,7 +28910,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 7,
           "title": "Top Affected Hosts",
           "query_file": "hunting/coordinator_top_affected_hosts.json",
@@ -27951,7 +28965,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 8,
           "title": "Hunt: Bind Shell Listener",
           "query_file": "linux_bind_shell_listener.json",
@@ -28008,7 +29022,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 9,
           "title": "Hunt: Boopkit eBPF Rootkit",
           "query_file": "linux_boopkit_ebpf_rootkit_activity.json",
@@ -28073,7 +29087,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 10,
           "title": "Hunt: Container Escape",
           "query_file": "linux_container_escape_attempt.json",
@@ -28130,7 +29144,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 11,
           "title": "Hunt: Kernel Module from Temp",
           "query_file": "linux_kernel_module_loaded_from_temp_directory.json",
@@ -28193,7 +29207,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 12,
           "title": "Hunt: Passwd/Shadow Direct Mod",
           "query_file": "linux_password_file_direct_modification.json",
@@ -28250,7 +29264,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 13,
           "title": "Hunt: Exec from /dev/shm",
           "query_file": "linux_process_execution_from_devshm.json",
@@ -28307,7 +29321,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 14,
           "title": "Hunt: Reverse Shell",
           "query_file": "linux_reverse_shell_detected.json",
@@ -28364,7 +29378,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 15,
           "title": "Hunt: Web Shell File Creation",
           "query_file": "linux_web_shell_file_creation.json",
@@ -28421,7 +29435,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 16,
           "title": "Hunt: SSRF to Cloud IMDS",
           "query_file": "ssrf_to_cloud_instance_metadata_service_linux.json",
@@ -28482,7 +29496,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 17,
           "title": "Hunt: insmod from Temp",
           "query_file": "suspicious_usage_of_insmod.json",
@@ -28545,7 +29559,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 18,
           "title": "Hunt: Shadow File Read",
           "query_file": "suspicious_usage_of_shadow.json",
@@ -28608,7 +29622,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 19,
           "title": "Hunt: Web Process Spawning Shell",
           "query_file": "web_server_process_spawning_shell_with_injection_characters_linux.json",
@@ -28669,7 +29683,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 20,
           "title": "Hunt: APM SQL Injection",
           "query_file": "apm_sql_injection_attack_in_request.json",
@@ -28730,7 +29744,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 21,
           "title": "Hunt: Insecure Deserialization",
           "query_file": "insecure_deserialization_attack_detected.json",
@@ -28804,7 +29818,7 @@
         },
         {
           "dashboard_name": "SOC: oci-coordinator Hunt Showcase Dashboard",
-          "dashboard_index": 24,
+          "dashboard_index": 25,
           "widget_index": 22,
           "title": "Hunt: OCI Audit Retention Reduced",
           "query_file": "oci_audit_configuration_retention_reduced.json",
@@ -28876,7 +29890,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
-          "dashboard_index": 25,
+          "dashboard_index": 26,
           "widget_index": 0,
           "title": "MITRE Detections (21d)",
           "query_file": "hunting/wazuh_mitre_total_detections_kpi.json",
@@ -28929,7 +29943,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
-          "dashboard_index": 25,
+          "dashboard_index": 26,
           "widget_index": 1,
           "title": "Alerts Evolution Over Time",
           "query_file": "hunting/wazuh_mitre_alerts_over_time.json",
@@ -28982,7 +29996,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
-          "dashboard_index": 25,
+          "dashboard_index": 26,
           "widget_index": 2,
           "title": "Top Tactics",
           "query_file": "hunting/wazuh_mitre_top_tactics.json",
@@ -29035,7 +30049,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
-          "dashboard_index": 25,
+          "dashboard_index": 26,
           "widget_index": 3,
           "title": "MITRE Attacks by Technique",
           "query_file": "hunting/wazuh_mitre_attacks_by_technique.json",
@@ -29093,7 +30107,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
-          "dashboard_index": 25,
+          "dashboard_index": 26,
           "widget_index": 4,
           "title": "Rule Level by Tactic",
           "query_file": "hunting/wazuh_mitre_rule_level_by_tactic.json",
@@ -29151,7 +30165,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
-          "dashboard_index": 25,
+          "dashboard_index": 26,
           "widget_index": 5,
           "title": "Top Agents by MITRE Alerts",
           "query_file": "hunting/wazuh_mitre_top_agents.json",
@@ -29209,7 +30223,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh MITRE ATT&CK Dashboard",
-          "dashboard_index": 25,
+          "dashboard_index": 26,
           "widget_index": 6,
           "title": "Recent MITRE Events",
           "query_file": "hunting/wazuh_mitre_recent_events.json",
@@ -29279,7 +30293,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
-          "dashboard_index": 26,
+          "dashboard_index": 27,
           "widget_index": 0,
           "title": "Critical - Severity",
           "query_file": "hunting/wazuh_vuln_critical_kpi.json",
@@ -29332,7 +30346,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
-          "dashboard_index": 26,
+          "dashboard_index": 27,
           "widget_index": 1,
           "title": "High - Severity",
           "query_file": "hunting/wazuh_vuln_high_kpi.json",
@@ -29385,7 +30399,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
-          "dashboard_index": 26,
+          "dashboard_index": 27,
           "widget_index": 2,
           "title": "Medium - Severity",
           "query_file": "hunting/wazuh_vuln_medium_kpi.json",
@@ -29438,7 +30452,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
-          "dashboard_index": 26,
+          "dashboard_index": 27,
           "widget_index": 3,
           "title": "Low - Severity",
           "query_file": "hunting/wazuh_vuln_low_kpi.json",
@@ -29491,7 +30505,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
-          "dashboard_index": 26,
+          "dashboard_index": 27,
           "widget_index": 4,
           "title": "Top 5 CVEs",
           "query_file": "hunting/wazuh_vuln_top_cves.json",
@@ -29549,7 +30563,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
-          "dashboard_index": 26,
+          "dashboard_index": 27,
           "widget_index": 5,
           "title": "Top 5 Packages",
           "query_file": "hunting/wazuh_vuln_top_packages.json",
@@ -29602,7 +30616,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
-          "dashboard_index": 26,
+          "dashboard_index": 27,
           "widget_index": 6,
           "title": "Vulnerabilities by Agent",
           "query_file": "hunting/wazuh_vuln_by_agent.json",
@@ -29655,7 +30669,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Vulnerability Detection Dashboard",
-          "dashboard_index": 26,
+          "dashboard_index": 27,
           "widget_index": 7,
           "title": "CVSS Score Distribution",
           "query_file": "hunting/wazuh_vuln_cvss_distribution.json",
@@ -29715,7 +30729,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
-          "dashboard_index": 27,
+          "dashboard_index": 28,
           "widget_index": 0,
           "title": "System Inventory",
           "query_file": "hunting/wazuh_inventory_hosts.json",
@@ -29778,7 +30792,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
-          "dashboard_index": 27,
+          "dashboard_index": 28,
           "widget_index": 1,
           "title": "Installed Packages",
           "query_file": "hunting/wazuh_inventory_packages.json",
@@ -29831,7 +30845,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
-          "dashboard_index": 27,
+          "dashboard_index": 28,
           "widget_index": 2,
           "title": "SCA Policy Score",
           "query_file": "hunting/wazuh_sca_score.json",
@@ -29894,7 +30908,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
-          "dashboard_index": 27,
+          "dashboard_index": 28,
           "widget_index": 3,
           "title": "Failed SCA Checks",
           "query_file": "hunting/wazuh_sca_failed_checks.json",
@@ -29957,7 +30971,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh Inventory & Compliance Dashboard",
-          "dashboard_index": 27,
+          "dashboard_index": 28,
           "widget_index": 4,
           "title": "Compliance Mapping",
           "query_file": "hunting/wazuh_sca_compliance.json",
@@ -30022,7 +31036,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Wazuh FIM & Threat Hunting Dashboard",
-          "dashboard_index": 28,
+          "dashboard_index": 29,
           "widget_index": 0,
           "title": "File Integrity Monitoring Events",
           "query_file": "hunting/wazuh_fim_events.json",
@@ -30085,7 +31099,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh FIM & Threat Hunting Dashboard",
-          "dashboard_index": 28,
+          "dashboard_index": 29,
           "widget_index": 1,
           "title": "Top Firing Rules",
           "query_file": "hunting/wazuh_hunting_top_rules.json",
@@ -30143,7 +31157,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh FIM & Threat Hunting Dashboard",
-          "dashboard_index": 28,
+          "dashboard_index": 29,
           "widget_index": 2,
           "title": "Alert Level Distribution",
           "query_file": "hunting/wazuh_hunting_level_distribution.json",
@@ -30196,7 +31210,7 @@
         },
         {
           "dashboard_name": "SOC: Wazuh FIM & Threat Hunting Dashboard",
-          "dashboard_index": 28,
+          "dashboard_index": 29,
           "widget_index": 3,
           "title": "Recent Alerts (All)",
           "query_file": "hunting/wazuh_hunting_recent_alerts.json",
@@ -30271,7 +31285,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 0,
           "title": "Sentinel: Cisco Duo - AD sync failed",
           "query_file": "sentinel/cisco_duo_-_ad_sync_failed.json",
@@ -30343,7 +31357,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 1,
           "title": "Sentinel: CiscoISE - Attempt to delete local store logs",
           "query_file": "sentinel/ciscoise_-_attempt_to_delete_local_store_logs.json",
@@ -30436,7 +31450,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 2,
           "title": "Sentinel: Cisco Duo - Admin password reset",
           "query_file": "sentinel/cisco_duo_-_admin_password_reset.json",
@@ -30508,7 +31522,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 3,
           "title": "Sentinel: Cisco Duo - Admin user deleted",
           "query_file": "sentinel/cisco_duo_-_admin_user_deleted.json",
@@ -30580,7 +31594,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 4,
           "title": "Sentinel: CiscoISE - Backup failed",
           "query_file": "sentinel/ciscoise_-_backup_failed.json",
@@ -30668,7 +31682,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 5,
           "title": "Sentinel: CiscoISE - Certificate has expired",
           "query_file": "sentinel/ciscoise_-_certificate_has_expired.json",
@@ -30761,7 +31775,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 6,
           "title": "Sentinel: CiscoISE - ISE administrator password has been reset",
           "query_file": "sentinel/ciscoise_-_ise_administrator_password_has_been_reset.json",
@@ -30850,7 +31864,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 7,
           "title": "Sentinel: CiscoISE - Log collector was suspended",
           "query_file": "sentinel/ciscoise_-_log_collector_was_suspended.json",
@@ -30938,7 +31952,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 8,
           "title": "Sentinel: CiscoISE - Log files deleted",
           "query_file": "sentinel/ciscoise_-_log_files_deleted.json",
@@ -31031,7 +32045,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 9,
           "title": "Sentinel: Cisco Duo - Admin failure authentications",
           "query_file": "sentinel/cisco_duo_-_admin_failure_authentications.json",
@@ -31114,7 +32128,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 10,
           "title": "Sentinel: Cisco Duo - Admin failure authentications",
           "query_file": "sentinel/cisco_duo_-_admin_failure_authentications_385b0938-3922-48ab-a57a-.json",
@@ -31197,7 +32211,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 11,
           "title": "Sentinel: Cisco Duo - Admin user created",
           "query_file": "sentinel/cisco_duo_-_admin_user_created.json",
@@ -31270,7 +32284,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 12,
           "title": "Sentinel: Cisco Duo - Authentication error reasons",
           "query_file": "sentinel/cisco_duo_-_authentication_error_reasons.json",
@@ -31353,7 +32367,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 13,
           "title": "Sentinel: Cisco Duo - Authentication errors",
           "query_file": "sentinel/cisco_duo_-_authentication_errors.json",
@@ -31441,7 +32455,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 14,
           "title": "Sentinel: Cisco Duo - Delete actions",
           "query_file": "sentinel/cisco_duo_-_delete_actions.json",
@@ -31529,7 +32543,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 15,
           "title": "Sentinel: Cisco Duo - Deleted users",
           "query_file": "sentinel/cisco_duo_-_deleted_users.json",
@@ -31617,7 +32631,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 16,
           "title": "Sentinel: Cisco Duo - Fraud authentications",
           "query_file": "sentinel/cisco_duo_-_fraud_authentications.json",
@@ -31705,7 +32719,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 17,
           "title": "Sentinel: Cisco Duo - Multiple admin 2FA failures",
           "query_file": "sentinel/cisco_duo_-_multiple_admin_2fa_failures.json",
@@ -31783,7 +32797,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 18,
           "title": "Sentinel: Cisco Duo - Multiple user login failures",
           "query_file": "sentinel/cisco_duo_-_multiple_user_login_failures.json",
@@ -31866,7 +32880,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 19,
           "title": "Sentinel: Cisco Duo - Multiple users deleted",
           "query_file": "sentinel/cisco_duo_-_multiple_users_deleted.json",
@@ -31944,7 +32958,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 20,
           "title": "Sentinel: Cisco Duo - New users",
           "query_file": "sentinel/cisco_duo_-_new_users.json",
@@ -32033,7 +33047,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 21,
           "title": "Sentinel: CiscoISE - Attempts to suspend the log collector",
           "query_file": "sentinel/ciscoise_-_attempts_to_suspend_the_log_collector.json",
@@ -32109,7 +33123,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 22,
           "title": "Sentinel: CiscoISE - Authentication attempts to suspended user account",
           "query_file": "sentinel/ciscoise_-_authentication_attempts_to_suspended_user_account.json",
@@ -32186,7 +33200,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Identity Converted Detections",
-          "dashboard_index": 29,
+          "dashboard_index": 30,
           "widget_index": 23,
           "title": "Sentinel: CiscoISE - Dynamic authorization failed",
           "query_file": "sentinel/ciscoise_-_dynamic_authorization_failed.json",
@@ -32274,7 +33288,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 0,
           "title": "Sentinel: ApexOne - Top sources with alerts",
           "query_file": "sentinel/apexone_-_top_sources_with_alerts.json",
@@ -32367,7 +33381,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 1,
           "title": "Sentinel: Known Nylon Typhoon Registry modifications patterns",
           "query_file": "sentinel/known_nylon_typhoon_registry_modifications_patterns.json",
@@ -32446,7 +33460,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 2,
           "title": "Sentinel: Detect Suspicious Commands Initiated by Webserver Processes",
           "query_file": "sentinel/detect_suspicious_commands_initiated_by_webserver_processes.json",
@@ -32545,7 +33559,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 3,
           "title": "Sentinel: McAfee ePO - Multiple threats on same host",
           "query_file": "sentinel/mcafee_epo_-_multiple_threats_on_same_host.json",
@@ -32637,7 +33651,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 4,
           "title": "Sentinel: Malicious Connection to LDAP port for CVE-2021-44228 vulnerability",
           "query_file": "sentinel/malicious_connection_to_ldap_port_for_cve-2021-44228_vulnerability.json",
@@ -32713,7 +33727,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 5,
           "title": "Sentinel: Cisco SE - User Logins",
           "query_file": "sentinel/cisco_se_-_user_logins.json",
@@ -32792,7 +33806,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 6,
           "title": "Sentinel: Dev-0530 File Extension Rename",
           "query_file": "sentinel/dev-0530_file_extension_rename.json",
@@ -32865,7 +33879,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 7,
           "title": "Sentinel: CyberArkEPM - MSBuild usage as LOLBin",
           "query_file": "sentinel/cyberarkepm_-_msbuild_usage_as_lolbin.json",
@@ -32954,7 +33968,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 8,
           "title": "Sentinel: Office ASR rule triggered from browser spawned office process.",
           "query_file": "sentinel/office_asr_rule_triggered_from_browser_spawned_office_process.json",
@@ -33038,7 +34052,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 9,
           "title": "Sentinel: Potential re-named sdelete usage (ASIM Version)",
           "query_file": "sentinel/potential_re-named_sdelete_usage_asim_version.json",
@@ -33124,7 +34138,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 10,
           "title": "Sentinel: Certutil (LOLBins and LOLScripts, Normalized Process Events)",
           "query_file": "sentinel/certutil_lolbins_and_lolscripts_normalized_process_events.json",
@@ -33203,7 +34217,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 11,
           "title": "Sentinel: Failed Logon Attempt",
           "query_file": "sentinel/failed_logon_attempt.json",
@@ -33288,7 +34302,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 12,
           "title": "Sentinel: NRT Base64 Encoded Windows Process Command-lines",
           "query_file": "sentinel/nrt_base64_encoded_windows_process_command-lines.json",
@@ -33375,7 +34389,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 13,
           "title": "Sentinel: Oracle suspicious command execution",
           "query_file": "sentinel/oracle_suspicious_command_execution.json",
@@ -33461,7 +34475,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 14,
           "title": "Sentinel: Suspicious Image Load related to IcedId",
           "query_file": "sentinel/suspicious_image_load_related_to_icedid.json",
@@ -33543,7 +34557,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 15,
           "title": "Sentinel: AD account with Don't Expire Password",
           "query_file": "sentinel/ad_account_with_don_t_expire_password.json",
@@ -33618,7 +34632,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 16,
           "title": "Sentinel: ApexOne - Attack Discovery Detection",
           "query_file": "sentinel/apexone_-_attack_discovery_detection.json",
@@ -33691,7 +34705,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 17,
           "title": "Sentinel: Cisco SE - Dropper activity on host",
           "query_file": "sentinel/cisco_se_-_dropper_activity_on_host.json",
@@ -33764,7 +34778,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 18,
           "title": "Sentinel: Cisco SE - Possible webshell",
           "query_file": "sentinel/cisco_se_-_possible_webshell.json",
@@ -33837,7 +34851,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 19,
           "title": "Sentinel: Dev-0270 WMIC  Discovery",
           "query_file": "sentinel/dev-0270_wmic_discovery.json",
@@ -33913,7 +34927,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 20,
           "title": "Sentinel: Disable or Modify Windows Defender",
           "query_file": "sentinel/disable_or_modify_windows_defender.json",
@@ -33992,7 +35006,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 21,
           "title": "Sentinel: Domain controller installation media creation",
           "query_file": "sentinel/domain_controller_installation_media_creation.json",
@@ -34067,7 +35081,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 22,
           "title": "Sentinel: Establishing internal proxies",
           "query_file": "sentinel/establishing_internal_proxies.json",
@@ -34142,7 +35156,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Endpoint Converted Detections",
-          "dashboard_index": 30,
+          "dashboard_index": 31,
           "widget_index": 23,
           "title": "Sentinel: Identify Mango Sandstorm powershell commands",
           "query_file": "sentinel/identify_mango_sandstorm_powershell_commands.json",
@@ -34226,7 +35240,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 0,
           "title": "Sentinel: GCP IAM - Empty user agent",
           "query_file": "sentinel/gcp_iam_-_empty_user_agent.json",
@@ -34305,7 +35319,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 1,
           "title": "Sentinel: OCI - Event rule deleted",
           "query_file": "sentinel/oci_-_event_rule_deleted.json",
@@ -34383,7 +35397,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 2,
           "title": "Sentinel: Palo Alto Prisma Cloud - Opened alerts",
           "query_file": "sentinel/palo_alto_prisma_cloud_-_opened_alerts.json",
@@ -34456,7 +35470,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 3,
           "title": "Sentinel: OCI - Delete operations",
           "query_file": "sentinel/oci_-_delete_operations.json",
@@ -34534,7 +35548,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 4,
           "title": "Sentinel: OCI - Deleted users",
           "query_file": "sentinel/oci_-_deleted_users.json",
@@ -34612,7 +35626,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 5,
           "title": "Sentinel: OCI - Insecure metadata endpoint",
           "query_file": "sentinel/oci_-_insecure_metadata_endpoint.json",
@@ -34695,7 +35709,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 6,
           "title": "Sentinel: OCI - Launched instances",
           "query_file": "sentinel/oci_-_launched_instances.json",
@@ -34773,7 +35787,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 7,
           "title": "Sentinel: OCI - Multiple instances launched",
           "query_file": "sentinel/oci_-_multiple_instances_launched.json",
@@ -34856,7 +35870,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 8,
           "title": "Sentinel: OCI - Multiple instances terminated",
           "query_file": "sentinel/oci_-_multiple_instances_terminated.json",
@@ -34939,7 +35953,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 9,
           "title": "Sentinel: OCI - Updated instances",
           "query_file": "sentinel/oci_-_updated_instances.json",
@@ -35017,7 +36031,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 10,
           "title": "Sentinel: Palo Alto Prisma Cloud - Updated resources",
           "query_file": "sentinel/palo_alto_prisma_cloud_-_updated_resources.json",
@@ -35090,7 +36104,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 11,
           "title": "Sentinel: OCI - New users",
           "query_file": "sentinel/oci_-_new_users.json",
@@ -35169,7 +36183,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Azure Cloud Converted Detections",
-          "dashboard_index": 31,
+          "dashboard_index": 32,
           "widget_index": 12,
           "title": "Sentinel: OCI - Terminated instances",
           "query_file": "sentinel/oci_-_terminated_instances.json",
@@ -35254,7 +36268,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 0,
           "title": "Sentinel: GWorkspace - Alert events",
           "query_file": "sentinel/gworkspace_-_alert_events.json",
@@ -35333,7 +36347,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 1,
           "title": "Sentinel: SlackAudit - User role changed to admin or owner",
           "query_file": "sentinel/slackaudit_-_user_role_changed_to_admin_or_owner.json",
@@ -35407,7 +36421,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 2,
           "title": "Sentinel: Box - Executable file in folder",
           "query_file": "sentinel/box_-_executable_file_in_folder.json",
@@ -35490,7 +36504,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 3,
           "title": "Sentinel: Email Top 10 Targeted Users (Spam)",
           "query_file": "sentinel/email_top_10_targeted_users_spam.json",
@@ -35574,7 +36588,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 4,
           "title": "Sentinel: Jira - Updated workflow schemes",
           "query_file": "sentinel/jira_-_updated_workflow_schemes.json",
@@ -35662,7 +36676,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 5,
           "title": "Sentinel: Azure DevOps Pull Request Policy Bypassing",
           "query_file": "sentinel/azure_devops_pull_request_policy_bypassing.json",
@@ -35734,7 +36748,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 6,
           "title": "Sentinel: GitHub OAuth App Restrictions Disabled",
           "query_file": "sentinel/github_oauth_app_restrictions_disabled_667e6a70-adc9-49b7-9cf3-.json",
@@ -35808,7 +36822,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 7,
           "title": "Sentinel: Trend Micro CAS - Ransomware infection",
           "query_file": "sentinel/trend_micro_cas_-_ransomware_infection.json",
@@ -35886,7 +36900,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 8,
           "title": "Sentinel: Hunt for TABL changes",
           "query_file": "sentinel/hunt_for_tabl_changes.json",
@@ -35959,7 +36973,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 9,
           "title": "Sentinel: Malicious URL Clicks by workload",
           "query_file": "sentinel/malicious_url_clicks_by_workload.json",
@@ -36038,7 +37052,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 10,
           "title": "Sentinel: Sticky Keys",
           "query_file": "sentinel/sticky_keys.json",
@@ -36114,7 +37128,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 11,
           "title": "Sentinel: Teams Malware ZAP",
           "query_file": "sentinel/teams_malware_zap.json",
@@ -36187,7 +37201,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 12,
           "title": "Sentinel: Box - File containing sensitive data",
           "query_file": "sentinel/box_-_file_containing_sensitive_data.json",
@@ -36270,7 +37284,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 13,
           "title": "Sentinel: GWorkspace - API Access Granted",
           "query_file": "sentinel/gworkspace_-_api_access_granted.json",
@@ -36343,7 +37357,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 14,
           "title": "Sentinel: GWorkspace - An Outbound Relay has been added to a G Suite Domain",
           "query_file": "sentinel/gworkspace_-_an_outbound_relay_has_been_added_to_a_g_suite_domain.json",
@@ -36415,7 +37429,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 15,
           "title": "Sentinel: GWorkspace - Suspended users",
           "query_file": "sentinel/gworkspace_-_suspended_users.json",
@@ -36487,7 +37501,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 16,
           "title": "Sentinel: GWorkspace - Two-step authentification disabled for a user",
           "query_file": "sentinel/gworkspace_-_two-step_authentification_disabled_for_a_user.json",
@@ -36559,7 +37573,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 17,
           "title": "Sentinel: SlackAudit - New User created",
           "query_file": "sentinel/slackaudit_-_new_user_created.json",
@@ -36631,7 +37645,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 18,
           "title": "Sentinel: Box - IP list for admin users",
           "query_file": "sentinel/box_-_ip_list_for_admin_users.json",
@@ -36720,7 +37734,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 19,
           "title": "Sentinel: Email Top 10 Targeted Users (Spam)",
           "query_file": "sentinel/email_top_10_targeted_users_spam_9e4b7553-1113-4d40-bb6b-.json",
@@ -36804,7 +37818,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 20,
           "title": "Sentinel: Email Top 15 Targeted Users (Spam) with Additional Details",
           "query_file": "sentinel/email_top_15_targeted_users_spam_with_additional_details.json",
@@ -36888,7 +37902,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 21,
           "title": "Sentinel: Email Top 15 Targeted Users (Spam) with Additional Details",
           "query_file": "sentinel/email_top_15_targeted_users_spam_with_additional_details_86f2b124-8caf-4b53-845a-.json",
@@ -36972,7 +37986,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 22,
           "title": "Sentinel: GWorkspace - Admin permissions granted",
           "query_file": "sentinel/gworkspace_-_admin_permissions_granted.json",
@@ -37044,7 +38058,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel M365 Converted Detections",
-          "dashboard_index": 32,
+          "dashboard_index": 33,
           "widget_index": 23,
           "title": "Sentinel: GWorkspace - User access has been changed",
           "query_file": "sentinel/gworkspace_-_user_access_has_been_changed.json",
@@ -37123,7 +38137,7 @@
       "widgets": [
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 0,
           "title": "Sentinel: Critical Risks",
           "query_file": "sentinel/critical_risks.json",
@@ -37208,7 +38222,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 1,
           "title": "Sentinel: Cisco Cloud Security - Crypto Miner User-Agent Detected",
           "query_file": "sentinel/cisco_cloud_security_-_crypto_miner_user-agent_detected.json",
@@ -37312,7 +38326,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 2,
           "title": "Sentinel: Cloudflare - Client errors",
           "query_file": "sentinel/cloudflare_-_client_errors.json",
@@ -37394,7 +38408,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 3,
           "title": "Sentinel: Apache - Unexpected Post Requests",
           "query_file": "sentinel/apache_-_unexpected_post_requests.json",
@@ -37487,7 +38501,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 4,
           "title": "Sentinel: Google DNS - Domains with rare errors",
           "query_file": "sentinel/google_dns_-_domains_with_rare_errors.json",
@@ -37567,7 +38581,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 5,
           "title": "Sentinel: Cisco Cloud Security - Windows PowerShell User-Agent Detected",
           "query_file": "sentinel/cisco_cloud_security_-_windows_powershell_user-agent_detected.json",
@@ -37671,7 +38685,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 6,
           "title": "Sentinel: Cisco WSA - Access to unwanted site",
           "query_file": "sentinel/cisco_wsa_-_access_to_unwanted_site.json",
@@ -37751,7 +38765,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 7,
           "title": "Sentinel: Imperva - Forbidden HTTP request method in request",
           "query_file": "sentinel/imperva_-_forbidden_http_request_method_in_request.json",
@@ -37832,7 +38846,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 8,
           "title": "Sentinel: NGINX - Core Dump",
           "query_file": "sentinel/nginx_-_core_dump.json",
@@ -37912,7 +38926,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 9,
           "title": "Sentinel: Oracle - Error messages",
           "query_file": "sentinel/oracle_-_error_messages.json",
@@ -37986,7 +39000,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 10,
           "title": "Sentinel: Acronis - Multiple Inboxes with Malicious Content Detected",
           "query_file": "sentinel/acronis_-_multiple_inboxes_with_malicious_content_detected.json",
@@ -38071,7 +39085,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 11,
           "title": "Sentinel: Acronis - Multiple Endpoints Accessing Malicious URLs",
           "query_file": "sentinel/acronis_-_multiple_endpoints_accessing_malicious_urls.json",
@@ -38155,7 +39169,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 12,
           "title": "Sentinel: Acronis - Multiple Endpoints Infected by Ransomware",
           "query_file": "sentinel/acronis_-_multiple_endpoints_infected_by_ransomware.json",
@@ -38239,7 +39253,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 13,
           "title": "Sentinel: Apache - Apache 2.4.49 flaw CVE-2021-41773",
           "query_file": "sentinel/apache_-_apache_2_4_49_flaw_cve-2021-41773.json",
@@ -38332,7 +39346,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 14,
           "title": "Sentinel: Cisco Cloud Security - 'Blocked' User-Agents.",
           "query_file": "sentinel/cisco_cloud_security_-_blocked_user-agents.json",
@@ -38412,7 +39426,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 15,
           "title": "Sentinel: Cisco Cloud Security - Empty User Agent Detected",
           "query_file": "sentinel/cisco_cloud_security_-_empty_user_agent_detected.json",
@@ -38512,7 +39526,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 16,
           "title": "Sentinel: Cisco WSA - Multiple errors to URL",
           "query_file": "sentinel/cisco_wsa_-_multiple_errors_to_url.json",
@@ -38597,7 +39611,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 17,
           "title": "Sentinel: Cisco WSA - Rare URL with error",
           "query_file": "sentinel/cisco_wsa_-_rare_url_with_error.json",
@@ -38679,7 +39693,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 18,
           "title": "Sentinel: Google DNS - CVE-2021-34527 (PrintNightmare) external exploit",
           "query_file": "sentinel/google_dns_-_cve-2021-34527_printnightmare_external_exploit.json",
@@ -38759,7 +39773,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 19,
           "title": "Sentinel: Google DNS - Exchange online autodiscover abuse",
           "query_file": "sentinel/google_dns_-_exchange_online_autodiscover_abuse.json",
@@ -38841,7 +39855,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 20,
           "title": "Sentinel: Google DNS - Malicous Python packages",
           "query_file": "sentinel/google_dns_-_malicous_python_packages.json",
@@ -38921,7 +39935,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 21,
           "title": "Sentinel: Google DNS - Possible data exfiltration",
           "query_file": "sentinel/google_dns_-_possible_data_exfiltration.json",
@@ -39001,7 +40015,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 22,
           "title": "Sentinel: PaloAlto - Multiple Deny result by user",
           "query_file": "sentinel/paloalto_-_multiple_deny_result_by_user.json",
@@ -39082,7 +40096,7 @@
         },
         {
           "dashboard_name": "SOC: Microsoft Sentinel Network Converted Detections",
-          "dashboard_index": 33,
+          "dashboard_index": 34,
           "widget_index": 23,
           "title": "Sentinel: Tomcat - Catalina errors",
           "query_file": "sentinel/tomcat_-_catalina_errors.json",

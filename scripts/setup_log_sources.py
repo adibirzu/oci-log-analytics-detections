@@ -378,6 +378,11 @@ def main():
         help="Alias for --application-only, scoped to the Octo APM demo schema",
     )
     parser.add_argument(
+        "--windows-access-only",
+        action="store_true",
+        help="Create only the Security/System JSON sources used by the Windows access synthetic E2E path",
+    )
+    parser.add_argument(
         "--field-audit",
         action="store_true",
         help="Inspect namespace fields and report exact reuse versus fields setup would create",
@@ -397,6 +402,17 @@ def main():
     args = parser.parse_args()
     octo_apm_only = args.octo_apm_only
     application_only = args.application_only or octo_apm_only
+    windows_access_only = args.windows_access_only
+
+    if windows_access_only and application_only:
+        parser.error("--windows-access-only cannot be combined with --application-only or --octo-apm-only")
+
+    windows_access_mappings = WINSEC_FIELD_MAPPINGS + WINSYS_FIELD_MAPPINGS
+    windows_access_fields = unique_preserving_order(
+        field_name
+        for field_name, _json_path, _sequence in windows_access_mappings
+        if field_name in CUSTOM_FIELDS
+    )
 
     if args.validate:
         ok = validate_oci_setup(['ocid', 'cli', 'namespace', 'compartment'])
@@ -407,12 +423,21 @@ def main():
             octo_apm_only=octo_apm_only,
             application_only=application_only,
         )
-        if not application_only:
+        if windows_access_only:
+            fields_to_create = windows_access_fields
+        elif not application_only:
             field_mappings = []
         print("DRY RUN - would create:")
         print(f"  up to {len(unique_preserving_order(fields_to_create))} custom fields")
         print("  existing namespace fields are reused by exact display name")
         print("  run with --field-audit to inspect live reuse before creating fields")
+        if windows_access_only:
+            print("  2 JSON parsers for deterministic Security/System synthetic upload validation")
+            print(f"  1 log source: {WINSEC_SOURCE_DISPLAY} ({WINSEC_SOURCE_INTERNAL})")
+            print(f"  1 log source: {WINSYS_SOURCE_DISPLAY} ({WINSYS_SOURCE_INTERNAL})")
+            print("  Application-channel fixtures are validated locally; optional upload reuses an existing SOC Application Logs source")
+            print("  continuous collection reuses Oracle-defined Windows Security/System/Application Events sources")
+            return
         if application_only:
             print(f"  1 JSON parser: {APP_PARSER_DISPLAY} ({len(field_mappings)} field maps)")
             print(f"  1 log source: {APP_SOURCE_DISPLAY} ({APP_SOURCE_INTERNAL})")
@@ -453,6 +478,8 @@ def main():
         octo_apm_only=octo_apm_only,
         application_only=application_only,
     )
+    if windows_access_only:
+        fields_to_create = windows_access_fields
 
     if args.field_audit:
         audit_existing_fields(
@@ -509,6 +536,26 @@ def main():
     print("\n" + "=" * 60)
     print("STEP 2: CREATE JSON PARSERS")
     print("=" * 60)
+
+    if windows_access_only:
+        for parser_name, parser_display, parser_desc, mappings, example in (
+            (WINSEC_PARSER_NAME, WINSEC_PARSER_DISPLAY, WINSEC_PARSER_DESC, WINSEC_FIELD_MAPPINGS, WINSEC_EXAMPLE),
+            (WINSYS_PARSER_NAME, WINSYS_PARSER_DISPLAY, WINSYS_PARSER_DESC, WINSYS_FIELD_MAPPINGS, WINSYS_EXAMPLE),
+        ):
+            print(f"\n--- {parser_display} ---")
+            create_parser(la_client, namespace, parser_name, parser_display, parser_desc, mappings, field_map, example)
+
+        print("\n" + "=" * 60)
+        print("STEP 3: CREATE LOG SOURCES")
+        print("=" * 60)
+        for source_internal, source_display, source_desc, parser_name in (
+            (WINSEC_SOURCE_INTERNAL, WINSEC_SOURCE_DISPLAY, WINSEC_SOURCE_DESC, WINSEC_PARSER_NAME),
+            (WINSYS_SOURCE_INTERNAL, WINSYS_SOURCE_DISPLAY, WINSYS_SOURCE_DESC, WINSYS_PARSER_NAME),
+        ):
+            print(f"\n--- {source_display} ---")
+            create_source(la_client, namespace, compartment_id, source_internal, source_display, source_desc, parser_name)
+        print("\nSETUP COMPLETE: Windows access synthetic-upload sources")
+        return
 
     if application_only:
         print("\n--- Application Telemetry Parser ---")

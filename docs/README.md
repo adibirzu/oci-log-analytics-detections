@@ -6,6 +6,11 @@ This directory is the wiki-style guide to using, operating, extending, and deplo
 
 | Need | Read | Outcome |
 | --- | --- | --- |
+| Onboard Windows access monitoring quickly | [Windows Access Monitoring Fast Onboarding](WINDOWS_ACCESS_FAST_ONBOARDING.md) | Management Agent, native Security/System/Application collection, five alerts, dashboard, and E2E proof |
+| Follow the Windows console path | [Windows Access Manual Runbook](WINDOWS_ACCESS_MANUAL_RUNBOOK.md) | Click-by-click IAM, standalone agent install, entity/source association, saved searches, scheduled rules, and alarm canary |
+| Follow the Windows automation path | [Windows Access Scripted Runbook](WINDOWS_ACCESS_SCRIPTED_RUNBOOK.md) | Guarded PowerShell, local E2E, OCI CLI bundle, dashboard deployment, and per-resource verification |
+| Review the Windows architecture and decisions | [Windows Access Workflow Diagrams](WINDOWS_ACCESS_WORKFLOW_DIAGRAMS.md) | Architecture, parallel paths, alert sequence, troubleshooting tree, and evidence ladder |
+| Establish the first Log Analytics data path | [Fast Onboarding Track](FAST_ONBOARDING_TRACK.md) | IAM, ingestion choice, canary sources, validation, and rollout ownership |
 | Find, run, customize, and validate queries | [Using Log Analytics Queries](LOG_ANALYTICS_QUERY_USAGE.md) | Console, OCL, repository, and live-validation workflow |
 | Plan a migration or SIEM-forwarding design | [Migration and Security Guide](MIGRATION_AND_SECURITY_GUIDE.md) | A phased telemetry, detection, and export plan |
 | Deploy the supported package | [Deployment Guide](DEPLOYMENT.md) | Resource Manager plan/apply with customer-owned identity |

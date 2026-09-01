@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "methodology": {
+    "usage_claim": "Public vendor catalogs do not expose comparable execution-frequency telemetry. Entries are official, commonly applicable detection families, not a ranked claim of customer usage.",
+    "content_policy": "Store product-level metadata and links only. Do not copy proprietary or license-restricted rule bodies, identifiers, names, or descriptions.",
+    "logan_mapping": "OCI Log Analytics mappings are independently authored and point to canonical repository query artifacts."
+  },
+  "products": [
+    {"id": "splunk", "name": "Splunk Enterprise Security", "query_language": "SPL", "catalog_url": "https://research.splunk.com/", "official_repository": "https://github.com/splunk/security_content", "license": "Apache-2.0", "integration": "converter-backed"},
+    {"id": "microsoft_sentinel", "name": "Microsoft Sentinel", "query_language": "KQL", "catalog_url": "https://github.com/Azure/Azure-Sentinel/tree/master/Detections", "official_repository": "https://github.com/Azure/Azure-Sentinel", "license": "MIT", "integration": "converter-backed-with-live-promotion"},
+    {"id": "qradar", "name": "IBM QRadar SIEM", "query_language": "AQL and CRE rules", "catalog_url": "https://www.ibm.com/docs/en/qsip/7.4.0?topic=qradar-content-extensions", "license": "Vendor content terms vary by extension", "integration": "reference-only"},
+    {"id": "logrhythm", "name": "LogRhythm SIEM", "query_language": "AI Engine rules and Web Console search", "catalog_url": "https://logrhythm.com/marketplace/", "license": "Vendor content terms", "integration": "reference-only"},
+    {"id": "arcsight", "name": "OpenText ArcSight", "query_language": "ESM filters and correlation rules", "catalog_url": "https://www.opentext.com/products/arcsight-enterprise-security-manager", "license": "Vendor content terms", "integration": "reference-only"},
+    {"id": "elastic", "name": "Elastic Security", "query_language": "KQL, Lucene, EQL, and ES|QL", "catalog_url": "https://github.com/elastic/detection-rules", "official_repository": "https://github.com/elastic/detection-rules", "license": "Elastic License 2.0", "integration": "converter-backed-user-input-only"}
+  ],
+  "detection_families": [
+    {"id": "credential_and_identity_abuse", "title": "Credential and identity abuse", "mitre_techniques": ["T1078", "T1098", "T1528"], "logan_queries": ["hunting/oci_console_brute_force.json", "hunting/oci_multi_user_same_ip.json", "hunting/cloud_identity_aitm_token_abuse.json", "hunting/cloud_identity_control_plane_takeover.json"]},
+    {"id": "suspicious_process_and_script_execution", "title": "Suspicious process and script execution", "mitre_techniques": ["T1059.001", "T1218"], "logan_queries": ["hunting/clickfix_clipboard_powershell_execution.json", "hunting/clickfix_lolbin_payload_execution.json", "hunting/windows_rare_process.json"]},
+    {"id": "remote_access_and_lateral_movement", "title": "Remote access and lateral movement", "mitre_techniques": ["T1219", "T1021"], "logan_queries": ["hunting/rmm_post_compromise_activity.json", "hunting/windows_lateral_movement_cluster.json", "hunting/win_lateral_movement_timeline.json"]},
+    {"id": "cloud_discovery_collection_exfiltration", "title": "Cloud discovery, collection, and exfiltration", "mitre_techniques": ["T1526", "T1530", "T1567"], "logan_queries": ["hunting/cloud_control_plane_discovery_burst.json", "hunting/cloud_secret_and_object_collection.json", "hunting/exfiltration_after_initial_access_2025_2026.json"]},
+    {"id": "destructive_and_defense_evasion", "title": "Destructive activity and defense evasion", "mitre_techniques": ["T1070", "T1485", "T1489"], "logan_queries": ["hunting/oci_resource_deletion_wave.json", "hunting/oci_resource_destruction_spike.json", "hunting/windows_defense_evasion_score.json"]},
+    {"id": "web_exploitation_and_web_shells", "title": "Web exploitation and web shells", "mitre_techniques": ["T1190", "T1505.003"], "logan_queries": ["hunting/sharepoint_toolshell_exploitation.json", "hunting/sharepoint_toolshell_webshell_post_exploit.json", "hunting/web_owasp_multi_stage_attack.json"]}
+  ]
+}

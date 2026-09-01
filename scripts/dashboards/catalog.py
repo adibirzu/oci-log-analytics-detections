@@ -253,6 +253,16 @@ DASHBOARDS = {
             {"title": "Win: Token Manipulation", "query_file": "windows_access_token_manipulation.json"},
         ]
     },
+    "SOC: Windows Access Monitoring": {
+        "description": "Fast-track Windows access monitoring for failed logon bursts, RDP after hours, Administrator use, local account creation, and privileged local-group additions.",
+        "widgets": [
+            {"title": "Access: Failed Logon Burst", "query_file": "hunting/windows_access_failed_logon_burst.json"},
+            {"title": "Access: RDP After Hours", "query_file": "hunting/windows_access_rdp_after_hours.json"},
+            {"title": "Access: Administrator Logon", "query_file": "hunting/windows_access_administrator_logon.json"},
+            {"title": "Access: New Local User", "query_file": "hunting/windows_access_new_local_user.json"},
+            {"title": "Access: Privileged Group Add", "query_file": "hunting/windows_access_privileged_group_add.json"},
+        ],
+    },
     "SOC: GOAD Caldera Operations Dashboard": {
         "description": "Maps the 5 Caldera adversary operations from c7_run_caldera_operations.sh (Discovery, Credential Access, Lateral Movement, Collection, Exfiltration) to detection rules firing on the 10 GOAD + Apex AD Windows hosts (kingslanding, winterfell, meereen, castelblack, braavos, hq-dc01, eu-dc01, eu-app01, apac-dc01, apac-db01). Each Caldera operation phase maps to a row of detection tiles plus two host-scoped hunting tiles (sandcat agent activity + multi-stage attack chain) that filter to the 11 lab Entities so red-team noise stays scoped and BLUE drilldowns stay attributable to a specific Caldera op.",
         "widgets": [
@@ -355,9 +365,12 @@ DASHBOARDS = {
     "SOC: 2025-2026 Threat Hunting Dashboard": {
         "description": "MELTS-driven threat-hunting dashboard for 2025-2026 attack tradecraft: ClickFix/CrashFix, SharePoint ToolShell, RMM abuse, AiTM token replay, compromised-machine drilldowns, and exfiltration evidence.",
         "widgets": [
+            {"title": "MELTS: Datasource Coverage", "query_file": "hunting/melts_datasource_coverage_kpi.json"},
             {"title": "MELTS: Signal Overview", "query_file": "hunting/melts_attack_signal_overview.json"},
             {"title": "MELTS: Attack Timeline", "query_file": "hunting/melts_attack_timeline.json"},
             {"title": "MELTS: Attack Path Link", "query_file": "hunting/melts_attack_path_link.json"},
+            {"title": "MELTS: Last-Week Risk Exposure", "query_file": "hunting/melts_last_week_risk_exposure.json"},
+            {"title": "MELTS: APM Log Trace Correlation", "query_file": "hunting/melts_apm_log_trace_correlation.json"},
             {"title": "ClickFix: Clipboard PowerShell", "query_file": "hunting/clickfix_clipboard_powershell_execution.json"},
             {"title": "ClickFix: LOLBin Payloads", "query_file": "hunting/clickfix_lolbin_payload_execution.json"},
             {"title": "CrashFix: Python RAT", "query_file": "hunting/crashfix_python_rat_activity.json"},
@@ -365,6 +378,9 @@ DASHBOARDS = {
             {"title": "SharePoint: Webshell Post-Exploit", "query_file": "hunting/sharepoint_toolshell_webshell_post_exploit.json"},
             {"title": "RMM: Post-Compromise Activity", "query_file": "hunting/rmm_post_compromise_activity.json"},
             {"title": "Cloud Identity: AiTM Token Abuse", "query_file": "hunting/cloud_identity_aitm_token_abuse.json"},
+            {"title": "Cloud Identity: Control-Plane Takeover", "query_file": "hunting/cloud_identity_control_plane_takeover.json"},
+            {"title": "Cloud: Discovery Burst", "query_file": "hunting/cloud_control_plane_discovery_burst.json"},
+            {"title": "Cloud: Secret and Object Collection", "query_file": "hunting/cloud_secret_and_object_collection.json"},
             {"title": "Exfil: After Initial Access", "query_file": "hunting/exfiltration_after_initial_access_2025_2026.json"},
             {"title": "Compromised Machines and Data", "query_file": "hunting/compromised_machines_and_data_2025_2026.json"},
         ]

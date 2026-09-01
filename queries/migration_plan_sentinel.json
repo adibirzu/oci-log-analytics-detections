@@ -1,8 +1,8 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-24T20:41:15.571907+00:00",
+  "generated_at": "2026-09-01T12:41:14.276306+00:00",
   "source_inventory": "queries/siem_discovery_inventory.json",
-  "migration_report": "docs/health/siem-migration-20260624T204115Z.json",
+  "migration_report": "docs/health/siem-migration-20260901T124114Z.json",
   "summary": {
     "planned_count": 4452,
     "ready_for_local_validation_count": 4452,

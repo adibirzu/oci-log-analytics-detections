@@ -1,0 +1,17 @@
+{
+  "title": "Windows Administrator Logon",
+  "description": "Alert-ready search for successful logons by the built-in Administrator account. Extend the approved-account filter for renamed or localized administrator accounts.",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4624' and ('Target User Name' = 'Administrator' or User = 'Administrator') | stats count as AdministratorLogons by 'Target User Name', 'Logon Type', 'Host Name (Server)' | sort -AdministratorLogons",
+  "type": "hunting",
+  "hunting_type": "privileged_access",
+  "level": "high",
+  "tags": ["attack.privilege_escalation", "attack.t1078"],
+  "mitre_attack": {"tactics": ["privilege_escalation", "defense_evasion"], "techniques": ["T1078"]},
+  "logsource": {"product": "windows", "service": "security", "candidates": ["Windows Security Events", "Windows Event Security Logs"]},
+  "falsepositives": ["Approved break-glass or local administration"],
+  "detection_rule": {"schedule": "5m", "lookback": "5m", "condition": "AdministratorLogons > 0"},
+  "dashboard": {"visualizationType": "summary_table", "showTitle": true, "timeSelection": {"timePeriod": "l24h"}, "visualizationOptions": {"groupBy": ["Target User Name", "Logon Type", "Host Name (Server)"], "valueField": "AdministratorLogons"}},
+  "detection_maturity": "validated_locally",
+  "test_data_coverage": "covered",
+  "live_validation_status": "not_run"
+}

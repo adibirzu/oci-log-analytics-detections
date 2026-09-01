@@ -266,31 +266,79 @@ This dashboard contains five source-attributed modern attack families and one en
 ### Walkthrough
 
 1. Open `SOC: 2025-2026 Threat Hunting Dashboard`.
-2. Set the dashboard to `Last 21 days`.
-3. Start with `MELTS: Signal Overview`.
+2. For a focused weekly hunt, set the dashboard to `Last 7 days`. For the full workshop corpus, use `Last 21 days`.
+3. Start with `MELTS: Datasource Coverage`.
+   Confirm the attack week has evidence from several Logan sources before drawing conclusions. A low value usually means one of the synthetic files was not generated or ingested.
+4. Open `MELTS: Signal Overview`.
    Identify which attack stage has the highest event count and which log sources participate.
-4. Open `MELTS: Attack Timeline`.
+5. Open `MELTS: Attack Timeline`.
    Find the first-seen event for the campaign and note whether the first source is endpoint, web, application, or cloud control plane.
-5. Open `MELTS: Attack Path Link`.
-   Select one trace ID and confirm it links more than one source. Use `trace_clickfix_2026_001` for endpoint-to-network-to-exfil and `trace_toolshell_sp_001` for web-to-application exploitation.
-6. Open `ClickFix: Clipboard PowerShell`.
+6. Open `MELTS: Attack Path Link`.
+   Select one trace ID and confirm it links more than one source and one attack stage. The tile row summarizes peak path, total evidence, traces, sources, and stages. Use the embedded drilldown tile to expose the containment checklist, then use the Main Table for the raw linked groups.
+7. Open `MELTS: Last-Week Risk Exposure`.
+   Rank the current week by trace ID, host, user, destination spread, and source coverage. This is the handoff view for containment prioritization.
+8. Open `MELTS: APM Log Trace Correlation`.
+   Confirm whether the same trace produced service, span, workflow, metric, latency, or error evidence in `SOC Application Logs`.
+9. Open `ClickFix: Clipboard PowerShell`.
    Confirm browser-parented PowerShell with ClickFix/fake CAPTCHA/clipboard indicators on `WS02.sevenkingdoms.local`.
-7. Open `ClickFix: LOLBin Payloads`.
+10. Open `ClickFix: LOLBin Payloads`.
    Confirm mshta/rundll32 scriptlet execution and remote payload references.
-8. Open `CrashFix: Python RAT`.
+11. Open `CrashFix: Python RAT`.
    Confirm `python.exe`, `crashfix.py`, and outbound callback traffic to `crashfix-help.example`.
-9. Open `SharePoint: ToolShell Attempts`.
+12. Open `SharePoint: ToolShell Attempts`.
    Confirm ToolPane and `spinstall0.aspx` activity from `198.51.100.44`, then check whether WAF only detected it or the backend returned a response.
-10. Open `SharePoint: Webshell Post-Exploit`.
+13. Open `SharePoint: Webshell Post-Exploit`.
     Confirm command-execution attempts against `spinstall0.aspx?cmd=whoami`.
-11. Open `RMM: Post-Compromise Activity`.
+14. Open `RMM: Post-Compromise Activity`.
     Confirm ScreenConnect, AnyDesk, or Atera process launches and associated relay domains.
-12. Open `Cloud Identity: AiTM Token Abuse`.
+15. Open `Cloud Identity: AiTM Token Abuse`.
     Confirm one principal moves from login to IAM discovery, Object Storage access, and auth-token creation.
-13. Open `Exfil: After Initial Access`.
+16. Open `Exfil: After Initial Access`.
     Tie large VCN/Network Firewall transfers and Object Storage reads to the entry trace.
-14. Finish with `Compromised Machines and Data`.
+17. Finish with `Compromised Machines and Data`.
     Record the compromised hosts, identities, destination IPs, data objects, and containment order.
+
+### Generate the Last-Week Dataset
+
+The MELTS weekly workflow uses the same generator surfaces as the rest of the repository. For normal demo preparation, use the reusable wrapper:
+
+```bash
+python3 scripts/prepare_threat_hunting_demo.py
+```
+
+That command generates a seven-day corpus, refreshes the catalog/dashboard/detection-rule artifacts, dry-runs the threat-hunting dashboards, and runs the focused local contracts. For a release-grade local sweep, add `--strict`:
+
+```bash
+python3 scripts/prepare_threat_hunting_demo.py --strict
+```
+
+The wrapper writes the current local readiness handoff to `docs/health/threat-hunting-demo-readiness.json`. Use that JSON when a future demo request needs to confirm the generated event count, dry-run dashboards, query catalog counts, and exact local commands used to prepare the corpus.
+
+If you only need the raw generated logs, run the lower-level generator directly:
+
+```bash
+python3 scripts/generate_dashboard_data.py --days 7 --validate
+```
+
+These commands write the synthetic source files under `test_data/`, including OCI Audit, Cloud Guard, Cloud Guard Instance Security, Linux, Windows Security, Sysmon, Sysmon network, WAF, load balancer, web application, `SOC Application Logs`, GenAI gateway, VCN flow, Network Firewall, Wazuh, and multicloud health datasets. The MELTS queries are intentionally keyed on deterministic pivots such as `trace_clickfix_2026_001`, `trace_toolshell_sp_001`, `trace_rmm_2025_001`, and `trace_aitm_token_2026_001`, so the same attack story remains visible after replication across seven daily windows.
+
+Live ingestion or dashboard import is a separate OCI action. Do it only after the target OCI profile, compartment, namespace, log group, source/entity mapping, and allowed upload/deploy window are approved.
+
+Before requesting that approval, run:
+
+```bash
+python3 scripts/preflight_threat_hunting_demo.py
+```
+
+The preflight writes `docs/health/threat-hunting-live-preflight.json` with PASS/WARN/FAIL checks and a placeholder-only live command plan.
+
+### Logan Dashboard Patterns Used
+
+The MELTS dashboard uses three Logan visualization patterns:
+
+- `tile` for the datasource coverage KPI, because it answers one readiness question before the hunt starts.
+- `summary_table` for risk exposure and APM/log correlation, because these are grouped `stats` outputs and render safely in OCI dashboards.
+- `link` with `dashboardOptions` set to `Tiles` and `Main Table` for attack-path reconstruction. The tile XML exposes headline counts and a click-to-show containment checklist while the Main Table keeps the linked evidence groups available for analyst drilldown.
 
 Expected conclusion:
 

@@ -1,0 +1,10 @@
+{
+  "title": "Cloud Control-Plane Discovery Burst",
+  "description": "Finds a principal rapidly enumerating multiple OCI service families, a common precursor to privilege expansion, lateral movement, or collection.",
+  "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like '*.listusers' or 'Event Type' like '*.listgroups' or 'Event Type' like '*.listpolicies' or 'Event Type' like '*.listinstances' or 'Event Type' like '*.listvcns' or 'Event Type' like '*.listsubnets' or 'Event Type' like '*.listbuckets' or 'Event Type' like '*.listautonomousdatabases') | stats count as DiscoveryEvents, distinctcount('Event Type') as ServiceQueries, unique('Event Type') as Actions by 'User Name', 'Source IP' | where DiscoveryEvents >= 6 and ServiceQueries >= 5 | sort -ServiceQueries",
+  "type": "hunting", "level": "high", "tags": ["cloud_discovery", "control_plane", "attack.t1526"],
+  "logsource": {"product": "oci", "service": "audit"},
+  "dashboard": {"visualizationType": "summary_table", "showTitle": true, "timeSelection": {"timePeriod": "l21d"}, "visualizationOptions": {"groupBy": ["User Name", "Source IP"], "valueField": "ServiceQueries"}, "ask_ai_prompts": ["Which service families did this identity enumerate and in what order?", "Compare this discovery burst with the principal's normal inventory activity."]},
+  "references": [{"name": "Microsoft: Storm-2949 identity-led cloud-wide breach", "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"}],
+  "mitre_attack": {"tactics": ["discovery"], "techniques": ["T1526"]}, "falsepositives": ["Approved inventory collection", "Cloud asset management synchronization"]
+}

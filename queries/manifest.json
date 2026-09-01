@@ -1,7 +1,7 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-06-24T20:40:34.078806+00:00",
+  "generated_at": "2026-09-01T12:00:48.006936+00:00",
   "stats": {
     "total_rules": 538,
     "total_sigma_rules": 522,
@@ -9096,7 +9096,7 @@
   ],
   "dashboards": {
     "total": 34,
-    "saved_searches": 530,
+    "saved_searches": 536,
     "names": [
       "SOC Overview Dashboard",
       "SOC: OCI STIG Compliance Dashboard",

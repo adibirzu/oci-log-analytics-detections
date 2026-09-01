@@ -1,0 +1,17 @@
+{
+  "title": "Windows User Added to Administrators or Remote Desktop Users",
+  "description": "Alert-ready search for Security Event 4732 additions to the local Administrators or Remote Desktop Users groups.",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4732' and ('Target User Name' like '*Administrators*' or 'Target User Name' like '*Remote Desktop Users*' or msg like '*Administrators*' or msg like '*Remote Desktop Users*') | stats count as GroupAdds by User, 'Target User Name', 'Host Name (Server)' | sort -GroupAdds",
+  "type": "hunting",
+  "hunting_type": "privileged_access",
+  "level": "critical",
+  "tags": ["attack.persistence", "attack.privilege_escalation", "attack.t1098"],
+  "mitre_attack": {"tactics": ["persistence", "privilege_escalation"], "techniques": ["T1098"]},
+  "logsource": {"product": "windows", "service": "security", "candidates": ["Windows Security Events", "Windows Event Security Logs"]},
+  "falsepositives": ["Approved endpoint administration"],
+  "detection_rule": {"schedule": "5m", "lookback": "5m", "condition": "GroupAdds > 0"},
+  "dashboard": {"visualizationType": "summary_table", "showTitle": true, "timeSelection": {"timePeriod": "l24h"}, "visualizationOptions": {"groupBy": ["User", "Target User Name", "Host Name (Server)"], "valueField": "GroupAdds"}},
+  "detection_maturity": "validated_locally",
+  "test_data_coverage": "covered",
+  "live_validation_status": "not_run"
+}

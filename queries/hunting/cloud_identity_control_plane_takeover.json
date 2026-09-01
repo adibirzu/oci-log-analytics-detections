@@ -1,0 +1,12 @@
+{
+  "title": "Cloud Identity to Control-Plane Takeover",
+  "description": "Correlates successful sign-in, broad discovery, new credentials, and access to high-value cloud resources by one identity.",
+  "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like 'com.oraclecloud.consolesignon.*' or 'Event Type' like 'com.oraclecloud.identitycontrolplane.list*' or 'Event Type' like 'com.oraclecloud.identitycontrolplane.create*token*' or 'Event Type' like 'com.oraclecloud.identitycontrolplane.*apikey*' or 'Event Type' like 'com.oraclecloud.objectstorage.list*' or 'Event Type' like 'com.oraclecloud.objectstorage.getobject' or 'Event Type' like 'com.oraclecloud.vault.getsecret*') | stats count as Events, distinctcount('Event Type') as ActionTypes, unique('Event Type') as Actions, unique('Resource Name') as Resources by 'User Name', 'Source IP' | where Events >= 6 and ActionTypes >= 4 | sort -ActionTypes",
+  "type": "hunting", "level": "critical",
+  "tags": ["cloud_identity", "control_plane", "credential_persistence", "attack.t1078", "attack.t1098", "attack.t1526"],
+  "logsource": {"product": "oci", "service": "audit"},
+  "dashboard": {"visualizationType": "summary_table", "showTitle": true, "timeSelection": {"timePeriod": "l21d"}, "visualizationOptions": {"groupBy": ["User Name", "Source IP"], "valueField": "ActionTypes"}, "ask_ai_prompts": ["Reconstruct the identity's sign-in, discovery, persistence, and collection sequence.", "Which actions deviate from this identity's normal administrative role?"]},
+  "references": [{"name": "Microsoft: Storm-2949 identity-led cloud-wide breach", "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"}],
+  "mitre_attack": {"tactics": ["initial_access", "persistence", "discovery", "collection"], "techniques": ["T1078", "T1098", "T1526", "T1530"]},
+  "falsepositives": ["Approved cloud inventory tooling", "Infrastructure-as-code deployment", "Planned credential rotation"]
+}

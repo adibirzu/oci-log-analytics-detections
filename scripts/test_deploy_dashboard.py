@@ -464,6 +464,53 @@ class TestDashboardContract(unittest.TestCase):
 
         self.assertTrue(expected_tile_layout_queries.issubset(tiled_queries))
 
+    def test_melts_dashboard_covers_weekly_melts_workflow(self):
+        dashboard = DASHBOARDS["SOC: 2025-2026 Threat Hunting Dashboard"]
+        expected_query_files = {
+            "hunting/melts_datasource_coverage_kpi.json",
+            "hunting/melts_attack_signal_overview.json",
+            "hunting/melts_attack_timeline.json",
+            "hunting/melts_attack_path_link.json",
+            "hunting/melts_last_week_risk_exposure.json",
+            "hunting/melts_apm_log_trace_correlation.json",
+            "hunting/clickfix_clipboard_powershell_execution.json",
+            "hunting/clickfix_lolbin_payload_execution.json",
+            "hunting/crashfix_python_rat_activity.json",
+            "hunting/sharepoint_toolshell_exploitation.json",
+            "hunting/sharepoint_toolshell_webshell_post_exploit.json",
+            "hunting/rmm_post_compromise_activity.json",
+            "hunting/cloud_identity_aitm_token_abuse.json",
+            "hunting/cloud_identity_control_plane_takeover.json",
+            "hunting/cloud_control_plane_discovery_burst.json",
+            "hunting/cloud_secret_and_object_collection.json",
+            "hunting/exfiltration_after_initial_access_2025_2026.json",
+            "hunting/compromised_machines_and_data_2025_2026.json",
+        }
+        actual_query_files = {widget["query_file"] for widget in dashboard["widgets"]}
+
+        self.assertEqual(expected_query_files, actual_query_files)
+        self.assertIn("MELTS", dashboard["description"])
+
+        weekly_queries = {
+            "hunting/melts_datasource_coverage_kpi.json": "tile",
+            "hunting/melts_last_week_risk_exposure.json": "summary_table",
+            "hunting/melts_apm_log_trace_correlation.json": "summary_table",
+        }
+        for query_file, visualization_type in weekly_queries.items():
+            with (Path(QUERIES_DIR) / query_file).open() as f:
+                payload = json.load(f)
+            self.assertEqual(payload["dashboard"]["visualizationType"], visualization_type)
+            self.assertEqual(payload["dashboard"]["timeSelection"], {"timePeriod": "l7d"})
+            self.assertTrue(payload["dashboard"]["ask_ai_prompts"], query_file)
+
+        with (Path(QUERIES_DIR) / "hunting/melts_attack_path_link.json").open() as f:
+            link_payload = json.load(f)
+        options = link_payload["dashboard"]["visualizationOptions"]
+        self.assertIn("Tiles", options["dashboardOptions"])
+        self.assertIn("Main Table", options["dashboardOptions"])
+        self.assertIn("show(id=containment-pivots", options["tileLayoutXml"])
+        self.assertIn(" as Stages", link_payload["query"])
+
     def test_link_commands_stay_within_oci_field_limit(self):
         """OCI Log Analytics link commands used by dashboards support up to four fields."""
         for config in DASHBOARDS.values():
@@ -526,9 +573,12 @@ class TestDashboardContract(unittest.TestCase):
     def test_2025_2026_dashboard_covers_modern_attack_drilldowns(self):
         dashboard = DASHBOARDS["SOC: 2025-2026 Threat Hunting Dashboard"]
         expected_query_files = {
+            "hunting/melts_datasource_coverage_kpi.json",
             "hunting/melts_attack_signal_overview.json",
             "hunting/melts_attack_timeline.json",
             "hunting/melts_attack_path_link.json",
+            "hunting/melts_last_week_risk_exposure.json",
+            "hunting/melts_apm_log_trace_correlation.json",
             "hunting/clickfix_clipboard_powershell_execution.json",
             "hunting/clickfix_lolbin_payload_execution.json",
             "hunting/crashfix_python_rat_activity.json",
@@ -536,6 +586,9 @@ class TestDashboardContract(unittest.TestCase):
             "hunting/sharepoint_toolshell_webshell_post_exploit.json",
             "hunting/rmm_post_compromise_activity.json",
             "hunting/cloud_identity_aitm_token_abuse.json",
+            "hunting/cloud_identity_control_plane_takeover.json",
+            "hunting/cloud_control_plane_discovery_burst.json",
+            "hunting/cloud_secret_and_object_collection.json",
             "hunting/exfiltration_after_initial_access_2025_2026.json",
             "hunting/compromised_machines_and_data_2025_2026.json",
         }
@@ -553,7 +606,16 @@ class TestDashboardContract(unittest.TestCase):
                 payload = json.load(f)
 
             advanced_types.add(payload.get("dashboard", {}).get("visualizationType"))
-            self.assertEqual(payload.get("dashboard", {}).get("timeSelection"), {"timePeriod": "l21d"})
+            expected_time = (
+                {"timePeriod": "l7d"}
+                if query_file in {
+                    "hunting/melts_datasource_coverage_kpi.json",
+                    "hunting/melts_last_week_risk_exposure.json",
+                    "hunting/melts_apm_log_trace_correlation.json",
+                }
+                else {"timePeriod": "l21d"}
+            )
+            self.assertEqual(payload.get("dashboard", {}).get("timeSelection"), expected_time)
             self.assertTrue(payload.get("dashboard", {}).get("ask_ai_prompts"), query_file)
             if payload.get("references"):
                 source_backed_queries.add(query_file)

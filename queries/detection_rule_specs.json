@@ -1,7 +1,7 @@
 {
-  "total_queries": 746,
-  "eligible_queries": 180,
-  "ineligible_queries": 566,
+  "total_queries": 758,
+  "eligible_queries": 189,
+  "ineligible_queries": 569,
   "specs": [
     {
       "query_file": "queries/accessibility_features_backdoor.json",
@@ -18897,6 +18897,39 @@
       }
     },
     {
+      "query_file": "queries/hunting/cloud_control_plane_discovery_burst.json",
+      "title": "Cloud Control-Plane Discovery Burst",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "DiscoveryEvents",
+      "dimensions": [
+        "User Name",
+        "Source IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like '*.listusers' or 'Event Type' like '*.listgroups' or 'Event Type' like '*.listpolicies' or 'Event Type' like '*.listinstances' or 'Event Type' like '*.listvcns' or 'Event Type' like '*.listsubnets' or 'Event Type' like '*.listbuckets' or 'Event Type' like '*.listautonomousdatabases') | stats count as DiscoveryEvents, distinctcount('Event Type') as ServiceQueries, unique('Event Type') as Actions by 'User Name', 'Source IP' | where DiscoveryEvents >= 6 and ServiceQueries >= 5 | sort -ServiceQueries",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "DiscoveryEvents",
+        "dimensions": [
+          "User Name",
+          "Source IP"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/hunting/cloud_identity_aitm_token_abuse.json",
       "title": "Cloud Identity: AiTM Token Abuse",
       "severity": "critical",
@@ -18926,6 +18959,72 @@
           "User Name",
           "Source IP",
           "Trace ID"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/cloud_identity_control_plane_takeover.json",
+      "title": "Cloud Identity to Control-Plane Takeover",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "Events",
+      "dimensions": [
+        "User Name",
+        "Source IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like 'com.oraclecloud.consolesignon.*' or 'Event Type' like 'com.oraclecloud.identitycontrolplane.list*' or 'Event Type' like 'com.oraclecloud.identitycontrolplane.create*token*' or 'Event Type' like 'com.oraclecloud.identitycontrolplane.*apikey*' or 'Event Type' like 'com.oraclecloud.objectstorage.list*' or 'Event Type' like 'com.oraclecloud.objectstorage.getobject' or 'Event Type' like 'com.oraclecloud.vault.getsecret*') | stats count as Events, distinctcount('Event Type') as ActionTypes, unique('Event Type') as Actions, unique('Resource Name') as Resources by 'User Name', 'Source IP' | where Events >= 6 and ActionTypes >= 4 | sort -ActionTypes",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "User Name",
+          "Source IP"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/cloud_secret_and_object_collection.json",
+      "title": "Cloud Secret and Object Collection",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "CollectionEvents",
+      "dimensions": [
+        "User Name",
+        "Source IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' like 'com.oraclecloud.vault.getsecret*' or 'Event Type' like 'com.oraclecloud.objectstorage.getobject' or 'Event Type' like 'com.oraclecloud.objectstorage.createpreauthenticatedrequest') and Status = 'Success' | stats count as CollectionEvents, distinctcount('Resource Name') as Resources, unique('Event Type') as Actions by 'User Name', 'Source IP' | where CollectionEvents >= 2 | sort -Resources",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "CollectionEvents",
+        "dimensions": [
+          "User Name",
+          "Source IP"
         ],
         "severity": "critical",
         "create_alarm_by_default": false
@@ -20071,6 +20170,41 @@
       }
     },
     {
+      "query_file": "queries/hunting/melts_apm_log_trace_correlation.json",
+      "title": "MELTS: APM Log Trace Correlation",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "Events",
+      "dimensions": [
+        "Trace ID",
+        "Service Name",
+        "APM Domain"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC Application Logs' and ('Trace ID' = 'trace_clickfix_2026_001' or 'Trace ID' = 'trace_toolshell_sp_001' or 'Trace ID' = 'trace_rmm_2025_001' or 'Trace ID' = 'trace_aitm_token_2026_001' or 'Attack ID' = 'attack-octo-demo-001' or 'Attack Stage' != '') | stats count as Events, unique('Response Time Ms') as ResponseTimes, unique('Workflow Step') as WorkflowSteps, unique('Metric Name') as Metrics by 'Trace ID', 'Service Name', 'APM Domain' | sort -Events",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Events",
+        "dimensions": [
+          "Trace ID",
+          "Service Name",
+          "APM Domain"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/hunting/melts_attack_path_link.json",
       "title": "MELTS: Attack Path Link Drilldown",
       "severity": "critical",
@@ -20079,7 +20213,7 @@
       "dimensions": [],
       "schedule": "5m",
       "lookback": "15m",
-      "query": "('Trace ID' = 'trace_clickfix_2026_001' or 'Trace ID' = 'trace_toolshell_sp_001' or 'Trace ID' = 'trace_rmm_2025_001' or 'Trace ID' = 'trace_aitm_token_2026_001' or 'Threat Name' = 'ClickFix Clipboard Execution' or 'Threat Name' = 'CrashFix Python RAT' or 'Threat Name' = 'RMM Tool Abuse' or 'Threat Name' = 'AiTM Token Replay' or 'Request URL' like '*spinstall0.aspx*' or 'Command Line' like '*ClickFix*' or 'Command Line' like '*CrashFix*' or 'Process Name' like '*ScreenConnect*' or 'Process Name' like '*AnyDesk*' or 'Process Name' like '*AteraAgent*' or 'User Name' = 'codeofconduct-reader@corp.example.com') | link span = 15minute 'Trace ID', 'Log Source' | eventstats max(Count) as PeakEvents, sum(Count) as Events, distinctcount('Trace ID') as Traces, distinctcount('Log Source') as Sources",
+      "query": "('Trace ID' = 'trace_clickfix_2026_001' or 'Trace ID' = 'trace_toolshell_sp_001' or 'Trace ID' = 'trace_rmm_2025_001' or 'Trace ID' = 'trace_aitm_token_2026_001' or 'Threat Name' = 'ClickFix Clipboard Execution' or 'Threat Name' = 'CrashFix Python RAT' or 'Threat Name' = 'RMM Tool Abuse' or 'Threat Name' = 'AiTM Token Replay' or 'Request URL' like '*spinstall0.aspx*' or 'Command Line' like '*ClickFix*' or 'Command Line' like '*CrashFix*' or 'Process Name' like '*ScreenConnect*' or 'Process Name' like '*AnyDesk*' or 'Process Name' like '*AteraAgent*' or 'User Name' = 'codeofconduct-reader@corp.example.com') | link span = 15minute 'Trace ID', 'Log Source', 'Attack Stage' | eventstats max(Count) as PeakEvents, sum(Count) as Events, distinctcount('Trace ID') as Traces, distinctcount('Log Source') as Sources, distinctcount('Attack Stage') as Stages",
       "reasons": [
         "dashboard-only visualization type: link",
         "query does not expose an explicit aggregate metric alias"
@@ -20163,6 +20297,72 @@
           "Log Source"
         ],
         "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/melts_datasource_coverage_kpi.json",
+      "title": "MELTS: Datasource Coverage KPI",
+      "severity": "informational",
+      "eligible": false,
+      "metric_name": "MELTS_Datasource_Coverage_KPI",
+      "dimensions": [],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Trace ID' = 'trace_clickfix_2026_001' or 'Trace ID' = 'trace_toolshell_sp_001' or 'Trace ID' = 'trace_rmm_2025_001' or 'Trace ID' = 'trace_aitm_token_2026_001' or 'Threat Name' = 'ClickFix Clipboard Execution' or 'Threat Name' = 'CrashFix Python RAT' or 'Threat Name' = 'RMM Tool Abuse' or 'Threat Name' = 'AiTM Token Replay' or 'Request URL' like '*spinstall0.aspx*' or 'Command Line' like '*ClickFix*' or 'Command Line' like '*CrashFix*' or 'Process Name' like '*ScreenConnect*' or 'Process Name' like '*AnyDesk*' or 'Process Name' like '*AteraAgent*' or 'User Name' = 'codeofconduct-reader@corp.example.com') | stats distinctcount('Log Source') as DataSources",
+      "reasons": [
+        "query does not expose an explicit aggregate metric alias"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "MELTS_Datasource_Coverage_KPI",
+        "dimensions": [],
+        "severity": "informational",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/melts_last_week_risk_exposure.json",
+      "title": "MELTS: Last-Week Risk Exposure",
+      "severity": "critical",
+      "eligible": false,
+      "metric_name": "Signals",
+      "dimensions": [
+        "Trace ID",
+        "Host Name (Server)",
+        "User Name"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "('Trace ID' = 'trace_clickfix_2026_001' or 'Trace ID' = 'trace_toolshell_sp_001' or 'Trace ID' = 'trace_rmm_2025_001' or 'Trace ID' = 'trace_aitm_token_2026_001' or 'Threat Name' = 'ClickFix Clipboard Execution' or 'Threat Name' = 'CrashFix Python RAT' or 'Threat Name' = 'RMM Tool Abuse' or 'Threat Name' = 'AiTM Token Replay' or 'Request URL' like '*spinstall0.aspx*' or 'Command Line' like '*ClickFix*' or 'Command Line' like '*CrashFix*' or 'Process Name' like '*ScreenConnect*' or 'Process Name' like '*AnyDesk*' or 'Process Name' like '*AteraAgent*' or 'User Name' = 'codeofconduct-reader@corp.example.com') | stats count as Signals, distinctcount('Log Source') as Sources, distinctcount('Destination IP') as Destinations by 'Trace ID', 'Host Name (Server)', 'User Name', 'Threat Name' | sort -Signals",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Signals",
+        "dimensions": [
+          "Trace ID",
+          "Host Name (Server)",
+          "User Name"
+        ],
+        "severity": "critical",
         "create_alarm_by_default": false
       }
     },
@@ -20791,6 +20991,43 @@
           "User Agent"
         ],
         "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/oci_vcn_external_egress_traffic.json",
+      "title": "OCI VCN: External Egress Traffic",
+      "severity": "informational",
+      "eligible": false,
+      "metric_name": "Flows",
+      "dimensions": [
+        "Source IP",
+        "Destination IP",
+        "Destination Port"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'SOC VCN Flow Logs' and 'Action' = 'ACCEPT' and 'Destination IP' != null and not ('Destination IP' like '10.*' or 'Destination IP' like '172.16.*' or 'Destination IP' like '172.17.*' or 'Destination IP' like '172.18.*' or 'Destination IP' like '172.19.*' or 'Destination IP' like '172.20.*' or 'Destination IP' like '172.21.*' or 'Destination IP' like '172.22.*' or 'Destination IP' like '172.23.*' or 'Destination IP' like '172.24.*' or 'Destination IP' like '172.25.*' or 'Destination IP' like '172.26.*' or 'Destination IP' like '172.27.*' or 'Destination IP' like '172.28.*' or 'Destination IP' like '172.29.*' or 'Destination IP' like '172.30.*' or 'Destination IP' like '172.31.*' or 'Destination IP' like '192.168.*' or 'Destination IP' like '127.*' or 'Destination IP' like '169.254.*' or 'Destination IP' like '224.*' or 'Destination IP' like '225.*' or 'Destination IP' like '226.*' or 'Destination IP' like '227.*' or 'Destination IP' like '228.*' or 'Destination IP' like '229.*' or 'Destination IP' like '230.*' or 'Destination IP' like '231.*' or 'Destination IP' like '232.*' or 'Destination IP' like '233.*' or 'Destination IP' like '234.*' or 'Destination IP' like '235.*' or 'Destination IP' like '236.*' or 'Destination IP' like '237.*' or 'Destination IP' like '238.*' or 'Destination IP' like '239.*') | stats count as Flows, unique('Bytes Sent') as BytesSentSamples, unique('Bytes Received') as BytesReceivedSamples, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Source IP', 'Destination IP', 'Destination Port', Protocol | sort -Flows | head 100",
+      "reasons": [
+        "scheduled-search rules support at most 3 dimensions"
+      ],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_deployable",
+      "alarm_template": {
+        "enabled": false,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "Flows",
+        "dimensions": [
+          "Source IP",
+          "Destination IP",
+          "Destination Port"
+        ],
+        "severity": "informational",
         "create_alarm_by_default": false
       }
     },
@@ -22542,6 +22779,181 @@
           "Process Name"
         ],
         "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/windows_access_administrator_logon.json",
+      "title": "Windows Administrator Logon",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "AdministratorLogons",
+      "dimensions": [
+        "Target User Name",
+        "Logon Type",
+        "Host Name (Server)"
+      ],
+      "schedule": "5m",
+      "lookback": "5m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4624' and ('Target User Name' = 'Administrator' or User = 'Administrator') | stats count as AdministratorLogons by 'Target User Name', 'Logon Type', 'Host Name (Server)' | sort -AdministratorLogons",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "AdministratorLogons",
+        "dimensions": [
+          "Target User Name",
+          "Logon Type",
+          "Host Name (Server)"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/windows_access_failed_logon_burst.json",
+      "title": "Windows Failed Logon Burst by Source",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "FailedLogons",
+      "dimensions": [
+        "Source Address",
+        "Target User Name",
+        "Host Name (Server)"
+      ],
+      "schedule": "5m",
+      "lookback": "5m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4625' | stats count as FailedLogons by 'Source Address', 'Target User Name', 'Host Name (Server)' | where FailedLogons > 10 | sort -FailedLogons",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "FailedLogons",
+        "dimensions": [
+          "Source Address",
+          "Target User Name",
+          "Host Name (Server)"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/windows_access_new_local_user.json",
+      "title": "Windows New Local User Created",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "UsersCreated",
+      "dimensions": [
+        "Target User Name",
+        "Subject User Name",
+        "Host Name (Server)"
+      ],
+      "schedule": "5m",
+      "lookback": "5m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4720' | stats count as UsersCreated by 'Target User Name', 'Subject User Name', 'Host Name (Server)' | sort -UsersCreated",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "UsersCreated",
+        "dimensions": [
+          "Target User Name",
+          "Subject User Name",
+          "Host Name (Server)"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/windows_access_privileged_group_add.json",
+      "title": "Windows User Added to Administrators or Remote Desktop Users",
+      "severity": "critical",
+      "eligible": true,
+      "metric_name": "GroupAdds",
+      "dimensions": [
+        "User",
+        "Target User Name",
+        "Host Name (Server)"
+      ],
+      "schedule": "5m",
+      "lookback": "5m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4732' and ('Target User Name' like '*Administrators*' or 'Target User Name' like '*Remote Desktop Users*' or msg like '*Administrators*' or msg like '*Remote Desktop Users*') | stats count as GroupAdds by User, 'Target User Name', 'Host Name (Server)' | sort -GroupAdds",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "GroupAdds",
+        "dimensions": [
+          "User",
+          "Target User Name",
+          "Host Name (Server)"
+        ],
+        "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/windows_access_rdp_after_hours.json",
+      "title": "Windows Successful RDP Logon Outside Business Hours",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "RDPLogons",
+      "dimensions": [
+        "Target User Name",
+        "Source Address",
+        "Host Name (Server)"
+      ],
+      "schedule": "5m",
+      "lookback": "5m",
+      "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4624' and 'Logon Type' = '10' | eval hour = toNumber(formatDate(Time, 'HH')) | where hour < 8 or hour >= 18 | stats count as RDPLogons by 'Target User Name', 'Source Address', 'Host Name (Server)' | sort -RDPLogons",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "RDPLogons",
+        "dimensions": [
+          "Target User Name",
+          "Source Address",
+          "Host Name (Server)"
+        ],
+        "severity": "high",
         "create_alarm_by_default": false
       }
     },

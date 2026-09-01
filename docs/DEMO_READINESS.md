@@ -8,12 +8,22 @@ For the current dashboard-first demo state, use the 21-day generation, ingest, d
 
 ```bash
 python3 scripts/setup_log_sources.py
-python3 scripts/generate_dashboard_data.py --days 21 --geo-interval 15 --validate
+python3 scripts/prepare_threat_hunting_demo.py --days 21 --strict
 python3 scripts/ingest_test_data.py --validate
 python3 scripts/ingest_test_data.py --mode direct
 python3 scripts/deploy_dashboard.py --cleanup --skip-live-validation --query-lookback 21d --query-timeout 90
 python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --max-workers 4 --json docs/health/verify-default-21d-2025-2026.json
 ```
+
+The preparation wrapper writes `docs/health/threat-hunting-demo-readiness.json` with local evidence class, generated log counts, dashboard inventory counts, requested demo dashboards, and the command sequence used. Treat that file as the reusable local handoff before any approved live ingestion or dashboard import.
+
+Before running the live mutation commands, run the read-only preflight:
+
+```bash
+python3 scripts/preflight_threat_hunting_demo.py
+```
+
+It writes `docs/health/threat-hunting-live-preflight.json` with local artifact checks, required environment-variable readiness, requested dashboard coverage, and a placeholder-only live command plan. A `WARN` result means local artifacts are present but the current shell still needs target-specific OCI values; a `FAIL` result means fix local artifacts before deployment.
 
 This is the canonical refresh path because it:
 
@@ -33,12 +43,12 @@ Live deployment evidence in the `<OCI_PROFILE_CAP>` OCI profile (`<OCI_REGION>`)
 - Current repository inventory: `29` dashboards and `441` active dashboard saved searches
 - Final live health evidence is stored in `docs/health/all-dashboard-verify.json`
 - `<OCI_PROFILE_CAP>`: `441` dashboard widgets deployed, `0` render/query errors (live `parse_validate_all_queries` 681/681 PASS; deploy-time validation 0 failed)
-- `DEFAULT`: redeploy and reverify before presenting this profile with the current 22-dashboard inventory
+- `DEFAULT`: redeploy and reverify before presenting this profile with the current 34-dashboard inventory
 - The Fusion correlation query remains cataloged for Fusion-enabled tenancies but is not deployed in this demo tenancy because no Fusion Apps source exists.
 - `scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --max-workers 4 --json docs/health/verify-<profile>-21d-2025-2026.json` is the current final gate for both `<OCI_PROFILE_CAP>` and `DEFAULT`
 - `scripts/setup_log_sources.py`: SOC/native-compatible sources exist in the target compartment; `SOC Application Logs` includes APM span and metric fields used by the Octo dashboard
 
-The current dashboard configuration resolves to `29` dashboards and `441` active saved searches after adding the Octo APM trace investigation Link/Tiles widget. Dashboard widgets default to `l21d` to match the three-week demo dataset; individual widgets may override with a shorter window via query or widget metadata. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the legacy extended-data helper.
+The current dashboard configuration resolves to `34` dashboards and `536` active saved searches after adding the MELTS weekly threat-hunting widgets and Octo APM trace investigation Link/Tiles widget. Dashboard widgets default to `l21d` to match the three-week demo dataset; individual widgets may override with a shorter window via query or widget metadata. Use `populate_dashboard_data_14d.py --validate` only when you intentionally need the legacy extended-data helper.
 
 ## Demo Story
 

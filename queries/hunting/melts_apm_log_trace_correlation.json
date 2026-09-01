@@ -1,0 +1,37 @@
+{
+  "title": "MELTS: APM Log Trace Correlation",
+  "description": "APM-oriented Logan query for the MELTS campaign. Uses SOC Application Logs to join request, span, workflow, metric, and security fields by Trace ID so analysts can see whether the attack affected service health while it progressed.",
+  "query": "'Log Source' = 'SOC Application Logs' and ('Trace ID' = 'trace_clickfix_2026_001' or 'Trace ID' = 'trace_toolshell_sp_001' or 'Trace ID' = 'trace_rmm_2025_001' or 'Trace ID' = 'trace_aitm_token_2026_001' or 'Attack ID' = 'attack-octo-demo-001' or 'Attack Stage' != '') | stats count as Events, unique('Response Time Ms') as ResponseTimes, unique('Workflow Step') as WorkflowSteps, unique('Metric Name') as Metrics by 'Trace ID', 'Service Name', 'APM Domain' | sort -Events",
+  "type": "hunting",
+  "level": "high",
+  "tags": ["melts", "apm", "logs", "traces", "metrics", "soc_application_logs"],
+  "logsource": {
+    "product": "application",
+    "service": "soc_application_logs"
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {"timePeriod": "l7d"},
+    "layout": {"width": 12, "height": 5},
+    "visualizationOptions": {
+      "valueField": "Events",
+      "groupBy": ["Trace ID", "Service Name", "APM Domain"]
+    },
+    "ask_ai_prompts": [
+      "Correlate the attack Trace ID with service, span, workflow, and metric evidence.",
+      "Did the security event coincide with service latency or error symptoms?"
+    ]
+  },
+  "references": [
+    {
+      "name": "Oracle Log Analytics: Link visualization",
+      "url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/link-visualization.html"
+    }
+  ],
+  "mitre_attack": {
+    "tactics": ["initial_access", "execution", "impact"],
+    "techniques": ["T1190", "T1059", "T1499"]
+  },
+  "falsepositives": ["Load-test or purple-team traffic carrying known MELTS trace IDs"]
+}

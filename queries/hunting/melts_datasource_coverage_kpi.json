@@ -1,0 +1,26 @@
+{
+  "title": "MELTS: Datasource Coverage KPI",
+  "description": "Single KPI showing how many Logan log sources contributed evidence to the active MELTS attack window. Use it to detect missing ingestion coverage before starting the hunt.",
+  "query": "('Trace ID' = 'trace_clickfix_2026_001' or 'Trace ID' = 'trace_toolshell_sp_001' or 'Trace ID' = 'trace_rmm_2025_001' or 'Trace ID' = 'trace_aitm_token_2026_001' or 'Threat Name' = 'ClickFix Clipboard Execution' or 'Threat Name' = 'CrashFix Python RAT' or 'Threat Name' = 'RMM Tool Abuse' or 'Threat Name' = 'AiTM Token Replay' or 'Request URL' like '*spinstall0.aspx*' or 'Command Line' like '*ClickFix*' or 'Command Line' like '*CrashFix*' or 'Process Name' like '*ScreenConnect*' or 'Process Name' like '*AnyDesk*' or 'Process Name' like '*AteraAgent*' or 'User Name' = 'codeofconduct-reader@corp.example.com') | stats distinctcount('Log Source') as DataSources",
+  "type": "hunting",
+  "level": "informational",
+  "tags": ["melts", "coverage", "kpi", "last_week"],
+  "logsource": {
+    "product": "multi_source",
+    "service": "log_analytics"
+  },
+  "dashboard": {
+    "visualizationType": "tile",
+    "showTitle": true,
+    "timeSelection": {"timePeriod": "l7d"},
+    "layout": {"width": 3, "height": 3},
+    "visualizationOptions": {
+      "dataField": "DataSources",
+      "unit": "sources"
+    },
+    "ask_ai_prompts": [
+      "Identify any expected MELTS datasource that is missing from the last-week hunt."
+    ]
+  },
+  "falsepositives": ["A lab run that intentionally generates only a subset of sources"]
+}

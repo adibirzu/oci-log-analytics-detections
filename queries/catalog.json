@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-07-15T07:18:12.418835+00:00",
+  "generated_at": "2026-09-01T12:41:15.420145+00:00",
   "total_rules": 1135,
   "total_base_rules": 545,
   "total_sentinel_queries": 590,
   "total_app_queries": 62,
-  "total_hunting": 140,
-  "total_content_items": 1337,
+  "total_hunting": 151,
+  "total_content_items": 1348,
   "inventory": {
     "source_yaml_rules": 522,
     "source_rule_breakdown": {
@@ -21,9 +21,9 @@
     "generated_app_queries": 62,
     "source_derived_app_queries": 8,
     "curated_app_queries": 54,
-    "generated_hunting_queries": 140,
+    "generated_hunting_queries": 151,
     "generated_sigma_queries": 553,
-    "total_query_artifacts": 1337,
+    "total_query_artifacts": 1348,
     "legacy_dirs": {
       "logandetectionqueries": 0,
       "logandetectionrules": 0
@@ -77007,6 +77007,32 @@
       "content_surface": "hunting"
     },
     {
+      "title": "Cloud Control-Plane Discovery Burst",
+      "description": "Finds a principal rapidly enumerating multiple OCI service families, a common precursor to privilege expansion, lateral movement, or collection.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1526"
+      ],
+      "references": [
+        {
+          "name": "Microsoft: Storm-2949 identity-led cloud-wide breach",
+          "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"
+        }
+      ],
+      "file": "hunting/cloud_control_plane_discovery_burst.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "Cloud Identity: AiTM Token Abuse",
       "description": "Detects code-of-conduct themed AiTM/token-replay behavior by following one principal through login, discovery, Object Storage access, and auth-token creation.",
       "level": "critical",
@@ -77024,6 +77050,62 @@
         }
       ],
       "file": "hunting/cloud_identity_aitm_token_abuse.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Cloud Identity to Control-Plane Takeover",
+      "description": "Correlates successful sign-in, broad discovery, new credentials, and access to high-value cloud resources by one identity.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1078",
+        "T1098",
+        "T1526",
+        "T1530"
+      ],
+      "references": [
+        {
+          "name": "Microsoft: Storm-2949 identity-led cloud-wide breach",
+          "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"
+        }
+      ],
+      "file": "hunting/cloud_identity_control_plane_takeover.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Cloud Secret and Object Collection",
+      "description": "Surfaces identities accessing secrets and object data after cloud discovery, emphasizing behavior that can precede data theft or credential compromise.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1555",
+        "T1530"
+      ],
+      "references": [
+        {
+          "name": "Microsoft: Storm-2949 identity-led cloud-wide breach",
+          "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"
+        }
+      ],
+      "file": "hunting/cloud_secret_and_object_collection.json",
       "content_lifecycle": "validated_locally",
       "detection_maturity": "curated",
       "source_confidence": "medium",
@@ -77850,8 +77932,36 @@
       "content_surface": "hunting"
     },
     {
+      "title": "MELTS: APM Log Trace Correlation",
+      "description": "APM-oriented Logan query for the MELTS campaign. Uses SOC Application Logs to join request, span, workflow, metric, and security fields by Trace ID so analysts can see whether the attack affected service health while it progressed.",
+      "level": "high",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1190",
+        "T1059",
+        "T1499"
+      ],
+      "references": [
+        {
+          "name": "Oracle Log Analytics: Link visualization",
+          "url": "https://docs.oracle.com/en-us/iaas/log-analytics/doc/link-visualization.html"
+        }
+      ],
+      "file": "hunting/melts_apm_log_trace_correlation.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "MELTS: Attack Path Link Drilldown",
-      "description": "Link analysis for the 2025-2026 campaign. Groups trace IDs to log sources so analysts can pivot from entry point to host execution, cloud abuse, C2, and exfiltration evidence.",
+      "description": "Link analysis for the 2025-2026 campaign. Groups trace IDs to log sources and stages so analysts can pivot from entry point to host execution, cloud abuse, C2, exfiltration, and the MELTS signal class behind the evidence.",
       "level": "critical",
       "hunting_type": "",
       "cookbook_method": "",
@@ -77920,6 +78030,62 @@
       ],
       "references": [],
       "file": "hunting/melts_attack_timeline.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "MELTS: Datasource Coverage KPI",
+      "description": "Single KPI showing how many Logan log sources contributed evidence to the active MELTS attack window. Use it to detect missing ingestion coverage before starting the hunt.",
+      "level": "informational",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [],
+      "references": [],
+      "file": "hunting/melts_datasource_coverage_kpi.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "curated",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "MELTS: Last-Week Risk Exposure",
+      "description": "Seven-day risk rollup for the MELTS campaign. Shows which compromised hosts, cloud identities, and destination systems create the highest business risk when endpoint, network, cloud audit, and security-state logs are viewed together.",
+      "level": "critical",
+      "hunting_type": "",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1566",
+        "T1059",
+        "T1218",
+        "T1219",
+        "T1528",
+        "T1530",
+        "T1071.001",
+        "T1041"
+      ],
+      "references": [
+        {
+          "name": "Microsoft: Storm-2949 turned compromised identity into cloud-wide breach",
+          "url": "https://www.microsoft.com/en-us/security/blog/2026/05/18/storm-2949-turned-compromised-identity-into-cloud-wide-breach/"
+        },
+        {
+          "name": "Microsoft: Compromised and malicious applications investigation",
+          "url": "https://learn.microsoft.com/security/operations/incident-response-playbook-compromised-malicious-app"
+        }
+      ],
+      "file": "hunting/melts_last_week_risk_exposure.json",
       "content_lifecycle": "validated_locally",
       "detection_maturity": "curated",
       "source_confidence": "medium",
@@ -78334,7 +78500,7 @@
     },
     {
       "title": "OCI VCN: External Egress Traffic",
-      "description": "Shows accepted VCN flow records whose destination is outside private, loopback, link-local, and multicast IPv4 ranges. Use this baseline to review internet-bound traffic, then pivot by source, destination, port, and transferred bytes. This query intentionally scopes to outbound traffic; it does not classify private endpoints reached through a public address or IPv6 traffic.",
+      "description": "Shows accepted VCN flow records whose destination is outside private, loopback, link-local, and multicast IPv4 ranges. Use this baseline to review internet-bound traffic, then pivot by source, destination, port, flow count, and sampled byte values. This query intentionally scopes to outbound traffic; it does not classify private endpoints reached through a public address or IPv6 traffic.",
       "level": "informational",
       "hunting_type": "",
       "cookbook_method": "",
@@ -79481,6 +79647,111 @@
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Windows Administrator Logon",
+      "description": "Alert-ready search for successful logons by the built-in Administrator account. Extend the approved-account filter for renamed or localized administrator accounts.",
+      "level": "high",
+      "hunting_type": "privileged_access",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1078"
+      ],
+      "references": [],
+      "file": "hunting/windows_access_administrator_logon.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Windows Failed Logon Burst by Source",
+      "description": "Alert-ready search for more than 10 Security Event 4625 failures from one source address in the five-minute scheduled-search window.",
+      "level": "high",
+      "hunting_type": "frequency",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1110"
+      ],
+      "references": [],
+      "file": "hunting/windows_access_failed_logon_burst.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Windows New Local User Created",
+      "description": "Alert-ready search for Security Event 4720, indicating that a user account was created on a monitored Windows host.",
+      "level": "high",
+      "hunting_type": "persistence",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1136.001"
+      ],
+      "references": [],
+      "file": "hunting/windows_access_new_local_user.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Windows User Added to Administrators or Remote Desktop Users",
+      "description": "Alert-ready search for Security Event 4732 additions to the local Administrators or Remote Desktop Users groups.",
+      "level": "critical",
+      "hunting_type": "privileged_access",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "references": [],
+      "file": "hunting/windows_access_privileged_group_add.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "Windows Successful RDP Logon Outside Business Hours",
+      "description": "Alert-ready search for successful RemoteInteractive logons (Security Event 4624, logon type 10) outside the configured 08:00-18:00 query timezone.",
+      "level": "high",
+      "hunting_type": "time_anomaly",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1021.001"
+      ],
+      "references": [],
+      "file": "hunting/windows_access_rdp_after_hours.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "not_evaluated",
       "content_surface": "hunting"
     },

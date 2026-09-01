@@ -1,0 +1,45 @@
+%% OCI diagram: node aliases and oci-service metadata are recorded in comments
+flowchart LR
+  subgraph G1["Authorized Windows Server"]
+    %% oci-node: n1 = channels (oci-service: custom)
+    n1["Windows Event Log Security · System · Application"]
+    %% oci-node: n2 = agent (oci-service: custom)
+    n2["Oracle Management Agent Log Analytics plug-in"]
+  end
+  subgraph G2["OCI control plane"]
+    %% oci-node: n3 = association (oci-service: custom)
+    n3["Host (Windows) entity 3 native source associations"]
+  end
+  subgraph G3["OCI operational plane"]
+    %% oci-node: n4 = logan (oci-service: log-analytics)
+    n4["OCI Log Analytics parse · fields · log group"]
+    %% oci-node: n7 = monitor (oci-service: monitoring)
+    n7["OCI Monitoring logan_windows_access"]
+  end
+  subgraph G4["Analyst content"]
+    %% oci-node: n5 = content (oci-service: custom)
+    n5["5 saved searches Windows access dashboard"]
+  end
+  subgraph G5["Detection rules"]
+    %% oci-node: n6 = schedule (oci-service: custom)
+    n6["5-minute scheduled searches numeric metric + up to 3 dimensions"]
+  end
+  subgraph G6["Response controls"]
+    %% oci-node: n8 = alarm (oci-service: custom)
+    n8["Disabled alarm canary then reviewed enablement"]
+  end
+  subgraph G7["Response"]
+    %% oci-node: n9 = notify (oci-service: notifications)
+    n9["OCI Notifications SOC response owner"]
+  end
+  n1 -.->|"Windows Event API"| n2
+  n2 -.->|"HTTPS 443"| n3
+  n3 -.->|"entity · source · log group"| n4
+  n4 -.->|"query and visualize"| n5
+  n4 -.->|"saved search result"| n6
+  n6 -.->|"custom metric"| n7
+  n7 -.->|"MQL evaluation"| n8
+  n8 -.->|"approved destination"| n9
+  n5 -.->|"analyst validation before enablement"| n8
+  classDef oci fill:#FFF3E0,stroke:#C74634,color:#312D2A,stroke-width:2px;
+  class n1,n2,n3,n4,n5,n6,n7,n8,n9 oci;

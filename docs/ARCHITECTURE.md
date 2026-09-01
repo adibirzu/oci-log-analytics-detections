@@ -200,7 +200,7 @@ python3 scripts/sentinel_conversion_workflow.py page
 python3 scripts/generate_catalog.py
 python3 scripts/deploy_dashboard.py --export-inventory
 python3 scripts/export_for_multicloud.py --manifest-only
-python3 scripts/generate_dashboard_data.py --days 21 --geo-interval 15 --validate
+python3 scripts/prepare_threat_hunting_demo.py --days 21 --strict
 python3 scripts/ingest_test_data.py --validate
 python3 scripts/audit_rule_quality.py --report docs/RULE_QUALITY_REPORT.md
 python3 scripts/deploy_dashboard.py --dry-run

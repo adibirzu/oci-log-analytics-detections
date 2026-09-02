@@ -37,6 +37,8 @@ architecture, manual-versus-script lanes, saved-search-to-notification sequence,
 troubleshooting decision tree, and evidence progression. Editable source is in
 [`docs/diagrams`](diagrams/).
 
+If Splunk is required, preserve this Management Agent → Log Analytics path as the collection/source-of-truth path. The five Windows access analytics are registered for optional Mode 2 evidence export; after their query and Monitoring metric proof, a reviewed alarm/Notifications/Function path can send bounded evidence to Splunk HEC. Raw Windows delivery is a separate customer-owned decision and is not implied by `oci-splunk`'s OCI Logging fan-out. See [Splunk Parallel Operations](SPLUNK_PARALLEL_OPERATIONS.md), [Rule Migration](SPLUNK_RULE_MIGRATION.md), and the editable [on-prem parallel diagram](diagrams/logan-splunk-onprem-agent.mmd).
+
 ```mermaid
 flowchart LR
     START["Approved target and owner"]
@@ -450,6 +452,7 @@ Provider acceptance:
 - [ ] All five searches return the intended canary or approved historical rows.
 - [ ] Dashboard renders and scheduled-search metrics are emitted.
 - [ ] Monitoring alarm state and notification delivery are tested separately.
+- [ ] If Mode 2 is approved, Function query, HEC confirmation, checkpoint/DLQ, and Splunk searchability are tested separately.
 
 ## Troubleshooting and rollback
 

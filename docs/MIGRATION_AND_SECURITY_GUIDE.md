@@ -27,6 +27,18 @@ OCI Audit / Cloud Guard / VCN / WAF / LB / OKE / hosts / applications
 
 Keep the authoritative raw-log retention, routing, and privacy requirements in the customer's tenancy. Use the repository's field dictionary and parser examples to make source contracts explicit before enabling detections.
 
+### Choose the Splunk delivery mode per source
+
+| Mode | Flow | Use when | Acceptance |
+|---|---|---|---|
+| Mode 1 — raw | OCI Logging → separate Connector Hub → Streaming → pinned `oci-splunk` → HEC | Splunk requires the approved raw source | Same fresh record searchable in Log Analytics and Splunk, plus connector/consumer/HEC receipts |
+| Mode 2 — evidence | Log Analytics detection → Monitoring → alarm → Notifications → Function → bounded query → HEC | Splunk needs governed detection evidence | Parsed hit, metric, alarm, Function, confirmed HEC, checkpoint, and Splunk search |
+| Hybrid | Either/both, recorded per source and detection | Raw compliance retention and selected SOC evidence differ | Each enabled path passes independently |
+
+Production raw delivery must use a reviewed tag or commit and must not track mutable `main`. Current migration provenance is `adibirzu/oci-splunk` tag `2.2.0` at commit `a98167404f19be6d18235bccbf1113b59a259c4c`. On-premises Management Agent/optional Management Gateway sources can use Mode 2 directly from Log Analytics; they do not need Streaming.
+
+Use [Splunk Parallel Operations](SPLUNK_PARALLEL_OPERATIONS.md) for the decision/ownership model, [Splunk Rule Migration](SPLUNK_RULE_MIGRATION.md) for analytic translation, [Evidence Export Runbook](SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md) for manual/scripted deployment, and [E2E Validation](SPLUNK_E2E_VALIDATION.md) for evidence gates.
+
 ## Migration workflow
 
 ### 1. Discover and classify telemetry
@@ -121,6 +133,8 @@ Use `queries/siem_log_examples.json` to give parser developers two separate test
 2. **Log Analytics detection event**: a source-shaped alarm event plus a stable normalized event, suitable for detection/event parsers.
 
 The normalized contract helps downstream systems map a consistent set of security fields even where individual OCI services use different payload shapes. Keep source provenance, event time, severity, rule identity, entities, and evidence intact. Treat the examples as parser fixtures, not as production data.
+
+For implemented Splunk evidence export, [`queries/splunk_detection_registry.json`](../queries/splunk_detection_registry.json) maps nine migrated analytics to canonical LAQL and [`schemas/splunk_evidence_event.schema.json`](../schemas/splunk_evidence_event.schema.json) defines the normalized HEC envelope. The default excludes original content. Neither artifact proves a live OCI query, HEC delivery, or Splunk search.
 
 ## Operational guardrails
 

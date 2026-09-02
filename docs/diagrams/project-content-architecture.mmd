@@ -1,0 +1,40 @@
+%% OCI diagram: node aliases and oci-service metadata are recorded in comments
+flowchart LR
+  subgraph G1["Authoring"]
+    %% oci-node: n1 = sigma (oci-service: custom)
+    n1["Sigma and YAML rules"]
+    %% oci-node: n2 = sentinel (oci-service: custom)
+    n2["Official Sentinel content cache"]
+    %% oci-node: n3 = curated (oci-service: custom)
+    n3["Curated app and hunting analytics"]
+  end
+  subgraph G2["Build and validation"]
+    %% oci-node: n4 = generators (oci-service: custom)
+    n4["Deterministic converters and generators"]
+    %% oci-node: n5 = gates (oci-service: custom)
+    n5["Schema, field, parser and quality gates"]
+  end
+  subgraph G3["Repository contracts"]
+    %% oci-node: n6 = canonical (oci-service: custom)
+    n6["Canonical queries and generated inventories"]
+  end
+  subgraph G4["OCI operator surfaces"]
+    %% oci-node: n7 = dashboard (oci-service: log-analytics)
+    n7["Dashboard and saved-search deployment"]
+  end
+  subgraph G5["Read-only consumers"]
+    %% oci-node: n8 = forge (oci-service: custom)
+    n8["Forge webapp and API wrappers"]
+    %% oci-node: n9 = exports (oci-service: custom)
+    n9["Manifest, MCP and multicloud consumers"]
+  end
+  n1 -.->|"convert_sigma.py"| n4
+  n2 -.->|"conversion workflow"| n4
+  n3 -.->|"catalog input"| n6
+  n4 -.->|"validate"| n5
+  n5 -.->|"promote and publish"| n6
+  n6 -.->|"embedded saved searches"| n7
+  n6 -.->|"typed loaders"| n8
+  n6 -.->|"generated contract"| n9
+  classDef oci fill:#FFF3E0,stroke:#C74634,color:#312D2A,stroke-width:2px;
+  class n1,n2,n3,n4,n5,n6,n7,n8,n9 oci;

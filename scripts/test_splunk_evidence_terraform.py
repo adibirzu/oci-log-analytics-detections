@@ -74,6 +74,11 @@ def test_exporter_is_opt_in_at_root_and_module_boundary() -> None:
         schema,
         re.DOTALL,
     )
+    assert re.search(
+        r"splunk_evidence_exporter_alarm_ids:\s*.*?type:\s*object",
+        schema,
+        re.DOTALL,
+    )
 
 
 def test_existing_vault_secret_reference_is_the_only_secret_interface() -> None:
@@ -177,6 +182,45 @@ def test_module_wires_only_the_scoped_exporter_path_with_logging_and_lifecycle()
     assert re.search(r'\bis_enabled\s*=\s*false\b', governed)
     assert 'resource "oci_monitoring_alarm" "exporter_delivery_failures"' in main
     assert "oci_log_analytics_splunk_exporter" in _read(MODULE / "variables.tf")
+
+
+def test_exporter_enablement_requires_complete_governed_alarm_bindings() -> None:
+    main = _read(MODULE / "main.tf")
+    variables = _read(MODULE / "variables.tf")
+    outputs = _read(MODULE / "outputs.tf")
+    root_outputs = _read(STACK / "outputs.tf")
+
+    # The Function is the exporter enablement boundary.  It must not be
+    # possible to deploy it with an empty, partial, or typoed binding map.
+    function_match = re.search(
+        r'resource\s+"oci_functions_function"\s+"exporter"\s*\{(?P<body>.*?)\n\}',
+        main,
+        re.DOTALL,
+    )
+    assert function_match, "missing oci_functions_function exporter"
+    function = function_match.group("body")
+    assert "set(keys(var.splunk_alarm_ids)) == local.governed_detection_alarm_ids" in function
+    assert "alltrue(" in function
+    assert "for alarm_id in values(var.splunk_alarm_ids)" in function
+    assert 'regex("^ocid1\\\\.alarm\\\\.", alarm_id)' in function
+
+    subscription_match = re.search(
+        r'resource\s+"oci_ons_subscription"\s+"function"\s*\{(?P<body>.*?)\n\}',
+        main,
+        re.DOTALL,
+    )
+    assert subscription_match, "missing oci_ons_subscription function"
+    subscription = subscription_match.group("body")
+    assert "set(keys(var.splunk_alarm_ids)) == local.governed_detection_alarm_ids" in subscription
+
+    assert 'output "governed_alarm_bindings"' in outputs
+    binding_output = _block(outputs, "output", "governed_alarm_bindings")
+    assert "var.splunk_alarm_ids" in binding_output
+    assert re.search(r"\bsensitive\s*=\s*true\b", binding_output)
+    assert 'output "splunk_evidence_exporter_governed_alarm_bindings"' in root_outputs
+
+    alarm_variable = _block(variables, "variable", "splunk_alarm_ids")
+    assert "governed detection binding keys" in alarm_variable
 
 
 def test_identifier_outputs_are_explicitly_sensitive_and_never_include_secrets() -> None:

@@ -162,6 +162,16 @@ resource "oci_functions_function" "exporter" {
       condition     = var.splunk_hec_url != "" && var.splunk_hec_index != ""
       error_message = "The reviewed HTTPS HEC endpoint and target index are required."
     }
+
+    precondition {
+      condition = (
+        set(keys(var.splunk_alarm_ids)) == local.governed_detection_alarm_ids
+        && alltrue([
+          for alarm_id in values(var.splunk_alarm_ids) : can(regex("^ocid1\\.alarm\\.", alarm_id))
+        ])
+      )
+      error_message = "When the exporter is enabled, splunk_alarm_ids must contain exactly the governed detection keys and an OCID for every Monitoring alarm."
+    }
   }
 
   depends_on = [
@@ -196,6 +206,18 @@ resource "oci_ons_subscription" "function" {
   topic_id       = oci_ons_notification_topic.evidence[0].id
   endpoint       = oci_functions_function.exporter[0].id
   freeform_tags  = var.freeform_tags
+
+  lifecycle {
+    precondition {
+      condition = (
+        set(keys(var.splunk_alarm_ids)) == local.governed_detection_alarm_ids
+        && alltrue([
+          for alarm_id in values(var.splunk_alarm_ids) : can(regex("^ocid1\\.alarm\\.", alarm_id))
+        ])
+      )
+      error_message = "The Notifications subscription requires complete governed splunk_alarm_ids bindings."
+    }
+  }
 }
 
 resource "oci_logging_log_group" "exporter" {

@@ -39,6 +39,7 @@ variableGroups:
       - enable_splunk_evidence_exporter
       - enable_splunk_evidence_exporter_alarm_actions
       - enable_splunk_evidence_exporter_subscription
+      - splunk_evidence_exporter_alarm_ids
       - splunk_evidence_exporter_object_storage_namespace
       - splunk_evidence_exporter_existing_state_bucket_name
       - splunk_evidence_exporter_existing_dlq_bucket_name
@@ -158,6 +159,17 @@ variables:
     description: "Review-gated. Enable the exact Notifications-to-Function subscription."
     default: false
     required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_alarm_ids:
+    type: object
+    title: "Governed Monitoring Alarm Bindings"
+    description: "Sensitive JSON map of each governed detection key to its exact existing Monitoring alarm OCID. Required when the exporter or subscription is enabled; unknown or missing keys are rejected."
+    default: {}
+    additionalProperties:
+      type: string
+    required: false
+    sensitive: true
     visible: enable_splunk_evidence_exporter
 
   splunk_evidence_exporter_hec_secret_id:

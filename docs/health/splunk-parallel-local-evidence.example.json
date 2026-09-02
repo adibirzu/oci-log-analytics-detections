@@ -57,7 +57,7 @@
     "scripts/splunk_evidence_exporter/service.py": "093a51dcebd8add54e7798a4c343e091365c54c7ef67a8b868ee7f0dc67da8d7",
     "scripts/splunk_evidence_exporter/window.py": "7ae7989cf8241513db7abe79a114000567c6e781e19478a3ae256f11eb17197e",
     "scripts/splunk_evidence_exporter_cli.py": "fd1e7570173b02c1b94179facb510804434c0765b2f0eca6a34c6ce6dda306a8",
-    "scripts/test_check_inventory_drift.py": "53fd5c9c423f65fd91e4fafd16063fea9e1d52458f8073fe0de8e2a43d9784c9",
+    "scripts/test_check_inventory_drift.py": "47e4afc9838099715d338fafd670211990ceada27c12e12ca46925eaa50b9a02",
     "scripts/test_splunk_detection_registry.py": "9fdbf2720f230ea1d7c1bbdc707a01eda259f088e9d0acfecb14c83454b05ceb",
     "scripts/test_splunk_diagrams.py": "430469b52316877813f86d5bb9bfd5567772e16b36430154a8ae9ffa0878c340",
     "scripts/test_splunk_documentation.py": "b6d7197d183c00145f6a7ee46f1493f7cfc1fc87d5189087075361862c7851e2",
@@ -147,7 +147,7 @@
       "scripts/splunk_evidence_exporter/service.py": "093a51dcebd8add54e7798a4c343e091365c54c7ef67a8b868ee7f0dc67da8d7",
       "scripts/splunk_evidence_exporter/window.py": "7ae7989cf8241513db7abe79a114000567c6e781e19478a3ae256f11eb17197e",
       "scripts/splunk_evidence_exporter_cli.py": "fd1e7570173b02c1b94179facb510804434c0765b2f0eca6a34c6ce6dda306a8",
-      "scripts/test_check_inventory_drift.py": "53fd5c9c423f65fd91e4fafd16063fea9e1d52458f8073fe0de8e2a43d9784c9",
+      "scripts/test_check_inventory_drift.py": "47e4afc9838099715d338fafd670211990ceada27c12e12ca46925eaa50b9a02",
       "scripts/test_splunk_detection_registry.py": "9fdbf2720f230ea1d7c1bbdc707a01eda259f088e9d0acfecb14c83454b05ceb",
       "scripts/test_splunk_diagrams.py": "430469b52316877813f86d5bb9bfd5567772e16b36430154a8ae9ffa0878c340",
       "scripts/test_splunk_documentation.py": "b6d7197d183c00145f6a7ee46f1493f7cfc1fc87d5189087075361862c7851e2",
@@ -176,8 +176,8 @@
       "stack/streaming.tf": "51ff3d3829e9e2a9a20f991c006c7fd627bb6f17d2dfb13d22705e0dbdc85c6f",
       "stack/variables.tf": "3661952de34c8511df4a05367e3080af957a88df85fa18437d4829d2dbfe2d4b"
     },
-    "git_head_at_execution": "397fecf1db8a57efe3c0c1968dea5f9d199a8a2f",
-    "git_head_tree_at_execution": "eb2a713bdc07ae3b77b6fb327eb5d310f4a7afb1",
+    "git_head_at_execution": "1187c4abf1402bf3b34d0c80d6f4be72cca71f51",
+    "git_head_tree_at_execution": "8ed37804ddb4cdec859cf6077103b327b1f5c2be",
     "missing": [],
     "tool_versions": {
       "git": "git version 2.50.1 (Apple Git-155)",

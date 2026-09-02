@@ -1,7 +1,7 @@
 {
   "title": "OCI IAM Policy Changes",
   "description": "Alert-ready aggregation of OCI IAM policy create, update, and delete events. The event selection reuses the existing portable OCI IAM Policy Modified Sigma rule and adds only the aggregation required by scheduled-search detection rules.",
-"query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' = 'com.oraclecloud.identitycontrolplane.createpolicy' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.updatepolicy' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.deletepolicy') | stats count as PolicyChanges, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Log Source', 'Event Type', 'User Name', 'Source IP' | sort -PolicyChanges",
+  "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' = 'com.oraclecloud.identitycontrolplane.createpolicy' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.updatepolicy' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.deletepolicy') | stats count as PolicyChanges by 'Event Type', 'User Name', 'Source IP' | sort -PolicyChanges",
   "type": "hunting",
   "hunting_type": "frequency",
   "level": "high",

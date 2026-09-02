@@ -1638,12 +1638,13 @@ def test_handler_decodes_one_notification_and_returns_only_sanitized_receipt(
             )
 
     monkeypatch.setattr(handler_module, "build_service", lambda: Service())
+    provider_raw = json.loads((ROOT / "scripts/fixtures/splunk_evidence/oci_raw_alarm.json").read_text())
     notification = {
         "type": "com.oraclecloud.notificationservice.publishmessage",
         "data": {
             "messageDetails": {
                 "type": "RAW",
-                "body": json.dumps(alarm_payload()),
+                "body": json.dumps(provider_raw),
             },
             "topicId": "provider-identifier-must-not-escape",
         },
@@ -1656,7 +1657,7 @@ def test_handler_decodes_one_notification_and_returns_only_sanitized_receipt(
     assert len(captured) == 1
     assert result == {
         "status": "delivered",
-        "detection_id": "oci-audit-failures",
+        "detection_id": None,
         "window_start": "2026-09-02T07:08:00Z",
         "window_end": "2026-09-02T07:15:00Z",
         "row_count": 1,
@@ -1670,6 +1671,14 @@ def test_handler_decodes_one_notification_and_returns_only_sanitized_receipt(
     assert "provider-identifier-must-not-escape" not in serialized_output
     assert "operator@example.invalid" not in serialized_output
     assert "identitycontrolplane" not in serialized_output
+
+
+def test_production_handler_rejects_legacy_synthetic_identity(monkeypatch):
+    monkeypatch.setattr(handler_module, "build_service", lambda: object())
+    with pytest.raises(RuntimeError, match="evidence export failed"):
+        handler_module.handler(object(), io.BytesIO(json.dumps(alarm_payload()).encode()))
+    # Offline/test adapters may still decode fixture payloads explicitly.
+    assert handler_module._decode_notification(json.dumps(alarm_payload()).encode()).detection_id == "oci-audit-failures"
 
 
 def test_function_service_uses_one_resource_principal_for_all_oci_clients(
@@ -1690,6 +1699,7 @@ def test_function_service_uses_one_resource_principal_for_all_oci_clients(
     monkeypatch.setattr(oci.log_analytics, "LogAnalyticsClient", client_factory)
     monkeypatch.setattr(oci.secrets, "SecretsClient", client_factory)
     monkeypatch.setattr(oci.object_storage, "ObjectStorageClient", client_factory)
+    monkeypatch.setattr(oci.monitoring, "MonitoringClient", client_factory)
     for name, value in {
         "OBJECT_STORAGE_NAMESPACE": "namespace-under-test",
         "SPLUNK_EVIDENCE_STATE_BUCKET": "state-bucket-under-test",
@@ -1699,9 +1709,11 @@ def test_function_service_uses_one_resource_principal_for_all_oci_clients(
         "OCI_LOG_ANALYTICS_NAMESPACE": "trusted-log-analytics-namespace",
         "SPLUNK_HEC_URL": "https://splunk.example.invalid:8088",
         "SPLUNK_HEC_INDEX": "evidence-index",
-        "SPLUNK_HEC_SOURCETYPE": "oci:logan:detection",
+            "SPLUNK_HEC_SOURCETYPE": "oci:logan:detection",
+            "SPLUNK_EXPORTER_TELEMETRY_NAMESPACE": "oci_log_analytics_splunk_exporter",
     }.items():
         monkeypatch.setenv(name, value)
+    monkeypatch.setenv("SPLUNK_ALARM_BINDINGS", json.dumps({"redacted-alarm-id": "oci-audit-failures"}))
 
     service = handler_module.build_service()
 

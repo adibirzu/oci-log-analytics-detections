@@ -1,7 +1,7 @@
 {
   "title": "Windows Successful RDP Logon Outside Business Hours",
   "description": "Alert-ready search for successful RemoteInteractive logons (Security Event 4624, logon type 10) outside the configured 08:00-18:00 query timezone.",
-"query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4624' and 'Logon Type' = '10' | eval hour = toNumber(formatDate(Time, 'HH')) | where hour < 8 or hour >= 18 | stats count as RDPLogons, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Log Source', 'Target User Name', 'Source Address', 'Host Name (Server)' | sort -RDPLogons",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4624' and 'Logon Type' = '10' | eval hour = toNumber(formatDate(Time, 'HH')) | where hour < 8 or hour >= 18 | stats count as RDPLogons by 'Target User Name', 'Source Address', 'Host Name (Server)' | sort -RDPLogons",
   "type": "hunting",
   "hunting_type": "time_anomaly",
   "level": "high",

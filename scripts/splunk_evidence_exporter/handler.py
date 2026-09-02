@@ -93,6 +93,7 @@ def build_service() -> EvidenceExportService:
         namespace=namespace,
         state_bucket=state_bucket,
         dlq_bucket=dlq_bucket,
+        telemetry_namespace=_required_environment("SPLUNK_EXPORTER_TELEMETRY_NAMESPACE"),
         query_loader=_load_query,
         clock=lambda: datetime.now(timezone.utc),
     )

@@ -1,7 +1,7 @@
 {
   "title": "Windows User Added to Administrators or Remote Desktop Users",
   "description": "Alert-ready search for Security Event 4732 additions to the local Administrators or Remote Desktop Users groups.",
-"query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4732' and ('Target User Name' like '*Administrators*' or 'Target User Name' like '*Remote Desktop Users*' or msg like '*Administrators*' or msg like '*Remote Desktop Users*') | stats count as GroupAdds, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Log Source', User, 'Target User Name', 'Host Name (Server)' | sort -GroupAdds",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4732' and ('Target User Name' like '*Administrators*' or 'Target User Name' like '*Remote Desktop Users*' or msg like '*Administrators*' or msg like '*Remote Desktop Users*') | stats count as GroupAdds by User, 'Target User Name', 'Host Name (Server)' | sort -GroupAdds",
   "type": "hunting",
   "hunting_type": "privileged_access",
   "level": "critical",

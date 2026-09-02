@@ -736,6 +736,7 @@ class OciResourcePrincipalAdapterFactory:
         namespace: str,
         state_bucket: str,
         dlq_bucket: str,
+        telemetry_namespace: str,
         query_loader: Callable[[str], Mapping[str, object]],
         clock: Callable[[], datetime],
     ) -> OciAdapterBundle:
@@ -774,7 +775,7 @@ class OciResourcePrincipalAdapterFactory:
             metrics=OciMonitoringMetricsAdapter(
                 client=lambda: oci.monitoring.MonitoringClient(config={}, signer=signer),
                 compartment_id=compartment_id,
-                namespace="oci_log_analytics_splunk_exporter",
+                namespace=telemetry_namespace,
                 metric_data_factory=oci.monitoring.models.PostMetricDataDetails,
             ),
         )

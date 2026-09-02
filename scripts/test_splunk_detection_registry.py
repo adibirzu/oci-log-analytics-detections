@@ -6,6 +6,7 @@ from pathlib import Path
 
 import jsonschema
 import yaml
+from scripts.splunk_delivery_contracts import registry_validation_errors
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,6 +75,21 @@ def valid_evidence_event():
     }
 
 
+def valid_original_content_event():
+    event = valid_evidence_event()
+    event["evidence"]["include_original_content"] = True
+    event["evidence"]["original_content"] = {
+        "redaction_profile": "oci-log-content-v1",
+        "records": [
+            {
+                "source_field": "Original Log Content",
+                "redacted_content": "<REDACTED>",
+            }
+        ],
+    }
+    return event
+
+
 def test_contract_schemas_are_valid_draft_2020_12():
     jsonschema.Draft202012Validator.check_schema(REGISTRY_SCHEMA)
     jsonschema.Draft202012Validator.check_schema(EVIDENCE_SCHEMA)
@@ -81,18 +97,21 @@ def test_contract_schemas_are_valid_draft_2020_12():
 
 def test_registry_schema_accepts_policy_derived_entry():
     entry = valid_registry_entry()
-    assert not list(REGISTRY_VALIDATOR.iter_errors(entry))
-    assert (ROOT / entry["oci_query_file"]).is_file()
+    assert not registry_validation_errors(entry, ROOT)
 
 
 def test_evidence_schema_accepts_valid_event():
     assert not list(EVIDENCE_VALIDATOR.iter_errors(valid_evidence_event()))
 
 
+def test_evidence_schema_accepts_bounded_redacted_original_content_opt_in():
+    assert not list(EVIDENCE_VALIDATOR.iter_errors(valid_original_content_event()))
+
+
 def test_registry_schema_rejects_unknown_query_path():
     entry = valid_registry_entry()
     entry["oci_query_file"] = "queries/does_not_exist.json"
-    assert not (ROOT / entry["oci_query_file"]).is_file()
+    assert registry_validation_errors(entry, ROOT)
 
 
 def test_registry_schema_rejects_more_than_three_dimensions():
@@ -111,6 +130,20 @@ def test_registry_schema_requires_redaction_profile_for_original_content():
 def test_evidence_schema_requires_event_key():
     event = valid_evidence_event()
     del event["event_key"]
+    assert list(EVIDENCE_VALIDATOR.iter_errors(event))
+
+
+def test_evidence_schema_rejects_original_log_content_by_default():
+    event = valid_evidence_event()
+    event["evidence"]["fields"].append(
+        {"name": "Original Log Content", "value": "unredacted"}
+    )
+    assert list(EVIDENCE_VALIDATOR.iter_errors(event))
+
+
+def test_evidence_schema_rejects_unbounded_original_content_records():
+    event = valid_original_content_event()
+    event["evidence"]["original_content"]["records"] *= 11
     assert list(EVIDENCE_VALIDATOR.iter_errors(event))
 
 

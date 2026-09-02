@@ -3,13 +3,16 @@
     {
       "alarm_contract": {
         "alarm_dimension_to_log_field": {},
-        "allowed_dimensions": {
-          "detectionId": "object-storage-new-external-source"
-        },
+        "allowed_dimensions": {},
         "binding_key": "object-storage-new-external-source",
-        "metric_name": "DetectionSignal",
+        "metric_dimensions": [
+          "Source IP",
+          "User Name",
+          "Event Type"
+        ],
+        "metric_name": "ExternalAccesses",
         "metric_namespace": "oci_log_analytics_detections",
-        "query": "DetectionSignal[5m]{detectionId = \"object-storage-new-external-source\"}.sum() > 0"
+        "query": "ExternalAccesses[1h].sum() > 0"
       },
       "delivery": {
         "delivery_mode": "evidence",
@@ -54,13 +57,16 @@
     {
       "alarm_contract": {
         "alarm_dimension_to_log_field": {},
-        "allowed_dimensions": {
-          "detectionId": "oci-audit-failures"
-        },
+        "allowed_dimensions": {},
         "binding_key": "oci-audit-failures",
-        "metric_name": "DetectionSignal",
+        "metric_dimensions": [
+          "Event Type",
+          "User Name",
+          "Status"
+        ],
+        "metric_name": "AuditFailures",
         "metric_namespace": "oci_log_analytics_detections",
-        "query": "DetectionSignal[5m]{detectionId = \"oci-audit-failures\"}.sum() > 0"
+        "query": "AuditFailures[15m].sum() > 0"
       },
       "delivery": {
         "delivery_mode": "evidence",
@@ -105,13 +111,16 @@
     {
       "alarm_contract": {
         "alarm_dimension_to_log_field": {},
-        "allowed_dimensions": {
-          "detectionId": "oci-iam-policy-change"
-        },
+        "allowed_dimensions": {},
         "binding_key": "oci-iam-policy-change",
-        "metric_name": "DetectionSignal",
+        "metric_dimensions": [
+          "Event Type",
+          "User Name",
+          "Source IP"
+        ],
+        "metric_name": "PolicyChanges",
         "metric_namespace": "oci_log_analytics_detections",
-        "query": "DetectionSignal[5m]{detectionId = \"oci-iam-policy-change\"}.sum() > 0"
+        "query": "PolicyChanges[15m].sum() > 0"
       },
       "delivery": {
         "delivery_mode": "evidence",
@@ -156,13 +165,14 @@
     {
       "alarm_contract": {
         "alarm_dimension_to_log_field": {},
-        "allowed_dimensions": {
-          "detectionId": "vcn-rejected-traffic-spike"
-        },
+        "allowed_dimensions": {},
         "binding_key": "vcn-rejected-traffic-spike",
-        "metric_name": "DetectionSignal",
+        "metric_dimensions": [
+          "Source IP"
+        ],
+        "metric_name": "RejectedFlows",
         "metric_namespace": "oci_log_analytics_detections",
-        "query": "DetectionSignal[5m]{detectionId = \"vcn-rejected-traffic-spike\"}.sum() > 0"
+        "query": "RejectedFlows[10m].sum() > 0"
       },
       "delivery": {
         "delivery_mode": "evidence",
@@ -186,7 +196,6 @@
       "id": "vcn-rejected-traffic-spike",
       "oci_query_file": "queries/hunting/oci_vcn_rejected_traffic_spike.json",
       "required_fields": [
-        "Action",
         "Source IP"
       ],
       "required_sources": [
@@ -204,13 +213,16 @@
     {
       "alarm_contract": {
         "alarm_dimension_to_log_field": {},
-        "allowed_dimensions": {
-          "detectionId": "windows-access-administrator-logon"
-        },
+        "allowed_dimensions": {},
         "binding_key": "windows-access-administrator-logon",
-        "metric_name": "DetectionSignal",
+        "metric_dimensions": [
+          "Target User Name",
+          "Logon Type",
+          "Host Name (Server)"
+        ],
+        "metric_name": "AdministratorLogons",
         "metric_namespace": "oci_log_analytics_detections",
-        "query": "DetectionSignal[5m]{detectionId = \"windows-access-administrator-logon\"}.sum() > 0"
+        "query": "AdministratorLogons[5m].sum() > 0"
       },
       "delivery": {
         "delivery_mode": "evidence",
@@ -234,7 +246,6 @@
       "id": "windows-access-administrator-logon",
       "oci_query_file": "queries/hunting/windows_access_administrator_logon.json",
       "required_fields": [
-        "Event ID",
         "Target User Name",
         "Logon Type",
         "Host Name (Server)"
@@ -257,13 +268,16 @@
     {
       "alarm_contract": {
         "alarm_dimension_to_log_field": {},
-        "allowed_dimensions": {
-          "detectionId": "windows-access-failed-logon-burst"
-        },
+        "allowed_dimensions": {},
         "binding_key": "windows-access-failed-logon-burst",
-        "metric_name": "DetectionSignal",
+        "metric_dimensions": [
+          "Source Address",
+          "Target User Name",
+          "Host Name (Server)"
+        ],
+        "metric_name": "FailedLogons",
         "metric_namespace": "oci_log_analytics_detections",
-        "query": "DetectionSignal[5m]{detectionId = \"windows-access-failed-logon-burst\"}.sum() > 0"
+        "query": "FailedLogons[5m].sum() > 0"
       },
       "delivery": {
         "delivery_mode": "evidence",
@@ -287,7 +301,6 @@
       "id": "windows-access-failed-logon-burst",
       "oci_query_file": "queries/hunting/windows_access_failed_logon_burst.json",
       "required_fields": [
-        "Event ID",
         "Source Address",
         "Target User Name",
         "Host Name (Server)"
@@ -310,13 +323,16 @@
     {
       "alarm_contract": {
         "alarm_dimension_to_log_field": {},
-        "allowed_dimensions": {
-          "detectionId": "windows-access-new-local-user"
-        },
+        "allowed_dimensions": {},
         "binding_key": "windows-access-new-local-user",
-        "metric_name": "DetectionSignal",
+        "metric_dimensions": [
+          "Target User Name",
+          "Subject User Name",
+          "Host Name (Server)"
+        ],
+        "metric_name": "UsersCreated",
         "metric_namespace": "oci_log_analytics_detections",
-        "query": "DetectionSignal[5m]{detectionId = \"windows-access-new-local-user\"}.sum() > 0"
+        "query": "UsersCreated[5m].sum() > 0"
       },
       "delivery": {
         "delivery_mode": "evidence",
@@ -340,7 +356,6 @@
       "id": "windows-access-new-local-user",
       "oci_query_file": "queries/hunting/windows_access_new_local_user.json",
       "required_fields": [
-        "Event ID",
         "Target User Name",
         "Subject User Name",
         "Host Name (Server)"
@@ -363,13 +378,16 @@
     {
       "alarm_contract": {
         "alarm_dimension_to_log_field": {},
-        "allowed_dimensions": {
-          "detectionId": "windows-access-privileged-group-add"
-        },
+        "allowed_dimensions": {},
         "binding_key": "windows-access-privileged-group-add",
-        "metric_name": "DetectionSignal",
+        "metric_dimensions": [
+          "User",
+          "Target User Name",
+          "Host Name (Server)"
+        ],
+        "metric_name": "GroupAdds",
         "metric_namespace": "oci_log_analytics_detections",
-        "query": "DetectionSignal[5m]{detectionId = \"windows-access-privileged-group-add\"}.sum() > 0"
+        "query": "GroupAdds[5m].sum() > 0"
       },
       "delivery": {
         "delivery_mode": "evidence",
@@ -393,10 +411,9 @@
       "id": "windows-access-privileged-group-add",
       "oci_query_file": "queries/hunting/windows_access_privileged_group_add.json",
       "required_fields": [
-        "Event ID",
+        "User",
         "Target User Name",
-        "Host Name (Server)",
-        "msg"
+        "Host Name (Server)"
       ],
       "required_sources": [
         "Windows Security Events",
@@ -416,13 +433,16 @@
     {
       "alarm_contract": {
         "alarm_dimension_to_log_field": {},
-        "allowed_dimensions": {
-          "detectionId": "windows-access-rdp-after-hours"
-        },
+        "allowed_dimensions": {},
         "binding_key": "windows-access-rdp-after-hours",
-        "metric_name": "DetectionSignal",
+        "metric_dimensions": [
+          "Target User Name",
+          "Source Address",
+          "Host Name (Server)"
+        ],
+        "metric_name": "RDPLogons",
         "metric_namespace": "oci_log_analytics_detections",
-        "query": "DetectionSignal[5m]{detectionId = \"windows-access-rdp-after-hours\"}.sum() > 0"
+        "query": "RDPLogons[5m].sum() > 0"
       },
       "delivery": {
         "delivery_mode": "evidence",
@@ -446,12 +466,9 @@
       "id": "windows-access-rdp-after-hours",
       "oci_query_file": "queries/hunting/windows_access_rdp_after_hours.json",
       "required_fields": [
-        "Event ID",
-        "Logon Type",
         "Target User Name",
         "Source Address",
-        "Host Name (Server)",
-        "Time"
+        "Host Name (Server)"
       ],
       "required_sources": [
         "Windows Security Events",
@@ -469,7 +486,7 @@
       "title": "Windows Successful RDP Logon Outside Business Hours"
     }
   ],
-  "generated_at": "2026-09-02T16:30:21.567080+00:00",
+  "generated_at": "2026-09-02T17:08:19.349499+00:00",
   "splunk_provenance": {
     "object-storage-new-external-source": {
       "app": "splunk_app_oci",

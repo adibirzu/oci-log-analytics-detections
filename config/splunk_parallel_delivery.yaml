@@ -9,7 +9,6 @@ defaults:
   max_attempts: 4
   sourcetype: oci:logan:detection
   metric_namespace: oci_log_analytics_detections
-  metric_name: DetectionSignal
 raw_sources:
   enabled: false
   delivery_mode: raw
@@ -27,7 +26,7 @@ detections:
         source_url: https://github.com/adibirzu/oci-splunk/blob/a98167404f19be6d18235bccbf1113b59a259c4c/splunk-app/splunk_app_oci/default/savedsearches.conf#L180-L191
       oci_query_file: queries/hunting/oci_vcn_rejected_traffic_spike.json
       required_sources: [SOC VCN Flow Logs]
-      required_fields: [Action, Source IP]
+      required_fields: [Source IP]
       fidelity: evidence
       detection: {severity: high, mitre_techniques: [T1046]}
       delivery: {delivery_mode: evidence, lookback: 10m, overlap: 2m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
@@ -81,7 +80,7 @@ detections:
         source_url: https://research.splunk.com/endpoint/09555511-aca6-484a-b6ab-72cd03d73c34/
       oci_query_file: queries/hunting/windows_access_administrator_logon.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
-      required_fields: [Event ID, Target User Name, Logon Type, Host Name (Server)]
+      required_fields: [Target User Name, Logon Type, Host Name (Server)]
       fidelity: evidence
       detection: {severity: high, mitre_techniques: [T1078]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
@@ -95,7 +94,7 @@ detections:
         source_url: https://research.splunk.com/endpoint/cf06a0ee-ffa9-4ed3-be77-0670ed9bab52/
       oci_query_file: queries/hunting/windows_access_failed_logon_burst.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
-      required_fields: [Event ID, Source Address, Target User Name, Host Name (Server)]
+      required_fields: [Source Address, Target User Name, Host Name (Server)]
       fidelity: evidence
       detection: {severity: high, mitre_techniques: [T1110]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
@@ -109,7 +108,7 @@ detections:
         source_url: https://research.splunk.com/endpoint/3fb2e8e3-7bc0-4567-9722-c5ab9f8595eb/
       oci_query_file: queries/hunting/windows_access_new_local_user.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
-      required_fields: [Event ID, Target User Name, Subject User Name, Host Name (Server)]
+      required_fields: [Target User Name, Subject User Name, Host Name (Server)]
       fidelity: evidence
       detection: {severity: high, mitre_techniques: [T1136.001]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
@@ -123,7 +122,7 @@ detections:
         source_url: https://research.splunk.com/endpoint/b8cbef2c-2cc3-4550-b0fc-9715b7852df9/
       oci_query_file: queries/hunting/windows_access_privileged_group_add.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
-      required_fields: [Event ID, Target User Name, Host Name (Server), msg]
+      required_fields: [User, Target User Name, Host Name (Server)]
       fidelity: evidence
       detection: {severity: high, mitre_techniques: [T1098]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
@@ -137,7 +136,7 @@ detections:
         source_url: https://research.splunk.com/endpoint/00ca7f9e-88ab-4841-a6c2-83979ab1ed29/
       oci_query_file: queries/hunting/windows_access_rdp_after_hours.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
-      required_fields: [Event ID, Logon Type, Target User Name, Source Address, Host Name (Server), Time]
+      required_fields: [Target User Name, Source Address, Host Name (Server)]
       fidelity: evidence
       detection: {severity: high, mitre_techniques: [T1021.001]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}

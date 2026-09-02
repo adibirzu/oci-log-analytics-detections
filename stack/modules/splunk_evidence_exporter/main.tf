@@ -19,7 +19,7 @@ locals {
     SPLUNK_EVIDENCE_DLQ_BUCKET               = local.dlq_bucket_name
     OCI_LOG_ANALYTICS_COMPARTMENT_ID         = var.log_analytics_compartment_id
     OCI_LOG_ANALYTICS_NAMESPACE              = var.log_analytics_namespace
-    SPLUNK_ALARM_BINDINGS                    = jsonencode({ for binding_key, alarm_id in var.splunk_alarm_ids : alarm_id => binding_key })
+    SPLUNK_ALARM_BINDINGS                    = jsonencode({ for binding_key, alarm_id in local.effective_governed_alarm_bindings : alarm_id => binding_key })
     OCI_LOG_ANALYTICS_COMPARTMENT_IN_SUBTREE = tostring(var.log_analytics_compartment_in_subtree)
     SPLUNK_HEC_SECRET_ID                     = var.splunk_hec_secret_id
     SPLUNK_HEC_URL                           = var.splunk_hec_url
@@ -34,16 +34,38 @@ locals {
     SPLUNK_EVIDENCE_OVERLAP_SECONDS          = tostring(var.splunk_evidence_overlap_seconds)
     SPLUNK_EVIDENCE_MAX_WINDOW_SECONDS       = tostring(var.splunk_evidence_max_window_seconds)
     SPLUNK_EXPORTER_TELEMETRY_NAMESPACE      = var.exporter_telemetry_namespace
+    SPLUNK_SUPPLY_CHAIN_ATTESTATION_SHA256   = var.function_attestation_sha256
+    SPLUNK_SUPPLY_CHAIN_PROVENANCE_SHA256    = var.function_provenance_sha256
   }
 
-  # These are governed contracts, not discovered tenant alarms.  The operator
-  # reviews the metric query and explicitly enables actions separately.
-  governed_detection_alarm_ids = toset([
-    "object-storage-new-external-source", "oci-audit-failures", "oci-iam-policy-change",
-    "vcn-rejected-traffic-spike", "windows-access-administrator-logon",
-    "windows-access-failed-logon-burst", "windows-access-new-local-user",
-    "windows-access-privileged-group-add", "windows-access-rdp-after-hours",
-  ])
+  # The generated registry is the canonical scheduled-detection metric
+  # contract.  Terraform never invents a generic signal metric or dimensions.
+  splunk_detection_registry = jsondecode(file("${path.module}/../../../queries/splunk_detection_registry.json"))
+  governed_detection_contracts = {
+    for detection in local.splunk_detection_registry.detections : detection.alarm_contract.binding_key => {
+      metric_namespace  = detection.alarm_contract.metric_namespace
+      metric_name       = detection.alarm_contract.metric_name
+      metric_dimensions = detection.alarm_contract.metric_dimensions
+      query             = detection.alarm_contract.query
+      severity          = upper(detection.detection.severity)
+    }
+  }
+
+  # Managed is the safe default: the Function binds directly to these exact
+  # Terraform-created alarm OCIDs. Existing supports pre-created alarms only
+  # when the operator supplies the complete, exact governed map.
+  managed_governed_alarm_bindings = {
+    for binding_key, alarm in oci_monitoring_alarm.governed_detection : binding_key => alarm.id
+  }
+  effective_governed_alarm_bindings = var.alarm_binding_mode == "managed" ? local.managed_governed_alarm_bindings : var.splunk_alarm_ids
+  complete_governed_alarm_bindings = (
+    var.alarm_binding_mode == "managed"
+    ? length(var.splunk_alarm_ids) == 0
+    : var.alarm_binding_mode == "existing" && (
+      set(keys(var.splunk_alarm_ids)) == set(keys(local.governed_detection_contracts))
+      && alltrue([for alarm_id in values(var.splunk_alarm_ids) : can(regex("^ocid1\\.alarm\\.", alarm_id))])
+    )
+  )
 }
 
 resource "oci_objectstorage_bucket" "state" {
@@ -154,6 +176,26 @@ resource "oci_functions_function" "exporter" {
     }
 
     precondition {
+      condition     = can(regex("^[0-9a-f]{64}$", var.function_attestation_sha256))
+      error_message = "A verified signed supply-chain attestation SHA-256 is required when the exporter is enabled."
+    }
+
+    precondition {
+      condition     = can(regex("^[0-9a-f]{64}$", var.function_provenance_sha256))
+      error_message = "Verified signed build provenance SHA-256 is required when the exporter is enabled."
+    }
+
+    precondition {
+      condition     = var.function_attestation_path != "" && fileexists(var.function_attestation_path) && filesha256(var.function_attestation_path) == var.function_attestation_sha256
+      error_message = "The private attestation receipt must exist and match function_attestation_sha256; rerun the pre-live supply-chain gate."
+    }
+
+    precondition {
+      condition     = var.function_provenance_path != "" && fileexists(var.function_provenance_path) && filesha256(var.function_provenance_path) == var.function_provenance_sha256
+      error_message = "The private signed provenance receipt must exist and match function_provenance_sha256; rerun the pre-live supply-chain gate."
+    }
+
+    precondition {
       condition     = var.splunk_hec_secret_id != ""
       error_message = "An existing OCI Vault secret OCID is required; never pass the HEC token value."
     }
@@ -164,13 +206,8 @@ resource "oci_functions_function" "exporter" {
     }
 
     precondition {
-      condition = (
-        set(keys(var.splunk_alarm_ids)) == local.governed_detection_alarm_ids
-        && alltrue([
-          for alarm_id in values(var.splunk_alarm_ids) : can(regex("^ocid1\\.alarm\\.", alarm_id))
-        ])
-      )
-      error_message = "When the exporter is enabled, splunk_alarm_ids must contain exactly the governed detection keys and an OCID for every Monitoring alarm."
+      condition     = local.complete_governed_alarm_bindings
+      error_message = "Managed mode requires no supplied alarm IDs; existing mode requires exactly the governed detection keys and an OCID for every Monitoring alarm."
     }
   }
 
@@ -209,12 +246,7 @@ resource "oci_ons_subscription" "function" {
 
   lifecycle {
     precondition {
-      condition = (
-        set(keys(var.splunk_alarm_ids)) == local.governed_detection_alarm_ids
-        && alltrue([
-          for alarm_id in values(var.splunk_alarm_ids) : can(regex("^ocid1\\.alarm\\.", alarm_id))
-        ])
-      )
+      condition     = local.complete_governed_alarm_bindings
       error_message = "The Notifications subscription requires complete governed splunk_alarm_ids bindings."
     }
   }
@@ -268,19 +300,29 @@ resource "oci_monitoring_alarm" "function_errors" {
 }
 
 resource "oci_monitoring_alarm" "governed_detection" {
-  for_each = local.enabled ? local.governed_detection_alarm_ids : toset([])
+  for_each = local.enabled && var.alarm_binding_mode == "managed" ? local.governed_detection_contracts : {}
 
   compartment_id        = var.compartment_id
   destinations          = [oci_ons_notification_topic.evidence[0].id]
-  display_name          = "${var.resource_name_prefix}-${each.value}"
+  display_name          = "${var.resource_name_prefix}-${each.key}"
   is_enabled            = false
   metric_compartment_id = var.log_analytics_compartment_id
-  namespace             = var.log_analytics_metric_namespace
-  query                 = "DetectionSignal[5m]{detectionId = \"${each.value}\"}.sum() > 0"
-  severity              = "CRITICAL"
+  namespace             = each.value.metric_namespace
+  query                 = each.value.query
+  severity              = each.value.severity
   message_format        = "RAW"
   body                  = "Governed Log Analytics detection alarm; keep disabled until metric and exporter validation pass."
   freeform_tags         = var.freeform_tags
+
+  lifecycle {
+    precondition {
+      # The OCI Monitoring query intentionally aggregates across the scheduled
+      # rule's real dimensions.  It must still carry a valid canonical metric
+      # dimension set, rather than silently falling back to a generic signal.
+      condition     = length(each.value.metric_dimensions) > 0 && length(each.value.metric_dimensions) <= 3
+      error_message = "Every governed alarm must retain the one-to-three canonical scheduled-detection metric dimensions."
+    }
+  }
 }
 
 resource "oci_monitoring_alarm" "exporter_delivery_failures" {

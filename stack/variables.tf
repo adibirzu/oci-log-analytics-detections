@@ -106,6 +106,17 @@ variable "splunk_evidence_exporter_alarm_ids" {
   sensitive   = true
 }
 
+variable "splunk_evidence_exporter_alarm_binding_mode" {
+  type        = string
+  description = "managed binds Terraform-created alarms; existing requires the reviewed complete alarm OCID map"
+  default     = "managed"
+
+  validation {
+    condition     = contains(["managed", "existing"], var.splunk_evidence_exporter_alarm_binding_mode)
+    error_message = "splunk_evidence_exporter_alarm_binding_mode must be managed or existing."
+  }
+}
+
 variable "enable_splunk_evidence_exporter_subscription" {
   type        = bool
   description = "Enable the exact Notifications-to-Function subscription after review"
@@ -163,6 +174,30 @@ variable "splunk_evidence_exporter_function_image" {
 variable "splunk_evidence_exporter_function_image_digest" {
   type        = string
   description = "Optional immutable digest for the reviewed exporter image"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_attestation_sha256" {
+  type        = string
+  description = "SHA-256 of the externally verified signed exporter supply-chain attestation"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_provenance_sha256" {
+  type        = string
+  description = "SHA-256 of the verified signed exporter build provenance"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_attestation_path" {
+  type        = string
+  description = "Private path to the verified signed exporter attestation receipt"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_provenance_path" {
+  type        = string
+  description = "Private path to the verified signed exporter provenance receipt"
   default     = ""
 }
 

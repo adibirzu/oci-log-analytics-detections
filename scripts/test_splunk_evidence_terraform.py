@@ -51,34 +51,42 @@ def test_exporter_is_opt_in_at_root_and_module_boundary() -> None:
         r"\benable_splunk_evidence_exporter\s*=\s*var\.enable_splunk_evidence_exporter\b",
         module,
     )
-    assert re.search(
-        r"\benable_alarm_actions\s*=\s*var\.enable_splunk_evidence_exporter_alarm_actions\b",
-        module,
-    )
-    assert re.search(
-        r"\benable_notification_subscription\s*=\s*var\.enable_splunk_evidence_exporter_subscription\b",
-        module,
-    )
-    assert re.search(
-        r"enable_splunk_evidence_exporter:\s*.*?default:\s*false",
-        schema,
-        re.DOTALL,
-    )
-    assert re.search(
-        r"enable_splunk_evidence_exporter_alarm_actions:\s*.*?default:\s*false",
-        schema,
-        re.DOTALL,
-    )
-    assert re.search(
-        r"enable_splunk_evidence_exporter_subscription:\s*.*?default:\s*false",
-        schema,
-        re.DOTALL,
-    )
-    assert re.search(
-        r"splunk_evidence_exporter_alarm_ids:\s*.*?type:\s*object",
-        schema,
-        re.DOTALL,
-    )
+    assert re.search(r"\benable_alarm_actions\s*=\s*var\.enable_splunk_evidence_exporter_alarm_actions\b", module)
+    assert re.search(r"\benable_notification_subscription\s*=\s*var\.enable_splunk_evidence_exporter_subscription\b", module)
+    assert re.search(r"enable_splunk_evidence_exporter:\s*.*?default:\s*false", schema, re.DOTALL)
+    assert re.search(r"enable_splunk_evidence_exporter_alarm_actions:\s*.*?default:\s*false", schema, re.DOTALL)
+    assert re.search(r"enable_splunk_evidence_exporter_subscription:\s*.*?default:\s*false", schema, re.DOTALL)
+    assert re.search(r"splunk_evidence_exporter_alarm_ids:\s*.*?type:\s*object", schema, re.DOTALL)
+
+
+def test_enabled_exporter_binds_the_verified_attestation_and_provenance_to_the_exact_image() -> None:
+    root_variables = _read(STACK / "variables.tf")
+    root_main = _read(STACK / "main.tf")
+    module_variables = _read(MODULE / "variables.tf")
+    module_main = _read(MODULE / "main.tf")
+    schema = _read(STACK / "schema.yaml")
+
+    for name in (
+        "splunk_evidence_exporter_function_attestation_sha256",
+        "splunk_evidence_exporter_function_provenance_sha256",
+        "splunk_evidence_exporter_function_attestation_path",
+        "splunk_evidence_exporter_function_provenance_path",
+    ):
+        assert _block(root_variables, "variable", name)
+        assert name in schema
+    for name in ("function_attestation_sha256", "function_provenance_sha256", "function_attestation_path", "function_provenance_path"):
+        assert _block(module_variables, "variable", name)
+        assert re.search(rf"var\.{name}", module_main)
+    for name in ("function_attestation_sha256", "function_provenance_sha256"):
+        assert re.search(rf'can\(regex\("\^\[0-9a-f\]\{{64\}}\$", var\.{name}\)\)', module_main)
+    assert "SPLUNK_SUPPLY_CHAIN_ATTESTATION_SHA256" in module_main
+    assert "SPLUNK_SUPPLY_CHAIN_PROVENANCE_SHA256" in module_main
+    assert "filesha256(var.function_attestation_path) == var.function_attestation_sha256" in module_main
+    assert "filesha256(var.function_provenance_path) == var.function_provenance_sha256" in module_main
+    assert re.search(r"function_attestation_sha256\s*=\s*var\.splunk_evidence_exporter_function_attestation_sha256", root_main)
+    assert re.search(r"function_provenance_sha256\s*=\s*var\.splunk_evidence_exporter_function_provenance_sha256", root_main)
+    assert re.search(r"function_attestation_path\s*=\s*var\.splunk_evidence_exporter_function_attestation_path", root_main)
+    assert re.search(r"function_provenance_path\s*=\s*var\.splunk_evidence_exporter_function_provenance_path", root_main)
 
 
 def test_existing_vault_secret_reference_is_the_only_secret_interface() -> None:
@@ -176,22 +184,31 @@ def test_module_wires_only_the_scoped_exporter_path_with_logging_and_lifecycle()
     assert "oci_functions_function.exporter[0].id" in main
 
     assert 'resource "oci_monitoring_alarm" "governed_detection"' in main
-    assert "governed_detection_alarm_ids" in main
-    assert "windows-access-rdp-after-hours" in main
+    assert "governed_detection_contracts" in main
+    assert 'splunk_detection_registry.json' in main
     governed = main.split('resource "oci_monitoring_alarm" "governed_detection"', 1)[1]
     assert re.search(r'\bis_enabled\s*=\s*false\b', governed)
+    assert re.search(r'\bquery\s*=\s*each\.value\.query\b', governed)
+    assert re.search(r'\bnamespace\s*=\s*each\.value\.metric_namespace\b', governed)
+    assert "length(each.value.metric_dimensions) > 0" in governed
     assert 'resource "oci_monitoring_alarm" "exporter_delivery_failures"' in main
     assert "oci_log_analytics_splunk_exporter" in _read(MODULE / "variables.tf")
 
 
-def test_exporter_enablement_requires_complete_governed_alarm_bindings() -> None:
+def test_exporter_uses_direct_managed_alarm_bindings_or_exact_existing_bindings() -> None:
     main = _read(MODULE / "main.tf")
     variables = _read(MODULE / "variables.tf")
     outputs = _read(MODULE / "outputs.tf")
     root_outputs = _read(STACK / "outputs.tf")
 
-    # The Function is the exporter enablement boundary.  It must not be
-    # possible to deploy it with an empty, partial, or typoed binding map.
+    # The default managed mode binds the exact Terraform-created alarm OCIDs.
+    # Existing mode must still reject empty, partial, or typoed binding maps.
+    assert "managed_governed_alarm_bindings" in main
+    assert 'oci_monitoring_alarm.governed_detection' in main
+    assert "effective_governed_alarm_bindings" in main
+    assert "SPLUNK_ALARM_BINDINGS" in main
+    assert "local.effective_governed_alarm_bindings" in main
+
     function_match = re.search(
         r'resource\s+"oci_functions_function"\s+"exporter"\s*\{(?P<body>.*?)\n\}',
         main,
@@ -199,10 +216,13 @@ def test_exporter_enablement_requires_complete_governed_alarm_bindings() -> None
     )
     assert function_match, "missing oci_functions_function exporter"
     function = function_match.group("body")
-    assert "set(keys(var.splunk_alarm_ids)) == local.governed_detection_alarm_ids" in function
-    assert "alltrue(" in function
-    assert "for alarm_id in values(var.splunk_alarm_ids)" in function
-    assert 'regex("^ocid1\\\\.alarm\\\\.", alarm_id)' in function
+    assert "local.complete_governed_alarm_bindings" in function
+    assert 'var.alarm_binding_mode == "managed"' in main
+    assert 'var.alarm_binding_mode == "existing"' in main
+    assert "set(keys(var.splunk_alarm_ids)) == set(keys(local.governed_detection_contracts))" in main
+    assert "alltrue(" in main
+    assert "for alarm_id in values(var.splunk_alarm_ids)" in main
+    assert 'regex("^ocid1\\\\.alarm\\\\.", alarm_id)' in main
 
     subscription_match = re.search(
         r'resource\s+"oci_ons_subscription"\s+"function"\s*\{(?P<body>.*?)\n\}',
@@ -211,16 +231,37 @@ def test_exporter_enablement_requires_complete_governed_alarm_bindings() -> None
     )
     assert subscription_match, "missing oci_ons_subscription function"
     subscription = subscription_match.group("body")
-    assert "set(keys(var.splunk_alarm_ids)) == local.governed_detection_alarm_ids" in subscription
+    assert "local.complete_governed_alarm_bindings" in subscription
 
     assert 'output "governed_alarm_bindings"' in outputs
     binding_output = _block(outputs, "output", "governed_alarm_bindings")
-    assert "var.splunk_alarm_ids" in binding_output
+    assert "local.effective_governed_alarm_bindings" in binding_output
     assert re.search(r"\bsensitive\s*=\s*true\b", binding_output)
     assert 'output "splunk_evidence_exporter_governed_alarm_bindings"' in root_outputs
 
     alarm_variable = _block(variables, "variable", "splunk_alarm_ids")
     assert "governed detection binding keys" in alarm_variable
+    binding_mode = _block(variables, "variable", "alarm_binding_mode")
+    assert 'default     = "managed"' in binding_mode
+    assert 'contains(["managed", "existing"], var.alarm_binding_mode)' in binding_mode
+
+
+def test_terraform_alarm_contracts_reconcile_to_generated_registry() -> None:
+    main = _read(MODULE / "main.tf")
+    registry = json.loads((ROOT / "queries/splunk_detection_registry.json").read_text())
+    expected = {
+        entry["id"]: entry["alarm_contract"]
+        for entry in registry["detections"]
+    }
+
+    assert len(expected) == 9
+    assert 'file("${path.module}/../../../queries/splunk_detection_registry.json")' in main
+    assert "detection.alarm_contract.metric_name" in main
+    assert "detection.alarm_contract.metric_dimensions" in main
+    assert "detection.alarm_contract.query" in main
+    for contract in expected.values():
+        assert contract["metric_name"] != "DetectionSignal"
+        assert contract["metric_dimensions"]
 
 
 def test_identifier_outputs_are_explicitly_sensitive_and_never_include_secrets() -> None:

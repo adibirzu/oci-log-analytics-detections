@@ -53,6 +53,17 @@ variable "splunk_alarm_ids" {
   sensitive   = true
 }
 
+variable "alarm_binding_mode" {
+  type        = string
+  description = "managed binds Terraform-created governed alarm OCIDs; existing requires a reviewed complete alarm map"
+  default     = "managed"
+
+  validation {
+    condition     = contains(["managed", "existing"], var.alarm_binding_mode)
+    error_message = "alarm_binding_mode must be managed or existing."
+  }
+}
+
 variable "log_analytics_compartment_in_subtree" {
   type        = bool
   description = "Whether bounded queries include subcompartments"
@@ -104,6 +115,30 @@ variable "function_image" {
 variable "function_image_digest" {
   type        = string
   description = "Required immutable sha256 digest for the reviewed exporter image when enabled"
+  default     = ""
+}
+
+variable "function_attestation_sha256" {
+  type        = string
+  description = "SHA-256 of the externally verified signed supply-chain attestation for function_image_digest"
+  default     = ""
+}
+
+variable "function_provenance_sha256" {
+  type        = string
+  description = "SHA-256 of the signed build provenance accepted with function_image_digest"
+  default     = ""
+}
+
+variable "function_attestation_path" {
+  type        = string
+  description = "Private path to the attestation verified by the pre-live gate; Terraform checks its SHA-256 without reading its contents into state"
+  default     = ""
+}
+
+variable "function_provenance_path" {
+  type        = string
+  description = "Private path to the signed provenance verified by the pre-live gate; Terraform checks its SHA-256 without reading its contents into state"
   default     = ""
 }
 

@@ -372,6 +372,36 @@ def run_splunk_parallel_offline_stage(*, bootstrap: bool = False) -> dict[str, o
     }
 
 
+def run_splunk_pre_live_supply_chain_gate(
+    *, attestation: Path, trust_policy: Path, staged_build_context: Path, image_digest: str, terraform_tfvars_out: Path | None = None
+) -> dict[str, object]:
+    """Verify the selected immutable image before an approved Terraform apply.
+
+    This is intentionally separate from the credential-free offline stage: its
+    inputs are retained private release receipts, never repository examples.
+    """
+    command = [
+        sys.executable,
+        str(SCRIPTS_DIR / "verify_splunk_function_supply_chain.py"),
+        "--attestation", str(attestation),
+        "--trust-policy", str(trust_policy),
+        "--staged-build-context", str(staged_build_context),
+        "--deployed-image-digest", image_digest,
+    ]
+    if terraform_tfvars_out:
+        command.extend(["--terraform-tfvars-out", str(terraform_tfvars_out)])
+    result = _run_step("splunk signed supply-chain pre-live gate", command, 300, offline=True)
+    try:
+        receipt = json.loads(result["output_tail"])
+    except (TypeError, json.JSONDecodeError):
+        receipt = {"status": "rejected"}
+    return {
+        "status": "PASS" if result["ok"] and receipt.get("status") == "accepted_for_pre_live_gate" else "FAIL",
+        "gate": result,
+        "receipt": receipt,
+    }
+
+
 def refresh_splunk_parallel_example() -> dict[str, object]:
     """Fail-closed two-step bootstrap for the self-excluded local example."""
     bootstrap = run_splunk_parallel_offline_stage(bootstrap=True)
@@ -523,6 +553,12 @@ def main() -> int:
     )
     parser.add_argument("--write-splunk-parallel-evidence-example", action="store_true", help="Refresh the checked-in local-only Splunk evidence example")
     parser.add_argument("--refresh-splunk-parallel-example", action="store_true", help="Fail-closed two-step refresh of the self-excluded local example")
+    parser.add_argument("--splunk-pre-live-supply-chain-gate", action="store_true", help="Verify signed private exporter provenance for the exact image before a separately approved Terraform apply")
+    parser.add_argument("--splunk-attestation", type=Path, help="Private signed exporter attestation")
+    parser.add_argument("--splunk-trust-policy", type=Path, help="Approved private signer trust policy")
+    parser.add_argument("--splunk-staged-build-context", type=Path, help="Exact staged Function build context")
+    parser.add_argument("--splunk-image-digest", help="Exact immutable image digest to bind to Terraform")
+    parser.add_argument("--splunk-terraform-tfvars-out", type=Path, help="Private JSON tfvars output for the verified image/receipt binding")
     args = parser.parse_args()
 
     if args.refresh_splunk_parallel_example or args.write_splunk_parallel_evidence_example:
@@ -533,6 +569,19 @@ def main() -> int:
         if args.include_live:
             parser.error("the Splunk parallel offline stage cannot include live validation")
         evidence = run_splunk_parallel_offline_stage()
+        print(json.dumps(evidence, indent=2, sort_keys=True))
+        return 0 if evidence["status"] == "PASS" else 1
+    if args.splunk_pre_live_supply_chain_gate:
+        required = (args.splunk_attestation, args.splunk_trust_policy, args.splunk_staged_build_context, args.splunk_image_digest)
+        if not all(required):
+            parser.error("--splunk-pre-live-supply-chain-gate requires --splunk-attestation, --splunk-trust-policy, --splunk-staged-build-context, and --splunk-image-digest")
+        evidence = run_splunk_pre_live_supply_chain_gate(
+            attestation=args.splunk_attestation,
+            trust_policy=args.splunk_trust_policy,
+            staged_build_context=args.splunk_staged_build_context,
+            image_digest=args.splunk_image_digest,
+            terraform_tfvars_out=args.splunk_terraform_tfvars_out,
+        )
         print(json.dumps(evidence, indent=2, sort_keys=True))
         return 0 if evidence["status"] == "PASS" else 1
 

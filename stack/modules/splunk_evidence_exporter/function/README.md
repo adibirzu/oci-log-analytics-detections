@@ -24,6 +24,9 @@ A production builder must resolve direct and transitive pins with
 hashes. The repository does not invent or bless artifact hashes offline: the
 machine-verifiable pre-live gate rejects a receipt unless the source manifest,
 verified dependency lock, SBOM, passing SCA/SAST/IaC/container scans, signature,
-and immutable deployed image digest all identify the same build. Retain that
+and immutable deployed image digest all identify the same build. It also
+verifies detached signed provenance against a retained approved public trust
+root and exact builder/workflow identity, and recalculates staged source file
+hashes. Retain that
 private receipt bundle with the reviewed digest; this repository intentionally
 performs none of those networked build actions.

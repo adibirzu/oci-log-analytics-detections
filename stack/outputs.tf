@@ -22,3 +22,15 @@ output "service_connector_ids" {
   description = "Map of service connector name to OCID"
   value       = { for k, v in oci_sch_service_connector.soc_detection : k => v.id }
 }
+
+output "splunk_evidence_exporter_resource_identifiers" {
+  description = "Scoped exporter identifiers for operator verification; null when disabled"
+  value       = module.splunk_evidence_exporter.resource_identifiers
+  sensitive   = true
+}
+
+output "splunk_evidence_exporter_dynamic_group_matching_rule" {
+  description = "Exact resource-principal match for separate IAM review; null when disabled"
+  value       = module.splunk_evidence_exporter.function_dynamic_group_matching_rule
+  sensitive   = true
+}

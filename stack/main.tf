@@ -27,6 +27,8 @@ module "splunk_evidence_exporter" {
   enable_notification_subscription    = var.enable_splunk_evidence_exporter_subscription
   compartment_id                      = var.compartment_id
   log_analytics_compartment_id        = var.compartment_id
+  log_analytics_namespace             = local.la_namespace
+  splunk_alarm_ids                    = var.splunk_evidence_exporter_alarm_ids
   object_storage_namespace            = var.splunk_evidence_exporter_object_storage_namespace
   existing_state_bucket_name          = var.splunk_evidence_exporter_existing_state_bucket_name
   existing_dlq_bucket_name            = var.splunk_evidence_exporter_existing_dlq_bucket_name

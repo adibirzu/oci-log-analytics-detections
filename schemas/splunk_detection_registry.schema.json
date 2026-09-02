@@ -4,7 +4,7 @@
   "title": "OCI Log Analytics Splunk Detection Registry Entry",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "title", "splunk", "oci_query_file", "required_sources", "required_fields", "fidelity", "detection", "delivery", "evidence"],
+  "required": ["id", "title", "splunk", "oci_query_file", "required_sources", "required_fields", "fidelity", "detection", "delivery", "evidence", "alarm_contract"],
   "properties": {
     "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "title": {"type": "string", "minLength": 1},
@@ -15,7 +15,8 @@
     "fidelity": {"enum": ["evidence", "raw"]},
     "detection": {"$ref": "#/$defs/detection"},
     "delivery": {"$ref": "#/$defs/delivery"},
-    "evidence": {"$ref": "#/$defs/evidence"}
+    "evidence": {"$ref": "#/$defs/evidence"},
+    "alarm_contract": {"$ref": "#/$defs/alarmContract"}
   },
   "$defs": {
     "nonEmptyStringArray": {
@@ -67,6 +68,17 @@
         "if": {"properties": {"include_original_content": {"const": true}}, "required": ["include_original_content"]},
         "then": {"properties": {"redaction_profile": {"type": "string", "minLength": 1}}, "required": ["redaction_profile"]}
       }]
+    },
+    "alarmContract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["binding_key", "metric_namespace", "metric_name", "query", "allowed_dimensions"],
+      "properties": {
+        "binding_key": {"type": "string", "minLength": 1},
+        "metric_namespace": {"type": "string", "minLength": 1},
+        "metric_name": {"type": "string", "minLength": 1},
+        "query": {"type": "string", "minLength": 1},
+        "allowed_dimensions": {"type": "object", "additionalProperties": {"type": "string"}}
+      }
     }
   }
 }

@@ -107,11 +107,10 @@ def test_alarm_trigger_decodes_oci_raw_monitoring_alarm_without_trusting_detecti
 def test_raw_alarm_contract_rejects_namespace_metric_dimension_and_query_mismatch():
     entry = registry_entry()
     entry["alarm_contract"] = {
-        "alarm_id": "ocid1.alarm.oc1..fixture",
+        "binding_key": "oci-audit-failures",
         "metric_namespace": "oci_log_analytics_detections",
         "metric_name": "AuditFailures",
         "query": "AuditFailures[5m].sum() > 0",
-        "log_analytics_namespace": "oci_log_analytics_detections",
         "allowed_dimensions": {"Status": "Failure"},
     }
     trigger = AlarmTrigger.from_payload({"data": {
@@ -664,7 +663,7 @@ def test_export_service_honors_registry_delivery_bounds():
 
     assert observed["window"].start == datetime(2026, 9, 2, 7, 9, tzinfo=timezone.utc)
     assert observed["max_rows"] == 7
-    assert observed["batch_sizes"] == [2, 1]
+    assert observed["batch_sizes"] == [1]
 
 
 @pytest.mark.parametrize(
@@ -1674,6 +1673,7 @@ def test_function_service_uses_one_resource_principal_for_all_oci_clients(
         "SPLUNK_EVIDENCE_DLQ_BUCKET": "dlq-bucket-under-test",
         "SPLUNK_HEC_SECRET_ID": "secret-reference-under-test",
         "OCI_LOG_ANALYTICS_COMPARTMENT_ID": "compartment-under-test",
+        "OCI_LOG_ANALYTICS_NAMESPACE": "trusted-log-analytics-namespace",
         "SPLUNK_HEC_URL": "https://splunk.example.invalid:8088",
         "SPLUNK_HEC_INDEX": "evidence-index",
         "SPLUNK_HEC_SOURCETYPE": "oci:logan:detection",

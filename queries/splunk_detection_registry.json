@@ -1,6 +1,15 @@
 {
   "detections": [
     {
+      "alarm_contract": {
+        "allowed_dimensions": {
+          "detectionId": "object-storage-new-external-source"
+        },
+        "binding_key": "object-storage-new-external-source",
+        "metric_name": "DetectionSignal",
+        "metric_namespace": "oci_log_analytics_detections",
+        "query": "DetectionSignal[5m]{detectionId = \"object-storage-new-external-source\"}.sum() > 0"
+      },
       "delivery": {
         "delivery_mode": "evidence",
         "lookback": "1h",
@@ -42,6 +51,15 @@
       "title": "OCI Object Storage Access from External Source"
     },
     {
+      "alarm_contract": {
+        "allowed_dimensions": {
+          "detectionId": "oci-audit-failures"
+        },
+        "binding_key": "oci-audit-failures",
+        "metric_name": "DetectionSignal",
+        "metric_namespace": "oci_log_analytics_detections",
+        "query": "DetectionSignal[5m]{detectionId = \"oci-audit-failures\"}.sum() > 0"
+      },
       "delivery": {
         "delivery_mode": "evidence",
         "lookback": "15m",
@@ -83,6 +101,15 @@
       "title": "OCI Audit Failures"
     },
     {
+      "alarm_contract": {
+        "allowed_dimensions": {
+          "detectionId": "oci-iam-policy-change"
+        },
+        "binding_key": "oci-iam-policy-change",
+        "metric_name": "DetectionSignal",
+        "metric_namespace": "oci_log_analytics_detections",
+        "query": "DetectionSignal[5m]{detectionId = \"oci-iam-policy-change\"}.sum() > 0"
+      },
       "delivery": {
         "delivery_mode": "evidence",
         "lookback": "15m",
@@ -124,6 +151,15 @@
       "title": "OCI IAM Policy Changes"
     },
     {
+      "alarm_contract": {
+        "allowed_dimensions": {
+          "detectionId": "vcn-rejected-traffic-spike"
+        },
+        "binding_key": "vcn-rejected-traffic-spike",
+        "metric_name": "DetectionSignal",
+        "metric_namespace": "oci_log_analytics_detections",
+        "query": "DetectionSignal[5m]{detectionId = \"vcn-rejected-traffic-spike\"}.sum() > 0"
+      },
       "delivery": {
         "delivery_mode": "evidence",
         "lookback": "10m",
@@ -162,6 +198,15 @@
       "title": "OCI VCN Rejected Traffic Spike"
     },
     {
+      "alarm_contract": {
+        "allowed_dimensions": {
+          "detectionId": "windows-access-administrator-logon"
+        },
+        "binding_key": "windows-access-administrator-logon",
+        "metric_name": "DetectionSignal",
+        "metric_namespace": "oci_log_analytics_detections",
+        "query": "DetectionSignal[5m]{detectionId = \"windows-access-administrator-logon\"}.sum() > 0"
+      },
       "delivery": {
         "delivery_mode": "evidence",
         "lookback": "5m",
@@ -205,6 +250,15 @@
       "title": "Windows Administrator Logon"
     },
     {
+      "alarm_contract": {
+        "allowed_dimensions": {
+          "detectionId": "windows-access-failed-logon-burst"
+        },
+        "binding_key": "windows-access-failed-logon-burst",
+        "metric_name": "DetectionSignal",
+        "metric_namespace": "oci_log_analytics_detections",
+        "query": "DetectionSignal[5m]{detectionId = \"windows-access-failed-logon-burst\"}.sum() > 0"
+      },
       "delivery": {
         "delivery_mode": "evidence",
         "lookback": "5m",
@@ -248,6 +302,15 @@
       "title": "Windows Failed Logon Burst by Source"
     },
     {
+      "alarm_contract": {
+        "allowed_dimensions": {
+          "detectionId": "windows-access-new-local-user"
+        },
+        "binding_key": "windows-access-new-local-user",
+        "metric_name": "DetectionSignal",
+        "metric_namespace": "oci_log_analytics_detections",
+        "query": "DetectionSignal[5m]{detectionId = \"windows-access-new-local-user\"}.sum() > 0"
+      },
       "delivery": {
         "delivery_mode": "evidence",
         "lookback": "5m",
@@ -291,6 +354,15 @@
       "title": "Windows New Local User Created"
     },
     {
+      "alarm_contract": {
+        "allowed_dimensions": {
+          "detectionId": "windows-access-privileged-group-add"
+        },
+        "binding_key": "windows-access-privileged-group-add",
+        "metric_name": "DetectionSignal",
+        "metric_namespace": "oci_log_analytics_detections",
+        "query": "DetectionSignal[5m]{detectionId = \"windows-access-privileged-group-add\"}.sum() > 0"
+      },
       "delivery": {
         "delivery_mode": "evidence",
         "lookback": "5m",
@@ -334,6 +406,15 @@
       "title": "Windows User Added to Administrators or Remote Desktop Users"
     },
     {
+      "alarm_contract": {
+        "allowed_dimensions": {
+          "detectionId": "windows-access-rdp-after-hours"
+        },
+        "binding_key": "windows-access-rdp-after-hours",
+        "metric_name": "DetectionSignal",
+        "metric_namespace": "oci_log_analytics_detections",
+        "query": "DetectionSignal[5m]{detectionId = \"windows-access-rdp-after-hours\"}.sum() > 0"
+      },
       "delivery": {
         "delivery_mode": "evidence",
         "lookback": "5m",
@@ -379,7 +460,7 @@
       "title": "Windows Successful RDP Logon Outside Business Hours"
     }
   ],
-  "generated_at": "2026-09-02T08:41:02.227231+00:00",
+  "generated_at": "2026-09-02T15:45:28.409701+00:00",
   "splunk_provenance": {
     "object-storage-new-external-source": {
       "app": "splunk_app_oci",

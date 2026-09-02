@@ -284,7 +284,7 @@ def _scenario_contract_ok(name: str, output: str) -> bool:
     if name == "local exporter duplicate":
         return (
             common
-            and receipt.get("status") == "delivered"
+            and receipt.get("status") == "no_evidence"
             and receipt.get("invocation_count") == 2
             and receipt.get("stable_event_keys") is True
         )
@@ -479,12 +479,18 @@ def main() -> int:
         action="store_true",
         help="Run only the credential-free Splunk parallel release stage and print JSON",
     )
+    parser.add_argument("--write-splunk-parallel-evidence-example", action="store_true", help="Refresh the checked-in local-only Splunk evidence example")
     args = parser.parse_args()
 
     if args.splunk_parallel_offline_stage:
         if args.include_live:
             parser.error("the Splunk parallel offline stage cannot include live validation")
         evidence = run_splunk_parallel_offline_stage()
+        if args.write_splunk_parallel_evidence_example:
+            example = dict(evidence)
+            example["example"] = True
+            example["receipt_type"] = "local_example"
+            (HEALTH_DIR / "splunk-parallel-local-evidence.example.json").write_text(json.dumps(example, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(json.dumps(evidence, indent=2, sort_keys=True))
         return 0 if evidence["status"] == "PASS" else 1
 

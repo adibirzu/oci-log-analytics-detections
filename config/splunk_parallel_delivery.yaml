@@ -8,6 +8,8 @@ defaults:
   max_batch_events: 100
   max_attempts: 4
   sourcetype: oci:logan:detection
+  metric_namespace: oci_log_analytics_detections
+  metric_name: DetectionSignal
 raw_sources:
   enabled: false
   delivery_mode: raw

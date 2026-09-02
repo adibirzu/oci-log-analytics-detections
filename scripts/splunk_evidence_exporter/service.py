@@ -259,7 +259,10 @@ class EvidenceExportService:
                     dimensions=evidence_dimensions,
                     checkpoint=window.end,
                 )
-                self._emit_metric("DeliveryFailed", 1, detection_id)
+                # The native Function error alarm is the fallback when the
+                # failure metric itself cannot be emitted. DLQ persistence
+                # happened first, so replay remains safe.
+                self._emit_metric("DeliveryFailed", 1, detection_id, fatal=True)
                 # A batch may have been acknowledged before a later batch
                 # failed. Report that confirmed prefix so telemetry reconciles
                 # with the receipt and DLQ remaining-event count.
@@ -303,14 +306,15 @@ class EvidenceExportService:
             completed_at=self._clock(),
         )
 
-    def _emit_metric(self, name: str, value: int, detection_id: str) -> None:
+    def _emit_metric(self, name: str, value: int, detection_id: str, *, fatal: bool = False) -> None:
         if self._metrics is None:
             return
         # Metrics must not turn a confirmed HEC delivery into a retry storm.
         try:
             self._metrics.emit(name, value, {"detection": detection_id, "outcome": name})
         except Exception:
-            return
+            if fatal:
+                raise RuntimeError("operational metric could not be emitted") from None
 
     @staticmethod
     def _find_entry(document: object, trigger: AlarmTrigger, alarm_bindings: Mapping[str, str]) -> Mapping[str, object]:

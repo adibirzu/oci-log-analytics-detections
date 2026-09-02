@@ -364,9 +364,27 @@ class TestReleaseChecklistEvidence(unittest.TestCase):
             "network negative control",
             [sys.executable, "-c", "import socket; socket.create_connection(('127.0.0.1', 9))"],
             timeout=30,
+            offline=True,
         )
         self.assertFalse(result["ok"])
         self.assertTrue(result["network"]["attempted"])
+
+    def test_live_step_path_does_not_install_offline_guard(self):
+        completed = subprocess.CompletedProcess(["live"], 0, "ok\n", "")
+        with patch.object(release_checklist.subprocess, "run", return_value=completed) as run:
+            result = release_checklist._run_step("live regression", [sys.executable, "-c", "print('ok')"])
+        self.assertTrue(result["ok"])
+        self.assertNotIn("env", run.call_args.kwargs)
+
+    def test_offline_manifest_includes_harness_and_stage_dependencies(self):
+        manifest = release_checklist._splunk_evidence_manifest()
+        for path in (
+            "scripts/generate_splunk_detection_registry.py",
+            "scripts/validate_terraform_static.py",
+            "scripts/sitecustomize.py",
+        ):
+            self.assertIn(path, manifest["files"])
+            self.assertNotIn(path, manifest["missing"])
 
     def test_manifest_is_complete_and_has_identity(self):
         manifest = release_checklist._splunk_evidence_manifest()

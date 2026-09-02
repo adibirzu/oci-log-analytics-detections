@@ -145,6 +145,29 @@ def test_metrics_adapter_sends_documented_namespace_and_service_metric_contract(
     assert set(metric["dimensions"]) == {"detection", "outcome"}
 
 
+def test_metrics_adapter_uses_real_oci_monitoring_models_and_nested_compartment():
+    oci = pytest.importorskip("oci")
+    from oci.monitoring.models import Datapoint, MetricDataDetails, PostMetricDataDetails
+
+    client = _MetricsClient()
+    adapter = OciMonitoringMetricsAdapter(
+        client=client,
+        compartment_id="compartment",
+        namespace="oci_log_analytics_splunk_exporter",
+        metric_data_factory=PostMetricDataDetails,
+        metric_details_factory=MetricDataDetails,
+        datapoint_factory=Datapoint,
+    )
+    adapter.emit("DeliverySucceeded", 1, {"detection": "rule", "outcome": "DeliverySucceeded"})
+    request = client.payloads[0]
+    assert isinstance(request, PostMetricDataDetails)
+    metric = request.metric_data[0]
+    assert isinstance(metric, MetricDataDetails)
+    assert metric.compartment_id == "compartment"
+    assert metric.namespace == "oci_log_analytics_splunk_exporter"
+    assert isinstance(metric.datapoints[0], Datapoint)
+
+
 class _MetricSink:
     def __init__(self, fail=False):
         self.calls = []
@@ -215,17 +238,15 @@ def test_service_with_actual_metrics_adapter_emits_success_and_count_metrics():
     assert [payload["metric_data"][0]["datapoints"][0]["value"] for payload in client.payloads] == [1, 1]
 
 
-def test_service_emits_failure_and_dead_letter_metrics_without_making_metrics_fatal():
+def test_service_propagates_when_failure_metric_cannot_be_emitted_after_dead_letter():
     metrics = _MetricSink(fail=True)
     dead_letters = []
-    receipt = _metric_service(metrics, TimeoutError("timeout"), dead_letters).export(
-        AlarmTrigger.from_payload(alarm_payload())
-    )
-    assert receipt.status == "delivery_failed"
+    with pytest.raises(RuntimeError, match="operational metric"):
+        _metric_service(metrics, TimeoutError("timeout"), dead_letters).export(
+            AlarmTrigger.from_payload(alarm_payload())
+        )
     assert len(dead_letters) == 1
-    assert [(name, value) for name, value, _ in metrics.calls] == [
-        ("DeliveryFailed", 1), ("DeadLetteredEvents", 1)
-    ]
+    assert [(name, value) for name, value, _ in metrics.calls] == [("DeliveryFailed", 1)]
 
 
 def test_service_with_actual_metrics_adapter_emits_failure_and_dead_letter_counts():

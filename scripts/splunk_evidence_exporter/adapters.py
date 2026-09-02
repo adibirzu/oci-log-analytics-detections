@@ -387,8 +387,22 @@ class OciMonitoringMetricsAdapter:
         {"token", "secret", "password", "credential", "authorization", "cookie", "email"}
     )
 
-    def __init__(self, *, client: object | Callable[[], object], compartment_id: str, namespace: str, metric_data_factory: Callable[..., object]) -> None:
-        self._client, self._compartment_id, self._namespace, self._factory = client, _required_text(compartment_id, "compartment"), _required_text(namespace, "metric namespace"), metric_data_factory
+    def __init__(
+        self,
+        *,
+        client: object | Callable[[], object],
+        compartment_id: str,
+        namespace: str,
+        metric_data_factory: Callable[..., object],
+        metric_details_factory: Callable[..., object] | None = None,
+        datapoint_factory: Callable[..., object] | None = None,
+    ) -> None:
+        self._client = client
+        self._compartment_id = _required_text(compartment_id, "compartment")
+        self._namespace = _required_text(namespace, "metric namespace")
+        self._factory = metric_data_factory
+        self._details_factory = metric_details_factory
+        self._datapoint_factory = datapoint_factory
 
     def emit(self, name: str, value: int, dimensions: Mapping[str, str]) -> None:
         if name not in {"DeliveryFailed", "DeliverySucceeded", "DeliveredEvents", "DeadLetteredEvents"} or not isinstance(value, int) or value < 0:
@@ -417,9 +431,22 @@ class OciMonitoringMetricsAdapter:
         try:
             client = self._client() if callable(self._client) else self._client
             self._client = client
-            client.post_metric_data(self._factory(compartment_id=self._compartment_id, metric_data=[{
-                "namespace": self._namespace, "name": name, "compartment_id": self._compartment_id, "dimensions": safe, "datapoints": [{"timestamp": datetime.now(timezone.utc), "value": value}],
-            }]))
+            timestamp = datetime.now(timezone.utc)
+            datapoint = {"timestamp": timestamp, "value": value}
+            if self._datapoint_factory is not None:
+                datapoint = self._datapoint_factory(timestamp=timestamp, value=value)
+            metric = {
+                "namespace": self._namespace,
+                "name": name,
+                "compartment_id": self._compartment_id,
+                "dimensions": safe,
+                "datapoints": [datapoint],
+            }
+            if self._details_factory is not None:
+                metric = self._details_factory(**metric)
+            # Monitoring's PostMetricDataDetails accepts only metric_data and
+            # batch_atomicity. The compartment belongs to MetricDataDetails.
+            client.post_metric_data(self._factory(metric_data=[metric]))
         except Exception:
             raise RuntimeError("operational metric could not be emitted") from None
 
@@ -803,5 +830,7 @@ class OciResourcePrincipalAdapterFactory:
                 compartment_id=compartment_id,
                 namespace=telemetry_namespace,
                 metric_data_factory=oci.monitoring.models.PostMetricDataDetails,
+                metric_details_factory=oci.monitoring.models.MetricDataDetails,
+                datapoint_factory=oci.monitoring.models.Datapoint,
             ),
         )

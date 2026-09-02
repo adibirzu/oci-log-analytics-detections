@@ -7,6 +7,7 @@ from pathlib import Path
 import jsonschema
 import yaml
 from scripts.splunk_delivery_contracts import registry_validation_errors
+from scripts.generate_splunk_detection_registry import build_registry, validate_registry
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,6 +20,83 @@ EVIDENCE_SCHEMA = json.loads(
 )
 REGISTRY_VALIDATOR = jsonschema.Draft202012Validator(REGISTRY_SCHEMA)
 EVIDENCE_VALIDATOR = jsonschema.Draft202012Validator(EVIDENCE_SCHEMA)
+
+
+def delivery_config_with_migration(tmp_path: Path, **overrides) -> Path:
+    """Write a minimal delivery policy with one portable migration entry."""
+    migration = {
+        "id": "oci-console-login-failure",
+        "title": "OCI Console Login Failure",
+        "splunk": {
+            "repository": "adibirzu/oci-splunk",
+            "app": "oci-splunk",
+            "version": "v1.0.0",
+            "saved_search": "OCI Audit failures",
+        },
+        "oci_query_file": "queries/oci_console_login_failure.json",
+        "required_sources": ["OCI Audit Logs"],
+        "required_fields": ["Event Type", "Status"],
+        "fidelity": "evidence",
+        "detection": {"severity": "medium", "mitre_techniques": ["T1078"]},
+    }
+    migration.update(overrides)
+    policy = {
+        "version": 1,
+        "defaults": POLICY["defaults"],
+        "detections": {"enabled": True, "migrations": [migration]},
+        "splunk_target": POLICY["splunk_target"],
+    }
+    path = tmp_path / "splunk_parallel_delivery.yaml"
+    path.write_text(yaml.safe_dump(policy), encoding="utf-8")
+    return path
+
+
+def test_registry_is_deterministic(tmp_path: Path):
+    config = delivery_config_with_migration(tmp_path)
+    first = build_registry(config)
+    second = build_registry(config)
+    first.pop("generated_at", None)
+    second.pop("generated_at", None)
+    assert first == second
+    assert [x["id"] for x in first["detections"]] == sorted(
+        x["id"] for x in first["detections"]
+    )
+
+
+def test_registry_preserves_splunk_provenance(tmp_path: Path):
+    registry = build_registry(delivery_config_with_migration(tmp_path))
+    provenance = registry["splunk_provenance"]["oci-console-login-failure"]
+    assert provenance == {
+        "repository": "adibirzu/oci-splunk",
+        "app": "oci-splunk",
+        "version": "v1.0.0",
+        "saved_search": "OCI Audit failures",
+    }
+
+
+def test_registry_rejects_missing_query_files_and_fields(tmp_path: Path):
+    missing_query = build_registry(
+        delivery_config_with_migration(tmp_path, oci_query_file="queries/missing.json")
+    )
+    missing_field = build_registry(
+        delivery_config_with_migration(tmp_path, required_fields=["Definitely Missing Field"])
+    )
+    assert any("canonical query" in error for error in validate_registry(missing_query))
+    assert any("required field" in error for error in validate_registry(missing_field))
+
+
+def test_registry_rejects_ineligible_scheduled_detection_and_secret_keys(tmp_path: Path):
+    registry = build_registry(delivery_config_with_migration(tmp_path))
+    registry["splunk_provenance"]["oci-console-login-failure"]["hec_token"] = "not-a-token"
+    errors = validate_registry(registry)
+    assert any("not scheduled-detection eligible" in error for error in errors)
+    assert any("forbidden secret or tenant key" in error for error in errors)
+
+
+def test_registry_requires_complete_splunk_provenance(tmp_path: Path):
+    registry = build_registry(delivery_config_with_migration(tmp_path))
+    del registry["splunk_provenance"]["oci-console-login-failure"]["version"]
+    assert any("provenance is missing version" in error for error in validate_registry(registry))
 
 
 def valid_registry_entry():

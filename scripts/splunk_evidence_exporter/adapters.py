@@ -11,6 +11,8 @@ import binascii
 import hashlib
 import json
 import re
+import time
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Callable, Mapping, Sequence
 from urllib import error as urllib_error
@@ -30,6 +32,7 @@ class OciLogAnalyticsQueryAdapter:
         client: object,
         compartment_id: str,
         compartment_id_in_subtree: bool,
+        max_rows_ceiling: int,
         query_loader: Callable[[str], Mapping[str, object]],
         query_details_factory: Callable[..., object],
         time_range_factory: Callable[..., object],
@@ -39,6 +42,13 @@ class OciLogAnalyticsQueryAdapter:
         self._client = client
         self._compartment_id = compartment_id
         self._compartment_id_in_subtree = bool(compartment_id_in_subtree)
+        if (
+            isinstance(max_rows_ceiling, bool)
+            or not isinstance(max_rows_ceiling, int)
+            or max_rows_ceiling < 1
+        ):
+            raise ValueError("Log Analytics row ceiling must be a positive integer")
+        self._max_rows_ceiling = max_rows_ceiling
         self._query_loader = query_loader
         self._query_details_factory = query_details_factory
         self._time_range_factory = time_range_factory
@@ -54,6 +64,8 @@ class OciLogAnalyticsQueryAdapter:
     ) -> tuple[Mapping[str, object], ...]:
         if isinstance(max_rows, bool) or not isinstance(max_rows, int) or max_rows < 1:
             raise ValueError("max_rows must be a positive integer")
+        if max_rows > self._max_rows_ceiling:
+            raise ValueError("max_rows exceeds the runtime maximum")
         query_document = self._query_loader(query_file)
         query_string = query_document.get("query")
         if not isinstance(query_string, str) or not query_string.strip():
@@ -93,6 +105,7 @@ class OciLogAnalyticsQueryAdapter:
         *,
         compartment_id: str,
         compartment_id_in_subtree: bool,
+        max_rows_ceiling: int,
         query_loader: Callable[[str], Mapping[str, object]],
     ) -> "OciLogAnalyticsQueryAdapter":
         import oci
@@ -103,6 +116,7 @@ class OciLogAnalyticsQueryAdapter:
             client=client,
             compartment_id=compartment_id,
             compartment_id_in_subtree=compartment_id_in_subtree,
+            max_rows_ceiling=max_rows_ceiling,
             query_loader=query_loader,
             query_details_factory=oci.log_analytics.models.QueryDetails,
             time_range_factory=oci.log_analytics.models.TimeRange,
@@ -163,6 +177,10 @@ def _dimension_hash(dimensions: Mapping[str, str]) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
 
+def _identifier_hash(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()[:16]
+
+
 class ObjectStorageStateAdapter:
     """Store per-rule checkpoints under deterministic, non-sensitive names."""
 
@@ -173,7 +191,8 @@ class ObjectStorageStateAdapter:
 
     def _object_name(self, detection_id: str, dimensions: Mapping[str, str]) -> str:
         return (
-            f"state-{_safe_identifier(detection_id)}-{_dimension_hash(dimensions)}.json"
+            f"state-{_safe_identifier(detection_id, maximum=48)}-"
+            f"{_identifier_hash(detection_id)}-{_dimension_hash(dimensions)}.json"
         )
 
     def load_checkpoint(
@@ -324,6 +343,8 @@ class SplunkHecAdapter:
     """Deliver normalized events to the Splunk HEC JSON event endpoint."""
 
     _MAX_TIMEOUT_SECONDS = 60
+    _MAX_ACK_POLLS = 32
+    _MAX_ACK_POLL_INTERVAL_SECONDS = 2.0
 
     def __init__(
         self,
@@ -336,6 +357,9 @@ class SplunkHecAdapter:
         acknowledgement_mode: str = "response",
         opener: Callable[..., object] = urllib_request.urlopen,
         allow_insecure_local_test: bool = False,
+        clock: Callable[[], float] = time.monotonic,
+        sleep: Callable[[float], None] = time.sleep,
+        ack_poll_initial_seconds: float = 0.25,
     ) -> None:
         self._event_url, self._ack_url = self._validated_urls(
             hec_url, allow_insecure_local_test
@@ -353,9 +377,20 @@ class SplunkHecAdapter:
             )
         if acknowledgement_mode not in ("response", "indexer_ack"):
             raise ValueError("unsupported HEC acknowledgement mode")
+        if (
+            isinstance(ack_poll_initial_seconds, bool)
+            or not isinstance(ack_poll_initial_seconds, (int, float))
+            or not 0 < ack_poll_initial_seconds <= timeout_seconds
+        ):
+            raise ValueError(
+                "HEC acknowledgement poll interval must be within the timeout"
+            )
         self._timeout_seconds = timeout_seconds
         self._acknowledgement_mode = acknowledgement_mode
         self._opener = opener
+        self._clock = clock
+        self._sleep = sleep
+        self._ack_poll_initial_seconds = float(ack_poll_initial_seconds)
 
     def __repr__(self) -> str:
         return (
@@ -430,19 +465,7 @@ class SplunkHecAdapter:
             and isinstance(response, Mapping)
             and isinstance(response.get("ackId"), int)
         ):
-            ack_id = response["ackId"]
-            ack_body = json.dumps({"acks": [ack_id]}, separators=(",", ":")).encode(
-                "utf-8"
-            )
-            ack_result = self._post(self._ack_url, ack_body, headers)
-            ack_response = ack_result["response"]
-            acknowledgements = (
-                ack_response.get("acks") if isinstance(ack_response, Mapping) else None
-            )
-            confirmed = isinstance(acknowledgements, Mapping) and (
-                acknowledgements.get(str(ack_id)) is True
-                or acknowledgements.get(ack_id) is True
-            )
+            confirmed = self._confirm_indexer_ack(response["ackId"], headers)
         return {
             "status": status,
             "response": response,
@@ -450,14 +473,60 @@ class SplunkHecAdapter:
             "acknowledgement_confirmed": confirmed,
         }
 
+    def _confirm_indexer_ack(self, ack_id: int, headers: Mapping[str, str]) -> bool:
+        ack_body = json.dumps({"acks": [ack_id]}, separators=(",", ":")).encode("utf-8")
+        deadline = self._clock() + self._timeout_seconds
+        interval = self._ack_poll_initial_seconds
+        for _ in range(self._MAX_ACK_POLLS):
+            remaining = deadline - self._clock()
+            if remaining <= 0:
+                return False
+            ack_result = self._post(
+                self._ack_url,
+                ack_body,
+                headers,
+                timeout_seconds=remaining,
+            )
+            ack_response = ack_result["response"]
+            acknowledgements = (
+                ack_response.get("acks") if isinstance(ack_response, Mapping) else None
+            )
+            if isinstance(acknowledgements, Mapping) and (
+                acknowledgements.get(str(ack_id)) is True
+                or acknowledgements.get(ack_id) is True
+            ):
+                return True
+            status = ack_result["status"]
+            if isinstance(status, int) and 400 <= status <= 499:
+                return False
+            remaining = deadline - self._clock()
+            sleep_for = min(interval, remaining)
+            if sleep_for <= 0:
+                return False
+            self._sleep(sleep_for)
+            interval = min(interval * 2, self._MAX_ACK_POLL_INTERVAL_SECONDS)
+        return False
+
     def _post(
-        self, url: str, body: bytes, headers: Mapping[str, str]
+        self,
+        url: str,
+        body: bytes,
+        headers: Mapping[str, str],
+        *,
+        timeout_seconds: float | None = None,
     ) -> Mapping[str, object]:
         request = urllib_request.Request(
             url=url, data=body, headers=dict(headers), method="POST"
         )
         try:
-            with self._opener(request, timeout=self._timeout_seconds) as response:
+            with self._opener(
+                request,
+                timeout=(
+                    self._timeout_seconds
+                    if timeout_seconds is None
+                    else min(timeout_seconds, self._timeout_seconds)
+                ),
+            ) as response:
                 status = response.status
                 raw = response.read()
         except urllib_error.HTTPError as exc:
@@ -484,3 +553,61 @@ class SplunkHecAdapter:
             "status": status,
             "response": decoded if isinstance(decoded, Mapping) else {},
         }
+
+
+@dataclass(frozen=True)
+class OciAdapterBundle:
+    """Resource-principal-backed OCI adapters for one Function invocation."""
+
+    query: OciLogAnalyticsQueryAdapter
+    vault: OciVaultSecretAdapter
+    checkpoint: ObjectStorageStateAdapter
+    dead_letter: ObjectStorageDeadLetterAdapter
+
+
+class OciResourcePrincipalAdapterFactory:
+    """Own all OCI SDK imports, models, signing, clients, and adapter wiring."""
+
+    @staticmethod
+    def create(
+        *,
+        compartment_id: str,
+        compartment_id_in_subtree: bool,
+        max_rows_ceiling: int,
+        secret_id: str,
+        namespace: str,
+        state_bucket: str,
+        dlq_bucket: str,
+        query_loader: Callable[[str], Mapping[str, object]],
+        clock: Callable[[], datetime],
+    ) -> OciAdapterBundle:
+        import oci
+
+        signer = oci.auth.signers.get_resource_principals_signer()
+        log_client = oci.log_analytics.LogAnalyticsClient(config={}, signer=signer)
+        secrets_client = oci.secrets.SecretsClient(config={}, signer=signer)
+        object_client = oci.object_storage.ObjectStorageClient(config={}, signer=signer)
+        return OciAdapterBundle(
+            query=OciLogAnalyticsQueryAdapter(
+                client=log_client,
+                compartment_id=compartment_id,
+                compartment_id_in_subtree=compartment_id_in_subtree,
+                max_rows_ceiling=max_rows_ceiling,
+                query_loader=query_loader,
+                query_details_factory=oci.log_analytics.models.QueryDetails,
+                time_range_factory=oci.log_analytics.models.TimeRange,
+            ),
+            vault=OciVaultSecretAdapter(
+                client=secrets_client,
+                secret_id=secret_id,  # allow-sensitive-value
+            ),
+            checkpoint=ObjectStorageStateAdapter(
+                client=object_client, namespace=namespace, bucket=state_bucket
+            ),
+            dead_letter=ObjectStorageDeadLetterAdapter(
+                client=object_client,
+                namespace=namespace,
+                bucket=dlq_bucket,
+                clock=clock,
+            ),
+        )

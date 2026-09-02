@@ -10,10 +10,7 @@ from pathlib import Path
 from typing import Mapping
 
 from .adapters import (
-    ObjectStorageDeadLetterAdapter,
-    ObjectStorageStateAdapter,
-    OciLogAnalyticsQueryAdapter,
-    OciVaultSecretAdapter,
+    OciResourcePrincipalAdapterFactory,
     SplunkHecAdapter,
 )
 from .models import AlarmTrigger
@@ -76,19 +73,28 @@ def _environment_int(name: str, default: int, *, minimum: int, maximum: int) -> 
 def build_service() -> EvidenceExportService:
     """Build production adapters with a single OCI Function resource principal."""
 
-    import oci
-
-    signer = oci.auth.signers.get_resource_principals_signer()
-    log_client = oci.log_analytics.LogAnalyticsClient(config={}, signer=signer)
-    secrets_client = oci.secrets.SecretsClient(config={}, signer=signer)
-    object_client = oci.object_storage.ObjectStorageClient(config={}, signer=signer)
-
     namespace = _required_environment("OBJECT_STORAGE_NAMESPACE")
     state_bucket = _required_environment("SPLUNK_EVIDENCE_STATE_BUCKET")
     dlq_bucket = _required_environment("SPLUNK_EVIDENCE_DLQ_BUCKET")
-    vault = OciVaultSecretAdapter(
-        client=secrets_client,
+    max_rows = _environment_int(
+        "SPLUNK_EVIDENCE_MAX_ROWS", 1000, minimum=1, maximum=10000
+    )
+    max_batch_events = _environment_int(
+        "SPLUNK_HEC_MAX_BATCH_EVENTS", 100, minimum=1, maximum=1000
+    )
+    oci_adapters = OciResourcePrincipalAdapterFactory.create(
+        compartment_id=_required_environment("OCI_LOG_ANALYTICS_COMPARTMENT_ID"),
+        compartment_id_in_subtree=os.environ.get(
+            "OCI_LOG_ANALYTICS_COMPARTMENT_IN_SUBTREE", "true"
+        ).casefold()
+        == "true",
+        max_rows_ceiling=max_rows,
         secret_id=_required_environment("SPLUNK_HEC_SECRET_ID"),
+        namespace=namespace,
+        state_bucket=state_bucket,
+        dlq_bucket=dlq_bucket,
+        query_loader=_load_query,
+        clock=lambda: datetime.now(timezone.utc),
     )
     return EvidenceExportService(
         registry=_JsonRegistry(
@@ -99,23 +105,11 @@ def build_service() -> EvidenceExportService:
                 )
             )
         ),
-        query=OciLogAnalyticsQueryAdapter(
-            client=log_client,
-            compartment_id=_required_environment("OCI_LOG_ANALYTICS_COMPARTMENT_ID"),
-            compartment_id_in_subtree=os.environ.get(
-                "OCI_LOG_ANALYTICS_COMPARTMENT_IN_SUBTREE", "true"
-            ).casefold()
-            == "true",
-            query_loader=_load_query,
-            query_details_factory=oci.log_analytics.models.QueryDetails,
-            time_range_factory=oci.log_analytics.models.TimeRange,
-        ),
-        checkpoint=ObjectStorageStateAdapter(
-            client=object_client, namespace=namespace, bucket=state_bucket
-        ),
+        query=oci_adapters.query,
+        checkpoint=oci_adapters.checkpoint,
         hec=SplunkHecAdapter(
             hec_url=_required_environment("SPLUNK_HEC_URL"),
-            token_provider=vault,
+            token_provider=oci_adapters.vault,  # allow-sensitive-value
             index=_required_environment("SPLUNK_HEC_INDEX"),
             sourcetype=_required_environment("SPLUNK_HEC_SOURCETYPE"),
             timeout_seconds=_environment_int(
@@ -129,12 +123,7 @@ def build_service() -> EvidenceExportService:
             ).casefold()
             == "true",
         ),
-        dead_letter=ObjectStorageDeadLetterAdapter(
-            client=object_client,
-            namespace=namespace,
-            bucket=dlq_bucket,
-            clock=lambda: datetime.now(timezone.utc),
-        ),
+        dead_letter=oci_adapters.dead_letter,
         clock=lambda: datetime.now(timezone.utc),
         lookback=timedelta(
             seconds=_environment_int(
@@ -154,12 +143,8 @@ def build_service() -> EvidenceExportService:
                 maximum=86400,
             )
         ),
-        max_rows=_environment_int(
-            "SPLUNK_EVIDENCE_MAX_ROWS", 1000, minimum=1, maximum=10000
-        ),
-        max_batch_events=_environment_int(
-            "SPLUNK_HEC_MAX_BATCH_EVENTS", 100, minimum=1, maximum=1000
-        ),
+        max_rows=max_rows,
+        max_batch_events=max_batch_events,
     )
 
 

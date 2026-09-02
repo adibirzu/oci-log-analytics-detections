@@ -34,11 +34,13 @@ def _duration(value: object, fallback: timedelta, label: str) -> timedelta:
     )
 
 
-def _positive_int(value: object, fallback: int, label: str) -> int:
+def _bounded_int(value: object, runtime_maximum: int, label: str) -> int:
     if value is None:
-        return fallback
+        return runtime_maximum
     if isinstance(value, bool) or not isinstance(value, int) or value < 1:
         raise ValueError(f"registry {label} must be a positive integer")
+    if value > runtime_maximum:
+        raise ValueError(f"registry {label} exceeds the runtime maximum")
     return value
 
 
@@ -110,8 +112,8 @@ class EvidenceExportService:
             raise ValueError("registry delivery configuration must be an object")
         lookback = _duration(delivery.get("lookback"), self._lookback, "lookback")
         overlap = _duration(delivery.get("overlap"), self._overlap, "overlap")
-        max_rows = _positive_int(delivery.get("max_rows"), self._max_rows, "max_rows")
-        max_batch_events = _positive_int(
+        max_rows = _bounded_int(delivery.get("max_rows"), self._max_rows, "max_rows")
+        max_batch_events = _bounded_int(
             delivery.get("max_batch_events"),
             self._max_batch_events,
             "max_batch_events",

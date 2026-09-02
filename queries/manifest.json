@@ -1,7 +1,7 @@
 {
   "project": "oci-log-analytics-detections",
   "version": "2.0.0",
-  "generated_at": "2026-09-01T12:00:48.006936+00:00",
+  "generated_at": "2026-09-02T16:30:22.740431+00:00",
   "stats": {
     "total_rules": 538,
     "total_sigma_rules": 522,
@@ -9095,8 +9095,8 @@
     }
   ],
   "dashboards": {
-    "total": 34,
-    "saved_searches": 536,
+    "total": 35,
+    "saved_searches": 541,
     "names": [
       "SOC Overview Dashboard",
       "SOC: OCI STIG Compliance Dashboard",
@@ -9107,6 +9107,7 @@
       "SOC: Linux Advanced Threats Dashboard",
       "SOC: Windows Security Dashboard",
       "SOC: Windows Advanced Threats Dashboard",
+      "SOC: Windows Access Monitoring",
       "SOC: GOAD Caldera Operations Dashboard",
       "SOC: Threat Hunting Dashboard",
       "SOC: Sysmon Network and Lateral Movement Dashboard",

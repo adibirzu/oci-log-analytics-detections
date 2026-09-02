@@ -33,6 +33,7 @@ locals {
     SPLUNK_EVIDENCE_LOOKBACK_SECONDS         = tostring(var.splunk_evidence_lookback_seconds)
     SPLUNK_EVIDENCE_OVERLAP_SECONDS          = tostring(var.splunk_evidence_overlap_seconds)
     SPLUNK_EVIDENCE_MAX_WINDOW_SECONDS       = tostring(var.splunk_evidence_max_window_seconds)
+    SPLUNK_EXPORTER_TELEMETRY_NAMESPACE      = var.exporter_telemetry_namespace
   }
 
   # These are governed contracts, not discovered tenant alarms.  The operator

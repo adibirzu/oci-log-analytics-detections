@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/adibirzu/oci-log-analytics-detections/blob/main/schemas/splunk_evidence_event.schema.json",
+  "title": "OCI Log Analytics Splunk Evidence Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event_key", "batch_id", "detection", "evidence", "provenance"],
+  "properties": {
+    "schema_version": {"const": "oci.logan.splunk.evidence.v1"},
+    "event_key": {"type": "string", "minLength": 1},
+    "batch_id": {"type": "string", "minLength": 1},
+    "detection": {"$ref": "#/$defs/detection"},
+    "evidence": {"$ref": "#/$defs/evidence"},
+    "provenance": {"$ref": "#/$defs/provenance"}
+  },
+  "$defs": {
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "severity"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["low", "medium", "high", "critical"]}
+      }
+    },
+    "evidenceField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "value": {"type": ["string", "number", "integer", "boolean", "null"]}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["include_original_content", "fields"],
+      "properties": {
+        "include_original_content": {"type": "boolean"},
+        "redaction_profile": {"type": "string", "minLength": 1},
+        "fields": {"type": "array", "items": {"$ref": "#/$defs/evidenceField"}}
+      },
+      "allOf": [{
+        "if": {"properties": {"include_original_content": {"const": true}}, "required": ["include_original_content"]},
+        "then": {"required": ["redaction_profile"]}
+      }]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product", "query_file", "window_start", "window_end"],
+      "properties": {
+        "product": {"const": "OCI Log Analytics"},
+        "query_file": {"type": "string", "pattern": "^queries/(?:apps/|hunting/|sentinel/)?[a-z0-9][a-z0-9_-]*\\.json$"},
+        "window_start": {"type": "string", "format": "date-time"},
+        "window_end": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}

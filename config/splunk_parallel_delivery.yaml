@@ -1,0 +1,23 @@
+version: 1
+defaults:
+  delivery_mode: evidence
+  include_original_content: false
+  lookback: 15m
+  overlap: 2m
+  max_rows: 1000
+  max_batch_events: 100
+  max_attempts: 4
+  sourcetype: oci:logan:detection
+raw_sources:
+  enabled: false
+  delivery_mode: raw
+detections:
+  enabled: true
+  registry_file: config/splunk_detection_registry.json
+splunk_target:
+  hec_url_env: SPLUNK_HEC_URL
+  hec_token_env: SPLUNK_HEC_TOKEN
+  index_env: SPLUNK_HEC_INDEX
+  sourcetype_env: SPLUNK_HEC_SOURCETYPE
+  index: ${SPLUNK_HEC_INDEX}
+  sourcetype: ${SPLUNK_HEC_SOURCETYPE}

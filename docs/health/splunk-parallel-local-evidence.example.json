@@ -1,0 +1,48 @@
+{
+  "artifact_hashes": {
+    "config/splunk_parallel_delivery.yaml": "186dec36f7580beb12f152efa5056ee63cf8d418062824b10b68ca64b2fd615f",
+    "queries/splunk_detection_registry.json": "dc5fdfbcc387f3a272730a3dd6b04a72be7cecad80059d6158ecd828bfb2e90c",
+    "schemas/splunk_detection_registry.schema.json": "fff6b872f9c9af6c1ed959190ea912533ca9315583e20a847f8d019c3b134131",
+    "schemas/splunk_evidence_event.schema.json": "1153be6a65bf2b3182cd2f8bbc9a8cdd39fb738c45c41ebc2300d293c49d6f4e",
+    "scripts/release_checklist.py": "e6f2cb748244e18ba15369468090693552fd12c1e922578aa8a1b09820f7f666",
+    "scripts/splunk_evidence_exporter_cli.py": "a3b10d31d04f9025ca4d25cd87800d71ea20ddd0f59b49dfd6c0e513e8a34481",
+    "stack/main.tf": "5ea9480341b50f0e07fa2720480aff1a319bc70b814d528f2f8298421d205dd2",
+    "stack/schema.yaml": "b2f2a1cafd5f3ab68514545b5e7d46a99fae7064778c09d90808041d73abe6ee"
+  },
+  "evidence_class": "locally_verified",
+  "example": true,
+  "external_calls": [],
+  "gate_counts": {
+    "failed": 0,
+    "passed": 10,
+    "total": 10
+  },
+  "gates": [
+    {"exit_code": 0, "name": "registry drift validation", "ok": true},
+    {"exit_code": 0, "name": "schema validation", "ok": true},
+    {"exit_code": 0, "name": "local exporter success", "ok": true},
+    {"exit_code": 0, "name": "local exporter duplicate", "ok": true},
+    {"exit_code": 0, "name": "local exporter failure", "ok": true},
+    {"exit_code": 0, "name": "local exporter replay", "ok": true},
+    {"exit_code": 0, "name": "diagram validation", "ok": true},
+    {"exit_code": 0, "name": "documentation validation", "ok": true},
+    {"exit_code": 0, "name": "terraform format validation", "ok": true},
+    {"exit_code": 0, "name": "terraform static validation", "ok": true}
+  ],
+  "limitations": "Local fixtures and static validation only; no OCI, Vault, HEC, Splunk search, provider, customer, or release acceptance was run.",
+  "offline": true,
+  "provider_validation": "not_run",
+  "provider_verified": false,
+  "receipt_type": "local_example",
+  "reproduction_command": "python3 scripts/release_checklist.py --splunk-parallel-offline-stage",
+  "scenario_counts": {
+    "duplicate": 1,
+    "failure": 1,
+    "passed": 4,
+    "replay": 1,
+    "requested": 4,
+    "success": 1
+  },
+  "schema_version": "oci.logan.splunk.local-release.v1",
+  "status": "PASS"
+}

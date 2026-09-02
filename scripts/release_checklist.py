@@ -9,6 +9,7 @@ OCI resources.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import ipaddress
 import json
 import re
@@ -21,6 +22,7 @@ PROJECT_DIR = Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = PROJECT_DIR / "scripts"
 HEALTH_DIR = PROJECT_DIR / "docs" / "health"
 SENTINEL_BACKLOG_PRIORITY_PATH = PROJECT_DIR / "queries" / "sentinel_backlog_priority.json"
+SPLUNK_EXPORTER_CLI = SCRIPTS_DIR / "splunk_evidence_exporter_cli.py"
 
 OCID_RE = re.compile(r"\bocid1\.[A-Za-z0-9][A-Za-z0-9._-]{8,}\b", re.IGNORECASE)
 REQUEST_ID_RE = re.compile(r"(?i)(opc[-_]request[-_]id\s*[:=]\s*)[A-Za-z0-9._:-]{12,}")
@@ -79,6 +81,174 @@ def _run_step(name: str, command: list[str], timeout: int = 2400) -> dict:
             "ok": False,
             "output_tail": _redact_output(f"TIMEOUT after {timeout}s: {exc}"),
         }
+    except OSError as exc:
+        return {
+            "name": name,
+            "command": command,
+            "started_at": started,
+            "exit_code": 127,
+            "ok": False,
+            "output_tail": _redact_output(f"EXECUTION ERROR: {exc}"),
+        }
+
+
+def build_splunk_parallel_offline_steps() -> list[tuple[str, list[str], int]]:
+    """Return the credential-free validators in the Splunk parallel release stage."""
+    python = sys.executable
+    return [
+        (
+            "registry drift validation",
+            [python, str(SCRIPTS_DIR / "generate_splunk_detection_registry.py"), "--check"],
+            300,
+        ),
+        (
+            "schema validation",
+            [python, "-m", "pytest", "-q", "scripts/test_splunk_detection_registry.py"],
+            600,
+        ),
+        (
+            "local exporter success",
+            [python, str(SPLUNK_EXPORTER_CLI), "local-e2e", "--scenario", "success"],
+            300,
+        ),
+        (
+            "local exporter duplicate",
+            [python, str(SPLUNK_EXPORTER_CLI), "local-e2e", "--scenario", "duplicate-invocation"],
+            300,
+        ),
+        (
+            "local exporter failure",
+            [python, str(SPLUNK_EXPORTER_CLI), "local-e2e", "--scenario", "500"],
+            300,
+        ),
+        (
+            "local exporter replay",
+            [
+                python,
+                str(SPLUNK_EXPORTER_CLI),
+                "local-e2e",
+                "--scenario",
+                "approved-replay",
+                "--approve-replay",
+            ],
+            300,
+        ),
+        (
+            "diagram validation",
+            [python, "-m", "pytest", "-q", "scripts/test_splunk_diagrams.py"],
+            600,
+        ),
+        (
+            "documentation validation",
+            [python, "-m", "pytest", "-q", "scripts/test_splunk_documentation.py"],
+            600,
+        ),
+        (
+            "terraform format validation",
+            ["terraform", "fmt", "-check", "-recursive", "stack"],
+            300,
+        ),
+        (
+            "terraform static validation",
+            ["terraform", "-chdir=stack", "validate", "-no-color"],
+            300,
+        ),
+    ]
+
+
+def _splunk_artifact_hashes() -> dict[str, str]:
+    paths = (
+        PROJECT_DIR / "config" / "splunk_parallel_delivery.yaml",
+        PROJECT_DIR / "queries" / "splunk_detection_registry.json",
+        PROJECT_DIR / "schemas" / "splunk_detection_registry.schema.json",
+        PROJECT_DIR / "schemas" / "splunk_evidence_event.schema.json",
+        SCRIPTS_DIR / "release_checklist.py",
+        SCRIPTS_DIR / "splunk_evidence_exporter_cli.py",
+        PROJECT_DIR / "stack" / "main.tf",
+        PROJECT_DIR / "stack" / "schema.yaml",
+    )
+    return {
+        path.relative_to(PROJECT_DIR).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in sorted(paths)
+    }
+
+
+def _scenario_contract_ok(name: str, output: str) -> bool:
+    if not name.startswith("local exporter "):
+        return True
+    try:
+        receipt = json.loads(output)
+    except json.JSONDecodeError:
+        return False
+    common = (
+        receipt.get("evidence_class") == "locally_verified"
+        and receipt.get("provider_validation") == "not_run"
+        and receipt.get("provider_verified") is False
+    )
+    if name == "local exporter success":
+        return common and receipt.get("status") == "delivered" and receipt.get("checkpoint_committed") is True
+    if name == "local exporter duplicate":
+        return (
+            common
+            and receipt.get("status") == "delivered"
+            and receipt.get("invocation_count") == 2
+            and receipt.get("stable_event_keys") is True
+        )
+    if name == "local exporter failure":
+        return (
+            common
+            and receipt.get("status") == "delivery_failed"
+            and receipt.get("checkpoint_committed") is False
+            and receipt.get("dlq_record_count") == 1
+        )
+    if name == "local exporter replay":
+        return (
+            common
+            and receipt.get("initial_status") == "delivery_failed"
+            and receipt.get("status") == "delivered"
+            and receipt.get("replay_approved") is True
+            and receipt.get("replay_matches_quarantined_events") is True
+        )
+    return False
+
+
+def run_splunk_parallel_offline_stage() -> dict[str, object]:
+    """Run and summarize the tenant-neutral Splunk parallel release contracts."""
+    gates: list[dict[str, object]] = []
+    scenario_passed = 0
+    for name, command, timeout in build_splunk_parallel_offline_steps():
+        result = _run_step(name, command, timeout)
+        contract_ok = _scenario_contract_ok(name, result["output_tail"])
+        ok = bool(result["ok"] and contract_ok)
+        gates.append({"name": name, "exit_code": result["exit_code"], "ok": ok})
+        if name.startswith("local exporter ") and ok:
+            scenario_passed += 1
+
+    passed = sum(gate["ok"] is True for gate in gates)
+    return {
+        "schema_version": "oci.logan.splunk.local-release.v1",
+        "status": "PASS" if passed == len(gates) else "FAIL",
+        "offline": True,
+        "external_calls": [],
+        "evidence_class": "locally_verified",
+        "provider_validation": "not_run",
+        "provider_verified": False,
+        "scenario_counts": {
+            "requested": 4,
+            "passed": scenario_passed,
+            "success": 1 if gates[2]["ok"] else 0,
+            "duplicate": 1 if gates[3]["ok"] else 0,
+            "failure": 1 if gates[4]["ok"] else 0,
+            "replay": 1 if gates[5]["ok"] else 0,
+        },
+        "gate_counts": {
+            "total": len(gates),
+            "passed": passed,
+            "failed": len(gates) - passed,
+        },
+        "artifact_hashes": _splunk_artifact_hashes(),
+        "gates": gates,
+    }
 
 
 def build_steps(
@@ -121,6 +291,11 @@ def build_steps(
         # is not regenerated here — it ships fresh from sentinel_conversion_workflow.py
         # and is treated as an input artifact for the release window.
         ("inventory drift check", [python, str(SCRIPTS_DIR / "check_inventory_drift.py")], 60),
+        (
+            "splunk parallel offline release",
+            [python, str(SCRIPTS_DIR / "release_checklist.py"), "--splunk-parallel-offline-stage"],
+            2400,
+        ),
         ("sensitive value scan", [python, str(SCRIPTS_DIR / "scan_sensitive_values.py")], 300),
         ("compileall scripts", [python, "-m", "compileall", "-q", "scripts"], 300),
     ]
@@ -198,7 +373,19 @@ def main() -> int:
     parser.add_argument("--report", help="Optional release evidence JSON path")
     parser.add_argument("--handoff-summary", action="store_true", help="Write docs/health/latest-handoff.json after a passing run")
     parser.add_argument("--handoff-out", default=str(HEALTH_DIR / "latest-handoff.json"), help="Handoff summary path when --handoff-summary is set")
+    parser.add_argument(
+        "--splunk-parallel-offline-stage",
+        action="store_true",
+        help="Run only the credential-free Splunk parallel release stage and print JSON",
+    )
     args = parser.parse_args()
+
+    if args.splunk_parallel_offline_stage:
+        if args.include_live:
+            parser.error("the Splunk parallel offline stage cannot include live validation")
+        evidence = run_splunk_parallel_offline_stage()
+        print(json.dumps(evidence, indent=2, sort_keys=True))
+        return 0 if evidence["status"] == "PASS" else 1
 
     HEALTH_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ")

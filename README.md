@@ -67,10 +67,10 @@ This repository ships both source authoring content and generated OCI query asse
   - 545 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
 - **Microsoft Sentinel converted queries:** 590 live OCI parser-passing queries
-- **Curated analytics:** 205
+- **Curated analytics:** 209
   - 54 app telemetry analytics in `queries/apps/`
-  - 151 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 1,348
+  - 155 hunting analytics in `queries/hunting/`
+- **Total query artifacts/content items:** 1,352
 - **Source rule breakdown:** Windows (302), Cloud/OCI (102), Linux (80), Web/WAF (38)
 - **Combined MITRE ATT&CK coverage:** 279 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls

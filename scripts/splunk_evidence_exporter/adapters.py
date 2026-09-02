@@ -380,7 +380,9 @@ class ObjectStorageDeliveryLedgerAdapter:
 class OciMonitoringMetricsAdapter:
     """Sanitized bounded Monitoring emission using the Function principal."""
     _ALLOWED_DIMENSIONS = frozenset({"detection", "outcome"})
-    _ALLOWED_OUTCOMES = frozenset({"DeliveryFailed", "DeliverySucceeded"})
+    _ALLOWED_METRICS = frozenset(
+        {"DeliveryFailed", "DeliverySucceeded", "DeliveredEvents", "DeadLetteredEvents"}
+    )
     _SENSITIVE_MARKERS = frozenset(
         {"token", "secret", "password", "credential", "authorization", "cookie", "email"}
     )
@@ -407,7 +409,7 @@ class OciMonitoringMetricsAdapter:
             # arbitrary user-controlled strings may become Monitoring series.
             if not item or len(item) > 64 or not re.fullmatch(r"[A-Za-z0-9_.:-]+", item):
                 raise ValueError("metric dimensions are invalid")
-            if key == "outcome" and item not in self._ALLOWED_OUTCOMES:
+            if key == "outcome" and item not in self._ALLOWED_METRICS:
                 raise ValueError("metric dimensions are invalid")
             if re.fullmatch(r"(?:[0-9a-f]{8}-){3,}[0-9a-f-]+|ocid1\.[A-Za-z0-9.:-]+|\d{1,3}(?:\.\d{1,3}){3}", item, re.IGNORECASE):
                 raise ValueError("metric dimensions are invalid")

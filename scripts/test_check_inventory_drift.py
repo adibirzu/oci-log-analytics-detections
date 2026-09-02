@@ -254,6 +254,7 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
             [
                 "registry drift validation",
                 "schema validation",
+                "sensitive value scan",
                 "splunk parallel red contracts",
                 "local exporter success",
                 "local exporter duplicate",
@@ -345,7 +346,7 @@ class TestReleaseChecklistEvidence(unittest.TestCase):
                 "replay": 1,
             },
         )
-        self.assertEqual(evidence["gate_counts"], {"total": 11, "passed": 11, "failed": 0})
+        self.assertEqual(evidence["gate_counts"], {"total": 12, "passed": 12, "failed": 0})
         self.assertTrue(all(gate["ok"] for gate in evidence["gates"]))
         self.assertIn("queries/splunk_detection_registry.json", evidence["artifact_hashes"])
         self.assertIn("schemas/splunk_evidence_event.schema.json", evidence["artifact_hashes"])

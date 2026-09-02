@@ -153,6 +153,11 @@ def build_splunk_parallel_offline_steps(*, bootstrap: bool = False) -> list[tupl
             600,
         ),
         (
+            "sensitive value scan",
+            [python, str(SCRIPTS_DIR / "scan_sensitive_values.py")],
+            300,
+        ),
+        (
             "splunk parallel red contracts",
             [python, "-m", "pytest", "-q", "scripts/test_splunk_parallel_red_contracts.py"],
             600,
@@ -223,6 +228,7 @@ def _splunk_evidence_manifest() -> dict[str, object]:
         SCRIPTS_DIR / "validate_terraform_static.py",
         SCRIPTS_DIR / "verify_splunk_function_supply_chain.py",
         SCRIPTS_DIR / "sitecustomize.py",
+        SCRIPTS_DIR / "scan_sensitive_values.py",
     ]
     roots = {
         "exporter": [SCRIPTS_DIR / "splunk_evidence_exporter_cli.py", * (SCRIPTS_DIR / "splunk_evidence_exporter").glob("**/*.py")],
@@ -255,6 +261,7 @@ def _splunk_evidence_manifest() -> dict[str, object]:
         "scripts/validate_terraform_static.py",
         "scripts/verify_splunk_function_supply_chain.py",
         "scripts/sitecustomize.py",
+        "scripts/scan_sensitive_values.py",
         "queries/splunk_detection_registry.json",
         "config/splunk_parallel_delivery.yaml",
         "stack/main.tf",
@@ -336,6 +343,7 @@ def run_splunk_parallel_offline_stage(*, bootstrap: bool = False) -> dict[str, o
             scenario_passed += 1
 
     passed = sum(gate["ok"] is True for gate in gates)
+    gate_by_name = {str(gate["name"]): gate for gate in gates}
     manifest = _splunk_evidence_manifest()
     return {
         "schema_version": "oci.logan.splunk.local-release.v1",
@@ -348,10 +356,10 @@ def run_splunk_parallel_offline_stage(*, bootstrap: bool = False) -> dict[str, o
         "scenario_counts": {
             "requested": 4,
             "passed": scenario_passed,
-            "success": 1 if gates[2]["ok"] else 0,
-            "duplicate": 1 if gates[3]["ok"] else 0,
-            "failure": 1 if gates[4]["ok"] else 0,
-            "replay": 1 if gates[5]["ok"] else 0,
+            "success": 1 if gate_by_name["local exporter success"]["ok"] else 0,
+            "duplicate": 1 if gate_by_name["local exporter duplicate"]["ok"] else 0,
+            "failure": 1 if gate_by_name["local exporter failure"]["ok"] else 0,
+            "replay": 1 if gate_by_name["local exporter replay"]["ok"] else 0,
         },
         "gate_counts": {
             "total": len(gates),

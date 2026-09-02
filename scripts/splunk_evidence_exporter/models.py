@@ -191,7 +191,7 @@ class EvidenceEvent:
         provenance: Mapping[str, object],
         schema_version: str = _EVIDENCE_SCHEMA_VERSION,
         *,
-        _factory_token: object = None,
+        _factory_token: object = None,  # allow-sensitive-value: internal factory sentinel, never a credential
     ) -> None:
         if _factory_token is not _EVIDENCE_EVENT_FACTORY:
             raise TypeError("EvidenceEvent must be created by build_evidence_event")
@@ -225,7 +225,7 @@ class EvidenceEvent:
             detection=detection,
             evidence=evidence,
             provenance=provenance,
-            _factory_token=_EVIDENCE_EVENT_FACTORY,
+            _factory_token=_EVIDENCE_EVENT_FACTORY,  # allow-sensitive-value: internal factory sentinel, never a credential
         )
 
     def to_dict(self) -> dict[str, object]:

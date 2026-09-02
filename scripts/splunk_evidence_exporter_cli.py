@@ -411,6 +411,7 @@ def _render_iam() -> dict[str, object]:
             "statements": [
                 "Allow group <OPERATOR_GROUP_NAME> to read metrics in compartment <FUNCTION_COMPARTMENT_NAME>",
                 "Allow group <OPERATOR_GROUP_NAME> to manage alarms in compartment <FUNCTION_COMPARTMENT_NAME>",
+                "Allow dynamic-group <FUNCTION_DYNAMIC_GROUP_NAME> to post-metric-data in compartment <FUNCTION_COMPARTMENT_NAME>",
             ],
             "warning": "Alarm resources remain disabled until the exact topic, query, and response owner are reviewed",
         },

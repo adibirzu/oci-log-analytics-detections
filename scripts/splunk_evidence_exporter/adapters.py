@@ -379,15 +379,39 @@ class ObjectStorageDeliveryLedgerAdapter:
 
 class OciMonitoringMetricsAdapter:
     """Sanitized bounded Monitoring emission using the Function principal."""
+    _ALLOWED_DIMENSIONS = frozenset({"detection", "outcome"})
+    _ALLOWED_OUTCOMES = frozenset({"DeliveryFailed", "DeliverySucceeded"})
+    _SENSITIVE_MARKERS = frozenset(
+        {"token", "secret", "password", "credential", "authorization", "cookie", "email"}
+    )
+
     def __init__(self, *, client: object | Callable[[], object], compartment_id: str, namespace: str, metric_data_factory: Callable[..., object]) -> None:
         self._client, self._compartment_id, self._namespace, self._factory = client, _required_text(compartment_id, "compartment"), _required_text(namespace, "metric namespace"), metric_data_factory
 
     def emit(self, name: str, value: int, dimensions: Mapping[str, str]) -> None:
         if name not in {"DeliveryFailed", "DeliverySucceeded", "DeliveredEvents", "DeadLetteredEvents"} or not isinstance(value, int) or value < 0:
             raise ValueError("metric is not governed")
-        safe = {key: value for key, value in dimensions.items() if key in {"detection", "outcome"}}
-        if len(safe) > 2 or not all(isinstance(key, str) and isinstance(item, str) and len(item) <= 64 for key, item in safe.items()):
+        if not isinstance(dimensions, Mapping):
             raise ValueError("metric dimensions are invalid")
+        if set(dimensions) - self._ALLOWED_DIMENSIONS:
+            raise ValueError("metric dimensions are invalid")
+        if len(dimensions) > len(self._ALLOWED_DIMENSIONS):
+            raise ValueError("metric dimensions are invalid")
+        for key, item in dimensions.items():
+            if not isinstance(key, str) or not isinstance(item, str):
+                raise ValueError("metric dimensions are invalid")
+            lowered = f"{key}:{item}".casefold()
+            if any(marker in lowered for marker in self._SENSITIVE_MARKERS):
+                raise ValueError("metric dimensions are invalid")
+            # Keep dimensions bounded and stable: no opaque IDs, addresses, or
+            # arbitrary user-controlled strings may become Monitoring series.
+            if not item or len(item) > 64 or not re.fullmatch(r"[A-Za-z0-9_.:-]+", item):
+                raise ValueError("metric dimensions are invalid")
+            if key == "outcome" and item not in self._ALLOWED_OUTCOMES:
+                raise ValueError("metric dimensions are invalid")
+            if re.fullmatch(r"(?:[0-9a-f]{8}-){3,}[0-9a-f-]+|ocid1\.[A-Za-z0-9.:-]+|\d{1,3}(?:\.\d{1,3}){3}", item, re.IGNORECASE):
+                raise ValueError("metric dimensions are invalid")
+        safe = dict(dimensions)
         try:
             client = self._client() if callable(self._client) else self._client
             self._client = client

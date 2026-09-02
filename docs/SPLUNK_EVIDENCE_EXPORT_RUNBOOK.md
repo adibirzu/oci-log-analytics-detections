@@ -58,7 +58,7 @@ Render, save privately, and review the placeholder-only IAM categories:
 python3 scripts/splunk_evidence_exporter_cli.py render-iam
 ```
 
-Create an exact Function dynamic group from the Terraform output `function_dynamic_group_matching_rule`. Scope Log Analytics query/read, the exact Vault secret bundle, named state/DLQ objects, and Notifications invocation of the exact Function. Review the broader operator family grants and the regional Object Storage lifecycle service grant; the renderer explicitly does not apply policy.
+Create an exact Function dynamic group from the Terraform output `function_dynamic_group_matching_rule`. Scope Log Analytics query/read, the exact Vault secret bundle, named state/DLQ objects, Notifications invocation of the exact Function, and `post-metric-data` only in the exact Function compartment for exporter operational metrics. Review the broader operator family grants and the regional Object Storage lifecycle service grant; the renderer explicitly does not apply policy.
 
 The Function must have no inbound route. Its reviewed existing subnets need OCI service access and HTTPS egress to the exact HEC host. Validate DNS, hostname, certificate chain/private CA trust, port, route table, NSG, firewall, NAT/FastConnect/VPN, and Splunk allowlists. The accepted URL is exactly `https://<SPLUNK_HEC_HOST>/services/collector/event`; the token lives only in Vault.
 

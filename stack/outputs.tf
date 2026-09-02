@@ -34,3 +34,9 @@ output "splunk_evidence_exporter_dynamic_group_matching_rule" {
   value       = module.splunk_evidence_exporter.function_dynamic_group_matching_rule
   sensitive   = true
 }
+
+output "splunk_evidence_exporter_governed_alarm_bindings" {
+  description = "Exact governed detection binding keys and Monitoring alarm OCIDs supplied to the exporter"
+  sensitive   = true
+  value       = module.splunk_evidence_exporter.governed_alarm_bindings
+}

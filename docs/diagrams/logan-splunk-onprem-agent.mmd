@@ -2,26 +2,27 @@
 %% Evidence: design aligned to implemented evidence interfaces; provider verified = false; release accepted = false
 %% Primary objects: 9
 flowchart LR
-  subgraph SITE["On-premises source boundary"]
+  subgraph SITE["On-premises source"]
     host["On-premises host logs"]
     agent["Management Agent"]
     gateway["Optional Management Gateway"]
   end
-  subgraph OCI["OCI collection and analytics boundary"]
+  subgraph OCI["OCI analytics"]
     association["Source and entity association"]
     logan["Log Analytics"]
     detection["Detection rule"]
     function["Function evidence export"]
   end
-  subgraph DEST["Customer-managed destination boundary"]
+  subgraph DEST["Customer-managed destination"]
     hec["Splunk HEC"]
-    response_owner["Response owner"]
+    response["Response owner"]
   end
   host -->|"telemetry: collected records"| agent
-  agent -->|"telemetry: direct collection"| gateway
-  gateway -->|"telemetry: associated source records"| association
-  association -->|"telemetry: parsed records"| logan
+  agent -->|"telemetry: direct Log Analytics ingestion"| association
+  agent -->|"telemetry: optional gateway path"| gateway
+  gateway -->|"telemetry: relayed Log Analytics ingestion"| association
+  association -->|"telemetry: parsed associated records"| logan
   logan -->|"telemetry: detection evidence"| detection
   detection -.->|"control: reviewed trigger chain"| function
   function -->|"telemetry: normalized evidence only"| hec
-  hec -.->|"response: searchable evidence"| response_owner
+  hec -.->|"response: searchable evidence"| response

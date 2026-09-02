@@ -6,10 +6,10 @@
     {
       "id": "__boundary_1",
       "type": "rectangle",
-      "x": 25.0,
+      "x": 5.0,
       "y": 105.0,
-      "width": 680.0,
-      "height": 150.0,
+      "width": 660.0,
+      "height": 270.0,
       "angle": 0,
       "strokeColor": "#9B1C31",
       "backgroundColor": "transparent",
@@ -34,7 +34,7 @@
     {
       "id": "__boundary_label_1",
       "type": "text",
-      "x": 33.0,
+      "x": 13.0,
       "y": 112.0,
       "width": 138.60000000000002,
       "height": 17.5,
@@ -66,10 +66,10 @@
     {
       "id": "__boundary_2",
       "type": "rectangle",
-      "x": 705.0,
-      "y": 35.0,
-      "width": 460.0,
-      "height": 290.0,
+      "x": 655.0,
+      "y": 25.0,
+      "width": 660.0,
+      "height": 310.0,
       "angle": 0,
       "strokeColor": "#9B1C31",
       "backgroundColor": "transparent",
@@ -94,8 +94,8 @@
     {
       "id": "__boundary_label_2",
       "type": "text",
-      "x": 713.0,
-      "y": 42.0,
+      "x": 663.0,
+      "y": 32.0,
       "width": 100.10000000000001,
       "height": 17.5,
       "angle": 0,
@@ -126,7 +126,7 @@
     {
       "id": "__boundary_3",
       "type": "rectangle",
-      "x": 1165.0,
+      "x": 1295.0,
       "y": 55.0,
       "width": 240.0,
       "height": 290.0,
@@ -154,7 +154,7 @@
     {
       "id": "__boundary_label_3",
       "type": "text",
-      "x": 1173.0,
+      "x": 1303.0,
       "y": 62.0,
       "width": 215.60000000000002,
       "height": 17.5,
@@ -187,9 +187,9 @@
       "id": "__flow_key_boundary",
       "type": "rectangle",
       "x": 25,
-      "y": 426.0,
+      "y": 456.0,
       "width": 1325,
-      "height": 138,
+      "height": 162,
       "angle": 0,
       "strokeColor": "#6B6B6B",
       "backgroundColor": "#F7F7F7",
@@ -214,7 +214,7 @@
       "id": "__flow_key_title",
       "type": "text",
       "x": 37,
-      "y": 435.0,
+      "y": 465.0,
       "width": 100,
       "height": 17.5,
       "angle": 0,
@@ -246,7 +246,7 @@
       "id": "__flow_key_1",
       "type": "text",
       "x": 37,
-      "y": 460.0,
+      "y": 490.0,
       "width": 211.20000000000002,
       "height": 15.0,
       "angle": 0,
@@ -278,8 +278,8 @@
       "id": "__flow_key_2",
       "type": "text",
       "x": 687,
-      "y": 460.0,
-      "width": 211.20000000000002,
+      "y": 490.0,
+      "width": 297.0,
       "height": 15.0,
       "angle": 0,
       "strokeColor": "#4A4542",
@@ -297,21 +297,21 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "T2  telemetry: direct collection",
+      "text": "T2  telemetry: direct Log Analytics ingestion",
       "fontSize": 12,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "T2  telemetry: direct collection",
+      "originalText": "T2  telemetry: direct Log Analytics ingestion",
       "lineHeight": 1.25
     },
     {
       "id": "__flow_key_3",
       "type": "text",
       "x": 37,
-      "y": 484.0,
-      "width": 217.8,
+      "y": 514.0,
+      "width": 237.60000000000002,
       "height": 15.0,
       "angle": 0,
       "strokeColor": "#4A4542",
@@ -329,21 +329,21 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "T3  telemetry: associated records",
+      "text": "T3  telemetry: optional gateway path",
       "fontSize": 12,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "T3  telemetry: associated records",
+      "originalText": "T3  telemetry: optional gateway path",
       "lineHeight": 1.25
     },
     {
       "id": "__flow_key_4",
       "type": "text",
       "x": 687,
-      "y": 484.0,
-      "width": 191.4,
+      "y": 514.0,
+      "width": 303.6,
       "height": 15.0,
       "angle": 0,
       "strokeColor": "#4A4542",
@@ -361,20 +361,52 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "T4  telemetry: parsed records",
+      "text": "T4  telemetry: relayed Log Analytics ingestion",
       "fontSize": 12,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "T4  telemetry: parsed records",
+      "originalText": "T4  telemetry: relayed Log Analytics ingestion",
       "lineHeight": 1.25
     },
     {
       "id": "__flow_key_5",
       "type": "text",
       "x": 37,
-      "y": 508.0,
+      "y": 538.0,
+      "width": 264.0,
+      "height": 15.0,
+      "angle": 0,
+      "strokeColor": "#4A4542",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "seed": 70012,
+      "version": 1,
+      "versionNonce": 71012,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "text": "T5  telemetry: parsed associated records",
+      "fontSize": 12,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "T5  telemetry: parsed associated records",
+      "lineHeight": 1.25
+    },
+    {
+      "id": "__flow_key_6",
+      "type": "text",
+      "x": 687,
+      "y": 538.0,
       "width": 217.8,
       "height": 15.0,
       "angle": 0,
@@ -393,20 +425,20 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "T5  telemetry: detection evidence",
+      "text": "T6  telemetry: detection evidence",
       "fontSize": 12,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "T5  telemetry: detection evidence",
+      "originalText": "T6  telemetry: detection evidence",
       "lineHeight": 1.25
     },
     {
-      "id": "__flow_key_6",
+      "id": "__flow_key_7",
       "type": "text",
-      "x": 687,
-      "y": 508.0,
+      "x": 37,
+      "y": 562.0,
       "width": 231.00000000000003,
       "height": 15.0,
       "angle": 0,
@@ -435,10 +467,10 @@
       "lineHeight": 1.25
     },
     {
-      "id": "__flow_key_7",
+      "id": "__flow_key_8",
       "type": "text",
-      "x": 37,
-      "y": 532.0,
+      "x": 687,
+      "y": 562.0,
       "width": 257.40000000000003,
       "height": 15.0,
       "angle": 0,
@@ -457,20 +489,20 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "T6  telemetry: normalized evidence only",
+      "text": "T7  telemetry: normalized evidence only",
       "fontSize": 12,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "T6  telemetry: normalized evidence only",
+      "originalText": "T7  telemetry: normalized evidence only",
       "lineHeight": 1.25
     },
     {
-      "id": "__flow_key_8",
+      "id": "__flow_key_9",
       "type": "text",
-      "x": 687,
-      "y": 532.0,
+      "x": 37,
+      "y": 586.0,
       "width": 217.8,
       "height": 15.0,
       "angle": 0,
@@ -502,7 +534,7 @@
       "id": "__title",
       "type": "text",
       "x": 25,
-      "y": -25.0,
+      "y": -35.0,
       "width": 900,
       "height": 30.0,
       "angle": 0,
@@ -534,7 +566,7 @@
       "id": "__evidence",
       "type": "text",
       "x": 25,
-      "y": 10.0,
+      "y": 0.0,
       "width": 900,
       "height": 15.0,
       "angle": 0,
@@ -565,7 +597,7 @@
     {
       "id": "host",
       "type": "rectangle",
-      "x": 50,
+      "x": 30,
       "y": 150,
       "width": 190,
       "height": 76,
@@ -595,7 +627,7 @@
     {
       "id": "__oci_label_host",
       "type": "text",
-      "x": 62,
+      "x": 42,
       "y": 173,
       "width": 166,
       "height": 25,
@@ -627,7 +659,7 @@
     {
       "id": "agent",
       "type": "rectangle",
-      "x": 270,
+      "x": 240,
       "y": 150,
       "width": 190,
       "height": 76,
@@ -657,7 +689,7 @@
     {
       "id": "__oci_label_agent",
       "type": "text",
-      "x": 282,
+      "x": 252,
       "y": 173,
       "width": 166,
       "height": 25,
@@ -689,8 +721,8 @@
     {
       "id": "gateway",
       "type": "rectangle",
-      "x": 490,
-      "y": 150,
+      "x": 450,
+      "y": 270,
       "width": 190,
       "height": 76,
       "angle": 0,
@@ -719,8 +751,8 @@
     {
       "id": "__oci_label_gateway",
       "type": "text",
-      "x": 502,
-      "y": 173,
+      "x": 462,
+      "y": 293,
       "width": 166,
       "height": 25,
       "angle": 0,
@@ -751,8 +783,8 @@
     {
       "id": "association",
       "type": "rectangle",
-      "x": 730,
-      "y": 80,
+      "x": 680,
+      "y": 150,
       "width": 190,
       "height": 76,
       "angle": 0,
@@ -781,8 +813,8 @@
     {
       "id": "__oci_label_association",
       "type": "text",
-      "x": 742,
-      "y": 103,
+      "x": 692,
+      "y": 173,
       "width": 166,
       "height": 25,
       "angle": 0,
@@ -813,8 +845,8 @@
     {
       "id": "logan",
       "type": "rectangle",
-      "x": 730,
-      "y": 220,
+      "x": 890,
+      "y": 150,
       "width": 190,
       "height": 76,
       "angle": 0,
@@ -843,8 +875,8 @@
     {
       "id": "__oci_label_logan",
       "type": "text",
-      "x": 742,
-      "y": 243,
+      "x": 902,
+      "y": 173,
       "width": 166,
       "height": 25,
       "angle": 0,
@@ -875,8 +907,8 @@
     {
       "id": "detection",
       "type": "rectangle",
-      "x": 950,
-      "y": 80,
+      "x": 1100,
+      "y": 70,
       "width": 190,
       "height": 76,
       "angle": 0,
@@ -905,8 +937,8 @@
     {
       "id": "__oci_label_detection",
       "type": "text",
-      "x": 962,
-      "y": 103,
+      "x": 1112,
+      "y": 93,
       "width": 166,
       "height": 25,
       "angle": 0,
@@ -937,8 +969,8 @@
     {
       "id": "function",
       "type": "rectangle",
-      "x": 950,
-      "y": 220,
+      "x": 1100,
+      "y": 230,
       "width": 190,
       "height": 76,
       "angle": 0,
@@ -967,8 +999,8 @@
     {
       "id": "__oci_label_function",
       "type": "text",
-      "x": 962,
-      "y": 243,
+      "x": 1112,
+      "y": 253,
       "width": 166,
       "height": 25,
       "angle": 0,
@@ -999,7 +1031,7 @@
     {
       "id": "hec",
       "type": "rectangle",
-      "x": 1190,
+      "x": 1320,
       "y": 100,
       "width": 190,
       "height": 76,
@@ -1029,7 +1061,7 @@
     {
       "id": "__oci_label_hec",
       "type": "text",
-      "x": 1202,
+      "x": 1332,
       "y": 123,
       "width": 166,
       "height": 25,
@@ -1061,7 +1093,7 @@
     {
       "id": "response",
       "type": "rectangle",
-      "x": 1190,
+      "x": 1320,
       "y": 240,
       "width": 190,
       "height": 76,
@@ -1091,7 +1123,7 @@
     {
       "id": "__oci_label_response",
       "type": "text",
-      "x": 1202,
+      "x": 1332,
       "y": 263,
       "width": 166,
       "height": 25,
@@ -1123,9 +1155,9 @@
     {
       "id": "__oci_edge_1",
       "type": "arrow",
-      "x": 240.0,
+      "x": 220.0,
       "y": 188.0,
-      "width": 30.0,
+      "width": 20.0,
       "height": 0.0,
       "angle": 0,
       "strokeColor": "#C74634",
@@ -1149,15 +1181,15 @@
           0.0
         ],
         [
-          15.0,
+          10.0,
           0.0
         ],
         [
-          15.0,
+          10.0,
           0.0
         ],
         [
-          30.0,
+          20.0,
           0.0
         ]
       ],
@@ -1168,15 +1200,17 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "telemetry",
-        "label": "telemetry: collected records"
+        "label": "telemetry: collected records",
+        "from": "host",
+        "to": "agent"
       }
     },
     {
       "id": "__oci_edge_2",
       "type": "arrow",
-      "x": 460.0,
+      "x": 430.0,
       "y": 188.0,
-      "width": 30.0,
+      "width": 250.0,
       "height": 0.0,
       "angle": 0,
       "strokeColor": "#C74634",
@@ -1200,15 +1234,15 @@
           0.0
         ],
         [
-          15.0,
+          125.0,
           0.0
         ],
         [
-          15.0,
+          125.0,
           0.0
         ],
         [
-          30.0,
+          250.0,
           0.0
         ]
       ],
@@ -1219,16 +1253,18 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "telemetry",
-        "label": "telemetry: direct collection"
+        "label": "telemetry: direct Log Analytics ingestion",
+        "from": "agent",
+        "to": "association"
       }
     },
     {
       "id": "__oci_edge_3",
       "type": "arrow",
-      "x": 680.0,
+      "x": 430.0,
       "y": 188.0,
-      "width": 50.0,
-      "height": -70.0,
+      "width": 20.0,
+      "height": 120.0,
       "angle": 0,
       "strokeColor": "#C74634",
       "backgroundColor": "transparent",
@@ -1251,16 +1287,16 @@
           0.0
         ],
         [
-          25.0,
+          10.0,
           0.0
         ],
         [
-          25.0,
-          -70.0
+          10.0,
+          120.0
         ],
         [
-          50.0,
-          -70.0
+          20.0,
+          120.0
         ]
       ],
       "lastCommittedPoint": null,
@@ -1270,16 +1306,18 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "telemetry",
-        "label": "telemetry: associated records"
+        "label": "telemetry: optional gateway path",
+        "from": "agent",
+        "to": "gateway"
       }
     },
     {
       "id": "__oci_edge_4",
       "type": "arrow",
-      "x": 825.0,
-      "y": 156.0,
-      "width": 0.0,
-      "height": 64.0,
+      "x": 640.0,
+      "y": 308.0,
+      "width": 40.0,
+      "height": -120.0,
       "angle": 0,
       "strokeColor": "#C74634",
       "backgroundColor": "transparent",
@@ -1302,16 +1340,16 @@
           0.0
         ],
         [
-          0.0,
-          32.0
+          20.0,
+          0.0
         ],
         [
-          0.0,
-          32.0
+          20.0,
+          -120.0
         ],
         [
-          0.0,
-          64.0
+          40.0,
+          -120.0
         ]
       ],
       "lastCommittedPoint": null,
@@ -1321,16 +1359,18 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "telemetry",
-        "label": "telemetry: parsed records"
+        "label": "telemetry: relayed Log Analytics ingestion",
+        "from": "gateway",
+        "to": "association"
       }
     },
     {
       "id": "__oci_edge_5",
       "type": "arrow",
-      "x": 920.0,
-      "y": 258.0,
-      "width": 30.0,
-      "height": -140.0,
+      "x": 870.0,
+      "y": 188.0,
+      "width": 20.0,
+      "height": 0.0,
       "angle": 0,
       "strokeColor": "#C74634",
       "backgroundColor": "transparent",
@@ -1353,16 +1393,16 @@
           0.0
         ],
         [
-          15.0,
+          10.0,
           0.0
         ],
         [
-          15.0,
-          -140.0
+          10.0,
+          0.0
         ],
         [
-          30.0,
-          -140.0
+          20.0,
+          0.0
         ]
       ],
       "lastCommittedPoint": null,
@@ -1372,18 +1412,20 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "telemetry",
-        "label": "telemetry: detection evidence"
+        "label": "telemetry: parsed associated records",
+        "from": "association",
+        "to": "logan"
       }
     },
     {
       "id": "__oci_edge_6",
       "type": "arrow",
-      "x": 1045.0,
-      "y": 156.0,
-      "width": 0.0,
-      "height": 64.0,
+      "x": 1080.0,
+      "y": 188.0,
+      "width": 20.0,
+      "height": -80.0,
       "angle": 0,
-      "strokeColor": "#312D2A",
+      "strokeColor": "#C74634",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 2,
@@ -1404,16 +1446,16 @@
           0.0
         ],
         [
-          0.0,
-          32.0
+          10.0,
+          0.0
         ],
         [
-          0.0,
-          32.0
+          10.0,
+          -80.0
         ],
         [
-          0.0,
-          64.0
+          20.0,
+          -80.0
         ]
       ],
       "lastCommittedPoint": null,
@@ -1422,19 +1464,21 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "customData": {
-        "flowType": "control",
-        "label": "control: reviewed trigger chain"
+        "flowType": "telemetry",
+        "label": "telemetry: detection evidence",
+        "from": "logan",
+        "to": "detection"
       }
     },
     {
       "id": "__oci_edge_7",
       "type": "arrow",
-      "x": 1140.0,
-      "y": 258.0,
-      "width": 50.0,
-      "height": -120.0,
+      "x": 1195.0,
+      "y": 146.0,
+      "width": 0.0,
+      "height": 84.0,
       "angle": 0,
-      "strokeColor": "#C74634",
+      "strokeColor": "#312D2A",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
       "strokeWidth": 2,
@@ -1455,16 +1499,69 @@
           0.0
         ],
         [
-          25.0,
+          0.0,
+          42.0
+        ],
+        [
+          0.0,
+          42.0
+        ],
+        [
+          0.0,
+          84.0
+        ]
+      ],
+      "lastCommittedPoint": null,
+      "startBinding": null,
+      "endBinding": null,
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "customData": {
+        "flowType": "control",
+        "label": "control: reviewed trigger chain",
+        "from": "detection",
+        "to": "function"
+      }
+    },
+    {
+      "id": "__oci_edge_8",
+      "type": "arrow",
+      "x": 1290.0,
+      "y": 268.0,
+      "width": 30.0,
+      "height": -130.0,
+      "angle": 0,
+      "strokeColor": "#C74634",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 1050,
+      "version": 1,
+      "versionNonce": 1051,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0.0,
           0.0
         ],
         [
-          25.0,
-          -120.0
+          15.0,
+          0.0
         ],
         [
-          50.0,
-          -120.0
+          15.0,
+          -130.0
+        ],
+        [
+          30.0,
+          -130.0
         ]
       ],
       "lastCommittedPoint": null,
@@ -1474,13 +1571,15 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "telemetry",
-        "label": "telemetry: normalized evidence only"
+        "label": "telemetry: normalized evidence only",
+        "from": "function",
+        "to": "hec"
       }
     },
     {
-      "id": "__oci_edge_8",
+      "id": "__oci_edge_9",
       "type": "arrow",
-      "x": 1285.0,
+      "x": 1415.0,
       "y": 176.0,
       "width": 0.0,
       "height": 64.0,
@@ -1492,9 +1591,9 @@
       "strokeStyle": "dashed",
       "roughness": 1,
       "opacity": 100,
-      "seed": 1050,
+      "seed": 1052,
       "version": 1,
-      "versionNonce": 1051,
+      "versionNonce": 1053,
       "isDeleted": false,
       "boundElements": null,
       "updated": 1,
@@ -1525,13 +1624,15 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "response",
-        "label": "response: searchable evidence"
+        "label": "response: searchable evidence",
+        "from": "hec",
+        "to": "response"
       }
     },
     {
       "id": "__edge_label_1",
       "type": "text",
-      "x": 259.0,
+      "x": 234.0,
       "y": 175.0,
       "width": 100,
       "height": 13.75,
@@ -1563,7 +1664,7 @@
     {
       "id": "__edge_label_2",
       "type": "text",
-      "x": 479.0,
+      "x": 559.0,
       "y": 175.0,
       "width": 100,
       "height": 13.75,
@@ -1595,8 +1696,8 @@
     {
       "id": "__edge_label_3",
       "type": "text",
-      "x": 709.0,
-      "y": 140.0,
+      "x": 444.0,
+      "y": 235.0,
       "width": 100,
       "height": 13.75,
       "angle": 0,
@@ -1627,8 +1728,8 @@
     {
       "id": "__edge_label_4",
       "type": "text",
-      "x": 829.0,
-      "y": 175.0,
+      "x": 664.0,
+      "y": 235.0,
       "width": 100,
       "height": 13.75,
       "angle": 0,
@@ -1659,7 +1760,7 @@
     {
       "id": "__edge_label_5",
       "type": "text",
-      "x": 939.0,
+      "x": 884.0,
       "y": 175.0,
       "width": 100,
       "height": 13.75,
@@ -1691,7 +1792,39 @@
     {
       "id": "__edge_label_6",
       "type": "text",
-      "x": 1049.0,
+      "x": 1094.0,
+      "y": 135.0,
+      "width": 100,
+      "height": 13.75,
+      "angle": 0,
+      "strokeColor": "#6B6B6B",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "seed": 70014,
+      "version": 1,
+      "versionNonce": 71014,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "text": "T6",
+      "fontSize": 11,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "T6",
+      "lineHeight": 1.25
+    },
+    {
+      "id": "__edge_label_7",
+      "type": "text",
+      "x": 1199.0,
       "y": 175.0,
       "width": 100,
       "height": 13.75,
@@ -1721,10 +1854,10 @@
       "lineHeight": 1.25
     },
     {
-      "id": "__edge_label_7",
+      "id": "__edge_label_8",
       "type": "text",
-      "x": 1169.0,
-      "y": 185.0,
+      "x": 1309.0,
+      "y": 190.0,
       "width": 100,
       "height": 13.75,
       "angle": 0,
@@ -1743,19 +1876,19 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "T6",
+      "text": "T7",
       "fontSize": 11,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "T6",
+      "originalText": "T7",
       "lineHeight": 1.25
     },
     {
-      "id": "__edge_label_8",
+      "id": "__edge_label_9",
       "type": "text",
-      "x": 1289.0,
+      "x": 1419.0,
       "y": 195.0,
       "width": 100,
       "height": 13.75,

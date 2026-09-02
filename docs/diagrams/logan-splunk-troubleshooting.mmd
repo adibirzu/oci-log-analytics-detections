@@ -1,28 +1,30 @@
-%% Title: Boundary-first troubleshooting workflow
+%% Title: Boundary-first raw and evidence troubleshooting workflow
 %% Evidence: code-backed failure contracts and operator checks; provider verified = false; release accepted = false
-%% Primary objects: 8
+%% Primary objects: 9
 flowchart LR
-  subgraph TRIAGE["Symptom boundary"]
+  subgraph TRIAGE["Symptom"]
     symptom["Missing or delayed Splunk result"]
   end
-  subgraph RAW["Raw route boundary"]
-    oci_splunk["oci-splunk raw path"]
+  subgraph RAW["Raw route"]
+    connector["Connector Hub state"]
+    streaming["OCI Streaming lag"]
+    oci_splunk["oci-splunk transport"]
   end
-  subgraph OCI["Evidence route boundary"]
+  subgraph EVIDENCE["Evidence route"]
     logan["Log Analytics query result"]
-    monitoring["Monitoring alarm state"]
-    notifications["Notifications delivery"]
-    function["Function sanitized receipt"]
-    state["checkpoint/DLQ state"]
+    trigger["Monitoring and Notifications state"]
+    function_state["Function and checkpoint/DLQ state"]
   end
-  subgraph DEST["Customer-managed destination boundary"]
+  subgraph DEST["Shared destination"]
     hec["Splunk HEC response"]
+    search["Splunk search result"]
   end
-  symptom -.->|"control: identify raw or evidence mode"| oci_splunk
-  symptom -.->|"control: verify bounded query first"| logan
-  logan -->|"telemetry: detection metric"| monitoring
-  monitoring -.->|"control: inspect alarm transition"| notifications
-  notifications -.->|"control: inspect Function invocation"| function
-  function -.->|"control: inspect retry and quarantine state"| state
-  function -->|"telemetry: replay-safe batch"| hec
-  hec -.->|"response: accepted, retryable, or quarantine"| function
+  symptom -.->|"control: inspect raw route upstream"| connector
+  connector -->|"telemetry: verify Connector Hub delivery"| streaming
+  streaming -->|"telemetry: inspect lag and consumption"| oci_splunk
+  oci_splunk -->|"telemetry: retry-safe raw batch"| hec
+  symptom -.->|"control: verify bounded evidence query"| logan
+  logan -->|"telemetry: inspect metric and notification"| trigger
+  trigger -.->|"control: inspect invocation, checkpoint, and DLQ"| function_state
+  function_state -->|"telemetry: retry-safe evidence batch"| hec
+  hec -.->|"response: accepted and searchable"| search

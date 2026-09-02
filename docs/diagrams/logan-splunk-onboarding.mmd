@@ -1,25 +1,33 @@
 %% Title: Two-mode onboarding decision workflow
 %% Evidence: code-backed offline plan and operator workflow; provider verified = false; release accepted = false
-%% Primary objects: 8
+%% Primary objects: 9
 flowchart LR
-  subgraph SCOPE["Ownership and source boundary"]
+  subgraph SCOPE["Ownership and mode"]
     owner["Source owner and data policy"]
     mode["Raw, evidence, or both modes"]
   end
-  subgraph COLLECT["Collection boundary"]
-    agent["Management Agent or OCI Logging"]
-    logan["Log Analytics"]
-    parsed["Source, entity, parser, and fields"]
+  subgraph RAW["Raw branch"]
+    raw_route["Connector Hub to Streaming"]
+    oci_splunk["oci-splunk"]
   end
-  subgraph DELIVERY["Delivery boundary"]
-    disabled["Disabled trigger and exporter"]
+  subgraph EVIDENCE["Evidence branch"]
+    logan["Log Analytics"]
+    evidence_export["Detection and Function export"]
+  end
+  subgraph DEST["Shared destination"]
     hec["Splunk HEC"]
+  end
+  subgraph ACCEPT["Acceptance"]
+    join["Selected-mode validation join"]
     acceptance["Acceptance owner"]
   end
-  owner -.->|"control: approve source and retention"| mode
-  mode -.->|"control: select collection route"| agent
-  agent -->|"telemetry: fresh canary record"| logan
-  logan -->|"telemetry: searchable parsed fields"| parsed
-  parsed -.->|"control: configure detection and delivery"| disabled
-  disabled -->|"telemetry: one approved canary"| hec
-  hec -.->|"response: intended index is searchable"| acceptance
+  owner -.->|"control: approve source, retention, and mode"| mode
+  mode -.->|"control: raw selected"| raw_route
+  raw_route -->|"telemetry: Connector Hub to Streaming records"| oci_splunk
+  oci_splunk -->|"telemetry: raw HEC batches"| hec
+  mode -.->|"control: evidence selected"| logan
+  logan -->|"telemetry: detection evidence"| evidence_export
+  evidence_export -->|"telemetry: normalized evidence batches"| hec
+  hec -.->|"response: selected-mode search receipts"| join
+  mode -.->|"control: both requires two independent receipts"| join
+  join -.->|"control: record selected-mode acceptance"| acceptance

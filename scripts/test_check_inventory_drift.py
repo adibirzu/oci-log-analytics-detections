@@ -401,8 +401,9 @@ class TestReleaseChecklistEvidence(unittest.TestCase):
             "stack/provider.tf",
         ):
             self.assertIn(path, manifest["files"])
-        self.assertRegex(manifest["git_commit"], r"^[0-9a-f]{40}$")
-        self.assertRegex(manifest["git_tree"], r"^[0-9a-f]{40}$")
+        self.assertRegex(manifest["git_head_at_execution"], r"^[0-9a-f]{40}$")
+        self.assertRegex(manifest["git_head_tree_at_execution"], r"^[0-9a-f]{40}$")
+        self.assertIn(manifest["working_tree_dirty"], (True, False, None))
         self.assertIn("python", manifest["tool_versions"])
 
     def test_static_terraform_contract_works_without_provider_cache(self):

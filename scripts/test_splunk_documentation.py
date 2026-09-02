@@ -222,6 +222,10 @@ def test_contributor_release_guidance_links_classified_local_evidence_example() 
     assert evidence["evidence_class"] == "locally_verified"
     assert evidence["provider_validation"] == "not_run"
     assert evidence["provider_verified"] is False
+    assert "git_head_at_execution" in evidence["evidence_manifest"]
+    assert "git_head_tree_at_execution" in evidence["evidence_manifest"]
+    assert "working_tree_dirty" in evidence["evidence_manifest"]
+    assert evidence["evidence_manifest"]["working_tree_dirty"] is True
     assert evidence["status"] == "PASS"
     assert evidence["scenario_counts"]["passed"] == 4
     assert evidence["artifact_hashes"]

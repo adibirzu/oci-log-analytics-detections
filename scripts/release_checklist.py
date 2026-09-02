@@ -252,7 +252,19 @@ def _splunk_evidence_manifest() -> dict[str, object]:
         git_version = subprocess.check_output(["git", "--version"], text=True, stderr=subprocess.DEVNULL).strip()
     except (OSError, subprocess.CalledProcessError):
         commit = tree = git_version = "unavailable"
-    return {"complete": not missing, "missing": sorted(set(missing)), "files": paths, "git_commit": commit, "git_tree": tree, "tool_versions": {"python": sys.version.split()[0], "git": git_version}}
+    try:
+        working_tree_dirty = bool(subprocess.check_output(["git", "status", "--porcelain", "--untracked-files=no"], cwd=PROJECT_DIR, text=True, stderr=subprocess.DEVNULL).strip())
+    except (OSError, subprocess.CalledProcessError):
+        working_tree_dirty = None
+    return {
+        "complete": not missing,
+        "missing": sorted(set(missing)),
+        "files": paths,
+        "git_head_at_execution": commit,
+        "git_head_tree_at_execution": tree,
+        "working_tree_dirty": working_tree_dirty,
+        "tool_versions": {"python": sys.version.split()[0], "git": git_version},
+    }
 
 
 def _scenario_contract_ok(name: str, output: str) -> bool:

@@ -25,12 +25,14 @@ NAVIGATION_PAGES = (
     ROOT / "docs/ARCHITECTURE.md",
     ROOT / "docs/MIGRATION_AND_SECURITY_GUIDE.md",
     ROOT / "docs/FAST_ONBOARDING_TRACK.md",
+    ROOT / "docs/LOG_ANALYTICS_COST_OPTIMIZATION.md",
     ROOT / "docs/DEPLOYMENT.md",
     ROOT / "docs/WINDOWS_ACCESS_FAST_ONBOARDING.md",
     ROOT / "docs/WINDOWS_ACCESS_WORKFLOW_DIAGRAMS.md",
     *GUIDES,
 )
 LOCAL_EVIDENCE_EXAMPLE = ROOT / "docs/health/splunk-parallel-local-evidence.example.json"
+COST_GUIDE = ROOT / "docs/LOG_ANALYTICS_COST_OPTIMIZATION.md"
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 
 
@@ -177,6 +179,33 @@ def test_customer_facing_commands_use_a_portable_python_interpreter() -> None:
         assert "/Users/" not in text, f"developer-local path in {page.relative_to(ROOT)}"
     for guide in GUIDES:
         assert "python3" in _read(guide)
+
+
+def test_cost_optimization_guide_covers_archive_workflow_and_sources() -> None:
+    text = _read(COST_GUIDE)
+    normalized = text.lower()
+
+    for concept in (
+        "active storage",
+        "archive storage",
+        "recall",
+        "release",
+        "purge",
+        "mode 1",
+        "mode 2",
+        "management agent",
+        "active storage used",
+        "archival storage used",
+        "recalledstorageinactivestorageused",
+        "object storage archive",
+        "splunk",
+        "1 tb",
+        "30 days",
+    ):
+        assert concept in normalized, concept
+    assert "```mermaid" in text
+    assert "https://docs.oracle.com/" in text
+    assert "https://www.ateam-oracle.com/oci-logging-analytics-best-practices-series-cost-optimization" in text
 
 
 def test_contributor_release_guidance_links_classified_local_evidence_example() -> None:

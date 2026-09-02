@@ -11,6 +11,7 @@ This directory is the wiki-style guide to using, operating, extending, and deplo
 | Follow the Windows automation path | [Windows Access Scripted Runbook](WINDOWS_ACCESS_SCRIPTED_RUNBOOK.md) | Guarded PowerShell, local E2E, OCI CLI bundle, dashboard deployment, and per-resource verification |
 | Review the Windows architecture and decisions | [Windows Access Workflow Diagrams](WINDOWS_ACCESS_WORKFLOW_DIAGRAMS.md) | Architecture, parallel paths, alert sequence, troubleshooting tree, and evidence ladder |
 | Establish the first Log Analytics data path | [Fast Onboarding Track](FAST_ONBOARDING_TRACK.md) | IAM, ingestion choice, canary sources, validation, and rollout ownership |
+| Design archive retention and cost controls | [Cost Optimization and Archive Retention](LOG_ANALYTICS_COST_OPTIMIZATION.md) | Active/archive decisions, recall/release workflow, Splunk cost tradeoffs, and long-term retention |
 | Find, run, customize, and validate queries | [Using Log Analytics Queries](LOG_ANALYTICS_QUERY_USAGE.md) | Console, OCL, repository, and live-validation workflow |
 | Plan a migration or SIEM-forwarding design | [Migration and Security Guide](MIGRATION_AND_SECURITY_GUIDE.md) | A phased telemetry, detection, and export plan |
 | Choose raw or evidence delivery to Splunk | [Splunk Parallel Operations](SPLUNK_PARALLEL_OPERATIONS.md) | Mode 1, Mode 2, hybrid/on-prem policy, ownership, and steady-state operations |
@@ -43,6 +44,7 @@ This directory is the wiki-style guide to using, operating, extending, and deplo
 - A detection is deployable only when its source, parser fields, query contract, and dashboard references are validated.
 - Export raw events only when required. Prefer forwarding selected, enriched Log Analytics detection events to downstream SIEMs.
 - Treat raw fan-out and detection-evidence export as separate products. A connector, Function invocation, or HEC response is not by itself end-to-end acceptance.
+- Manage active storage, archive storage, recall, release, and purge deliberately; storage lifecycle is part of the security design, not an afterthought.
 
 ## Automation and release workflows
 

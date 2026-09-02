@@ -223,6 +223,11 @@ Mode 1 also needs Connector Hub errors, stream throughput/retention, consumer la
 
 Budget Log Analytics ingest/storage/query use, OCI Logging/Connector Hub, Streaming partitions and retention, Functions invocations/time, Notifications, Vault, Object Storage versions/DLQ, network egress, Splunk HEC/index storage, and Splunk license volume. Mode 1 duplicates raw volume; Mode 2 adds query and Function work while reducing exported volume. Measure with a canary before extrapolating.
 
+Use [Cost Optimization and Archive Retention](LOG_ANALYTICS_COST_OPTIMIZATION.md)
+to decide which sources stay hot in active storage, which move to archive, when
+recalled data must be released, and whether a source really warrants Mode 1 raw
+duplication instead of Mode 2 evidence export.
+
 Keep `include_original_content: false` unless a reviewed privacy need overrides it. Evidence may still contain user, host, source-address, and event context; apply classification, field minimization, Splunk access, retention, and deletion rules. Detection metrics allow at most three governed dimensions; high-cardinality identities can increase Monitoring cost/noise and must be reviewed.
 
 ## Rollback, cleanup, and replay
@@ -245,4 +250,6 @@ Repository schemas, Terraform, and commands are **code-backed**. A completed loc
 - [Log Analytics query IAM permissions](https://docs.oracle.com/en-us/iaas/Content/Identity/policyreference/loganalyticspolicyreference.htm)
 - [Access OCI resources from Functions](https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionsaccessingociresources.htm)
 - [Manage Log Analytics storage](https://docs.oracle.com/en-us/iaas/log-analytics/doc/manage-storage.html)
+- [Cost Optimization and Archive Retention](LOG_ANALYTICS_COST_OPTIMIZATION.md)
+- [A-Team: OCI Logging Analytics Best Practices Series - Cost Optimization](https://www.ateam-oracle.com/oci-logging-analytics-best-practices-series-cost-optimization)
 - [Splunk Web HEC procedure](https://help.splunk.com/en/splunk-enterprise/get-started/get-data-in/9.0/get-data-with-http-event-collector/set-up-and-use-http-event-collector-in-splunk-web)

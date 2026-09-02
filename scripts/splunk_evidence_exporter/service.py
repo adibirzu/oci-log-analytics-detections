@@ -260,6 +260,11 @@ class EvidenceExportService:
                     checkpoint=window.end,
                 )
                 self._emit_metric("DeliveryFailed", 1, detection_id)
+                # A batch may have been acknowledged before a later batch
+                # failed. Report that confirmed prefix so telemetry reconciles
+                # with the receipt and DLQ remaining-event count.
+                if delivered_count:
+                    self._emit_metric("DeliveredEvents", delivered_count, detection_id)
                 self._emit_metric("DeadLetteredEvents", len(remaining_events), detection_id)
                 return ExportReceipt(
                     status="delivery_failed",

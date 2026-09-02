@@ -102,6 +102,12 @@ Run the authoritative focused tests:
 python3 -m pytest scripts/test_splunk_detection_registry.py scripts/test_splunk_evidence_exporter.py scripts/test_splunk_evidence_e2e.py scripts/test_splunk_evidence_terraform.py scripts/test_splunk_diagrams.py scripts/test_splunk_documentation.py scripts/test_scan_sensitive_values.py -q
 ```
 
+The release checklist also runs the focused durable-delivery and telemetry contracts:
+
+```bash
+python3 -m pytest scripts/test_splunk_parallel_red_contracts.py -q
+```
+
 ## Manual provider canary
 
 The offline plan is available with:
@@ -151,6 +157,8 @@ Repository CLI previews/validators and deterministic context staging are offline
 Record canary and projected steady-state volume for Log Analytics ingest/query/storage, Streaming/raw duplication, Functions, Notifications, Vault, Object Storage, Logging, egress, HEC, and Splunk license/index retention. Test close to realistic rates without sending sensitive data. Keep original content excluded by default and published receipts sanitized.
 
 Metric dimensions are limited to no more than three governed fields; event evidence can still be high-cardinality. Track duplicate-key rate, HEC batch count, DLQ growth, query rows, and source/detection frequency. Retention in Log Analytics, stream, state/DLQ, Function logs, and Splunk are independent approvals.
+
+Occurrence identity is derived from the detection ID plus the governed source row, including source event time and `FirstSeen`/`LastSeen` bounds. Moving query-window metadata is excluded, so overlapping alarms and retries produce the same key; two source occurrences with equal aggregate values but different event-time bounds remain distinct. During a partial batch failure, the exporter emits both the confirmed `DeliveredEvents` count and the `DeadLetteredEvents` count so the metric record reconciles with the sanitized receipt and DLQ.
 
 ## Rollback, cleanup, and replay
 

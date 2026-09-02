@@ -261,6 +261,23 @@ def test_event_key_discriminates_rule_time_entity_and_row_changes():
     assert all(event_key(rule_id, variant) != baseline for rule_id, variant in variants)
 
 
+def test_event_key_ignores_moving_query_window_but_keeps_source_occurrence_bounds():
+    source = {
+        "Time": "2026-09-02T07:14:00Z",
+        "FirstSeen": "2026-09-02T07:14:00Z",
+        "LastSeen": "2026-09-02T07:14:03Z",
+        "Entity": "demo-host",
+        "Status": "Failure",
+        "Query Window Start": "2026-09-02T06:59:00Z",
+        "Query Window End": "2026-09-02T07:15:00Z",
+    }
+    moved = {**source, "Query Window Start": "2026-09-02T07:00:00Z", "Query Window End": "2026-09-02T07:16:00Z"}
+    distinct_occurrence = {**source, "FirstSeen": "2026-09-02T07:15:00Z", "LastSeen": "2026-09-02T07:15:03Z"}
+
+    assert event_key("oci-audit-failures", source) == event_key("oci-audit-failures", moved)
+    assert event_key("oci-audit-failures", source) != event_key("oci-audit-failures", distinct_occurrence)
+
+
 def registry_entry():
     return {
         "id": "oci-audit-failures",

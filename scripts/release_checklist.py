@@ -154,7 +154,7 @@ def build_splunk_parallel_offline_steps() -> list[tuple[str, list[str], int]]:
         ),
         (
             "local exporter success",
-            [python, str(SPLUNK_EXPORTER_CLI), "local-e2e", "--scenario", "success"],
+            [python, str(SPLUNK_EXPORTER_CLI), "local-e2e", "--scenario", "success", "--alarm-fixture", "scripts/fixtures/splunk_evidence/oci_raw_alarm.json"],
             300,
         ),
         (

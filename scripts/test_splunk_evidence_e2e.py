@@ -78,6 +78,17 @@ def test_checked_in_provider_raw_alarm_fixture_is_accepted_without_a_custom_dete
     assert payload["detection_id"] is None
 
 
+def test_cli_local_e2e_runs_provider_raw_alarm_through_bound_export_and_checkpoint():
+    result = run_cli("local-e2e", "--scenario", "success", "--alarm-fixture", "scripts/fixtures/splunk_evidence/oci_raw_alarm.json")
+    assert result.returncode == 0, result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["alarm_fixture"] == "oci_raw_alarm.json"
+    assert receipt["status"] == "delivered"
+    assert receipt["hec_attempt_count"] == 1
+    assert receipt["mock_hec_event_count"] == receipt["delivered_count"] == 3
+    assert receipt["checkpoint_committed"] is True
+
+
 @pytest.mark.parametrize(
     ("scenario", "status", "reason", "attempts"),
     [

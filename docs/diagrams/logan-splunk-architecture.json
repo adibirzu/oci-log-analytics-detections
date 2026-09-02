@@ -1,0 +1,172 @@
+{
+  "title": "OCI Log Analytics and Splunk Parallel Operations",
+  "evidence": {
+    "code_backed": true,
+    "provider_verified": false,
+    "release_accepted": false
+  },
+  "nodes": [
+    {
+      "id": "management_agent",
+      "label": "Management Agent",
+      "kind": "compute",
+      "group": "Collection boundary",
+      "layer": "Workloads",
+      "evidence": "design",
+      "x": 60,
+      "y": 100
+    },
+    {
+      "id": "logan",
+      "label": "Log Analytics",
+      "service": "log-analytics",
+      "kind": "observability",
+      "group": "Analytics source of truth",
+      "layer": "Observability",
+      "evidence": "code-backed",
+      "x": 310,
+      "y": 100
+    },
+    {
+      "id": "monitoring",
+      "label": "Monitoring",
+      "service": "monitoring",
+      "kind": "observability",
+      "group": "Trigger boundary",
+      "layer": "Observability",
+      "evidence": "code-backed",
+      "x": 560,
+      "y": 100
+    },
+    {
+      "id": "notifications",
+      "label": "Notifications",
+      "service": "notifications",
+      "kind": "observability",
+      "group": "Trigger boundary",
+      "layer": "Observability",
+      "evidence": "code-backed",
+      "x": 810,
+      "y": 100
+    },
+    {
+      "id": "function",
+      "label": "Function",
+      "kind": "compute",
+      "group": "Evidence export boundary",
+      "layer": "Workloads",
+      "evidence": "code-backed",
+      "x": 1060,
+      "y": 100
+    },
+    {
+      "id": "vault",
+      "label": "Vault",
+      "service": "vault",
+      "kind": "security",
+      "group": "Evidence export boundary",
+      "layer": "Security",
+      "evidence": "configured",
+      "x": 1060,
+      "y": 250
+    },
+    {
+      "id": "state_dlq",
+      "label": "checkpoint/DLQ",
+      "kind": "data",
+      "group": "Evidence export boundary",
+      "layer": "Workloads",
+      "evidence": "code-backed",
+      "x": 1060,
+      "y": 400
+    },
+    {
+      "id": "oci_splunk",
+      "label": "oci-splunk",
+      "kind": "compute",
+      "group": "Raw parallel boundary",
+      "layer": "Workloads",
+      "evidence": "code-backed external integration",
+      "x": 1310,
+      "y": 400
+    },
+    {
+      "id": "splunk_hec",
+      "label": "Splunk HEC",
+      "kind": "security",
+      "group": "Customer-managed destination boundary",
+      "layer": "Security",
+      "evidence": "unverified",
+      "x": 1310,
+      "y": 250
+    }
+  ],
+  "edges": [
+    {
+      "from": "management_agent",
+      "to": "logan",
+      "type": "telemetry",
+      "label": "telemetry: associated source records"
+    },
+    {
+      "from": "logan",
+      "to": "monitoring",
+      "type": "telemetry",
+      "label": "telemetry: detection metric"
+    },
+    {
+      "from": "monitoring",
+      "to": "notifications",
+      "type": "control",
+      "label": "control: reviewed alarm transition"
+    },
+    {
+      "from": "notifications",
+      "to": "function",
+      "type": "control",
+      "label": "control: at-least-once invocation"
+    },
+    {
+      "from": "function",
+      "to": "logan",
+      "type": "control",
+      "label": "control: bounded evidence query"
+    },
+    {
+      "from": "function",
+      "to": "vault",
+      "type": "control",
+      "label": "control: read credential reference"
+    },
+    {
+      "from": "function",
+      "to": "state_dlq",
+      "type": "control",
+      "label": "control: commit success or quarantine"
+    },
+    {
+      "from": "function",
+      "to": "splunk_hec",
+      "type": "telemetry",
+      "label": "telemetry: normalized evidence batch"
+    },
+    {
+      "from": "splunk_hec",
+      "to": "function",
+      "type": "response",
+      "label": "response: HEC acceptance"
+    },
+    {
+      "from": "oci_splunk",
+      "to": "splunk_hec",
+      "type": "telemetry",
+      "label": "telemetry: approved raw stream"
+    },
+    {
+      "from": "splunk_hec",
+      "to": "oci_splunk",
+      "type": "response",
+      "label": "response: raw delivery receipt"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+%% Title: OCI Log Analytics and Splunk parallel operations
+%% Evidence: code-backed and configured disabled; provider verified = false; release accepted = false
+%% Primary objects: 9
+%% OCI diagram: node aliases and oci-service metadata are recorded in comments
+flowchart LR
+  subgraph G1["Collection boundary"]
+    %% oci-node: n1 = management_agent (oci-service: custom)
+    n1["Management Agent"]
+  end
+  subgraph G2["Analytics source of truth"]
+    %% oci-node: n2 = logan (oci-service: log-analytics)
+    n2["Log Analytics"]
+  end
+  subgraph G3["Trigger boundary"]
+    %% oci-node: n3 = monitoring (oci-service: monitoring)
+    n3["Monitoring"]
+    %% oci-node: n4 = notifications (oci-service: notifications)
+    n4["Notifications"]
+  end
+  subgraph G4["Evidence export boundary"]
+    %% oci-node: n5 = function (oci-service: custom)
+    n5["Function"]
+    %% oci-node: n6 = vault (oci-service: vault)
+    n6["Vault"]
+    %% oci-node: n7 = state_dlq (oci-service: custom)
+    n7["checkpoint/DLQ"]
+  end
+  subgraph G5["Raw parallel boundary"]
+    %% oci-node: n8 = oci_splunk (oci-service: custom)
+    n8["oci-splunk"]
+  end
+  subgraph G6["Customer-managed destination boundary"]
+    %% oci-node: n9 = splunk_hec (oci-service: custom)
+    n9["Splunk HEC"]
+  end
+  n1 -.->|"telemetry: associated source records"| n2
+  n2 -.->|"telemetry: detection metric"| n3
+  n3 -.->|"control: reviewed alarm transition"| n4
+  n4 -.->|"control: at-least-once invocation"| n5
+  n5 -.->|"control: bounded evidence query"| n2
+  n5 -.->|"control: read credential reference"| n6
+  n5 -.->|"control: commit success or quarantine"| n7
+  n5 -.->|"telemetry: normalized evidence batch"| n9
+  n9 -.->|"response: HEC acceptance"| n5
+  n8 -.->|"telemetry: approved raw stream"| n9
+  n9 -.->|"response: raw delivery receipt"| n8
+  classDef oci fill:#FFF3E0,stroke:#C74634,color:#312D2A,stroke-width:2px;
+  class n1,n2,n3,n4,n5,n6,n7,n8,n9 oci;

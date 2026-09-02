@@ -1,0 +1,25 @@
+%% Title: Two-mode onboarding decision workflow
+%% Evidence: code-backed offline plan and operator workflow; provider verified = false; release accepted = false
+%% Primary objects: 8
+flowchart LR
+  subgraph SCOPE["Ownership and source boundary"]
+    owner["Source owner and data policy"]
+    mode["Raw, evidence, or both modes"]
+  end
+  subgraph COLLECT["Collection boundary"]
+    agent["Management Agent or OCI Logging"]
+    logan["Log Analytics"]
+    parsed["Source, entity, parser, and fields"]
+  end
+  subgraph DELIVERY["Delivery boundary"]
+    disabled["Disabled trigger and exporter"]
+    hec["Splunk HEC"]
+    acceptance["Acceptance owner"]
+  end
+  owner -.->|"control: approve source and retention"| mode
+  mode -.->|"control: select collection route"| agent
+  agent -->|"telemetry: fresh canary record"| logan
+  logan -->|"telemetry: searchable parsed fields"| parsed
+  parsed -.->|"control: configure detection and delivery"| disabled
+  disabled -->|"telemetry: one approved canary"| hec
+  hec -.->|"response: intended index is searchable"| acceptance

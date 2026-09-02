@@ -1,0 +1,28 @@
+%% Title: Boundary-first troubleshooting workflow
+%% Evidence: code-backed failure contracts and operator checks; provider verified = false; release accepted = false
+%% Primary objects: 8
+flowchart LR
+  subgraph TRIAGE["Symptom boundary"]
+    symptom["Missing or delayed Splunk result"]
+  end
+  subgraph RAW["Raw route boundary"]
+    oci_splunk["oci-splunk raw path"]
+  end
+  subgraph OCI["Evidence route boundary"]
+    logan["Log Analytics query result"]
+    monitoring["Monitoring alarm state"]
+    notifications["Notifications delivery"]
+    function["Function sanitized receipt"]
+    state["checkpoint/DLQ state"]
+  end
+  subgraph DEST["Customer-managed destination boundary"]
+    hec["Splunk HEC response"]
+  end
+  symptom -.->|"control: identify raw or evidence mode"| oci_splunk
+  symptom -.->|"control: verify bounded query first"| logan
+  logan -->|"telemetry: detection metric"| monitoring
+  monitoring -.->|"control: inspect alarm transition"| notifications
+  notifications -.->|"control: inspect Function invocation"| function
+  function -.->|"control: inspect retry and quarantine state"| state
+  function -->|"telemetry: replay-safe batch"| hec
+  hec -.->|"response: accepted, retryable, or quarantine"| function

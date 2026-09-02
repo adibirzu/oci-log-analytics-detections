@@ -1,0 +1,29 @@
+%% Title: Evidence export sequence and commit boundary
+%% Evidence: code-backed execution order; provider verified = false; release accepted = false
+%% Primary objects: 8
+sequenceDiagram
+  participant LA as Log Analytics
+  participant DR as Detection rule
+  participant M as Monitoring
+  participant N as Notifications
+  participant F as Function
+  participant V as Vault
+  participant S as checkpoint/DLQ
+  participant H as Splunk HEC
+  LA->>DR: telemetry: saved search evaluates bounded window
+  DR-->>M: telemetry: numeric metric and dimensions
+  M-->>N: control: reviewed alarm transition
+  N-->>F: control: at-least-once invocation
+  F->>S: control: load per-rule checkpoint
+  F->>LA: control: query checkpoint overlap through alarm end
+  LA-->>F: response: selected evidence fields
+  F->>V: control: read credential reference
+  V-->>F: response: runtime credential value
+  F->>H: telemetry: deterministic HEC event batches
+  alt HEC confirms every batch
+    H-->>F: response: accepted
+    F->>S: control: commit monotonic checkpoint
+  else delivery fails or is quarantined
+    H-->>F: response: retryable or quarantine outcome
+    F->>S: control: persist remaining events without checkpoint advance
+  end

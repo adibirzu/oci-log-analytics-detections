@@ -1,0 +1,28 @@
+%% Title: Mode 1 - raw parallel fan-out
+%% Evidence: code-backed routing contract; provider verified = false; release accepted = false
+%% Primary objects: 8
+flowchart LR
+  subgraph SRC["OCI source boundary"]
+    sources["Approved OCI log sources"]
+    logging["OCI Logging"]
+  end
+  subgraph ROUTE["OCI routing boundary"]
+    la_connector["Connector Hub to Log Analytics"]
+    stream_connector["Connector Hub to Streaming"]
+    stream["OCI Streaming"]
+  end
+  subgraph ANALYTICS["Analytics source-of-truth boundary"]
+    logan["Log Analytics"]
+  end
+  subgraph RAW["Raw transport and customer-managed boundary"]
+    oci_splunk["oci-splunk"]
+    hec["Splunk HEC"]
+  end
+  sources -->|"telemetry: approved raw logs"| logging
+  logging -.->|"control: source selection"| la_connector
+  la_connector -->|"telemetry: Log Analytics copy"| logan
+  logging -.->|"control: independent source selection"| stream_connector
+  stream_connector -->|"telemetry: raw stream"| stream
+  stream -->|"telemetry: consumer delivery"| oci_splunk
+  oci_splunk -->|"telemetry: HEC event batches"| hec
+  hec -.->|"response: delivery receipt"| oci_splunk

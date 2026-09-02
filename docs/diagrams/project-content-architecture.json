@@ -1,0 +1,24 @@
+{
+  "title": "OCI Log Analytics Detections Content Architecture",
+  "nodes": [
+    {"id": "sigma", "label": "Sigma and YAML rules", "kind": "security", "group": "Authoring", "layer": "Workloads", "x": 60, "y": 110},
+    {"id": "sentinel", "label": "Official Sentinel content cache", "kind": "security", "group": "Authoring", "layer": "Workloads", "x": 60, "y": 230},
+    {"id": "curated", "label": "Curated app and hunting analytics", "kind": "security", "group": "Authoring", "layer": "Workloads", "x": 60, "y": 350},
+    {"id": "generators", "label": "Deterministic converters and generators", "kind": "compute", "group": "Build and validation", "layer": "Workloads", "x": 350, "y": 190},
+    {"id": "gates", "label": "Schema, field, parser and quality gates", "kind": "security", "group": "Build and validation", "layer": "Security", "x": 350, "y": 330},
+    {"id": "canonical", "label": "Canonical queries and generated inventories", "kind": "data", "group": "Repository contracts", "layer": "Workloads", "x": 670, "y": 190},
+    {"id": "dashboard", "label": "Dashboard and saved-search deployment", "service": "log-analytics", "kind": "observability", "group": "OCI operator surfaces", "layer": "Observability", "x": 990, "y": 90},
+    {"id": "forge", "label": "Forge webapp and API wrappers", "kind": "compute", "group": "Read-only consumers", "layer": "Workloads", "x": 990, "y": 230},
+    {"id": "exports", "label": "Manifest, MCP and multicloud consumers", "kind": "data", "group": "Read-only consumers", "layer": "Workloads", "x": 990, "y": 370}
+  ],
+  "edges": [
+    {"from": "sigma", "to": "generators", "type": "control", "label": "convert_sigma.py"},
+    {"from": "sentinel", "to": "generators", "type": "control", "label": "conversion workflow"},
+    {"from": "curated", "to": "canonical", "type": "control", "label": "catalog input"},
+    {"from": "generators", "to": "gates", "type": "control", "label": "validate"},
+    {"from": "gates", "to": "canonical", "type": "control", "label": "promote and publish"},
+    {"from": "canonical", "to": "dashboard", "type": "control", "label": "embedded saved searches"},
+    {"from": "canonical", "to": "forge", "type": "control", "label": "typed loaders"},
+    {"from": "canonical", "to": "exports", "type": "control", "label": "generated contract"}
+  ]
+}

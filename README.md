@@ -11,6 +11,7 @@ This repository is scoped to OCI Log Analytics query, dashboard, and Forge webap
 - generate synthetic logs that populate the dashboards
 - validate query metadata, log-source mappings, and dashboard inventory
 - create OCI Log Analytics dashboards and embedded saved searches only after validation passes
+- provide manual and script-assisted Windows Event Log onboarding, including guarded Management Agent installation, native source association, saved searches, scheduled detections, disabled alarm canaries, and operator evidence gates
 - ship the integrated Forge webapp for cross-QL conversion into OCI Log Analytics QL
 - publish redacted OCI Logging and Log Analytics detection-event examples for third-party SIEM parser development
 
@@ -48,14 +49,14 @@ This repository ships both source authoring content and generated OCI query asse
 - **Curated analytics:** 205
   - 54 app telemetry analytics in `queries/apps/`
   - 151 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 1348
+- **Total query artifacts/content items:** 1,348
 - **Source rule breakdown:** Windows (302), Cloud/OCI (102), Linux (80), Web/WAF (38)
 - **Combined MITRE ATT&CK coverage:** 279 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Atomic Red Team coverage:** 280 / 397 testable rules have ART mappings (70.5%)
 - **Dashboard inventory:** 35 dashboards with 541 active dashboard saved searches and 161 advanced visualization widgets
 - **Generated demo data:** 93,142 events across 25 NDJSON files in the latest local `test_data/manifest.json`
-- **Target environment:** OCI-DEMO Landing Zone (`demo-observability` compartment)
+- **Deployment model:** tenant-neutral artifacts; the operator supplies and approves the exact OCI target
 
 Canonical inventory and supporting documentation:
 
@@ -76,50 +77,62 @@ Canonical inventory and supporting documentation:
 
 ## Architecture
 
-The repo is intentionally split into three content surfaces:
+The repository separates authoring, deterministic generation, validation, deployment, and consumption. Generated artifacts are the interface between these layers: Forge, API wrappers, MCP integrations, exports, and dashboards consume them instead of reimplementing conversion or deployment logic.
 
-- `rules/**` — source Sigma/YAML authoring layer
-- `queries/*.json` and source-derived files in `queries/apps/` — generated OCI detections
-- `queries/apps/*.json` curated analytics and `queries/hunting/*.json` — hand-authored app and hunting content
+```mermaid
+flowchart LR
+  subgraph AUTHOR["Authoring"]
+    SIGMA["Sigma/YAML rules"]
+    SENTINEL["Official Sentinel content"]
+    CURATED["Curated app and hunting analytics"]
+  end
+  subgraph BUILD["Deterministic build and validation"]
+    CONVERT["Converters and generators"]
+    GATES["Schema · field · parser · quality gates"]
+  end
+  subgraph CONTRACT["Canonical repository contracts"]
+    QUERIES["queries/**"]
+    INVENTORY["catalog · dashboard inventory · manifest"]
+  end
+  subgraph CONSUMERS["Consumers"]
+    DASH["OCI dashboards and saved searches"]
+    FORGE["Forge webapp and API wrappers"]
+    EXPORT["MCP and multicloud integrations"]
+  end
 
-The canonical architecture contract is documented in `docs/ARCHITECTURE.md`. The short version is:
-
-```text
-rules/** ------------------------------------------> scripts/convert_sigma.py
-                                                        |
-                                                        +--> queries/*.json
-                                                        +--> queries/apps/*.json (8 Sigma-derived browser detections)
-
-queries/apps/*.json (54 curated app analytics) --------+
-queries/hunting/*.json (151 hunting analytics) ---------+--> scripts/generate_catalog.py
-                                                             |
-                                                             +--> CATALOG.md
-                                                             +--> queries/catalog.json
-
-queries/** -----------------------------------------------> scripts/export_for_multicloud.py --manifest-only
-                                                             |
-                                                             +--> queries/manifest.json
-
-queries/** -----------------------------------------------> scripts/deploy_dashboard.py
-                                                             |
-                                                             +--> 35 dashboards / 541 saved searches
-                                                             +--> queries/dashboard_inventory.json
+  SIGMA --> CONVERT
+  SENTINEL --> CONVERT
+  CONVERT --> GATES
+  GATES --> QUERIES
+  CURATED --> QUERIES
+  QUERIES --> INVENTORY
+  INVENTORY --> DASH
+  INVENTORY --> FORGE
+  INVENTORY --> EXPORT
 ```
 
-### Data Flow
+The editable offline-generated source is available as [Mermaid](docs/diagrams/project-content-architecture.mmd) with its [JSON specification](docs/diagrams/project-content-architecture.json). The detailed contract is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-```
-  Sysmon/Windows Events ─────┐
-  Linux Syslog/Secure ───────┤
-  OCI Audit Events ──────────┤──> OCI Streaming ──> Service Connector Hub ──> Log Analytics
-  Cloud Guard Problems ──────┤                                                    |
-  WAF/LB Access Logs ────────┤                                                    v
-  App/Browser Telemetry JSON ─┘                                         SOC Dashboards (35)
-                                                                       Saved Searches (541)
-  Generated Test Data (NDJSON) ──> Upload API ──> Log Analytics ──> Dashboard Verification
+### Runtime telemetry and response
+
+Runtime collection is not a single mandatory pipeline. Choose the supported route that matches the source, then prove every layer independently.
+
+```mermaid
+flowchart LR
+  WIN["Windows Security · System · Application"] -->|"Management Agent + native sources"| LA["OCI Log Analytics"]
+  OCI["OCI service logs"] -->|"OCI Logging / Service Connector Hub"| LA
+  CUSTOM["App, browser, syslog, and custom JSON"] -->|"Agent, connector, or approved upload"| LA
+  FIXTURES["Tenant-neutral synthetic NDJSON"] -->|"dry-run, then approved upload"| LA
+
+  LA --> SEARCH["Saved searches and 35 dashboards"]
+  LA --> RULE["Ingest-time or scheduled detection"]
+  RULE -->|"numeric metric"| MON["OCI Monitoring"]
+  MON --> ALARM["Alarm created disabled; enable reviewed canary"]
+  ALARM --> NOTIFY["OCI Notifications / approved response"]
+  SEARCH -. "analyst validation" .-> ALARM
 ```
 
-Browser and app dashboards currently run against `SOC Application Logs`, a custom OCI Log Analytics source created by `scripts/setup_log_sources.py`. The contract intentionally uses OCI LA display names such as `Service Name`, `Trace ID`, `Request URL`, `Response Code`, `Span Name`, `Span Attributes`, and `Referrer` so the queries remain valid against the deployed parser.
+Browser and app dashboards run against `SOC Application Logs`, a custom Log Analytics JSON source created by `scripts/setup_log_sources.py`. Windows Security, System, and Application channels use the native Management Agent/source-association path documented in the [Windows fast onboarding track](docs/WINDOWS_ACCESS_FAST_ONBOARDING.md); they do not need to traverse OCI Streaming. The full manual/scripted workflows and troubleshooting gates are in [the workflow diagrams](docs/WINDOWS_ACCESS_WORKFLOW_DIAGRAMS.md).
 
 ### Canonical Inventory Contract
 
@@ -149,7 +162,7 @@ Notes:
 ### SOC Detection Dashboards (35)
 | Dashboard | Widgets | Purpose |
 | :--- | :--- | :--- |
-| SOC Overview Dashboard | 14 | Executive-level cross-domain security summary + hunting alerts |
+| SOC Overview Dashboard | 17 | Cross-domain KPIs, timeline, MITRE, health, and critical drilldowns |
 | SOC: OCI STIG Compliance | 17 | STIG compliance: MFA, key rotation, vault secrets, audit config |
 | SOC: OCI Audit Security | 22 | IAM, network, compute, storage, KMS, DB, bastion, discovery |
 | SOC: Cloud Guard Security | 12 | Cloud Guard problem detection |
@@ -175,10 +188,15 @@ Notes:
 | SOC: APT Detection | 22 | BLUELIGHT RAT (S0657/APT37) summary KPIs, kill chain, links, and YARA enrichment |
 | SOC: Browser Attack Detection | 13 | SOC Application Logs: APM/WAF correlation, OWASP mix, XSS, SQLi, CSRF, session hijack |
 | SOC: oci-coordinator Hunt Showcase | 23 | End-to-end hunt showcase for the oci-coordinator demo: KPIs, top rules, drilldowns |
-| SOC: Microsoft Sentinel Endpoint Converted Detections | 24 | Live-validated Sentinel endpoint detections converted to Logan QL |
-| SOC: Microsoft Sentinel Identity Converted Detections | 1 | Live-validated Sentinel identity detection converted to Logan QL |
-| SOC: Microsoft Sentinel M365 Converted Detections | 2 | Live-validated Sentinel M365 detections converted to Logan QL |
-| SOC: Microsoft Sentinel Network Converted Detections | 17 | Live-validated Sentinel network detections converted to Logan QL |
+| SOC: Wazuh MITRE ATT&CK | 7 | MITRE tactics, techniques, rules, agents, and recent events |
+| SOC: Wazuh Vulnerability Detection | 8 | CVEs, packages, agents, severity, and CVSS distribution |
+| SOC: Wazuh Inventory & Compliance | 5 | Host inventory, packages, SCA checks, CIS, and PCI mapping |
+| SOC: Wazuh FIM & Threat Hunting | 4 | File integrity changes, firing rules, levels, and recent alerts |
+| SOC: Microsoft Sentinel Identity Converted Detections | 24 | Promoted Sentinel identity detections converted to Logan QL |
+| SOC: Microsoft Sentinel Endpoint Converted Detections | 24 | Promoted Sentinel endpoint detections converted to Logan QL |
+| SOC: Microsoft Sentinel Azure Cloud Converted Detections | 13 | Promoted Sentinel Azure/cloud detections converted to Logan QL |
+| SOC: Microsoft Sentinel M365 Converted Detections | 24 | Promoted Sentinel M365 detections converted to Logan QL |
+| SOC: Microsoft Sentinel Network Converted Detections | 24 | Promoted Sentinel network detections converted to Logan QL |
 
 ### APT Detection: BLUELIGHT RAT (S0657/APT37)
 Full kill chain detection for the North Korean BLUELIGHT Remote Access Trojan:
@@ -223,9 +241,9 @@ The browser dashboard now leads with 4 showcase widgets for total attack volume,
 
 ```
 rules/                          # Source detection rules (Sigma YAML)
-  cloud/oci/                    # 100 OCI rules (STIG + security + discovery)
-  linux/                        # 67 Linux rules (advanced attacks + hunting)
-  windows/                      # 249 Windows rules (13 subdirectories)
+  cloud/oci/                    # 102 OCI rules (STIG + security + discovery)
+  linux/                        # 80 Linux rules (advanced attacks + hunting)
+  windows/                      # 302 Windows rules (13 subdirectories)
     apt/                        # 16 BLUELIGHT/APT37 + YARA-backed detections
     process_creation/           # 56 process creation rules
     defense_evasion/            # 29 defense evasion rules
@@ -263,10 +281,8 @@ docs/                           # Additional documentation
 For customer-facing deployment, start with [DEPLOYMENT.md](docs/DEPLOYMENT.md). It documents the Forge-to-Resource-Manager handoff, the package boundary, the GitHub Pages deployment preflight, and the scheduled Sentinel validation preflight. The commands below are operator/development workflows and require an explicitly configured OCI environment; they are not a substitute for reviewing a Resource Manager plan in the target tenancy.
 
 ### Target Environment
-This project deploys to the **OCI-DEMO Landing Zone** MAIN compartments:
-- **Dashboard/Search compartment:** `demo-observability`
-- **Log group:** `oci-demo-log-group`
-- **OCI Profile:** `cap` (configured in `.env.local`)
+
+All checked-in documentation and automation are tenant-neutral. Before any live command, resolve and record the approved OCI CLI profile, region, compartment, Log Analytics namespace, log group, target resources, ownership boundary, and rollback/stop conditions. A successful local test or dry-run is not proof of deployment in a customer tenancy.
 
 ### Quick Deploy
 ```bash
@@ -352,8 +368,9 @@ python3 scripts/audit_rule_quality.py         # Audit source and generated conte
 ## Integration
 
 ### OCI-DEMO
-This project is component C17 of the OCI-DEMO platform. Dashboards deploy to the
-MAIN `demo-observability` compartment alongside 53 other multicloud dashboards.
+The repository can be consumed as the Log Analytics detection component of an
+OCI-DEMO deployment. The target compartment, namespace, log group, retention,
+and approval boundary remain deployment inputs rather than checked-in defaults.
 
 ### MultiCloud Operations
 ```bash
@@ -363,7 +380,7 @@ python3 scripts/export_for_multicloud.py    # Export to ~/dev/multicloudoperatio
 ### Forge Webapp
 `webapp/` is the maintained Forge UI for this project. It exposes the `/forge` workbench and the query-aware `/forge?view=log-samples` parser workspace, links to `https://github.com/adibirzu/oci-log-analytics-detections`, and consumes generated artifacts including `queries/logan_ql_reference_catalog.json`, `queries/cross_ql_mapping_patterns.json`, `queries/conversion_examples.json`, `queries/catalog.json`, `queries/dashboard_inventory.json`, `queries/siem_log_examples.json`, and `test_data/manifest.json`.
 
-The webapp deployment manifests and helper scripts live under `webapp/deploy/oke/`. Production traffic is routed through the existing Octo APM load balancer at `convert.octodemo.cloud`, with backend write actions expected to sit behind API Gateway and WAF.
+The webapp deployment manifests and helper scripts live under `webapp/deploy/oke/`. Any production write path must use an operator-approved ingress, authentication, authorization, and WAF/API-policy design; Forge's generated-artifact readers do not grant OCI management access.
 
 ## License
 See [LICENSE](LICENSE) for details.

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log Analytics + Splunk Parallel Architecture</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: hsl(224 44% 6%);
+      --sunken: hsl(225 42% 5%);
+      --panel: hsl(222 34% 11%);
+      --overlay: hsl(221 32% 14%);
+      --text: hsl(210 30% 92%);
+      --muted: hsl(217 18% 64%);
+      --border: hsl(220 28% 18%);
+      --strong: hsl(218 30% 26%);
+      --brand: hsl(16 84% 56%);
+      --glow: hsl(24 92% 60%);
+      --info: hsl(202 90% 62%);
+      --ok: hsl(158 72% 50%);
+      --warn: hsl(42 96% 56%);
+      --danger: hsl(356 84% 64%);
+      --font: "SF Pro Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+      --mono: "JetBrains Mono", "SFMono-Regular", "Cascadia Code", monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); }
+    body {
+      background-image:
+        radial-gradient(1000px 700px at 0% 0%, hsl(24 92% 60% / .10), transparent 60%),
+        linear-gradient(hsl(220 32% 16% / .35) 1px, transparent 1px),
+        linear-gradient(90deg, hsl(220 32% 16% / .35) 1px, transparent 1px);
+      background-size: 100% 100%, 44px 44px, 44px 44px;
+    }
+    main { width: min(1500px, 100%); margin: 0 auto; padding: 36px clamp(18px, 4vw, 64px) 72px; }
+    header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: end; margin-bottom: 28px; }
+    h1 { font-size: clamp(2rem, 4vw, 4.25rem); max-width: 980px; line-height: .98; letter-spacing: -.045em; margin: 8px 0 16px; }
+    h2 { font-size: clamp(1.35rem, 2vw, 2rem); letter-spacing: -.02em; margin: 0; }
+    h3 { font-size: 1rem; margin: 0 0 8px; }
+    p { line-height: 1.6; }
+    .eyebrow { color: var(--glow); text-transform: uppercase; letter-spacing: .18em; font-size: .7rem; font-weight: 800; }
+    .lede { max-width: 900px; color: var(--muted); font-size: 1.05rem; margin: 0; }
+    .badge { border: 1px solid var(--strong); color: var(--muted); border-radius: 999px; padding: 8px 12px; font: 700 .72rem var(--mono); white-space: nowrap; }
+    .section { margin-top: 26px; }
+    .section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; margin-bottom: 14px; }
+    .section-head p { color: var(--muted); margin: 0; max-width: 720px; text-align: right; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .panel { min-width: 0; background: hsl(222 34% 11% / .92); border: 1px solid var(--border); border-radius: 18px; padding: 20px; box-shadow: inset 0 1px 0 hsl(0 0% 100% / .035), 0 24px 50px -38px #000; }
+    .panel.recommended { border-color: hsl(24 92% 60% / .65); box-shadow: inset 3px 0 0 var(--brand), 0 24px 50px -38px #000; }
+    .panel h3 span { color: var(--glow); }
+    .panel p { color: var(--muted); margin: 7px 0; }
+    .mermaid { background: var(--sunken); border: 1px solid var(--border); border-radius: 14px; padding: 16px; overflow: auto; min-width: 0; }
+    .callout { display: grid; grid-template-columns: 6px minmax(0, 1fr); background: var(--overlay); border: 1px solid var(--strong); border-radius: 14px; overflow: hidden; }
+    .callout::before { content: ""; background: var(--warn); }
+    .callout > div { padding: 14px 16px; }
+    .callout strong { color: var(--warn); }
+    ul { padding-left: 19px; color: var(--muted); line-height: 1.6; }
+    li + li { margin-top: 5px; }
+    code { font-family: var(--mono); color: hsl(24 92% 74%); overflow-wrap: anywhere; }
+    .flow-steps { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+    .step { min-width: 0; padding: 13px 11px; border-radius: 12px; background: var(--overlay); border: 1px solid var(--border); }
+    .step b { display: block; color: var(--glow); font: 800 .68rem var(--mono); margin-bottom: 6px; }
+    .step span { font-size: .82rem; line-height: 1.35; display: block; }
+    .matrix { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    .matrix th, .matrix td { text-align: left; vertical-align: top; padding: 11px 12px; border-bottom: 1px solid var(--border); }
+    .matrix th { color: var(--glow); font: 800 .68rem var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    .matrix td { color: var(--muted); }
+    .matrix td:first-child { color: var(--text); font-weight: 700; }
+    .status { display: inline-flex; align-items: center; gap: 6px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 12px hsl(158 72% 50% / .55); }
+    form { margin-top: 28px; padding: 22px; border-radius: 18px; background: linear-gradient(135deg, hsl(222 34% 13%), hsl(225 42% 7%)); border: 1px solid hsl(24 92% 60% / .5); }
+    fieldset { border: 0; padding: 0; margin: 15px 0; display: grid; gap: 10px; }
+    label.choice { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); cursor: pointer; }
+    label.choice:hover { border-color: var(--strong); }
+    input[type="radio"] { margin-top: 3px; accent-color: var(--brand); }
+    textarea { width: 100%; min-height: 90px; resize: vertical; background: var(--sunken); color: var(--text); border: 1px solid var(--strong); border-radius: 12px; padding: 12px; font: .9rem var(--font); }
+    button { border: 0; border-radius: 12px; padding: 12px 18px; background: linear-gradient(180deg, var(--glow), var(--brand)); color: hsl(224 44% 7%); font-weight: 850; cursor: pointer; }
+    button:hover { filter: brightness(1.07); }
+    .small { font-size: .76rem; color: var(--muted); }
+    a { color: var(--info); }
+    @media (max-width: 1000px) {
+      header, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .flow-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .section-head { display: block; }
+      .section-head p { text-align: left; }
+    }
+    @media (max-width: 580px) { .flow-steps { grid-template-columns: 1fr; } main { padding-inline: 14px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <div class="eyebrow">Architecture review · OCI Log Analytics + Splunk</div>
+      <h1>Two delivery modes.<br>One governed detection catalog.</h1>
+      <p class="lede">All supported sources land in Log Analytics for OCI-aware parsing, hunting, dashboards, and detections. Splunk receives either the raw parallel feed or a bounded, enriched evidence feed—without pretending a Log Analytics detection rule is itself a log forwarder.</p>
+    </div>
+    <div class="badge"><span class="status"><span class="dot"></span> DESIGN · TENANT-NEUTRAL</span></div>
+  </header>
+
+  <section class="section">
+    <div class="section-head"><h2>Supported operating modes</h2><p>Customers may enable either mode—or both per source—while keeping ownership and cost visible.</p></div>
+    <div class="grid-2">
+      <article class="panel">
+        <h3><span>01</span> Raw parallel fan-out</h3>
+        <p>Reuse <a href="https://github.com/adibirzu/oci-splunk">adibirzu/oci-splunk</a>. Add approved OCI Logging sources to the Service Connector filter, send them to OCI Streaming, then consume with SOC4Kafka or Kafka Connect and land them through Splunk HEC.</p>
+        <div class="mermaid">
+flowchart TB
+  S["OCI Audit · VCN · WAF · LB · custom OCI logs"] --> L["OCI Logging"]
+  L --> C1["Connector A"]
+  L --> C2["Connector B"]
+  C1 --> LA["OCI Log Analytics"]
+  C2 --> ST["OCI Streaming"]
+  ST --> OS["oci-splunk consumer\nSOC4Kafka or Kafka Connect"]
+  OS --> HEC["Splunk HEC · raw indexes"]
+        </div>
+        <ul>
+          <li>Best for mandated raw retention, independent Splunk searches, or existing ES content.</li>
+          <li>Duplicates ingestion/storage cost and requires schema parity in two analytics planes.</li>
+          <li>Only OCI Logging sources in the connector filter follow this route.</li>
+        </ul>
+      </article>
+
+      <article class="panel recommended">
+        <h3><span>02</span> Log Analytics source of truth</h3>
+        <p>Collect OCI and on-premises telemetry into Log Analytics, recreate the prioritized Splunk rules in LAQL, emit governed metrics, and invoke a bounded exporter that re-queries matching evidence and posts an enriched HEC envelope.</p>
+        <div class="mermaid">
+flowchart TB
+  S["OCI + on-prem sources"] --> LA["OCI Log Analytics\nsource of truth"]
+  LA --> SS["Saved search + detection rule"]
+  SS --> M["Monitoring metric"]
+  M --> A["Alarm + Notifications"]
+  A --> F["Evidence Export Function"]
+  F -->|"bounded LA query"| LA
+  F --> V["Vault token · checkpoint · DLQ"]
+  F --> H["Splunk HEC\nenriched detection index"]
+        </div>
+        <ul>
+          <li>Preserves OCI parsing, correlation, dashboards, and tuning as the primary control plane.</li>
+          <li>Forwards evidence and context, not an uncontrolled second copy of every event.</li>
+          <li>Requires a tested export worker because detection rules post metrics—not log records.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="callout"><div><strong>Non-negotiable boundary.</strong> A Log Analytics ingest-time or scheduled detection posts a metric to OCI Monitoring. The alarm payload is a trigger and correlation hint. The exporter must use a registered saved-search query, bounded lookback, dimensions, and watermark to retrieve the actual evidence before sending it to Splunk.</div></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Option 2 · evidence export control plane</h2><p>Designed for replay safety, least privilege, and observable failure rather than fire-and-forget delivery.</p></div>
+    <div class="mermaid">
+sequenceDiagram
+  autonumber
+  participant S as Source / Management Agent
+  participant L as Log Analytics
+  participant D as Saved Search + Detection
+  participant M as Monitoring / Alarm
+  participant N as Notifications
+  participant F as Export Function
+  participant V as Vault + State / DLQ
+  participant H as Splunk HEC
+  S-->>L: Parsed event with stable source and entity fields
+  L->>D: Scheduled bounded query
+  D-->>M: Numeric metric + <=3 dimensions
+  M-->>N: Alarm transition with detection identity
+  N-->>F: At-least-once trigger
+  F->>V: Read HEC secret and checkpoint
+  F->>L: Query [watermark-overlap, alarm end] with rule dimensions
+  L-->>F: Matching evidence rows
+  F->>F: Normalize, redact, batch, hash event IDs
+  F->>H: HEC batch with idempotency metadata
+  alt HEC 2xx
+    F->>V: Advance checkpoint and write receipt
+  else timeout / 429 / 5xx
+    F->>V: Retry with backoff, then DLQ without advancing watermark
+  else 4xx / schema failure
+    F->>V: Quarantine and emit operational metric
+  end
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Component ownership</h2><p>The detections repository owns content contracts; the Splunk repository owns the raw transport and Splunk-side application.</p></div>
+    <div class="grid-3">
+      <article class="panel"><h3>Detection repository</h3><ul><li>Splunk SPL provenance and priority registry</li><li>LAQL saved searches and detection specs</li><li>Evidence-envelope schema and synthetic fixtures</li><li>Exporter Function source, Terraform module, tests, runbook, diagrams</li></ul></article>
+      <article class="panel"><h3><code>oci-splunk</code></h3><ul><li>Logging → Streaming raw fan-out</li><li>SOC4Kafka / Kafka Connect consumer</li><li>Managed or existing Splunk HEC</li><li>Splunk app, indexes, CIM, dashboards, saved searches, transport verification</li></ul></article>
+      <article class="panel"><h3>Customer-owned controls</h3><ul><li>Source allow-list and retention tier</li><li>Splunk HEC endpoint/index/token</li><li>Vault, network egress, IAM, quotas</li><li>Alarm thresholds, notification destinations, acceptance and rollback</li></ul></article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Multiple use cases</h2><p>One architecture, explicit delivery policy per source and detection family.</p></div>
+    <div class="panel" style="padding:0; overflow:hidden">
+      <table class="matrix">
+        <thead><tr><th>Use case</th><th>Collection</th><th>Log Analytics role</th><th>Splunk delivery</th><th>Acceptance proof</th></tr></thead>
+        <tbody>
+          <tr><td>All OCI raw logs</td><td>OCI Logging</td><td>Connector target + OCI analytics</td><td>Parallel Streaming via <code>oci-splunk</code></td><td>Same canary event queryable in both systems</td></tr>
+          <tr><td>High-value OCI detections</td><td>OCI Logging → LA</td><td>Primary parsing, correlation, detection</td><td>Enriched HEC evidence envelope</td><td>Metric, alarm, bounded rows, HEC receipt, Splunk search</td></tr>
+          <tr><td>On-prem Windows/Linux</td><td>Management Agent / Gateway</td><td>Entity/source association and source of truth</td><td>Selected evidence through exporter</td><td>Fresh host event crosses every layer</td></tr>
+          <tr><td>Compliance raw + SOC signal</td><td>Per-source dual policy</td><td>Full OCI hunting and tuned signal</td><td>Raw mandatory sources + enriched detections</td><td>No gaps, duplicates labeled, cost measured</td></tr>
+          <tr><td>HEC outage / replay</td><td>Collection continues</td><td>Evidence remains queryable</td><td>Checkpoint overlap + DLQ replay</td><td>No watermark advance before confirmed delivery</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Implementation and E2E gates</h2><p>Provider tests remain separate from local contracts and require an approved OCI/Splunk target.</p></div>
+    <div class="flow-steps">
+      <div class="step"><b>G0 · CONTRACT</b><span>SPL provenance, LAQL, source fields, evidence schema, delivery policy</span></div>
+      <div class="step"><b>G1 · UNIT</b><span>Conversion, registry, envelope, redaction, batching, idempotency</span></div>
+      <div class="step"><b>G2 · LOCAL E2E</b><span>Fake LA query + Function + mock HEC; 2xx, duplicate, 429, 5xx, 4xx</span></div>
+      <div class="step"><b>G3 · OCI CANARY</b><span>One approved source, one saved search, one disabled alarm, one Function</span></div>
+      <div class="step"><b>G4 · SPLUNK PROOF</b><span>HEC receipt and queryable event with detection identity and source provenance</span></div>
+      <div class="step"><b>G5 · OPERATIONS</b><span>Lag, delivery, DLQ, cost, retention, rollback, handoff, canary cadence</span></div>
+    </div>
+  </section>
+
+  <form data-lavish-question="splunk_architecture" onsubmit="event.preventDefault(); const fd=new FormData(event.currentTarget); const decision=fd.get('decision'); const notes=fd.get('notes'); if(decision){ window.lavish.queuePrompt('Splunk parallel architecture review: '+decision+'. Notes: '+(notes||'none'), {tag:'architecture-review', text:'Architecture: '+decision, queueKey:'splunk-architecture', element:event.currentTarget, data:{decision,notes}}); }">
+    <div class="eyebrow">Review gate</div>
+    <h2 style="margin-top:8px">Is this the right architecture to turn into the written specification?</h2>
+    <fieldset>
+      <label class="choice"><input type="radio" name="decision" value="approve-both-modes" checked><span><strong>Approve both modes</strong><br><span class="small">Raw fan-out via <code>oci-splunk</code> plus Log Analytics evidence export as the recommended operating model.</span></span></label>
+      <label class="choice"><input type="radio" name="decision" value="approve-with-changes"><span><strong>Approve with changes</strong><br><span class="small">Queue your required adjustments below before the spec is written.</span></span></label>
+      <label class="choice"><input type="radio" name="decision" value="hold-design"><span><strong>Hold</strong><br><span class="small">Do not write the specification yet.</span></span></label>
+    </fieldset>
+    <textarea name="notes" placeholder="Optional: rule scope, export latency, raw-log exceptions, Splunk index/sourcetype, or other corrections"></textarea>
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:12px">
+      <span class="small">Queue the decision, then use Lavish “Send to Agent”.</span>
+      <button type="submit">Queue architecture decision</button>
+    </div>
+  </form>
+
+  <p class="small" style="margin-top:20px">Evidence: repository inspection and the public <code>adibirzu/oci-splunk</code> main branch. Product behavior requiring provider confirmation is labeled as a gate, not an accomplished deployment.</p>
+</main>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "strict", flowchart: { curve: "basis", htmlLabels: true } });
+  await mermaid.run({ querySelector: ".mermaid" });
+</script>
+</body>
+</html>

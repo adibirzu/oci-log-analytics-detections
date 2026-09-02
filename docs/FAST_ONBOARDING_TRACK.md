@@ -420,6 +420,9 @@ alert/detection use cases, failure response, and offboarding steps.
 
 See [Manage Storage](https://docs.oracle.com/en-us/iaas/log-analytics/doc/manage-storage.html)
 for active/archive behavior, recall implications, and purge controls.
+Use [Cost Optimization and Archive Retention](LOG_ANALYTICS_COST_OPTIMIZATION.md)
+for the operator workflow, the service-metric watchlist, archive advantages, and
+the Splunk Mode 1 versus Mode 2 cost tradeoff.
 
 ## Troubleshooting order
 
@@ -462,5 +465,7 @@ not evidence that the source produced no events.
 - [Lab — Set Up Continuous Log Collection](https://docs.oracle.com/en/cloud/paas/log-analytics/laagt/)
 - [Cloud Adoption Framework — Logging and Log Analytics Strategy](https://docs.oracle.com/en-us/iaas/Content/cloud-adoption-framework/logging-and-logging-analytics-strategy.htm)
 - [Best Practices](https://docs.oracle.com/en-us/iaas/log-analytics/doc/best-practices.html)
+- [Cost Optimization and Archive Retention](LOG_ANALYTICS_COST_OPTIMIZATION.md)
+- [A-Team: OCI Logging Analytics Best Practices Series - Cost Optimization](https://www.ateam-oracle.com/oci-logging-analytics-best-practices-series-cost-optimization)
 - [IAM Policies Catalog](https://docs.oracle.com/en-us/iaas/log-analytics/doc/iam-policies-catalog-logging-analytics.html)
 - [Ingest Logs](https://docs.oracle.com/en-us/iaas/log-analytics/doc/ingest-logs.html)

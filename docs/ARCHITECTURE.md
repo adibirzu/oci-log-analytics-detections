@@ -1,6 +1,6 @@
 # OCI Log Analytics Detections Architecture
 
-Last reconciled with generated artifacts: 2026-09-01
+Last reconciled with generated artifacts: 2026-09-02
 
 ## Purpose and scope
 
@@ -39,14 +39,14 @@ Published counts come from [`queries/catalog.json`](../queries/catalog.json), [`
 | Sigma-derived browser/app queries | 8 | `queries/catalog.json:inventory.source_derived_app_queries` |
 | Promoted Sentinel queries | 590 | `queries/catalog.json:total_sentinel_queries` |
 | Curated app analytics | 54 | `queries/catalog.json:inventory.curated_app_queries` |
-| Curated hunting analytics | 151 | `queries/catalog.json:total_hunting` |
-| Total query content | 1,348 | `queries/catalog.json:total_content_items` |
+| Curated hunting analytics | 155 | `queries/catalog.json:total_hunting` |
+| Total query content | 1,352 | `queries/catalog.json:total_content_items` |
 | Dashboards | 35 | `queries/dashboard_inventory.json:summary.total_dashboards` |
 | Dashboard saved searches/widgets | 541 | `queries/dashboard_inventory.json:summary.total_widgets` |
 | Advanced visualization widgets | 161 | `queries/dashboard_inventory.json:summary.advanced_visualization_widgets` |
 | Latest local synthetic events | 93,142 across 25 NDJSON files | `test_data/manifest.json` |
 
-The 553 Sigma-derived queries are the 545 top-level queries plus 8 browser/app queries. The 205 curated analytics are 54 app queries plus 151 hunting queries. Sentinel content is source-derived but is not counted as Sigma-derived.
+The 553 Sigma-derived queries are the 545 top-level queries plus 8 browser/app queries. The 209 curated analytics are 54 app queries plus 155 hunting queries. Sentinel content is source-derived but is not counted as Sigma-derived.
 
 ## Repository content architecture
 
@@ -182,6 +182,36 @@ flowchart LR
 | Application/browser telemetry | `SOC Application Logs` custom JSON source | Use OCI display fields such as `Service Name`, `Trace ID`, and `Response Code` |
 | Sysmon-rich/custom JSON | Repository custom source/parser where required fields are declared | Do not assume a minimalist native parser exposes every detection field |
 | Synthetic evidence | Local generation/validation first; approved upload only afterward | Synthetic hits prove query contracts, not production coverage |
+
+## Storage lifecycle architecture
+
+Log Analytics storage is part of the operating model, especially when the same
+source might stay only in Log Analytics, feed Splunk in parallel, or do both.
+Recent searchable data belongs in active storage. Older data with future
+investigative or compliance value belongs in archive storage. Recalled data
+returns to active storage temporarily and must be released after analysis to
+avoid unnecessary active-storage cost.
+
+```mermaid
+flowchart LR
+  COLLECT[Collected logs] --> ACTIVE[Active storage]
+  ACTIVE --> SEARCH[Dashboards searches detections]
+  ACTIVE --> AGE{Older than active window?}
+  AGE -->|No| ACTIVE
+  AGE -->|Yes| ARCHIVE[Archive storage]
+  ARCHIVE --> RECALL[Recall selected time range]
+  RECALL --> SEARCH
+  SEARCH --> RELEASE[Release recalled data]
+  RELEASE --> ARCHIVE
+  ACTIVE --> PURGE[Purge only by approved lifecycle]
+  ARCHIVE --> PURGE
+```
+
+This repository documents the workflow but does not enable archiving, trigger
+recalls, or purge customer data. Use the customer's OCI Console, CLI, or
+approved Terraform process for those actions. See
+[Cost Optimization and Archive Retention](LOG_ANALYTICS_COST_OPTIMIZATION.md)
+for the operator procedure and source-backed storage behaviors.
 
 ## Windows access onboarding workflow
 

@@ -36,6 +36,7 @@ This is a migration accelerator for teams moving security analytics into OCI Log
 The [documentation hub](docs/README.md) is the maintained wiki-style entry point for operators, SOC teams, contributors, and integration owners.
 For hands-on use, start with [Using OCI Log Analytics Queries](docs/LOG_ANALYTICS_QUERY_USAGE.md) to select an artifact, run it in Log Explorer, customize OCL safely, and validate it locally or against an approved OCI target.
 For a new customer deployment, follow the [OCI Log Analytics Fast Onboarding Track](docs/FAST_ONBOARDING_TRACK.md) to establish IAM, choose an ingestion path, prove the first two sources, and plan a governed production rollout.
+For storage design, use [Cost Optimization and Archive Retention](docs/LOG_ANALYTICS_COST_OPTIMIZATION.md) to decide active versus archive retention, recall/release workflow, and when Splunk parallel delivery justifies duplicate cost.
 For the Windows access use case, continue with [Windows Access Monitoring Fast Onboarding](docs/WINDOWS_ACCESS_FAST_ONBOARDING.md), then choose the [manual console runbook](docs/WINDOWS_ACCESS_MANUAL_RUNBOOK.md) or [script-assisted runbook](docs/WINDOWS_ACCESS_SCRIPTED_RUNBOOK.md). The [workflow diagrams](docs/WINDOWS_ACCESS_WORKFLOW_DIAGRAMS.md) show collection, detection, notification, troubleshooting, and evidence gates.
 
 ## Splunk Parallel Operations
@@ -58,6 +59,7 @@ flowchart LR
 ```
 
 Start with [Splunk Parallel Operations](docs/SPLUNK_PARALLEL_OPERATIONS.md), then use the [rule migration guide](docs/SPLUNK_RULE_MIGRATION.md), [evidence export runbook](docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md), and [E2E validation guide](docs/SPLUNK_E2E_VALIDATION.md). Editable sources include the full [Splunk architecture](docs/diagrams/logan-splunk-architecture.mmd) and [project content architecture](docs/diagrams/project-content-architecture.mmd). Local tests and plans do not prove OCI/HEC deployment or Splunk searchability.
+Use [Cost Optimization and Archive Retention](docs/LOG_ANALYTICS_COST_OPTIMIZATION.md) when deciding whether a source belongs in Mode 1 raw fan-out, Mode 2 governed evidence export, or an archive-first Log Analytics retention policy.
 
 ## Current Inventory
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
@@ -93,6 +95,7 @@ Canonical inventory and supporting documentation:
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit report
 - `docs/WEBAPP.md` — integrated Forge webapp contract, security posture, and deployment notes
 - `docs/MIGRATION_AND_SECURITY_GUIDE.md` — customer migration, use-case, and SIEM-forwarding playbook
+- `docs/LOG_ANALYTICS_COST_OPTIMIZATION.md` — active/archive retention, recall/release workflow, and cost controls for Log Analytics with or without Splunk
 - `docs/SPLUNK_PARALLEL_OPERATIONS.md` — Mode 1 raw, Mode 2 evidence, hybrid, on-prem, and steady-state operations
 - `docs/SPLUNK_RULE_MIGRATION.md` — governed SPL-to-LAQL migration and detection promotion gates
 - `docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md` — manual and approval-separated exporter deployment/rollback/replay

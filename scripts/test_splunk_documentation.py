@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -28,6 +30,7 @@ NAVIGATION_PAGES = (
     ROOT / "docs/WINDOWS_ACCESS_WORKFLOW_DIAGRAMS.md",
     *GUIDES,
 )
+LOCAL_EVIDENCE_EXAMPLE = ROOT / "docs/health/splunk-parallel-local-evidence.example.json"
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 
 
@@ -174,6 +177,30 @@ def test_customer_facing_commands_use_a_portable_python_interpreter() -> None:
         assert "/Users/" not in text, f"developer-local path in {page.relative_to(ROOT)}"
     for guide in GUIDES:
         assert "python3" in _read(guide)
+
+
+def test_contributor_release_guidance_links_classified_local_evidence_example() -> None:
+    contributing = _read(ROOT / "CONTRIBUTING.md")
+    evidence = json.loads(_read(LOCAL_EVIDENCE_EXAMPLE))
+
+    assert "release_checklist.py --splunk-parallel-offline-stage" in contributing
+    assert "docs/health/splunk-parallel-local-evidence.example.json" in contributing
+    assert "does not call OCI, Splunk HEC, Vault, or external endpoints" in contributing
+    assert evidence["example"] is True
+    assert evidence["receipt_type"] == "local_example"
+    assert evidence["offline"] is True
+    assert evidence["external_calls"] == []
+    assert evidence["evidence_class"] == "locally_verified"
+    assert evidence["provider_validation"] == "not_run"
+    assert evidence["provider_verified"] is False
+    assert evidence["status"] == "PASS"
+    assert evidence["scenario_counts"]["passed"] == 4
+    assert evidence["artifact_hashes"]
+    assert "generated_at" not in evidence
+    for relative_path, expected_hash in evidence["artifact_hashes"].items():
+        artifact = ROOT / relative_path
+        assert artifact.is_file(), relative_path
+        assert hashlib.sha256(artifact.read_bytes()).hexdigest() == expected_hash
 
 
 def test_terraform_phases_are_not_misclassified_as_offline() -> None:

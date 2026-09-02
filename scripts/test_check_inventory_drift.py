@@ -4,6 +4,7 @@
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -242,9 +243,107 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
         live_commands = " ".join(str(part) for _, command, _ in live_steps for part in command)
         self.assertIn("verify_deployed_dashboards.py", live_commands)
 
+    def test_splunk_parallel_stage_covers_only_offline_release_contracts(self):
+        stage_steps = release_checklist.build_splunk_parallel_offline_steps()
+        names = [step[0] for step in stage_steps]
+
+        self.assertEqual(
+            names,
+            [
+                "registry drift validation",
+                "schema validation",
+                "local exporter success",
+                "local exporter duplicate",
+                "local exporter failure",
+                "local exporter replay",
+                "diagram validation",
+                "documentation validation",
+                "terraform format validation",
+                "terraform static validation",
+            ],
+        )
+        commands = [step[1] for step in stage_steps]
+        self.assertIn("--check", commands[0])
+        self.assertEqual(commands[2][-2:], ["--scenario", "success"])
+        self.assertEqual(commands[3][-2:], ["--scenario", "duplicate-invocation"])
+        self.assertEqual(commands[4][-2:], ["--scenario", "500"])
+        self.assertEqual(
+            commands[5][-3:],
+            ["--scenario", "approved-replay", "--approve-replay"],
+        )
+        self.assertIn("scripts/test_splunk_diagrams.py", commands[6])
+        self.assertIn("scripts/test_splunk_documentation.py", commands[7])
+        self.assertEqual(commands[8][1:], ["fmt", "-check", "-recursive", "stack"])
+        self.assertEqual(
+            commands[9][1:],
+            ["-chdir=stack", "validate", "-no-color"],
+        )
+
+        allowed_executables = {sys.executable, "terraform"}
+        self.assertTrue(all(command[0] in allowed_executables for command in commands))
+        forbidden_arguments = {
+            "--include-live",
+            "plan",
+            "apply",
+            "oci",
+            "curl",
+            "wget",
+        }
+        self.assertFalse(
+            forbidden_arguments.intersection(
+                argument.lower()
+                for command in commands
+                for argument in command
+            )
+        )
+
+        release_steps = build_steps(False, False, "21d", 60)
+        release_names = [step[0] for step in release_steps]
+        self.assertIn("splunk parallel offline release", release_names)
+
 
 class TestReleaseChecklistEvidence(unittest.TestCase):
     """Validate release evidence shape and fail-fast behavior."""
+
+    def test_splunk_parallel_offline_stage_returns_classified_structured_evidence(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(Path(release_checklist.__file__).resolve()),
+                "--splunk-parallel-offline-stage",
+            ],
+            cwd=Path(release_checklist.__file__).resolve().parents[1],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        evidence = json.loads(result.stdout)
+        self.assertEqual(evidence["schema_version"], "oci.logan.splunk.local-release.v1")
+        self.assertEqual(evidence["status"], "PASS")
+        self.assertTrue(evidence["offline"])
+        self.assertEqual(evidence["external_calls"], [])
+        self.assertEqual(evidence["evidence_class"], "locally_verified")
+        self.assertEqual(evidence["provider_validation"], "not_run")
+        self.assertFalse(evidence["provider_verified"])
+        self.assertEqual(
+            evidence["scenario_counts"],
+            {
+                "requested": 4,
+                "passed": 4,
+                "success": 1,
+                "duplicate": 1,
+                "failure": 1,
+                "replay": 1,
+            },
+        )
+        self.assertEqual(evidence["gate_counts"], {"total": 10, "passed": 10, "failed": 0})
+        self.assertTrue(all(gate["ok"] for gate in evidence["gates"]))
+        self.assertIn("queries/splunk_detection_registry.json", evidence["artifact_hashes"])
+        self.assertIn("schemas/splunk_evidence_event.schema.json", evidence["artifact_hashes"])
+        self.assertNotIn("generated_at", evidence)
+        self.assertNotRegex(result.stdout, r"(?i)ocid1\.|authorization: splunk")
 
     def test_run_step_output_tail_is_bounded(self):
         result = release_checklist._run_step(

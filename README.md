@@ -99,6 +99,7 @@ Canonical inventory and supporting documentation:
 - `docs/SPLUNK_PARALLEL_OPERATIONS.md` — Mode 1 raw, Mode 2 evidence, hybrid, on-prem, and steady-state operations
 - `docs/SPLUNK_RULE_MIGRATION.md` — governed SPL-to-LAQL migration and detection promotion gates
 - `docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md` — manual and approval-separated exporter deployment/rollback/replay
+- `docs/SPLUNK_FUNCTION_DEPENDENCY_LOCK.md` — direct/transitive hash-lock and offline pre-live image-attestation gate
 - `docs/SPLUNK_E2E_VALIDATION.md` — local, provider, HEC, Splunk-search, and acceptance evidence gates
 - `docs/README.md` — documentation hub and workflow index
 - `CONTRIBUTING.md` — contributor workflow and validation expectations

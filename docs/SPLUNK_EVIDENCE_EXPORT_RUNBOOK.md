@@ -102,6 +102,14 @@ python3 stack/modules/splunk_evidence_exporter/function/stage_build_context.py -
 
 Expected output is a deterministic context and `build-context-manifest.json` with SHA-256 digests. Inspect every staged file/manifest. Staging is offline and is not a build or publish receipt.
 
+Before any image is accepted for Terraform or Function deployment, follow the
+[dependency lock and pre-live attestation gate](SPLUNK_FUNCTION_DEPENDENCY_LOCK.md).
+The gate checks an externally generated hash lock (including transitives),
+SBOM, passing SCA/SAST/IaC/container scans, signature, source-manifest hash,
+and the exact immutable image digest. It remains offline and rejects local
+examples or missing/mismatched receipts; it does not perform OCI, registry, or
+Splunk validation.
+
 ### 3. Obtain build approval
 
 **Build approval** is separate. Only then may the image owner run the documented `fn build`, scan/sign the image, push it through the approved OCI Registry pipeline, and return an immutable image reference/digest. These dependency/download/registry actions may use networks and credentials; record their own receipts.

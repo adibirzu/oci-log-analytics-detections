@@ -72,6 +72,50 @@ def oci_audit_event(event_type, user=None, ip=None, status="200",
     return event
 
 
+def generate_splunk_migration_audit_events():
+    """Return positive and negative OCI Audit fixtures for initial migrations."""
+    return [
+        oci_audit_event(
+            "com.oraclecloud.identitycontrolplane.listusers",
+            status="403",
+            resource_name="splunk-migration-audit-failure-positive",
+            offset=1160,
+        ),
+        oci_audit_event(
+            "com.oraclecloud.identitycontrolplane.listusers",
+            status="200",
+            resource_name="splunk-migration-audit-failure-negative",
+            offset=1161,
+        ),
+        oci_audit_event(
+            "com.oraclecloud.identitycontrolplane.updatepolicy",
+            status="200",
+            resource_name="splunk-migration-iam-change-positive",
+            offset=1162,
+        ),
+        oci_audit_event(
+            "com.oraclecloud.identitycontrolplane.listpolicies",
+            status="200",
+            resource_name="splunk-migration-iam-change-negative",
+            offset=1163,
+        ),
+        oci_audit_event(
+            "com.oraclecloud.objectstorage.getobject",
+            ip="203.0.113.112",
+            status="200",
+            resource_name="splunk-migration-object-external-positive",
+            offset=1164,
+        ),
+        oci_audit_event(
+            "com.oraclecloud.objectstorage.getobject",
+            ip="10.0.0.112",
+            status="200",
+            resource_name="splunk-migration-object-external-negative",
+            offset=1165,
+        ),
+    ]
+
+
 def generate_oci_audit_events():
     """Generate OCI Audit events covering all 44 OCI Audit detection rules."""
     events = []
@@ -520,6 +564,8 @@ def generate_oci_audit_events():
             ip=random.choice(SUSPICIOUS_IPS),
             offset=1140+i
         ))
+
+    events.extend(generate_splunk_migration_audit_events())
 
     from testlogs.oci_audit_expansion import append_oci_audit_expansion_events
 

@@ -283,10 +283,12 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
             ["--scenario", "approved-replay", "--approve-replay"],
         )
         self.assertIn("scripts/test_splunk_diagrams.py", commands[names.index("diagram validation")])
-        self.assertIn("scripts/test_splunk_documentation.py", commands[8])
-        self.assertIn("validate_terraform_static.py", commands[9][1])
-        self.assertIn("--check-format", commands[9])
-        self.assertIn("validate_terraform_static.py", commands[10][1])
+        self.assertIn("scripts/test_splunk_documentation.py", commands[names.index("documentation validation")])
+        format_command = commands[names.index("terraform format validation")]
+        static_command = commands[names.index("terraform static validation")]
+        self.assertIn("validate_terraform_static.py", format_command[1])
+        self.assertIn("--check-format", format_command)
+        self.assertIn("validate_terraform_static.py", static_command[1])
 
         allowed_executables = {sys.executable}
         self.assertTrue(all(command[0] in allowed_executables for command in commands))

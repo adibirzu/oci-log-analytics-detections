@@ -54,13 +54,20 @@ This repository publishes detection content across multiple surfaces. Pick the r
 
    This stage validates registry drift and schemas, exercises fixture-backed
    exporter success, duplicate, failure, and approved-local-replay scenarios,
-   checks the editable diagrams and operator documentation, and runs Terraform
-   formatting plus static validation against already initialized providers. It
+   checks the editable diagrams and operator documentation, and runs a
+   provider-free Terraform format/contract validator that works from a clean
+   checkout without a `.terraform` cache. Provider-backed `terraform validate`
+   remains a separate deployment review gate. It
    does not call OCI, Splunk HEC, Vault, or external endpoints, and it never
    runs `terraform plan` or `terraform apply`. Its structured output remains
    `evidence_class: locally_verified` with `provider_validation: not_run`.
    [The checked-in evidence packet](docs/health/splunk-parallel-local-evidence.example.json)
    is a tenant-neutral local example, not a provider or customer receipt.
+
+   The default checklist runs this local stage before the fail-closed Sentinel
+   drift gate. If the checklist stops at `sentinel drift check`, record the
+   exact blocker `parser_schema_hash_mismatch`; do not edit promoted Sentinel
+   JSON to force a green result.
 
 4. Inspect the generated artifacts you changed:
    - `queries/catalog.json`

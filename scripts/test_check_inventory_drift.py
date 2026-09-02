@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import shutil
 from pathlib import Path
 from unittest.mock import patch
 
@@ -186,6 +187,7 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
 
         self.assertLess(self.step_index(steps, "dashboard inventory export"), self.step_index(steps, "dashboard dry run"))
         self.assertLess(self.step_index(steps, "sentinel strict status"), self.step_index(steps, "sentinel drift check"))
+        self.assertLess(self.step_index(steps, "splunk parallel offline release"), self.step_index(steps, "sentinel drift check"))
         self.assertLess(self.step_index(steps, "sentinel drift check"), self.step_index(steps, "dashboard dry run"))
         self.assertLess(self.step_index(steps, "inventory drift check"), self.step_index(steps, "sensitive value scan"))
         self.assertLess(self.step_index(steps, "sensitive value scan"), self.step_index(steps, "pytest"))
@@ -273,13 +275,11 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
         )
         self.assertIn("scripts/test_splunk_diagrams.py", commands[6])
         self.assertIn("scripts/test_splunk_documentation.py", commands[7])
-        self.assertEqual(commands[8][1:], ["fmt", "-check", "-recursive", "stack"])
-        self.assertEqual(
-            commands[9][1:],
-            ["-chdir=stack", "validate", "-no-color"],
-        )
+        self.assertIn("validate_terraform_static.py", commands[8][1])
+        self.assertIn("--check-format", commands[8])
+        self.assertIn("validate_terraform_static.py", commands[9][1])
 
-        allowed_executables = {sys.executable, "terraform"}
+        allowed_executables = {sys.executable}
         self.assertTrue(all(command[0] in allowed_executables for command in commands))
         forbidden_arguments = {
             "--include-live",
@@ -358,6 +358,46 @@ class TestReleaseChecklistEvidence(unittest.TestCase):
             {"name", "command", "started_at", "exit_code", "ok", "output_tail"},
             set(result),
         )
+
+    def test_run_step_denies_and_records_socket_attempt(self):
+        result = release_checklist._run_step(
+            "network negative control",
+            [sys.executable, "-c", "import socket; socket.create_connection(('127.0.0.1', 9))"],
+            timeout=30,
+        )
+        self.assertFalse(result["ok"])
+        self.assertTrue(result["network"]["attempted"])
+
+    def test_manifest_is_complete_and_has_identity(self):
+        manifest = release_checklist._splunk_evidence_manifest()
+        self.assertTrue(manifest["complete"], manifest["missing"])
+        self.assertEqual(manifest["missing"], [])
+        for path in (
+            "scripts/splunk_evidence_exporter_cli.py",
+            "scripts/splunk_evidence_exporter/models.py",
+            "scripts/fixtures/splunk_evidence/query_rows.json",
+            "queries/splunk_detection_registry.json",
+            "schemas/splunk_evidence_event.schema.json",
+            "docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md",
+            "docs/diagrams/logan-splunk-architecture.mmd",
+            "stack/provider.tf",
+        ):
+            self.assertIn(path, manifest["files"])
+        self.assertRegex(manifest["git_commit"], r"^[0-9a-f]{40}$")
+        self.assertRegex(manifest["git_tree"], r"^[0-9a-f]{40}$")
+        self.assertIn("python", manifest["tool_versions"])
+
+    def test_static_terraform_contract_works_without_provider_cache(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            shutil.copytree(Path(release_checklist.PROJECT_DIR) / "stack", root / "stack")
+            shutil.rmtree(root / "stack/.terraform", ignore_errors=True)
+            result = subprocess.run(
+                [sys.executable, str(Path(release_checklist.PROJECT_DIR) / "scripts/validate_terraform_static.py"), "--root", str(root), "--check-format"],
+                text=True, capture_output=True, check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse((root / "stack/.terraform").exists())
 
     def test_run_step_output_tail_is_redacted(self):
         fixture_ocid = "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  # scanner-fixture

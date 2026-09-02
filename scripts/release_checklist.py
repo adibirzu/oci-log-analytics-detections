@@ -55,8 +55,20 @@ def _redact_output(output: str) -> str:
     return output
 
 
-def _run_step(name: str, command: list[str], timeout: int = 2400) -> dict:
+def _run_step(name: str, command: list[str], timeout: int = 2400, *, offline: bool = False) -> dict:
     started = datetime.now(timezone.utc).isoformat()
+    if not offline:
+        try:
+            result = subprocess.run(command, cwd=PROJECT_DIR, capture_output=True, text=True, timeout=timeout, check=False)
+            return {
+                "name": name, "command": command, "started_at": started,
+                "exit_code": result.returncode, "ok": result.returncode == 0,
+                "output_tail": _redact_output(result.stdout + result.stderr)[-6000:],
+            }
+        except subprocess.TimeoutExpired as exc:
+            return {"name": name, "command": command, "started_at": started, "exit_code": 124, "ok": False, "output_tail": _redact_output(f"TIMEOUT after {timeout}s: {exc}")}
+        except OSError as exc:
+            return {"name": name, "command": command, "started_at": started, "exit_code": 127, "ok": False, "output_tail": _redact_output(f"EXECUTION ERROR: {exc}")}
     egress_receipt = Path(tempfile.mkstemp(prefix="logan-offline-egress-")[1])
     egress_receipt.unlink(missing_ok=True)
     env = os.environ.copy()
@@ -201,11 +213,17 @@ def _splunk_evidence_manifest() -> dict[str, object]:
             registry_query_paths = [PROJECT_DIR / item["oci_query_file"] for item in registry.get("detections", []) if item.get("oci_query_file")]
         except (OSError, json.JSONDecodeError, TypeError):
             registry_query_paths = []
+    stage_script_paths = [
+        SCRIPTS_DIR / "generate_splunk_detection_registry.py",
+        SCRIPTS_DIR / "validate_terraform_static.py",
+        SCRIPTS_DIR / "sitecustomize.py",
+    ]
     roots = {
         "exporter": [SCRIPTS_DIR / "splunk_evidence_exporter_cli.py", * (SCRIPTS_DIR / "splunk_evidence_exporter").glob("**/*.py")],
         "fixtures": list((SCRIPTS_DIR / "fixtures/splunk_evidence").glob("**/*")),
         "registry": [PROJECT_DIR / "queries/splunk_detection_registry.json"],
         "registry-referenced-queries": registry_query_paths,
+        "offline-stage-dependencies": stage_script_paths,
         "schemas-config": [* (PROJECT_DIR / "schemas").glob("splunk_*.json"), PROJECT_DIR / "config/splunk_parallel_delivery.yaml"],
         "release-tests": [PROJECT_DIR / "scripts/release_checklist.py", *SCRIPTS_DIR.glob("test_splunk_*.py"), SCRIPTS_DIR / "test_check_inventory_drift.py"],
         "docs-diagrams": [*PROJECT_DIR.glob("docs/SPLUNK*.md"), *PROJECT_DIR.glob("docs/diagrams/*splunk*"), *PROJECT_DIR.glob("docs/diagrams/*logan*" )],
@@ -218,7 +236,15 @@ def _splunk_evidence_manifest() -> dict[str, object]:
             paths[relative] = hashlib.sha256(path.read_bytes()).hexdigest()
         if not candidates:
             missing.append(f"manifest category has no inputs: {category}")
-    required = ["scripts/splunk_evidence_exporter_cli.py", "queries/splunk_detection_registry.json", "config/splunk_parallel_delivery.yaml", "stack/main.tf"]
+    required = [
+        "scripts/splunk_evidence_exporter_cli.py",
+        "scripts/generate_splunk_detection_registry.py",
+        "scripts/validate_terraform_static.py",
+        "scripts/sitecustomize.py",
+        "queries/splunk_detection_registry.json",
+        "config/splunk_parallel_delivery.yaml",
+        "stack/main.tf",
+    ]
     missing.extend(path for path in required if path not in paths)
     try:
         commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=PROJECT_DIR, text=True, stderr=subprocess.DEVNULL).strip()
@@ -273,7 +299,7 @@ def run_splunk_parallel_offline_stage() -> dict[str, object]:
     gates: list[dict[str, object]] = []
     scenario_passed = 0
     for name, command, timeout in build_splunk_parallel_offline_steps():
-        result = _run_step(name, command, timeout)
+        result = _run_step(name, command, timeout, offline=True)
         contract_ok = _scenario_contract_ok(name, result["output_tail"])
         ok = bool(result["ok"] and contract_ok)
         gate = {"name": name, "exit_code": result["exit_code"], "ok": ok}

@@ -331,17 +331,20 @@ def _render_iam() -> dict[str, object]:
         {
             "id": "operator",
             "principal": "<OPERATOR_GROUP_NAME>",
-            "scope": "<FUNCTION_COMPARTMENT_NAME>",
+            "scope": ["<FUNCTION_COMPARTMENT_NAME>", "<STATE_COMPARTMENT_NAME>"],
             "statements": [
                 "Allow group <OPERATOR_GROUP_NAME> to manage functions-family in compartment <FUNCTION_COMPARTMENT_NAME>",
                 "Allow group <OPERATOR_GROUP_NAME> to manage ons-family in compartment <FUNCTION_COMPARTMENT_NAME>",
                 "Allow group <OPERATOR_GROUP_NAME> to manage alarms in compartment <FUNCTION_COMPARTMENT_NAME>",
                 "Allow group <OPERATOR_GROUP_NAME> to manage log-groups in compartment <FUNCTION_COMPARTMENT_NAME>",
+                "Allow group <OPERATOR_GROUP_NAME> to manage buckets in compartment <STATE_COMPARTMENT_NAME> where any {target.bucket.name='<STATE_BUCKET_NAME>', target.bucket.name='<DLQ_BUCKET_NAME>'}",
+                "Allow group <OPERATOR_GROUP_NAME> to manage objects in compartment <STATE_COMPARTMENT_NAME> where any {target.bucket.name='<STATE_BUCKET_NAME>', target.bucket.name='<DLQ_BUCKET_NAME>'}",
             ],
             "warning": (
                 "functions-family and ons-family are operator conveniences that "
-                "broaden access; split duties and replace them with reviewed "
-                "permission sets when the tenancy policy model supports it"
+                "broaden access; bucket and object grants are constrained to the "
+                "two exact names, but lifecycle policy operations still require "
+                "both grants; split duties where the tenancy policy model supports it"
             ),
         },
         {
@@ -380,12 +383,16 @@ def _render_iam() -> dict[str, object]:
         },
         {
             "id": "function-state-dlq",
-            "principal": "<FUNCTION_DYNAMIC_GROUP_NAME>",
+            "principal": [
+                "<FUNCTION_DYNAMIC_GROUP_NAME>",
+                "objectstorage-<REGION_IDENTIFIER>",
+            ],
             "scope": "<STATE_COMPARTMENT_NAME>",
             "statements": [
                 "Allow dynamic-group <FUNCTION_DYNAMIC_GROUP_NAME> to manage objects in compartment <STATE_COMPARTMENT_NAME> where any {target.bucket.name='<STATE_BUCKET_NAME>', target.bucket.name='<DLQ_BUCKET_NAME>'}",
+                "Allow service objectstorage-<REGION_IDENTIFIER> to manage object-family in compartment <STATE_COMPARTMENT_NAME> where any {target.bucket.name='<STATE_BUCKET_NAME>', target.bucket.name='<DLQ_BUCKET_NAME>'}",
             ],
-            "warning": "Keep state and DLQ bucket names exact; manage objects is bounded by the two target bucket conditions",
+            "warning": "Keep state and DLQ bucket names exact; manage objects is bounded by those conditions, while the regional object-family lifecycle service grant is broader and must be reviewed",
         },
         {
             "id": "notifications-function-invocation",

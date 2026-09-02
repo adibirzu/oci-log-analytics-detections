@@ -3,17 +3,22 @@
 
 from __future__ import annotations
 
-import re
+import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
+
+import pytest
+import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
 STACK = ROOT / "stack"
 MODULE = STACK / "modules/splunk_evidence_exporter"
 CLI = ROOT / "scripts/splunk_evidence_exporter_cli.py"
+FUNCTION_SOURCE = MODULE / "function"
 
 
 def _read(path: Path) -> str:
@@ -240,15 +245,162 @@ def test_iam_preview_separates_eight_reviewable_policy_boundaries() -> None:
     assert preview["apply_supported"] is False
     assert preview["requires_scope_review"] is True
 
+    operator_statements = "\n".join(categories["operator"]["statements"])
+    assert (
+        "Allow group <OPERATOR_GROUP_NAME> to manage buckets in compartment "
+        "<STATE_COMPARTMENT_NAME> where any {target.bucket.name="
+        "'<STATE_BUCKET_NAME>', target.bucket.name='<DLQ_BUCKET_NAME>'}"
+        in operator_statements
+    )
+    assert (
+        "Allow group <OPERATOR_GROUP_NAME> to manage objects in compartment "
+        "<STATE_COMPARTMENT_NAME> where any {target.bucket.name="
+        "'<STATE_BUCKET_NAME>', target.bucket.name='<DLQ_BUCKET_NAME>'}"
+        in operator_statements
+    )
+    state_statements = "\n".join(categories["function-state-dlq"]["statements"])
+    assert (
+        "Allow service objectstorage-<REGION_IDENTIFIER> to manage object-family "
+        "in compartment <STATE_COMPARTMENT_NAME> where any {target.bucket.name="
+        "'<STATE_BUCKET_NAME>', target.bucket.name='<DLQ_BUCKET_NAME>'}"
+        in state_statements
+    )
+    assert "<REGION_IDENTIFIER>" in rendered
+    assert "object-family" in categories["function-state-dlq"]["warning"]
+
 
 def test_function_build_metadata_points_to_existing_handler_without_credentials() -> None:
     manifest = _read(MODULE / "function/func.yaml")
     requirements = _read(MODULE / "function/requirements.txt")
 
     assert "runtime: python" in manifest
-    assert "scripts/splunk_evidence_exporter/handler.py handler" in manifest
+    assert "/function/func.py handler" in manifest
     assert "memory: 512" in manifest
     assert re.search(r"^fdk[^\n]*$", requirements, re.MULTILINE)
     assert re.search(r"^oci[^\n]*$", requirements, re.MULTILINE)
     combined = f"{manifest}\n{requirements}"
     assert not re.search(r"hec[_-]?(?:token|secret_value)", combined, re.IGNORECASE)
+
+
+def _hcl_regex(block: str) -> str:
+    match = re.search(r'can\(regex\("(?P<pattern>(?:\\.|[^"\\])+)"', block)
+    assert match, "missing URL validation regex"
+    return json.loads(f'"{match.group("pattern")}"')
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://splunk.example.invalid:8088/services/collector/event",
+        "https://user:credential@splunk.example.invalid:8088/services/collector/event",
+        "https://splunk.example.invalid:8088/services/collector/event?token=credential",
+        "https://splunk.example.invalid:8088/services/collector/event#credential",
+        "https://splunk.example.invalid:8088/services/collector",
+        "https://splunk.example.invalid:8088/services/collector/event/",
+        "https:///services/collector/event",
+        "https://splunk_example.invalid:8088/services/collector/event",
+        "https://splunk.example.invalid:0/services/collector/event",
+        "https://splunk.example.invalid:65536/services/collector/event",
+    ],
+)
+def test_hec_url_contract_rejects_unsafe_or_unsupported_urls(url: str) -> None:
+    root_block = _block(
+        _read(STACK / "variables.tf"),
+        "variable",
+        "splunk_evidence_exporter_hec_url",
+    )
+    child_block = _block(_read(MODULE / "variables.tf"), "variable", "splunk_hec_url")
+    root_pattern = _hcl_regex(root_block)
+    child_pattern = _hcl_regex(child_block)
+    schema = yaml.safe_load(_read(STACK / "schema.yaml"))
+    schema_pattern = schema["variables"]["splunk_evidence_exporter_hec_url"][
+        "pattern"
+    ]
+
+    assert root_pattern == child_pattern
+    assert re.fullmatch(root_pattern, url) is None
+    assert re.fullmatch(schema_pattern, url) is None
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://splunk.example.invalid/services/collector/event",
+        "https://splunk.example.invalid:8088/services/collector/event",
+        "https://10.0.0.8:443/services/collector/event",
+    ],
+)
+def test_hec_url_contract_accepts_only_supported_https_event_endpoint(url: str) -> None:
+    root_block = _block(
+        _read(STACK / "variables.tf"),
+        "variable",
+        "splunk_evidence_exporter_hec_url",
+    )
+    child_block = _block(_read(MODULE / "variables.tf"), "variable", "splunk_hec_url")
+    schema = yaml.safe_load(_read(STACK / "schema.yaml"))
+    schema_pattern = schema["variables"]["splunk_evidence_exporter_hec_url"][
+        "pattern"
+    ]
+
+    assert re.fullmatch(_hcl_regex(root_block), url)
+    assert re.fullmatch(_hcl_regex(child_block), url)
+    assert re.fullmatch(schema_pattern, url)
+
+
+def test_stage_command_builds_complete_context_from_canonical_sources(tmp_path: Path) -> None:
+    stage_script = FUNCTION_SOURCE / "stage_build_context.py"
+    documentation = _read(FUNCTION_SOURCE / "README.md")
+    context = tmp_path / "function-context"
+
+    assert "stage_build_context.py --output" in documentation
+    result = subprocess.run(
+        [sys.executable, str(stage_script), "--output", str(context)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["status"] == "staged"
+    manifest = json.loads(_read(context / "build-context-manifest.json"))
+    registry = json.loads(_read(ROOT / "queries/splunk_detection_registry.json"))
+    expected = {
+        "func.py",
+        "func.yaml",
+        "requirements.txt",
+        "config/splunk_parallel_delivery.yaml",
+        "queries/splunk_detection_registry.json",
+        "schemas/splunk_evidence_event.schema.json",
+        "scripts/__init__.py",
+        *{
+            path.relative_to(ROOT).as_posix()
+            for path in (ROOT / "scripts/splunk_evidence_exporter").glob("*.py")
+        },
+        *{entry["oci_query_file"] for entry in registry["detections"]},
+    }
+    assert set(manifest["files"]) == expected
+    for relative, digest in manifest["files"].items():
+        staged = context / relative
+        assert staged.is_file()
+        assert hashlib.sha256(staged.read_bytes()).hexdigest() == digest
+        source = ROOT / relative
+        if relative.startswith(("config/", "queries/", "schemas/", "scripts/")):
+            assert staged.read_bytes() == source.read_bytes()
+
+    import_result = subprocess.run(
+        [sys.executable, "-c", "import func; assert callable(func.handler)"],
+        cwd=context,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert import_result.returncode == 0, import_result.stderr
+    staged_text = "\n".join(
+        path.read_text(encoding="utf-8", errors="ignore")
+        for path in context.rglob("*")
+        if path.is_file()
+    )
+    assert "ocid1." not in staged_text
+    assert "Authorization: Splunk " not in staged_text

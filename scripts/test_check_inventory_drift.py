@@ -266,7 +266,13 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
         )
         commands = [step[1] for step in stage_steps]
         self.assertIn("--check", commands[0])
-        self.assertEqual(commands[2][-2:], ["--scenario", "success"])
+        self.assertIn("--scenario", commands[2])
+        self.assertEqual(commands[2][commands[2].index("--scenario") + 1], "success")
+        self.assertIn("--alarm-fixture", commands[2])
+        self.assertEqual(
+            commands[2][commands[2].index("--alarm-fixture") + 1],
+            "scripts/fixtures/splunk_evidence/oci_raw_alarm.json",
+        )
         self.assertEqual(commands[3][-2:], ["--scenario", "duplicate-invocation"])
         self.assertEqual(commands[4][-2:], ["--scenario", "500"])
         self.assertEqual(

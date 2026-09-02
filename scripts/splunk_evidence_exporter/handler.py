@@ -145,6 +145,9 @@ def build_service() -> EvidenceExportService:
         ),
         max_rows=max_rows,
         max_batch_events=max_batch_events,
+        max_attempts=_environment_int(
+            "SPLUNK_EVIDENCE_MAX_ATTEMPTS", 4, minimum=1, maximum=10
+        ),
     )
 
 

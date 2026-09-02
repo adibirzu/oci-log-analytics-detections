@@ -36,7 +36,10 @@ from scripts.splunk_evidence_exporter.ports import (
     HecDeliveryPort,
     QuarantinePort,
 )
-from scripts.splunk_evidence_exporter.service import EvidenceExportService
+from scripts.splunk_evidence_exporter.service import (
+    EvidenceExportService,
+    EvidenceReplayService,
+)
 from scripts.splunk_evidence_exporter import handler as handler_module
 
 
@@ -669,17 +672,18 @@ def test_partial_hec_failure_writes_one_replay_safe_dlq_and_never_commits():
 
         def deliver(self, batch):
             self.attempts += 1
-            if self.attempts == 2:
+            if self.attempts >= 2:
                 raise TimeoutError("sanitized timeout")
             return {"status": 200, "response": {"code": 0}}
 
     class Dlq:
-        def quarantine(self, batch, reason, *, delivered_event_keys=()):
+        def quarantine(self, batch, reason, *, delivered_event_keys=(), **metadata):
             quarantines.append(
                 {
                     "reason": reason,
                     "delivered_event_keys": tuple(delivered_event_keys),
                     "remaining_events": tuple(batch.events),
+                    "metadata": metadata,
                 }
             )
 
@@ -706,6 +710,9 @@ def test_partial_hec_failure_writes_one_replay_safe_dlq_and_never_commits():
     assert len(quarantines[0]["delivered_event_keys"]) == 1
     assert len(quarantines[0]["remaining_events"]) == 2
     assert quarantines[0]["reason"] == "retryable"
+    assert quarantines[0]["metadata"]["checkpoint"] == datetime(
+        2026, 9, 2, 7, 15, tzinfo=timezone.utc
+    )
 
 
 def test_log_analytics_adapter_binds_scope_window_dimensions_and_row_limit():
@@ -855,7 +862,14 @@ def test_object_storage_state_and_dlq_names_expose_no_dimensions_or_event_conten
         bucket="bucket-under-test",
         clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
     )
-    dlq.quarantine(batch, "retryable", delivered_event_keys=("confirmed-key",))
+    dlq.quarantine(
+        batch,
+        "retryable",
+        delivered_event_keys=("confirmed-key",),
+        detection_id="oci-audit-failures",
+        dimensions=dimensions,
+        checkpoint=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+    )
 
     object_names = [write["object_name"] for write in writes]
     assert len(object_names) == 2
@@ -866,6 +880,9 @@ def test_object_storage_state_and_dlq_names_expose_no_dimensions_or_event_conten
     assert all("private-hostname" not in name for name in object_names)
     dlq_record = json.loads(writes[1]["put_object_body"])
     assert dlq_record["delivered_event_keys"] == ["confirmed-key"]
+    assert dlq_record["detection_id"] == "oci-audit-failures"
+    assert dlq_record["dimensions"] == dimensions
+    assert dlq_record["checkpoint"] == "2026-09-02T07:15:00Z"
     assert [item["event_key"] for item in dlq_record["remaining_events"]] == [
         event.event_key
     ]
@@ -1203,6 +1220,230 @@ def test_service_requires_selected_indexer_ack_before_checkpoint_commit():
     assert receipt.status == "delivery_failed"
     assert receipt.checkpoint_committed is False
     assert dlq.calls == 1
+
+
+def test_export_service_retries_each_batch_and_commits_after_later_success():
+    entry = registry_entry()
+    entry["delivery"] = {"max_attempts": 3}
+    operations = []
+
+    class Registry:
+        def load(self):
+            return {"detections": [entry]}
+
+    class State:
+        def load_checkpoint(self, detection_id, dimensions):
+            return None
+
+        def save_checkpoint(self, detection_id, dimensions, checkpoint):
+            operations.append("checkpoint")
+
+    class Query:
+        def query_evidence(self, **request):
+            return [{"Status": "Failure"}]
+
+    class Hec:
+        attempts = 0
+
+        def deliver(self, batch):
+            self.attempts += 1
+            operations.append(f"hec:{self.attempts}")
+            if self.attempts == 1:
+                return {"status": 500, "response": {"code": 8}}
+            if self.attempts == 2:
+                raise TimeoutError("sanitized timeout")
+            return {"status": 200, "response": {"code": 0}}
+
+    class Dlq:
+        def quarantine(self, *args, **kwargs):
+            raise AssertionError("eventually successful delivery must not quarantine")
+
+    hec = Hec()
+    service = EvidenceExportService(
+        registry=Registry(),
+        query=Query(),
+        checkpoint=State(),
+        hec=hec,
+        dead_letter=Dlq(),
+        clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
+        lookback=timedelta(minutes=15),
+        overlap=timedelta(minutes=2),
+        maximum_window=timedelta(hours=1),
+        max_rows=1000,
+        max_batch_events=100,
+        max_attempts=4,
+    )
+
+    receipt = service.export(AlarmTrigger.from_payload(alarm_payload()))
+
+    assert receipt.status == "delivered"
+    assert receipt.checkpoint_committed is True
+    assert hec.attempts == 3
+    assert operations == ["hec:1", "hec:2", "hec:3", "checkpoint"]
+
+
+def test_export_service_rejects_registry_attempts_above_runtime_ceiling():
+    entry = registry_entry()
+    entry["delivery"] = {"max_attempts": 5}
+
+    class Registry:
+        def load(self):
+            return {"detections": [entry]}
+
+    class NeverCalled:
+        def __getattr__(self, name):
+            raise AssertionError(f"{name} must not run after unsafe retry bounds")
+
+    service = EvidenceExportService(
+        registry=Registry(),
+        query=NeverCalled(),
+        checkpoint=NeverCalled(),
+        hec=NeverCalled(),
+        dead_letter=NeverCalled(),
+        clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
+        lookback=timedelta(minutes=15),
+        overlap=timedelta(minutes=2),
+        maximum_window=timedelta(hours=1),
+        max_rows=1000,
+        max_batch_events=100,
+        max_attempts=4,
+    )
+
+    with pytest.raises(ValueError, match="max_attempts exceeds the runtime maximum"):
+        service.export(AlarmTrigger.from_payload(alarm_payload()))
+
+
+def test_replay_delivers_stored_remaining_evidence_and_excludes_confirmed_keys():
+    window = QueryWindow(
+        start=datetime(2026, 9, 2, 7, 8, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+    )
+    stored_events = [
+        build_evidence_event(
+            registry_entry(),
+            {"Status": status, "Evidence Version": "stored"},
+            window,
+            batch_id="replay-batch",
+        )
+        for status in ("Already delivered", "Still pending")
+    ]
+    record = {
+        "schema_version": "oci.logan.splunk.dead-letter.v1",
+        "reason": "retryable",
+        "batch_id": "replay-batch",
+        "detection_id": "oci-audit-failures",
+        "dimensions": {"Status": "Failure"},
+        "checkpoint": "2026-09-02T07:15:00Z",
+        "delivered_event_keys": [stored_events[0].event_key],
+        "remaining_events": [event.to_dict() for event in stored_events],
+    }
+    delivered = []
+    commits = []
+
+    class Hec:
+        def deliver(self, batch):
+            delivered.extend(event.to_dict() for event in batch.events)
+            return {"status": 200, "response": {"code": 0}}
+
+    class State:
+        def save_checkpoint(self, detection_id, dimensions, checkpoint):
+            commits.append((detection_id, dict(dimensions), checkpoint))
+
+    class Dlq:
+        def quarantine(self, *args, **kwargs):
+            raise AssertionError("successful replay must not quarantine")
+
+    receipt = EvidenceReplayService(
+        checkpoint=State(),
+        hec=Hec(),
+        dead_letter=Dlq(),
+        clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
+        max_batch_events=100,
+        max_attempts=4,
+    ).replay(record)
+
+    assert receipt.status == "delivered"
+    assert receipt.excluded_confirmed_count == 1
+    assert receipt.delivered_count == 1
+    assert delivered[0]["event_key"] == stored_events[1].event_key
+    assert {field["value"] for field in delivered[0]["evidence"]["fields"]} >= {
+        "stored",
+        "Still pending",
+    }
+    assert commits == [
+        (
+            "oci-audit-failures",
+            {"Status": "Failure"},
+            datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+        )
+    ]
+
+
+def test_partial_replay_failure_updates_dlq_and_never_commits_checkpoint():
+    window = QueryWindow(
+        start=datetime(2026, 9, 2, 7, 8, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+    )
+    events = [
+        build_evidence_event(
+            registry_entry(),
+            {"Status": f"pending-{number}"},
+            window,
+            batch_id="partial-replay-batch",
+        )
+        for number in range(3)
+    ]
+    record = {
+        "schema_version": "oci.logan.splunk.dead-letter.v1",
+        "reason": "retryable",
+        "batch_id": "partial-replay-batch",
+        "detection_id": "oci-audit-failures",
+        "dimensions": {},
+        "checkpoint": "2026-09-02T07:15:00Z",
+        "delivered_event_keys": ["previously-confirmed"],
+        "remaining_events": [event.to_dict() for event in events],
+    }
+    attempts = []
+    quarantines = []
+
+    class Hec:
+        def deliver(self, batch):
+            attempts.append(batch.events[0].event_key)
+            if len(attempts) == 1:
+                return {"status": 200, "response": {"code": 0}}
+            return {"status": 500, "response": {"code": 8}}
+
+    class State:
+        def save_checkpoint(self, *args, **kwargs):
+            raise AssertionError("partial replay failure must not commit")
+
+    class Dlq:
+        def quarantine(self, batch, reason, **metadata):
+            quarantines.append((batch, reason, metadata))
+
+    receipt = EvidenceReplayService(
+        checkpoint=State(),
+        hec=Hec(),
+        dead_letter=Dlq(),
+        clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
+        max_batch_events=1,
+        max_attempts=2,
+    ).replay(record)
+
+    assert receipt.status == "delivery_failed"
+    assert receipt.delivered_count == 1
+    assert receipt.checkpoint_committed is False
+    assert len(attempts) == 3
+    batch, reason, metadata = quarantines[0]
+    assert reason == "retryable"
+    assert [event.event_key for event in batch.events] == [
+        events[1].event_key,
+        events[2].event_key,
+    ]
+    assert metadata["delivered_event_keys"] == (
+        "previously-confirmed",
+        events[0].event_key,
+    )
 
 
 def test_handler_decodes_one_notification_and_returns_only_sanitized_receipt(

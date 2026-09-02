@@ -27,6 +27,9 @@ _QUERY_FILE = re.compile(
     r"queries/(?:apps/|hunting/|sentinel/)?[a-z0-9][a-z0-9_-]*\.json"
 )
 _SEVERITIES = frozenset({"low", "medium", "high", "critical"})
+_EVENT_KEYS = frozenset(
+    {"schema_version", "event_key", "batch_id", "detection", "evidence", "provenance"}
+)
 
 
 def _normalize_datetime(value: datetime) -> str:
@@ -188,6 +191,92 @@ def build_evidence_event(
             "window_start": _date_time(window.start),
             "window_end": _date_time(window.end),
         },
+    )
+
+
+def restore_evidence_event(payload: Mapping[str, object]) -> EvidenceEvent:
+    """Restore one strict normalized event from a trusted-store JSON record."""
+
+    if not isinstance(payload, Mapping) or set(payload) != _EVENT_KEYS:
+        raise ValueError("stored evidence event shape is invalid")
+    if payload.get("schema_version") != "oci.logan.splunk.evidence.v1":
+        raise ValueError("stored evidence schema version is unsupported")
+    event_key_value = payload.get("event_key")
+    batch_id = payload.get("batch_id")
+    detection = payload.get("detection")
+    evidence = payload.get("evidence")
+    provenance = payload.get("provenance")
+    if not isinstance(event_key_value, str) or not event_key_value:
+        raise ValueError("stored evidence event key is invalid")
+    if not isinstance(batch_id, str) or not batch_id:
+        raise ValueError("stored evidence batch id is invalid")
+    if not isinstance(detection, Mapping) or set(detection) != {
+        "id",
+        "title",
+        "severity",
+    }:
+        raise ValueError("stored evidence detection metadata is invalid")
+    if (
+        any(
+            not isinstance(detection.get(name), str) or not detection[name]
+            for name in ("id", "title", "severity")
+        )
+        or detection["severity"] not in _SEVERITIES
+    ):
+        raise ValueError("stored evidence detection metadata is invalid")
+    if not isinstance(evidence, Mapping) or set(evidence) != {
+        "include_original_content",
+        "fields",
+    }:
+        raise ValueError("stored evidence body is invalid")
+    if evidence.get("include_original_content") is not False:
+        raise ValueError("stored replay evidence must exclude original content")
+    fields = evidence.get("fields")
+    if not isinstance(fields, (list, tuple)):
+        raise ValueError("stored evidence fields are invalid")
+    for field in fields:
+        if not isinstance(field, Mapping) or set(field) != {"name", "value"}:
+            raise ValueError("stored evidence field is invalid")
+        name = field.get("name")
+        value = field.get("value")
+        if (
+            not isinstance(name, str)
+            or not name
+            or name.casefold() == _ORIGINAL_CONTENT_FIELD
+            or not (value is None or isinstance(value, (str, int, float, bool)))
+            or isinstance(value, float)
+            and not math.isfinite(value)
+        ):
+            raise ValueError("stored evidence field is invalid")
+    expected_provenance = {"product", "query_file", "window_start", "window_end"}
+    if not isinstance(provenance, Mapping) or set(provenance) != expected_provenance:
+        raise ValueError("stored evidence provenance is invalid")
+    if provenance.get("product") != "OCI Log Analytics" or not isinstance(
+        provenance.get("query_file"), str
+    ):
+        raise ValueError("stored evidence provenance is invalid")
+    if _QUERY_FILE.fullmatch(provenance["query_file"]) is None:
+        raise ValueError("stored evidence query file is invalid")
+    parsed_window = []
+    for name in ("window_start", "window_end"):
+        value = provenance.get(name)
+        if not isinstance(value, str) or not value:
+            raise ValueError("stored evidence window is invalid")
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            raise ValueError("stored evidence window is invalid") from None
+        if parsed.tzinfo is None or parsed.utcoffset() is None:
+            raise ValueError("stored evidence window is invalid")
+        parsed_window.append(parsed.astimezone(timezone.utc))
+    if parsed_window[0] > parsed_window[1]:
+        raise ValueError("stored evidence window is invalid")
+    return EvidenceEvent._from_validated_payload(
+        event_key=event_key_value,
+        batch_id=batch_id,
+        detection=detection,
+        evidence=evidence,
+        provenance=provenance,
     )
 
 

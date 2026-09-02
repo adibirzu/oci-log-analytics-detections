@@ -1,7 +1,8 @@
 """Infrastructure ports for the evidence-export application service.
 
 Only structural contracts live here; adapters own SDKs, HTTP, persistence,
-credentials, environment configuration, retries, and clocks.
+credentials, environment configuration, and clocks. Application services own
+the bounded retry and checkpoint policy around adapter delivery attempts.
 """
 
 from __future__ import annotations
@@ -55,7 +56,16 @@ class CheckpointPort(Protocol):
 class QuarantinePort(Protocol):
     """Persist a failed batch for operator review without silent loss."""
 
-    def quarantine(self, batch: ExportBatch, reason: str) -> None: ...
+    def quarantine(
+        self,
+        batch: ExportBatch,
+        reason: str,
+        *,
+        delivered_event_keys: Sequence[str] = (),
+        detection_id: str | None = None,
+        dimensions: Mapping[str, str] | None = None,
+        checkpoint: datetime | None = None,
+    ) -> None: ...
 
 
 # Vocabulary aliases keep later adapters readable without adding behavior.

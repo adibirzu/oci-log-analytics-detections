@@ -24,7 +24,10 @@ if str(ROOT) not in sys.path:
 
 from scripts.splunk_evidence_exporter.models import AlarmTrigger, ExportBatch
 from scripts.splunk_evidence_exporter.retry import classify_hec_failure
-from scripts.splunk_evidence_exporter.service import EvidenceExportService
+from scripts.splunk_evidence_exporter.service import (
+    EvidenceExportService,
+    EvidenceReplayService,
+)
 from scripts.splunk_delivery_contracts import registry_validation_errors
 
 
@@ -99,42 +102,33 @@ class _InProcessHecAdapter:
         self,
         responses: Sequence[Mapping[str, object] | str],
         operations: list[str],
-        *,
-        max_attempts: int = 1,
     ) -> None:
         self._responses = tuple(responses)
         self._operations = operations
         self.events: list[Mapping[str, object]] = []
         self.attempts = 0
-        self._max_attempts = max_attempts
 
     def deliver(self, batch: ExportBatch) -> Mapping[str, object]:
-        last_response: Mapping[str, object] | None = None
-        for attempt in range(self._max_attempts):
-            self.attempts += 1
-            self._operations.append("mock_hec_attempted")
-            response = self._responses[min(attempt, len(self._responses) - 1)]
-            if response == "missing-secret":
-                raise RuntimeError(
-                    "sensitive-marker-never-print raw-provider-identifier-never-print"
-                )
-            if response == "timeout":
-                raise TimeoutError(
-                    "sensitive-marker-never-print raw-provider-identifier-never-print"
-                )
-            last_response = response
-            outcome = classify_hec_failure(
-                response.get("status"), response=response.get("response")
-            )
-            if outcome == "success":
-                self.events.extend(event.to_dict() for event in batch.events)
-                self._operations.append("mock_hec_delivered")
-                return response
-            if outcome != "retryable":
-                return response
-        if last_response is None:
+        if not self._responses:
             raise RuntimeError("local HEC response fixture is empty")
-        return last_response
+        response = self._responses[min(self.attempts, len(self._responses) - 1)]
+        self.attempts += 1
+        self._operations.append("mock_hec_attempted")
+        if response == "missing-secret":
+            raise RuntimeError(
+                "sensitive-marker-never-print raw-provider-identifier-never-print"
+            )
+        if response == "timeout":
+            raise TimeoutError(
+                "sensitive-marker-never-print raw-provider-identifier-never-print"
+            )
+        outcome = classify_hec_failure(
+            response.get("status"), response=response.get("response")
+        )
+        if outcome == "success":
+            self.events.extend(event.to_dict() for event in batch.events)
+            self._operations.append("mock_hec_delivered")
+        return response
 
 
 class _InMemoryDeadLetterAdapter:
@@ -149,6 +143,9 @@ class _InMemoryDeadLetterAdapter:
         reason: str,
         *,
         delivered_event_keys: Sequence[str] = (),
+        detection_id: str | None = None,
+        dimensions: Mapping[str, str] | None = None,
+        checkpoint: datetime | None = None,
     ) -> None:
         if self._fail_write:
             self._operations.append("dlq_write_failed")
@@ -157,10 +154,20 @@ class _InMemoryDeadLetterAdapter:
             )
         self.records.append(
             {
+                "schema_version": "oci.logan.splunk.dead-letter.v1",
                 "reason": reason,
-                "event_count": len(batch.events),
-                "delivered_event_key_count": len(delivered_event_keys),
-                "event_keys": tuple(event.event_key for event in batch.events),
+                "batch_id": batch.batch_id,
+                "detection_id": detection_id,
+                "dimensions": dict(dimensions or {}),
+                "checkpoint": (
+                    checkpoint.astimezone(timezone.utc)
+                    .isoformat()
+                    .replace("+00:00", "Z")
+                    if checkpoint is not None
+                    else None
+                ),
+                "delivered_event_keys": list(delivered_event_keys),
+                "remaining_events": [event.to_dict() for event in batch.events],
             }
         )
         self._operations.append("dlq_written")
@@ -312,6 +319,7 @@ def _render_function_config() -> dict[str, object]:
                 "SPLUNK_HEC_TIMEOUT_SECONDS": "10",
                 "SPLUNK_EVIDENCE_MAX_ROWS": "1000",
                 "SPLUNK_HEC_MAX_BATCH_EVENTS": "100",
+                "SPLUNK_EVIDENCE_MAX_ATTEMPTS": "4",
             },
             "secret_handling": "Vault reference only; the HEC token is never rendered",
         }
@@ -442,12 +450,14 @@ def _service(
         maximum_window=timedelta(hours=2),
         max_rows=1000,
         max_batch_events=100,
+        max_attempts=4,
     )
 
 
 def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, object]:
     supported = {
         "success",
+        "success-after-retry",
         "duplicate-invocation",
         "zero-evidence",
         "timeout",
@@ -481,6 +491,7 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, obje
     checkpoint = _InMemoryCheckpointAdapter(operations)
     response_name = {
         "success": "success",
+        "success-after-retry": "success-after-retry",
         "duplicate-invocation": "success",
         "zero-evidence": "success",
         "dlq-write": "500",
@@ -494,17 +505,15 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, obje
         if response_name == "missing-secret"
         else responses[response_name]
     )
-    hec = _InProcessHecAdapter(
-        response_sequence,
-        operations,
-        max_attempts=4 if scenario == "retry-exhaustion" else 1,
-    )
+    hec = _InProcessHecAdapter(response_sequence, operations)
     dead_letter = _InMemoryDeadLetterAdapter(
         operations, fail_write=scenario == "dlq-failure"
     )
     service = _service(query, checkpoint, hec, dead_letter)
     trigger = AlarmTrigger.from_payload(alarm)
     receipt = service.export(trigger)
+    service_name = "EvidenceExportService"
+    query_row_count = receipt.row_count
     initial_status: str | None = None
     replayed_event_count = 0
     replay_approved = False
@@ -513,14 +522,26 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, obje
     if scenario == "approved-replay":
         initial_status = receipt.status
         replay_hec = _InProcessHecAdapter(responses["success"], operations)
-        receipt = _service(query, checkpoint, replay_hec, dead_letter).export(trigger)
+        receipt = EvidenceReplayService(
+            checkpoint=checkpoint,
+            hec=replay_hec,
+            dead_letter=dead_letter,
+            clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
+            max_batch_events=100,
+            max_attempts=4,
+        ).replay(dead_letter.records[0])
+        service_name = "EvidenceReplayService"
         hec = replay_hec
         replayed_event_count = len(replay_hec.events)
         replay_approved = True
-        replay_matches_quarantined_events = (
-            tuple(event["event_key"] for event in replay_hec.events)
-            == dead_letter.records[0]["event_keys"]
-        )
+        replay_expected_keys = {
+            event["event_key"]
+            for event in dead_letter.records[0]["remaining_events"]
+            if event["event_key"] not in dead_letter.records[0]["delivered_event_keys"]
+        }
+        replay_matches_quarantined_events = {
+            event["event_key"] for event in replay_hec.events
+        } == replay_expected_keys
         total_hec_attempts += replay_hec.attempts
     invocation_count = 1
     first_event_keys = [event["event_key"] for event in hec.events]
@@ -532,9 +553,9 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, obje
     unique_event_keys = set(all_event_keys)
     return {
         "scenario": scenario,
-        "service": "EvidenceExportService",
+        "service": service_name,
         **receipt.to_dict(),
-        "query_row_count": receipt.row_count,
+        "query_row_count": query_row_count,
         "mock_hec_event_count": len(hec.events),
         "hec_attempt_count": total_hec_attempts,
         "dlq_record_count": len(dead_letter.records),
@@ -556,7 +577,7 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, obje
         "replayed_event_count": replayed_event_count,
         "replay_matches_quarantined_events": replay_matches_quarantined_events,
         "scenario_counts": {
-            "query_rows": receipt.row_count,
+            "query_rows": query_row_count,
             "events": receipt.event_count,
             "batches": receipt.batch_count,
             "delivered": receipt.delivered_count,

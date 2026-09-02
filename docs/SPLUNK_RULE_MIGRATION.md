@@ -4,7 +4,7 @@
 
 This guide migrates a Splunk analytic into the repository's canonical OCI Log Analytics query and detection interfaces. It supports Mode 2 evidence export and records whether the same source also uses Mode 1 raw delivery. Migration is semantic translation and validation, not blind SPL-to-LAQL rewriting.
 
-Production raw delivery must use a pinned, reviewed `oci-splunk` ref and must not track mutable `main`. Current provenance is tag `2.2.0` at commit `a98167404f19be6d18235bccbf1113b59a259c4c`; source links for its four migrated alerts are pinned in [`config/splunk_parallel_delivery.yaml`](../config/splunk_parallel_delivery.yaml).
+Production raw delivery must use a pinned, reviewed `oci-splunk` ref and must not track mutable `main`. The selected ref is immutable commit `a98167404f19be6d18235bccbf1113b59a259c4c`; `2.2.0` is bundled Splunk-app provenance, not a Git tag. Source links for its four migrated alerts are pinned in [`config/splunk_parallel_delivery.yaml`](../config/splunk_parallel_delivery.yaml).
 
 ## Prerequisites and ownership
 
@@ -38,7 +38,7 @@ The generated registry contains nine detections: four pinned `oci-splunk` alerts
 Local migration needs no OCI credentials or network. Provider validation needs the operator's reviewed Log Analytics permissions for the target compartment/log group, scheduled-task and detection-rule permissions, Monitoring metric/alarm read or manage permissions, and only the additional Mode 1 or Mode 2 policies for the approved delivery path. Preview policy categories offline:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py render-iam
+python3 scripts/splunk_evidence_exporter_cli.py render-iam
 ```
 
 Never copy broad example policy unchanged. Resolve every placeholder and verify the target, region, conditional keys, and dynamic-group match. For evidence export, the Function network must resolve and validate the HTTPS HEC hostname through a reviewed private route or NAT/egress; migration validation alone makes no external call.
@@ -61,16 +61,16 @@ Expected output is a versioned migration record pointing to one canonical query,
 Run one change at a time from the repository root:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/generate_splunk_detection_registry.py --check
-/Users/abirzu/oci-cli/bin/python3 scripts/detection_rule_creator.py --eligible-only
-/Users/abirzu/oci-cli/bin/python3 -m pytest scripts/test_splunk_detection_registry.py -q
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py validate-config
+python3 scripts/generate_splunk_detection_registry.py --check
+python3 scripts/detection_rule_creator.py --eligible-only
+python3 -m pytest scripts/test_splunk_detection_registry.py -q
+python3 scripts/splunk_evidence_exporter_cli.py validate-config
 ```
 
 When intentionally updating the generated registry after changing canonical configuration:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/generate_splunk_detection_registry.py
+python3 scripts/generate_splunk_detection_registry.py
 ```
 
 Then review the exact diff and rerun `--check`. Do not hand-edit the generated output. `scripts/ql/splunk.py` is a conversion module used by existing code/tests, not a supported operator CLI.

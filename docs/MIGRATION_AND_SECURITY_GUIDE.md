@@ -35,7 +35,7 @@ Keep the authoritative raw-log retention, routing, and privacy requirements in t
 | Mode 2 — evidence | Log Analytics detection → Monitoring → alarm → Notifications → Function → bounded query → HEC | Splunk needs governed detection evidence | Parsed hit, metric, alarm, Function, confirmed HEC, checkpoint, and Splunk search |
 | Hybrid | Either/both, recorded per source and detection | Raw compliance retention and selected SOC evidence differ | Each enabled path passes independently |
 
-Production raw delivery must use a reviewed tag or commit and must not track mutable `main`. Current migration provenance is `adibirzu/oci-splunk` tag `2.2.0` at commit `a98167404f19be6d18235bccbf1113b59a259c4c`. On-premises Management Agent/optional Management Gateway sources can use Mode 2 directly from Log Analytics; they do not need Streaming.
+Production raw delivery must use a reviewed tag or commit and must not track mutable `main`. The selected `adibirzu/oci-splunk` ref is immutable commit `a98167404f19be6d18235bccbf1113b59a259c4c`; `2.2.0` is bundled app provenance, not a Git tag. On-premises Management Agent/optional Management Gateway sources can use Mode 2 directly from Log Analytics; they do not need Streaming.
 
 Use [Splunk Parallel Operations](SPLUNK_PARALLEL_OPERATIONS.md) for the decision/ownership model, [Splunk Rule Migration](SPLUNK_RULE_MIGRATION.md) for analytic translation, [Evidence Export Runbook](SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md) for manual/scripted deployment, and [E2E Validation](SPLUNK_E2E_VALIDATION.md) for evidence gates.
 

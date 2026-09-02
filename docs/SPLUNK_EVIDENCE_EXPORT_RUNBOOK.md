@@ -4,7 +4,7 @@
 
 This runbook deploys and operates **Mode 2**, where OCI Log Analytics is the source of truth and a detection-triggered Function exports bounded, normalized evidence to Splunk HEC. It does not turn Log Analytics into a raw log pump. For Mode 1 raw delivery, use the [parallel operations guide](SPLUNK_PARALLEL_OPERATIONS.md) and a reviewed pinned `oci-splunk` release.
 
-Production must use a pinned, reviewed `oci-splunk` ref for any raw path and must not track mutable `main`. Current repository provenance is tag `2.2.0` at commit `a98167404f19be6d18235bccbf1113b59a259c4c`.
+Production must use a pinned, reviewed `oci-splunk` ref for any raw path and must not track mutable `main`. The selected immutable ref is commit `a98167404f19be6d18235bccbf1113b59a259c4c`; `2.2.0` is bundled Splunk-app provenance, not a Git tag.
 
 ## Prerequisites and ownership
 
@@ -14,7 +14,7 @@ Prerequisites are:
 
 - one parsed source and canonical query already proven in Log Analytics;
 - one eligible saved-search detection rule and its first Monitoring metric;
-- Python at `/Users/abirzu/oci-cli/bin/python3` for repository validation;
+- Python 3 available as `python3` for repository validation;
 - Terraform/Resource Manager only for a separately approved deployment;
 - a reviewed OCI Registry image produced from the deterministic staging context;
 - existing Function subnet(s), optional NSGs, DNS/TLS route to the HEC hostname, and OCI service reachability;
@@ -55,7 +55,7 @@ sequenceDiagram
 Render, save privately, and review the placeholder-only IAM categories:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py render-iam
+python3 scripts/splunk_evidence_exporter_cli.py render-iam
 ```
 
 Create an exact Function dynamic group from the Terraform output `function_dynamic_group_matching_rule`. Scope Log Analytics query/read, the exact Vault secret bundle, named state/DLQ objects, and Notifications invocation of the exact Function. Review the broader operator family grants and the regional Object Storage lifecycle service grant; the renderer explicitly does not apply policy.
@@ -79,30 +79,45 @@ Expected output after deployment but before canary is a disabled alarm/action, o
 
 ## Scripted flow with separate approvals
 
-All commands run from the repository root. Steps 1–3 are offline and make no external calls.
+All commands run from the repository root. Only the repository CLI previews, validators, and deterministic Function context staging are offline. Image build/publish, Terraform dependency initialization, provider read/plan, apply, canary, and replay are separate phases with separate evidence and approvals.
 
 ### 1. Offline plan and preflight
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py plan --json
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py validate-config
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py render-function-config
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py render-iam
+python3 scripts/splunk_evidence_exporter_cli.py plan --json
+python3 scripts/splunk_evidence_exporter_cli.py validate-config
+python3 scripts/splunk_evidence_exporter_cli.py render-function-config
+python3 scripts/splunk_evidence_exporter_cli.py render-iam
 ```
 
 Expected output includes `offline: true`, `external_calls: []`, two disabled modes, nine detections, `credentials_present: false`, a disabled Function template, and placeholder IAM categories requiring scope review.
 
-### 2. Stage, inspect, and obtain build approval
+### 2. Stage and inspect the offline Function context
 
 Use a new empty temporary destination:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 stack/modules/splunk_evidence_exporter/function/stage_build_context.py --output /tmp/splunk-evidence-exporter-build-context
+python3 stack/modules/splunk_evidence_exporter/function/stage_build_context.py --output /tmp/splunk-evidence-exporter-build-context
 ```
 
-Expected output is a deterministic context and `build-context-manifest.json` with SHA-256 digests. Inspect every staged file/manifest. **Build approval** is separate: only then may the image owner run the documented `fn build`, scan/sign the image, push it through the approved OCI Registry pipeline, and return an immutable image reference/digest. Staging is not a build or publish receipt.
+Expected output is a deterministic context and `build-context-manifest.json` with SHA-256 digests. Inspect every staged file/manifest. Staging is offline and is not a build or publish receipt.
 
-### 3. Create and review a saved Terraform plan
+### 3. Obtain build approval
+
+**Build approval** is separate. Only then may the image owner run the documented `fn build`, scan/sign the image, push it through the approved OCI Registry pipeline, and return an immutable image reference/digest. These dependency/download/registry actions may use networks and credentials; record their own receipts.
+
+### 4. Initialize Terraform dependencies without changing infrastructure
+
+Keep all three root enable variables `false`. Review the Terraform CLI/provider source and the configured backend before running:
+
+```bash
+terraform -chdir=stack init
+terraform -chdir=stack validate
+```
+
+`terraform init` may contact provider registries; `terraform plan` loads configured credentials and may read OCI or configured state. Neither phase mutates infrastructure, but neither phase is offline or credential-free. Initialization can also access a configured backend and writes dependency metadata locally; validation uses that initialized configuration.
+
+### 5. Create and review a saved Terraform provider plan
 
 Keep these root variables false during the first preview:
 
@@ -115,14 +130,12 @@ enable_splunk_evidence_exporter_subscription  = false
 After target/IAM/network/image review, set only `enable_splunk_evidence_exporter = true` in a private reviewed tfvars file; leave alarm actions and subscription false. Required non-defaults include the existing Vault secret OCID, Object Storage namespace, Function subnet IDs, reviewed image and optional digest, exact HEC event URL, and target index.
 
 ```bash
-terraform -chdir=stack init
-terraform -chdir=stack validate
 terraform -chdir=stack plan -var-file=<REVIEWED_TFVARS_PATH> -out=<SAVED_PLAN_PATH>
 ```
 
-Expected plan creates only the scoped exporter resources selected by inputs, creates no VCN/subnet/Vault secret/HEC token, and leaves the Function-error alarm actions and Function subscription disabled. Existing bucket names cause reuse; empty names create private versioned buckets with lifecycle defaults. Treat plan files as sensitive because they can contain identifiers.
+The provider plan uses the already reviewed target and credentials. Expected output creates only the scoped exporter resources selected by inputs, creates no VCN/subnet/Vault secret/HEC token, and leaves the Function-error alarm actions and Function subscription disabled. Existing bucket names cause reuse; empty names create private versioned buckets with lifecycle defaults. Treat plan files as sensitive because they can contain identifiers.
 
-### 4. Obtain apply approval and apply the exact saved plan
+### 6. Obtain apply approval and apply the exact saved plan
 
 **Apply approval** must bind the reviewed plan digest, profile/account, region, compartment, resource list, cost, owner, window, and rollback. Only after approval:
 
@@ -132,18 +145,18 @@ terraform -chdir=stack apply <SAVED_PLAN_PATH>
 
 The sensitive outputs identify created resources and the exact dynamic-group matching rule. Do not publish them. Apply proves resources are configured, not that the Function can query, deliver, or be searched.
 
-### 5. Review canary plan and obtain canary approval
+### 7. Review canary plan and obtain canary approval
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py canary-plan
+python3 scripts/splunk_evidence_exporter_cli.py canary-plan
 ```
 
 This command is non-executing. **Canary approval** is a separate target-bound decision. Enable only the reviewed alarm/action and exact Function subscription through Console or an independently reviewed saved Terraform plan, then generate one authorized event. Stop on unexpected volume, unauthorized fields, incorrect target, HEC rejection, missing state, or network/TLS failure.
 
-### 6. Review replay plan and obtain replay approval
+### 8. Review replay plan and obtain replay approval
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py replay-plan
+python3 scripts/splunk_evidence_exporter_cli.py replay-plan
 ```
 
 This command is non-executing. **Replay approval** must name the sanitized DLQ record/batch, remaining event keys, time window, HEC target/capacity, and stop conditions. There is no live replay command in this repository. An operator must use the reviewed deployed exporter path, require HEC confirmation, and commit the checkpoint only after all remaining batches confirm.

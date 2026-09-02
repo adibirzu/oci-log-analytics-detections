@@ -10,6 +10,7 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
+PINNED_OCI_SPLUNK_COMMIT = "a98167404f19be6d18235bccbf1113b59a259c4c"
 GUIDES = (
     ROOT / "docs/SPLUNK_PARALLEL_OPERATIONS.md",
     ROOT / "docs/SPLUNK_RULE_MIGRATION.md",
@@ -44,6 +45,16 @@ def _local_target(page: Path, raw_target: str) -> Path | None:
     if not path:
         return None
     return (page.parent / path).resolve()
+
+
+def _subsection(text: str, heading: str) -> str:
+    match = re.search(
+        rf"^### {re.escape(heading)}\s*$\n(?P<body>.*?)(?=^#{{2,3}} |\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    assert match, f"missing subsection: {heading}"
+    return match.group("body")
 
 
 def test_operator_guides_cover_required_execution_contract() -> None:
@@ -103,8 +114,7 @@ def test_production_guidance_requires_reviewed_pinned_oci_splunk_ref() -> None:
     migration = _read(ROOT / "docs/MIGRATION_AND_SECURITY_GUIDE.md")
     combined = "\n".join((operations, deployment, migration)).lower()
 
-    assert "2.2.0" in combined
-    assert "a98167404f19be6d18235bccbf1113b59a259c4c" in combined
+    assert PINNED_OCI_SPLUNK_COMMIT in combined
     assert "production" in combined
     assert "reviewed tag or commit" in combined
     assert "must not track" in combined and "main" in combined
@@ -145,3 +155,79 @@ def test_guides_keep_acceptance_layers_distinct() -> None:
         "provider acceptance",
     ):
         assert layer in combined
+
+
+def test_customer_facing_commands_use_a_portable_python_interpreter() -> None:
+    pages = (
+        README,
+        *(
+            page
+            for page in sorted(ROOT.rglob("*.md"))
+            if ".superpowers" not in page.parts
+            and not (
+                "docs" in page.parts and "superpowers" in page.parts
+            )
+        ),
+    )
+    for page in pages:
+        text = _read(page)
+        assert "/Users/" not in text, f"developer-local path in {page.relative_to(ROOT)}"
+    for guide in GUIDES:
+        assert "python3" in _read(guide)
+
+
+def test_terraform_phases_are_not_misclassified_as_offline() -> None:
+    runbook = _read(ROOT / "docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md")
+    operations = _read(ROOT / "docs/SPLUNK_PARALLEL_OPERATIONS.md")
+    e2e = _read(ROOT / "docs/SPLUNK_E2E_VALIDATION.md")
+    combined = "\n".join((runbook, operations, e2e)).lower()
+
+    assert "only the repository cli previews, validators, and deterministic function context staging are offline" in combined
+    for page in (runbook, operations, e2e):
+        normalized = page.replace("`", "").lower()
+        assert "terraform init may contact provider registries" in normalized
+        assert "terraform plan loads configured credentials and may read oci" in normalized
+        assert "neither phase mutates infrastructure" in normalized
+        assert "neither phase is offline or credential-free" in normalized
+    assert "steps 1–3 are offline" not in combined
+    assert "offline terraform" not in combined
+
+
+def test_mode1_has_executable_pinned_preview_and_explicit_apply_gate() -> None:
+    text = _read(ROOT / "docs/SPLUNK_PARALLEL_OPERATIONS.md")
+    pinned_root = f"https://github.com/adibirzu/oci-splunk/blob/{PINNED_OCI_SPLUNK_COMMIT}"
+
+    assert f"{pinned_root}/README.md" in text
+    assert f"{pinned_root}/docs/DEPLOYMENT.md" in text
+    commands = (
+        "git clone https://github.com/adibirzu/oci-splunk.git oci-splunk",
+        f"git -C oci-splunk checkout --detach {PINNED_OCI_SPLUNK_COMMIT}",
+        "terraform -chdir=oci-splunk/terraform init -backend=false",
+        "terraform -chdir=oci-splunk/terraform validate",
+        "terraform -chdir=oci-splunk/terraform plan",
+        "terraform -chdir=oci-splunk/terraform show -no-color",
+        "terraform -chdir=oci-splunk/terraform apply",
+    )
+    offsets = [text.index(command) for command in commands]
+    assert offsets == sorted(offsets)
+    assert "Required variable categories and defaults" in text
+    assert "Expected preview output" in text
+    assert "Mode 1 preview failure handling" in text
+    assert "Mode 1 apply approval" in text
+
+
+def test_common_and_mode_prerequisites_do_not_cross_impose_services() -> None:
+    for page in (
+        ROOT / "docs/SPLUNK_PARALLEL_OPERATIONS.md",
+        ROOT / "docs/SPLUNK_E2E_VALIDATION.md",
+    ):
+        text = _read(page)
+        common = _subsection(text, "Common prerequisites")
+        mode1 = _subsection(text, "Mode 1 prerequisites")
+        mode2 = _subsection(text, "Mode 2 prerequisites")
+
+        assert "explicit" in common.lower() and "approval" in common.lower()
+        assert "Streaming" in mode1 and "oci-splunk" in mode1
+        assert not re.search(r"\b(?:Vault|Function|alarm|subscription)\b", mode1, re.I)
+        assert "Vault" in mode2 and "Function" in mode2 and "alarm" in mode2.lower()
+        assert not re.search(r"\b(?:Streaming|oci-splunk)\b", mode2, re.I)

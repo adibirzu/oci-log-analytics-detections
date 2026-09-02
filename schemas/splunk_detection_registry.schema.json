@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/adibirzu/oci-log-analytics-detections/blob/main/schemas/splunk_detection_registry.schema.json",
+  "title": "OCI Log Analytics Splunk Detection Registry Entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "splunk", "oci_query_file", "required_sources", "required_fields", "fidelity", "detection", "delivery", "evidence"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "title": {"type": "string", "minLength": 1},
+    "splunk": {"$ref": "#/$defs/splunk"},
+    "oci_query_file": {"type": "string", "pattern": "^queries/(?:apps/|hunting/|sentinel/)?[a-z0-9][a-z0-9_-]*\\.json$"},
+    "required_sources": {"$ref": "#/$defs/nonEmptyStringArray"},
+    "required_fields": {"$ref": "#/$defs/nonEmptyStringArray"},
+    "fidelity": {"enum": ["evidence", "raw"]},
+    "detection": {"$ref": "#/$defs/detection"},
+    "delivery": {"$ref": "#/$defs/delivery"},
+    "evidence": {"$ref": "#/$defs/evidence"}
+  },
+  "$defs": {
+    "nonEmptyStringArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "splunk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "sourcetype", "dimensions"],
+      "properties": {
+        "index": {"type": "string", "minLength": 1},
+        "sourcetype": {"type": "string", "minLength": 1},
+        "dimensions": {"type": "array", "maxItems": 3, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["severity", "mitre_techniques"],
+      "properties": {
+        "severity": {"enum": ["low", "medium", "high", "critical"]},
+        "mitre_techniques": {"type": "array", "items": {"type": "string", "pattern": "^T[0-9]{4}(?:\\.[0-9]{3})?$"}}
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["delivery_mode", "lookback", "overlap", "max_rows", "max_batch_events", "max_attempts"],
+      "properties": {
+        "delivery_mode": {"enum": ["evidence", "raw"]},
+        "lookback": {"type": "string", "pattern": "^[1-9][0-9]*[smhd]$"},
+        "overlap": {"type": "string", "pattern": "^[1-9][0-9]*[smhd]$"},
+        "max_rows": {"type": "integer", "minimum": 1},
+        "max_batch_events": {"type": "integer", "minimum": 1},
+        "max_attempts": {"type": "integer", "minimum": 1}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["include_original_content", "redaction_profile"],
+      "properties": {
+        "include_original_content": {"type": "boolean"},
+        "redaction_profile": {"type": ["string", "null"]}
+      },
+      "allOf": [{
+        "if": {"properties": {"include_original_content": {"const": true}}, "required": ["include_original_content"]},
+        "then": {"properties": {"redaction_profile": {"type": "string", "minLength": 1}}, "required": ["redaction_profile"]}
+      }]
+    }
+  }
+}

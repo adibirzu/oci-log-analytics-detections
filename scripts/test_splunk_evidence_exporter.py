@@ -1346,6 +1346,9 @@ def test_replay_delivers_stored_remaining_evidence_and_excludes_confirmed_keys()
             return {"status": 200, "response": {"code": 0}}
 
     class State:
+        def load_checkpoint(self, detection_id, dimensions):
+            return None
+
         def save_checkpoint(self, detection_id, dimensions, checkpoint):
             commits.append((detection_id, dict(dimensions), checkpoint))
 
@@ -1379,6 +1382,86 @@ def test_replay_delivers_stored_remaining_evidence_and_excludes_confirmed_keys()
     ]
 
 
+@pytest.mark.parametrize(
+    ("current_checkpoint", "checkpoint_status", "expected_saves"),
+    [
+        (
+            datetime(2026, 9, 2, 7, 20, tzinfo=timezone.utc),
+            "preserved_newer",
+            [],
+        ),
+        (
+            datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+            "already_current",
+            [],
+        ),
+        (
+            datetime(2026, 9, 2, 7, 10, tzinfo=timezone.utc),
+            "advanced",
+            [datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc)],
+        ),
+    ],
+)
+def test_confirmed_replay_advances_checkpoint_monotonically(
+    current_checkpoint, checkpoint_status, expected_saves
+):
+    operations = []
+    window = QueryWindow(
+        start=datetime(2026, 9, 2, 7, 8, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+    )
+    event = build_evidence_event(
+        registry_entry(),
+        {"Status": "stored"},
+        window,
+        batch_id="monotonic-replay-batch",
+    )
+    record = {
+        "schema_version": "oci.logan.splunk.dead-letter.v1",
+        "reason": "retryable",
+        "batch_id": "monotonic-replay-batch",
+        "detection_id": "oci-audit-failures",
+        "dimensions": {"Status": "Failure"},
+        "checkpoint": "2026-09-02T07:15:00Z",
+        "delivered_event_keys": [],
+        "remaining_events": [event.to_dict()],
+    }
+    saves = []
+
+    class Hec:
+        def deliver(self, batch):
+            operations.append("hec_confirmed")
+            return {"status": 200, "response": {"code": 0}}
+
+    class State:
+        def load_checkpoint(self, detection_id, dimensions):
+            operations.append("checkpoint_loaded")
+            return current_checkpoint
+
+        def save_checkpoint(self, detection_id, dimensions, checkpoint):
+            operations.append("checkpoint_saved")
+            saves.append(checkpoint)
+
+    class Dlq:
+        def quarantine(self, *args, **kwargs):
+            raise AssertionError("confirmed replay must not quarantine")
+
+    receipt = EvidenceReplayService(
+        checkpoint=State(),
+        hec=Hec(),
+        dead_letter=Dlq(),
+        clock=lambda: datetime(2026, 9, 2, 7, 21, tzinfo=timezone.utc),
+        max_batch_events=100,
+        max_attempts=4,
+    ).replay(record)
+
+    assert receipt.status == "delivered"
+    assert receipt.checkpoint_status == checkpoint_status
+    assert receipt.checkpoint_committed is (checkpoint_status == "advanced")
+    assert saves == expected_saves
+    assert operations[:2] == ["hec_confirmed", "checkpoint_loaded"]
+
+
 def test_partial_replay_failure_updates_dlq_and_never_commits_checkpoint():
     window = QueryWindow(
         start=datetime(2026, 9, 2, 7, 8, tzinfo=timezone.utc),
@@ -1405,6 +1488,7 @@ def test_partial_replay_failure_updates_dlq_and_never_commits_checkpoint():
     }
     attempts = []
     quarantines = []
+    state_accesses = []
 
     class Hec:
         def deliver(self, batch):
@@ -1414,8 +1498,12 @@ def test_partial_replay_failure_updates_dlq_and_never_commits_checkpoint():
             return {"status": 500, "response": {"code": 8}}
 
     class State:
+        def load_checkpoint(self, *args, **kwargs):
+            state_accesses.append("load")
+            return None
+
         def save_checkpoint(self, *args, **kwargs):
-            raise AssertionError("partial replay failure must not commit")
+            state_accesses.append("save")
 
     class Dlq:
         def quarantine(self, batch, reason, **metadata):
@@ -1433,6 +1521,8 @@ def test_partial_replay_failure_updates_dlq_and_never_commits_checkpoint():
     assert receipt.status == "delivery_failed"
     assert receipt.delivered_count == 1
     assert receipt.checkpoint_committed is False
+    assert receipt.checkpoint_status == "not_evaluated"
+    assert state_accesses == []
     assert len(attempts) == 3
     batch, reason, metadata = quarantines[0]
     assert reason == "retryable"

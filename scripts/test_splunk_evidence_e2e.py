@@ -159,6 +159,7 @@ def test_replay_requires_explicit_local_approval_and_uses_service_again():
     assert receipt["replayed_event_count"] == 3
     assert receipt["replay_matches_quarantined_events"] is True
     assert receipt["checkpoint_committed"] is True
+    assert receipt["checkpoint_status"] == "advanced"
     assert receipt["service"] == "EvidenceReplayService"
     assert receipt["hec_attempt_count"] == 5
     assert receipt["operations"].count("query_executed") == 1

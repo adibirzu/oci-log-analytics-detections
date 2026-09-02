@@ -292,6 +292,7 @@ class ReplayReceipt:
     batch_count: int
     delivered_count: int
     checkpoint_committed: bool
+    checkpoint_status: str
     completed_at: datetime
 
     def to_dict(self) -> dict[str, object]:
@@ -306,6 +307,7 @@ class ReplayReceipt:
             "batch_count": self.batch_count,
             "delivered_count": self.delivered_count,
             "checkpoint_committed": self.checkpoint_committed,
+            "checkpoint_status": self.checkpoint_status,
             "completed_at": _utc_text(self.completed_at),
         }
 
@@ -417,10 +419,21 @@ class EvidenceReplayService:
                     batch_count=len(batches),
                     delivered_count=delivered_count,
                     committed=False,
+                    checkpoint_status="not_evaluated",
                 )
             delivered_count += len(batch.events)
             newly_delivered_keys.extend(event.event_key for event in batch.events)
-        self._checkpoint.save_checkpoint(detection_id, dimensions, checkpoint)
+        current_checkpoint = self._checkpoint.load_checkpoint(detection_id, dimensions)
+        if current_checkpoint is None or current_checkpoint < checkpoint:
+            self._checkpoint.save_checkpoint(detection_id, dimensions, checkpoint)
+            checkpoint_status = "advanced"
+            checkpoint_committed = True
+        elif current_checkpoint == checkpoint:
+            checkpoint_status = "already_current"
+            checkpoint_committed = False
+        else:
+            checkpoint_status = "preserved_newer"
+            checkpoint_committed = False
         return self._receipt(
             status="delivered" if remaining else "already_delivered",
             detection_id=detection_id,
@@ -430,7 +443,8 @@ class EvidenceReplayService:
             excluded_count=excluded_count,
             batch_count=len(batches),
             delivered_count=delivered_count,
-            committed=True,
+            committed=checkpoint_committed,
+            checkpoint_status=checkpoint_status,
         )
 
     def _receipt(
@@ -445,6 +459,7 @@ class EvidenceReplayService:
         batch_count: int,
         delivered_count: int,
         committed: bool,
+        checkpoint_status: str,
     ) -> ReplayReceipt:
         return ReplayReceipt(
             status=status,
@@ -457,6 +472,7 @@ class EvidenceReplayService:
             batch_count=batch_count,
             delivered_count=delivered_count,
             checkpoint_committed=committed,
+            checkpoint_status=checkpoint_status,
             completed_at=self._clock(),
         )
 

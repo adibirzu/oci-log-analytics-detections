@@ -3,6 +3,7 @@
 
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 import jsonschema
@@ -14,6 +15,8 @@ from scripts.generate_splunk_detection_registry import (
     validate_registry,
 )
 from scripts.detection_rule_creator import build_detection_rule_spec
+from scripts.splunk_evidence_exporter.envelope import build_evidence_event
+from scripts.splunk_evidence_exporter.window import QueryWindow
 from scripts.testlogs import network, oci_audit
 
 
@@ -47,6 +50,16 @@ WINDOWS_ACCESS_QUERY_FILES = {
     "windows-access-privileged-group-add": "queries/hunting/windows_access_privileged_group_add.json",
     "windows-access-rdp-after-hours": "queries/hunting/windows_access_rdp_after_hours.json",
 }
+
+
+def _canonical_detection_specs() -> dict[str, dict]:
+    """Return the generated scheduled-detection specification by query path."""
+    payload = json.loads((ROOT / "queries/detection_rule_specs.json").read_text())
+    return {
+        spec["query_file"]: spec
+        for spec in payload["specs"]
+        if isinstance(spec, dict) and isinstance(spec.get("query_file"), str)
+    }
 
 
 def delivery_config_with_migration(tmp_path: Path, **overrides) -> Path:
@@ -130,6 +143,60 @@ def test_initial_migration_pack_is_scheduled_detection_eligible():
         assert len(numeric_metric_aliases) == 1, entry["id"]
         assert spec["metric_name"]
         assert len(spec["dimensions"]) <= 3
+
+
+def test_governed_alarm_contracts_reconcile_to_canonical_detection_specs():
+    """Each exported detection alarms on its real scheduled-rule metric contract."""
+    registry = build_registry()
+    canonical_specs = _canonical_detection_specs()
+
+    for entry in registry["detections"]:
+        spec = canonical_specs[entry["oci_query_file"]]
+        contract = entry["alarm_contract"]
+
+        assert spec["eligible"], entry["id"]
+        assert contract["metric_namespace"] == spec["alarm_template"]["namespace"]
+        assert contract["metric_name"] == spec["metric_name"]
+        assert contract["metric_dimensions"] == spec["dimensions"]
+        assert contract["query"] == f'{spec["metric_name"]}[{spec["schedule"]}].sum() > 0'
+        # Alarm identity is bound by its OCI alarm OCID.  Metric dimensions are
+        # not treated as Log Analytics query filters unless explicitly mapped.
+        assert contract["allowed_dimensions"] == {}
+        assert contract["alarm_dimension_to_log_field"] == {}
+
+
+def test_governed_evidence_queries_emit_source_occurrence_bounds_for_dedupe():
+    """Actual aggregate rows carry source evidence time, not invocation bounds."""
+    registry = build_registry()
+    window = QueryWindow(
+        start=datetime(2026, 9, 2, 7, 0, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+    )
+
+    for entry in registry["detections"]:
+        query = json.loads((ROOT / entry["oci_query_file"]).read_text())["query"]
+        assert "earliest(Time) as FirstSeen" in query, entry["id"]
+        assert "latest(Time) as LastSeen" in query, entry["id"]
+
+        # These fields are taken from the aggregation output: its group-by
+        # dimensions plus its metric alias.  They intentionally omit Time and
+        # query-window metadata, which are not emitted by these queries.
+        stats = re.search(r"\| stats (?P<stats>.+?) by (?P<groups>.+?)(?: \| |$)", query)
+        assert stats, entry["id"]
+        metric = re.search(r"\bcount as (?P<name>[A-Za-z_][A-Za-z0-9_]*)", stats["stats"])
+        assert metric, entry["id"]
+        groups = [field.strip().strip("'") for field in stats["groups"].split(",")]
+        assert set(entry["required_fields"]).issubset(groups), entry["id"]
+        output = {field: f"{entry['id']}-{index}" for index, field in enumerate(groups)}
+        output[metric["name"]] = 11
+        first = {**output, "FirstSeen": "2026-09-02T07:10:00Z", "LastSeen": "2026-09-02T07:10:04Z"}
+        second = {**output, "FirstSeen": "2026-09-02T07:20:00Z", "LastSeen": "2026-09-02T07:20:04Z"}
+
+        first_event = build_evidence_event(entry, first, window, "first")
+        duplicate_event = build_evidence_event(entry, first, window, "retry")
+        second_event = build_evidence_event(entry, second, window, "second")
+        assert first_event.event_key == duplicate_event.event_key, entry["id"]
+        assert first_event.event_key != second_event.event_key, entry["id"]
 
 
 def test_windows_access_migrations_reuse_the_existing_five_minute_queries():
@@ -286,9 +353,10 @@ def valid_registry_entry():
         "alarm_contract": {
             "binding_key": "oci-console-login-failure",
             "metric_namespace": "oci_log_analytics_detections",
-            "metric_name": "DetectionSignal",
-            "query": "DetectionSignal[5m]{detectionId = \"oci-console-login-failure\"}.sum() > 0",
-            "allowed_dimensions": {"detectionId": "oci-console-login-failure"},
+            "metric_name": "AuditFailures",
+            "metric_dimensions": ["Event Type", "Status"],
+            "query": "AuditFailures[5m].sum() > 0",
+            "allowed_dimensions": {},
         },
     }
 

@@ -335,7 +335,7 @@ class EvidenceExportService:
         if trigger.alarm_id is None:
             return
         contract = entry.get("alarm_contract")
-        required = ("binding_key", "metric_namespace", "metric_name", "query", "allowed_dimensions")
+        required = ("binding_key", "metric_namespace", "metric_name", "metric_dimensions", "query", "allowed_dimensions")
         if not isinstance(contract, Mapping) or any(key not in contract for key in required):
             raise ValueError("governed alarm contract is incomplete")
         if (contract["metric_namespace"] != trigger.namespace or contract["metric_name"] != trigger.metric_name or contract["query"] != trigger.query):

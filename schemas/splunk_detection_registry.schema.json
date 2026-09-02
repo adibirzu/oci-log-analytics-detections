@@ -71,11 +71,12 @@
     },
     "alarmContract": {
       "type": "object", "additionalProperties": false,
-      "required": ["binding_key", "metric_namespace", "metric_name", "query", "allowed_dimensions"],
+      "required": ["binding_key", "metric_namespace", "metric_name", "metric_dimensions", "query", "allowed_dimensions"],
       "properties": {
         "binding_key": {"type": "string", "minLength": 1},
         "metric_namespace": {"type": "string", "minLength": 1},
         "metric_name": {"type": "string", "minLength": 1},
+        "metric_dimensions": {"$ref": "#/$defs/nonEmptyStringArray"},
         "query": {"type": "string", "minLength": 1},
         "allowed_dimensions": {"type": "object", "additionalProperties": {"type": "string"}},
         "alarm_dimension_to_log_field": {"type": "object", "additionalProperties": {"type": "string"}}

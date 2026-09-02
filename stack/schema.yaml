@@ -47,6 +47,10 @@ variableGroups:
       - splunk_evidence_exporter_function_nsg_ids
       - splunk_evidence_exporter_function_image
       - splunk_evidence_exporter_function_image_digest
+      - splunk_evidence_exporter_function_attestation_sha256
+      - splunk_evidence_exporter_function_provenance_sha256
+      - splunk_evidence_exporter_function_attestation_path
+      - splunk_evidence_exporter_function_provenance_path
       - splunk_evidence_exporter_hec_secret_id
       - splunk_evidence_exporter_hec_url
       - splunk_evidence_exporter_hec_index
@@ -235,6 +239,38 @@ variables:
     type: string
     title: "Exporter Image Digest"
     description: "Optional immutable sha256 digest paired with the reviewed image."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_function_attestation_sha256:
+    type: string
+    title: "Verified Attestation SHA-256"
+    description: "SHA-256 emitted by the signed supply-chain verifier for the exact reviewed image."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_function_provenance_sha256:
+    type: string
+    title: "Verified Provenance SHA-256"
+    description: "SHA-256 of the signed build provenance accepted for the exact reviewed image."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_function_attestation_path:
+    type: string
+    title: "Private Attestation Path"
+    description: "Private local path to the signed attestation; Terraform recomputes the configured SHA-256."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_function_provenance_path:
+    type: string
+    title: "Private Provenance Path"
+    description: "Private local path to the signed provenance; Terraform recomputes the configured SHA-256."
     default: ""
     required: false
     visible: enable_splunk_evidence_exporter

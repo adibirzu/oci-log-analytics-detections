@@ -21,7 +21,7 @@ output "function_dynamic_group_matching_rule" {
 }
 
 output "governed_alarm_bindings" {
-  description = "Exact governed detection binding keys and Monitoring alarm OCIDs supplied to the exporter"
+  description = "Exact governed detection binding keys and effective Monitoring alarm OCIDs bound to the exporter"
   sensitive   = true
-  value       = local.enabled ? var.splunk_alarm_ids : null
+  value       = local.enabled ? local.effective_governed_alarm_bindings : null
 }

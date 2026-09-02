@@ -110,6 +110,7 @@ def test_raw_alarm_contract_rejects_namespace_metric_dimension_and_query_mismatc
         "binding_key": "oci-audit-failures",
         "metric_namespace": "oci_log_analytics_detections",
         "metric_name": "AuditFailures",
+        "metric_dimensions": ["Event Type", "User Name", "Status"],
         "query": "AuditFailures[5m].sum() > 0",
         "allowed_dimensions": {"Status": "Failure"},
     }
@@ -126,8 +127,9 @@ def test_provider_raw_alarm_routes_by_bound_identity_but_queries_trusted_la_name
     entry = registry_entry()
     entry["alarm_contract"] = {
         "binding_key": "oci-audit-failures", "metric_namespace": "oci_log_analytics_detections",
-        "metric_name": "DetectionSignal", "query": 'DetectionSignal[5m]{detectionId = "oci-audit-failures"}.sum() > 0',
-        "allowed_dimensions": {"detectionId": "oci-audit-failures"}, "alarm_dimension_to_log_field": {},
+        "metric_name": "AuditFailures", "metric_dimensions": ["Event Type", "User Name", "Status"],
+        "query": "AuditFailures[15m].sum() > 0",
+        "allowed_dimensions": {}, "alarm_dimension_to_log_field": {},
     }
     seen = {}
     class Registry:

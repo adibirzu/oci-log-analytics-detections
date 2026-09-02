@@ -5,9 +5,9 @@
     "alarmMetaData": [{
       "id": "redacted-alarm-id",
       "namespace": "oci_log_analytics_detections",
-      "metricName": "DetectionSignal",
-      "query": "DetectionSignal[5m]{detectionId = \"oci-audit-failures\"}.sum() > 0",
-      "dimensions": {"detectionId": "oci-audit-failures"}
+      "metricName": "AuditFailures",
+      "query": "AuditFailures[15m].sum() > 0",
+      "dimensions": {}
     }],
     "timestamp": "2026-09-02T07:15:00Z"
   }

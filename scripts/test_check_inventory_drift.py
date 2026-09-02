@@ -268,20 +268,21 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
         )
         commands = [step[1] for step in stage_steps]
         self.assertIn("--check", commands[0])
-        self.assertIn("--scenario", commands[3])
-        self.assertEqual(commands[3][commands[3].index("--scenario") + 1], "success")
-        self.assertIn("--alarm-fixture", commands[3])
+        scenario_commands = [command for command in commands if "--scenario" in command]
+        self.assertEqual(len(scenario_commands), 4)
+        self.assertEqual(scenario_commands[0][scenario_commands[0].index("--scenario") + 1], "success")
+        self.assertIn("--alarm-fixture", scenario_commands[0])
         self.assertEqual(
-            commands[3][commands[3].index("--alarm-fixture") + 1],
+            scenario_commands[0][scenario_commands[0].index("--alarm-fixture") + 1],
             "scripts/fixtures/splunk_evidence/oci_raw_alarm.json",
         )
-        self.assertEqual(commands[4][-2:], ["--scenario", "duplicate-invocation"])
-        self.assertEqual(commands[5][-2:], ["--scenario", "500"])
+        self.assertEqual(scenario_commands[1][-2:], ["--scenario", "duplicate-invocation"])
+        self.assertEqual(scenario_commands[2][-2:], ["--scenario", "500"])
         self.assertEqual(
-            commands[6][-3:],
+            scenario_commands[3][-3:],
             ["--scenario", "approved-replay", "--approve-replay"],
         )
-        self.assertIn("scripts/test_splunk_diagrams.py", commands[7])
+        self.assertIn("scripts/test_splunk_diagrams.py", commands[names.index("diagram validation")])
         self.assertIn("scripts/test_splunk_documentation.py", commands[8])
         self.assertIn("validate_terraform_static.py", commands[9][1])
         self.assertIn("--check-format", commands[9])

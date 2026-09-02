@@ -100,7 +100,7 @@ def build_service() -> EvidenceExportService:
         alarm_bindings = json.loads(os.environ.get("SPLUNK_ALARM_BINDINGS", "{}"))
     except json.JSONDecodeError:
         raise RuntimeError("exporter alarm bindings are invalid") from None
-    if not isinstance(alarm_bindings, Mapping) or not all(isinstance(key, str) and isinstance(value, str) for key, value in alarm_bindings.items()):
+    if not isinstance(alarm_bindings, Mapping) or not alarm_bindings or not all(isinstance(key, str) and key.strip() and isinstance(value, str) and value.strip() for key, value in alarm_bindings.items()):
         raise RuntimeError("exporter alarm bindings are invalid")
     return EvidenceExportService(
         registry=_JsonRegistry(
@@ -156,10 +156,12 @@ def build_service() -> EvidenceExportService:
         ),
         alarm_bindings=alarm_bindings,
         log_analytics_namespace=_required_environment("OCI_LOG_ANALYTICS_NAMESPACE"),
+        delivery_ledger=oci_adapters.ledger,
+        metrics=oci_adapters.metrics,
     )
 
 
-def _decode_notification(data: object) -> AlarmTrigger:
+def _decode_notification(data: object, *, allow_legacy_synthetic: bool = True) -> AlarmTrigger:
     if data is None:
         raise ValueError("one Notifications message is required")
     raw = data.read(_MAX_NOTIFICATION_BYTES + 1) if hasattr(data, "read") else data
@@ -190,14 +192,17 @@ def _decode_notification(data: object) -> AlarmTrigger:
             raise ValueError("Notifications alarm body is not valid JSON") from None
     if not isinstance(body, Mapping):
         raise ValueError("exactly one Notifications alarm object is required")
-    return AlarmTrigger.from_payload(body)
+    trigger = AlarmTrigger.from_payload(body)
+    if not allow_legacy_synthetic and trigger.alarm_id is None:
+        raise ValueError("provider RAW alarm_id is required")
+    return trigger
 
 
 def handler(ctx: object, data: object = None) -> dict[str, object]:
     """Decode one alarm notification and return a sanitized receipt summary."""
 
     try:
-        trigger = _decode_notification(data)
+        trigger = _decode_notification(data, allow_legacy_synthetic=False)
         receipt = build_service().export(trigger)
     except Exception as exc:
         LOGGER.error(

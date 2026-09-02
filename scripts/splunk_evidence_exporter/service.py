@@ -18,7 +18,7 @@ from .envelope import (
     restore_evidence_event,
 )
 from .models import AlarmTrigger, ExportBatch
-from .ports import CheckpointPort, EvidenceQueryPort, HecDeliveryPort, QuarantinePort
+from .ports import CheckpointPort, DeliveryLedgerPort, EvidenceQueryPort, HecDeliveryPort, MetricsPort, QuarantinePort
 from .retry import classify_hec_failure
 from .window import calculate_window
 
@@ -143,6 +143,9 @@ class EvidenceExportService:
         random_fraction: Callable[[], float] = random.random,
         alarm_bindings: Mapping[str, str] | None = None,
         log_analytics_namespace: str | None = None,
+        delivery_ledger: DeliveryLedgerPort | None = None,
+        metrics: MetricsPort | None = None,
+        reservation_lease: timedelta = timedelta(minutes=10),
     ) -> None:
         self._registry = registry
         self._query = query
@@ -160,6 +163,11 @@ class EvidenceExportService:
         self._random_fraction = random_fraction
         self._alarm_bindings = dict(alarm_bindings or {})
         self._log_analytics_namespace = log_analytics_namespace
+        self._delivery_ledger = delivery_ledger
+        self._metrics = metrics
+        if reservation_lease.total_seconds() <= 0:
+            raise ValueError("reservation lease must be positive")
+        self._reservation_lease = reservation_lease
         # Invocation-local duplicate guard.  Persistent checkpoint/CAS prevents
         # out-of-order watermarks; an externally durable delivery ledger is a
         # separate deployment concern and is deliberately not implied here.
@@ -212,7 +220,11 @@ class EvidenceExportService:
             event = build_evidence_event(entry, row, window, batch_id)
             unique_events.setdefault(event.event_key, event)
         events = tuple(unique_events.values())
-        events = tuple(event for event in events if event.event_key not in self._delivered_event_keys)
+        now = self._clock()
+        if self._delivery_ledger is not None:
+            events = tuple(event for event in events if self._delivery_ledger.reserve(event.event_key, now=now, lease=self._reservation_lease))
+        else:
+            events = tuple(event for event in events if event.event_key not in self._delivered_event_keys)
         batches = batch_events(events, max_batch_events)
 
         if not events:
@@ -247,6 +259,8 @@ class EvidenceExportService:
                     dimensions=evidence_dimensions,
                     checkpoint=window.end,
                 )
+                self._emit_metric("DeliveryFailed", 1, detection_id)
+                self._emit_metric("DeadLetteredEvents", len(remaining_events), detection_id)
                 return ExportReceipt(
                     status="delivery_failed",
                     detection_id=detection_id,
@@ -262,10 +276,15 @@ class EvidenceExportService:
             delivered_count += len(batch.events)
             delivered_event_keys.extend(event.event_key for event in batch.events)
             self._delivered_event_keys.update(event.event_key for event in batch.events)
+            if self._delivery_ledger is not None:
+                for event in batch.events:
+                    self._delivery_ledger.mark_delivered(event.event_key, now=self._clock())
 
         self._checkpoint.save_checkpoint(
             detection_id, evidence_dimensions, window.end
         )
+        self._emit_metric("DeliverySucceeded", 1, detection_id)
+        self._emit_metric("DeliveredEvents", delivered_count, detection_id)
         return ExportReceipt(
             status="delivered",
             detection_id=detection_id,
@@ -278,6 +297,15 @@ class EvidenceExportService:
             checkpoint_committed=True,
             completed_at=self._clock(),
         )
+
+    def _emit_metric(self, name: str, value: int, detection_id: str) -> None:
+        if self._metrics is None:
+            return
+        # Metrics must not turn a confirmed HEC delivery into a retry storm.
+        try:
+            self._metrics.emit(name, value, {"detection": detection_id, "outcome": name})
+        except Exception:
+            return
 
     @staticmethod
     def _find_entry(document: object, trigger: AlarmTrigger, alarm_bindings: Mapping[str, str]) -> Mapping[str, object]:

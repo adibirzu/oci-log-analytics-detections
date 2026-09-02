@@ -13,7 +13,7 @@ import json
 import re
 import time
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Callable, Mapping, Sequence
 from urllib import error as urllib_error
 from urllib import request as urllib_request
@@ -290,6 +290,112 @@ class ObjectStorageStateAdapter:
         signer = oci.auth.signers.get_resource_principals_signer()
         client = oci.object_storage.ObjectStorageClient(config={}, signer=signer)
         return cls(client=client, namespace=namespace, bucket=bucket)
+
+
+class ObjectStorageDeliveryLedgerAdapter:
+    """Object Storage CAS ledger for cross-instance at-least-once delivery.
+
+    Each opaque event-key hash has a tiny state object.  A reservation may be
+    taken over only after its lease expires; a delivered record is permanent.
+    Conditional create/update makes this safe across cold starts.
+    """
+
+    def __init__(self, *, client: object, namespace: str, bucket: str) -> None:
+        self._client = client
+        self._namespace = _required_text(namespace, "Object Storage namespace")
+        self._bucket = _required_text(bucket, "Object Storage bucket")
+
+    @staticmethod
+    def _name(event_key: str) -> str:
+        return "delivery-ledger/" + hashlib.sha256(event_key.encode("utf-8")).hexdigest() + ".json"
+
+    def _get(self, name: str) -> tuple[dict[str, object] | None, str | None]:
+        try:
+            response = self._client.get_object(namespace_name=self._namespace, bucket_name=self._bucket, object_name=name)
+        except Exception as exc:
+            if getattr(exc, "status", None) == 404:
+                return None, None
+            raise RuntimeError("delivery ledger is unavailable") from None
+        content = response.data.content.read() if hasattr(response.data.content, "read") else response.data.content
+        try:
+            document = json.loads(content)
+        except (TypeError, json.JSONDecodeError):
+            raise RuntimeError("delivery ledger is invalid") from None
+        if not isinstance(document, dict):
+            raise RuntimeError("delivery ledger is invalid")
+        return document, getattr(response, "etag", None) or getattr(getattr(response, "headers", {}), "get", lambda _key: None)("etag")
+
+    def _put(self, name: str, document: Mapping[str, object], etag: str | None) -> bool:
+        request = {"namespace_name": self._namespace, "bucket_name": self._bucket, "object_name": name,
+                   "put_object_body": json.dumps(document, sort_keys=True, separators=(",", ":")), "content_type": "application/json"}
+        request["if_none_match" if etag is None else "if_match"] = "*" if etag is None else etag
+        try:
+            self._client.put_object(**request)
+            return True
+        except Exception as exc:
+            if getattr(exc, "status", None) == 412:
+                return False
+            raise RuntimeError("delivery ledger could not be committed") from None
+
+    def reserve(self, event_key: str, *, now: datetime, lease: timedelta) -> bool:
+        if now.tzinfo is None or now.utcoffset() is None or lease.total_seconds() <= 0:
+            raise ValueError("delivery reservation is invalid")
+        name = self._name(_required_text(event_key, "event key"))
+        for _ in range(4):
+            current, etag = self._get(name)
+            if current and current.get("state") == "delivered":
+                return False
+            if current and current.get("state") == "reserved":
+                try:
+                    expires = datetime.fromisoformat(str(current["lease_expires_at"]).replace("Z", "+00:00"))
+                except (KeyError, ValueError):
+                    raise RuntimeError("delivery ledger is invalid") from None
+                if expires > now:
+                    return False
+            document = {"schema_version": "oci.logan.splunk.delivery-ledger.v1", "state": "reserved",
+                        "lease_expires_at": (now + lease).astimezone(timezone.utc).isoformat().replace("+00:00", "Z")}
+            if self._put(name, document, etag):
+                return True
+        return False
+
+    def mark_delivered(self, event_key: str, *, now: datetime) -> None:
+        name = self._name(_required_text(event_key, "event key"))
+        for _ in range(4):
+            current, etag = self._get(name)
+            if current is None:
+                raise RuntimeError("delivery reservation is missing")
+            if current.get("state") == "delivered":
+                return
+            if self._put(name, {"schema_version": "oci.logan.splunk.delivery-ledger.v1", "state": "delivered",
+                                "delivered_at": now.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")}, etag):
+                return
+        raise RuntimeError("delivery ledger could not be committed")
+
+    def release(self, event_key: str) -> None:
+        # A failed delivery remains reserved until lease expiry.  This avoids a
+        # concurrent redelivery race; a crash is recoverable by lease takeover.
+        return None
+
+
+class OciMonitoringMetricsAdapter:
+    """Sanitized bounded Monitoring emission using the Function principal."""
+    def __init__(self, *, client: object | Callable[[], object], compartment_id: str, namespace: str, metric_data_factory: Callable[..., object]) -> None:
+        self._client, self._compartment_id, self._namespace, self._factory = client, _required_text(compartment_id, "compartment"), _required_text(namespace, "metric namespace"), metric_data_factory
+
+    def emit(self, name: str, value: int, dimensions: Mapping[str, str]) -> None:
+        if name not in {"DeliveryFailed", "DeliverySucceeded", "DeliveredEvents", "DeadLetteredEvents"} or not isinstance(value, int) or value < 0:
+            raise ValueError("metric is not governed")
+        safe = {key: value for key, value in dimensions.items() if key in {"detection", "outcome"}}
+        if len(safe) > 2 or not all(isinstance(key, str) and isinstance(item, str) and len(item) <= 64 for key, item in safe.items()):
+            raise ValueError("metric dimensions are invalid")
+        try:
+            client = self._client() if callable(self._client) else self._client
+            self._client = client
+            client.post_metric_data(self._factory(compartment_id=self._compartment_id, metric_data=[{
+                "namespace": self._namespace, "name": name, "compartment_id": self._compartment_id, "dimensions": safe, "datapoints": [{"timestamp": datetime.now(timezone.utc), "value": value}],
+            }]))
+        except Exception:
+            raise RuntimeError("operational metric could not be emitted") from None
 
 
 class ObjectStorageDeadLetterAdapter:
@@ -613,6 +719,8 @@ class OciAdapterBundle:
     vault: OciVaultSecretAdapter
     checkpoint: ObjectStorageStateAdapter
     dead_letter: ObjectStorageDeadLetterAdapter
+    ledger: ObjectStorageDeliveryLedgerAdapter
+    metrics: OciMonitoringMetricsAdapter
 
 
 class OciResourcePrincipalAdapterFactory:
@@ -659,5 +767,14 @@ class OciResourcePrincipalAdapterFactory:
                 namespace=namespace,
                 bucket=dlq_bucket,
                 clock=clock,
+            ),
+            ledger=ObjectStorageDeliveryLedgerAdapter(
+                client=object_client, namespace=namespace, bucket=state_bucket
+            ),
+            metrics=OciMonitoringMetricsAdapter(
+                client=lambda: oci.monitoring.MonitoringClient(config={}, signer=signer),
+                compartment_id=compartment_id,
+                namespace="oci_log_analytics_splunk_exporter",
+                metric_data_factory=oci.monitoring.models.PostMetricDataDetails,
             ),
         )

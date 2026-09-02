@@ -69,6 +69,11 @@ Splunk parallel local release validation on 2026-09-02:
   - evidence class `locally_verified`; provider validation `not_run`
   - no OCI, Vault, HEC, Splunk search, provider, or external endpoint validation
 - Reproducible tenant-neutral packet: `docs/health/splunk-parallel-local-evidence.example.json`
+- The default checklist preserves this local result before the known
+  fail-closed `sentinel drift check` blocker (`parser_schema_hash_mismatch`).
+- Terraform release validation is provider-free and cache-independent via
+  `scripts/validate_terraform_static.py`; provider-backed validation remains
+  an explicitly separate deployment gate.
 
 Live and local verification on 2026-06-09 (eu-frankfurt-1 tenancy):
 

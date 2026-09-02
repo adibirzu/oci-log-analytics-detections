@@ -17,12 +17,13 @@ development hints, never production image references. Terraform production
 enablement requires an externally built, scanned and signed OCI Registry image
 addressed by a non-empty `sha256:` digest.
 
-The exact dependency pins are recorded in
-`docs/SPLUNK_FUNCTION_DEPENDENCY_LOCK.md`. A production builder must resolve
-those pins with `pip install --require-hashes` using externally verified wheel
-or sdist hashes. The repository does not invent or bless artifact hashes
-offline: the pre-live gate must refuse image acceptance unless the verified
-hash lock, SBOM, SCA, SAST, IaC, container scan, signature, and image digest
-receipts all identify the same build. Retain those receipts with the reviewed
-digest; this repository intentionally performs none of those networked build
-actions.
+The exact dependency and attestation contract is in
+[`docs/SPLUNK_FUNCTION_DEPENDENCY_LOCK.md`](../../../../docs/SPLUNK_FUNCTION_DEPENDENCY_LOCK.md).
+A production builder must resolve direct and transitive pins with
+`pip install --require-hashes` using externally verified wheel or sdist
+hashes. The repository does not invent or bless artifact hashes offline: the
+machine-verifiable pre-live gate rejects a receipt unless the source manifest,
+verified dependency lock, SBOM, passing SCA/SAST/IaC/container scans, signature,
+and immutable deployed image digest all identify the same build. Retain that
+private receipt bundle with the reviewed digest; this repository intentionally
+performs none of those networked build actions.

@@ -379,7 +379,7 @@ def refresh_splunk_parallel_example() -> dict[str, object]:
         temporary = Path(handle.name)
     os.replace(temporary, target)
     final = run_splunk_parallel_offline_stage()
-    if final["status"] != "PASS" or final["gate_counts"]["total"] != 10:
+    if final["status"] != "PASS" or final["gate_counts"]["total"] != len(build_splunk_parallel_offline_steps()):
         raise RuntimeError("normal offline verification after example refresh did not pass")
     return final
 

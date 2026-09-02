@@ -12,6 +12,10 @@ from types import MappingProxyType
 from typing import Mapping
 
 
+_EVIDENCE_SCHEMA_VERSION = "oci.logan.splunk.evidence.v1"
+_EVIDENCE_EVENT_FACTORY = object()
+
+
 def _required_text(value: object, field_name: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{field_name} must be a non-empty string")
@@ -146,29 +150,62 @@ class AlarmTrigger:
     decode = from_payload
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class EvidenceEvent:
-    """One immutable event matching ``splunk_evidence_event.schema.json``."""
+    """One immutable, factory-built strict evidence-schema event."""
 
     event_key: str
     batch_id: str
     detection: Mapping[str, object]
     evidence: Mapping[str, object]
     provenance: Mapping[str, object]
-    schema_version: str = "oci.logan.splunk.evidence.v1"
+    schema_version: str = _EVIDENCE_SCHEMA_VERSION
 
-    def __post_init__(self) -> None:
-        object.__setattr__(
-            self, "event_key", _required_text(self.event_key, "event_key")
-        )
-        object.__setattr__(self, "batch_id", _required_text(self.batch_id, "batch_id"))
-        if self.schema_version != "oci.logan.splunk.evidence.v1":
+    def __init__(
+        self,
+        event_key: str,
+        batch_id: str,
+        detection: Mapping[str, object],
+        evidence: Mapping[str, object],
+        provenance: Mapping[str, object],
+        schema_version: str = _EVIDENCE_SCHEMA_VERSION,
+        *,
+        _factory_token: object = None,
+    ) -> None:
+        if _factory_token is not _EVIDENCE_EVENT_FACTORY:
+            raise TypeError("EvidenceEvent must be created by build_evidence_event")
+        object.__setattr__(self, "event_key", _required_text(event_key, "event_key"))
+        object.__setattr__(self, "batch_id", _required_text(batch_id, "batch_id"))
+        if schema_version != _EVIDENCE_SCHEMA_VERSION:
             raise ValueError("unsupported evidence schema_version")
-        for name in ("detection", "evidence", "provenance"):
-            value = getattr(self, name)
+        object.__setattr__(self, "schema_version", schema_version)
+        for name, value in (
+            ("detection", detection),
+            ("evidence", evidence),
+            ("provenance", provenance),
+        ):
             if not isinstance(value, Mapping):
                 raise TypeError(f"{name} must be a mapping")
             object.__setattr__(self, name, _freeze(value))
+
+    @classmethod
+    def _from_validated_payload(
+        cls,
+        *,
+        event_key: str,
+        batch_id: str,
+        detection: Mapping[str, object],
+        evidence: Mapping[str, object],
+        provenance: Mapping[str, object],
+    ) -> "EvidenceEvent":
+        return cls(
+            event_key=event_key,
+            batch_id=batch_id,
+            detection=detection,
+            evidence=evidence,
+            provenance=provenance,
+            _factory_token=_EVIDENCE_EVENT_FACTORY,
+        )
 
     def to_dict(self) -> dict[str, object]:
         """Return a detached JSON-serializable schema payload."""

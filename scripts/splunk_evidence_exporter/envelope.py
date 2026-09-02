@@ -177,7 +177,7 @@ def build_evidence_event(
             }
         )
 
-    return EvidenceEvent(
+    return EvidenceEvent._from_validated_payload(
         event_key=event_key(rule_id, row),
         batch_id=batch_id,
         detection={"id": rule_id, "title": title, "severity": severity},

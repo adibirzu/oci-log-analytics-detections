@@ -12,6 +12,7 @@ import pytest
 
 from scripts.splunk_evidence_exporter import (
     AlarmTrigger,
+    EvidenceEvent,
     ExportBatch,
     QueryWindow,
     batch_events,
@@ -236,7 +237,34 @@ def test_evidence_event_is_schema_valid_excludes_original_and_redacts_secrets():
         event.batch_id = "different"
 
 
-def test_batch_events_builds_bounded_immutable_batches():
+def test_evidence_event_rejects_direct_construction_with_empty_schema_sections():
+    with pytest.raises(TypeError, match="must be created by build_evidence_event"):
+        EvidenceEvent("event-key", "batch-id", {}, {}, {})
+
+
+def test_evidence_event_rejects_direct_construction_with_non_json_field_value():
+    valid = build_evidence_event(
+        registry_entry(),
+        {"Event Type": "demo"},
+        QueryWindow(
+            start=datetime(2026, 9, 2, 6, 58, tzinfo=timezone.utc),
+            end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+        ),
+        batch_id="batch-20260902-0001",
+    ).to_dict()
+    valid["evidence"]["fields"][0]["value"] = object()
+
+    with pytest.raises(TypeError, match="must be created by build_evidence_event"):
+        EvidenceEvent(
+            event_key=valid["event_key"],
+            batch_id=valid["batch_id"],
+            detection=valid["detection"],
+            evidence=valid["evidence"],
+            provenance=valid["provenance"],
+        )
+
+
+def test_batch_events_accepts_factory_events_and_builds_bounded_immutable_batches():
     window = QueryWindow(
         start=datetime(2026, 9, 2, 6, 58, tzinfo=timezone.utc),
         end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),

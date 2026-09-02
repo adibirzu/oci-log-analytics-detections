@@ -235,8 +235,13 @@ def test_registry_allows_only_approved_public_provenance_urls(tmp_path: Path):
     provenance["source_url"] = "https://github.com/adibirzu/oci-splunk/blob/ref/file.conf"
     assert not any("source_url" in error for error in validate_registry(registry))
 
-    provenance["source_url"] = "https://splunk.private.example.com/savedsearches.conf"
-    assert any("source_url" in error for error in validate_registry(registry))
+    for invalid_url in (
+        "not-a-url",
+        "http://github.com/adibirzu/oci-splunk/blob/ref/file.conf",
+        "https://splunk.private.example.com/savedsearches.conf",
+    ):
+        provenance["source_url"] = invalid_url
+        assert any("source_url" in error for error in validate_registry(registry))
 
 
 def test_registry_requires_migration_title_to_match_canonical_query(tmp_path: Path):

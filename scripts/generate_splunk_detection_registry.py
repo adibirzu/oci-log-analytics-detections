@@ -152,11 +152,15 @@ def build_registry(config_path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
 
 def _is_allowed_public_source_url(value: str) -> bool:
     """Allow provenance links only on reviewed public source hosts."""
-    parsed = urlparse(value)
+    try:
+        parsed = urlparse(value)
+        port = parsed.port
+    except ValueError:
+        return False
     return (
         parsed.scheme == "https"
         and parsed.hostname in ALLOWED_PUBLIC_SOURCE_HOSTS
-        and parsed.port is None
+        and port is None
         and parsed.username is None
         and parsed.password is None
         and bool(parsed.path and parsed.path != "/")
@@ -219,6 +223,15 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
             for key in ("repository", "app", "version", "saved_search", "source_url"):
                 if not isinstance(entry_provenance.get(key), str) or not entry_provenance[key].strip():
                     errors.append(f"{identifier}: Splunk provenance is missing {key}")
+            source_url = entry_provenance.get("source_url")
+            if (
+                isinstance(source_url, str)
+                and source_url.strip()
+                and not _is_allowed_public_source_url(source_url)
+            ):
+                errors.append(
+                    f"{identifier}: Splunk provenance source_url must use HTTPS on an approved public source host"
+                )
         query_file = entry.get("oci_query_file")
         payload = _query_payload(query_file) if isinstance(query_file, str) else None
         if not payload:

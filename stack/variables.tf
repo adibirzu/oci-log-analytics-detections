@@ -161,12 +161,12 @@ variable "splunk_evidence_exporter_function_image_digest" {
 
 variable "splunk_evidence_exporter_hec_url" {
   type        = string
-  description = "Reviewed HTTPS Splunk HEC event endpoint"
+  description = "Reviewed HTTPS Splunk HEC /services/collector/event endpoint without userinfo, query, fragment, or credential material"
   default     = ""
 
   validation {
-    condition     = var.splunk_evidence_exporter_hec_url == "" || can(regex("^https://", var.splunk_evidence_exporter_hec_url))
-    error_message = "The Splunk HEC endpoint must use HTTPS."
+    condition     = var.splunk_evidence_exporter_hec_url == "" || can(regex("^https://[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(:([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?/services/collector/event$", var.splunk_evidence_exporter_hec_url))
+    error_message = "Use an HTTPS authority and the exact /services/collector/event path, without userinfo, query, or fragment."
   }
 }
 

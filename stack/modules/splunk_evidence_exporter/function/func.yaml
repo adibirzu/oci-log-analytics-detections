@@ -4,6 +4,6 @@ version: 0.1.0
 runtime: python
 build_image: fnproject/python:3.11-dev
 run_image: fnproject/python:3.11
-entrypoint: /python/bin/fdk /function/scripts/splunk_evidence_exporter/handler.py handler
+entrypoint: /python/bin/fdk /function/func.py handler
 memory: 512
 timeout: 120

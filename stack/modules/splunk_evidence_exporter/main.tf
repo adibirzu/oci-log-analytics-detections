@@ -32,6 +32,15 @@ locals {
     SPLUNK_EVIDENCE_OVERLAP_SECONDS          = tostring(var.splunk_evidence_overlap_seconds)
     SPLUNK_EVIDENCE_MAX_WINDOW_SECONDS       = tostring(var.splunk_evidence_max_window_seconds)
   }
+
+  # These are governed contracts, not discovered tenant alarms.  The operator
+  # reviews the metric query and explicitly enables actions separately.
+  governed_detection_alarm_ids = toset([
+    "object-storage-new-external-source", "oci-audit-failures", "oci-iam-policy-change",
+    "vcn-rejected-traffic-spike", "windows-access-administrator-logon",
+    "windows-access-failed-logon-burst", "windows-access-new-local-user",
+    "windows-access-privileged-group-add", "windows-access-rdp-after-hours",
+  ])
 }
 
 resource "oci_objectstorage_bucket" "state" {
@@ -225,5 +234,37 @@ resource "oci_monitoring_alarm" "function_errors" {
   severity              = "CRITICAL"
   message_format        = "RAW"
   body                  = "The Splunk evidence exporter Function returned an error. Review service logs and the DLQ before any replay."
+  freeform_tags         = var.freeform_tags
+}
+
+resource "oci_monitoring_alarm" "governed_detection" {
+  for_each = local.enabled ? local.governed_detection_alarm_ids : toset([])
+
+  compartment_id        = var.compartment_id
+  destinations          = [oci_ons_notification_topic.evidence[0].id]
+  display_name          = "${var.resource_name_prefix}-${each.value}"
+  is_enabled            = false
+  metric_compartment_id = var.log_analytics_compartment_id
+  namespace             = var.log_analytics_metric_namespace
+  query                 = "DetectionSignal[5m]{detectionId = \"${each.value}\"}.sum() > 0"
+  severity              = "CRITICAL"
+  message_format        = "RAW"
+  body                  = "Governed Log Analytics detection alarm; keep disabled until metric and exporter validation pass."
+  freeform_tags         = var.freeform_tags
+}
+
+resource "oci_monitoring_alarm" "exporter_delivery_failures" {
+  count = local.enabled ? 1 : 0
+
+  compartment_id        = var.compartment_id
+  destinations          = [oci_ons_notification_topic.operational_alerts[0].id]
+  display_name          = "${var.resource_name_prefix}-delivery-failures"
+  is_enabled            = var.enable_alarm_actions
+  metric_compartment_id = var.compartment_id
+  namespace             = var.exporter_telemetry_namespace
+  query                 = "DeliveryFailed[5m].sum() > 0"
+  severity              = "CRITICAL"
+  message_format        = "RAW"
+  body                  = "Splunk evidence exporter delivery failed; review Function logs and DLQ."
   freeform_tags         = var.freeform_tags
 }

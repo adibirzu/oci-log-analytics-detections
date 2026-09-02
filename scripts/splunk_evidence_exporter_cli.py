@@ -636,7 +636,7 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, obje
         "invocation_count": invocation_count,
         "stable_event_keys": (
             invocation_count == 2
-            and first_event_keys == all_event_keys[len(first_event_keys) :]
+            and all_event_keys == first_event_keys
         ),
         "duplicate_event_count": len(all_event_keys) - len(unique_event_keys),
         "initial_status": initial_status,

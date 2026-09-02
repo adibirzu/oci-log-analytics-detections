@@ -194,6 +194,17 @@ Only the module interface exposes alternative HEC acknowledgment and guardrail v
 - Duplicate invocation: stable event keys permit Splunk-side deduplication; at-least-once receipts remain.
 - Indexer-ack mode: checkpoint waits for `/services/collector/ack` confirmation, not only `ackId` issuance.
 
+### Alarm and evidence binding guardrails
+
+Use RAW Monitoring alarms only when their exact operator-configured alarm identity,
+metric namespace/name/query, allowed dimensions, and Log Analytics namespace match
+the governed registry contract. The exporter treats any notification-supplied
+custom detection ID as untrusted. It exports only the registry's explicit
+`required_fields` plus bounded identity fields; new query columns are withheld
+until reviewed. Retry delay is bounded exponential backoff with jitter, and
+checkpoint writes use Object Storage conditional writes so an older concurrent
+invocation cannot move the watermark backwards.
+
 ## Cost, retention, privacy, and cardinality
 
 Monitor bounded Log Analytics query work, Function memory/time/invocations, Notifications, Vault reads, Object Storage versions/DLQ, Logging retention, outbound egress, HEC throughput, Splunk indexing/license, and operational alarm noise. Defaults are starting guardrails, not a sizing promise or OCI/Splunk service limit.

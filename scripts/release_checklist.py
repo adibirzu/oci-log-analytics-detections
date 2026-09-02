@@ -503,21 +503,16 @@ def main() -> int:
     parser.add_argument("--refresh-splunk-parallel-example", action="store_true", help="Fail-closed two-step refresh of the self-excluded local example")
     args = parser.parse_args()
 
+    if args.refresh_splunk_parallel_example or args.write_splunk_parallel_evidence_example:
+        evidence = refresh_splunk_parallel_example()
+        print(json.dumps(evidence, indent=2, sort_keys=True))
+        return 0
     if args.splunk_parallel_offline_stage:
         if args.include_live:
             parser.error("the Splunk parallel offline stage cannot include live validation")
         evidence = run_splunk_parallel_offline_stage()
-        if args.write_splunk_parallel_evidence_example:
-            example = dict(evidence)
-            example["example"] = True
-            example["receipt_type"] = "local_example"
-            (HEALTH_DIR / "splunk-parallel-local-evidence.example.json").write_text(json.dumps(example, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(json.dumps(evidence, indent=2, sort_keys=True))
         return 0 if evidence["status"] == "PASS" else 1
-    if args.refresh_splunk_parallel_example:
-        evidence = refresh_splunk_parallel_example()
-        print(json.dumps(evidence, indent=2, sort_keys=True))
-        return 0
 
     HEALTH_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ")

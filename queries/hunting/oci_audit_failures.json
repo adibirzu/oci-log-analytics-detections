@@ -1,0 +1,17 @@
+{
+  "title": "OCI Audit Failures",
+  "description": "Alert-ready aggregation of OCI Audit control-plane operations whose parsed Status is Failure. This is a field-backed approximation of the referenced Splunk message-text search: it preserves failed 4xx/5xx activity but does not independently classify throttling when the parser does not expose it as Failure.",
+  "query": "'Log Source' = 'OCI Audit Logs' and Status = 'Failure' | stats count as AuditFailures by 'Event Type', 'User Name', Status | sort -AuditFailures",
+  "type": "hunting",
+  "hunting_type": "frequency",
+  "level": "medium",
+  "tags": ["attack.initial_access", "attack.t1078"],
+  "mitre_attack": {"tactics": ["initial_access"], "techniques": ["T1078"]},
+  "logsource": {"product": "oci", "service": "audit", "candidates": ["OCI Audit Logs"]},
+  "falsepositives": ["Expired credentials", "Denied but expected automation", "Temporary permission or service failures"],
+  "detection_rule": {"schedule": "15m", "lookback": "15m", "condition": "AuditFailures > 0"},
+  "dashboard": {"visualizationType": "summary_table", "showTitle": true, "timeSelection": {"timePeriod": "l15m"}, "visualizationOptions": {"groupBy": ["Event Type", "User Name", "Status"], "valueField": "AuditFailures"}},
+  "detection_maturity": "validated_locally",
+  "test_data_coverage": "covered",
+  "live_validation_status": "not_run"
+}

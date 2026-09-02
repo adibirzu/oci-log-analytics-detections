@@ -87,6 +87,24 @@ def vcn_flow_event(src_ip, dst_ip, src_port, dst_port, protocol="6", action="ACC
     }
 
 
+def generate_splunk_migration_vcn_flow_events():
+    """Return deterministic threshold-boundary fixtures for the Splunk migration alert."""
+    events = []
+    for source_ip, rejected_count in (("203.0.113.110", 101), ("203.0.113.111", 100)):
+        for index in range(rejected_count):
+            events.append(vcn_flow_event(
+                source_ip,
+                "192.0.2.80",
+                40000 + index,
+                443,
+                action="REJECT",
+                flow_id=f"flow-splunk-rejected-{source_ip.rsplit('.', 1)[-1]}-{index:03d}",
+                stage="splunk_migration_fixture",
+                offset=220 + index,
+            ))
+    return events
+
+
 def generate_vcn_flow_events():
     """Generate VCN Flow Log records for ingress, C2, lateral movement, and exfil."""
     events = []
@@ -241,6 +259,7 @@ def generate_vcn_flow_events():
             offset=185 + i,
         ))
 
+    events.extend(generate_splunk_migration_vcn_flow_events())
     return events
 
 

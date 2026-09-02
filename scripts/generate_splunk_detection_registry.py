@@ -10,6 +10,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import yaml
 import jsonschema
@@ -45,6 +46,7 @@ SENSITIVE_VALUE_PATTERNS = {
 }
 PLACEHOLDER_VALUE_RE = re.compile(r"(?:\$\{[A-Z0-9_]+\}|<[A-Z0-9_ -]+>)")
 LOG_SOURCE_RE = re.compile(r"['\"]Log Source['\"]\s*=\s*['\"]([^'\"]+)['\"]", re.IGNORECASE)
+ALLOWED_PUBLIC_SOURCE_HOSTS = frozenset({"github.com", "research.splunk.com"})
 
 
 def load_delivery_config(path: Path) -> dict[str, Any]:
@@ -148,6 +150,20 @@ def build_registry(config_path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     }
 
 
+def _is_allowed_public_source_url(value: str) -> bool:
+    """Allow provenance links only on reviewed public source hosts."""
+    parsed = urlparse(value)
+    return (
+        parsed.scheme == "https"
+        and parsed.hostname in ALLOWED_PUBLIC_SOURCE_HOSTS
+        and parsed.port is None
+        and parsed.username is None
+        and parsed.password is None
+        and bool(parsed.path and parsed.path != "/")
+        and not parsed.query
+    )
+
+
 def _forbidden_keys(value: Any, location: str = "registry") -> list[str]:
     if isinstance(value, dict):
         errors: list[str] = []
@@ -159,6 +175,12 @@ def _forbidden_keys(value: Any, location: str = "registry") -> list[str]:
         return errors
     if isinstance(value, list):
         return [error for index, child in enumerate(value) for error in _forbidden_keys(child, f"{location}[{index}]")]
+    if (
+        isinstance(value, str)
+        and location.endswith(".source_url")
+        and _is_allowed_public_source_url(value)
+    ):
+        return []
     if isinstance(value, str) and not PLACEHOLDER_VALUE_RE.fullmatch(value.strip()):
         return [
             f"forbidden sensitive value at {location}: {label}"
@@ -194,7 +216,7 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
         if not isinstance(entry_provenance, dict):
             errors.append(f"{identifier}: Splunk provenance is missing")
         else:
-            for key in ("repository", "app", "version", "saved_search"):
+            for key in ("repository", "app", "version", "saved_search", "source_url"):
                 if not isinstance(entry_provenance.get(key), str) or not entry_provenance[key].strip():
                     errors.append(f"{identifier}: Splunk provenance is missing {key}")
         query_file = entry.get("oci_query_file")

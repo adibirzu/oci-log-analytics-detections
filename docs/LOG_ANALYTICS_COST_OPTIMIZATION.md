@@ -49,7 +49,172 @@ The current OCI documentation says:
 - Recalled data counts toward active storage until it is released.
 - Recall requests are billed based on the active storage they generate.
 
-Those are service behaviors, not project conventions. Recheck the current OCI documentation before final customer rollout because service details can change.
+These facts were checked against Oracle documentation on 2026-09-02. They are
+time-sensitive service behaviors, not project conventions. Recheck the
+current [Manage Storage](https://docs.oracle.com/en-us/iaas/log-analytics/doc/manage-storage.html)
+and [other administration actions](https://docs.oracle.com/en-us/iaas/log-analytics/doc/administer-other-actions.html)
+documentation immediately before execution because eligibility, retention,
+command parameters, and pricing can change. This guide intentionally contains
+no numeric price; use the [Oracle Cloud price list](https://www.oracle.com/cloud/price-list/)
+for a current estimate. Archive may reduce active-storage pressure, but there
+are recall, ingest, query, and operational costs: there is no guaranteed savings.
+
+## Ownership and prerequisites
+
+Name these owners in the change record before touching a tenancy:
+
+- service owner: approves the Log Analytics namespace, log groups, source scope, and active/archive policy;
+- security and privacy owner: approves fields, residency, access, legal hold, and purge conditions;
+- incident owner: approves a bounded recall interval and confirms when analysis is complete;
+- cost owner: reviews Monitoring and Billing trends, forecasts, and duplicate Splunk volume;
+- IAM/network owner: reviews policies, compartments, endpoints, and any private access path;
+- validation approver: accepts evidence and the rollback/cleanup record.
+
+Prerequisites are an identified tenancy/profile and region, exact compartment and
+Log Analytics namespace, an approved source and retention inventory, a saved
+rollback record, and a maintenance window. Confirm that the current Oracle
+documentation says the namespace is eligible for archiving (the currently
+documented 1 TB active-data and 30-day active-storage prerequisites are
+time-sensitive). Do not infer provider readiness from local files, a successful
+CLI login, or an HTTP response.
+
+## IAM boundary
+
+Use the [Oracle Log Analytics IAM policies catalog](https://docs.oracle.com/en-us/iaas/log-analytics/doc/iam-policies-catalog-logging-analytics.html)
+to select the narrowest policy for the named compartment and namespace. A
+read-only inspector needs `read loganalytics-storage` for usage inspection and
+read access to the relevant Monitoring metrics. Recall and release use
+`use loganalytics-storage` plus `manage loganalytics-storage-work-request`;
+they are separate reviewed change boundaries. Enabling, disabling, updating,
+or estimating purge size uses `manage loganalytics-storage`. Purge execution is
+separate and requires the catalog's additional purge permissions, including
+`LOG_ANALYTICS_STORAGE_PURGE`, `LOG_ANALYTICS_QUERY_VIEW`,
+`LOG_ANALYTICS_STORAGE_WORK_REQUEST_CREATE`,
+`LOG_ANALYTICS_LOG_GROUP_DELETE_LOGS`, and
+`LOG_ANALYTICS_QUERYJOB_WORK_REQUEST_READ`; review the [Oracle purge IAM
+procedure](https://docs.oracle.com/en-us/iaas/log-analytics/doc/manage-storage.html#AllowUsersToPurgeLogData)
+before granting it. Do not grant tenancy-wide manage access to an operator who
+only needs inspection.
+
+## Manual Console workflow
+
+1. Select the approved profile, region, compartment, and Log Analytics namespace.
+2. Open Log Analytics storage administration and record active, archive, and
+   recalled-in-active usage before making a change.
+3. Review the documented eligibility and retention values; save a screenshot or
+   redacted export with the change record, without log payloads or OCIDs.
+4. With the service owner and IAM reviewer present, enable archiving only for
+   the approved namespace and retention policy.
+5. For an investigation, request recall for the smallest approved interval,
+   search only after recall is complete, and release recalled data when analysis
+   ends. Archived data is not active/searchable until recalled.
+6. Purge only under a separate, approved retention/legal-hold procedure. Purge
+   is destructive and is not a rollback mechanism. Archived data is not immediately searchable;
+   recall must complete first.
+
+## Read-only OCI CLI inspection
+
+These examples inspect only. Substitute approved values in a shell that does not
+log secrets, and confirm the current command help before use:
+
+```bash
+oci log-analytics storage get-storage-usage \
+  --namespace-name "$LOG_ANALYTICS_NAMESPACE"
+oci monitoring metric-data summarize-metrics-data \
+  --namespace "oci_logging_analytics" \
+  --query-text 'ActiveStorageUsed[1h].max()' \
+  --compartment-id "$COMPARTMENT_OCID"
+```
+
+Expected output is a JSON response containing the requested usage or metric
+datapoints and timestamps. It is local/configured inspection evidence only;
+successful output does not prove archive eligibility, provider acceptance, or
+customer approval.
+
+## Approval-gated CLI templates
+
+The following are exact OCI CLI command templates for documented Log Analytics
+storage operations. Oracle command parameters can change, so run each command's
+current `--help` and update the change record before execution. Every mutating
+command requires explicit written approval bound to profile, region,
+compartment, namespace, interval, owner, cost, and rollback. Do not paste real
+OCIDs, credentials, or log content into this guide.
+
+```bash
+# Review current syntax first; this command is read-only.
+oci log-analytics storage enable-archiving --help
+
+# Enablement: execute only after archive-eligibility and IAM approval.
+oci log-analytics storage enable-archiving \
+  --namespace-name "$LOG_ANALYTICS_NAMESPACE"
+
+# Recall sizing: read-only estimate for the approved interval.
+oci log-analytics storage estimate-recall-data-size \
+  --namespace-name "$LOG_ANALYTICS_NAMESPACE" \
+  --time-data-started "$START_TIME" \
+  --time-data-ended "$END_TIME"
+
+# Recall and release: each requires separate approval and a saved receipt.
+oci log-analytics storage recall-archived-data \
+  --compartment-id "$COMPARTMENT_OCID" \
+  --namespace-name "$LOG_ANALYTICS_NAMESPACE" \
+  --time-data-started "$START_TIME" \
+  --time-data-ended "$END_TIME"
+oci log-analytics storage release-recalled-data \
+  --compartment-id "$COMPARTMENT_OCID" \
+  --namespace-name "$LOG_ANALYTICS_NAMESPACE" \
+  --time-data-started "$START_TIME" \
+  --time-data-ended "$END_TIME"
+```
+
+The `get-storage-usage` command returns a JSON usage payload, the Monitoring
+command returns metric datapoints, `enable-archiving` returns an operation
+response, and `estimate-recall-data-size` returns an estimate.
+`recall-archived-data` and `release-recalled-data` return work-request
+responses. Poll their documented operation status, confirm the intended
+interval, and record the work-request
+identifier with sensitive values removed. Not every operation returns a work-request.
+No output proves that data is searchable. Purge command is not provided here;
+destructive purge requires a separate retention procedure and approval.
+
+## Validation and evidence
+
+Capture the before/after storage metrics, operation status, selected interval,
+query result count, release confirmation, and owner sign-off. Label each receipt
+as `code-backed`, `configured`, `locally verified`, `provider verified`, or
+`release accepted`; do not promote one class into another. For this repository,
+documentation and focused tests are **evidence class: locally verified**.
+Provider validation: not_run. Customer acceptance: unverified.
+
+Validation should show that recent data remains searchable, archived data became
+searchable only after recall, recalled usage decreases after release, and no
+unexpected fields were exported to Splunk. A rendered Console page or HTTP 200
+alone is insufficient evidence.
+
+## Failure modes
+
+| Symptom | Likely cause | Safe response |
+|---|---|---|
+| Archive enablement rejected | Namespace or active-data eligibility is not met | Stop; recheck current Oracle prerequisites and do not bypass them |
+| Recall request fails or is delayed | Invalid interval, insufficient IAM, or service/work-request issue | Keep the interval bounded, inspect the work request, and escalate to the service owner |
+| Active usage stays high | Recalled data was not released or ingest grew | Confirm release status, then review source volume and retention owners |
+| Metrics are missing | Wrong Monitoring namespace/compartment or permissions | Correct scope and read-only policy; do not infer zero usage |
+| Splunk volume rises unexpectedly | Mode 1 raw duplication or an unbounded Mode 2 exporter | Pause the approved path, preserve evidence, and review field/volume limits |
+
+## Rollback and cleanup
+
+For a failed or abandoned change, stop further enablement, retain the sanitized
+operation receipt, release recalled data after the incident owner confirms no
+active analysis depends on it, and restore the prior documented retention
+configuration through the Console or approved change tooling. Do not delete
+logs to make a metric look healthy. Remove temporary exports, local shell
+history, downloaded receipts, and temporary access grants according to the
+security owner’s cleanup record. Purge remains destructive, separately approved,
+and irreversible for the purged interval.
+
+## Security and privacy
+
+Apply [Oracle's Log Analytics security guidance](https://docs.oracle.com/en-us/iaas/log-analytics/doc/security-your-logs-logging-analytics.html): minimize sensitive fields, restrict namespace and compartment access, encrypt transport and storage, and honor legal holds and residency requirements. Redact OCIDs, hostnames, user identifiers, tokens, query payloads, and customer data from evidence packets. For Mode 2, export bounded detection evidence by default; for Mode 1, explicitly approve the larger raw-copy exposure and duplicate retention. Native Log Analytics archive is not an operator-managed Object Storage Archive bucket. Object Storage Archive is an optional separate cold-storage pattern that requires its own IAM, lifecycle, restore, re-ingestion, and privacy review.
 
 ## Manual operator process
 
@@ -232,11 +397,14 @@ For Splunk parallel paths, pair this guide with:
 ## Reference set
 
 - [Oracle Log Analytics: Manage Storage](https://docs.oracle.com/en-us/iaas/log-analytics/doc/manage-storage.html)
-- [Oracle Log Analytics: Monitor service metrics](https://docs.oracle.com/iaas/log-analytics/doc/administer-other-actions.html)
+- [Oracle Log Analytics: Monitor service metrics](https://docs.oracle.com/en-us/iaas/log-analytics/doc/administer-other-actions.html)
+- [Oracle Log Analytics: IAM policies catalog](https://docs.oracle.com/en-us/iaas/log-analytics/doc/iam-policies-catalog-logging-analytics.html)
+- [Oracle Log Analytics: Security for your logs](https://docs.oracle.com/en-us/iaas/log-analytics/doc/security-your-logs-logging-analytics.html)
 - [OCI CLI: Log Analytics storage commands](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/log-analytics/storage.html)
 - [Log Analytics release note: Recalled Storage in Active Storage Used metric](https://docs.oracle.com/en-us/iaas/releasenotes/log-analytics/apr25-storage-mon-metric.htm)
 - [OCI Billing and Cost Management](https://docs.oracle.com/en-us/iaas/Content/Billing/home.htm)
 - [OCI budget alert rules](https://docs.oracle.com/en-us/iaas/Content/Billing/Tasks/managingalertrules.htm)
+- [Oracle Cloud price list](https://www.oracle.com/cloud/price-list/)
 - [A-Team: OCI Logging Analytics Best Practices Series - Cost Optimization](https://www.ateam-oracle.com/oci-logging-analytics-best-practices-series-cost-optimization)
 
 Use the A-Team article as supplemental design reading. Use current Oracle documentation for operational facts, limits, and rollout decisions.

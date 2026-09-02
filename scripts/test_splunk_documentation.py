@@ -208,6 +208,101 @@ def test_cost_optimization_guide_covers_archive_workflow_and_sources() -> None:
     assert "https://www.ateam-oracle.com/oci-logging-analytics-best-practices-series-cost-optimization" in text
 
 
+def test_cost_guide_has_operational_anchors_and_authoritative_sources() -> None:
+    text = _read(COST_GUIDE)
+    for anchor in (
+        "## Ownership and prerequisites",
+        "## IAM boundary",
+        "## Manual Console workflow",
+        "## Read-only OCI CLI inspection",
+        "## Approval-gated CLI templates",
+        "## Validation and evidence",
+        "## Failure modes",
+        "## Rollback and cleanup",
+        "## Security and privacy",
+    ):
+        assert anchor in text
+    for url in (
+        "https://docs.oracle.com/en-us/iaas/log-analytics/doc/manage-storage.html",
+        "https://docs.oracle.com/en-us/iaas/log-analytics/doc/administer-other-actions.html",
+        "https://docs.oracle.com/en-us/iaas/log-analytics/doc/iam-policies-catalog-logging-analytics.html",
+        "https://docs.oracle.com/en-us/iaas/log-analytics/doc/security-your-logs-logging-analytics.html",
+        "https://www.oracle.com/cloud/price-list/",
+        "https://www.ateam-oracle.com/oci-logging-analytics-best-practices-series-cost-optimization",
+    ):
+        assert url in text
+
+
+def test_cost_guide_labels_evidence_and_keeps_archive_claims_conservative() -> None:
+    text = _read(COST_GUIDE)
+    normalized = text.lower()
+    assert "evidence class: locally verified" in normalized
+    assert "provider validation: not_run" in normalized
+    assert "customer acceptance: unverified" in normalized
+    assert "not immediately searchable" in normalized
+    assert "not an operator-managed object storage archive bucket" in normalized
+    assert "no guaranteed savings" in normalized
+    assert "recheck" in normalized
+    assert "price" in normalized and "numeric" in normalized
+    assert "/users/" not in normalized
+    forbidden = (
+        "archive data is immediately searchable",
+        "archive data is instantly searchable",
+        "archive guarantees savings",
+        "object storage archive bucket is the log analytics archive",
+    )
+    for claim in forbidden:
+        assert claim not in normalized
+
+
+def test_cost_guide_cli_mutations_are_explicitly_approval_gated() -> None:
+    text = _read(COST_GUIDE)
+    inspection = text.index("## Read-only OCI CLI inspection")
+    templates = text.index("## Approval-gated CLI templates")
+    assert inspection < templates
+    for command in (
+        "oci log-analytics storage get-storage-usage",
+        "oci log-analytics storage enable-archiving",
+        "oci log-analytics storage estimate-recall-data-size",
+        "oci log-analytics storage recall-archived-data",
+        "oci log-analytics storage release-recalled-data",
+    ):
+        assert command in text
+    gated = text[templates:]
+    assert "explicit written approval" in gated.lower()
+    assert "purge" not in gated.lower() or "not provided" in gated.lower()
+
+
+def test_cost_guide_uses_supported_cli_parameters_and_monitoring_namespace() -> None:
+    text = _read(COST_GUIDE)
+    inspection = text[text.index("## Read-only OCI CLI inspection") : text.index("## Approval-gated CLI templates")]
+    assert "oci log-analytics storage get-storage-usage" in inspection
+    assert '--namespace-name "$LOG_ANALYTICS_NAMESPACE"' in inspection
+    assert "--compartment-id \"$COMPARTMENT_OCID\"" not in inspection.split("oci monitoring", 1)[0]
+    assert '--namespace "oci_logging_analytics"' in inspection
+    templates = text[text.index("## Approval-gated CLI templates") : text.index("## Validation and evidence")]
+    for option in ("--time-data-started", "--time-data-ended"):
+        assert option in templates
+    assert "--time-interval-start" not in templates
+    assert "--time-interval-end" not in templates
+
+
+def test_cost_guide_iam_boundaries_and_command_outputs_are_distinct() -> None:
+    text = _read(COST_GUIDE)
+    normalized = text.lower()
+    assert "read loganalytics-storage" in normalized
+    assert "use loganalytics-storage" in normalized
+    assert "manage loganalytics-storage-work-request" in normalized
+    assert "manage loganalytics-storage" in normalized
+    assert "recall and release use\n`use loganalytics-storage`" in normalized
+    assert "recall and release use\n`manage loganalytics-storage`" not in normalized
+    assert "purge execution" in normalized
+    assert "log_analytics_storage_purge" in normalized
+    assert "not every operation returns a work-request" in normalized
+    assert "`enable-archiving` returns" in normalized
+    assert "`recall-archived-data` and `release-recalled-data` return" in normalized
+
+
 def test_contributor_release_guidance_links_classified_local_evidence_example() -> None:
     contributing = _read(ROOT / "CONTRIBUTING.md")
     evidence = json.loads(_read(LOCAL_EVIDENCE_EXAMPLE))

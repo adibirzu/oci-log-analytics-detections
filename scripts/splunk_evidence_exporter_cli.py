@@ -284,7 +284,7 @@ def _validate_payload(path: Path) -> dict[str, object]:
     if not isinstance(detections, list):
         raise RuntimeError("detection registry is invalid")
     known_ids = {entry.get("id") for entry in detections if isinstance(entry, Mapping)}
-    if trigger.detection_id not in known_ids:
+    if trigger.detection_id is not None and trigger.detection_id not in known_ids:
         raise ValueError("alarm detection is not present in the registry")
     return _offline(
         {
@@ -292,6 +292,7 @@ def _validate_payload(path: Path) -> dict[str, object]:
             "status": "valid",
             "payload_kind": "monitoring-alarm",
             "detection_id": trigger.detection_id,
+            "alarm_id": trigger.alarm_id,
             "dimension_count": len(trigger.dimensions),
             "contains_credentials": False,
             "evidence_class": "locally_verified",

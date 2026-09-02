@@ -283,6 +283,13 @@ def valid_registry_entry():
             "include_original_content": POLICY["defaults"]["include_original_content"],
             "redaction_profile": None,
         },
+        "alarm_contract": {
+            "binding_key": "oci-console-login-failure",
+            "metric_namespace": "oci_log_analytics_detections",
+            "metric_name": "DetectionSignal",
+            "query": "DetectionSignal[5m]{detectionId = \"oci-console-login-failure\"}.sum() > 0",
+            "allowed_dimensions": {"detectionId": "oci-console-login-failure"},
+        },
     }
 
 

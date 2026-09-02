@@ -96,6 +96,12 @@ def build_service() -> EvidenceExportService:
         query_loader=_load_query,
         clock=lambda: datetime.now(timezone.utc),
     )
+    try:
+        alarm_bindings = json.loads(os.environ.get("SPLUNK_ALARM_BINDINGS", "{}"))
+    except json.JSONDecodeError:
+        raise RuntimeError("exporter alarm bindings are invalid") from None
+    if not isinstance(alarm_bindings, Mapping) or not all(isinstance(key, str) and isinstance(value, str) for key, value in alarm_bindings.items()):
+        raise RuntimeError("exporter alarm bindings are invalid")
     return EvidenceExportService(
         registry=_JsonRegistry(
             Path(
@@ -148,6 +154,8 @@ def build_service() -> EvidenceExportService:
         max_attempts=_environment_int(
             "SPLUNK_EVIDENCE_MAX_ATTEMPTS", 4, minimum=1, maximum=10
         ),
+        alarm_bindings=alarm_bindings,
+        log_analytics_namespace=_required_environment("OCI_LOG_ANALYTICS_NAMESPACE"),
     )
 
 

@@ -18,6 +18,8 @@ locals {
     SPLUNK_EVIDENCE_STATE_BUCKET             = local.state_bucket_name
     SPLUNK_EVIDENCE_DLQ_BUCKET               = local.dlq_bucket_name
     OCI_LOG_ANALYTICS_COMPARTMENT_ID         = var.log_analytics_compartment_id
+    OCI_LOG_ANALYTICS_NAMESPACE              = var.log_analytics_namespace
+    SPLUNK_ALARM_BINDINGS                    = jsonencode({ for binding_key, alarm_id in var.splunk_alarm_ids : alarm_id => binding_key })
     OCI_LOG_ANALYTICS_COMPARTMENT_IN_SUBTREE = tostring(var.log_analytics_compartment_in_subtree)
     SPLUNK_HEC_SECRET_ID                     = var.splunk_hec_secret_id
     SPLUNK_HEC_URL                           = var.splunk_hec_url

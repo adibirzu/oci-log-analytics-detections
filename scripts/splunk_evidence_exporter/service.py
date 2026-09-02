@@ -141,6 +141,8 @@ class EvidenceExportService:
         max_attempts: int = 4,
         sleep: Callable[[float], None] = time.sleep,
         random_fraction: Callable[[], float] = random.random,
+        alarm_bindings: Mapping[str, str] | None = None,
+        log_analytics_namespace: str | None = None,
     ) -> None:
         self._registry = registry
         self._query = query
@@ -156,6 +158,8 @@ class EvidenceExportService:
         self._max_attempts = _runtime_maximum(max_attempts, "max_attempts")
         self._sleep = sleep
         self._random_fraction = random_fraction
+        self._alarm_bindings = dict(alarm_bindings or {})
+        self._log_analytics_namespace = log_analytics_namespace
         # Invocation-local duplicate guard.  Persistent checkpoint/CAS prevents
         # out-of-order watermarks; an externally durable delivery ledger is a
         # separate deployment concern and is deliberately not implied here.
@@ -163,7 +167,7 @@ class EvidenceExportService:
 
     def export(self, trigger: AlarmTrigger) -> ExportReceipt:
         registry_document = self._registry.load()
-        entry = self._find_entry(registry_document, trigger)
+        entry = self._find_entry(registry_document, trigger, self._alarm_bindings)
         detection_id = entry["id"]
         self._validate_alarm_contract(entry, trigger)
         delivery = entry.get("delivery", {})
@@ -192,7 +196,7 @@ class EvidenceExportService:
         )
         rows = tuple(
             self._query.query_evidence(
-                namespace=trigger.namespace,
+                namespace=self._log_analytics_namespace or trigger.namespace,
                 query_file=entry["oci_query_file"],
                 window=window,
                 dimensions=trigger.dimensions,
@@ -200,13 +204,13 @@ class EvidenceExportService:
             )
         )
         batch_id = self._batch_id(trigger, detection_id)
-        unique_rows: dict[str, Mapping[str, object]] = {}
+        # Build/allowlist/redact before deduplication; a new unreviewed query
+        # column must never cause a second export of the same governed evidence.
+        unique_events: dict[str, object] = {}
         for row in rows:
-            unique_rows.setdefault(event_key(detection_id, row, window), row)
-        events = tuple(
-            build_evidence_event(entry, row, window, batch_id)
-            for row in unique_rows.values()
-        )
+            event = build_evidence_event(entry, row, window, batch_id)
+            unique_events.setdefault(event.event_key, event)
+        events = tuple(unique_events.values())
         events = tuple(event for event in events if event.event_key not in self._delivered_event_keys)
         batches = batch_events(events, max_batch_events)
 
@@ -275,7 +279,7 @@ class EvidenceExportService:
         )
 
     @staticmethod
-    def _find_entry(document: object, trigger: AlarmTrigger) -> Mapping[str, object]:
+    def _find_entry(document: object, trigger: AlarmTrigger, alarm_bindings: Mapping[str, str]) -> Mapping[str, object]:
         if not isinstance(document, Mapping):
             raise ValueError("registry document must be an object")
         detections = document.get("detections")
@@ -285,7 +289,8 @@ class EvidenceExportService:
             if not isinstance(entry, Mapping):
                 continue
             contract = entry.get("alarm_contract")
-            if trigger.alarm_id is not None and isinstance(contract, Mapping) and contract.get("alarm_id") == trigger.alarm_id:
+            bound_key = alarm_bindings.get(trigger.alarm_id or "")
+            if trigger.alarm_id is not None and isinstance(contract, Mapping) and contract.get("binding_key") == bound_key:
                 return entry
             if trigger.alarm_id is None and trigger.detection_id is not None and entry.get("id") == trigger.detection_id:
                 return entry
@@ -296,10 +301,10 @@ class EvidenceExportService:
         if trigger.alarm_id is None:
             return
         contract = entry.get("alarm_contract")
-        required = ("alarm_id", "metric_namespace", "metric_name", "query", "log_analytics_namespace", "allowed_dimensions")
+        required = ("binding_key", "metric_namespace", "metric_name", "query", "allowed_dimensions")
         if not isinstance(contract, Mapping) or any(key not in contract for key in required):
             raise ValueError("governed alarm contract is incomplete")
-        if (contract["alarm_id"] != trigger.alarm_id or contract["metric_namespace"] != trigger.namespace or contract["metric_name"] != trigger.metric_name or contract["query"] != trigger.query or contract["log_analytics_namespace"] != trigger.namespace):
+        if (contract["metric_namespace"] != trigger.namespace or contract["metric_name"] != trigger.metric_name or contract["query"] != trigger.query):
             raise ValueError("alarm contract mismatch")
         if not isinstance(contract["allowed_dimensions"], Mapping) or dict(contract["allowed_dimensions"]) != dict(trigger.dimensions):
             raise ValueError("alarm dimensions do not match the governed contract")

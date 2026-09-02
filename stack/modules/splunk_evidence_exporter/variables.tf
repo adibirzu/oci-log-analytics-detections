@@ -40,6 +40,19 @@ variable "log_analytics_compartment_id" {
   default     = ""
 }
 
+variable "log_analytics_namespace" {
+  type        = string
+  description = "Trusted Log Analytics tenancy namespace; never taken from alarm payloads"
+  default     = ""
+}
+
+variable "splunk_alarm_ids" {
+  type        = map(string)
+  description = "Operator-configured map of governed detection binding keys to exact Monitoring alarm OCIDs"
+  default     = {}
+  sensitive   = true
+}
+
 variable "log_analytics_compartment_in_subtree" {
   type        = bool
   description = "Whether bounded queries include subcompartments"

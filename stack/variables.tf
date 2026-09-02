@@ -99,6 +99,13 @@ variable "enable_splunk_evidence_exporter_alarm_actions" {
   default     = false
 }
 
+variable "splunk_evidence_exporter_alarm_ids" {
+  type        = map(string)
+  description = "Reviewed map from governed detection binding key to exact Monitoring alarm OCID"
+  default     = {}
+  sensitive   = true
+}
+
 variable "enable_splunk_evidence_exporter_subscription" {
   type        = bool
   description = "Enable the exact Notifications-to-Function subscription after review"

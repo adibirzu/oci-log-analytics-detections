@@ -64,9 +64,18 @@ def test_local_success_uses_service_and_commits_only_after_mock_hec_delivery():
     assert receipt["scenario_counts"]["delivered"] == 3
     assert set(receipt["artifact_hashes"]) == {
         "scripts/fixtures/splunk_evidence/alarm.json",
+        "scripts/fixtures/splunk_evidence/oci_raw_alarm.json",
         "scripts/fixtures/splunk_evidence/hec_responses.json",
         "scripts/fixtures/splunk_evidence/query_rows.json",
     }
+
+
+def test_checked_in_provider_raw_alarm_fixture_is_accepted_without_a_custom_detection_id():
+    result = run_cli("validate-payload", "--file", "scripts/fixtures/splunk_evidence/oci_raw_alarm.json")
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["alarm_id"] == "redacted-alarm-id"
+    assert payload["detection_id"] is None
 
 
 @pytest.mark.parametrize(

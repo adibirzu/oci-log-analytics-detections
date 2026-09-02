@@ -103,7 +103,7 @@ variable "function_image" {
 
 variable "function_image_digest" {
   type        = string
-  description = "Optional immutable digest for the reviewed exporter image"
+  description = "Required immutable sha256 digest for the reviewed exporter image when enabled"
   default     = ""
 }
 

@@ -1,7 +1,7 @@
 {
   "title": "Windows Failed Logon Burst by Source",
   "description": "Alert-ready search for more than 10 Security Event 4625 failures from one source address in the five-minute scheduled-search window.",
-  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4625' | stats count as FailedLogons by 'Source Address', 'Target User Name', 'Host Name (Server)' | where FailedLogons > 10 | sort -FailedLogons",
+"query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4625' | stats count as FailedLogons, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Log Source', 'Source Address', 'Target User Name', 'Host Name (Server)' | where FailedLogons > 10 | sort -FailedLogons",
   "type": "hunting",
   "hunting_type": "frequency",
   "level": "high",

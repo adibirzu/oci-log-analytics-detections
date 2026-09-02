@@ -134,8 +134,8 @@ resource "oci_functions_function" "exporter" {
 
   application_id     = oci_functions_application.exporter[0].id
   display_name       = "${var.resource_name_prefix}-function"
-  image              = var.function_image
-  image_digest       = var.function_image_digest != "" ? var.function_image_digest : null
+  image              = "${var.function_image}@${var.function_image_digest}"
+  image_digest       = var.function_image_digest
   memory_in_mbs      = var.function_memory_in_mbs
   timeout_in_seconds = var.function_timeout_in_seconds
   config             = local.function_config
@@ -145,6 +145,11 @@ resource "oci_functions_function" "exporter" {
     precondition {
       condition     = var.function_image != ""
       error_message = "A reviewed OCI Registry image reference is required when the exporter is enabled."
+    }
+
+    precondition {
+      condition     = can(regex("^sha256:[0-9a-f]{64}$", var.function_image_digest))
+      error_message = "A non-empty sha256 image digest is required when the exporter is enabled."
     }
 
     precondition {

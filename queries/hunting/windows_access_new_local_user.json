@@ -1,7 +1,7 @@
 {
   "title": "Windows New Local User Created",
   "description": "Alert-ready search for Security Event 4720, indicating that a user account was created on a monitored Windows host.",
-  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4720' | stats count as UsersCreated by 'Target User Name', 'Subject User Name', 'Host Name (Server)' | sort -UsersCreated",
+"query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4720' | stats count as UsersCreated, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Log Source', 'Target User Name', 'Subject User Name', 'Host Name (Server)' | sort -UsersCreated",
   "type": "hunting",
   "hunting_type": "persistence",
   "level": "high",

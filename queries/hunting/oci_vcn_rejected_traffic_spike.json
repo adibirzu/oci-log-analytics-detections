@@ -1,7 +1,7 @@
 {
   "title": "OCI VCN Rejected Traffic Spike",
   "description": "Alert-ready aggregation for a source address producing more than 100 rejected VCN flow records in the ten-minute scheduled-search window. This preserves the threshold behavior of the referenced Splunk alert while using OCI Log Analytics display fields.",
-  "query": "'Log Source' = 'SOC VCN Flow Logs' and 'Action' = 'REJECT' | stats count as RejectedFlows by 'Source IP' | where RejectedFlows > 100 | sort -RejectedFlows",
+"query": "'Log Source' = 'SOC VCN Flow Logs' and 'Action' = 'REJECT' | stats count as RejectedFlows, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Log Source', 'Source IP' | where RejectedFlows > 100 | sort -RejectedFlows",
   "type": "hunting",
   "hunting_type": "frequency",
   "level": "high",

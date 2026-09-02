@@ -69,21 +69,16 @@ def event_key(
     """Return a deterministic key over governed evidence identity only.
 
     A query can add columns over time.  The caller supplies an already
-    allowlisted row, and the window makes a repeated alarm invocation stable
-    without conflating two otherwise identical events from different windows.
+    allowlisted row; identity uses event time, never a moving query window.
     """
 
     if not isinstance(rule_id, str) or not rule_id.strip():
         raise ValueError("rule_id must be a non-empty string")
     if not isinstance(row, Mapping):
         raise TypeError("row must be a mapping")
+    if window is not None and not isinstance(window, QueryWindow):
+        raise TypeError("window must be a QueryWindow")
     identity: dict[str, object] = {"detection_id": rule_id, "row": normalize_for_hash(row)}
-    if window is not None:
-        if not isinstance(window, QueryWindow):
-            raise TypeError("window must be a QueryWindow")
-        # The alarm/end watermark is stable across a retried invocation while
-        # the overlap start may move after a concurrent checkpoint commit.
-        identity["window_end"] = _normalize_datetime(window.end)
     canonical = json.dumps(
         identity,
         sort_keys=True,
@@ -182,7 +177,7 @@ def build_evidence_event(
         raise ValueError("registry required_fields must be an explicit export allowlist")
     # Time and common source/entity columns support repeatable evidence identity;
     # every other field must be governed by the registry.
-    identity_fields = {"Time", "Log Source", "Entity"}
+    identity_fields = {"Time", "FirstSeen", "LastSeen", "Log Source", "Entity"}
     allowed_names = set(allowed) | identity_fields
     sanitized_row = {name: row[name] for name in row if name in allowed_names}
     fields: list[dict[str, object]] = []

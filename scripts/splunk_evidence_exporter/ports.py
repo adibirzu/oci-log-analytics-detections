@@ -7,7 +7,7 @@ the bounded retry and checkpoint policy around adapter delivery attempts.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Mapping, Protocol, Sequence, runtime_checkable
 
 from .models import ExportBatch
@@ -66,6 +66,24 @@ class QuarantinePort(Protocol):
         dimensions: Mapping[str, str] | None = None,
         checkpoint: datetime | None = None,
     ) -> None: ...
+
+
+@runtime_checkable
+class DeliveryLedgerPort(Protocol):
+    """Durably reserve evidence keys before delivery and record confirmation."""
+
+    def reserve(self, event_key: str, *, now: datetime, lease: timedelta) -> bool: ...
+
+    def mark_delivered(self, event_key: str, *, now: datetime) -> None: ...
+
+    def release(self, event_key: str) -> None: ...
+
+
+@runtime_checkable
+class MetricsPort(Protocol):
+    """Emit bounded exporter operational metrics; values contain no evidence."""
+
+    def emit(self, name: str, value: int, dimensions: Mapping[str, str]) -> None: ...
 
 
 # Vocabulary aliases keep later adapters readable without adding behavior.

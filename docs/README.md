@@ -13,6 +13,10 @@ This directory is the wiki-style guide to using, operating, extending, and deplo
 | Establish the first Log Analytics data path | [Fast Onboarding Track](FAST_ONBOARDING_TRACK.md) | IAM, ingestion choice, canary sources, validation, and rollout ownership |
 | Find, run, customize, and validate queries | [Using Log Analytics Queries](LOG_ANALYTICS_QUERY_USAGE.md) | Console, OCL, repository, and live-validation workflow |
 | Plan a migration or SIEM-forwarding design | [Migration and Security Guide](MIGRATION_AND_SECURITY_GUIDE.md) | A phased telemetry, detection, and export plan |
+| Choose raw or evidence delivery to Splunk | [Splunk Parallel Operations](SPLUNK_PARALLEL_OPERATIONS.md) | Mode 1, Mode 2, hybrid/on-prem policy, ownership, and steady-state operations |
+| Migrate Splunk analytics | [Splunk Rule Migration](SPLUNK_RULE_MIGRATION.md) | Provenance, source/field translation, detection gates, and fidelity |
+| Deploy the evidence exporter | [Splunk Evidence Export Runbook](SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md) | Console steps plus separated plan, build, apply, canary, and replay approvals |
+| Prove Splunk delivery end to end | [Splunk E2E Validation](SPLUNK_E2E_VALIDATION.md) | Local failure matrix and independent provider/Splunk acceptance layers |
 | Deploy the supported package | [Deployment Guide](DEPLOYMENT.md) | Resource Manager plan/apply with customer-owned identity |
 | Build third-party SIEM parsers | [`queries/siem_log_examples.json`](../queries/siem_log_examples.json) and [Webapp Guide](WEBAPP.md) | Placeholder-safe OCI envelopes and normalized detection events |
 | Investigate and demonstrate attacks | [Threat Hunting Walkthrough](THREAT_HUNTING_WALKTHROUGH.md) | Evidence-driven analyst pivots |
@@ -38,6 +42,7 @@ This directory is the wiki-style guide to using, operating, extending, and deplo
 - Forge is a preparation and handoff surface. OCI Resource Manager, under the customer's identity, owns plan and apply.
 - A detection is deployable only when its source, parser fields, query contract, and dashboard references are validated.
 - Export raw events only when required. Prefer forwarding selected, enriched Log Analytics detection events to downstream SIEMs.
+- Treat raw fan-out and detection-evidence export as separate products. A connector, Function invocation, or HEC response is not by itself end-to-end acceptance.
 
 ## Automation and release workflows
 
@@ -61,3 +66,6 @@ The protected live workflows never run from untrusted pull requests. A missing c
 - `queries/siem_log_examples.json`: redacted source envelopes and normalized SIEM event examples
 - `queries/log_source_field_dictionary.json`: parser/source field contract
 - `queries/detection_rule_specs.json`: detection-rule specifications
+- `queries/splunk_detection_registry.json`: generated Splunk provenance, canonical query, source/field, fidelity, and delivery mapping
+- `config/splunk_parallel_delivery.yaml`: source/detection delivery policy and tenant-neutral HEC placeholders
+- `schemas/splunk_evidence_event.schema.json`: normalized Mode 2 HEC evidence contract

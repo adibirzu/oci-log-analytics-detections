@@ -208,6 +208,16 @@ and [Architecture of Log Analytics](https://docs.oracle.com/en-us/iaas/log-analy
 Cross-tenancy collection is intentionally not a fast-track default; design and
 review the `admit`/`endorse` policies separately.
 
+### Optional Splunk parallel branch
+
+Choose per source, after Log Analytics collection/parsing proof:
+
+- **Mode 1 raw:** add a separate Logging → Connector Hub → Streaming route and use a reviewed pinned `adibirzu/oci-splunk` tag/commit for the consumer/HEC path. Do not change the Log Analytics connector or track mutable `main` in production.
+- **Mode 2 evidence:** keep Log Analytics as source of truth; enable a migrated detection rule, prove its Monitoring metric, then use the alarm → Notifications → Function → bounded query → HEC path.
+- **Hybrid:** record both choices and accept duplicate-ingest, retention, privacy, egress, and Splunk-license costs explicitly.
+
+On-premises Management Agent sources, optionally proxied by Management Gateway, can use Mode 2 after entity/source/field proof and do not need Streaming. Start with [Splunk Parallel Operations](SPLUNK_PARALLEL_OPERATIONS.md); use the [export runbook](SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md) and [E2E gates](SPLUNK_E2E_VALIDATION.md) only after the base onboarding exit criteria pass. Editable path: [onboarding diagram](diagrams/logan-splunk-onboarding.mmd).
+
 ## Step 4 — Run the OCI-native canary
 
 1. In Log Analytics, open **Add Data**.

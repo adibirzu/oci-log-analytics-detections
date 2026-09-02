@@ -10,6 +10,8 @@ The logical architecture also has an offline-generated
 [Mermaid source](diagrams/windows-access-architecture.mmd). The Mermaid source
 passed the OCI diagramming skill's structural and active-content validation.
 
+For a Windows source that also delivers detection evidence to Splunk, continue with the full editable [on-prem Management Agent path](diagrams/logan-splunk-onprem-agent.mmd), [evidence-export sequence](diagrams/logan-splunk-export-sequence.mmd), [validation layers](diagrams/logan-splunk-validation.mmd), and [replay state](diagrams/logan-splunk-replay-state.mmd). The [Splunk operations guide](SPLUNK_PARALLEL_OPERATIONS.md) owns raw-versus-evidence decisions; this page keeps the Windows collection and detection workflow focused.
+
 ## 1. Collection, detection, and response architecture
 
 ```mermaid
@@ -214,3 +216,4 @@ Do not infer a higher state from a lower one. In particular, `ACTIVE` agent,
 successful dashboard import, or HTTP success does not prove native Windows event
 collection and notification delivery.
 
+When Mode 2 is enabled, extend the ladder after notification: exact Function invocation → bounded Log Analytics query → HEC confirmation → checkpoint commit or DLQ → Splunk searchability. None of those steps is implied by the earlier metric/alarm receipt; validate with [Splunk E2E Validation](SPLUNK_E2E_VALIDATION.md).

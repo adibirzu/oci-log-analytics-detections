@@ -25,7 +25,7 @@ Use Mode 1 only for a source whose raw-copy, retention, privacy, and Splunk-lice
 
 ## Prerequisites and ownership
 
-Before any provider action, record the OCI profile/account, region, tenancy, exact compartments, Log Analytics namespace/log groups/sources/entities, Splunk deployment and index owner, HEC owner, network owner, change window, authorized canary, stop conditions, rollback owner, retention, and cost approver.
+Before any provider action, assign and record the owners below.
 
 | Owner | Responsibility |
 |---|---|
@@ -36,7 +36,25 @@ Before any provider action, record the OCI profile/account, region, tenancy, exa
 | Splunk owner | HEC endpoint/token, allowed index, sourcetype, search, license, retention |
 | SOC/change owner | Alarm enablement, canary, replay, incident handling, acceptance |
 
-Prerequisites are a parsed fresh-event proof in Log Analytics; the required source/display fields; a reviewed delivery policy in [`config/splunk_parallel_delivery.yaml`](../config/splunk_parallel_delivery.yaml); an HTTPS HEC JSON-event endpoint; an existing Vault secret for the HEC credential; existing Function subnets; and explicit live approval. The repository commands do not authenticate to OCI or Splunk.
+### Common prerequisites
+
+- Record the OCI account/profile, region, tenancy, exact compartments, Log Analytics namespace/log group/source, Splunk deployment/index/sourcetype, network owner, change window, safe canary, stop conditions, retention, cost, rollback, and explicit live approval.
+- Prove a fresh parsed event and required display fields in Log Analytics; approve the raw/evidence choice in [`config/splunk_parallel_delivery.yaml`](../config/splunk_parallel_delivery.yaml).
+- Have the Splunk owner provision an HTTPS HEC JSON-event endpoint, approved index/sourcetype, credential handling, TLS requirements, search access, and capacity.
+- Use repository CLI previews and validators before target-specific work. They do not authenticate to OCI or Splunk.
+
+### Mode 1 prerequisites
+
+- One approved OCI Logging log or Audit scope, a dedicated Connector Hub route, OCI Streaming pool/stream with reviewed partitions and retention, and exact connector principal policy.
+- The immutable `oci-splunk` commit checked out outside this repository; select `legacy_kafka_connect` or `soc4kafka` and assign its runtime/offset owner.
+- Streaming consumer SASL identity/auth-token handling, HEC credential handling, and network paths from the consumer to OCI Streaming and Splunk HEC.
+- Managed-Splunk inputs (network/ingress, SSH public key, compute sizing, admin credential) or existing-Splunk inputs and a separately owned consumer runtime.
+
+### Mode 2 prerequisites
+
+- One canonical query and eligible detection rule with first Monitoring metric proven; reviewed alarm and Notifications topic/subscription held disabled before the canary.
+- One reviewed Function image/digest, existing Function subnets/optional NSGs, an exact resource-principal dynamic group, and OCI-query plus HTTPS HEC egress.
+- One existing Vault secret containing the HEC credential and private versioned Object Storage checkpoint/DLQ buckets with approved lifecycle.
 
 ## Architecture and workflow
 
@@ -65,10 +83,18 @@ Collection, parsing, Log Analytics query results, detection-rule execution, Moni
 Run this offline preview and have an OCI IAM reviewer replace every placeholder:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py render-iam
+python3 scripts/splunk_evidence_exporter_cli.py render-iam
 ```
 
-It renders eight review categories and never applies policy. Mode 1 requires one exact Service Connector principal to read the approved log content and push to the exact stream. Mode 2 uses a dynamic group matching the exact Function OCID and separately scoped grants for Log Analytics queries, the exact Vault secret bundle, the named checkpoint/DLQ buckets, and Notifications invocation of the exact Function. Operator convenience grants such as `functions-family` and `ons-family`, and the Object Storage lifecycle service grant, are broader than a single resource; review and split duties where the tenancy model permits.
+It renders eight review categories and never applies policy.
+
+### Mode 1 IAM and network
+
+Use one exact Service Connector principal to read only the approved log content and push to the exact stream. The selected consumer needs `use stream-pull`, SASL/TLS reachability to the stream-pool endpoint, and TLS reachability to HEC. Managed Splunk networking and ingress are owned by the pinned project; review every proposed VCN/subnet/NSG/LB/public route and reject broad ingress. Existing Splunk mode still needs an explicitly hosted and secured consumer.
+
+### Mode 2 IAM and network
+
+Use a dynamic group matching the exact Function OCID and separately scoped grants for Log Analytics queries, the exact Vault secret bundle, the named checkpoint/DLQ buckets, and Notifications invocation of the exact Function. Operator convenience grants such as `functions-family` and `ons-family`, and the Object Storage lifecycle service grant, are broader than a single resource; review and split duties where the tenancy model permits.
 
 The Function accepts only an HTTPS authority ending in `/services/collector/event`; userinfo, query strings, fragments, and embedded credentials are rejected. Provide outbound DNS/TLS and either a private FastConnect/VPN route to Splunk or reviewed NAT egress with NSG/firewall destination controls. The module creates no VCN or subnet and needs no inbound route: Notifications invokes the Function. Maintain an explicit trust bundle for a private CA; never bypass certificate validation.
 
@@ -76,7 +102,7 @@ Oracle IAM references: [Log Analytics policy reference](https://docs.oracle.com/
 
 ## Mode 1 manual procedure: raw fan-out
 
-Production must use a reviewed tag or commit of `adibirzu/oci-splunk`; it must not track mutable `main`. The current reviewed provenance used by this repository is tag `2.2.0` at commit `a98167404f19be6d18235bccbf1113b59a259c4c`. [Browse the project](https://github.com/adibirzu/oci-splunk) for discovery, but use the [pinned tree](https://github.com/adibirzu/oci-splunk/tree/a98167404f19be6d18235bccbf1113b59a259c4c) for production review.
+Production must use a reviewed tag or commit of `adibirzu/oci-splunk`; it must not track mutable `main`. This repository selects immutable commit `a98167404f19be6d18235bccbf1113b59a259c4c`; `2.2.0` is bundled Splunk-app provenance, not a Git tag. [Browse the project](https://github.com/adibirzu/oci-splunk) only for discovery. Production review starts from the pinned [README](https://github.com/adibirzu/oci-splunk/blob/a98167404f19be6d18235bccbf1113b59a259c4c/README.md), [deployment guide](https://github.com/adibirzu/oci-splunk/blob/a98167404f19be6d18235bccbf1113b59a259c4c/docs/DEPLOYMENT.md), and [Terraform variables](https://github.com/adibirzu/oci-splunk/blob/a98167404f19be6d18235bccbf1113b59a259c4c/terraform/variables.tf).
 
 1. In OCI Console, open **Observability & Management → Logging → Logs**, select one approved source, and record its log group and expected event.
 2. Open **Analytics & AI → Messaging → Streams**, create or select the reviewed stream and verify retention, partitions, encryption, and consumer ownership.
@@ -88,7 +114,68 @@ Production must use a reviewed tag or commit of `adibirzu/oci-splunk`; it must n
 
 Expected output is one fresh, parsed Log Analytics record and one searchable raw Splunk event, plus connector, stream-consumer, and HEC transport receipts. A connector `ACTIVE` state alone is not acceptance.
 
-The script-assisted equivalent is owned by the pinned `oci-splunk` release. Begin its documented offline Terraform/Resource Manager preview, review the saved plan and exact source/stream/HEC boundaries, then obtain a separate apply approval. Do not run its mutable `main` branch in production.
+### Mode 1 script-assisted pinned-ref preview
+
+Run this in a new operator-owned workspace outside this repository. Source checkout contacts GitHub. The direct Terraform path avoids `deploy_local.sh`, which is an interactive deployment wrapper that performs OCI preflights, can offer IAM reconciliation, and applies when invoked with `apply`.
+
+```bash
+git clone https://github.com/adibirzu/oci-splunk.git oci-splunk
+git -C oci-splunk checkout --detach a98167404f19be6d18235bccbf1113b59a259c4c
+test "$(git -C oci-splunk rev-parse HEAD)" = "a98167404f19be6d18235bccbf1113b59a259c4c"
+cp oci-splunk/terraform/terraform.tfvars.example oci-splunk/terraform/terraform.tfvars
+chmod 600 oci-splunk/terraform/terraform.tfvars
+```
+
+Edit the untracked private `terraform.tfvars`; never paste it into tickets or commit it. Resolve the exact target, credentials, routing scope, planned resources, and secrets before initializing dependencies.
+
+#### Required variable categories and defaults
+
+| Category | Required/reviewed values | Pinned defaults that require an explicit decision |
+|---|---|---|
+| Target/auth | `compartment_ocid`, `region`; for local API-key auth select the reviewed `oci_profile`/config | `auth = "APIKey"`, `oci_profile = ""`, `oci_config_file = "~/.oci/config"` |
+| Raw source | Audit scope or exact custom `log_group_ocid`/`log_ocid` | Audit connector `true`; custom-log connector `false`; VCN flow logs `true` when its network is created |
+| Connector IAM | Exact connector identity and policy owner | `manage_service_connector_policy = true`; set deliberately after policy review |
+| Streaming | Existing or created pool/stream; SASL tenancy/user/auth token | 1 partition, 24-hour retention, internal Kafka streams `false` |
+| Consumer | Runtime/host/offset owner | `legacy_kafka_connect`; `soc4kafka` is opt-in and pins collector `0.154.1` |
+| Splunk | Existing versus managed, exact HEC event URL/token/index | `use_existing_splunk = false` (managed); index `main`; HEC URL default is a non-routable placeholder |
+| Managed network/compute | Existing versus created VCN/subnet/NSG, ingress CIDR, SSH public key, admin credential, size/cost | Created network; public subnet; 2 OCPUs, 16 GB memory, 100 GB boot volume |
+| Other path | Keep the unrelated raw-Functions alternative out of this mode | `enable_functions_path = false`, `create_logs_to_functions_connector = false` |
+
+`compartment_ocid`, `region`, and sensitive `splunk_hec_token` have no defaults. `streaming_auth_token`, sensitive `splunk_admin_password`, `ssh_public_key`, and `allowed_ingress_cidr` default to empty and must be resolved when their selected path needs them. Plan and state are also sensitive. Store all credentials only in approved private mechanisms. The pinned project can create Audit and VCN-flow routes by default, so set both booleans explicitly; never let defaults expand the approved source set accidentally.
+
+Initialize dependencies, validate configuration, and request a provider read/plan window:
+
+```bash
+terraform -chdir=oci-splunk/terraform init -backend=false
+terraform -chdir=oci-splunk/terraform validate
+terraform -chdir=oci-splunk/terraform plan -var-file=terraform.tfvars -out=oci-splunk-mode1.tfplan
+terraform -chdir=oci-splunk/terraform show -no-color oci-splunk-mode1.tfplan
+```
+
+`terraform init` may contact provider registries; `terraform plan` loads configured credentials and may read OCI or configured state. Neither phase mutates infrastructure, but neither phase is offline or credential-free. Initialization writes local dependency metadata, and the saved plan is sensitive.
+
+#### Expected preview output
+
+Initialization reports installed provider dependencies; validation reports that configuration is valid; plan reports proposed additions/changes/destructions and saves `oci-splunk-mode1.tfplan`; show renders that exact saved plan. Accept only the approved Logging source, connector, stream/pool, chosen consumer/managed-Splunk resources, and intentional IAM/network resources. Reject unexpected source expansion, unrelated Functions-path resources, broad ingress/IAM, or any destroy/replace action not explicitly reviewed.
+
+#### Mode 1 preview failure handling
+
+- Checkout hash mismatch: stop; do not preview or deploy a different ref.
+- Provider download failure: fix the reviewed registry/proxy path; do not claim validation.
+- Missing/expired profile or 401/403: stop at target/IAM review; never switch profiles silently.
+- Invalid compartment/region/existing IDs: correct the private variable file and regenerate the plan.
+- Audit, VCN flow, policy, network, LB, or compute resources appear unexpectedly: set the corresponding opt-in/reuse variables deliberately and re-plan.
+- Quota/capacity or HEC/consumer prerequisites fail: resolve with the resource owner; do not apply a partial alternative.
+
+#### Mode 1 apply approval
+
+Bind approval to the commit hash, reviewed variable file, saved-plan digest, exact OCI target, resource list, cost, source scope, secrets, time window, and rollback. Only after that approval may an operator run:
+
+```bash
+terraform -chdir=oci-splunk/terraform apply oci-splunk-mode1.tfplan
+```
+
+Apply mutates OCI. Follow the pinned verification procedure afterward, but keep connector state, HEC transport, and Splunk searchability as separate acceptance receipts.
 
 ## Mode 2 manual procedure: evidence export
 

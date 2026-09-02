@@ -4,13 +4,27 @@
 
 This guide proves Mode 1 raw fan-out, Mode 2 Log Analytics evidence export, or a hybrid policy without merging their evidence. Local tests exercise repository behavior only. Provider acceptance requires a fresh authorized event and authenticated receipts from every enabled layer.
 
-Production Mode 1 must use a pinned, reviewed `oci-splunk` tag or commit and must not track mutable `main`. The migration registry currently pins tag `2.2.0` and commit `a98167404f19be6d18235bccbf1113b59a259c4c`.
+Production Mode 1 must use a pinned, reviewed `oci-splunk` tag or commit and must not track mutable `main`. The migration registry selects immutable commit `a98167404f19be6d18235bccbf1113b59a259c4c`; `2.2.0` identifies bundled Splunk-app provenance, not a Git tag.
 
 ## Prerequisites and ownership
 
-Name the test owner, source/system owner, OCI Log Analytics owner, Splunk/HEC owner, network/IAM owner, response owner, and acceptance approver. Record exact target/profile, region, compartments, source/entity, detection, canary event, UTC window, expected positive/negative results, approved index/sourcetype, retention/privacy/cost boundaries, rollback/replay owner, and stop conditions.
+Name the test owner, source/system owner, OCI Log Analytics owner, Splunk/HEC owner, network/IAM owner, response owner, and acceptance approver.
 
-Prerequisites are passing local gates, one source/parser/query proven with safe data, a reviewed IAM/network design, HEC token in Vault, disabled alarm/subscription before the window, and explicit approval for any live canary. Do not use production raw payloads as fixtures.
+### Common prerequisites
+
+- Passing local gates; one safe source/parser/query canary; exact target/profile, region, compartments, UTC window, positive/negative results, approved index/sourcetype, and explicit live approval.
+- Reviewed IAM/network, privacy, retention, cost, rollback/replay, evidence-capture, and stop-condition decisions.
+- An approved HTTPS HEC input/credential handling path and Splunk Search access. Do not use production raw payloads as fixtures.
+
+### Mode 1 prerequisites
+
+- The exact OCI Logging source scope, dedicated Connector Hub route, OCI Streaming pool/stream/retention, connector policy, and expected raw event.
+- Immutable `oci-splunk` commit `a98167404f19be6d18235bccbf1113b59a259c4c`, the chosen consumer, SASL identity/secret handling, runtime/offset owner, and HEC/network capacity.
+
+### Mode 2 prerequisites
+
+- Canonical query, required fields, eligible detection rule, and first Monitoring metric already proven.
+- Reviewed disabled alarm and Notifications trigger, approved Function image/digest/subnet/identity, exact Vault secret reference, and checkpoint/DLQ lifecycle.
 
 ## Architecture and evidence workflow
 
@@ -38,19 +52,19 @@ Mode 1 branches after OCI Logging through its own Connector Hub, Streaming, pinn
 Render the offline policy review and confirm each applied statement is narrower than or equal to the reviewed target:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py render-iam
+python3 scripts/splunk_evidence_exporter_cli.py render-iam
 ```
 
-Verify the exact Function dynamic-group match; Log Analytics query and log-group read; exact Vault secret-bundle read; named state/DLQ object access; exact Notifications-to-Function condition; and separately scoped Mode 1 connector identity. Test Function subnet DNS/TLS/HTTPS egress to the HEC hostname over the approved NAT, FastConnect, or VPN route. Do not disable TLS validation or expose a Function ingress path.
+For Mode 1, verify the exact connector identity, log-content read, stream-push/consumer-pull, SASL/TLS endpoints, consumer-host route, and HEC egress. For Mode 2, verify the exact Function dynamic-group match; Log Analytics query/log-group read; exact Vault secret-bundle read; named state/DLQ access; exact Notifications invocation condition; and Function subnet DNS/TLS/HTTPS egress. Do not disable TLS validation or expose an unnecessary ingress path.
 
 ## Local scripted validation
 
 Start with the offline contract and configuration:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py plan --json
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py validate-config
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success
+python3 scripts/splunk_evidence_exporter_cli.py plan --json
+python3 scripts/splunk_evidence_exporter_cli.py validate-config
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success
 ```
 
 Expected success output includes `status: delivered`, three query rows/events, one mock HEC attempt, `checkpoint_committed: true`, `evidence_class: locally_verified`, and `provider_validation: not_run`.
@@ -58,18 +72,18 @@ Expected success output includes `status: delivered`, three query rows/events, o
 Run each fail-closed path:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario zero-evidence
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario duplicate-invocation
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success-after-retry
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario timeout
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario 429
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario 500
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario 400
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario 401
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario oversized-batch
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario missing-secret
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario dlq-write
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario retry-exhaustion
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario zero-evidence
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario duplicate-invocation
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success-after-retry
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario timeout
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario 429
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario 500
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario 400
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario 401
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario oversized-batch
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario missing-secret
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario dlq-write
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario retry-exhaustion
 ```
 
 Expected output has no checkpoint commit for failed delivery; retryable paths stop at four default attempts and write DLQ; configuration/security failures quarantine after one attempt; zero evidence makes no HEC attempt.
@@ -77,7 +91,7 @@ Expected output has no checkpoint commit for failed delivery; retryable paths st
 Local replay is separately approved even though it is fixture-only:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario approved-replay --approve-replay
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario approved-replay --approve-replay
 ```
 
 Expected output reports `EvidenceReplayService`, exactly one original query, preserved quarantined event keys, delivered replay, and checkpoint advance only after confirmation. The command without `--approve-replay` fails closed.
@@ -85,7 +99,7 @@ Expected output reports `EvidenceReplayService`, exactly one original query, pre
 Run the authoritative focused tests:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 -m pytest scripts/test_splunk_detection_registry.py scripts/test_splunk_evidence_exporter.py scripts/test_splunk_evidence_e2e.py scripts/test_splunk_evidence_terraform.py scripts/test_splunk_diagrams.py scripts/test_splunk_documentation.py scripts/test_scan_sensitive_values.py -q
+python3 -m pytest scripts/test_splunk_detection_registry.py scripts/test_splunk_evidence_exporter.py scripts/test_splunk_evidence_e2e.py scripts/test_splunk_evidence_terraform.py scripts/test_splunk_diagrams.py scripts/test_splunk_documentation.py scripts/test_scan_sensitive_values.py -q
 ```
 
 ## Manual provider canary
@@ -93,7 +107,7 @@ Run the authoritative focused tests:
 The offline plan is available with:
 
 ```bash
-/Users/abirzu/oci-cli/bin/python3 scripts/splunk_evidence_exporter_cli.py canary-plan
+python3 scripts/splunk_evidence_exporter_cli.py canary-plan
 ```
 
 It does not log in or execute. With separate live approval:
@@ -115,7 +129,7 @@ For Mode 1, additionally verify the source connector success, stream messages/re
 
 ## Script-assisted provider path
 
-Repository automation ends at offline previews. Follow the ordered approval flow in [the export runbook](SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md): offline plan/preflight, deterministic staging, build approval, saved Terraform plan, apply approval, canary approval, and replay approval. There is no command here that performs a live canary or live replay.
+Repository CLI previews/validators and deterministic context staging are offline. `terraform init` may contact provider registries; `terraform plan` loads configured credentials and may read OCI or configured state. Neither phase mutates infrastructure, but neither phase is offline or credential-free. Follow the ordered approval flow in [the export runbook](SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md): offline CLI preflight/staging, build approval, dependency initialization, provider read/plan, apply approval, canary approval, and replay approval. There is no command here that performs a live canary or live replay.
 
 ## Failure modes and troubleshooting
 

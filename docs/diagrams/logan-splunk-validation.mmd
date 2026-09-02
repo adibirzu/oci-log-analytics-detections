@@ -1,0 +1,25 @@
+%% Title: Separate validation and acceptance gates
+%% Evidence: code-backed local gates only; provider verified = false; release accepted = false
+%% Primary objects: 8
+flowchart LR
+  subgraph OCI["OCI evidence boundary"]
+    collection["Collection gate"]
+    parsing["Parsing and field gate"]
+    logan["Log Analytics detection gate"]
+    monitoring["Monitoring metric and alarm gate"]
+    invocation["Notifications and Function gate"]
+  end
+  subgraph DEST["Customer-managed destination boundary"]
+    hec["Splunk HEC delivery gate"]
+    search["Splunk searchability gate"]
+  end
+  subgraph ACCEPT["Release boundary"]
+    release["Release acceptance"]
+  end
+  collection -->|"telemetry: fresh record receipt"| parsing
+  parsing -->|"telemetry: expected parsed fields"| logan
+  logan -->|"telemetry: deterministic match and metric"| monitoring
+  monitoring -.->|"control: approved alarm canary"| invocation
+  invocation -->|"telemetry: normalized evidence batch"| hec
+  hec -.->|"response: HEC acceptance"| search
+  search -.->|"control: owner records acceptance"| release

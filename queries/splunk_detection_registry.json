@@ -379,7 +379,7 @@
       "title": "Windows Successful RDP Logon Outside Business Hours"
     }
   ],
-  "generated_at": "2026-09-02T08:26:14.483123+00:00",
+  "generated_at": "2026-09-02T08:41:02.227231+00:00",
   "splunk_provenance": {
     "object-storage-new-external-source": {
       "app": "splunk_app_oci",

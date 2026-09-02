@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-09-01T12:41:15.842689+00:00",
+  "generated_at": "2026-09-02T08:41:19.705716+00:00",
   "source": "scripts/deploy_dashboard.py:DASHBOARDS",
   "summary": {
     "total_dashboards": 35,

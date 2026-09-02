@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-09-01T12:41:15.420145+00:00",
+  "generated_at": "2026-09-02T08:41:13.973127+00:00",
   "total_rules": 1135,
   "total_base_rules": 545,
   "total_sentinel_queries": 590,
   "total_app_queries": 62,
-  "total_hunting": 151,
-  "total_content_items": 1348,
+  "total_hunting": 155,
+  "total_content_items": 1352,
   "inventory": {
     "source_yaml_rules": 522,
     "source_rule_breakdown": {
@@ -21,9 +21,9 @@
     "generated_app_queries": 62,
     "source_derived_app_queries": 8,
     "curated_app_queries": 54,
-    "generated_hunting_queries": 151,
+    "generated_hunting_queries": 155,
     "generated_sigma_queries": 553,
-    "total_query_artifacts": 1348,
+    "total_query_artifacts": 1352,
     "legacy_dirs": {
       "logandetectionqueries": 0,
       "logandetectionrules": 0
@@ -78257,6 +78257,27 @@
       "content_surface": "hunting"
     },
     {
+      "title": "OCI Audit Failures",
+      "description": "Alert-ready aggregation of OCI Audit control-plane operations whose parsed Status is Failure. This is a field-backed approximation of the referenced Splunk message-text search: it preserves failed 4xx/5xx activity but does not independently classify throttling when the parser does not expose it as Failure.",
+      "level": "medium",
+      "hunting_type": "frequency",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1078"
+      ],
+      "references": [],
+      "file": "hunting/oci_audit_failures.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "OCI Console Login Brute Force (Frequency Analysis)",
       "description": "Detects brute force or credential stuffing against OCI Console by counting failed login attempts per user. Uses frequency analysis (Threat Hunter's Cookbook: Sorting/Stacking method) to identify accounts with more than 3 failed attempts in the time window.",
       "level": "high",
@@ -78345,6 +78366,27 @@
       "content_surface": "hunting"
     },
     {
+      "title": "OCI IAM Policy Changes",
+      "description": "Alert-ready aggregation of OCI IAM policy create, update, and delete events. The event selection reuses the existing portable OCI IAM Policy Modified Sigma rule and adds only the aggregation required by scheduled-search detection rules.",
+      "level": "high",
+      "hunting_type": "frequency",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "references": [],
+      "file": "hunting/oci_iam_policy_changes.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
       "title": "OCI IAM Rapid Configuration Changes (Anomaly Detection)",
       "description": "Detects users making a high volume of IAM changes in a short time window. A burst of identity changes (policy updates, user creation, group modifications) from a single principal may indicate account compromise or insider threat. Uses frequency analysis with threshold (Threat Hunter's Cookbook: Forecasting/Anomaly Detection method).",
       "level": "high",
@@ -78385,6 +78427,27 @@
       "test_data_coverage": "not_evaluated",
       "live_validation_status": "not_run",
       "dashboard_readiness": "not_annotated",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "OCI Object Storage Access from External Source",
+      "description": "Alert-ready aggregation of OCI Object Storage operations from non-RFC1918 IPv4 source addresses. This preserves the referenced Splunk alert's public-source evidence but omits Splunk iplocation country enrichment and does not claim that the address is new relative to a historical baseline.",
+      "level": "medium",
+      "hunting_type": "frequency",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1530"
+      ],
+      "references": [],
+      "file": "hunting/oci_object_storage_external_source.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "not_evaluated",
       "content_surface": "hunting"
     },
@@ -78515,6 +78578,27 @@
       "source_confidence": "medium",
       "field_coverage": "not_evaluated",
       "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "not_evaluated",
+      "content_surface": "hunting"
+    },
+    {
+      "title": "OCI VCN Rejected Traffic Spike",
+      "description": "Alert-ready aggregation for a source address producing more than 100 rejected VCN flow records in the ten-minute scheduled-search window. This preserves the threshold behavior of the referenced Splunk alert while using OCI Log Analytics display fields.",
+      "level": "high",
+      "hunting_type": "frequency",
+      "cookbook_method": "",
+      "mitre_techniques": [
+        "T1046"
+      ],
+      "references": [],
+      "file": "hunting/oci_vcn_rejected_traffic_spike.json",
+      "content_lifecycle": "validated_locally",
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
       "live_validation_status": "not_run",
       "dashboard_readiness": "dashboard_ready",
       "scheduled_rule_eligibility": "not_evaluated",

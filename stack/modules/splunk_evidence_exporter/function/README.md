@@ -12,7 +12,17 @@ Inspect the manifest and context before any separately authorized image build. A
 # Production supply-chain gate
 
 `func.yaml` is only local build metadata and is not a production provenance
-record. Production enablement requires an externally built, scanned and signed
-OCI Registry image addressed by a non-empty `sha256:` digest. Retain the SCA,
-SAST, IaC scan, container scan and SBOM receipts with the reviewed digest; this
-repository intentionally performs none of those networked build actions.
+record. Its mutable `build_image` and `run_image` values are therefore local
+development hints, never production image references. Terraform production
+enablement requires an externally built, scanned and signed OCI Registry image
+addressed by a non-empty `sha256:` digest.
+
+The exact dependency pins are recorded in
+`docs/SPLUNK_FUNCTION_DEPENDENCY_LOCK.md`. A production builder must resolve
+those pins with `pip install --require-hashes` using externally verified wheel
+or sdist hashes. The repository does not invent or bless artifact hashes
+offline: the pre-live gate must refuse image acceptance unless the verified
+hash lock, SBOM, SCA, SAST, IaC, container scan, signature, and image digest
+receipts all identify the same build. Retain those receipts with the reviewed
+digest; this repository intentionally performs none of those networked build
+actions.

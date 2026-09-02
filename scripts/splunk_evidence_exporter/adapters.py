@@ -283,6 +283,9 @@ class ObjectStorageDeadLetterAdapter:
         reason: str,
         *,
         delivered_event_keys: Sequence[str] = (),
+        detection_id: str | None = None,
+        dimensions: Mapping[str, str] | None = None,
+        checkpoint: datetime | None = None,
     ) -> None:
         if reason not in ("retryable", "quarantine"):
             raise ValueError("unsupported dead-letter reason")
@@ -299,17 +302,33 @@ class ObjectStorageDeadLetterAdapter:
         object_name = (
             f"dlq-{_safe_identifier(batch.batch_id)}-{created_text}-{digest}.json"
         )
+        record: dict[str, object] = {
+            "schema_version": "oci.logan.splunk.dead-letter.v1",
+            "reason": reason,
+            "created_at": created_at.astimezone(timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z"),
+            "batch_id": batch.batch_id,
+            "delivered_event_keys": list(delivered_event_keys),
+            "remaining_events": remaining,
+        }
+        context = (detection_id, dimensions, checkpoint)
+        if any(item is not None for item in context):
+            if detection_id is None or dimensions is None or checkpoint is None:
+                raise ValueError("complete replay context is required")
+            if checkpoint.tzinfo is None or checkpoint.utcoffset() is None:
+                raise ValueError("dead-letter checkpoint must be timezone-aware")
+            record.update(
+                {
+                    "detection_id": _required_text(detection_id, "detection id"),
+                    "dimensions": dict(dimensions),
+                    "checkpoint": checkpoint.astimezone(timezone.utc)
+                    .isoformat()
+                    .replace("+00:00", "Z"),
+                }
+            )
         body = json.dumps(
-            {
-                "schema_version": "oci.logan.splunk.dead-letter.v1",
-                "reason": reason,
-                "created_at": created_at.astimezone(timezone.utc)
-                .isoformat()
-                .replace("+00:00", "Z"),
-                "batch_id": batch.batch_id,
-                "delivered_event_keys": list(delivered_event_keys),
-                "remaining_events": remaining,
-            },
+            record,
             sort_keys=True,
             separators=(",", ":"),
         )

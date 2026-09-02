@@ -1,5 +1,10 @@
 {
   "success": [{"status": 200, "response": {"code": 0, "text": "Success"}}],
+  "success-after-retry": [
+    {"status": 500, "response": {"code": 8, "text": "Server unavailable"}},
+    {"status": 429, "response": {"code": 9, "text": "Rate limited"}},
+    {"status": 200, "response": {"code": 0, "text": "Success"}}
+  ],
   "timeout": ["timeout"],
   "429": [{"status": 429, "response": {"code": 9, "text": "Rate limited"}}],
   "500": [{"status": 500, "response": {"code": 8, "text": "Server unavailable"}}],

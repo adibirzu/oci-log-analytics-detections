@@ -1,6 +1,11 @@
 """Pure domain API for OCI Log Analytics evidence export to Splunk."""
 
-from .envelope import batch_events, build_evidence_event, event_key
+from .envelope import (
+    batch_events,
+    build_evidence_event,
+    event_key,
+    restore_evidence_event,
+)
 from .models import AlarmTrigger, EvidenceEvent, ExportBatch
 from .ports import CheckpointPort, EvidenceQueryPort, HecDeliveryPort, QuarantinePort
 from .retry import classify_hec_failure
@@ -18,6 +23,7 @@ __all__ = [
     "calculate_window",
     "classify_hec_failure",
     "event_key",
+    "restore_evidence_event",
     "CheckpointPort",
     "QuarantinePort",
 ]

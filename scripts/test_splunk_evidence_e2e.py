@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -16,14 +17,13 @@ from scripts.splunk_evidence_exporter import QueryWindow, build_evidence_event
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PYTHON = "/Users/abirzu/oci-cli/bin/python3"
 CLI = ROOT / "scripts/splunk_evidence_exporter_cli.py"
 FIXTURES = ROOT / "scripts/fixtures/splunk_evidence"
 
 
 def run_cli(*arguments: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [PYTHON, str(CLI), *arguments],
+        [sys.executable, str(CLI), *arguments],
         cwd=ROOT,
         text=True,
         capture_output=True,
@@ -73,14 +73,14 @@ def test_local_success_uses_service_and_commits_only_after_mock_hec_delivery():
     ("scenario", "status", "reason", "attempts"),
     [
         ("zero-evidence", "no_evidence", None, 0),
-        ("timeout", "delivery_failed", "retryable", 1),
-        ("429", "delivery_failed", "retryable", 1),
-        ("500", "delivery_failed", "retryable", 1),
+        ("timeout", "delivery_failed", "retryable", 4),
+        ("429", "delivery_failed", "retryable", 4),
+        ("500", "delivery_failed", "retryable", 4),
         ("400", "delivery_failed", "quarantine", 1),
         ("401", "delivery_failed", "quarantine", 1),
         ("oversized-batch", "delivery_failed", "quarantine", 1),
         ("missing-secret", "delivery_failed", "quarantine", 1),
-        ("dlq-write", "delivery_failed", "retryable", 1),
+        ("dlq-write", "delivery_failed", "retryable", 4),
         ("retry-exhaustion", "delivery_failed", "retryable", 4),
     ],
 )
@@ -95,6 +95,7 @@ def test_local_failure_matrix_is_bounded_sanitized_and_fail_closed(
     assert receipt["status"] == status
     assert receipt["checkpoint_committed"] is False
     assert receipt["hec_attempt_count"] == attempts
+    assert receipt["operations"].count("mock_hec_attempted") == attempts
     if reason is None:
         assert receipt["dlq_record_count"] == 0
         assert receipt["operations"][-1] == "query_executed"
@@ -119,6 +120,18 @@ def test_duplicate_invocation_retains_stable_keys_and_reports_at_least_once_deli
     assert receipt["stable_event_keys"] is True
     assert receipt["duplicate_event_count"] == 3
     assert receipt["checkpoint_committed"] is True
+
+
+def test_service_visible_retry_succeeds_before_budget_and_then_commits():
+    result = run_cli("local-e2e", "--scenario", "success-after-retry")
+
+    assert result.returncode == 0, result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["status"] == "delivered"
+    assert receipt["hec_attempt_count"] == 3
+    assert receipt["mock_hec_event_count"] == 3
+    assert receipt["checkpoint_committed"] is True
+    assert receipt["operations"][-1] == "checkpoint_committed"
 
 
 def test_dlq_failure_exits_nonzero_with_only_a_sanitized_fail_closed_error():
@@ -146,7 +159,9 @@ def test_replay_requires_explicit_local_approval_and_uses_service_again():
     assert receipt["replayed_event_count"] == 3
     assert receipt["replay_matches_quarantined_events"] is True
     assert receipt["checkpoint_committed"] is True
-    assert receipt["service"] == "EvidenceExportService"
+    assert receipt["service"] == "EvidenceReplayService"
+    assert receipt["hec_attempt_count"] == 5
+    assert receipt["operations"].count("query_executed") == 1
 
 
 def test_offline_operator_commands_validate_and_render_without_external_calls():
@@ -212,6 +227,7 @@ def test_fixtures_are_deterministic_sanitized_and_build_schema_valid_events():
     assert all(not list(validator.iter_errors(event)) for event in events)
     assert set(hec_responses) == {
         "success",
+        "success-after-retry",
         "timeout",
         "429",
         "500",

@@ -78,7 +78,20 @@ def event_key(
         raise TypeError("row must be a mapping")
     if window is not None and not isinstance(window, QueryWindow):
         raise TypeError("window must be a QueryWindow")
-    identity: dict[str, object] = {"detection_id": rule_id, "row": normalize_for_hash(row)}
+    # Query execution bounds are invocation metadata, not source occurrence
+    # identity.  Exclude them so an overlapping/replayed window cannot create
+    # a new event key.  Source event time and aggregation fields remain part of
+    # the key, allowing distinct occurrences with equal aggregates to deliver.
+    moving_window_fields = {
+        "querywindowstart", "querywindowend", "windowstart", "windowend",
+        "querystart", "queryend",
+    }
+    identity_row = {
+        name: value
+        for name, value in row.items()
+        if _field_identifier(name) not in moving_window_fields
+    }
+    identity: dict[str, object] = {"detection_id": rule_id, "row": normalize_for_hash(identity_row)}
     canonical = json.dumps(
         identity,
         sort_keys=True,

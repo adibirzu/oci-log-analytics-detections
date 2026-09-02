@@ -210,6 +210,58 @@ def test_service_emits_failure_and_dead_letter_metrics_without_making_metrics_fa
     ]
 
 
+def test_partial_delivery_emits_both_delivered_and_dead_lettered_event_metrics():
+    metrics = _MetricSink()
+    dead_letters = []
+
+    class Hec:
+        def __init__(self):
+            self.calls = 0
+
+        def deliver(self, _batch):
+            self.calls += 1
+            if self.calls == 1:
+                return {"status": 200, "response": {"code": 0}}
+            raise TimeoutError("timeout")
+
+    # Two distinct source occurrences share the same aggregate fields. A
+    # one-event batch makes the first delivery observable before the failure.
+    class Registry:
+        def load(self):
+            return {"detections": [registry_entry()]}
+
+    class Query:
+        def query_evidence(self, **_):
+            return [
+                {"Event Type": "same", "Status": "Failure", "Time": "2026-09-02T07:10:00Z"},
+                {"Event Type": "same", "Status": "Failure", "Time": "2026-09-02T07:11:00Z"},
+            ]
+
+    class State:
+        def load_checkpoint(self, *_):
+            return None
+
+        def save_checkpoint(self, *_):
+            pass
+
+    class Dlq:
+        def quarantine(self, *args, **kwargs):
+            dead_letters.append((args, kwargs))
+
+    service = EvidenceExportService(
+        registry=Registry(), query=Query(), checkpoint=State(), hec=Hec(),
+        dead_letter=Dlq(), metrics=metrics,
+        clock=lambda: NOW + timedelta(minutes=1), lookback=timedelta(minutes=15),
+        overlap=timedelta(minutes=2), maximum_window=timedelta(hours=1),
+        max_rows=1000, max_batch_events=1, max_attempts=1,
+    )
+    receipt = service.export(AlarmTrigger.from_payload(alarm_payload()))
+    assert receipt.status == "delivery_failed"
+    assert [(name, value) for name, value, _ in metrics.calls] == [
+        ("DeliveryFailed", 1), ("DeliveredEvents", 1), ("DeadLetteredEvents", 1),
+    ]
+
+
 def test_two_service_instances_share_ledger_and_only_first_reaches_hec():
     store = _ObjectStore()
     ledger_a = ObjectStorageDeliveryLedgerAdapter(client=store, namespace="ns", bucket="ledger")

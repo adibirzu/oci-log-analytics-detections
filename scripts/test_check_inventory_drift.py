@@ -254,6 +254,7 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
             [
                 "registry drift validation",
                 "schema validation",
+                "splunk parallel red contracts",
                 "local exporter success",
                 "local exporter duplicate",
                 "local exporter failure",
@@ -266,24 +267,24 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
         )
         commands = [step[1] for step in stage_steps]
         self.assertIn("--check", commands[0])
-        self.assertIn("--scenario", commands[2])
-        self.assertEqual(commands[2][commands[2].index("--scenario") + 1], "success")
-        self.assertIn("--alarm-fixture", commands[2])
+        self.assertIn("--scenario", commands[3])
+        self.assertEqual(commands[3][commands[3].index("--scenario") + 1], "success")
+        self.assertIn("--alarm-fixture", commands[3])
         self.assertEqual(
-            commands[2][commands[2].index("--alarm-fixture") + 1],
+            commands[3][commands[3].index("--alarm-fixture") + 1],
             "scripts/fixtures/splunk_evidence/oci_raw_alarm.json",
         )
-        self.assertEqual(commands[3][-2:], ["--scenario", "duplicate-invocation"])
-        self.assertEqual(commands[4][-2:], ["--scenario", "500"])
+        self.assertEqual(commands[4][-2:], ["--scenario", "duplicate-invocation"])
+        self.assertEqual(commands[5][-2:], ["--scenario", "500"])
         self.assertEqual(
-            commands[5][-3:],
+            commands[6][-3:],
             ["--scenario", "approved-replay", "--approve-replay"],
         )
-        self.assertIn("scripts/test_splunk_diagrams.py", commands[6])
-        self.assertIn("scripts/test_splunk_documentation.py", commands[7])
-        self.assertIn("validate_terraform_static.py", commands[8][1])
-        self.assertIn("--check-format", commands[8])
+        self.assertIn("scripts/test_splunk_diagrams.py", commands[7])
+        self.assertIn("scripts/test_splunk_documentation.py", commands[8])
         self.assertIn("validate_terraform_static.py", commands[9][1])
+        self.assertIn("--check-format", commands[9])
+        self.assertIn("validate_terraform_static.py", commands[10][1])
 
         allowed_executables = {sys.executable}
         self.assertTrue(all(command[0] in allowed_executables for command in commands))
@@ -344,7 +345,7 @@ class TestReleaseChecklistEvidence(unittest.TestCase):
                 "replay": 1,
             },
         )
-        self.assertEqual(evidence["gate_counts"], {"total": 10, "passed": 10, "failed": 0})
+        self.assertEqual(evidence["gate_counts"], {"total": 11, "passed": 11, "failed": 0})
         self.assertTrue(all(gate["ok"] for gate in evidence["gates"]))
         self.assertIn("queries/splunk_detection_registry.json", evidence["artifact_hashes"])
         self.assertIn("schemas/splunk_evidence_event.schema.json", evidence["artifact_hashes"])

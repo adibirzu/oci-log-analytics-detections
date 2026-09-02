@@ -153,6 +153,11 @@ def build_splunk_parallel_offline_steps(*, bootstrap: bool = False) -> list[tupl
             600,
         ),
         (
+            "splunk parallel red contracts",
+            [python, "-m", "pytest", "-q", "scripts/test_splunk_parallel_red_contracts.py"],
+            600,
+        ),
+        (
             "local exporter success",
             [python, str(SPLUNK_EXPORTER_CLI), "local-e2e", "--scenario", "success", "--alarm-fixture", "scripts/fixtures/splunk_evidence/oci_raw_alarm.json"],
             300,
@@ -216,6 +221,7 @@ def _splunk_evidence_manifest() -> dict[str, object]:
     stage_script_paths = [
         SCRIPTS_DIR / "generate_splunk_detection_registry.py",
         SCRIPTS_DIR / "validate_terraform_static.py",
+        SCRIPTS_DIR / "verify_splunk_function_supply_chain.py",
         SCRIPTS_DIR / "sitecustomize.py",
     ]
     roots = {
@@ -226,6 +232,13 @@ def _splunk_evidence_manifest() -> dict[str, object]:
         "offline-stage-dependencies": stage_script_paths,
         "schemas-config": [* (PROJECT_DIR / "schemas").glob("splunk_*.json"), PROJECT_DIR / "config/splunk_parallel_delivery.yaml"],
         "release-tests": [PROJECT_DIR / "scripts/release_checklist.py", *SCRIPTS_DIR.glob("test_splunk_*.py"), SCRIPTS_DIR / "test_check_inventory_drift.py"],
+        "function-supply-chain": [
+            PROJECT_DIR / "stack/modules/splunk_evidence_exporter/function/README.md",
+            PROJECT_DIR / "stack/modules/splunk_evidence_exporter/function/func.yaml",
+            PROJECT_DIR / "stack/modules/splunk_evidence_exporter/function/requirements.txt",
+            PROJECT_DIR / "stack/modules/splunk_evidence_exporter/function/stage_build_context.py",
+            PROJECT_DIR / "docs/SPLUNK_FUNCTION_DEPENDENCY_LOCK.md",
+        ],
         "docs-diagrams": [*PROJECT_DIR.glob("docs/SPLUNK*.md"), *PROJECT_DIR.glob("docs/diagrams/*splunk*"), *PROJECT_DIR.glob("docs/diagrams/*logan*" )],
         "terraform": [* (PROJECT_DIR / "stack").glob("**/*.tf"), * (PROJECT_DIR / "stack").glob("**/*.yaml"), * (PROJECT_DIR / "stack").glob("**/*.yml")],
     }
@@ -240,6 +253,7 @@ def _splunk_evidence_manifest() -> dict[str, object]:
         "scripts/splunk_evidence_exporter_cli.py",
         "scripts/generate_splunk_detection_registry.py",
         "scripts/validate_terraform_static.py",
+        "scripts/verify_splunk_function_supply_chain.py",
         "scripts/sitecustomize.py",
         "queries/splunk_detection_registry.json",
         "config/splunk_parallel_delivery.yaml",

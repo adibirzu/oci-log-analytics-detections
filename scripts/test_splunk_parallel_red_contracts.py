@@ -197,6 +197,24 @@ def test_service_emits_success_metrics_and_delivery_counts():
     ]
 
 
+def test_service_with_actual_metrics_adapter_emits_success_and_count_metrics():
+    client = _MetricsClient()
+    metrics = OciMonitoringMetricsAdapter(
+        client=client,
+        compartment_id="compartment",
+        namespace="oci_log_analytics_splunk_exporter",
+        metric_data_factory=lambda **kwargs: kwargs,
+    )
+    receipt = _metric_service(metrics, {"status": 200, "response": {"code": 0}}).export(
+        AlarmTrigger.from_payload(alarm_payload())
+    )
+    assert receipt.status == "delivered"
+    assert [payload["metric_data"][0]["name"] for payload in client.payloads] == [
+        "DeliverySucceeded", "DeliveredEvents"
+    ]
+    assert [payload["metric_data"][0]["datapoints"][0]["value"] for payload in client.payloads] == [1, 1]
+
+
 def test_service_emits_failure_and_dead_letter_metrics_without_making_metrics_fatal():
     metrics = _MetricSink(fail=True)
     dead_letters = []
@@ -208,6 +226,24 @@ def test_service_emits_failure_and_dead_letter_metrics_without_making_metrics_fa
     assert [(name, value) for name, value, _ in metrics.calls] == [
         ("DeliveryFailed", 1), ("DeadLetteredEvents", 1)
     ]
+
+
+def test_service_with_actual_metrics_adapter_emits_failure_and_dead_letter_counts():
+    client = _MetricsClient()
+    metrics = OciMonitoringMetricsAdapter(
+        client=client,
+        compartment_id="compartment",
+        namespace="oci_log_analytics_splunk_exporter",
+        metric_data_factory=lambda **kwargs: kwargs,
+    )
+    receipt = _metric_service(metrics, TimeoutError("timeout")).export(
+        AlarmTrigger.from_payload(alarm_payload())
+    )
+    assert receipt.status == "delivery_failed"
+    assert [payload["metric_data"][0]["name"] for payload in client.payloads] == [
+        "DeliveryFailed", "DeadLetteredEvents"
+    ]
+    assert [payload["metric_data"][0]["datapoints"][0]["value"] for payload in client.payloads] == [1, 1]
 
 
 def test_partial_delivery_emits_both_delivered_and_dead_lettered_event_metrics():

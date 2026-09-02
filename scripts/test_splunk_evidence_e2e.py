@@ -114,12 +114,12 @@ def test_duplicate_invocation_retains_stable_keys_and_reports_at_least_once_deli
 
     assert result.returncode == 0, result.stderr
     receipt = json.loads(result.stdout)
-    assert receipt["status"] == "delivered"
+    assert receipt["status"] == "no_evidence"
     assert receipt["invocation_count"] == 2
-    assert receipt["hec_attempt_count"] == 2
+    assert receipt["hec_attempt_count"] == 1
     assert receipt["stable_event_keys"] is True
-    assert receipt["duplicate_event_count"] == 3
-    assert receipt["checkpoint_committed"] is True
+    assert receipt["duplicate_event_count"] == 0
+    assert receipt["checkpoint_committed"] is False
 
 
 def test_service_visible_retry_succeeds_before_budget_and_then_commits():

@@ -188,6 +188,7 @@ class ObjectStorageStateAdapter:
         self._client = client
         self._namespace = _required_text(namespace, "Object Storage namespace")
         self._bucket = _required_text(bucket, "Object Storage bucket")
+        self._etags: dict[str, str | None] = {}
 
     def _object_name(self, detection_id: str, dimensions: Mapping[str, str]) -> str:
         return (
@@ -198,14 +199,16 @@ class ObjectStorageStateAdapter:
     def load_checkpoint(
         self, detection_id: str, dimensions: Mapping[str, str]
     ) -> datetime | None:
+        object_name = self._object_name(detection_id, dimensions)
         try:
             response = self._client.get_object(
                 namespace_name=self._namespace,
                 bucket_name=self._bucket,
-                object_name=self._object_name(detection_id, dimensions),
+                object_name=object_name,
             )
         except Exception as exc:
             if getattr(exc, "status", None) == 404:
+                self._etags[object_name] = None
                 return None
             raise RuntimeError("checkpoint state is unavailable") from None
         content = getattr(response.data, "content", None)
@@ -219,6 +222,7 @@ class ObjectStorageStateAdapter:
             raise RuntimeError("checkpoint state is invalid") from None
         if checkpoint.tzinfo is None or checkpoint.utcoffset() is None:
             raise RuntimeError("checkpoint state is invalid")
+        self._etags[object_name] = getattr(response, "etag", None) or getattr(getattr(response, "headers", {}), "get", lambda _key: None)("etag")
         return checkpoint.astimezone(timezone.utc)
 
     def save_checkpoint(
@@ -239,16 +243,43 @@ class ObjectStorageStateAdapter:
             sort_keys=True,
             separators=(",", ":"),
         )
-        try:
-            self._client.put_object(
-                namespace_name=self._namespace,
-                bucket_name=self._bucket,
-                object_name=self._object_name(detection_id, dimensions),
-                put_object_body=body,
-                content_type="application/json",
-            )
-        except Exception:
-            raise RuntimeError("checkpoint state could not be committed") from None
+        object_name = self._object_name(detection_id, dimensions)
+        # Retry a bounded read/compare/CAS loop.  This prevents a slower alarm
+        # invocation from replacing a later checkpoint.
+        for _ in range(3):
+            known = self._etags.get(object_name, "__unloaded__")
+            if known == "__unloaded__":
+                # The production SDK always implements get_object.  The
+                # fallback keeps the pure local adapter seam usable while
+                # still issuing create-only conditional writes.
+                current = self.load_checkpoint(detection_id, dimensions) if hasattr(self._client, "get_object") else None
+                if current is not None and current >= checkpoint:
+                    return
+                known = self._etags.get(object_name)
+            request = {
+                "namespace_name": self._namespace,
+                "bucket_name": self._bucket,
+                "object_name": object_name,
+                "put_object_body": body,
+                "content_type": "application/json",
+            }
+            if known is None:
+                request["if_none_match"] = "*"
+            else:
+                request["if_match"] = known
+            try:
+                response = self._client.put_object(**request)
+                self._etags[object_name] = getattr(response, "etag", None) or getattr(getattr(response, "headers", {}), "get", lambda _key: None)("etag")
+                return
+            except Exception as exc:
+                if getattr(exc, "status", None) != 412:
+                    raise RuntimeError("checkpoint state could not be committed") from None
+                # A concurrent writer won. Reload its watermark and only retry
+                # if this invocation can move it forward.
+                current = self.load_checkpoint(detection_id, dimensions)
+                if current is not None and current >= checkpoint:
+                    return
+        raise RuntimeError("checkpoint state could not be committed")
 
     @classmethod
     def from_resource_principal(

@@ -79,6 +79,49 @@ def test_alarm_trigger_decodes_sanitized_notification():
     }
 
 
+def test_alarm_trigger_decodes_oci_raw_monitoring_alarm_without_trusting_detection_id():
+    """The provider payload identity is bound later to the governed registry."""
+    payload = {
+        "version": "1.0",
+        "type": "com.oraclecloud.monitoring.alarm",
+        "data": {
+            "alarmMetaData": [{
+                "id": "ocid1.alarm.oc1..fixture",
+                "namespace": "oci_log_analytics_detections",
+                "query": "AuditFailures[5m].sum() > 0",
+                "dimensions": {"Status": "Failure"},
+            }],
+            "timestamp": "2026-09-02T07:15:00Z",
+            "metricName": "AuditFailures",
+            "detectionId": "attacker-controlled-id",
+        },
+    }
+
+    trigger = AlarmTrigger.from_payload(payload)
+
+    assert trigger.alarm_id == "ocid1.alarm.oc1..fixture"
+    assert trigger.detection_id is None
+    assert trigger.query == "AuditFailures[5m].sum() > 0"
+
+
+def test_raw_alarm_contract_rejects_namespace_metric_dimension_and_query_mismatch():
+    entry = registry_entry()
+    entry["alarm_contract"] = {
+        "alarm_id": "ocid1.alarm.oc1..fixture",
+        "metric_namespace": "oci_log_analytics_detections",
+        "metric_name": "AuditFailures",
+        "query": "AuditFailures[5m].sum() > 0",
+        "log_analytics_namespace": "oci_log_analytics_detections",
+        "allowed_dimensions": {"Status": "Failure"},
+    }
+    trigger = AlarmTrigger.from_payload({"data": {
+        "alarmMetaData": [{"id": "ocid1.alarm.oc1..fixture", "namespace": "oci_log_analytics_detections", "query": "different", "dimensions": {"Status": "Failure"}}],
+        "timestamp": "2026-09-02T07:15:00Z", "metricName": "AuditFailures",
+    }})
+    with pytest.raises(ValueError, match="alarm contract mismatch"):
+        EvidenceExportService._validate_alarm_contract(entry, trigger)
+
+
 @pytest.mark.parametrize(
     "overrides",
     [
@@ -201,6 +244,10 @@ def registry_entry():
         "id": "oci-audit-failures",
         "title": "OCI Audit Failures",
         "oci_query_file": "queries/hunting/oci_audit_failures.json",
+        "required_fields": [
+            "Event Type", "Status", "Evidence Version", "api_token", "Password Hash", "Authorization",
+            "clientSecret", "Resource OCID", "Customer Field", "Details",
+        ],
         "detection": {"severity": "medium", "mitre_techniques": ["T1078"]},
         "evidence": {"include_original_content": False, "redaction_profile": None},
     }
@@ -249,6 +296,17 @@ def test_evidence_event_is_schema_valid_excludes_original_and_redacts_secrets():
     assert fields["Details"] == '{"authorization":"[REDACTED]","operation":"update"}'
     with pytest.raises(FrozenInstanceError):
         event.batch_id = "different"
+
+
+def test_evidence_export_is_allowlisted_and_ignores_unreviewed_query_columns():
+    entry = registry_entry()
+    entry["required_fields"] = ["Status"]
+    window = QueryWindow(
+        start=datetime(2026, 9, 2, 7, 8, tzinfo=timezone.utc),
+        end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+    )
+    event = build_evidence_event(entry, {"Status": "Failure", "new_column": "must-not-export"}, window, "batch")
+    assert event.to_dict()["evidence"]["fields"] == [{"name": "Status", "value": "Failure"}]
 
 
 def test_evidence_event_rejects_direct_construction_with_empty_schema_sections():

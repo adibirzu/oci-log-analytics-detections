@@ -105,16 +105,23 @@ def _thaw(value: object) -> object:
 class AlarmTrigger:
     """Sanitized Monitoring alarm data used to initiate one evidence query."""
 
-    detection_id: str
+    detection_id: str | None
     alarm_end: datetime
     namespace: str
     metric_name: str
     dimensions: Mapping[str, str]
+    alarm_id: str | None = None
+    query: str | None = None
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self, "detection_id", _required_text(self.detection_id, "detection_id")
-        )
+        if self.detection_id is not None:
+            object.__setattr__(
+                self, "detection_id", _required_text(self.detection_id, "detection_id")
+            )
+        if self.alarm_id is not None:
+            object.__setattr__(self, "alarm_id", _required_text(self.alarm_id, "alarm_id"))
+        if self.query is not None:
+            object.__setattr__(self, "query", _required_text(self.query, "alarm query"))
         object.__setattr__(self, "alarm_end", _parse_alarm_time(self.alarm_end))
         object.__setattr__(
             self, "namespace", _required_text(self.namespace, "namespace")
@@ -131,8 +138,16 @@ class AlarmTrigger:
         if not isinstance(payload, Mapping):
             raise ValueError("alarm payload must be an object")
         data = _payload_data(payload)
+        metadata = _first(data, "alarmMetaData", "alarm_metadata")
+        if isinstance(metadata, (list, tuple)):
+            metadata = metadata[0] if len(metadata) == 1 else None
+        if not isinstance(metadata, Mapping):
+            metadata = {}
+        # A provider RAW payload has no governed detection identity.  Never map
+        # its optional custom detectionId; the service binds alarm_id to registry.
+        raw_provider = bool(metadata)
         return cls(
-            detection_id=_first(
+            detection_id=None if raw_provider else _first(
                 data, "detectionId", "detection_id", "ruleId", "rule_id"
             ),
             alarm_end=_first(
@@ -142,9 +157,15 @@ class AlarmTrigger:
                 "timestamp",
                 "timestampEpochMillis",
             ),
-            namespace=_first(data, "namespace", "metricNamespace", "metric_namespace"),
-            metric_name=_first(data, "metricName", "metric_name"),
-            dimensions=_first(data, "dimensions"),
+            namespace=_first(metadata, "namespace", "metricNamespace", "metric_namespace")
+            or _first(data, "namespace", "metricNamespace", "metric_namespace"),
+            metric_name=_first(metadata, "metricName", "metric_name")
+            or _first(data, "metricName", "metric_name"),
+            dimensions=_first(metadata, "dimensions") or _first(data, "dimensions"),
+            alarm_id=_first(metadata, "id", "alarmId", "alarm_id")
+            or _first(data, "alarmId", "alarm_id"),
+            query=_first(metadata, "query", "metricQuery", "metric_query")
+            or _first(data, "query", "metricQuery", "metric_query"),
         )
 
     decode = from_payload

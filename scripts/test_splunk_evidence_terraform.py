@@ -170,6 +170,14 @@ def test_module_wires_only_the_scoped_exporter_path_with_logging_and_lifecycle()
     assert 'FunctionResponseCount[5m]' in main
     assert "oci_functions_function.exporter[0].id" in main
 
+    assert 'resource "oci_monitoring_alarm" "governed_detection"' in main
+    assert "governed_detection_alarm_ids" in main
+    assert "windows-access-rdp-after-hours" in main
+    governed = main.split('resource "oci_monitoring_alarm" "governed_detection"', 1)[1]
+    assert re.search(r'\bis_enabled\s*=\s*false\b', governed)
+    assert 'resource "oci_monitoring_alarm" "exporter_delivery_failures"' in main
+    assert "oci_log_analytics_splunk_exporter" in _read(MODULE / "variables.tf")
+
 
 def test_identifier_outputs_are_explicitly_sensitive_and_never_include_secrets() -> None:
     module_outputs = _read(MODULE / "outputs.tf")

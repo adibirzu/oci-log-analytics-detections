@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import random
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Callable, Mapping
@@ -56,12 +58,14 @@ def _runtime_maximum(value: object, label: str) -> int:
 
 
 def _delivery_outcome(
-    hec: HecDeliveryPort, batch: ExportBatch, max_attempts: int
+    hec: HecDeliveryPort, batch: ExportBatch, max_attempts: int,
+    *, sleep: Callable[[float], None] = time.sleep,
+    random_fraction: Callable[[], float] = random.random,
 ) -> str:
     """Run service-visible HEC attempts; one adapter call is one attempt."""
 
     outcome = "retryable"
-    for _ in range(max_attempts):
+    for attempt in range(max_attempts):
         try:
             result = hec.deliver(batch)
             outcome = classify_hec_failure(
@@ -81,6 +85,9 @@ def _delivery_outcome(
             outcome = classify_hec_failure(sanitized_failure)
         if outcome != "retryable":
             return outcome
+        if attempt + 1 < max_attempts:
+            jitter = max(0.0, min(1.0, float(random_fraction())))
+            sleep(min(4.0, 0.25 * (2**attempt)) * (0.5 + jitter))
     return outcome
 
 
@@ -132,6 +139,8 @@ class EvidenceExportService:
         max_rows: int,
         max_batch_events: int,
         max_attempts: int = 4,
+        sleep: Callable[[float], None] = time.sleep,
+        random_fraction: Callable[[], float] = random.random,
     ) -> None:
         self._registry = registry
         self._query = query
@@ -145,10 +154,18 @@ class EvidenceExportService:
         self._max_rows = max_rows
         self._max_batch_events = max_batch_events
         self._max_attempts = _runtime_maximum(max_attempts, "max_attempts")
+        self._sleep = sleep
+        self._random_fraction = random_fraction
+        # Invocation-local duplicate guard.  Persistent checkpoint/CAS prevents
+        # out-of-order watermarks; an externally durable delivery ledger is a
+        # separate deployment concern and is deliberately not implied here.
+        self._delivered_event_keys: set[str] = set()
 
     def export(self, trigger: AlarmTrigger) -> ExportReceipt:
         registry_document = self._registry.load()
-        entry = self._find_entry(registry_document, trigger.detection_id)
+        entry = self._find_entry(registry_document, trigger)
+        detection_id = entry["id"]
+        self._validate_alarm_contract(entry, trigger)
         delivery = entry.get("delivery", {})
         if not isinstance(delivery, Mapping):
             raise ValueError("registry delivery configuration must be an object")
@@ -164,7 +181,7 @@ class EvidenceExportService:
             delivery.get("max_attempts"), self._max_attempts, "max_attempts"
         )
         checkpoint = self._checkpoint.load_checkpoint(
-            trigger.detection_id, trigger.dimensions
+            detection_id, trigger.dimensions
         )
         window = calculate_window(
             trigger.alarm_end,
@@ -182,20 +199,21 @@ class EvidenceExportService:
                 max_rows=max_rows,
             )
         )
-        batch_id = self._batch_id(trigger)
+        batch_id = self._batch_id(trigger, detection_id)
         unique_rows: dict[str, Mapping[str, object]] = {}
         for row in rows:
-            unique_rows.setdefault(event_key(trigger.detection_id, row), row)
+            unique_rows.setdefault(event_key(detection_id, row, window), row)
         events = tuple(
             build_evidence_event(entry, row, window, batch_id)
             for row in unique_rows.values()
         )
+        events = tuple(event for event in events if event.event_key not in self._delivered_event_keys)
         batches = batch_events(events, max_batch_events)
 
         if not events:
             return ExportReceipt(
                 status="no_evidence",
-                detection_id=trigger.detection_id,
+                detection_id=detection_id,
                 window_start=window.start,
                 window_end=window.end,
                 row_count=len(rows),
@@ -209,7 +227,7 @@ class EvidenceExportService:
         delivered_count = 0
         delivered_event_keys: list[str] = []
         for batch_index, batch in enumerate(batches):
-            outcome = _delivery_outcome(self._hec, batch, max_attempts)
+            outcome = _delivery_outcome(self._hec, batch, max_attempts, sleep=self._sleep, random_fraction=self._random_fraction)
             if outcome != "success":
                 remaining_events = tuple(
                     event
@@ -220,13 +238,13 @@ class EvidenceExportService:
                     ExportBatch(batch_id=batch_id, events=remaining_events),
                     outcome,
                     delivered_event_keys=tuple(delivered_event_keys),
-                    detection_id=trigger.detection_id,
+                    detection_id=detection_id,
                     dimensions=trigger.dimensions,
                     checkpoint=window.end,
                 )
                 return ExportReceipt(
                     status="delivery_failed",
-                    detection_id=trigger.detection_id,
+                    detection_id=detection_id,
                     window_start=window.start,
                     window_end=window.end,
                     row_count=len(rows),
@@ -238,13 +256,14 @@ class EvidenceExportService:
                 )
             delivered_count += len(batch.events)
             delivered_event_keys.extend(event.event_key for event in batch.events)
+            self._delivered_event_keys.update(event.event_key for event in batch.events)
 
         self._checkpoint.save_checkpoint(
-            trigger.detection_id, trigger.dimensions, window.end
+            detection_id, trigger.dimensions, window.end
         )
         return ExportReceipt(
             status="delivered",
-            detection_id=trigger.detection_id,
+            detection_id=detection_id,
             window_start=window.start,
             window_end=window.end,
             row_count=len(rows),
@@ -256,26 +275,44 @@ class EvidenceExportService:
         )
 
     @staticmethod
-    def _find_entry(document: object, detection_id: str) -> Mapping[str, object]:
+    def _find_entry(document: object, trigger: AlarmTrigger) -> Mapping[str, object]:
         if not isinstance(document, Mapping):
             raise ValueError("registry document must be an object")
         detections = document.get("detections")
         if not isinstance(detections, list):
             raise ValueError("registry detections must be a list")
         for entry in detections:
-            if isinstance(entry, Mapping) and entry.get("id") == detection_id:
+            if not isinstance(entry, Mapping):
+                continue
+            contract = entry.get("alarm_contract")
+            if trigger.alarm_id is not None and isinstance(contract, Mapping) and contract.get("alarm_id") == trigger.alarm_id:
                 return entry
-        raise ValueError("alarm detection is not present in the registry")
+            if trigger.alarm_id is None and trigger.detection_id is not None and entry.get("id") == trigger.detection_id:
+                return entry
+        raise ValueError("alarm identity is not present in the registry")
 
     @staticmethod
-    def _batch_id(trigger: AlarmTrigger) -> str:
+    def _validate_alarm_contract(entry: Mapping[str, object], trigger: AlarmTrigger) -> None:
+        if trigger.alarm_id is None:
+            return
+        contract = entry.get("alarm_contract")
+        required = ("alarm_id", "metric_namespace", "metric_name", "query", "log_analytics_namespace", "allowed_dimensions")
+        if not isinstance(contract, Mapping) or any(key not in contract for key in required):
+            raise ValueError("governed alarm contract is incomplete")
+        if (contract["alarm_id"] != trigger.alarm_id or contract["metric_namespace"] != trigger.namespace or contract["metric_name"] != trigger.metric_name or contract["query"] != trigger.query or contract["log_analytics_namespace"] != trigger.namespace):
+            raise ValueError("alarm contract mismatch")
+        if not isinstance(contract["allowed_dimensions"], Mapping) or dict(contract["allowed_dimensions"]) != dict(trigger.dimensions):
+            raise ValueError("alarm dimensions do not match the governed contract")
+
+    @staticmethod
+    def _batch_id(trigger: AlarmTrigger, detection_id: str) -> str:
         time_id = trigger.alarm_end.strftime("%Y%m%dT%H%M%SZ").lower()
         dimension_hash = hashlib.sha256(
             json.dumps(
                 dict(trigger.dimensions), sort_keys=True, separators=(",", ":")
             ).encode("utf-8")
         ).hexdigest()[:12]
-        return f"{trigger.detection_id}-{time_id}-{dimension_hash}"
+        return f"{detection_id}-{time_id}-{dimension_hash}"
 
 
 @dataclass(frozen=True)

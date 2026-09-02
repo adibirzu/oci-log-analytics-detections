@@ -63,21 +63,35 @@ def normalize_for_hash(value: object) -> object:
     raise TypeError(f"unsupported event row value: {type(value).__name__}")
 
 
-def event_key(rule_id: str, row: Mapping[str, object]) -> str:
-    """Return the idempotency key for a rule and complete evidence row."""
+def event_key(
+    rule_id: str, row: Mapping[str, object], window: QueryWindow | None = None
+) -> str:
+    """Return a deterministic key over governed evidence identity only.
+
+    A query can add columns over time.  The caller supplies an already
+    allowlisted row, and the window makes a repeated alarm invocation stable
+    without conflating two otherwise identical events from different windows.
+    """
 
     if not isinstance(rule_id, str) or not rule_id.strip():
         raise ValueError("rule_id must be a non-empty string")
     if not isinstance(row, Mapping):
         raise TypeError("row must be a mapping")
+    identity: dict[str, object] = {"detection_id": rule_id, "row": normalize_for_hash(row)}
+    if window is not None:
+        if not isinstance(window, QueryWindow):
+            raise TypeError("window must be a QueryWindow")
+        # The alarm/end watermark is stable across a retried invocation while
+        # the overlap start may move after a concurrent checkpoint commit.
+        identity["window_end"] = _normalize_datetime(window.end)
     canonical = json.dumps(
-        normalize_for_hash(row),
+        identity,
         sort_keys=True,
         separators=(",", ":"),
         ensure_ascii=False,
         allow_nan=False,
     )
-    return hashlib.sha256(f"{rule_id}\n{canonical}".encode("utf-8")).hexdigest()
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def _field_identifier(name: str) -> str:
@@ -163,8 +177,16 @@ def build_evidence_event(
     if _QUERY_FILE.fullmatch(query_file) is None:
         raise ValueError("registry query file is not a canonical evidence schema path")
 
+    allowed = registry_entry.get("required_fields")
+    if not isinstance(allowed, list) or not all(isinstance(value, str) for value in allowed):
+        raise ValueError("registry required_fields must be an explicit export allowlist")
+    # Time and common source/entity columns support repeatable evidence identity;
+    # every other field must be governed by the registry.
+    identity_fields = {"Time", "Log Source", "Entity"}
+    allowed_names = set(allowed) | identity_fields
+    sanitized_row = {name: row[name] for name in row if name in allowed_names}
     fields: list[dict[str, object]] = []
-    for name in sorted(row):
+    for name in sorted(sanitized_row):
         if not isinstance(name, str) or not name:
             raise ValueError("evidence field names must be non-empty strings")
         if name.casefold() == _ORIGINAL_CONTENT_FIELD:
@@ -175,13 +197,13 @@ def build_evidence_event(
                 "value": (
                     _REDACTED
                     if _is_sensitive(name, sensitive_fields)
-                    else _field_value(_redact_nested(row[name], sensitive_fields))
+                    else _field_value(_redact_nested(sanitized_row[name], sensitive_fields))
                 ),
             }
         )
 
     return EvidenceEvent._from_validated_payload(
-        event_key=event_key(rule_id, row),
+        event_key=event_key(rule_id, sanitized_row, window),
         batch_id=batch_id,
         detection={"id": rule_id, "title": title, "severity": severity},
         evidence={"include_original_content": False, "fields": fields},

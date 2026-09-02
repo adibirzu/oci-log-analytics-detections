@@ -16,6 +16,18 @@ variable "enable_notification_subscription" {
   default     = false
 }
 
+variable "log_analytics_metric_namespace" {
+  type        = string
+  description = "Governed Monitoring metric namespace for Log Analytics detection signals"
+  default     = "oci_log_analytics_detections"
+}
+
+variable "exporter_telemetry_namespace" {
+  type        = string
+  description = "Governed Monitoring metric namespace for exporter operational telemetry"
+  default     = "oci_log_analytics_splunk_exporter"
+}
+
 variable "compartment_id" {
   type        = string
   description = "OCID of the compartment that owns the scoped exporter resources"

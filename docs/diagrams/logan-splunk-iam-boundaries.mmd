@@ -2,28 +2,34 @@
 %% Evidence: configured disabled Terraform and IAM review output; provider verified = false; release accepted = false
 %% Primary objects: 9
 flowchart LR
-  subgraph OP["Operator identity boundary"]
-    operator["Reviewed operator"]
-  end
-  subgraph RAW["Raw route identity boundary"]
+  subgraph CONNECTOR["Connector Hub service principal"]
     connector["Connector Hub identity"]
+  end
+  subgraph RAW["Independent raw transport"]
+    streaming["OCI Streaming"]
     oci_splunk["oci-splunk"]
   end
-  subgraph FN["Function dynamic-group boundary"]
+  subgraph ONS["Notifications service principal"]
+    notifications["Notifications"]
+  end
+  subgraph FUNCTION["Function dynamic group principal"]
     function["Function"]
+  end
+  subgraph TARGETS["Function permission targets"]
     logan["Log Analytics"]
     vault["Vault"]
     state["checkpoint/DLQ"]
-    notifications["Notifications"]
   end
-  subgraph DEST["Customer-managed destination boundary"]
+  subgraph DEST["Customer-managed destination"]
     hec["Splunk HEC"]
   end
-  operator -.->|"control: deploy and enable after review"| function
-  connector -.->|"control: scoped raw route"| oci_splunk
+  connector -.->|"control: scoped stream-push permission"| streaming
+  streaming -->|"telemetry: raw records"| oci_splunk
+  oci_splunk -->|"telemetry: raw HEC batches"| hec
+  hec -.->|"response: raw delivery receipt"| oci_splunk
   notifications -.->|"control: invoke exact Function"| function
-  function -.->|"control: query permissions"| logan
+  function -.->|"control: Log Analytics query permission"| logan
   function -.->|"control: one secret-bundle read"| vault
-  function -.->|"control: exact state and DLQ object access"| state
-  function -->|"telemetry: evidence batch over reviewed route"| hec
+  function -.->|"control: checkpoint and DLQ object access"| state
+  function -->|"telemetry: evidence batch"| hec
   hec -.->|"response: HEC acceptance"| function

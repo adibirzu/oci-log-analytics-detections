@@ -39,6 +39,135 @@ TENANT_SPECIFIC = re.compile(
     r"(?i)ocid1\.|https?://|www\.|(?:\d{1,3}\.){3}\d{1,3}|"
     r"(?:password|api[_ -]?key|authorization)\s*[:=]"
 )
+FLOWCHART_NODE = re.compile(r'^\s*([A-Za-z][A-Za-z0-9_]*)\["([^"]+)"\]\s*$')
+FLOWCHART_EDGE = re.compile(
+    r'^\s*([A-Za-z][A-Za-z0-9_]*)\s+(?:-->|-\.->|==>)\|"([^"]+)"\|\s*'
+    r'([A-Za-z][A-Za-z0-9_]*)\s*$'
+)
+FOCUSED_TOPOLOGY = {
+    "logan-splunk-iam-boundaries": {
+        "groups": {
+            "connector": "Connector Hub service principal",
+            "streaming": "Independent raw transport",
+            "oci_splunk": "Independent raw transport",
+            "notifications": "Notifications service principal",
+            "function": "Function dynamic group principal",
+            "logan": "Function permission targets",
+            "vault": "Function permission targets",
+            "state": "Function permission targets",
+            "hec": "Customer-managed destination",
+        },
+        "edges": {
+            ("connector", "streaming"): "control: scoped stream-push permission",
+            ("streaming", "oci_splunk"): "telemetry: raw records",
+            ("oci_splunk", "hec"): "telemetry: raw HEC batches",
+            ("hec", "oci_splunk"): "response: raw delivery receipt",
+            ("notifications", "function"): "control: invoke exact Function",
+            ("function", "logan"): "control: Log Analytics query permission",
+            ("function", "vault"): "control: one secret-bundle read",
+            ("function", "state"): "control: checkpoint and DLQ object access",
+            ("function", "hec"): "telemetry: evidence batch",
+            ("hec", "function"): "response: HEC acceptance",
+        },
+    },
+    "logan-splunk-onboarding": {
+        "groups": {
+            "owner": "Ownership and mode",
+            "mode": "Ownership and mode",
+            "raw_route": "Raw branch",
+            "oci_splunk": "Raw branch",
+            "logan": "Evidence branch",
+            "evidence_export": "Evidence branch",
+            "hec": "Shared destination",
+            "join": "Acceptance",
+            "acceptance": "Acceptance",
+        },
+        "edges": {
+            ("owner", "mode"): "control: approve source, retention, and mode",
+            ("mode", "raw_route"): "control: raw selected",
+            ("raw_route", "oci_splunk"): "telemetry: Connector Hub to Streaming records",
+            ("oci_splunk", "hec"): "telemetry: raw HEC batches",
+            ("mode", "logan"): "control: evidence selected",
+            ("logan", "evidence_export"): "telemetry: detection evidence",
+            ("evidence_export", "hec"): "telemetry: normalized evidence batches",
+            ("hec", "join"): "response: selected-mode search receipts",
+            ("mode", "join"): "control: both requires two independent receipts",
+            ("join", "acceptance"): "control: record selected-mode acceptance",
+        },
+    },
+    "logan-splunk-onprem-agent": {
+        "groups": {
+            "host": "On-premises source",
+            "agent": "On-premises source",
+            "gateway": "On-premises source",
+            "association": "OCI analytics",
+            "logan": "OCI analytics",
+            "detection": "OCI analytics",
+            "function": "OCI analytics",
+            "hec": "Customer-managed destination",
+            "response": "Customer-managed destination",
+        },
+        "edges": {
+            ("host", "agent"): "telemetry: collected records",
+            ("agent", "association"): "telemetry: direct Log Analytics ingestion",
+            ("agent", "gateway"): "telemetry: optional gateway path",
+            ("gateway", "association"): "telemetry: relayed Log Analytics ingestion",
+            ("association", "logan"): "telemetry: parsed associated records",
+            ("logan", "detection"): "telemetry: detection evidence",
+            ("detection", "function"): "control: reviewed trigger chain",
+            ("function", "hec"): "telemetry: normalized evidence only",
+            ("hec", "response"): "response: searchable evidence",
+        },
+    },
+    "logan-splunk-validation": {
+        "groups": {
+            "source": "Selected-mode scope",
+            "connector": "Raw-route gates",
+            "streaming": "Raw-route gates",
+            "oci_splunk": "Raw-route gates",
+            "logan": "Evidence-route gates",
+            "evidence_gate": "Evidence-route gates",
+            "hec": "Shared destination gates",
+            "search": "Shared destination gates",
+            "release": "Release boundary",
+        },
+        "edges": {
+            ("source", "connector"): "telemetry: raw canary",
+            ("connector", "streaming"): "telemetry: Connector Hub delivery",
+            ("streaming", "oci_splunk"): "telemetry: stream consumption",
+            ("oci_splunk", "hec"): "telemetry: raw HEC batch",
+            ("source", "logan"): "telemetry: evidence canary",
+            ("logan", "evidence_gate"): "telemetry: parse, detection, metric, and invocation",
+            ("evidence_gate", "hec"): "telemetry: evidence HEC batch",
+            ("hec", "search"): "response: accepted and searchable",
+            ("search", "release"): "control: accept every selected mode",
+        },
+    },
+    "logan-splunk-troubleshooting": {
+        "groups": {
+            "symptom": "Symptom",
+            "connector": "Raw route",
+            "streaming": "Raw route",
+            "oci_splunk": "Raw route",
+            "logan": "Evidence route",
+            "trigger": "Evidence route",
+            "function_state": "Evidence route",
+            "hec": "Shared destination",
+            "search": "Shared destination",
+        },
+        "edges": {
+            ("symptom", "connector"): "control: inspect raw route upstream",
+            ("connector", "streaming"): "telemetry: verify Connector Hub delivery",
+            ("streaming", "oci_splunk"): "telemetry: inspect lag and consumption",
+            ("oci_splunk", "hec"): "telemetry: retry-safe raw batch",
+            ("symptom", "logan"): "control: verify bounded evidence query",
+            ("logan", "trigger"): "telemetry: inspect metric and notification",
+            ("trigger", "function_state"): "control: inspect invocation, checkpoint, and DLQ",
+            ("function_state", "hec"): "telemetry: retry-safe evidence batch",
+            ("hec", "search"): "response: accepted and searchable",
+        },
+    },
+}
 
 
 def _pair(name: str) -> tuple[Path, Path]:
@@ -49,6 +178,94 @@ def _scene(path: Path) -> dict[str, object]:
     value = json.loads(path.read_text(encoding="utf-8"))
     assert isinstance(value, dict)
     return value
+
+
+def _mermaid_topology(path: Path) -> tuple[dict[str, str], dict[tuple[str, str], str]]:
+    groups: dict[str, str] = {}
+    edges: dict[tuple[str, str], str] = {}
+    current_group: str | None = None
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        group_match = re.fullmatch(r'subgraph\s+\w+\["([^"]+)"\]', line)
+        if group_match:
+            current_group = group_match.group(1)
+            continue
+        if line == "end":
+            current_group = None
+            continue
+        node_match = FLOWCHART_NODE.fullmatch(line)
+        if node_match and current_group is not None:
+            groups[node_match.group(1)] = current_group
+            continue
+        edge_match = FLOWCHART_EDGE.fullmatch(line)
+        if edge_match:
+            edges[(edge_match.group(1), edge_match.group(3))] = edge_match.group(2)
+    return groups, edges
+
+
+def _excalidraw_topology(
+    path: Path,
+) -> tuple[dict[str, str], dict[tuple[str, str], str]]:
+    elements = _scene(path)["elements"]
+    assert isinstance(elements, list)
+    groups = {
+        element["id"]: element["customData"]["group"]
+        for element in elements
+        if isinstance(element, dict)
+        and element.get("type") == "rectangle"
+        and isinstance(element.get("customData"), dict)
+        and element["customData"].get("primaryObject") is True
+    }
+    edges = {
+        (element["customData"]["from"], element["customData"]["to"]):
+        element["customData"]["label"]
+        for element in elements
+        if isinstance(element, dict)
+        and element.get("type") == "arrow"
+        and isinstance(element.get("customData"), dict)
+        and "from" in element["customData"]
+        and "to" in element["customData"]
+    }
+    return groups, edges
+
+
+def _assert_excalidraw_boundary_geometry(
+    path: Path, expected_groups: dict[str, str]
+) -> None:
+    elements = _scene(path)["elements"]
+    assert isinstance(elements, list)
+    boundaries = {
+        element["customData"]["label"]: element
+        for element in elements
+        if isinstance(element, dict)
+        and element.get("type") == "rectangle"
+        and isinstance(element.get("customData"), dict)
+        and element["customData"].get("boundary") is True
+    }
+    primary = {
+        element["id"]: element
+        for element in elements
+        if isinstance(element, dict)
+        and element.get("type") == "rectangle"
+        and isinstance(element.get("customData"), dict)
+        and element["customData"].get("primaryObject") is True
+    }
+    assert set(boundaries) == set(expected_groups.values()), path
+    for node_id, group in expected_groups.items():
+        node = primary[node_id]
+        boundary = boundaries[group]
+        assert boundary["x"] <= node["x"], (path, node_id, "left")
+        assert boundary["y"] <= node["y"], (path, node_id, "top")
+        assert boundary["x"] + boundary["width"] >= node["x"] + node["width"], (
+            path,
+            node_id,
+            "right",
+        )
+        assert boundary["y"] + boundary["height"] >= node["y"] + node["height"], (
+            path,
+            node_id,
+            "bottom",
+        )
 
 
 def test_inventory_has_ten_editable_pairs_and_main_spec() -> None:
@@ -138,6 +355,18 @@ def test_paired_views_share_primary_object_terminology() -> None:
         assert primary_ids == labels.keys(), excalidraw
         for label in labels.values():
             assert label in mermaid_text, (name, label)
+
+
+def test_critical_views_match_explicit_boundary_and_edge_contracts() -> None:
+    for name, contract in FOCUSED_TOPOLOGY.items():
+        mermaid, excalidraw = _pair(name)
+        mermaid_groups, mermaid_edges = _mermaid_topology(mermaid)
+        excalidraw_groups, excalidraw_edges = _excalidraw_topology(excalidraw)
+        assert mermaid_groups == contract["groups"], (name, "Mermaid boundaries")
+        assert excalidraw_groups == contract["groups"], (name, "Excalidraw boundaries")
+        assert mermaid_edges == contract["edges"], (name, "Mermaid edges")
+        assert excalidraw_edges == contract["edges"], (name, "Excalidraw edges")
+        _assert_excalidraw_boundary_geometry(excalidraw, contract["groups"])
 
 
 def test_main_spec_matches_implemented_architecture_inventory() -> None:

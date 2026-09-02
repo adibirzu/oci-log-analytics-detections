@@ -170,6 +170,7 @@ class EvidenceExportService:
         entry = self._find_entry(registry_document, trigger, self._alarm_bindings)
         detection_id = entry["id"]
         self._validate_alarm_contract(entry, trigger)
+        evidence_dimensions = self._evidence_dimensions(entry, trigger)
         delivery = entry.get("delivery", {})
         if not isinstance(delivery, Mapping):
             raise ValueError("registry delivery configuration must be an object")
@@ -185,7 +186,7 @@ class EvidenceExportService:
             delivery.get("max_attempts"), self._max_attempts, "max_attempts"
         )
         checkpoint = self._checkpoint.load_checkpoint(
-            detection_id, trigger.dimensions
+            detection_id, evidence_dimensions
         )
         window = calculate_window(
             trigger.alarm_end,
@@ -199,7 +200,7 @@ class EvidenceExportService:
                 namespace=self._log_analytics_namespace or trigger.namespace,
                 query_file=entry["oci_query_file"],
                 window=window,
-                dimensions=trigger.dimensions,
+                dimensions=evidence_dimensions,
                 max_rows=max_rows,
             )
         )
@@ -243,7 +244,7 @@ class EvidenceExportService:
                     outcome,
                     delivered_event_keys=tuple(delivered_event_keys),
                     detection_id=detection_id,
-                    dimensions=trigger.dimensions,
+                    dimensions=evidence_dimensions,
                     checkpoint=window.end,
                 )
                 return ExportReceipt(
@@ -263,7 +264,7 @@ class EvidenceExportService:
             self._delivered_event_keys.update(event.event_key for event in batch.events)
 
         self._checkpoint.save_checkpoint(
-            detection_id, trigger.dimensions, window.end
+            detection_id, evidence_dimensions, window.end
         )
         return ExportReceipt(
             status="delivered",
@@ -308,6 +309,15 @@ class EvidenceExportService:
             raise ValueError("alarm contract mismatch")
         if not isinstance(contract["allowed_dimensions"], Mapping) or dict(contract["allowed_dimensions"]) != dict(trigger.dimensions):
             raise ValueError("alarm dimensions do not match the governed contract")
+
+    @staticmethod
+    def _evidence_dimensions(entry: Mapping[str, object], trigger: AlarmTrigger) -> Mapping[str, str]:
+        """Map only explicitly governed routing dimensions into LA filters."""
+        contract = entry.get("alarm_contract", {})
+        mappings = contract.get("alarm_dimension_to_log_field", {}) if isinstance(contract, Mapping) else {}
+        if not isinstance(mappings, Mapping) or not all(isinstance(k, str) and isinstance(v, str) for k, v in mappings.items()):
+            raise ValueError("alarm dimension filter mapping is invalid")
+        return {log_field: trigger.dimensions[alarm_field] for alarm_field, log_field in mappings.items() if alarm_field in trigger.dimensions}
 
     @staticmethod
     def _batch_id(trigger: AlarmTrigger, detection_id: str) -> str:

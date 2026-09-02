@@ -139,6 +139,7 @@ def _entry_from_migration(migration: dict[str, Any], config: dict[str, Any]) -> 
             "metric_name": defaults.get("metric_name", "DetectionSignal"),
             "query": f'DetectionSignal[5m]{{detectionId = "{migration.get("id", "")}"}}.sum() > 0',
             "allowed_dimensions": {"detectionId": migration.get("id", "")},
+            "alarm_dimension_to_log_field": {},
         }),
     }
     return entry, provenance

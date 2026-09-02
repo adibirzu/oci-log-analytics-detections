@@ -77,7 +77,8 @@
         "metric_namespace": {"type": "string", "minLength": 1},
         "metric_name": {"type": "string", "minLength": 1},
         "query": {"type": "string", "minLength": 1},
-        "allowed_dimensions": {"type": "object", "additionalProperties": {"type": "string"}}
+        "allowed_dimensions": {"type": "object", "additionalProperties": {"type": "string"}},
+        "alarm_dimension_to_log_field": {"type": "object", "additionalProperties": {"type": "string"}}
       }
     }
   }

@@ -121,6 +121,29 @@ def test_raw_alarm_contract_rejects_namespace_metric_dimension_and_query_mismatc
         EvidenceExportService._validate_alarm_contract(entry, trigger)
 
 
+def test_provider_raw_alarm_routes_by_bound_identity_but_queries_trusted_la_namespace_without_routing_dimensions():
+    raw = json.loads((ROOT / "scripts/fixtures/splunk_evidence/oci_raw_alarm.json").read_text())
+    entry = registry_entry()
+    entry["alarm_contract"] = {
+        "binding_key": "oci-audit-failures", "metric_namespace": "oci_log_analytics_detections",
+        "metric_name": "DetectionSignal", "query": 'DetectionSignal[5m]{detectionId = "oci-audit-failures"}.sum() > 0',
+        "allowed_dimensions": {"detectionId": "oci-audit-failures"}, "alarm_dimension_to_log_field": {},
+    }
+    seen = {}
+    class Registry:
+        def load(self): return {"detections": [entry]}
+    class State:
+        def load_checkpoint(self, *_): return None
+        def save_checkpoint(self, *_): seen["checkpoint"] = True
+    class Query:
+        def query_evidence(self, **request):
+            seen.update(request); assert request["namespace"] == "trusted-la-namespace"; assert request["dimensions"] == {}; return [{"Status": "Failure"}]
+    class Hec:
+        def deliver(self, _): return {"status": 200, "response": {"code": 0}}
+    receipt = EvidenceExportService(registry=Registry(), query=Query(), checkpoint=State(), hec=Hec(), dead_letter=object(), clock=lambda: datetime(2026,9,2,7,16,tzinfo=timezone.utc), lookback=timedelta(minutes=15), overlap=timedelta(minutes=2), maximum_window=timedelta(hours=1), max_rows=100, max_batch_events=10, alarm_bindings={"redacted-alarm-id": "oci-audit-failures"}, log_analytics_namespace="trusted-la-namespace").export(AlarmTrigger.from_payload(raw))
+    assert receipt.status == "delivered" and seen["checkpoint"] is True
+
+
 @pytest.mark.parametrize(
     "overrides",
     [

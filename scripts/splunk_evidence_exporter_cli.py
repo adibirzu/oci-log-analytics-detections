@@ -329,37 +329,92 @@ def _render_function_config() -> dict[str, object]:
 def _render_iam() -> dict[str, object]:
     categories = [
         {
-            "id": "log-analytics-query",
+            "id": "operator",
+            "principal": "<OPERATOR_GROUP_NAME>",
+            "scope": "<FUNCTION_COMPARTMENT_NAME>",
+            "statements": [
+                "Allow group <OPERATOR_GROUP_NAME> to manage functions-family in compartment <FUNCTION_COMPARTMENT_NAME>",
+                "Allow group <OPERATOR_GROUP_NAME> to manage ons-family in compartment <FUNCTION_COMPARTMENT_NAME>",
+                "Allow group <OPERATOR_GROUP_NAME> to manage alarms in compartment <FUNCTION_COMPARTMENT_NAME>",
+                "Allow group <OPERATOR_GROUP_NAME> to manage log-groups in compartment <FUNCTION_COMPARTMENT_NAME>",
+            ],
+            "warning": (
+                "functions-family and ons-family are operator conveniences that "
+                "broaden access; split duties and replace them with reviewed "
+                "permission sets when the tenancy policy model supports it"
+            ),
+        },
+        {
+            "id": "connector-hub-mode-1",
+            "principal": "serviceconnector:<MODE1_CONNECTOR_OCID>",
+            "scope": [
+                "<MODE1_LOG_COMPARTMENT_NAME>",
+                "<MODE1_STREAM_COMPARTMENT_NAME>",
+            ],
+            "statements": [
+                "Allow any-user to read log-content in compartment <MODE1_LOG_COMPARTMENT_NAME> where all {request.principal.type='serviceconnector', target.serviceconnector.id='<MODE1_CONNECTOR_OCID>'}",
+                "Allow any-user to use stream-push in compartment <MODE1_STREAM_COMPARTMENT_NAME> where all {request.principal.type='serviceconnector', target.serviceconnector.id='<MODE1_CONNECTOR_OCID>'}",
+            ],
+            "warning": (
+                "Mode 1 is the separately reviewed raw Connector Hub path; do "
+                "not reuse its connector identity for the evidence Function"
+            ),
+        },
+        {
+            "id": "function-log-analytics-query",
             "principal": "<FUNCTION_DYNAMIC_GROUP_NAME>",
             "scope": "<LOG_ANALYTICS_COMPARTMENT_NAME>",
-            "permissions": [
-                "LOG_ANALYTICS_QUERY_VIEW",
-                "LOG_ANALYTICS_QUERYJOB_WORK_REQUEST_READ",
-                "read loganalytics-log-group",
+            "statements": [
+                "Allow dynamic-group <FUNCTION_DYNAMIC_GROUP_NAME> to {LOG_ANALYTICS_QUERY_VIEW, LOG_ANALYTICS_QUERYJOB_WORK_REQUEST_READ} in compartment <LOG_ANALYTICS_COMPARTMENT_NAME>",
+                "Allow dynamic-group <FUNCTION_DYNAMIC_GROUP_NAME> to read loganalytics-log-group in compartment <LOG_ANALYTICS_COMPARTMENT_NAME>",
             ],
         },
         {
-            "id": "vault-secret-read",
+            "id": "function-vault-secret",
             "principal": "<FUNCTION_DYNAMIC_GROUP_NAME>",
             "scope": "<VAULT_COMPARTMENT_NAME>",
-            "resource": "<EXISTING_VAULT_SECRET_ID>",
+            "statements": [
+                "Allow dynamic-group <FUNCTION_DYNAMIC_GROUP_NAME> to read secret-bundles in compartment <VAULT_COMPARTMENT_NAME> where target.secret.id='<EXISTING_VAULT_SECRET_OCID>'",
+            ],
+            "warning": "Reference one existing Vault secret OCID; never render or store its HEC credential value",
         },
         {
-            "id": "checkpoint-dlq-object-access",
+            "id": "function-state-dlq",
             "principal": "<FUNCTION_DYNAMIC_GROUP_NAME>",
             "scope": "<STATE_COMPARTMENT_NAME>",
-            "resources": ["<STATE_BUCKET_NAME>", "<DLQ_BUCKET_NAME>"],
+            "statements": [
+                "Allow dynamic-group <FUNCTION_DYNAMIC_GROUP_NAME> to manage objects in compartment <STATE_COMPARTMENT_NAME> where any {target.bucket.name='<STATE_BUCKET_NAME>', target.bucket.name='<DLQ_BUCKET_NAME>'}",
+            ],
+            "warning": "Keep state and DLQ bucket names exact; manage objects is bounded by the two target bucket conditions",
         },
         {
-            "id": "notifications-function-invoke",
+            "id": "notifications-function-invocation",
             "principal": "OCI Notifications",
             "scope": "<FUNCTION_COMPARTMENT_NAME>",
-            "resource": "<FUNCTION_NAME>",
+            "statements": [
+                "Allow service ons to use functions-family in compartment <FUNCTION_COMPARTMENT_NAME> where target.function.id='<FUNCTION_OCID>'",
+            ],
+            "warning": "functions-family is broad without the exact target.function.id condition",
         },
         {
-            "id": "operational-telemetry",
-            "principal": "<FUNCTION_DYNAMIC_GROUP_NAME>",
+            "id": "monitoring",
+            "principal": "<OPERATOR_GROUP_NAME>",
             "scope": "<FUNCTION_COMPARTMENT_NAME>",
+            "statements": [
+                "Allow group <OPERATOR_GROUP_NAME> to read metrics in compartment <FUNCTION_COMPARTMENT_NAME>",
+                "Allow group <OPERATOR_GROUP_NAME> to manage alarms in compartment <FUNCTION_COMPARTMENT_NAME>",
+            ],
+            "warning": "Alarm resources remain disabled until the exact topic, query, and response owner are reviewed",
+        },
+        {
+            "id": "logging",
+            "principal": "<OPERATOR_GROUP_NAME>",
+            "scope": "<FUNCTION_COMPARTMENT_NAME>",
+            "statements": [
+                "Allow group <OPERATOR_GROUP_NAME> to manage log-groups in compartment <FUNCTION_COMPARTMENT_NAME>",
+                "Allow group <OPERATOR_GROUP_NAME> to read log-content in compartment <FUNCTION_COMPARTMENT_NAME>",
+            ],
+            "warning": "Scope service-log management and access to the exporter log group through the tenancy's reviewed policy design",
         },
     ]
     return _offline(
@@ -368,6 +423,11 @@ def _render_iam() -> dict[str, object]:
             "requires_scope_review": True,
             "apply_supported": False,
             "policy_categories": categories,
+            "warnings": (
+                "IAM resource-family shortcuts broaden access. Resolve every exact "
+                "placeholder, validate conditional keys against current Oracle "
+                "documentation, and obtain a separate policy review before apply."
+            ),
             "review_gate": (
                 "Resolve every placeholder and verify current Oracle IAM policy syntax "
                 "before any separately approved apply"

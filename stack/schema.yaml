@@ -33,6 +33,23 @@ variableGroups:
       - deploy_dashboard_cleanup
       - ingest_test_data
 
+  - title: "Optional Splunk Evidence Exporter"
+    description: "Disabled-by-default evidence export resources; review all identifiers and IAM before deployment"
+    variables:
+      - enable_splunk_evidence_exporter
+      - enable_splunk_evidence_exporter_alarm_actions
+      - enable_splunk_evidence_exporter_subscription
+      - splunk_evidence_exporter_object_storage_namespace
+      - splunk_evidence_exporter_existing_state_bucket_name
+      - splunk_evidence_exporter_existing_dlq_bucket_name
+      - splunk_evidence_exporter_function_subnet_ids
+      - splunk_evidence_exporter_function_nsg_ids
+      - splunk_evidence_exporter_function_image
+      - splunk_evidence_exporter_function_image_digest
+      - splunk_evidence_exporter_hec_secret_id
+      - splunk_evidence_exporter_hec_url
+      - splunk_evidence_exporter_hec_index
+
 variables:
   compartment_id:
     type: oci:identity:compartment:id
@@ -119,3 +136,109 @@ variables:
     description: "Upload test attack logs for validation (not recommended for production)"
     default: false
     required: false
+
+  enable_splunk_evidence_exporter:
+    type: boolean
+    title: "Enable Splunk Evidence Exporter"
+    description: "Create the optional exporter resources after target review"
+    default: false
+    required: false
+
+  enable_splunk_evidence_exporter_alarm_actions:
+    type: boolean
+    title: "Enable Exporter Alarm Actions"
+    description: "Review-gated. Enable Monitoring alarm actions for the exporter."
+    default: false
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  enable_splunk_evidence_exporter_subscription:
+    type: boolean
+    title: "Enable Exporter Function Subscription"
+    description: "Review-gated. Enable the exact Notifications-to-Function subscription."
+    default: false
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_hec_secret_id:
+    type: string
+    title: "Existing Vault Secret OCID"
+    description: "Sensitive reference only. Existing OCI Vault secret OCID containing the HEC credential; never enter the secret value."
+    default: ""
+    required: false
+    sensitive: true
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_object_storage_namespace:
+    type: string
+    title: "Object Storage Namespace"
+    description: "Existing namespace for exporter checkpoint and DLQ storage."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_existing_state_bucket_name:
+    type: string
+    title: "Existing State Bucket Name"
+    description: "Optional existing private checkpoint bucket. Leave empty to create one with version lifecycle."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_existing_dlq_bucket_name:
+    type: string
+    title: "Existing DLQ Bucket Name"
+    description: "Optional existing private dead-letter bucket. Leave empty to create one with retention lifecycle."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_function_subnet_ids:
+    type: array
+    title: "Existing Function Subnet OCIDs"
+    description: "Existing reviewed subnets with HEC and OCI service reachability. This stack does not create a VCN."
+    items:
+      type: string
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_function_nsg_ids:
+    type: array
+    title: "Existing Function NSG OCIDs"
+    description: "Optional existing network security groups restricting Function egress."
+    items:
+      type: string
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_function_image:
+    type: string
+    title: "Reviewed Exporter Image"
+    description: "OCI Registry image containing the existing exporter handler."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_function_image_digest:
+    type: string
+    title: "Exporter Image Digest"
+    description: "Optional immutable sha256 digest paired with the reviewed image."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_hec_url:
+    type: string
+    title: "Splunk HEC URL"
+    description: "Reviewed HTTPS HEC event endpoint. Never include a credential in this URL."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_hec_index:
+    type: string
+    title: "Splunk Evidence Index"
+    description: "Reviewed target index for normalized evidence events."
+    default: ""
+    required: false
+    visible: enable_splunk_evidence_exporter

@@ -324,6 +324,8 @@ def test_contributor_release_guidance_links_classified_local_evidence_example() 
     assert evidence["status"] == "PASS"
     assert evidence["scenario_counts"]["passed"] == 4
     assert evidence["artifact_hashes"]
+    assert "docs/health/splunk-parallel-local-evidence.example.json" not in evidence["artifact_hashes"]
+    assert evidence["artifact_hashes"] == evidence["evidence_manifest"]["files"]
     assert "generated_at" not in evidence
     for relative_path, expected_hash in evidence["artifact_hashes"].items():
         artifact = ROOT / relative_path

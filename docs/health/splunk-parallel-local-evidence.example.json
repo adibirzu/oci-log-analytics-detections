@@ -43,7 +43,7 @@
     "scripts/fixtures/splunk_evidence/oci_raw_alarm.json": "5027b7ee4d17de346ece7f27f8d461f400d58e00d573683b337e1dc68c085978",
     "scripts/fixtures/splunk_evidence/query_rows.json": "bc881adbb94ce583015466c6a178361449eefcc06537478e0843e22e0381377c",
     "scripts/generate_splunk_detection_registry.py": "372319f850216617c41838ede6315f1a823f2d0946ef5e1d2a3a711b5544b7f7",
-    "scripts/release_checklist.py": "892531356c602ff5af8329fd7bb6139671a328eb63d56bdbd8ae552fd24421a8",
+    "scripts/release_checklist.py": "62fc5b50569e8da85f1f6dcf3e093f68db57cd92d1d64bae4b92e13f14f78d96",
     "scripts/sitecustomize.py": "edd37132889310d7808c7ec416a58e574c47c03f5544c3e3b8107cc61e1ea4fb",
     "scripts/splunk_evidence_exporter/__init__.py": "1f366c60e2c85e89b01f48f2f04ada30e1f7120440eb55989b909dea7380d82d",
     "scripts/splunk_evidence_exporter/adapters.py": "965f774c454a0f302f399281910bceb577b264f5fc2499f1e1a996cd59c3dbf8",
@@ -54,12 +54,12 @@
     "scripts/splunk_evidence_exporter/retry.py": "090df2ec0d2c8f25b07e162b517935158ff997e3da26eaa3a47f5181e5f042fc",
     "scripts/splunk_evidence_exporter/service.py": "158ca25b0f24832da2ab4439f6368a36b57bbe850b904a5f9fbc268cc250cb10",
     "scripts/splunk_evidence_exporter/window.py": "7ae7989cf8241513db7abe79a114000567c6e781e19478a3ae256f11eb17197e",
-    "scripts/splunk_evidence_exporter_cli.py": "18ef95cde158c89019251442144e728277b741f59708f9136e6cd06b5c32b4d1",
+    "scripts/splunk_evidence_exporter_cli.py": "bdf1e2414acb8a1e3cadf1aed2a73c71fe0c1e0f06f4754969751fecbbd5fcbf",
     "scripts/test_check_inventory_drift.py": "9a262a74bf6e7aa6288ea36d4ae77c242abe1b5ce05797c9693f7d027e2e3b48",
     "scripts/test_splunk_detection_registry.py": "915a8cc78cfe7f53effdd0a0d97281e806f9091b8cb64d4cb0def76497ca7bed",
     "scripts/test_splunk_diagrams.py": "430469b52316877813f86d5bb9bfd5567772e16b36430154a8ae9ffa0878c340",
-    "scripts/test_splunk_documentation.py": "1aca17a0c36d56d39538c8cb803ddc6288ad0c52996583d27241993f1141b678",
-    "scripts/test_splunk_evidence_e2e.py": "1527b021a5d43e266d840d4f9a2e2003f289b201c34fbcfbe76aa25946cd96ea",
+    "scripts/test_splunk_documentation.py": "d129d9aa6a388c2d1758bf0a668c97b5014f028052d94692db058d9a527c484a",
+    "scripts/test_splunk_evidence_e2e.py": "aff726ccd8e5f955c4a0f15039caaa764d3227a88d4b42d4a03416bdcb61c854",
     "scripts/test_splunk_evidence_exporter.py": "6be1a0fe54beff6cb9e30530db77d738624b99b2f8e90f62ec0623e64b64b4b0",
     "scripts/test_splunk_evidence_terraform.py": "b6e464e7dc1e9ef2d06701cf37fc29307eab30266dd7d5fd824ff847f69dbf5b",
     "scripts/validate_terraform_static.py": "cefe65cb65a7ac3e730acbc1a5e38d3e200c81b3de53288bf90728bbb22c0441",
@@ -125,7 +125,7 @@
       "scripts/fixtures/splunk_evidence/oci_raw_alarm.json": "5027b7ee4d17de346ece7f27f8d461f400d58e00d573683b337e1dc68c085978",
       "scripts/fixtures/splunk_evidence/query_rows.json": "bc881adbb94ce583015466c6a178361449eefcc06537478e0843e22e0381377c",
       "scripts/generate_splunk_detection_registry.py": "372319f850216617c41838ede6315f1a823f2d0946ef5e1d2a3a711b5544b7f7",
-      "scripts/release_checklist.py": "892531356c602ff5af8329fd7bb6139671a328eb63d56bdbd8ae552fd24421a8",
+      "scripts/release_checklist.py": "62fc5b50569e8da85f1f6dcf3e093f68db57cd92d1d64bae4b92e13f14f78d96",
       "scripts/sitecustomize.py": "edd37132889310d7808c7ec416a58e574c47c03f5544c3e3b8107cc61e1ea4fb",
       "scripts/splunk_evidence_exporter/__init__.py": "1f366c60e2c85e89b01f48f2f04ada30e1f7120440eb55989b909dea7380d82d",
       "scripts/splunk_evidence_exporter/adapters.py": "965f774c454a0f302f399281910bceb577b264f5fc2499f1e1a996cd59c3dbf8",
@@ -136,12 +136,12 @@
       "scripts/splunk_evidence_exporter/retry.py": "090df2ec0d2c8f25b07e162b517935158ff997e3da26eaa3a47f5181e5f042fc",
       "scripts/splunk_evidence_exporter/service.py": "158ca25b0f24832da2ab4439f6368a36b57bbe850b904a5f9fbc268cc250cb10",
       "scripts/splunk_evidence_exporter/window.py": "7ae7989cf8241513db7abe79a114000567c6e781e19478a3ae256f11eb17197e",
-      "scripts/splunk_evidence_exporter_cli.py": "18ef95cde158c89019251442144e728277b741f59708f9136e6cd06b5c32b4d1",
+      "scripts/splunk_evidence_exporter_cli.py": "bdf1e2414acb8a1e3cadf1aed2a73c71fe0c1e0f06f4754969751fecbbd5fcbf",
       "scripts/test_check_inventory_drift.py": "9a262a74bf6e7aa6288ea36d4ae77c242abe1b5ce05797c9693f7d027e2e3b48",
       "scripts/test_splunk_detection_registry.py": "915a8cc78cfe7f53effdd0a0d97281e806f9091b8cb64d4cb0def76497ca7bed",
       "scripts/test_splunk_diagrams.py": "430469b52316877813f86d5bb9bfd5567772e16b36430154a8ae9ffa0878c340",
-      "scripts/test_splunk_documentation.py": "1aca17a0c36d56d39538c8cb803ddc6288ad0c52996583d27241993f1141b678",
-      "scripts/test_splunk_evidence_e2e.py": "1527b021a5d43e266d840d4f9a2e2003f289b201c34fbcfbe76aa25946cd96ea",
+      "scripts/test_splunk_documentation.py": "d129d9aa6a388c2d1758bf0a668c97b5014f028052d94692db058d9a527c484a",
+      "scripts/test_splunk_evidence_e2e.py": "aff726ccd8e5f955c4a0f15039caaa764d3227a88d4b42d4a03416bdcb61c854",
       "scripts/test_splunk_evidence_exporter.py": "6be1a0fe54beff6cb9e30530db77d738624b99b2f8e90f62ec0623e64b64b4b0",
       "scripts/test_splunk_evidence_terraform.py": "b6e464e7dc1e9ef2d06701cf37fc29307eab30266dd7d5fd824ff847f69dbf5b",
       "scripts/validate_terraform_static.py": "cefe65cb65a7ac3e730acbc1a5e38d3e200c81b3de53288bf90728bbb22c0441",
@@ -160,8 +160,8 @@
       "stack/streaming.tf": "51ff3d3829e9e2a9a20f991c006c7fd627bb6f17d2dfb13d22705e0dbdc85c6f",
       "stack/variables.tf": "4d5dc1b76b4ea025be5a763ec38950bada84dbc3db5eadb019803f25bf2f32f8"
     },
-    "git_head_at_execution": "8c02d7d44b685bf4e9d420936b5f1f88e76aa936",
-    "git_head_tree_at_execution": "2a63f0b050b84d8185d95db9770416e8436c35b0",
+    "git_head_at_execution": "4eeb2b99b8c6228de95c16758ad5e6d766adffca",
+    "git_head_tree_at_execution": "c28992ac3aa30980bd2b506bd45c3f4f834c0ce1",
     "missing": [],
     "tool_versions": {
       "git": "git version 2.50.1 (Apple Git-155)",
@@ -172,8 +172,8 @@
   "example": true,
   "external_calls": [],
   "gate_counts": {
-    "failed": 1,
-    "passed": 9,
+    "failed": 0,
+    "passed": 10,
     "total": 10
   },
   "gates": [
@@ -213,9 +213,9 @@
       "ok": true
     },
     {
-      "exit_code": 1,
+      "exit_code": 0,
       "name": "documentation validation",
-      "ok": false
+      "ok": true
     },
     {
       "exit_code": 0,
@@ -241,5 +241,5 @@
     "success": 1
   },
   "schema_version": "oci.logan.splunk.local-release.v1",
-  "status": "FAIL"
+  "status": "PASS"
 }

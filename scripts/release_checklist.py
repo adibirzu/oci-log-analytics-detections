@@ -138,7 +138,7 @@ def _run_step(name: str, command: list[str], timeout: int = 2400, *, offline: bo
             pass
 
 
-def build_splunk_parallel_offline_steps() -> list[tuple[str, list[str], int]]:
+def build_splunk_parallel_offline_steps(*, bootstrap: bool = False) -> list[tuple[str, list[str], int]]:
     """Return the credential-free validators in the Splunk parallel release stage."""
     python = sys.executable
     return [
@@ -186,7 +186,7 @@ def build_splunk_parallel_offline_steps() -> list[tuple[str, list[str], int]]:
         ),
         (
             "documentation validation",
-            [python, "-m", "pytest", "-q", "scripts/test_splunk_documentation.py"],
+            [python, "-m", "pytest", "-q", "scripts/test_splunk_documentation.py"] + (["-k", "not contributor_release_guidance_links_classified_local_evidence_example"] if bootstrap else []),
             600,
         ),
         (
@@ -306,11 +306,11 @@ def _scenario_contract_ok(name: str, output: str) -> bool:
     return False
 
 
-def run_splunk_parallel_offline_stage() -> dict[str, object]:
+def run_splunk_parallel_offline_stage(*, bootstrap: bool = False) -> dict[str, object]:
     """Run and summarize the tenant-neutral Splunk parallel release contracts."""
     gates: list[dict[str, object]] = []
     scenario_passed = 0
-    for name, command, timeout in build_splunk_parallel_offline_steps():
+    for name, command, timeout in build_splunk_parallel_offline_steps(bootstrap=bootstrap):
         result = _run_step(name, command, timeout, offline=True)
         contract_ok = _scenario_contract_ok(name, result["output_tail"])
         ok = bool(result["ok"] and contract_ok)
@@ -348,6 +348,26 @@ def run_splunk_parallel_offline_stage() -> dict[str, object]:
         "evidence_manifest": manifest,
         "gates": gates,
     }
+
+
+def refresh_splunk_parallel_example() -> dict[str, object]:
+    """Fail-closed two-step bootstrap for the self-excluded local example."""
+    bootstrap = run_splunk_parallel_offline_stage(bootstrap=True)
+    if bootstrap["status"] != "PASS" or bootstrap["external_calls"] or bootstrap["provider_validation"] != "not_run":
+        raise RuntimeError("offline example bootstrap gates did not pass")
+    example = dict(bootstrap)
+    example.update({"example": True, "receipt_type": "local_example"})
+    target = HEALTH_DIR / "splunk-parallel-local-evidence.example.json"
+    HEALTH_DIR.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", dir=HEALTH_DIR, delete=False, encoding="utf-8") as handle:
+        json.dump(example, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+        temporary = Path(handle.name)
+    os.replace(temporary, target)
+    final = run_splunk_parallel_offline_stage()
+    if final["status"] != "PASS" or final["gate_counts"]["total"] != 10:
+        raise RuntimeError("normal offline verification after example refresh did not pass")
+    return final
 
 
 def build_steps(
@@ -480,6 +500,7 @@ def main() -> int:
         help="Run only the credential-free Splunk parallel release stage and print JSON",
     )
     parser.add_argument("--write-splunk-parallel-evidence-example", action="store_true", help="Refresh the checked-in local-only Splunk evidence example")
+    parser.add_argument("--refresh-splunk-parallel-example", action="store_true", help="Fail-closed two-step refresh of the self-excluded local example")
     args = parser.parse_args()
 
     if args.splunk_parallel_offline_stage:
@@ -493,6 +514,10 @@ def main() -> int:
             (HEALTH_DIR / "splunk-parallel-local-evidence.example.json").write_text(json.dumps(example, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(json.dumps(evidence, indent=2, sort_keys=True))
         return 0 if evidence["status"] == "PASS" else 1
+    if args.refresh_splunk_parallel_example:
+        evidence = refresh_splunk_parallel_example()
+        print(json.dumps(evidence, indent=2, sort_keys=True))
+        return 0
 
     HEALTH_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%SZ")

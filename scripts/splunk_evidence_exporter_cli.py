@@ -502,6 +502,7 @@ def _service(
     checkpoint: _InMemoryCheckpointAdapter,
     hec: _InProcessHecAdapter,
     dead_letter: _InMemoryDeadLetterAdapter,
+    *, alarm_bindings: Mapping[str, str] | None = None,
 ) -> EvidenceExportService:
     registry = _read_json(REGISTRY_PATH)
     if not isinstance(registry, Mapping):
@@ -519,10 +520,12 @@ def _service(
         max_rows=1000,
         max_batch_events=100,
         max_attempts=4,
+        alarm_bindings=alarm_bindings,
+        log_analytics_namespace="offline-trusted-log-analytics-namespace",
     )
 
 
-def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, object]:
+def _local_e2e(scenario: str, *, approve_replay: bool = False, alarm_fixture: Path | None = None) -> dict[str, object]:
     supported = {
         "success",
         "success-after-retry",
@@ -544,7 +547,8 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, obje
         raise ValueError("unsupported local E2E scenario")
     if scenario == "approved-replay" and not approve_replay:
         raise ValueError("replay requires explicit approval")
-    alarm = _read_json(FIXTURES / "alarm.json")
+    fixture_path = alarm_fixture or FIXTURES / "alarm.json"
+    alarm = _read_json(fixture_path)
     rows = _read_json(FIXTURES / "query_rows.json")
     responses = _read_json(FIXTURES / "hec_responses.json")
     if (
@@ -577,7 +581,8 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, obje
     dead_letter = _InMemoryDeadLetterAdapter(
         operations, fail_write=scenario == "dlq-failure"
     )
-    service = _service(query, checkpoint, hec, dead_letter)
+    bindings = {"redacted-alarm-id": "oci-audit-failures"} if fixture_path.name == "oci_raw_alarm.json" else None
+    service = _service(query, checkpoint, hec, dead_letter, alarm_bindings=bindings)
     trigger = AlarmTrigger.from_payload(alarm)
     receipt = service.export(trigger)
     service_name = "EvidenceExportService"
@@ -621,6 +626,7 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False) -> dict[str, obje
     unique_event_keys = set(all_event_keys)
     return {
         "scenario": scenario,
+        "alarm_fixture": str(fixture_path.relative_to(ROOT)) if fixture_path.is_relative_to(ROOT) else fixture_path.name,
         "service": service_name,
         **receipt.to_dict(),
         "query_row_count": query_row_count,
@@ -667,6 +673,7 @@ def _parser() -> argparse.ArgumentParser:
     local = subparsers.add_parser("local-e2e", help="run an in-process E2E scenario")
     local.add_argument("--scenario", default="success")
     local.add_argument("--approve-replay", action="store_true")
+    local.add_argument("--alarm-fixture", type=Path, help="offline sanitized Monitoring alarm fixture")
     subparsers.add_parser("validate-config", help="validate local delivery artifacts")
     payload = subparsers.add_parser(
         "validate-payload", help="validate one sanitized alarm payload"
@@ -689,7 +696,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             output = _plan()
         elif arguments.command == "local-e2e":
             output = _local_e2e(
-                arguments.scenario, approve_replay=arguments.approve_replay
+                arguments.scenario, approve_replay=arguments.approve_replay, alarm_fixture=arguments.alarm_fixture
             )
         elif arguments.command == "validate-config":
             output = _validate_config()

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+import jsonschema
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
 if str(SCRIPTS_DIR) not in sys.path:
@@ -28,7 +29,21 @@ except ImportError:  # pragma: no cover - selected by pytest package imports
 DEFAULT_CONFIG = REPOSITORY_ROOT / "config" / "splunk_parallel_delivery.yaml"
 DEFAULT_OUTPUT = REPOSITORY_ROOT / "queries" / "splunk_detection_registry.json"
 FIELD_DICTIONARY = REPOSITORY_ROOT / "queries" / "log_source_field_dictionary.json"
-FORBIDDEN_KEY_PARTS = ("token", "secret", "password", "ocid", "tenancy", "namespace", "hostname", "ip_address", "endpoint")
+EVIDENCE_SCHEMA_PATH = REPOSITORY_ROOT / "schemas" / "splunk_evidence_event.schema.json"
+EVIDENCE_SCHEMA = json.loads(EVIDENCE_SCHEMA_PATH.read_text(encoding="utf-8"))
+FORBIDDEN_KEY_PARTS = (
+    "token", "secret", "password", "ocid", "tenancy", "namespace", "hostname",
+    "host", "ip_address", "public_ip", "endpoint", "topology", "payload",
+)
+SENSITIVE_VALUE_PATTERNS = {
+    "OCID": re.compile(r"\bocid1\.[a-z0-9._-]+", re.IGNORECASE),
+    "IP address": re.compile(r"\b(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})(?:\.(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})){3}\b"),
+    "endpoint URL": re.compile(r"\bhttps?://[^\s]+", re.IGNORECASE),
+    "hostname": re.compile(r"\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|net|org|io|dev|app|cloud|local|internal|corp)\b", re.IGNORECASE),
+    "namespace": re.compile(r"\bnamespace\s*[:=]\s*\S+", re.IGNORECASE),
+    "token": re.compile(r"\b(?:token|secret|api[-_ ]?key|bearer)\s*[:=]\s*\S+", re.IGNORECASE),
+}
+PLACEHOLDER_VALUE_RE = re.compile(r"(?:\$\{[A-Z0-9_]+\}|<[A-Z0-9_ -]+>)")
 LOG_SOURCE_RE = re.compile(r"['\"]Log Source['\"]\s*=\s*['\"]([^'\"]+)['\"]", re.IGNORECASE)
 
 
@@ -144,12 +159,22 @@ def _forbidden_keys(value: Any, location: str = "registry") -> list[str]:
         return errors
     if isinstance(value, list):
         return [error for index, child in enumerate(value) for error in _forbidden_keys(child, f"{location}[{index}]")]
+    if isinstance(value, str) and not PLACEHOLDER_VALUE_RE.fullmatch(value.strip()):
+        return [
+            f"forbidden sensitive value at {location}: {label}"
+            for label, pattern in SENSITIVE_VALUE_PATTERNS.items()
+            if pattern.search(value)
+        ]
     return []
 
 
 def validate_registry(registry: dict[str, Any]) -> list[str]:
     """Return contract, canonical-query, source/field, eligibility, and safety errors."""
     errors = _forbidden_keys(registry)
+    try:
+        jsonschema.Draft202012Validator.check_schema(EVIDENCE_SCHEMA)
+    except jsonschema.SchemaError as error:
+        errors.append(f"evidence event schema invalid: {error.message}")
     detections = registry.get("detections")
     if not isinstance(detections, list):
         return [*errors, "detections must be a list"]
@@ -178,6 +203,8 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
             continue
         if not isinstance(payload.get("title"), str) or not payload["title"].strip():
             errors.append(f"{identifier}: canonical query is missing a title")
+        elif entry.get("title") != payload["title"]:
+            errors.append(f"{identifier}: title does not match canonical query title")
         query = payload.get("query", "")
         if not isinstance(query, str) or not query.strip():
             errors.append(f"{identifier}: canonical query is missing a query")

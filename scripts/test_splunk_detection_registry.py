@@ -7,7 +7,11 @@ from pathlib import Path
 import jsonschema
 import yaml
 from scripts.splunk_delivery_contracts import registry_validation_errors
-from scripts.generate_splunk_detection_registry import build_registry, validate_registry
+from scripts.generate_splunk_detection_registry import (
+    EVIDENCE_SCHEMA,
+    build_registry,
+    validate_registry,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -97,6 +101,39 @@ def test_registry_requires_complete_splunk_provenance(tmp_path: Path):
     registry = build_registry(delivery_config_with_migration(tmp_path))
     del registry["splunk_provenance"]["oci-console-login-failure"]["version"]
     assert any("provenance is missing version" in error for error in validate_registry(registry))
+
+
+def test_registry_rejects_sensitive_values_but_allows_documented_placeholders(tmp_path: Path):
+    registry = build_registry(delivery_config_with_migration(tmp_path))
+    provenance = registry["splunk_provenance"]["oci-console-login-failure"]
+    for sensitive_value in (
+        "ocid1.tenancy.oc1..example",
+        "10.20.30.40",
+        "splunk.private.example.com",
+        "https://splunk.example.com/services/search",
+        "namespace=customer-a",
+        "token=not-a-real-token",
+    ):
+        provenance["saved_search"] = sensitive_value
+        assert any("forbidden sensitive value" in error for error in validate_registry(registry))
+
+    provenance["saved_search"] = "<SPLUNK_SAVED_SEARCH>"
+    assert not any("forbidden sensitive value" in error for error in validate_registry(registry))
+    provenance["topology"] = "not-permitted"
+    assert any("forbidden secret or tenant key" in error for error in validate_registry(registry))
+
+
+def test_registry_requires_migration_title_to_match_canonical_query(tmp_path: Path):
+    registry = build_registry(delivery_config_with_migration(tmp_path, title="Incorrect title"))
+    assert any("title does not match canonical query title" in error for error in validate_registry(registry))
+
+
+def test_generator_loads_and_validates_the_evidence_event_schema():
+    jsonschema.Draft202012Validator.check_schema(EVIDENCE_SCHEMA)
+    assert not any(
+        "evidence event schema invalid" in error
+        for error in validate_registry({"version": 1, "detections": [], "splunk_provenance": {}})
+    )
 
 
 def valid_registry_entry():

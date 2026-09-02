@@ -62,6 +62,10 @@ This repository publishes detection content across multiple surfaces. Pick the r
    runs `terraform plan` or `terraform apply`. Its structured output remains
    `evidence_class: locally_verified` with `provider_validation: not_run`.
    [The checked-in evidence packet](docs/health/splunk-parallel-local-evidence.example.json)
+
+   After an intentional change to a hashed Splunk offline-stage input, refresh both
+   manifest hash maps in this local example before running the offline stage. The
+   example is deliberately excluded from its own manifest to avoid self-reference.
    is a tenant-neutral local example, not a provider or customer receipt.
    Its `git_head_at_execution` and `git_head_tree_at_execution` fields identify
    the checkout observed when the packet was generated; they do not claim the

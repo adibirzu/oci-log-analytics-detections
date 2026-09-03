@@ -127,7 +127,8 @@ def test_module_wires_only_the_scoped_exporter_path_with_logging_and_lifecycle()
     assert 'resource "oci_core_subnet"' not in main
     assert 'resource "oci_functions_application" "exporter"' in main
     assert re.search(r"\bsubnet_ids\s*=\s*var\.function_subnet_ids\b", main)
-    assert "line_format = \"JSON\"" in main
+    application = _block(main, "resource", "oci_functions_application\" \"exporter")
+    assert "logging {" not in application
 
     assert 'resource "oci_functions_function" "exporter"' in main
     assert re.search(

@@ -1,0 +1,33 @@
+%% Title: Two-mode onboarding decision workflow
+%% Evidence: code-backed offline plan and operator workflow; provider verified = false; release accepted = false
+%% Primary objects: 9
+flowchart LR
+  subgraph SCOPE["Ownership and mode"]
+    owner["Source owner and data policy"]
+    mode["Raw, evidence, or both modes"]
+  end
+  subgraph RAW["Raw branch"]
+    raw_route["Connector Hub to Streaming"]
+    oci_splunk["oci-splunk"]
+  end
+  subgraph EVIDENCE["Evidence branch"]
+    logan["Log Analytics"]
+    evidence_export["Detection and Function export"]
+  end
+  subgraph DEST["Shared destination"]
+    hec["Splunk HEC"]
+  end
+  subgraph ACCEPT["Acceptance"]
+    join["Selected-mode validation join"]
+    acceptance["Acceptance owner"]
+  end
+  owner -.->|"control: approve source, retention, and mode"| mode
+  mode -.->|"control: raw selected"| raw_route
+  raw_route -->|"telemetry: Connector Hub to Streaming records"| oci_splunk
+  oci_splunk -->|"telemetry: raw HEC batches"| hec
+  mode -.->|"control: evidence selected"| logan
+  logan -->|"telemetry: detection evidence"| evidence_export
+  evidence_export -->|"telemetry: normalized evidence batches"| hec
+  hec -.->|"response: selected-mode search receipts"| join
+  mode -.->|"control: both requires two independent receipts"| join
+  join -.->|"control: record selected-mode acceptance"| acceptance

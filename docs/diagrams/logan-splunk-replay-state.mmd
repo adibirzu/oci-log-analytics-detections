@@ -1,0 +1,22 @@
+%% Title: DLQ replay and monotonic checkpoint state model
+%% Evidence: code-backed replay state transitions; provider verified = false; release accepted = false
+%% Primary objects: 7
+stateDiagram-v2
+  state "checkpoint/DLQ record loaded" as loaded
+  state "Validated remaining events" as validated
+  state "Splunk HEC delivery" as hec
+  state "Replacement DLQ record" as replacement
+  state "Advanced checkpoint" as advanced
+  state "Already-current checkpoint" as current
+  state "Preserved newer checkpoint" as newer
+  [*] --> loaded: control: operator selects one record
+  loaded --> validated: control: validate schema and provenance
+  validated --> hec: telemetry: exclude confirmed event keys and batch
+  hec --> replacement: response: retryable or quarantine failure
+  replacement --> [*]: control: preserve checkpoint
+  hec --> advanced: response: accepted and stored checkpoint is older
+  hec --> current: response: accepted and checkpoint matches
+  hec --> newer: response: accepted and stored checkpoint is newer
+  advanced --> [*]: control: monotonic commit
+  current --> [*]: control: no write
+  newer --> [*]: control: no rollback

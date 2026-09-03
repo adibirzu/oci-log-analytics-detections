@@ -23,8 +23,16 @@ Confirm all of the following in the customer tenancy:
 - Required log sources and parser fields have been validated with representative events.
 - The planned dashboards, saved searches, streaming/service-connector resources, and log sources are understood by the service owner.
 - Alert routing, data retention, rollback ownership, and downstream SIEM forwarding policy are defined.
+- For Splunk, each source/detection has a reviewed Mode 1 raw, Mode 2 evidence, hybrid, or disabled policy.
+- Any Mode 1 production package uses a reviewed `adibirzu/oci-splunk` tag or commit and must not track mutable `main`; the selected immutable ref is commit `a98167404f19be6d18235bccbf1113b59a259c4c` (`2.2.0` is bundled app provenance, not a Git tag).
 
 The Forge UI is intentionally not a credential form. It can prepare a package and open OCI Resource Manager, but it cannot select a tenancy, run a plan, or apply changes on the customer's behalf.
+
+### Optional Splunk evidence exporter
+
+Mode 2 is opt-in. `enable_splunk_evidence_exporter`, `enable_splunk_evidence_exporter_alarm_actions`, and `enable_splunk_evidence_exporter_subscription` all default to `false`. Start with the offline repository CLI plan/preflight and Function-context staging, obtain build approval, initialize dependencies, and create a saved Terraform plan with alarm actions/subscription still disabled. Terraform init may access registries; plan loads credentials and may read OCI/state, though neither applies changes. Obtain separate apply and canary approvals. Replay is another explicit approval and the repository only renders a non-executing replay plan.
+
+The exporter module creates no VCN, subnet, Vault secret, HEC input, or Splunk index. It consumes existing reviewed subnet/NSG IDs, image/digest, Vault secret OCID, Object Storage namespace/buckets, HTTPS HEC event URL, and index. The token must never enter Terraform variables. See the complete [Splunk evidence export runbook](SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md) and [E2E validation guide](SPLUNK_E2E_VALIDATION.md).
 
 ## Package Contents and Local Verification
 

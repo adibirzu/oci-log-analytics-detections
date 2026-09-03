@@ -46,6 +46,37 @@ This repository publishes detection content across multiple surfaces. Pick the r
    python3 scripts/deploy_dashboard.py --dry-run
    ```
 
+   Splunk parallel delivery changes also run through one strictly local stage:
+
+   ```bash
+   python3 scripts/release_checklist.py --splunk-parallel-offline-stage
+   ```
+
+   This stage validates registry drift and schemas, exercises fixture-backed
+   exporter success, duplicate, failure, and approved-local-replay scenarios,
+   checks the editable diagrams and operator documentation, and runs a
+   provider-free Terraform format/contract validator that works from a clean
+   checkout without a `.terraform` cache. Provider-backed `terraform validate`
+   remains a separate deployment review gate. It
+   does not call OCI, Splunk HEC, Vault, or external endpoints, and it never
+   runs `terraform plan` or `terraform apply`. Its structured output remains
+   `evidence_class: locally_verified` with `provider_validation: not_run`.
+   [The checked-in evidence packet](docs/health/splunk-parallel-local-evidence.example.json)
+
+   After an intentional change to a hashed Splunk offline-stage input, refresh both
+   manifest hash maps in this local example before running the offline stage. The
+   example is deliberately excluded from its own manifest to avoid self-reference.
+   is a tenant-neutral local example, not a provider or customer receipt.
+   Its `git_head_at_execution` and `git_head_tree_at_execution` fields identify
+   the checkout observed when the packet was generated; they do not claim the
+   eventual commit containing the example. `working_tree_dirty` records whether
+   tracked changes were present at generation time.
+
+   The default checklist runs this local stage before the fail-closed Sentinel
+   drift gate. If the checklist stops at `sentinel drift check`, record the
+   exact blocker `parser_schema_hash_mismatch`; do not edit promoted Sentinel
+   JSON to force a green result.
+
 4. Inspect the generated artifacts you changed:
    - `queries/catalog.json`
    - `queries/manifest.json`
@@ -86,6 +117,7 @@ Before submitting a PR:
 
 - Rule quality audit should report 0 issues.
 - Unit tests should pass.
+- The Splunk parallel offline release stage should pass without credentials or network access.
 - Dashboard dry-run should resolve dashboard/query references cleanly.
 - Generated inventory should match the current repo contents.
 - If you touched `test_data/*.jsonl`, `test_data/manifest.json` should reflect the new file counts and event totals.

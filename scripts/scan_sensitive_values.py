@@ -46,6 +46,7 @@ ALLOWED_VALUE_FRAGMENTS = (
     "sample",
     "synthetic",
     "test-only",
+    "not-a-real",
     "your-",
 )
 

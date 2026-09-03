@@ -84,3 +84,136 @@ variable "ingest_test_data" {
   description = "Upload test attack logs for validation"
   default     = false
 }
+
+# --- Optional Splunk Evidence Exporter ---
+
+variable "enable_splunk_evidence_exporter" {
+  type        = bool
+  description = "Create the reviewed Splunk evidence exporter resources"
+  default     = false
+}
+
+variable "enable_splunk_evidence_exporter_alarm_actions" {
+  type        = bool
+  description = "Enable exporter alarm actions after a separate operator review"
+  default     = false
+}
+
+variable "splunk_evidence_exporter_alarm_ids" {
+  type        = map(string)
+  description = "Reviewed map from governed detection binding key to exact Monitoring alarm OCID"
+  default     = {}
+  sensitive   = true
+}
+
+variable "splunk_evidence_exporter_alarm_binding_mode" {
+  type        = string
+  description = "managed binds Terraform-created alarms; existing requires the reviewed complete alarm OCID map"
+  default     = "managed"
+
+  validation {
+    condition     = contains(["managed", "existing"], var.splunk_evidence_exporter_alarm_binding_mode)
+    error_message = "splunk_evidence_exporter_alarm_binding_mode must be managed or existing."
+  }
+}
+
+variable "enable_splunk_evidence_exporter_subscription" {
+  type        = bool
+  description = "Enable the exact Notifications-to-Function subscription after review"
+  default     = false
+}
+
+variable "splunk_evidence_exporter_hec_secret_id" {
+  type        = string
+  description = "OCID of an existing OCI Vault secret containing the Splunk HEC credential"
+  default     = ""
+  sensitive   = true
+
+  validation {
+    condition     = var.splunk_evidence_exporter_hec_secret_id == "" || can(regex("^ocid1\\.vaultsecret\\.", var.splunk_evidence_exporter_hec_secret_id))
+    error_message = "Provide an existing OCI Vault secret OCID; never provide a secret value."
+  }
+}
+
+variable "splunk_evidence_exporter_object_storage_namespace" {
+  type        = string
+  description = "Existing Object Storage namespace for exporter state and DLQ"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_existing_state_bucket_name" {
+  type        = string
+  description = "Existing private state bucket name; leave empty to create one"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_existing_dlq_bucket_name" {
+  type        = string
+  description = "Existing private DLQ bucket name; leave empty to create one"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_subnet_ids" {
+  type        = list(string)
+  description = "Existing subnet OCIDs for the Function application; no VCN is created"
+  default     = []
+}
+
+variable "splunk_evidence_exporter_function_nsg_ids" {
+  type        = list(string)
+  description = "Existing NSG OCIDs governing reviewed Function egress"
+  default     = []
+}
+
+variable "splunk_evidence_exporter_function_image" {
+  type        = string
+  description = "Reviewed OCI Registry image reference containing the exporter handler"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_image_digest" {
+  type        = string
+  description = "Optional immutable digest for the reviewed exporter image"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_attestation_sha256" {
+  type        = string
+  description = "SHA-256 of the externally verified signed exporter supply-chain attestation"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_provenance_sha256" {
+  type        = string
+  description = "SHA-256 of the verified signed exporter build provenance"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_attestation_path" {
+  type        = string
+  description = "Private path to the verified signed exporter attestation receipt"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_function_provenance_path" {
+  type        = string
+  description = "Private path to the verified signed exporter provenance receipt"
+  default     = ""
+}
+
+variable "splunk_evidence_exporter_hec_url" {
+  type        = string
+  description = "Reviewed HTTPS Splunk HEC /services/collector/event endpoint without userinfo, query, fragment, or credential material"
+  default     = ""
+
+  validation {
+    condition     = var.splunk_evidence_exporter_hec_url == "" || can(regex("^https://[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(:([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?/services/collector/event$", var.splunk_evidence_exporter_hec_url))
+    error_message = "Use an HTTPS authority and the exact /services/collector/event path, without userinfo, query, or fragment."
+  }
+}
+
+variable "splunk_evidence_exporter_hec_index" {
+  type        = string
+  description = "Reviewed Splunk index for evidence events"
+  default     = ""
+}

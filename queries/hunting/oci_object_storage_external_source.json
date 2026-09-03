@@ -1,0 +1,17 @@
+{
+  "title": "OCI Object Storage Access from External Source",
+  "description": "Alert-ready aggregation of OCI Object Storage operations from non-RFC1918 IPv4 source addresses. This preserves the referenced Splunk alert's public-source evidence but omits Splunk iplocation country enrichment and does not claim that the address is new relative to a historical baseline.",
+  "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' like 'com.oraclecloud.objectstorage.*' and 'Source IP' != null and not ('Source IP' like '10.*' or 'Source IP' like '172.16.*' or 'Source IP' like '172.17.*' or 'Source IP' like '172.18.*' or 'Source IP' like '172.19.*' or 'Source IP' like '172.20.*' or 'Source IP' like '172.21.*' or 'Source IP' like '172.22.*' or 'Source IP' like '172.23.*' or 'Source IP' like '172.24.*' or 'Source IP' like '172.25.*' or 'Source IP' like '172.26.*' or 'Source IP' like '172.27.*' or 'Source IP' like '172.28.*' or 'Source IP' like '172.29.*' or 'Source IP' like '172.30.*' or 'Source IP' like '172.31.*' or 'Source IP' like '192.168.*') | stats count as ExternalAccesses, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Source IP', 'User Name', 'Event Type' | sort -ExternalAccesses",
+  "type": "hunting",
+  "hunting_type": "frequency",
+  "level": "medium",
+  "tags": ["attack.collection", "attack.t1530"],
+  "mitre_attack": {"tactics": ["collection"], "techniques": ["T1530"]},
+  "logsource": {"product": "oci", "service": "audit", "candidates": ["OCI Audit Logs"]},
+  "falsepositives": ["Approved public clients", "Corporate egress not yet allowlisted", "Expected cross-cloud integrations"],
+  "detection_rule": {"schedule": "1h", "lookback": "1h", "condition": "ExternalAccesses > 0"},
+  "dashboard": {"visualizationType": "summary_table", "showTitle": true, "timeSelection": {"timePeriod": "l1h"}, "visualizationOptions": {"groupBy": ["Source IP", "User Name", "Event Type"], "valueField": "ExternalAccesses"}},
+  "detection_maturity": "validated_locally",
+  "test_data_coverage": "covered",
+  "live_validation_status": "not_run"
+}

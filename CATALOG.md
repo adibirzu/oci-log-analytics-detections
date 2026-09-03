@@ -1,6 +1,6 @@
 # Detection Rule Catalog
 
-> **545 base detection queries** + **590 Microsoft Sentinel conversions** + **62 app/APM queries** + **151 hunting queries**
+> **545 base detection queries** + **590 Microsoft Sentinel conversions** + **62 app/APM queries** + **155 hunting queries**
 
 ## Summary
 
@@ -9,7 +9,7 @@
 | Base detection queries | 545 | Sigma-derived detections in `queries/` |
 | Microsoft Sentinel conversions | 590 | Source-derived converted detections in `queries/sentinel/` |
 | App/APM queries | 62 | 8 Sigma-derived browser detections + 54 curated analytics in `queries/apps/` |
-| Hunting queries | 151 | Curated analytics and correlation content in `queries/hunting/` |
+| Hunting queries | 155 | Curated analytics and correlation content in `queries/hunting/` |
 
 **Source YAML rules:** 522 total (cloud: 102, linux: 80, web: 38, windows: 302)
 
@@ -125,7 +125,7 @@
 | T1070 | McAfee ePO - Multiple threats on same host, McAfee ePO - Threat was not blocked |
 | T1071 | ApexOne - Top sources with alerts, Cyble Vision Alerts IOC'S, MELTS: 2025-2026 Attack Timeline |
 | T1071.001 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host), +10 more |
-| T1078 | API Endpoint Unauthorized Access Attempts, OCI Console Login Failure, +45 more |
+| T1078 | API Endpoint Unauthorized Access Attempts, OCI Console Login Failure, +46 more |
 | T1082 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1083 | WAF Path Traversal Attack Blocked, BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1087 | OCI Unusual API Caller - First Seen User-Agent |
@@ -286,7 +286,7 @@
 | T1070 | McAfee ePO - Multiple threats on same host |
 | T1071 | Apache - Unexpected Post Requests |
 | T1078 | Cisco Duo - Admin password reset, Cisco Duo - Admin user created, +13 more |
-| T1098 | AdminSDHolder ACL Modification for Persistence, Computer Account Creation for Delegation Abuse (MachineAccountQuota), +20 more |
+| T1098 | AdminSDHolder ACL Modification for Persistence, Computer Account Creation for Delegation Abuse (MachineAccountQuota), +21 more |
 | T1098.001 | OCI Action: AddUserToGroup, OCI API Key Uploaded, OCI Dynamic Group Created |
 | T1098.004 | Linux SSH Authorized Keys Modified, Linux Persistence Indicator Score (Combined Methods) |
 | T1100 | Apache - Unexpected Post Requests |
@@ -358,7 +358,7 @@
 | T1071 | ApexOne - Top sources with alerts |
 | T1078 | Mass Assignment Attack Detected, Web Application Privilege Escalation, +12 more |
 | T1095 | ApexOne - Top sources with alerts |
-| T1098 | Certifried (CVE-2022-26923): Machine Account dNSHostName Abuse, Cloud Guard Problem: Group Has Too Many Admins, +19 more |
+| T1098 | Certifried (CVE-2022-26923): Machine Account dNSHostName Abuse, Cloud Guard Problem: Group Has Too Many Admins, +20 more |
 | T1098.001 | Cloud Guard Problem: Instance Principals Enabled |
 | T1110.001 | Hunting: AD Attack Timeline - Multi-Stage Credential Attack Chain, Hunting: GOAD/Apex Caldera Attack Chain (Multi-Stage) |
 | T1112 | ApexOne - Top sources with alerts |
@@ -579,7 +579,7 @@
 | T1027 | BLUELIGHT APT37 Kill Chain Correlation, BLUELIGHT: Attack Path (per Host) |
 | T1033 | Caldera - System Owner and Identity Discovery via id/whoami (Linux), Caldera - System Owner and User Discovery (Windows), +2 more |
 | T1041 | MELTS: Last-Week Risk Exposure |
-| T1046 | Linux Network Service Scanning, Cyble Vision Alerts IOC'S, Cyble Vision Alerts Vulnerability |
+| T1046 | Linux Network Service Scanning, Cyble Vision Alerts IOC'S, +2 more |
 | T1049 | Caldera - System Network Connections Discovery (Linux), Caldera - System Network Connections Discovery (Windows) |
 | T1055 | Contrast ADR - Security Incident Alert |
 | T1056.001 | BLUELIGHT: Attack Path (per Host) |
@@ -706,7 +706,7 @@
 | T1496 | APM: Suspicious JavaScript Execution Patterns |
 | T1526 | Cloud Identity to Control-Plane Takeover |
 | T1528 | Cloud Identity: AiTM Token Abuse, MELTS: Last-Week Risk Exposure |
-| T1530 | OCI Action: CreateBucket, Cyble Vision Alerts Darkweb Data Breaches, +10 more |
+| T1530 | OCI Action: CreateBucket, Cyble Vision Alerts Darkweb Data Breaches, +11 more |
 | T1538 | Cloud Identity: AiTM Token Abuse |
 | T1539 | BLUELIGHT RAT: YARA Chrome/Edge Cookie Theft (APT_MAL_Win_BlueLight_B) |
 | T1552 | Cyble Vision Alerts Github |
@@ -2207,83 +2207,87 @@ Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** (AML.T* te
 | 72 | C2 Beaconing Detection (Periodic Connection Analysis) | frequency_analysis | 🟠 high | T1071, T1573 |
 | 73 | OCI After-Hours IAM Activity (Time-Based Anomaly) | time_anomaly | 🟡 medium | T1098 |
 | 74 | OCI API Call Burst by User | - | 🟡 medium | T1119, T1530 |
-| 75 | OCI Console Login Brute Force (Frequency Analysis) | frequency_analysis | 🟠 high | T1078, T1110 |
-| 76 | OCI Cross-Compartment Activity Anomaly | - | 🟡 medium | T1087.004, T1580 |
-| 77 | OCI Failed Action Spike by Source IP | - | 🟡 medium | T1110, T1078 |
-| 78 | OCI IAM and Fusion Activity Correlation | grouping_correlation | 🟠 high | T1078, T1098 |
-| 79 | OCI IAM Rapid Configuration Changes (Anomaly Detection) | anomaly_detection | 🟠 high | T1098, T1078 |
-| 80 | OCI Multiple Users from Same IP (Grouping) | grouping | 🟠 high | T1078, T1110.004 |
-| 81 | OCI Off-Hours Administrative Activity | - | 🟡 medium | T1078, T1098 |
-| 82 | OCI Privilege Escalation Chain Detection | combined_scoring | 🔴 critical | T1098, T1078 |
-| 83 | OCI Resource Deletion Wave | - | 🟡 medium | T1485, T1489 |
-| 84 | OCI Resource Destruction Spike (Anomaly Detection) | anomaly_detection | 🔴 critical | T1485, T1489 |
-| 85 | OCI Unusual API Caller - First Seen User-Agent | - | 🟡 medium | T1087, T1078 |
-| 86 | OCI VCN: External Egress Traffic | - | ⚪ informational | T1071, T1041 |
-| 87 | Octo Chaos — Stale Scenario State | - | 🟡 medium | - |
-| 88 | Octo Checkout — DB Slowness Correlated With Chaos | - | 🟡 medium | T1499 |
-| 89 | Octo WAF Detections vs App 5xx | - | 🟡 medium | T1190 |
-| 90 | RMM: Post-Compromise Remote Access Activity | - | 🟠 high | T1219, T1071.001 |
-| 91 | SharePoint ToolShell: Exploitation Attempts | - | 🔴 critical | T1190, T1505.003 |
-| 92 | SharePoint ToolShell: Webshell Post-Exploit | - | 🔴 critical | T1505.003, T1059 |
-| 93 | SSH Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001 |
-| 94 | Login Activity Time-Series Anomaly | time_series_anomaly | 🟠 high | T1078, T1110 |
-| 95 | WAF Attack Frequency by Source IP (Frequency Analysis) | frequency_analysis | 🟠 high | T1190 |
-| 96 | WAF Multi-Attack Vector Scoring (Combined Methods) | scoring | 🔴 critical | T1190, T1059 |
-| 97 | SQL Injection Pattern Stacking (Rare Value Detection) | rare_value | 🟠 high | T1190 |
-| 98 | Wazuh: File Integrity Monitoring Events | - | 🟠 high | - |
-| 99 | Wazuh: Alert Level Distribution | - | 🟠 high | - |
-| 100 | Wazuh: Recent Alerts (All) | - | 🟠 high | - |
-| 101 | Wazuh: Top Firing Rules | - | 🟠 high | - |
-| 102 | Wazuh: System Inventory | - | 🟠 high | - |
-| 103 | Wazuh: Installed Packages | - | 🟠 high | - |
-| 104 | Wazuh: Alerts Evolution Over Time | - | 🟠 high | - |
-| 105 | Wazuh: MITRE Attacks by Technique | - | 🟠 high | - |
-| 106 | Wazuh: Recent MITRE Events | - | 🟠 high | - |
-| 107 | Wazuh: Rule Level by Tactic | - | 🟠 high | - |
-| 108 | Wazuh: Top Agents by MITRE Alerts | - | 🟠 high | - |
-| 109 | Wazuh: Top MITRE Tactics | - | 🟠 high | - |
-| 110 | Wazuh: MITRE Detections (KPI) | - | 🟠 high | - |
-| 111 | Wazuh: Compliance Mapping | - | 🟠 high | - |
-| 112 | Wazuh: Failed SCA Checks | - | 🟠 high | - |
-| 113 | Wazuh: SCA Policy Score | - | 🟠 high | - |
-| 114 | Wazuh: Vulnerabilities by Agent | - | 🟠 high | - |
-| 115 | Wazuh: Critical Vulnerabilities (KPI) | - | 🟠 high | - |
-| 116 | Wazuh: CVSS Score Distribution | - | 🟠 high | - |
-| 117 | Wazuh: High Vulnerabilities (KPI) | - | 🟠 high | - |
-| 118 | Wazuh: Low Vulnerabilities (KPI) | - | 🟠 high | - |
-| 119 | Wazuh: Medium Vulnerabilities (KPI) | - | 🟠 high | - |
-| 120 | Wazuh: Top CVEs | - | 🟠 high | - |
-| 121 | Wazuh: Top Vulnerable Packages | - | 🟠 high | - |
-| 122 | Web Attack Geographic Anomaly (Rare Country Detection) | rare_value | 🟡 medium | T1190 |
-| 123 | Web Application Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001, T1110.003 |
-| 124 | Web Directory Scanning IP Clustering (Anomaly Detection) | anomaly_detection | 🟡 medium | T1595.002 |
-| 125 | OWASP Multi-Stage Web Attack Chain (Combined Methods) | multi_stage | 🔴 critical | T1190, T1110, T1059 |
-| 126 | Web Scanner Tool Identification (User Agent Stacking) | rare_value | 🟡 medium | T1595.002 |
-| 127 | Web-to-Cloud: Attack Path Link Analysis | - | 🔴 critical | T1190, T1552.005, T1071.001, T1041 |
-| 128 | Web-to-Cloud: Correlated Attack Timeline | - | 🔴 critical | T1190, T1552.005, T1071.001, T1041 |
-| 129 | Web-to-Cloud: OCI Audit Cloud Abuse | - | 🔴 critical | T1580, T1530, T1567 |
-| 130 | Web-to-Cloud: Compromised Cloud Identity | - | 🔴 critical | T1552.005, T1580, T1530 |
-| 131 | Web-to-Cloud: Compromised Machines | - | 🟠 high | T1059, T1071.001 |
-| 132 | Web-to-Cloud: Entry Point and SSRF Evidence | - | 🔴 critical | T1190 |
-| 133 | Web-to-Cloud: Exfiltrated Data Evidence | - | 🔴 critical | T1530, T1041, T1567 |
-| 134 | Web-to-Cloud: Network Firewall C2 and Threat Alerts | - | 🔴 critical | T1071.001, T1041 |
-| 135 | Web-to-Cloud: MITRE Stage Breakdown | - | 🟠 high | T1190, T1552.005, T1071.001, T1041 |
-| 136 | Web-to-Cloud: VCN Egress and Exfil Flows | - | 🔴 critical | T1071.001, T1041 |
-| 137 | Windows High-Entropy DNS Queries | - | 🟡 medium | T1071.004, T1048.003 |
-| 138 | Windows Lateral Movement Timeline | - | 🟡 medium | T1021.002, T1021.006, T1021.001 |
-| 139 | Windows LOLBin Usage Frequency Anomaly | - | 🟡 medium | T1218, T1059 |
-| 140 | Windows Rare Parent-Child Process Relationships | - | 🟡 medium | T1055, T1218 |
-| 141 | Windows Administrator Logon | privileged_access | 🟠 high | T1078 |
-| 142 | Windows Failed Logon Burst by Source | frequency | 🟠 high | T1110 |
-| 143 | Windows New Local User Created | persistence | 🟠 high | T1136.001 |
-| 144 | Windows User Added to Administrators or Remote Desktop Users | privileged_access | 🔴 critical | T1098 |
-| 145 | Windows Successful RDP Logon Outside Business Hours | time_anomaly | 🟠 high | T1021.001 |
-| 146 | Windows Credential Access Tool Cluster (Grouping) | grouping | 🔴 critical | T1003, T1558.003 |
-| 147 | Windows Defense Evasion Score (Combined Methods) | scoring | 🔴 critical | T1562, T1548.002, T1070 |
-| 148 | Windows Lateral Movement Tool Cluster (Grouping) | grouping | 🔴 critical | T1021, T1570 |
-| 149 | Windows Suspiciously Long Command Line (Field Analysis) | field_analysis | 🟠 high | T1059.001, T1027 |
-| 150 | Windows Process from Unusual Path (Rare Value Analysis) | rare_value | 🟠 high | T1204, T1036 |
-| 151 | Windows Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059 |
+| 75 | OCI Audit Failures | frequency | 🟡 medium | T1078 |
+| 76 | OCI Console Login Brute Force (Frequency Analysis) | frequency_analysis | 🟠 high | T1078, T1110 |
+| 77 | OCI Cross-Compartment Activity Anomaly | - | 🟡 medium | T1087.004, T1580 |
+| 78 | OCI Failed Action Spike by Source IP | - | 🟡 medium | T1110, T1078 |
+| 79 | OCI IAM and Fusion Activity Correlation | grouping_correlation | 🟠 high | T1078, T1098 |
+| 80 | OCI IAM Policy Changes | frequency | 🟠 high | T1098 |
+| 81 | OCI IAM Rapid Configuration Changes (Anomaly Detection) | anomaly_detection | 🟠 high | T1098, T1078 |
+| 82 | OCI Multiple Users from Same IP (Grouping) | grouping | 🟠 high | T1078, T1110.004 |
+| 83 | OCI Object Storage Access from External Source | frequency | 🟡 medium | T1530 |
+| 84 | OCI Off-Hours Administrative Activity | - | 🟡 medium | T1078, T1098 |
+| 85 | OCI Privilege Escalation Chain Detection | combined_scoring | 🔴 critical | T1098, T1078 |
+| 86 | OCI Resource Deletion Wave | - | 🟡 medium | T1485, T1489 |
+| 87 | OCI Resource Destruction Spike (Anomaly Detection) | anomaly_detection | 🔴 critical | T1485, T1489 |
+| 88 | OCI Unusual API Caller - First Seen User-Agent | - | 🟡 medium | T1087, T1078 |
+| 89 | OCI VCN: External Egress Traffic | - | ⚪ informational | T1071, T1041 |
+| 90 | OCI VCN Rejected Traffic Spike | frequency | 🟠 high | T1046 |
+| 91 | Octo Chaos — Stale Scenario State | - | 🟡 medium | - |
+| 92 | Octo Checkout — DB Slowness Correlated With Chaos | - | 🟡 medium | T1499 |
+| 93 | Octo WAF Detections vs App 5xx | - | 🟡 medium | T1190 |
+| 94 | RMM: Post-Compromise Remote Access Activity | - | 🟠 high | T1219, T1071.001 |
+| 95 | SharePoint ToolShell: Exploitation Attempts | - | 🔴 critical | T1190, T1505.003 |
+| 96 | SharePoint ToolShell: Webshell Post-Exploit | - | 🔴 critical | T1505.003, T1059 |
+| 97 | SSH Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001 |
+| 98 | Login Activity Time-Series Anomaly | time_series_anomaly | 🟠 high | T1078, T1110 |
+| 99 | WAF Attack Frequency by Source IP (Frequency Analysis) | frequency_analysis | 🟠 high | T1190 |
+| 100 | WAF Multi-Attack Vector Scoring (Combined Methods) | scoring | 🔴 critical | T1190, T1059 |
+| 101 | SQL Injection Pattern Stacking (Rare Value Detection) | rare_value | 🟠 high | T1190 |
+| 102 | Wazuh: File Integrity Monitoring Events | - | 🟠 high | - |
+| 103 | Wazuh: Alert Level Distribution | - | 🟠 high | - |
+| 104 | Wazuh: Recent Alerts (All) | - | 🟠 high | - |
+| 105 | Wazuh: Top Firing Rules | - | 🟠 high | - |
+| 106 | Wazuh: System Inventory | - | 🟠 high | - |
+| 107 | Wazuh: Installed Packages | - | 🟠 high | - |
+| 108 | Wazuh: Alerts Evolution Over Time | - | 🟠 high | - |
+| 109 | Wazuh: MITRE Attacks by Technique | - | 🟠 high | - |
+| 110 | Wazuh: Recent MITRE Events | - | 🟠 high | - |
+| 111 | Wazuh: Rule Level by Tactic | - | 🟠 high | - |
+| 112 | Wazuh: Top Agents by MITRE Alerts | - | 🟠 high | - |
+| 113 | Wazuh: Top MITRE Tactics | - | 🟠 high | - |
+| 114 | Wazuh: MITRE Detections (KPI) | - | 🟠 high | - |
+| 115 | Wazuh: Compliance Mapping | - | 🟠 high | - |
+| 116 | Wazuh: Failed SCA Checks | - | 🟠 high | - |
+| 117 | Wazuh: SCA Policy Score | - | 🟠 high | - |
+| 118 | Wazuh: Vulnerabilities by Agent | - | 🟠 high | - |
+| 119 | Wazuh: Critical Vulnerabilities (KPI) | - | 🟠 high | - |
+| 120 | Wazuh: CVSS Score Distribution | - | 🟠 high | - |
+| 121 | Wazuh: High Vulnerabilities (KPI) | - | 🟠 high | - |
+| 122 | Wazuh: Low Vulnerabilities (KPI) | - | 🟠 high | - |
+| 123 | Wazuh: Medium Vulnerabilities (KPI) | - | 🟠 high | - |
+| 124 | Wazuh: Top CVEs | - | 🟠 high | - |
+| 125 | Wazuh: Top Vulnerable Packages | - | 🟠 high | - |
+| 126 | Web Attack Geographic Anomaly (Rare Country Detection) | rare_value | 🟡 medium | T1190 |
+| 127 | Web Application Brute Force Detection (Frequency Analysis) | frequency_analysis | 🟠 high | T1110.001, T1110.003 |
+| 128 | Web Directory Scanning IP Clustering (Anomaly Detection) | anomaly_detection | 🟡 medium | T1595.002 |
+| 129 | OWASP Multi-Stage Web Attack Chain (Combined Methods) | multi_stage | 🔴 critical | T1190, T1110, T1059 |
+| 130 | Web Scanner Tool Identification (User Agent Stacking) | rare_value | 🟡 medium | T1595.002 |
+| 131 | Web-to-Cloud: Attack Path Link Analysis | - | 🔴 critical | T1190, T1552.005, T1071.001, T1041 |
+| 132 | Web-to-Cloud: Correlated Attack Timeline | - | 🔴 critical | T1190, T1552.005, T1071.001, T1041 |
+| 133 | Web-to-Cloud: OCI Audit Cloud Abuse | - | 🔴 critical | T1580, T1530, T1567 |
+| 134 | Web-to-Cloud: Compromised Cloud Identity | - | 🔴 critical | T1552.005, T1580, T1530 |
+| 135 | Web-to-Cloud: Compromised Machines | - | 🟠 high | T1059, T1071.001 |
+| 136 | Web-to-Cloud: Entry Point and SSRF Evidence | - | 🔴 critical | T1190 |
+| 137 | Web-to-Cloud: Exfiltrated Data Evidence | - | 🔴 critical | T1530, T1041, T1567 |
+| 138 | Web-to-Cloud: Network Firewall C2 and Threat Alerts | - | 🔴 critical | T1071.001, T1041 |
+| 139 | Web-to-Cloud: MITRE Stage Breakdown | - | 🟠 high | T1190, T1552.005, T1071.001, T1041 |
+| 140 | Web-to-Cloud: VCN Egress and Exfil Flows | - | 🔴 critical | T1071.001, T1041 |
+| 141 | Windows High-Entropy DNS Queries | - | 🟡 medium | T1071.004, T1048.003 |
+| 142 | Windows Lateral Movement Timeline | - | 🟡 medium | T1021.002, T1021.006, T1021.001 |
+| 143 | Windows LOLBin Usage Frequency Anomaly | - | 🟡 medium | T1218, T1059 |
+| 144 | Windows Rare Parent-Child Process Relationships | - | 🟡 medium | T1055, T1218 |
+| 145 | Windows Administrator Logon | privileged_access | 🟠 high | T1078 |
+| 146 | Windows Failed Logon Burst by Source | frequency | 🟠 high | T1110 |
+| 147 | Windows New Local User Created | persistence | 🟠 high | T1136.001 |
+| 148 | Windows User Added to Administrators or Remote Desktop Users | privileged_access | 🔴 critical | T1098 |
+| 149 | Windows Successful RDP Logon Outside Business Hours | time_anomaly | 🟠 high | T1021.001 |
+| 150 | Windows Credential Access Tool Cluster (Grouping) | grouping | 🔴 critical | T1003, T1558.003 |
+| 151 | Windows Defense Evasion Score (Combined Methods) | scoring | 🔴 critical | T1562, T1548.002, T1070 |
+| 152 | Windows Lateral Movement Tool Cluster (Grouping) | grouping | 🔴 critical | T1021, T1570 |
+| 153 | Windows Suspiciously Long Command Line (Field Analysis) | field_analysis | 🟠 high | T1059.001, T1027 |
+| 154 | Windows Process from Unusual Path (Rare Value Analysis) | rare_value | 🟠 high | T1204, T1036 |
+| 155 | Windows Rare Process Detection (Stacking) | rare_value | 🟡 medium | T1059 |
 
 ## STIG Compliance Rules
 
@@ -2315,4 +2319,4 @@ Adversarial threats against AI/LLM systems, mapped to **MITRE ATLAS** (AML.T* te
 | OCI VCN Peering Connection Created | SC-7 | CAT II | medium |
 
 ---
-*Generated from 522 Sigma source rules routed to 545 top-level detection queries and 8 browser app queries, plus 590 Microsoft Sentinel conversions, 54 curated app/APM analytics, and 151 hunting queries*
+*Generated from 522 Sigma source rules routed to 545 top-level detection queries and 8 browser app queries, plus 590 Microsoft Sentinel conversions, 54 curated app/APM analytics, and 155 hunting queries*

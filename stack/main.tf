@@ -18,3 +18,30 @@ locals {
     "soc-detection-windows-sysmon" = { log_source = "Windows Sysmon Operational Logs" }
   }
 }
+
+module "splunk_evidence_exporter" {
+  source = "./modules/splunk_evidence_exporter"
+
+  enable_splunk_evidence_exporter     = var.enable_splunk_evidence_exporter
+  enable_alarm_actions                = var.enable_splunk_evidence_exporter_alarm_actions
+  enable_notification_subscription    = var.enable_splunk_evidence_exporter_subscription
+  compartment_id                      = var.compartment_id
+  log_analytics_compartment_id        = var.compartment_id
+  log_analytics_namespace             = local.la_namespace
+  alarm_binding_mode                  = var.splunk_evidence_exporter_alarm_binding_mode
+  splunk_alarm_ids                    = var.splunk_evidence_exporter_alarm_ids
+  object_storage_namespace            = var.splunk_evidence_exporter_object_storage_namespace
+  existing_state_bucket_name          = var.splunk_evidence_exporter_existing_state_bucket_name
+  existing_dlq_bucket_name            = var.splunk_evidence_exporter_existing_dlq_bucket_name
+  function_subnet_ids                 = var.splunk_evidence_exporter_function_subnet_ids
+  function_network_security_group_ids = var.splunk_evidence_exporter_function_nsg_ids
+  function_image                      = var.splunk_evidence_exporter_function_image
+  function_image_digest               = var.splunk_evidence_exporter_function_image_digest
+  function_attestation_sha256         = var.splunk_evidence_exporter_function_attestation_sha256
+  function_provenance_sha256          = var.splunk_evidence_exporter_function_provenance_sha256
+  function_attestation_path           = var.splunk_evidence_exporter_function_attestation_path
+  function_provenance_path            = var.splunk_evidence_exporter_function_provenance_path
+  splunk_hec_secret_id                = var.splunk_evidence_exporter_hec_secret_id
+  splunk_hec_url                      = var.splunk_evidence_exporter_hec_url
+  splunk_hec_index                    = var.splunk_evidence_exporter_hec_index
+}

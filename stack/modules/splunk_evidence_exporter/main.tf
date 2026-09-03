@@ -140,10 +140,6 @@ resource "oci_functions_application" "exporter" {
   network_security_group_ids = var.function_network_security_group_ids
   freeform_tags              = var.freeform_tags
 
-  logging {
-    line_format = "JSON"
-  }
-
   lifecycle {
     precondition {
       condition     = length(var.function_subnet_ids) > 0

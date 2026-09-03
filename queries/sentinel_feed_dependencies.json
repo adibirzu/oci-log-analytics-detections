@@ -1855,7 +1855,7 @@
       "url": "https://urlhaus.abuse.ch/downloads/text_online/"
     }
   ],
-  "generated_at": "2026-09-01T12:41:14Z",
+  "generated_at": "2026-09-03T08:52:59Z",
   "source_inventory": "queries/siem_discovery_inventory.json",
   "summary": {
     "candidate_count": 63,

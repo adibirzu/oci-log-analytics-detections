@@ -96,6 +96,7 @@ flowchart LR
   SRC --> LOG
   LOG --> LA_CONN --> PARSE --> ANALYZE
   LOG --> SPL_CONN --> STREAM --> CONSUMER --> HEC --> RAW
+  ANALYZE -. "optional selected detection events<br/>through an approved producer" .-> STREAM
 ```
 
 Operational implications:
@@ -105,6 +106,7 @@ Operational implications:
 - Prove the same canary event in Log Analytics and Splunk before adding another source.
 - Track duplicate ingestion, retention, egress, and Splunk license cost explicitly.
 - On-premises Management Agent records do not automatically appear in OCI Logging and therefore do not enter this raw fan-out unless a separate approved raw route is configured.
+- The dashed Log Analytics detection-to-Streaming link is optional and requires an approved producer or exporter. Log Analytics does not automatically publish detection rows to OCI Streaming; validate the producer, schema, retry behavior, and downstream `oci-splunk` consumer before enabling this path.
 
 ### Mode 2: Log Analytics detection evidence export
 
@@ -300,10 +302,10 @@ sequenceDiagram
   F->>H: HEC event batch over verified TLS
   alt HEC confirms success
     F->>S: Commit checkpoint and receipt
-  else retryable timeout, 429, or 5xx
-    F->>S: Backoff; write DLQ after retry budget
-  else non-retryable 4xx or schema error
-    F->>S: Quarantine without advancing checkpoint
+  else delivery not confirmed
+    F->>F: Classify the failure
+    F->>S: Retryable timeout, 429, or 5xx - backoff, then DLQ after budget
+    F->>S: Non-retryable 4xx or schema error - quarantine; hold checkpoint
   end
 ```
 

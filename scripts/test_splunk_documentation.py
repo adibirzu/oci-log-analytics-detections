@@ -169,7 +169,12 @@ def test_customer_facing_commands_use_a_portable_python_interpreter() -> None:
             page
             for page in sorted(ROOT.rglob("*.md"))
                 if ".superpowers" not in page.parts
-                and "node_modules" not in page.parts
+                and not {
+                    "node_modules",
+                    "playwright-report",
+                    "test-results",
+                    ".next",
+                }.intersection(page.parts)
             and not (
                 "docs" in page.parts and "superpowers" in page.parts
             )

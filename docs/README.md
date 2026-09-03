@@ -71,3 +71,8 @@ The protected live workflows never run from untrusted pull requests. A missing c
 - `queries/splunk_detection_registry.json`: generated Splunk provenance, canonical query, source/field, fidelity, and delivery mapping
 - `config/splunk_parallel_delivery.yaml`: source/detection delivery policy and tenant-neutral HEC placeholders
 - `schemas/splunk_evidence_event.schema.json`: normalized Mode 2 HEC evidence contract
+- `scripts/generate_splunk_detection_registry.py`: deterministic registry generator and drift check
+- `scripts/splunk_evidence_exporter_cli.py`: offline plan, configuration validation, scenario E2E, canary plan, and replay plan
+- `stack/modules/splunk_evidence_exporter`: opt-in Function, Notifications, state/DLQ, metrics, and alarm module
+- `docs/health/splunk-parallel-local-evidence.example.json`: self-hashed local-only release receipt
+- `docs/superpowers/plans/2026-09-02-log-analytics-splunk-parallel.md`: implementation plan, task traceability, and live-canary boundary

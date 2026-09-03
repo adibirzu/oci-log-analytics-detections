@@ -63,6 +63,21 @@ flowchart LR
 The dashed detection-to-Streaming route requires an explicitly approved producer or exporter; Log Analytics does not automatically publish detection rows to Streaming. Start with [Splunk Parallel Operations](docs/SPLUNK_PARALLEL_OPERATIONS.md), then use the [rule migration guide](docs/SPLUNK_RULE_MIGRATION.md), [evidence export runbook](docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md), and [E2E validation guide](docs/SPLUNK_E2E_VALIDATION.md). Editable sources include the full [Splunk architecture](docs/diagrams/logan-splunk-architecture.mmd), [raw fan-out](docs/diagrams/logan-splunk-raw-fanout.mmd), and [project content architecture](docs/diagrams/project-content-architecture.mmd). Local tests and plans do not prove OCI/HEC deployment or Splunk searchability.
 Use [Cost Optimization and Archive Retention](docs/LOG_ANALYTICS_COST_OPTIMIZATION.md) when deciding whether a source belongs in Mode 1 raw fan-out, Mode 2 governed evidence export, or an archive-first Log Analytics retention policy.
 
+Implementation entry points:
+
+- [implementation plan and status](docs/superpowers/plans/2026-09-02-log-analytics-splunk-parallel.md)
+- [delivery policy](config/splunk_parallel_delivery.yaml) and [generated nine-rule registry](queries/splunk_detection_registry.json)
+- [registry generator](scripts/generate_splunk_detection_registry.py) and [operator/E2E CLI](scripts/splunk_evidence_exporter_cli.py)
+- [optional Terraform/Resource Manager module](stack/modules/splunk_evidence_exporter) and [Function source](stack/modules/splunk_evidence_exporter/function)
+- [local evidence receipt](docs/health/splunk-parallel-local-evidence.example.json) and [complete workflow diagram set](docs/diagrams)
+
+```bash
+python3 scripts/generate_splunk_detection_registry.py --check
+python3 scripts/splunk_evidence_exporter_cli.py validate-config
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success
+python3 scripts/release_checklist.py --splunk-parallel-offline-stage
+```
+
 ## Current Inventory
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
 

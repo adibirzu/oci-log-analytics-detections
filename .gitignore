@@ -50,6 +50,7 @@ Thumbs.db
 # scripts/daily_health_check.py)
 docs/health/*.json
 !docs/health/.gitkeep
+!docs/health/*.example.json
 
 # Local graph/debug outputs
 graphify-out/

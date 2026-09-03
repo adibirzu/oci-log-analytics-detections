@@ -1,6 +1,6 @@
 # OCI Log Analytics Detections Architecture
 
-Last reconciled with generated artifacts: 2026-09-01
+Last reconciled with generated artifacts: 2026-09-02
 
 ## Purpose and scope
 
@@ -39,14 +39,14 @@ Published counts come from [`queries/catalog.json`](../queries/catalog.json), [`
 | Sigma-derived browser/app queries | 8 | `queries/catalog.json:inventory.source_derived_app_queries` |
 | Promoted Sentinel queries | 590 | `queries/catalog.json:total_sentinel_queries` |
 | Curated app analytics | 54 | `queries/catalog.json:inventory.curated_app_queries` |
-| Curated hunting analytics | 151 | `queries/catalog.json:total_hunting` |
-| Total query content | 1,348 | `queries/catalog.json:total_content_items` |
+| Curated hunting analytics | 155 | `queries/catalog.json:total_hunting` |
+| Total query content | 1,352 | `queries/catalog.json:total_content_items` |
 | Dashboards | 35 | `queries/dashboard_inventory.json:summary.total_dashboards` |
 | Dashboard saved searches/widgets | 541 | `queries/dashboard_inventory.json:summary.total_widgets` |
 | Advanced visualization widgets | 161 | `queries/dashboard_inventory.json:summary.advanced_visualization_widgets` |
 | Latest local synthetic events | 93,142 across 25 NDJSON files | `test_data/manifest.json` |
 
-The 553 Sigma-derived queries are the 545 top-level queries plus 8 browser/app queries. The 205 curated analytics are 54 app queries plus 151 hunting queries. Sentinel content is source-derived but is not counted as Sigma-derived.
+The 553 Sigma-derived queries are the 545 top-level queries plus 8 browser/app queries. The 209 curated analytics are 54 app queries plus 155 hunting queries. Sentinel content is source-derived but is not counted as Sigma-derived.
 
 ## Repository content architecture
 
@@ -56,7 +56,7 @@ flowchart LR
     SIGMA["rules/**<br/>522 Sigma/YAML rules"]
     SENTINEL["Official Azure/Azure-Sentinel cache<br/>local intake only"]
     APPS["queries/apps/**<br/>54 curated analytics"]
-    HUNT["queries/hunting/**<br/>151 curated analytics"]
+    HUNT["queries/hunting/**<br/>155 curated analytics"]
   end
 
   subgraph BUILD["Deterministic generation"]
@@ -183,6 +183,35 @@ flowchart LR
 | Sysmon-rich/custom JSON | Repository custom source/parser where required fields are declared | Do not assume a minimalist native parser exposes every detection field |
 | Synthetic evidence | Local generation/validation first; approved upload only afterward | Synthetic hits prove query contracts, not production coverage |
 
+## Storage lifecycle architecture
+
+Log Analytics storage is part of the operating model, especially when the same
+source might stay only in Log Analytics, feed Splunk in parallel, or do both.
+Recent searchable data belongs in active storage. Older data with future
+investigative or compliance value belongs in archive storage. Recalled data
+returns to active storage temporarily and must be released after analysis to
+avoid unnecessary active-storage cost.
+
+```mermaid
+flowchart LR
+  COLLECT[Collected logs] --> ACTIVE[Active storage]
+  ACTIVE --> SEARCH[Dashboards searches detections]
+  ACTIVE --> AGE{Older than active window?}
+  AGE -->|No| ACTIVE
+  AGE -->|Yes| ARCHIVE[Archive storage]
+  ARCHIVE --> RECALL[Recall selected time range]
+  RECALL --> SEARCH
+  SEARCH --> RELEASE[Release recalled data]
+  RELEASE --> ARCHIVE
+  ACTIVE --> PURGE[Purge only by approved lifecycle]
+  ARCHIVE --> PURGE
+```
+
+This repository documents the workflow but does not enable archiving, trigger
+recalls, or purge customer data. Use the customer's OCI Console, CLI, or
+approved Terraform process for those actions. See
+[Cost Optimization and Archive Retention](LOG_ANALYTICS_COST_OPTIMIZATION.md)
+for the operator procedure and source-backed storage behaviors.
 ## Windows access onboarding workflow
 
 The Windows access use case is a complete vertical slice for Security, System, and Application channels and the event IDs 4624, 4625, 4634, 4648, 4672, 4720, 4726, 4732, 4733, and 4776.
@@ -217,6 +246,36 @@ Operator entry points:
 
 Scripts reduce manual transcription; they do not lower the IAM, target, validation, or approval gates. Saved-search OCIDs remain blocking placeholders until the searches exist in the target tenancy, and generated alarms remain disabled until a metric and destination canary are reviewed.
 
+## Splunk parallel delivery architecture
+
+Splunk integration adds two explicit runtime paths without changing canonical query ownership:
+
+```mermaid
+flowchart LR
+  OCI[OCI Logging] --> C1[Connector to Log Analytics]
+  OCI --> C2[Connector to Streaming]
+  C1 --> LA[Log Analytics source of truth]
+  C2 --> ST[Streaming]
+  ST --> RAW[Pinned oci-splunk]
+  RAW --> HEC[Splunk HEC]
+  LA --> DR[Detection rule]
+  DR -.-> PUB[Approved Streaming producer]
+  PUB -.-> ST
+  DR --> MM[Monitoring metric]
+  MM --> AN[Alarm and Notifications]
+  AN --> FN[Evidence Function]
+  FN --> LA
+  FN --> SD[Checkpoint / DLQ]
+  FN --> HEC
+```
+
+- **Mode 1, raw:** the separate Connector Hub → Streaming → pinned `adibirzu/oci-splunk` path owns raw transport and consumer offsets. Selected Log Analytics detections may also enter Streaming through an explicitly approved producer; this is not an automatic Log Analytics capability.
+- **Mode 2, evidence:** Log Analytics detection metrics trigger a bounded query and normalized HEC envelope; checkpoint advances only after HEC confirmation.
+- **Hybrid:** delivery policy is explicit per source and detection. On-premises Management Agent/optional Management Gateway sources can remain in Log Analytics and use Mode 2 without Streaming.
+
+The architecture keeps collection, parsing, query, detection rule, Monitoring metric, alarm, Notifications, Function, checkpoint/DLQ, HEC confirmation, Splunk searchability, and provider acceptance independently observable. The exporter is opt-in and alarm actions/subscription default to disabled.
+
+Operator procedures are in [Splunk Parallel Operations](SPLUNK_PARALLEL_OPERATIONS.md), [Rule Migration](SPLUNK_RULE_MIGRATION.md), [Evidence Export Runbook](SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md), and [E2E Validation](SPLUNK_E2E_VALIDATION.md). Editable full diagrams: [overview](diagrams/logan-splunk-architecture.mmd), [raw fan-out](diagrams/logan-splunk-raw-fanout.mmd), [evidence export](diagrams/logan-splunk-evidence-export.mmd), [sequence](diagrams/logan-splunk-export-sequence.mmd), [IAM](diagrams/logan-splunk-iam-boundaries.mmd), [replay](diagrams/logan-splunk-replay-state.mmd), [on-prem](diagrams/logan-splunk-onprem-agent.mmd), [validation](diagrams/logan-splunk-validation.mmd), and [troubleshooting](diagrams/logan-splunk-troubleshooting.mmd).
 ## Dashboard, detection, and alert boundaries
 
 - Dashboard composition belongs in `scripts/deploy_dashboard.py:DASHBOARDS` and uses the 12-column layout resolver.

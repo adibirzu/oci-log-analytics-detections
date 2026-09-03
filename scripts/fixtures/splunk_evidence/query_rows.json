@@ -1,0 +1,23 @@
+[
+  {
+    "Time": "2026-09-02T07:12:00Z",
+    "Entity": "fixture-host-a",
+    "Event Type": "fixture.policy.update",
+    "Status": "Failure",
+    "User Name": "operator-a@example.invalid"
+  },
+  {
+    "Time": "2026-09-02T07:13:00Z",
+    "Entity": "fixture-host-b",
+    "Event Type": "fixture.policy.update",
+    "Status": "Failure",
+    "User Name": "operator-b@example.invalid"
+  },
+  {
+    "Time": "2026-09-02T07:14:00Z",
+    "Entity": "fixture-host-c",
+    "Event Type": "fixture.policy.update",
+    "Status": "Failure",
+    "User Name": "operator-c@example.invalid"
+  }
+]

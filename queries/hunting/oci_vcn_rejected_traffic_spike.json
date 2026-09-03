@@ -1,0 +1,17 @@
+{
+  "title": "OCI VCN Rejected Traffic Spike",
+  "description": "Alert-ready aggregation for a source address producing more than 100 rejected VCN flow records in the ten-minute scheduled-search window. This preserves the threshold behavior of the referenced Splunk alert while using OCI Log Analytics display fields.",
+  "query": "'Log Source' = 'SOC VCN Flow Logs' and 'Action' = 'REJECT' | stats count as RejectedFlows, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Source IP' | where RejectedFlows > 100 | sort -RejectedFlows",
+  "type": "hunting",
+  "hunting_type": "frequency",
+  "level": "high",
+  "tags": ["attack.discovery", "attack.t1046"],
+  "mitre_attack": {"tactics": ["discovery"], "techniques": ["T1046"]},
+  "logsource": {"product": "oci", "service": "vcn_flow", "candidates": ["SOC VCN Flow Logs"]},
+  "falsepositives": ["Authorized vulnerability scans", "Misconfigured health checks", "Expected blocked internet noise"],
+  "detection_rule": {"schedule": "10m", "lookback": "10m", "condition": "RejectedFlows > 100"},
+  "dashboard": {"visualizationType": "summary_table", "showTitle": true, "timeSelection": {"timePeriod": "l10m"}, "visualizationOptions": {"groupBy": ["Source IP"], "valueField": "RejectedFlows"}},
+  "detection_maturity": "validated_locally",
+  "test_data_coverage": "covered",
+  "live_validation_status": "not_run"
+}

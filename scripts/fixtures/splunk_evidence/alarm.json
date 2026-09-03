@@ -1,0 +1,14 @@
+{
+  "type": "com.oraclecloud.monitoring.alarm",
+  "data": {
+    "detectionId": "oci-audit-failures",
+    "alarmEndTime": "2026-09-02T07:15:00Z",
+    "namespace": "fixture-namespace",
+    "metricName": "AuditFailures",
+    "dimensions": {
+      "Event Type": "fixture.policy.update",
+      "Status": "Failure",
+      "User Name": "operator@example.invalid"
+    }
+  }
+}

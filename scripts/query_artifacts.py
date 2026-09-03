@@ -30,6 +30,7 @@ GENERATED_QUERY_ARTIFACT_FILENAMES = {
     "sentinel_feed_dependencies.json",
     "sentinel_synthetic_live_results.json",
     "sentinel_synthetic_plan.json",
+    "splunk_detection_registry.json",
 }
 
 

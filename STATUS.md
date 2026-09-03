@@ -1,6 +1,6 @@
 # Project Status
 
-Date: 2026-09-01
+Date: 2026-09-02
 
 ## Current State
 
@@ -10,12 +10,12 @@ Date: 2026-09-01
   - 545 top-level detections in `queries/`
   - 8 browser/app telemetry detections in `queries/apps/`
 - Microsoft Sentinel converted queries: 590 live OCI parser-passing queries
-- Curated analytics: 205
+- Curated analytics: 209
   - 54 app telemetry analytics
-  - 151 hunting analytics
-- Total query artifacts/content items: 1348
+  - 155 hunting analytics
+- Total query artifacts/content items: 1352
 - Dashboards: 35
-- Saved searches: 541 active dashboard saved searches; 1348 total content items
+- Saved searches: 541 active dashboard saved searches; 1352 total content items
 - Sentinel live validation: 590 / 607 locally clean conversions; 17 live failures remain in `queries/sentinel_conversion_report.json`
 - Sentinel synthetic live-hit check: **20 / 20 ready Logan QL queries HIT** in the `cap` profile with a 24-hour lookback after uploading Sentinel-shaped synthetic logs.
 - Latest full live dashboard deployment: **441 widgets across 29 dashboards** in the `cap` profile with a 21-day lookback — 0 render/query errors; live `parse_validate_all_queries` 681/681 PASS.
@@ -61,6 +61,19 @@ Date: 2026-09-01
 - Optional runtime helpers remain in the repository for Log Analytics ingestion support, but the canonical surfaces are `rules/**`, `queries/**`, generated manifests, synthetic logs, dashboard deployment scripts, and `webapp/`.
 
 ## Quality and Verification
+
+Splunk parallel local release validation on 2026-09-02:
+
+- `python3 scripts/release_checklist.py --splunk-parallel-offline-stage`
+  - 10 / 10 offline gates PASS, including 4 / 4 fixture-backed exporter scenarios
+  - evidence class `locally_verified`; provider validation `not_run`
+  - no OCI, Vault, HEC, Splunk search, provider, or external endpoint validation
+- Reproducible tenant-neutral packet: `docs/health/splunk-parallel-local-evidence.example.json`
+- The default checklist preserves this local result before the known
+  fail-closed `sentinel drift check` blocker (`parser_schema_hash_mismatch`).
+- Terraform release validation is provider-free and cache-independent via
+  `scripts/validate_terraform_static.py`; provider-backed validation remains
+  an explicitly separate deployment gate.
 
 Live and local verification on 2026-06-09 (eu-frankfurt-1 tenancy):
 

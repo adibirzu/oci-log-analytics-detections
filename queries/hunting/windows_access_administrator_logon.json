@@ -1,7 +1,7 @@
 {
   "title": "Windows Administrator Logon",
   "description": "Alert-ready search for successful logons by the built-in Administrator account. Extend the approved-account filter for renamed or localized administrator accounts.",
-  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4624' and ('Target User Name' = 'Administrator' or User = 'Administrator') | stats count as AdministratorLogons by 'Target User Name', 'Logon Type', 'Host Name (Server)' | sort -AdministratorLogons",
+  "query": "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs') and 'Event ID' = '4624' and ('Target User Name' = 'Administrator' or User = 'Administrator') | stats count as AdministratorLogons, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'Target User Name', 'Logon Type', 'Host Name (Server)' | sort -AdministratorLogons",
   "type": "hunting",
   "hunting_type": "privileged_access",
   "level": "high",

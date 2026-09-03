@@ -36,7 +36,32 @@ This is a migration accelerator for teams moving security analytics into OCI Log
 The [documentation hub](docs/README.md) is the maintained wiki-style entry point for operators, SOC teams, contributors, and integration owners.
 For hands-on use, start with [Using OCI Log Analytics Queries](docs/LOG_ANALYTICS_QUERY_USAGE.md) to select an artifact, run it in Log Explorer, customize OCL safely, and validate it locally or against an approved OCI target.
 For a new customer deployment, follow the [OCI Log Analytics Fast Onboarding Track](docs/FAST_ONBOARDING_TRACK.md) to establish IAM, choose an ingestion path, prove the first two sources, and plan a governed production rollout.
+For storage design, use [Cost Optimization and Archive Retention](docs/LOG_ANALYTICS_COST_OPTIMIZATION.md) to decide active versus archive retention, recall/release workflow, and when Splunk parallel delivery justifies duplicate cost.
 For the Windows access use case, continue with [Windows Access Monitoring Fast Onboarding](docs/WINDOWS_ACCESS_FAST_ONBOARDING.md), then choose the [manual console runbook](docs/WINDOWS_ACCESS_MANUAL_RUNBOOK.md) or [script-assisted runbook](docs/WINDOWS_ACCESS_SCRIPTED_RUNBOOK.md). The [workflow diagrams](docs/WINDOWS_ACCESS_WORKFLOW_DIAGRAMS.md) show collection, detection, notification, troubleshooting, and evidence gates.
+
+## Splunk Parallel Operations
+
+Splunk can run beside Log Analytics in two independently approved modes. **Mode 1** sends selected raw OCI Logging sources through a separate Connector Hub connector, OCI Streaming, and a pinned `adibirzu/oci-splunk` release to Splunk HEC. **Mode 2** keeps Log Analytics as the source of truth and exports bounded, normalized evidence only after a detection rule posts a Monitoring metric and an alarm invokes the exporter through Notifications. A hybrid policy may choose either or both paths per source/detection.
+
+```mermaid
+flowchart LR
+  LOG[OCI Logging] --> LA[OCI Log Analytics]
+  LOG --> SCH[Connector Hub]
+  SCH --> STREAM[OCI Streaming]
+  STREAM --> RAW[oci-splunk pinned ref]
+  RAW --> HEC[Splunk HEC]
+  LA --> DET[Detection rule]
+  DET -.-> PUB[Approved Streaming producer]
+  PUB -.-> STREAM
+  DET --> METRIC[Monitoring metric]
+  METRIC --> FN[Alarm + Notifications + Function]
+  FN --> LA
+  FN --> HEC
+  FN --> STATE[Checkpoint / DLQ]
+```
+
+The dashed detection-to-Streaming route requires an explicitly approved producer or exporter; Log Analytics does not automatically publish detection rows to Streaming. Start with [Splunk Parallel Operations](docs/SPLUNK_PARALLEL_OPERATIONS.md), then use the [rule migration guide](docs/SPLUNK_RULE_MIGRATION.md), [evidence export runbook](docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md), and [E2E validation guide](docs/SPLUNK_E2E_VALIDATION.md). Editable sources include the full [Splunk architecture](docs/diagrams/logan-splunk-architecture.mmd), [raw fan-out](docs/diagrams/logan-splunk-raw-fanout.mmd), and [project content architecture](docs/diagrams/project-content-architecture.mmd). Local tests and plans do not prove OCI/HEC deployment or Splunk searchability.
+Use [Cost Optimization and Archive Retention](docs/LOG_ANALYTICS_COST_OPTIMIZATION.md) when deciding whether a source belongs in Mode 1 raw fan-out, Mode 2 governed evidence export, or an archive-first Log Analytics retention policy.
 
 ## Current Inventory
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
@@ -46,10 +71,10 @@ This repository ships both source authoring content and generated OCI query asse
   - 545 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
 - **Microsoft Sentinel converted queries:** 590 live OCI parser-passing queries
-- **Curated analytics:** 205
+- **Curated analytics:** 209
   - 54 app telemetry analytics in `queries/apps/`
-  - 151 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 1,348
+  - 155 hunting analytics in `queries/hunting/`
+- **Total query artifacts/content items:** 1,352
 - **Source rule breakdown:** Windows (302), Cloud/OCI (102), Linux (80), Web/WAF (38)
 - **Combined MITRE ATT&CK coverage:** 279 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
@@ -72,6 +97,12 @@ Canonical inventory and supporting documentation:
 - `docs/RULE_QUALITY_REPORT.md` — latest quality audit report
 - `docs/WEBAPP.md` — integrated Forge webapp contract, security posture, and deployment notes
 - `docs/MIGRATION_AND_SECURITY_GUIDE.md` — customer migration, use-case, and SIEM-forwarding playbook
+- `docs/LOG_ANALYTICS_COST_OPTIMIZATION.md` — active/archive retention, recall/release workflow, and cost controls for Log Analytics with or without Splunk
+- `docs/SPLUNK_PARALLEL_OPERATIONS.md` — Mode 1 raw, Mode 2 evidence, hybrid, on-prem, and steady-state operations
+- `docs/SPLUNK_RULE_MIGRATION.md` — governed SPL-to-LAQL migration and detection promotion gates
+- `docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md` — manual and approval-separated exporter deployment/rollback/replay
+- `docs/SPLUNK_FUNCTION_DEPENDENCY_LOCK.md` — direct/transitive hash-lock and offline pre-live image-attestation gate
+- `docs/SPLUNK_E2E_VALIDATION.md` — local, provider, HEC, Splunk-search, and acceptance evidence gates
 - `docs/README.md` — documentation hub and workflow index
 - `CONTRIBUTING.md` — contributor workflow and validation expectations
 

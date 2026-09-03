@@ -4,9 +4,11 @@
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
+import shutil
 from pathlib import Path
 from unittest.mock import patch
 
@@ -185,6 +187,7 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
 
         self.assertLess(self.step_index(steps, "dashboard inventory export"), self.step_index(steps, "dashboard dry run"))
         self.assertLess(self.step_index(steps, "sentinel strict status"), self.step_index(steps, "sentinel drift check"))
+        self.assertLess(self.step_index(steps, "splunk parallel offline release"), self.step_index(steps, "sentinel drift check"))
         self.assertLess(self.step_index(steps, "sentinel drift check"), self.step_index(steps, "dashboard dry run"))
         self.assertLess(self.step_index(steps, "inventory drift check"), self.step_index(steps, "sensitive value scan"))
         self.assertLess(self.step_index(steps, "sensitive value scan"), self.step_index(steps, "pytest"))
@@ -242,9 +245,116 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
         live_commands = " ".join(str(part) for _, command, _ in live_steps for part in command)
         self.assertIn("verify_deployed_dashboards.py", live_commands)
 
+    def test_splunk_parallel_stage_covers_only_offline_release_contracts(self):
+        stage_steps = release_checklist.build_splunk_parallel_offline_steps()
+        names = [step[0] for step in stage_steps]
+
+        self.assertEqual(
+            names,
+            [
+                "registry drift validation",
+                "schema validation",
+                "sensitive value scan",
+                "splunk parallel red contracts",
+                "local exporter success",
+                "local exporter duplicate",
+                "local exporter failure",
+                "local exporter replay",
+                "diagram validation",
+                "documentation validation",
+                "terraform format validation",
+                "terraform static validation",
+            ],
+        )
+        commands = [step[1] for step in stage_steps]
+        self.assertIn("--check", commands[0])
+        scenario_commands = [command for command in commands if "--scenario" in command]
+        self.assertEqual(len(scenario_commands), 4)
+        self.assertEqual(scenario_commands[0][scenario_commands[0].index("--scenario") + 1], "success")
+        self.assertIn("--alarm-fixture", scenario_commands[0])
+        self.assertEqual(
+            scenario_commands[0][scenario_commands[0].index("--alarm-fixture") + 1],
+            "scripts/fixtures/splunk_evidence/oci_raw_alarm.json",
+        )
+        self.assertEqual(scenario_commands[1][-2:], ["--scenario", "duplicate-invocation"])
+        self.assertEqual(scenario_commands[2][-2:], ["--scenario", "500"])
+        self.assertEqual(
+            scenario_commands[3][-3:],
+            ["--scenario", "approved-replay", "--approve-replay"],
+        )
+        self.assertIn("scripts/test_splunk_diagrams.py", commands[names.index("diagram validation")])
+        self.assertIn("scripts/test_splunk_documentation.py", commands[names.index("documentation validation")])
+        format_command = commands[names.index("terraform format validation")]
+        static_command = commands[names.index("terraform static validation")]
+        self.assertIn("validate_terraform_static.py", format_command[1])
+        self.assertIn("--check-format", format_command)
+        self.assertIn("validate_terraform_static.py", static_command[1])
+
+        allowed_executables = {sys.executable}
+        self.assertTrue(all(command[0] in allowed_executables for command in commands))
+        forbidden_arguments = {
+            "--include-live",
+            "plan",
+            "apply",
+            "oci",
+            "curl",
+            "wget",
+        }
+        self.assertFalse(
+            forbidden_arguments.intersection(
+                argument.lower()
+                for command in commands
+                for argument in command
+            )
+        )
+
+        release_steps = build_steps(False, False, "21d", 60)
+        release_names = [step[0] for step in release_steps]
+        self.assertIn("splunk parallel offline release", release_names)
+
 
 class TestReleaseChecklistEvidence(unittest.TestCase):
     """Validate release evidence shape and fail-fast behavior."""
+
+    def test_splunk_parallel_offline_stage_returns_classified_structured_evidence(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(Path(release_checklist.__file__).resolve()),
+                "--splunk-parallel-offline-stage",
+            ],
+            cwd=Path(release_checklist.__file__).resolve().parents[1],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        evidence = json.loads(result.stdout)
+        self.assertEqual(evidence["schema_version"], "oci.logan.splunk.local-release.v1")
+        self.assertEqual(evidence["status"], "PASS")
+        self.assertTrue(evidence["offline"])
+        self.assertEqual(evidence["external_calls"], [])
+        self.assertEqual(evidence["evidence_class"], "locally_verified")
+        self.assertEqual(evidence["provider_validation"], "not_run")
+        self.assertFalse(evidence["provider_verified"])
+        self.assertEqual(
+            evidence["scenario_counts"],
+            {
+                "requested": 4,
+                "passed": 4,
+                "success": 1,
+                "duplicate": 1,
+                "failure": 1,
+                "replay": 1,
+            },
+        )
+        self.assertEqual(evidence["gate_counts"], {"total": 12, "passed": 12, "failed": 0})
+        self.assertTrue(all(gate["ok"] for gate in evidence["gates"]))
+        self.assertIn("queries/splunk_detection_registry.json", evidence["artifact_hashes"])
+        self.assertIn("schemas/splunk_evidence_event.schema.json", evidence["artifact_hashes"])
+        self.assertNotIn("generated_at", evidence)
+        self.assertNotRegex(result.stdout, r"(?i)ocid1\.|authorization: splunk")
 
     def test_run_step_output_tail_is_bounded(self):
         result = release_checklist._run_step(
@@ -259,6 +369,65 @@ class TestReleaseChecklistEvidence(unittest.TestCase):
             {"name", "command", "started_at", "exit_code", "ok", "output_tail"},
             set(result),
         )
+
+    def test_run_step_denies_and_records_socket_attempt(self):
+        result = release_checklist._run_step(
+            "network negative control",
+            [sys.executable, "-c", "import socket; socket.create_connection(('127.0.0.1', 9))"],
+            timeout=30,
+            offline=True,
+        )
+        self.assertFalse(result["ok"])
+        self.assertTrue(result["network"]["attempted"])
+
+    def test_live_step_path_does_not_install_offline_guard(self):
+        completed = subprocess.CompletedProcess(["live"], 0, "ok\n", "")
+        with patch.object(release_checklist.subprocess, "run", return_value=completed) as run:
+            result = release_checklist._run_step("live regression", [sys.executable, "-c", "print('ok')"])
+        self.assertTrue(result["ok"])
+        self.assertNotIn("env", run.call_args.kwargs)
+
+    def test_offline_manifest_includes_harness_and_stage_dependencies(self):
+        manifest = release_checklist._splunk_evidence_manifest()
+        for path in (
+            "scripts/generate_splunk_detection_registry.py",
+            "scripts/validate_terraform_static.py",
+            "scripts/sitecustomize.py",
+        ):
+            self.assertIn(path, manifest["files"])
+            self.assertNotIn(path, manifest["missing"])
+
+    def test_manifest_is_complete_and_has_identity(self):
+        manifest = release_checklist._splunk_evidence_manifest()
+        self.assertTrue(manifest["complete"], manifest["missing"])
+        self.assertEqual(manifest["missing"], [])
+        for path in (
+            "scripts/splunk_evidence_exporter_cli.py",
+            "scripts/splunk_evidence_exporter/models.py",
+            "scripts/fixtures/splunk_evidence/query_rows.json",
+            "queries/splunk_detection_registry.json",
+            "schemas/splunk_evidence_event.schema.json",
+            "docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md",
+            "docs/diagrams/logan-splunk-architecture.mmd",
+            "stack/provider.tf",
+        ):
+            self.assertIn(path, manifest["files"])
+        self.assertRegex(manifest["git_head_at_execution"], r"^[0-9a-f]{40}$")
+        self.assertRegex(manifest["git_head_tree_at_execution"], r"^[0-9a-f]{40}$")
+        self.assertIn(manifest["working_tree_dirty"], (True, False, None))
+        self.assertIn("python", manifest["tool_versions"])
+
+    def test_static_terraform_contract_works_without_provider_cache(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            shutil.copytree(Path(release_checklist.PROJECT_DIR) / "stack", root / "stack")
+            shutil.rmtree(root / "stack/.terraform", ignore_errors=True)
+            result = subprocess.run(
+                [sys.executable, str(Path(release_checklist.PROJECT_DIR) / "scripts/validate_terraform_static.py"), "--root", str(root), "--check-format"],
+                text=True, capture_output=True, check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse((root / "stack/.terraform").exists())
 
     def test_run_step_output_tail_is_redacted(self):
         fixture_ocid = "ocid1.tenancy.oc1..aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  # scanner-fixture

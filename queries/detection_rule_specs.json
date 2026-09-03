@@ -1,6 +1,6 @@
 {
-  "total_queries": 758,
-  "eligible_queries": 189,
+  "total_queries": 762,
+  "eligible_queries": 193,
   "ineligible_queries": 569,
   "specs": [
     {
@@ -20644,6 +20644,41 @@
       }
     },
     {
+      "query_file": "queries/hunting/oci_audit_failures.json",
+      "title": "OCI Audit Failures",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "AuditFailures",
+      "dimensions": [
+        "Event Type",
+        "User Name",
+        "Status"
+      ],
+      "schedule": "15m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and Status = 'Failure' | stats count as AuditFailures by 'Event Type', 'User Name', Status | sort -AuditFailures",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "AuditFailures",
+        "dimensions": [
+          "Event Type",
+          "User Name",
+          "Status"
+        ],
+        "severity": "medium",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/hunting/oci_console_brute_force.json",
       "title": "OCI Console Login Brute Force (Frequency Analysis)",
       "severity": "high",
@@ -20770,6 +20805,41 @@
       }
     },
     {
+      "query_file": "queries/hunting/oci_iam_policy_changes.json",
+      "title": "OCI IAM Policy Changes",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "PolicyChanges",
+      "dimensions": [
+        "Event Type",
+        "User Name",
+        "Source IP"
+      ],
+      "schedule": "15m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' = 'com.oraclecloud.identitycontrolplane.createpolicy' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.updatepolicy' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.deletepolicy') | stats count as PolicyChanges by 'Event Type', 'User Name', 'Source IP' | sort -PolicyChanges",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "PolicyChanges",
+        "dimensions": [
+          "Event Type",
+          "User Name",
+          "Source IP"
+        ],
+        "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
       "query_file": "queries/hunting/oci_iam_rapid_changes.json",
       "title": "OCI IAM Rapid Configuration Changes (Anomaly Detection)",
       "severity": "high",
@@ -20830,6 +20900,41 @@
           "Source IP"
         ],
         "severity": "high",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/oci_object_storage_external_source.json",
+      "title": "OCI Object Storage Access from External Source",
+      "severity": "medium",
+      "eligible": true,
+      "metric_name": "ExternalAccesses",
+      "dimensions": [
+        "Source IP",
+        "User Name",
+        "Event Type"
+      ],
+      "schedule": "1h",
+      "lookback": "1h",
+      "query": "'Log Source' = 'OCI Audit Logs' and 'Event Type' like 'com.oraclecloud.objectstorage.*' and 'Source IP' != null and not ('Source IP' like '10.*' or 'Source IP' like '172.16.*' or 'Source IP' like '172.17.*' or 'Source IP' like '172.18.*' or 'Source IP' like '172.19.*' or 'Source IP' like '172.20.*' or 'Source IP' like '172.21.*' or 'Source IP' like '172.22.*' or 'Source IP' like '172.23.*' or 'Source IP' like '172.24.*' or 'Source IP' like '172.25.*' or 'Source IP' like '172.26.*' or 'Source IP' like '172.27.*' or 'Source IP' like '172.28.*' or 'Source IP' like '172.29.*' or 'Source IP' like '172.30.*' or 'Source IP' like '172.31.*' or 'Source IP' like '192.168.*') | stats count as ExternalAccesses by 'Source IP', 'User Name', 'Event Type' | sort -ExternalAccesses",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "ExternalAccesses",
+        "dimensions": [
+          "Source IP",
+          "User Name",
+          "Event Type"
+        ],
+        "severity": "medium",
         "create_alarm_by_default": false
       }
     },
@@ -21028,6 +21133,37 @@
           "Destination Port"
         ],
         "severity": "informational",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/oci_vcn_rejected_traffic_spike.json",
+      "title": "OCI VCN Rejected Traffic Spike",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "RejectedFlows",
+      "dimensions": [
+        "Source IP"
+      ],
+      "schedule": "10m",
+      "lookback": "10m",
+      "query": "'Log Source' = 'SOC VCN Flow Logs' and 'Action' = 'REJECT' | stats count as RejectedFlows by 'Source IP' | where RejectedFlows > 100 | sort -RejectedFlows",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "covered",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "dashboard_ready",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "RejectedFlows",
+        "dimensions": [
+          "Source IP"
+        ],
+        "severity": "high",
         "create_alarm_by_default": false
       }
     },

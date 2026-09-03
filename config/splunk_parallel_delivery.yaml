@@ -1,0 +1,149 @@
+version: 1
+defaults:
+  delivery_mode: evidence
+  include_original_content: false
+  lookback: 15m
+  overlap: 2m
+  max_rows: 1000
+  max_batch_events: 100
+  max_attempts: 4
+  sourcetype: oci:logan:detection
+  metric_namespace: oci_log_analytics_detections
+raw_sources:
+  enabled: false
+  delivery_mode: raw
+detections:
+  enabled: true
+  registry_file: queries/splunk_detection_registry.json
+  migrations:
+    - id: vcn-rejected-traffic-spike
+      title: OCI VCN Rejected Traffic Spike
+      splunk:
+        repository: adibirzu/oci-splunk
+        app: splunk_app_oci
+        version: 2.2.0@a98167404f19be6d18235bccbf1113b59a259c4c
+        saved_search: OCI - VCN rejected traffic spike
+        source_url: https://github.com/adibirzu/oci-splunk/blob/a98167404f19be6d18235bccbf1113b59a259c4c/splunk-app/splunk_app_oci/default/savedsearches.conf#L180-L191
+      oci_query_file: queries/hunting/oci_vcn_rejected_traffic_spike.json
+      required_sources: [SOC VCN Flow Logs]
+      required_fields: [Source IP]
+      fidelity: evidence
+      detection: {severity: high, mitre_techniques: [T1046]}
+      delivery: {delivery_mode: evidence, lookback: 10m, overlap: 2m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
+    - id: oci-audit-failures
+      title: OCI Audit Failures
+      splunk:
+        repository: adibirzu/oci-splunk
+        app: splunk_app_oci
+        version: 2.2.0@a98167404f19be6d18235bccbf1113b59a259c4c
+        saved_search: OCI - Audit failures
+        source_url: https://github.com/adibirzu/oci-splunk/blob/a98167404f19be6d18235bccbf1113b59a259c4c/splunk-app/splunk_app_oci/default/savedsearches.conf#L193-L204
+      oci_query_file: queries/hunting/oci_audit_failures.json
+      required_sources: [OCI Audit Logs]
+      required_fields: [Event Type, User Name, Status]
+      fidelity: evidence
+      detection: {severity: medium, mitre_techniques: [T1078]}
+    - id: oci-iam-policy-change
+      title: OCI IAM Policy Changes
+      splunk:
+        repository: adibirzu/oci-splunk
+        app: splunk_app_oci
+        version: 2.2.0@a98167404f19be6d18235bccbf1113b59a259c4c
+        saved_search: OCI - IAM and policy changes
+        source_url: https://github.com/adibirzu/oci-splunk/blob/a98167404f19be6d18235bccbf1113b59a259c4c/splunk-app/splunk_app_oci/default/savedsearches.conf#L206-L217
+      oci_query_file: queries/hunting/oci_iam_policy_changes.json
+      required_sources: [OCI Audit Logs]
+      required_fields: [Event Type, User Name, Source IP]
+      fidelity: evidence
+      detection: {severity: high, mitre_techniques: [T1098]}
+    - id: object-storage-new-external-source
+      title: OCI Object Storage Access from External Source
+      splunk:
+        repository: adibirzu/oci-splunk
+        app: splunk_app_oci
+        version: 2.2.0@a98167404f19be6d18235bccbf1113b59a259c4c
+        saved_search: OCI - New external source IP (object storage)
+        source_url: https://github.com/adibirzu/oci-splunk/blob/a98167404f19be6d18235bccbf1113b59a259c4c/splunk-app/splunk_app_oci/default/savedsearches.conf#L219-L230
+      oci_query_file: queries/hunting/oci_object_storage_external_source.json
+      required_sources: [OCI Audit Logs]
+      required_fields: [Event Type, Source IP, User Name]
+      fidelity: evidence
+      detection: {severity: medium, mitre_techniques: [T1530]}
+      delivery: {delivery_mode: evidence, lookback: 1h, overlap: 5m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
+    - id: windows-access-administrator-logon
+      title: Windows Administrator Logon
+      splunk:
+        repository: splunk/security_content
+        app: Splunk Security Content
+        version: "13"
+        saved_search: Windows Local Administrator Credential Stuffing
+        source_url: https://research.splunk.com/endpoint/09555511-aca6-484a-b6ab-72cd03d73c34/
+      oci_query_file: queries/hunting/windows_access_administrator_logon.json
+      required_sources: [Windows Security Events, Windows Event Security Logs]
+      required_fields: [Target User Name, Logon Type, Host Name (Server)]
+      fidelity: evidence
+      detection: {severity: high, mitre_techniques: [T1078]}
+      delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
+    - id: windows-access-failed-logon-burst
+      title: Windows Failed Logon Burst by Source
+      splunk:
+        repository: splunk/security_content
+        app: Splunk Security Content
+        version: "12"
+        saved_search: Windows Unusual Count Of Users Remotely Failed To Auth From Host
+        source_url: https://research.splunk.com/endpoint/cf06a0ee-ffa9-4ed3-be77-0670ed9bab52/
+      oci_query_file: queries/hunting/windows_access_failed_logon_burst.json
+      required_sources: [Windows Security Events, Windows Event Security Logs]
+      required_fields: [Source Address, Target User Name, Host Name (Server)]
+      fidelity: evidence
+      detection: {severity: high, mitre_techniques: [T1110]}
+      delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
+    - id: windows-access-new-local-user
+      title: Windows New Local User Created
+      splunk:
+        repository: splunk/security_content
+        app: Splunk Security Content
+        version: "13"
+        saved_search: Windows Create Local Account
+        source_url: https://research.splunk.com/endpoint/3fb2e8e3-7bc0-4567-9722-c5ab9f8595eb/
+      oci_query_file: queries/hunting/windows_access_new_local_user.json
+      required_sources: [Windows Security Events, Windows Event Security Logs]
+      required_fields: [Target User Name, Subject User Name, Host Name (Server)]
+      fidelity: evidence
+      detection: {severity: high, mitre_techniques: [T1136.001]}
+      delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
+    - id: windows-access-privileged-group-add
+      title: Windows User Added to Administrators or Remote Desktop Users
+      splunk:
+        repository: splunk/security_content
+        app: Splunk Security Content
+        version: "12"
+        saved_search: Windows Privileged Group Modification
+        source_url: https://research.splunk.com/endpoint/b8cbef2c-2cc3-4550-b0fc-9715b7852df9/
+      oci_query_file: queries/hunting/windows_access_privileged_group_add.json
+      required_sources: [Windows Security Events, Windows Event Security Logs]
+      required_fields: [User, Target User Name, Host Name (Server)]
+      fidelity: evidence
+      detection: {severity: high, mitre_techniques: [T1098]}
+      delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
+    - id: windows-access-rdp-after-hours
+      title: Windows Successful RDP Logon Outside Business Hours
+      splunk:
+        repository: splunk/security_content
+        app: Splunk Security Content
+        version: "6"
+        saved_search: Windows RDP Login Session Was Established
+        source_url: https://research.splunk.com/endpoint/00ca7f9e-88ab-4841-a6c2-83979ab1ed29/
+      oci_query_file: queries/hunting/windows_access_rdp_after_hours.json
+      required_sources: [Windows Security Events, Windows Event Security Logs]
+      required_fields: [Target User Name, Source Address, Host Name (Server)]
+      fidelity: evidence
+      detection: {severity: high, mitre_techniques: [T1021.001]}
+      delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
+splunk_target:
+  hec_url_env: SPLUNK_HEC_URL
+  hec_token_env: SPLUNK_HEC_TOKEN
+  index_env: SPLUNK_HEC_INDEX
+  sourcetype_env: SPLUNK_HEC_SOURCETYPE
+  index: ${SPLUNK_HEC_INDEX}
+  sourcetype: ${SPLUNK_HEC_SOURCETYPE}

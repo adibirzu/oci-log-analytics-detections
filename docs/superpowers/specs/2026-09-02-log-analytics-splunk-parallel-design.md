@@ -305,7 +305,7 @@ sequenceDiagram
   else delivery not confirmed
     F->>F: Classify the failure
     F->>S: Retryable timeout, 429, or 5xx - backoff, then DLQ after budget
-    F->>S: Non-retryable 4xx or schema error - quarantine; hold checkpoint
+    F->>S: Non-retryable 4xx or schema error - quarantine and hold checkpoint
   end
 ```
 

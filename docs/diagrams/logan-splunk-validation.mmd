@@ -1,0 +1,32 @@
+%% Title: Separate raw and evidence validation gates
+%% Evidence: code-backed local gates only; provider verified = false; release accepted = false
+%% Primary objects: 9
+flowchart LR
+  subgraph SCOPE["Selected-mode scope"]
+    source["Selected-mode canary"]
+  end
+  subgraph RAW["Raw-route gates"]
+    connector["Connector Hub gate"]
+    streaming["OCI Streaming gate"]
+    oci_splunk["oci-splunk gate"]
+  end
+  subgraph EVIDENCE["Evidence-route gates"]
+    logan["Log Analytics parse and detection gate"]
+    evidence_gate["Monitoring, Notifications, and Function gate"]
+  end
+  subgraph DEST["Shared destination gates"]
+    hec["Splunk HEC delivery gate"]
+    search["Splunk searchability gate"]
+  end
+  subgraph ACCEPT["Release boundary"]
+    release["Release acceptance"]
+  end
+  source -->|"telemetry: raw canary"| connector
+  connector -->|"telemetry: Connector Hub delivery"| streaming
+  streaming -->|"telemetry: stream consumption"| oci_splunk
+  oci_splunk -->|"telemetry: raw HEC batch"| hec
+  source -->|"telemetry: evidence canary"| logan
+  logan -->|"telemetry: parse, detection, metric, and invocation"| evidence_gate
+  evidence_gate -->|"telemetry: evidence HEC batch"| hec
+  hec -.->|"response: accepted and searchable"| search
+  search -.->|"control: accept every selected mode"| release

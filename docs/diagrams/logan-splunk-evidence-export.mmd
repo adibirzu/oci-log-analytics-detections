@@ -1,0 +1,29 @@
+%% Title: Mode 2 - Log Analytics detection evidence export
+%% Evidence: code-backed exporter and configured disabled stack; provider verified = false; release accepted = false
+%% Primary objects: 8
+flowchart LR
+  subgraph ANALYTICS["Analytics source-of-truth boundary"]
+    logan["Log Analytics"]
+    detection["Detection rule"]
+  end
+  subgraph TRIGGER["Trigger boundary"]
+    monitoring["Monitoring"]
+    notifications["Notifications"]
+  end
+  subgraph EXPORT["Evidence export boundary"]
+    function["Function"]
+    vault["Vault"]
+    state["checkpoint/DLQ"]
+  end
+  subgraph DEST["Customer-managed destination boundary"]
+    hec["Splunk HEC"]
+  end
+  logan -->|"telemetry: bounded saved-search result"| detection
+  detection -->|"telemetry: numeric metric and dimensions"| monitoring
+  monitoring -.->|"control: reviewed alarm transition"| notifications
+  notifications -.->|"control: at-least-once invocation"| function
+  function -.->|"control: bounded evidence query"| logan
+  function -.->|"control: read credential reference"| vault
+  function -->|"telemetry: normalized evidence batches"| hec
+  hec -.->|"response: HEC acceptance"| function
+  function -.->|"control: commit after acceptance or quarantine"| state

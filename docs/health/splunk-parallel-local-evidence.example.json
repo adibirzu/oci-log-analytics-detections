@@ -176,14 +176,14 @@
       "stack/streaming.tf": "51ff3d3829e9e2a9a20f991c006c7fd627bb6f17d2dfb13d22705e0dbdc85c6f",
       "stack/variables.tf": "3661952de34c8511df4a05367e3080af957a88df85fa18437d4829d2dbfe2d4b"
     },
-    "git_head_at_execution": "318454a0be815b0ac9f0136b5f21a53a2599b2f8",
-    "git_head_tree_at_execution": "d98b30dff2626380305fbf7f22ace4bfbb04957f",
+    "git_head_at_execution": "df3309b9829322b76288becf88d6ee867384719f",
+    "git_head_tree_at_execution": "14b675bad977962fcb847f9a1caaaa779973e47c",
     "missing": [],
     "tool_versions": {
       "git": "git version 2.50.1 (Apple Git-155)",
       "python": "3.11.16"
     },
-    "working_tree_dirty": true
+    "working_tree_dirty": false
   },
   "example": true,
   "external_calls": [],

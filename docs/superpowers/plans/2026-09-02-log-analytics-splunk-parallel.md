@@ -10,6 +10,23 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-02-log-analytics-splunk-parallel-design.md`
 
+## Implementation status
+
+**Tasks 1-10: complete for the scoped local implementation.** The delivery policy, schemas, generated nine-rule registry, replay-safe exporter, OCI/HEC adapters, operator CLI, opt-in Terraform module, ten Mermaid/Excalidraw workflow pairs, four operator guides, navigation, and self-hashed offline release receipt are present in the file map below. The Splunk-specific offline release stage passes 12/12 gates, and native `terraform init -backend=false` plus `terraform validate` succeeds with OCI provider 8.2.0.
+
+Provider validation remains not run: no OCI tenancy, Windows host, Vault secret, live Log Analytics query, Function, Streaming consumer, Splunk HEC endpoint, or Splunk search was contacted by this implementation run. The live-canary follow-on remains an independently approved, target-bound gate. The repository-wide release checklist also reports pre-existing promoted-Sentinel parser-schema drift; that separate gate is not rewritten or waived here.
+
+Fast verification:
+
+```bash
+python3 scripts/generate_splunk_detection_registry.py --check
+python3 scripts/splunk_evidence_exporter_cli.py validate-config
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success
+python3 scripts/release_checklist.py --splunk-parallel-offline-stage
+terraform -chdir=stack init -backend=false
+terraform -chdir=stack validate
+```
+
 ## Global Constraints
 
 - Keep Log Analytics as the canonical analytics plane and keep existing query surfaces: `rules/**`, `queries/*.json`, `queries/apps/*.json`, and `queries/hunting/*.json`.

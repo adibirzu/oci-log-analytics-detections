@@ -33,6 +33,9 @@ NAVIGATION_PAGES = (
 )
 LOCAL_EVIDENCE_EXAMPLE = ROOT / "docs/health/splunk-parallel-local-evidence.example.json"
 COST_GUIDE = ROOT / "docs/LOG_ANALYTICS_COST_OPTIMIZATION.md"
+IMPLEMENTATION_PLAN = (
+    ROOT / "docs/superpowers/plans/2026-09-02-log-analytics-splunk-parallel.md"
+)
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 
 
@@ -111,6 +114,24 @@ def test_readme_explains_both_modes_with_renderable_mermaid_and_full_guides() ->
         assert f"docs/{guide.name}" in text
     assert "docs/diagrams/logan-splunk-architecture.mmd" in text
     assert "docs/diagrams/project-content-architecture.mmd" in text
+
+
+def test_navigation_exposes_implementation_assets_and_plan_status() -> None:
+    navigation = "\n".join((_read(README), _read(ROOT / "docs/README.md")))
+    for relative_path in (
+        "config/splunk_parallel_delivery.yaml",
+        "scripts/generate_splunk_detection_registry.py",
+        "scripts/splunk_evidence_exporter_cli.py",
+        "stack/modules/splunk_evidence_exporter",
+        "docs/health/splunk-parallel-local-evidence.example.json",
+        "docs/superpowers/plans/2026-09-02-log-analytics-splunk-parallel.md",
+    ):
+        assert relative_path in navigation
+
+    plan = _read(IMPLEMENTATION_PLAN)
+    assert "Implementation status" in plan
+    assert "Tasks 1-10" in plan and "complete" in plan.lower()
+    assert "Provider validation remains not run" in plan
 
 
 def test_production_guidance_requires_reviewed_pinned_oci_splunk_ref() -> None:

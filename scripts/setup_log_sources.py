@@ -396,7 +396,7 @@ def main():
         "--i-understand-prod",
         action="store_true",
         dest="i_understand_prod",
-        help="Acknowledge a deliberate create against the production PRODUCTION "
+        help="Acknowledge a deliberate create against the protected production "
              "tenancy outside the LogAnalytics subtree (or set OCI_ALLOW_PROD_WRITE=1).",
     )
     args = parser.parse_args()

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Contract tests for Splunk parallel evidence delivery artifacts."""
 
+import hashlib
 import json
 import re
 from datetime import datetime, timezone
@@ -77,7 +78,7 @@ def delivery_config_with_migration(tmp_path: Path, **overrides) -> Path:
         "oci_query_file": "queries/oci_console_login_failure.json",
         "required_sources": ["OCI Audit Logs"],
         "required_fields": ["Event Type", "Status"],
-        "fidelity": "evidence",
+        "fidelity": "transformed",
         "detection": {"severity": "medium", "mitre_techniques": ["T1078"]},
     }
     migration.update(overrides)
@@ -123,8 +124,33 @@ def test_initial_migration_pack_is_complete_and_valid():
         assert provenance["saved_search"]
         assert entry["required_sources"]
         assert entry["required_fields"]
-        assert entry["fidelity"] in {"evidence", "raw"}
+        assert entry["fidelity"] in {"lossless", "transformed", "unsupported"}
+        assert entry["detection"]["mechanism"] in {
+            "ingest-time",
+            "scheduled",
+            "interactive-only",
+        }
         assert entry["delivery"]["delivery_mode"] in {"evidence", "raw"}
+        assert entry["delivery"]["evidence_targets"] == ["hec", "streaming"]
+        assert entry["delivery"]["raw_mode"] in {"enabled", "disabled"}
+        assert entry["delivery"]["evidence_mode"] in {"enabled", "disabled"}
+        assert entry["governance"]["expected_results"]
+        assert entry["governance"]["security_objective"]
+        assert entry["governance"]["false_positives"]
+        assert entry["governance"]["tuning"]
+        assert entry["governance"]["cost_cardinality"]
+        assert entry["evidence_states"]["local"] == "code_backed"
+        assert set(entry["evidence_states"]) == {
+            "local",
+            "parser",
+            "data_hit",
+            "dashboard_render",
+            "metric",
+            "hec",
+            "splunk_search",
+        }
+        assert len(entry["query_version"]) == 64
+        assert entry["query_version"] == hashlib.sha256(query_path.read_bytes()).hexdigest()
 
 
 def test_initial_migration_pack_is_scheduled_detection_eligible():
@@ -279,7 +305,7 @@ def test_registry_rejects_sensitive_values_but_allows_documented_placeholders(tm
     registry = build_registry(delivery_config_with_migration(tmp_path))
     provenance = registry["splunk_provenance"]["oci-console-login-failure"]
     for sensitive_value in (
-        "ocid1.tenancy.oc1..example",
+        "ocid1.tenancy.demo.eu-frankfurt-1.aaaaaaaaaaaaaaaa",  # scanner-fixture
         "10.20.30.40",
         "splunk.private.example.com",
         "https://splunk.example.com/services/search",
@@ -336,15 +362,19 @@ def valid_registry_entry():
         "oci_query_file": "queries/oci_console_login_failure.json",
         "required_sources": ["OCI Audit Logs"],
         "required_fields": ["Event Type", "Status", "Time"],
-        "fidelity": "evidence",
-        "detection": {"severity": "medium", "mitre_techniques": ["T1078"]},
+        "fidelity": "transformed",
+        "query_version": "a" * 64,
+        "detection": {"severity": "medium", "mitre_techniques": ["T1078"], "mechanism": "scheduled"},
         "delivery": {
             "delivery_mode": POLICY["defaults"]["delivery_mode"],
+            "evidence_targets": ["hec", "streaming"],
             "lookback": POLICY["defaults"]["lookback"],
             "overlap": POLICY["defaults"]["overlap"],
             "max_rows": POLICY["defaults"]["max_rows"],
             "max_batch_events": POLICY["defaults"]["max_batch_events"],
             "max_attempts": POLICY["defaults"]["max_attempts"],
+            "raw_mode": "disabled",
+            "evidence_mode": "enabled",
         },
         "evidence": {
             "include_original_content": POLICY["defaults"]["include_original_content"],
@@ -358,6 +388,22 @@ def valid_registry_entry():
             "query": "AuditFailures[5m].sum() > 0",
             "allowed_dimensions": {},
         },
+        "governance": {
+            "security_objective": "Detect and investigate failed OCI console sign-ins.",
+            "expected_results": "One or more failed OCI sign-in aggregates.",
+            "false_positives": ["Approved test activity"],
+            "tuning": "Tune the threshold after a representative baseline.",
+            "cost_cardinality": "Keep metric dimensions bounded to three fields.",
+        },
+        "evidence_states": {
+            "local": "locally_verified",
+            "parser": "not_run",
+            "data_hit": "not_run",
+            "dashboard_render": "not_run",
+            "metric": "not_run",
+            "hec": "not_run",
+            "splunk_search": "not_run",
+        },
     }
 
 
@@ -370,16 +416,23 @@ def valid_evidence_event():
             "id": "oci-console-login-failure",
             "title": "OCI Console Login Failure",
             "severity": "medium",
+            "metric_namespace": "oci_log_analytics_detections",
+            "dimensions": {"Status": "Failure"},
         },
         "evidence": {
             "include_original_content": False,
+            "event_time": "2026-09-02T00:00:00Z",
+            "log_source": "OCI Audit Logs",
+            "entity": "operator@example.invalid",
             "fields": [
                 {"name": "Event Type", "value": "com.oraclecloud.consolesignon.login"}
             ],
         },
         "provenance": {
             "product": "OCI Log Analytics",
+            "analytics_plane": "oci_log_analytics",
             "query_file": "queries/oci_console_login_failure.json",
+            "query_version": "a" * 64,
             "window_start": "2026-09-02T00:00:00Z",
             "window_end": "2026-09-02T00:15:00Z",
         },

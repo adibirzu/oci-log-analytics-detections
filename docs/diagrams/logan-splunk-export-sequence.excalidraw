@@ -549,13 +549,13 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "T3  telemetry: deterministic batches",
+      "text": "T3  telemetry: deterministic evidence batches to selected sink",
       "fontSize": 12,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "T3  telemetry: deterministic batches",
+      "originalText": "T3  telemetry: deterministic evidence batches to selected sink",
       "lineHeight": 1.25
     },
     {
@@ -1587,7 +1587,7 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "telemetry",
-        "label": "telemetry: deterministic batches"
+        "label": "telemetry: deterministic evidence batches to selected sink"
       }
     },
     {

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -102,12 +103,55 @@ def _query_payload(query_file: str) -> dict[str, Any] | None:
     return payload if isinstance(payload, dict) else None
 
 
+def _query_version(query_file: str) -> str:
+    """Return the immutable SHA-256 version of one canonical query artifact."""
+    candidate = (REPOSITORY_ROOT / query_file).resolve()
+    if not candidate.is_file():
+        return ""
+    return hashlib.sha256(candidate.read_bytes()).hexdigest()
+
+
+def _merged_mapping(defaults: dict[str, Any], configured: object) -> dict[str, Any]:
+    """Overlay a configured mapping without dropping newly governed defaults."""
+    result = dict(defaults)
+    if isinstance(configured, dict):
+        result.update(configured)
+    return result
+
+
 def _entry_from_migration(migration: dict[str, Any], config: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     defaults = config.get("defaults", {})
     target = config.get("splunk_target", {})
     query_file = migration.get("oci_query_file", "")
     payload = _query_payload(query_file) if isinstance(query_file, str) else None
     eligibility = build_detection_rule_spec(query_file, payload) if payload and payload.get("query") and payload.get("title") else {"dimensions": []}
+    delivery_mode = migration.get("delivery", {}).get(
+        "delivery_mode", defaults.get("delivery_mode", "evidence")
+    ) if isinstance(migration.get("delivery"), dict) else defaults.get("delivery_mode", "evidence")
+    false_positives = payload.get("falsepositives", []) if payload else []
+    if not isinstance(false_positives, list) or not all(
+        isinstance(value, str) and value.strip() for value in false_positives
+    ):
+        false_positives = []
+    if not false_positives:
+        false_positives = [
+            "No known false positives documented; validate with the source owner."
+        ]
+    detection_defaults = {
+        "severity": payload.get("level", "medium") if payload else "medium",
+        "mitre_techniques": payload.get("mitre_attack", {}).get("techniques", []) if payload else [],
+        "mechanism": "scheduled",
+    }
+    delivery_defaults = {
+        key: defaults.get(key)
+        for key in ("delivery_mode", "lookback", "overlap", "max_rows", "max_batch_events", "max_attempts")
+    }
+    delivery_defaults.update({
+        "delivery_mode": delivery_mode,
+        "evidence_targets": defaults.get("evidence_targets", ["hec", "streaming"]),
+        "raw_mode": "enabled" if delivery_mode == "raw" else "disabled",
+        "evidence_mode": "enabled" if delivery_mode == "evidence" else "disabled",
+    })
     provenance = migration.get("splunk_provenance", migration.get("splunk", {}))
     provenance = provenance if isinstance(provenance, dict) else {}
     entry = {
@@ -119,16 +163,12 @@ def _entry_from_migration(migration: dict[str, Any], config: dict[str, Any]) -> 
             "dimensions": eligibility.get("dimensions", []),
         },
         "oci_query_file": query_file,
+        "query_version": _query_version(query_file) if isinstance(query_file, str) else "",
         "required_sources": migration.get("required_sources", []),
         "required_fields": migration.get("required_fields", []),
-        "fidelity": migration.get("fidelity", defaults.get("delivery_mode", "evidence")),
-        "detection": migration.get("detection", {
-            "severity": payload.get("level", "medium") if payload else "medium",
-            "mitre_techniques": payload.get("mitre_attack", {}).get("techniques", []) if payload else [],
-        }),
-        "delivery": migration.get("delivery", {
-            key: defaults.get(key) for key in ("delivery_mode", "lookback", "overlap", "max_rows", "max_batch_events", "max_attempts")
-        }),
+        "fidelity": migration.get("fidelity", "transformed"),
+        "detection": _merged_mapping(detection_defaults, migration.get("detection")),
+        "delivery": _merged_mapping(delivery_defaults, migration.get("delivery")),
         "evidence": migration.get("evidence", {
             "include_original_content": defaults.get("include_original_content", False),
             "redaction_profile": None,
@@ -147,6 +187,28 @@ def _entry_from_migration(migration: dict[str, Any], config: dict[str, Any]) -> 
             "allowed_dimensions": {},
             "alarm_dimension_to_log_field": {},
         }),
+        "governance": _merged_mapping({
+            "security_objective": (
+                f"Detect and investigate {migration.get('title', payload.get('title', '') if payload else migration.get('id', 'the governed condition'))}."
+            ),
+            "expected_results": (
+                payload.get("description")
+                if payload and isinstance(payload.get("description"), str) and payload["description"].strip()
+                else "One or more governed detection aggregates when the query condition matches."
+            ),
+            "false_positives": false_positives,
+            "tuning": "Validate the threshold and schedule against a representative baseline before promotion.",
+            "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        }, migration.get("governance")),
+        "evidence_states": _merged_mapping({
+            "local": "code_backed",
+            "parser": "not_run",
+            "data_hit": "not_run",
+            "dashboard_render": "not_run",
+            "metric": "not_run",
+            "hec": "not_run",
+            "splunk_search": "not_run",
+        }, migration.get("evidence_states")),
     }
     return entry, provenance
 

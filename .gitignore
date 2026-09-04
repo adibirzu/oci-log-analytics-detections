@@ -54,11 +54,17 @@ docs/health/*.json
 
 # Local graph/debug outputs
 graphify-out/
-.planning/graphs/
 firebase-debug.log
-.claude/settings.local.json
-.claude/scheduled_tasks.lock
-.claude/checkpoints.log
+
+# Local agent, planning, and rich-review workspaces
+# These are repository-local process state, not product or operator artifacts.
+/.agents/
+/.claude/
+/.codex/
+/.lavish/
+/.planning/
+/.superpowers/
+/docs/superpowers/
 
 # Integrated Next.js webapp
 webapp/node_modules/
@@ -69,4 +75,3 @@ webapp/.logan-detections-runtime/
 webapp/*.tsbuildinfo
 
 # Agent worktrees (local isolation, never commit)
-.claude/worktrees/

@@ -12,6 +12,7 @@ This repository is scoped to OCI Log Analytics query, dashboard, and Forge webap
 - validate query metadata, log-source mappings, and dashboard inventory
 - create OCI Log Analytics dashboards and embedded saved searches only after validation passes
 - provide manual and script-assisted Windows Event Log onboarding, including guarded Management Agent installation, native source association, saved searches, scheduled detections, disabled alarm canaries, and operator evidence gates
+- provide an OKE monitoring fast path using Oracle's Kubernetes Monitoring Quick Start for logs, metrics, object discovery, dashboards, and Log Analytics detection integration
 - ship the integrated Forge webapp for cross-QL conversion into OCI Log Analytics QL
 - publish redacted OCI Logging and Log Analytics detection-event examples for third-party SIEM parser development
 
@@ -34,14 +35,16 @@ This is a migration accelerator for teams moving security analytics into OCI Log
 5. Use Log Analytics to normalize, enrich, correlate, and suppress noise before forwarding the selected security signal to a cost-sensitive SIEM.
 
 The [documentation hub](docs/README.md) is the maintained wiki-style entry point for operators, SOC teams, contributors, and integration owners.
+The public [OCI SD Observability documentation hub](https://github.com/adibirzu/oci-sd-observability) starts from customer needs and answers, then links back to the technical assets in this repository. It includes service definitions for fast onboarding, Windows access monitoring, OKE observability, Parallel SIEM, Oracle Database security analytics, and cost-aware retention.
 For hands-on use, start with [Using OCI Log Analytics Queries](docs/LOG_ANALYTICS_QUERY_USAGE.md) to select an artifact, run it in Log Explorer, customize OCL safely, and validate it locally or against an approved OCI target.
 For a new customer deployment, follow the [OCI Log Analytics Fast Onboarding Track](docs/FAST_ONBOARDING_TRACK.md) to establish IAM, choose an ingestion path, prove the first two sources, and plan a governed production rollout.
+For Kubernetes clusters, use the [OKE Monitoring One Pager](docs/OKE_MONITORING_ONE_PAGER.md) to select the guided, Helm, or Resource Manager path, review IAM, and prove logs, metrics, object discovery, and dashboards. Continue with the detailed [OKE Observability Runbook](docs/OKE_OBSERVABILITY_RUNBOOK.md).
 For storage design, use [Cost Optimization and Archive Retention](docs/LOG_ANALYTICS_COST_OPTIMIZATION.md) to decide active versus archive retention, recall/release workflow, and when Splunk parallel delivery justifies duplicate cost.
 For the Windows access use case, continue with [Windows Access Monitoring Fast Onboarding](docs/WINDOWS_ACCESS_FAST_ONBOARDING.md), then choose the [manual console runbook](docs/WINDOWS_ACCESS_MANUAL_RUNBOOK.md) or [script-assisted runbook](docs/WINDOWS_ACCESS_SCRIPTED_RUNBOOK.md). The [workflow diagrams](docs/WINDOWS_ACCESS_WORKFLOW_DIAGRAMS.md) show collection, detection, notification, troubleshooting, and evidence gates.
 
 ## Splunk Parallel Operations
 
-Splunk can run beside Log Analytics in two independently approved modes. **Mode 1** sends selected raw OCI Logging sources through a separate Connector Hub connector, OCI Streaming, and a pinned `adibirzu/oci-splunk` release to Splunk HEC. **Mode 2** keeps Log Analytics as the source of truth and exports bounded, normalized evidence only after a detection rule posts a Monitoring metric and an alarm invokes the exporter through Notifications. A hybrid policy may choose either or both paths per source/detection.
+Splunk can run beside Log Analytics in two independently approved modes. **Mode 1** sends selected raw OCI Logging sources through a separate Connector Hub connector, OCI Streaming, and a pinned `adibirzu/oci-splunk` release to Splunk HEC. **Mode 2** keeps Log Analytics as the source of truth and exports bounded, normalized evidence only after a detection rule posts a Monitoring metric and an alarm invokes the exporter through Notifications. The Mode 2 Function can deliver directly to Splunk HEC or publish the same versioned evidence to an approved OCI Stream consumed by the pinned `adibirzu/oci-splunk` deployment. A hybrid policy may choose either or both paths per source/detection.
 
 ```mermaid
 flowchart LR
@@ -51,21 +54,21 @@ flowchart LR
   STREAM --> RAW[oci-splunk pinned ref]
   RAW --> HEC[Splunk HEC]
   LA --> DET[Detection rule]
-  DET -.-> PUB[Approved Streaming producer]
-  PUB -.-> STREAM
   DET --> METRIC[Monitoring metric]
   METRIC --> FN[Alarm + Notifications + Function]
   FN --> LA
   FN --> HEC
+  FN -.-> PUB[Streaming evidence adapter]
+  PUB -.-> STREAM
   FN --> STATE[Checkpoint / DLQ]
 ```
 
-The dashed detection-to-Streaming route requires an explicitly approved producer or exporter; Log Analytics does not automatically publish detection rows to Streaming. Start with [Splunk Parallel Operations](docs/SPLUNK_PARALLEL_OPERATIONS.md), then use the [rule migration guide](docs/SPLUNK_RULE_MIGRATION.md), [evidence export runbook](docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md), and [E2E validation guide](docs/SPLUNK_E2E_VALIDATION.md). Editable sources include the full [Splunk architecture](docs/diagrams/logan-splunk-architecture.mmd), [raw fan-out](docs/diagrams/logan-splunk-raw-fanout.mmd), and [project content architecture](docs/diagrams/project-content-architecture.mmd). Local tests and plans do not prove OCI/HEC deployment or Splunk searchability.
+The dashed detection-to-Streaming route is implemented by the exporter Function when `SPLUNK_EVIDENCE_TARGET=streaming`; Log Analytics does not automatically publish detection rows to Streaming. This path needs the exact Stream OCID/messages endpoint, scoped `stream-push` policy, and a pinned `oci-splunk` consumer configured for the normalized JSON contract. Start with [Splunk Parallel Operations](docs/SPLUNK_PARALLEL_OPERATIONS.md), then use the [rule migration guide](docs/SPLUNK_RULE_MIGRATION.md), [evidence export runbook](docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md), and [E2E validation guide](docs/SPLUNK_E2E_VALIDATION.md). Editable sources include the full [Splunk architecture](docs/diagrams/logan-splunk-architecture.mmd), [raw fan-out](docs/diagrams/logan-splunk-raw-fanout.mmd), and [project content architecture](docs/diagrams/project-content-architecture.mmd). Local tests and plans do not prove OCI/Streaming/HEC deployment or Splunk searchability.
 Use [Cost Optimization and Archive Retention](docs/LOG_ANALYTICS_COST_OPTIMIZATION.md) when deciding whether a source belongs in Mode 1 raw fan-out, Mode 2 governed evidence export, or an archive-first Log Analytics retention policy.
 
 Implementation entry points:
 
-- [implementation plan and status](docs/superpowers/plans/2026-09-02-log-analytics-splunk-parallel.md)
+- [implementation plan and status](docs/SPLUNK_PARALLEL_IMPLEMENTATION_PLAN.md)
 - [delivery policy](config/splunk_parallel_delivery.yaml) and [generated nine-rule registry](queries/splunk_detection_registry.json)
 - [registry generator](scripts/generate_splunk_detection_registry.py) and [operator/E2E CLI](scripts/splunk_evidence_exporter_cli.py)
 - [optional Terraform/Resource Manager module](stack/modules/splunk_evidence_exporter) and [Function source](stack/modules/splunk_evidence_exporter/function)
@@ -75,6 +78,7 @@ Implementation entry points:
 python3 scripts/generate_splunk_detection_registry.py --check
 python3 scripts/splunk_evidence_exporter_cli.py validate-config
 python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success --delivery-target streaming
 python3 scripts/release_checklist.py --splunk-parallel-offline-stage
 ```
 
@@ -113,6 +117,8 @@ Canonical inventory and supporting documentation:
 - `docs/WEBAPP.md` — integrated Forge webapp contract, security posture, and deployment notes
 - `docs/MIGRATION_AND_SECURITY_GUIDE.md` — customer migration, use-case, and SIEM-forwarding playbook
 - `docs/LOG_ANALYTICS_COST_OPTIMIZATION.md` — active/archive retention, recall/release workflow, and cost controls for Log Analytics with or without Splunk
+- `docs/OKE_MONITORING_ONE_PAGER.md` — Oracle Kubernetes Monitoring Quick Start architecture, IAM, deployment choices, and acceptance gates
+- `docs/OKE_OBSERVABILITY_RUNBOOK.md` — detailed OKE telemetry validation, metadata repair, and troubleshooting
 - `docs/SPLUNK_PARALLEL_OPERATIONS.md` — Mode 1 raw, Mode 2 evidence, hybrid, on-prem, and steady-state operations
 - `docs/SPLUNK_RULE_MIGRATION.md` — governed SPL-to-LAQL migration and detection promotion gates
 - `docs/SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md` — manual and approval-separated exporter deployment/rollback/replay

@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 """Public-contract tests for the pure Splunk evidence exporter domain."""
 
-import json
 import ast
+import base64
 import io
+import json
 from dataclasses import FrozenInstanceError
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from types import SimpleNamespace
 
 import jsonschema
 import pytest
 
 from scripts.splunk_evidence_exporter.adapters import (
     OciLogAnalyticsQueryAdapter,
+    OciStreamingEvidenceAdapter,
     OciVaultSecretAdapter,
     ObjectStorageDeadLetterAdapter,
     ObjectStorageStateAdapter,
     SplunkHecAdapter,
+    _validated_streaming_endpoint,
 )
 
 from scripts.splunk_evidence_exporter import (
@@ -86,7 +90,7 @@ def test_alarm_trigger_decodes_oci_raw_monitoring_alarm_without_trusting_detecti
         "type": "com.oraclecloud.monitoring.alarm",
         "data": {
             "alarmMetaData": [{
-                "id": "ocid1.alarm.oc1..fixture",
+                "id": "ocid1.alarm.demo.eu-frankfurt-1.aaaaaaaaaaaaaaaa",  # scanner-fixture
                 "namespace": "oci_log_analytics_detections",
                 "query": "AuditFailures[5m].sum() > 0",
                 "dimensions": {"Status": "Failure"},
@@ -99,7 +103,7 @@ def test_alarm_trigger_decodes_oci_raw_monitoring_alarm_without_trusting_detecti
 
     trigger = AlarmTrigger.from_payload(payload)
 
-    assert trigger.alarm_id == "ocid1.alarm.oc1..fixture"
+    assert trigger.alarm_id == "ocid1.alarm.demo.eu-frankfurt-1.aaaaaaaaaaaaaaaa"  # scanner-fixture
     assert trigger.detection_id is None
     assert trigger.query == "AuditFailures[5m].sum() > 0"
 
@@ -115,7 +119,7 @@ def test_raw_alarm_contract_rejects_namespace_metric_dimension_and_query_mismatc
         "allowed_dimensions": {"Status": "Failure"},
     }
     trigger = AlarmTrigger.from_payload({"data": {
-        "alarmMetaData": [{"id": "ocid1.alarm.oc1..fixture", "namespace": "oci_log_analytics_detections", "query": "different", "dimensions": {"Status": "Failure"}}],
+        "alarmMetaData": [{"id": "ocid1.alarm.demo.eu-frankfurt-1.aaaaaaaaaaaaaaaa", "namespace": "oci_log_analytics_detections", "query": "different", "dimensions": {"Status": "Failure"}}],  # scanner-fixture
         "timestamp": "2026-09-02T07:15:00Z", "metricName": "AuditFailures",
     }})
     with pytest.raises(ValueError, match="alarm contract mismatch"):
@@ -263,6 +267,21 @@ def test_event_key_discriminates_rule_time_entity_and_row_changes():
     assert all(event_key(rule_id, variant) != baseline for rule_id, variant in variants)
 
 
+def test_event_key_includes_resolved_source_and_entity_context():
+    row = {"FirstSeen": "2026-09-02T07:14:00Z", "Status": "Failure"}
+
+    baseline = event_key(
+        "oci-audit-failures", row, log_source="OCI Audit Logs", entity="host-a"
+    )
+
+    assert baseline != event_key(
+        "oci-audit-failures", row, log_source="Windows Security Events", entity="host-a"
+    )
+    assert baseline != event_key(
+        "oci-audit-failures", row, log_source="OCI Audit Logs", entity="host-b"
+    )
+
+
 def test_event_key_ignores_moving_query_window_but_keeps_source_occurrence_bounds():
     source = {
         "Time": "2026-09-02T07:14:00Z",
@@ -285,11 +304,18 @@ def registry_entry():
         "id": "oci-audit-failures",
         "title": "OCI Audit Failures",
         "oci_query_file": "queries/hunting/oci_audit_failures.json",
+        "query_version": "a" * 64,
+        "required_sources": ["OCI Audit Logs"],
         "required_fields": [
             "Event Type", "Status", "Evidence Version", "api_token", "Password Hash", "Authorization",
             "clientSecret", "Resource OCID", "Customer Field", "Details",
         ],
-        "detection": {"severity": "medium", "mitre_techniques": ["T1078"]},
+        "detection": {"severity": "medium", "mitre_techniques": ["T1078"], "mechanism": "scheduled"},
+        "delivery": {"evidence_targets": ["hec", "streaming"]},
+        "alarm_contract": {
+            "metric_namespace": "oci_log_analytics_detections",
+            "metric_dimensions": ["Event Type", "Status"],
+        },
         "evidence": {"include_original_content": False, "redaction_profile": None},
     }
 
@@ -298,6 +324,7 @@ def test_evidence_event_is_schema_valid_excludes_original_and_redacts_secrets():
     row = {
         "Time": "2026-09-02T07:14:00Z",
         "Event Type": "com.oraclecloud.identitycontrolplane.updatepolicy",
+        "Status": "Failure",
         "Original Log Content": "must never escape by default",
         "api_token": "token-value",
         "Password Hash": "hash-value",
@@ -335,6 +362,16 @@ def test_evidence_event_is_schema_valid_excludes_original_and_redacts_secrets():
     ):
         assert fields[name] == "[REDACTED]"
     assert fields["Details"] == '{"authorization":"[REDACTED]","operation":"update"}'
+    assert payload["detection"]["metric_namespace"] == "oci_log_analytics_detections"
+    assert payload["detection"]["dimensions"] == {
+        "Event Type": row["Event Type"],
+        "Status": row["Status"],
+    }
+    assert payload["evidence"]["event_time"] == row["Time"]
+    assert payload["evidence"]["log_source"] == "OCI Audit Logs"
+    assert payload["evidence"]["entity"] is None
+    assert payload["provenance"]["analytics_plane"] == "oci_log_analytics"
+    assert payload["provenance"]["query_version"] == "a" * 64
     with pytest.raises(FrozenInstanceError):
         event.batch_id = "different"
 
@@ -467,6 +504,112 @@ def test_hec_success_requires_configured_acknowledgement_semantics():
         )
         == "success"
     )
+
+
+def test_streaming_evidence_adapter_emits_one_keyed_json_message_per_event():
+    calls = []
+
+    class Client:
+        def put_messages(self, stream_id, details):
+            calls.append((stream_id, details))
+            entry = type("Entry", (), {"error": None})()
+            data = type("Data", (), {"entries": [entry], "failures": 0})()
+            return type("Response", (), {"data": data})()
+
+    adapter = OciStreamingEvidenceAdapter(
+        client=Client(),
+        stream_id="ocid1.stream.demo.eu-frankfurt-1.aaaaaaaaaaaaaaaa",  # scanner-fixture
+        message_factory=lambda **values: values,
+        details_factory=lambda **values: values,
+    )
+    event = build_evidence_event(
+        registry_entry(),
+        {"Time": "2026-09-02T07:14:00Z", "Event Type": "demo", "Status": "Failure"},
+        QueryWindow(
+            start=datetime(2026, 9, 2, 6, 58, tzinfo=timezone.utc),
+            end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+        ),
+        "batch",
+    )
+
+    result = adapter.deliver(ExportBatch(batch_id="batch", events=(event,)))
+
+    assert result == {"status": 200, "response": {"code": 0}}
+    assert calls[0][0].startswith("ocid1.stream.demo.")  # scanner-fixture
+    message = calls[0][1]["messages"][0]
+    assert json.loads(base64.b64decode(message["value"])) == event.to_dict()
+    assert base64.b64decode(message["key"]).decode() == event.event_key
+
+
+def test_streaming_evidence_adapter_rejects_partial_provider_confirmation():
+    class Client:
+        def put_messages(self, *_args):
+            data = type("Data", (), {"entries": [], "failures": 0})()
+            return type("Response", (), {"data": data})()
+
+    adapter = OciStreamingEvidenceAdapter(
+        client=Client(),
+        stream_id="ocid1.stream.demo.eu-frankfurt-1.aaaaaaaaaaaaaaaa",  # scanner-fixture
+        message_factory=lambda **values: values,
+        details_factory=lambda **values: values,
+    )
+    event = build_evidence_event(
+        registry_entry(),
+        {"Time": "2026-09-02T07:14:00Z", "Event Type": "demo"},
+        QueryWindow(
+            start=datetime(2026, 9, 2, 6, 58, tzinfo=timezone.utc),
+            end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+        ),
+        "batch",
+    )
+
+    assert adapter.deliver(ExportBatch(batch_id="batch", events=(event,))) == {
+        "status": 500,
+        "response": {},
+    }
+
+
+def test_streaming_endpoint_is_restricted_to_oci_streaming_hosts():
+    assert (
+        _validated_streaming_endpoint(
+            "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com/"
+        )
+        == "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com"
+    )
+    for endpoint in (
+        "https://example.invalid",
+        "https://streaming.example.invalid",
+        "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com.evil.invalid",
+        "https://cell-1.streaming.eu-frankfurt-1.oci.oraclecloud.com/path",
+    ):
+        with pytest.raises(ValueError):
+            _validated_streaming_endpoint(endpoint)
+
+
+def test_streaming_evidence_adapter_returns_retryable_status_without_payload_leak():
+    class Client:
+        def put_messages(self, *_args):
+            error = RuntimeError("provider detail must not escape")
+            error.status = 429
+            raise error
+
+    adapter = OciStreamingEvidenceAdapter(
+        client=Client(),
+        stream_id="ocid1.stream.demo.eu-frankfurt-1.aaaaaaaaaaaaaaaa",  # scanner-fixture
+        message_factory=lambda **values: values,
+        details_factory=lambda **values: values,
+    )
+    event = build_evidence_event(
+        registry_entry(),
+        {"Time": "2026-09-02T07:14:00Z", "Event Type": "demo", "Status": "Failure"},
+        QueryWindow(
+            start=datetime(2026, 9, 2, 6, 58, tzinfo=timezone.utc),
+            end=datetime(2026, 9, 2, 7, 15, tzinfo=timezone.utc),
+        ),
+        "batch",
+    )
+    result = adapter.deliver(ExportBatch(batch_id="batch", events=(event,)))
+    assert result == {"status": 429, "response": {}}
 
 
 def test_adapter_ports_are_runtime_checkable_structural_protocols():
@@ -656,9 +799,37 @@ def test_export_service_returns_no_evidence_without_hec_or_checkpoint_commit():
     assert receipt.checkpoint_committed is False
 
 
+def test_export_service_enforces_detection_evidence_target_policy():
+    entry = registry_entry()
+    entry["delivery"]["evidence_targets"] = ["hec"]
+
+    class Registry:
+        def load(self):
+            return {"detections": [entry]}
+
+    service = EvidenceExportService(
+        registry=Registry(),
+        query=object(),
+        checkpoint=object(),
+        hec=object(),
+        dead_letter=object(),
+        clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
+        lookback=timedelta(minutes=15),
+        overlap=timedelta(minutes=2),
+        maximum_window=timedelta(hours=1),
+        max_rows=1000,
+        max_batch_events=100,
+        delivery_target="streaming",
+    )
+
+    with pytest.raises(ValueError, match="not allowed"):
+        service.export(AlarmTrigger.from_payload(alarm_payload()))
+
+
 def test_export_service_honors_registry_delivery_bounds():
     entry = registry_entry()
     entry["delivery"] = {
+        "evidence_targets": ["hec", "streaming"],
         "lookback": "5m",
         "overlap": "1m",
         "max_rows": 7,
@@ -717,7 +888,7 @@ def test_export_service_honors_registry_delivery_bounds():
 )
 def test_export_service_rejects_registry_volume_above_runtime_ceiling(delivery):
     entry = registry_entry()
-    entry["delivery"] = delivery
+    entry["delivery"] = {"evidence_targets": ["hec", "streaming"], **delivery}
 
     class Registry:
         def load(self):
@@ -964,6 +1135,7 @@ def test_object_storage_state_and_dlq_names_expose_no_dimensions_or_event_conten
     dlq.quarantine(
         batch,
         "retryable",
+        delivery_target="hec",
         delivered_event_keys=("confirmed-key",),
         detection_id="oci-audit-failures",
         dimensions=dimensions,
@@ -982,6 +1154,7 @@ def test_object_storage_state_and_dlq_names_expose_no_dimensions_or_event_conten
     assert dlq_record["detection_id"] == "oci-audit-failures"
     assert dlq_record["dimensions"] == dimensions
     assert dlq_record["checkpoint"] == "2026-09-02T07:15:00Z"
+    assert dlq_record["delivery_target"] == "hec"
     assert [item["event_key"] for item in dlq_record["remaining_events"]] == [
         event.event_key
     ]
@@ -1323,7 +1496,7 @@ def test_service_requires_selected_indexer_ack_before_checkpoint_commit():
 
 def test_export_service_retries_each_batch_and_commits_after_later_success():
     entry = registry_entry()
-    entry["delivery"] = {"max_attempts": 3}
+    entry["delivery"] = {"evidence_targets": ["hec", "streaming"], "max_attempts": 3}
     operations = []
 
     class Registry:
@@ -1383,7 +1556,7 @@ def test_export_service_retries_each_batch_and_commits_after_later_success():
 
 def test_export_service_rejects_registry_attempts_above_runtime_ceiling():
     entry = registry_entry()
-    entry["delivery"] = {"max_attempts": 5}
+    entry["delivery"] = {"evidence_targets": ["hec", "streaming"], "max_attempts": 5}
 
     class Registry:
         def load(self):
@@ -1433,6 +1606,7 @@ def test_replay_delivers_stored_remaining_evidence_and_excludes_confirmed_keys()
         "detection_id": "oci-audit-failures",
         "dimensions": {"Status": "Failure"},
         "checkpoint": "2026-09-02T07:15:00Z",
+        "delivery_target": "hec",
         "delivered_event_keys": [stored_events[0].event_key],
         "remaining_events": [event.to_dict() for event in stored_events],
     }
@@ -1481,6 +1655,75 @@ def test_replay_delivers_stored_remaining_evidence_and_excludes_confirmed_keys()
     ]
 
 
+def test_replay_rejects_record_bound_to_a_different_sink_before_delivery():
+    record = {
+        "schema_version": "oci.logan.splunk.dead-letter.v1",
+        "reason": "retryable",
+        "batch_id": "replay-batch",
+        "detection_id": "oci-audit-failures",
+        "dimensions": {},
+        "checkpoint": "2026-09-02T07:15:00Z",
+        "delivery_target": "hec",
+        "delivered_event_keys": [],
+        "remaining_events": [{}],
+    }
+
+    class NeverCalled:
+        def __getattr__(self, name):
+            raise AssertionError(f"{name} must not be called for a sink mismatch")
+
+    service = EvidenceReplayService(
+        checkpoint=NeverCalled(),
+        hec=NeverCalled(),
+        dead_letter=NeverCalled(),
+        clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
+        max_batch_events=100,
+        max_attempts=4,
+        delivery_target="streaming",
+    )
+
+    with pytest.raises(ValueError, match="does not match replay sink"):
+        service.replay(record)
+
+
+def test_replay_rejects_target_removed_from_current_registry_policy():
+    record = {
+        "schema_version": "oci.logan.splunk.dead-letter.v1",
+        "reason": "retryable",
+        "batch_id": "replay-batch",
+        "detection_id": "oci-audit-failures",
+        "dimensions": {},
+        "checkpoint": "2026-09-02T07:15:00Z",
+        "delivery_target": "streaming",
+        "delivered_event_keys": [],
+        "remaining_events": [{}],
+    }
+    entry = registry_entry()
+    entry["delivery"]["evidence_targets"] = ["hec"]
+
+    class Registry:
+        def load(self):
+            return {"detections": [entry]}
+
+    class NeverCalled:
+        def __getattr__(self, name):
+            raise AssertionError(f"{name} must not be called for disallowed replay")
+
+    service = EvidenceReplayService(
+        checkpoint=NeverCalled(),
+        hec=NeverCalled(),
+        dead_letter=NeverCalled(),
+        clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
+        max_batch_events=100,
+        max_attempts=4,
+        delivery_target="streaming",
+        registry=Registry(),
+    )
+
+    with pytest.raises(ValueError, match="no longer allowed"):
+        service.replay(record)
+
+
 @pytest.mark.parametrize(
     ("current_checkpoint", "checkpoint_status", "expected_saves"),
     [
@@ -1522,6 +1765,7 @@ def test_confirmed_replay_advances_checkpoint_monotonically(
         "detection_id": "oci-audit-failures",
         "dimensions": {"Status": "Failure"},
         "checkpoint": "2026-09-02T07:15:00Z",
+        "delivery_target": "hec",
         "delivered_event_keys": [],
         "remaining_events": [event.to_dict()],
     }
@@ -1582,6 +1826,7 @@ def test_partial_replay_failure_updates_dlq_and_never_commits_checkpoint():
         "detection_id": "oci-audit-failures",
         "dimensions": {},
         "checkpoint": "2026-09-02T07:15:00Z",
+        "delivery_target": "hec",
         "delivered_event_keys": ["previously-confirmed"],
         "remaining_events": [event.to_dict() for event in events],
     }
@@ -1739,6 +1984,59 @@ def test_function_service_uses_one_resource_principal_for_all_oci_clients(
     assert isinstance(service, EvidenceExportService)
     assert len(clients) == 3
     assert all(call == {"config": {}, "signer": signer} for call in clients)
+
+
+def test_function_service_selects_streaming_sink_without_hec_credentials(monkeypatch):
+    sink = object()
+    bundle = SimpleNamespace(
+        query=object(),
+        checkpoint=object(),
+        dead_letter=object(),
+        ledger=object(),
+        metrics=object(),
+        vault=None,
+    )
+    monkeypatch.setattr(
+        handler_module.OciResourcePrincipalAdapterFactory,
+        "create",
+        lambda **_kwargs: bundle,
+    )
+    observed = {}
+
+    def streaming_factory(**values):
+        observed.update(values)
+        return sink
+
+    monkeypatch.setattr(
+        handler_module.OciStreamingEvidenceAdapter,
+        "from_resource_principal",
+        streaming_factory,
+    )
+    for name, value in {
+        "SPLUNK_EVIDENCE_TARGET": "streaming",
+        "OBJECT_STORAGE_NAMESPACE": "namespace-under-test",
+        "SPLUNK_EVIDENCE_STATE_BUCKET": "state-bucket-under-test",
+        "SPLUNK_EVIDENCE_DLQ_BUCKET": "dlq-bucket-under-test",
+        "OCI_LOG_ANALYTICS_COMPARTMENT_ID": "compartment-under-test",
+        "OCI_LOG_ANALYTICS_NAMESPACE": "trusted-log-analytics-namespace",
+        "SPLUNK_EVIDENCE_STREAM_ID": "stream-reference-under-test",
+        "SPLUNK_EVIDENCE_STREAM_MESSAGES_ENDPOINT": "https://streaming.example.invalid",
+        "SPLUNK_EXPORTER_TELEMETRY_NAMESPACE": "oci_log_analytics_splunk_exporter",
+        "SPLUNK_ALARM_BINDINGS": json.dumps(
+            {"redacted-alarm-id": "oci-audit-failures"}
+        ),
+    }.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.delenv("SPLUNK_HEC_SECRET_ID", raising=False)
+    monkeypatch.delenv("SPLUNK_HEC_URL", raising=False)
+
+    service = handler_module.build_service()
+
+    assert service._hec is sink
+    assert observed == {
+        "stream_id": "stream-reference-under-test",
+        "messages_endpoint": "https://streaming.example.invalid",
+    }
 
 
 def test_handler_has_no_oci_sdk_import_client_or_model_construction():

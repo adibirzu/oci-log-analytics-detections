@@ -2,6 +2,8 @@
 """Tests for sensitive value scanning and redaction."""
 
 import json
+import hashlib
+from unittest.mock import patch
 import os
 import subprocess
 import sys
@@ -10,7 +12,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from scan_sensitive_values import scan_paths
+from scan_sensitive_values import scan_paths, _PrivateLabelPattern
 
 
 SCRIPT = Path(__file__).resolve().parent / "scan_sensitive_values.py"
@@ -58,6 +60,20 @@ class TestSensitiveValueScanner(unittest.TestCase):
         serialized = json.dumps(findings)
         self.assertNotIn(fixture_value, serialized)
         self.assertIn("<redacted:secret_assignment>", serialized)
+
+    def test_detects_retired_tenant_label_without_echoing_it(self):
+        tenant_label = "fixtureretiredlabel"
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_file(root, "deploy.md", f"Forge Webapp on {tenant_label} OKE\n")
+
+            with patch("scan_sensitive_values.RETIRED_TENANT_LABEL_RE", _PrivateLabelPattern(
+                hashlib.sha256(tenant_label.encode()).hexdigest()
+            )):
+                findings = scan_paths([root])
+
+        self.assertIn("tenant_label", self.finding_kinds(findings))
+        self.assertNotIn(tenant_label, json.dumps(findings))
 
     def test_allows_runtime_secret_variable_assignments(self):
         with tempfile.TemporaryDirectory() as temp_dir:

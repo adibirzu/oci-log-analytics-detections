@@ -10,6 +10,7 @@ sequenceDiagram
   participant V as Vault
   participant S as checkpoint/DLQ
   participant H as Splunk HEC
+  participant T as OCI Streaming
   LA->>DR: telemetry: saved search evaluates bounded window
   DR-->>M: telemetry: numeric metric and dimensions
   M-->>N: control: reviewed alarm transition
@@ -17,13 +18,17 @@ sequenceDiagram
   F->>S: control: load per-rule checkpoint
   F->>LA: control: query checkpoint overlap through alarm end
   LA-->>F: response: selected evidence fields
-  F->>V: control: read credential reference
-  V-->>F: response: runtime credential value
-  F->>H: telemetry: deterministic HEC event batches
-  alt HEC confirms every batch
-    H-->>F: response: accepted
+  alt Direct HEC sink
+    F->>V: control: read HEC credential reference
+    V-->>F: response: runtime HEC credential value
+    F->>H: telemetry: deterministic evidence batches
+    H-->>F: response: every HEC event accepted
+  else OCI Streaming sink
+    F->>T: telemetry: deterministic evidence messages
+    T-->>F: response: every Stream message accepted
+  end
+  alt Selected producer sink confirms every item
     F->>S: control: commit monotonic checkpoint
-  else delivery fails or is quarantined
-    H-->>F: response: retryable or quarantine outcome
+  else Sink delivery fails or is quarantined
     F->>S: control: persist remaining events without checkpoint advance
   end

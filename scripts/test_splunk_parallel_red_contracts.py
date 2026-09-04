@@ -29,7 +29,10 @@ def alarm_payload():
 
 def registry_entry():
     return {"id": "oci-audit-failures", "title": "OCI Audit Failures", "oci_query_file": "queries/hunting/oci_audit_failures.json",
+            "query_version": "a" * 64, "required_sources": ["OCI Audit Logs"],
             "required_fields": ["Event Type", "Status"], "detection": {"severity": "medium"},
+            "delivery": {"evidence_targets": ["hec", "streaming"]},
+            "alarm_contract": {"metric_namespace": "oci_log_analytics_detections", "metric_dimensions": ["Event Type", "Status"]},
             "evidence": {"include_original_content": False}}
 
 

@@ -4,19 +4,22 @@
   "title": "OCI Log Analytics Splunk Detection Registry Entry",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "title", "splunk", "oci_query_file", "required_sources", "required_fields", "fidelity", "detection", "delivery", "evidence", "alarm_contract"],
+  "required": ["id", "title", "splunk", "oci_query_file", "query_version", "required_sources", "required_fields", "fidelity", "detection", "delivery", "evidence", "alarm_contract", "governance", "evidence_states"],
   "properties": {
     "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "title": {"type": "string", "minLength": 1},
     "splunk": {"$ref": "#/$defs/splunk"},
     "oci_query_file": {"type": "string", "pattern": "^queries/(?:apps/|hunting/|sentinel/)?[a-z0-9][a-z0-9_-]*\\.json$"},
+    "query_version": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "required_sources": {"$ref": "#/$defs/nonEmptyStringArray"},
     "required_fields": {"$ref": "#/$defs/nonEmptyStringArray"},
-    "fidelity": {"enum": ["evidence", "raw"]},
+    "fidelity": {"enum": ["lossless", "transformed", "unsupported"]},
     "detection": {"$ref": "#/$defs/detection"},
     "delivery": {"$ref": "#/$defs/delivery"},
     "evidence": {"$ref": "#/$defs/evidence"},
-    "alarm_contract": {"$ref": "#/$defs/alarmContract"}
+    "alarm_contract": {"$ref": "#/$defs/alarmContract"},
+    "governance": {"$ref": "#/$defs/governance"},
+    "evidence_states": {"$ref": "#/$defs/evidenceStates"}
   },
   "$defs": {
     "nonEmptyStringArray": {
@@ -37,23 +40,27 @@
     "detection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["severity", "mitre_techniques"],
+      "required": ["severity", "mitre_techniques", "mechanism"],
       "properties": {
         "severity": {"enum": ["low", "medium", "high", "critical"]},
-        "mitre_techniques": {"type": "array", "items": {"type": "string", "pattern": "^T[0-9]{4}(?:\\.[0-9]{3})?$"}}
+        "mitre_techniques": {"type": "array", "items": {"type": "string", "pattern": "^T[0-9]{4}(?:\\.[0-9]{3})?$"}},
+        "mechanism": {"enum": ["ingest-time", "scheduled", "interactive-only"]}
       }
     },
     "delivery": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["delivery_mode", "lookback", "overlap", "max_rows", "max_batch_events", "max_attempts"],
+      "required": ["delivery_mode", "evidence_targets", "lookback", "overlap", "max_rows", "max_batch_events", "max_attempts", "raw_mode", "evidence_mode"],
       "properties": {
         "delivery_mode": {"enum": ["evidence", "raw"]},
+        "evidence_targets": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["hec", "streaming"]}},
         "lookback": {"type": "string", "pattern": "^[1-9][0-9]*[smhd]$"},
         "overlap": {"type": "string", "pattern": "^[1-9][0-9]*[smhd]$"},
         "max_rows": {"type": "integer", "minimum": 1},
         "max_batch_events": {"type": "integer", "minimum": 1},
-        "max_attempts": {"type": "integer", "minimum": 1}
+        "max_attempts": {"type": "integer", "minimum": 1},
+        "raw_mode": {"enum": ["enabled", "disabled"]},
+        "evidence_mode": {"enum": ["enabled", "disabled"]}
       }
     },
     "evidence": {
@@ -80,6 +87,33 @@
         "query": {"type": "string", "minLength": 1},
         "allowed_dimensions": {"type": "object", "additionalProperties": {"type": "string"}},
         "alarm_dimension_to_log_field": {"type": "object", "additionalProperties": {"type": "string"}}
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["security_objective", "expected_results", "false_positives", "tuning", "cost_cardinality"],
+      "properties": {
+        "security_objective": {"type": "string", "minLength": 1},
+        "expected_results": {"type": "string", "minLength": 1},
+        "false_positives": {"$ref": "#/$defs/nonEmptyStringArray"},
+        "tuning": {"type": "string", "minLength": 1},
+        "cost_cardinality": {"type": "string", "minLength": 1}
+      }
+    },
+    "evidenceState": {"enum": ["not_run", "code_backed", "locally_verified", "provider_verified", "release_accepted", "failed"]},
+    "evidenceStates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local", "parser", "data_hit", "dashboard_render", "metric", "hec", "splunk_search"],
+      "properties": {
+        "local": {"$ref": "#/$defs/evidenceState"},
+        "parser": {"$ref": "#/$defs/evidenceState"},
+        "data_hit": {"$ref": "#/$defs/evidenceState"},
+        "dashboard_render": {"$ref": "#/$defs/evidenceState"},
+        "metric": {"$ref": "#/$defs/evidenceState"},
+        "hec": {"$ref": "#/$defs/evidenceState"},
+        "splunk_search": {"$ref": "#/$defs/evidenceState"}
       }
     }
   }

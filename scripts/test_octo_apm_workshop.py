@@ -62,7 +62,7 @@ class TestOctoApmWorkshop(unittest.TestCase):
         self.assertIn("API Gateway Action", {field["display_name"] for field in bundle["fields"]})
         self.assertGreaterEqual(bundle["detection_rules"]["deployable_count"], 4)
         self.assertNotIn("ocid1.", serialized)
-        self.assertNotIn("octodemo.cloud", serialized)
+        self.assertNotRegex(serialized, r"[a-z0-9-]+\.cloud")
         self.assertNotIn("161.153.", serialized)
 
     def test_validate_bundle_accepts_current_generated_contract(self):
@@ -91,7 +91,7 @@ class TestOctoApmWorkshop(unittest.TestCase):
         bundle = build_bundle(generated_at="2026-05-10T00:00:00Z")
         bad_bundle = deepcopy(bundle)
         bad_bundle["deployment"]["commands"].append(
-            "oci la query --compartment-id ocid1.compartment.oc1..secret --endpoint https://octodemo.cloud"
+            "oci la query --compartment-id ocid1.compartment.oc1..secret --endpoint https://tenant-specific.cloud"
         )
 
         errors = validate_bundle(bad_bundle)

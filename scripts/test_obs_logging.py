@@ -106,10 +106,10 @@ def test_logfmt_fields_present(capsys):
 
 def test_bind_injects_structured_fields(capsys):
     log = obs_logging.get_logger("obs_test.bind")
-    blog = obs_logging.bind(log, profile="cap", compartment="cmpt-x")
+    blog = obs_logging.bind(log, profile="staging", compartment="cmpt-x")
     blog.info("validating")
     err = capsys.readouterr().err
-    assert "profile=cap" in err
+    assert "profile=staging" in err
     assert "compartment=cmpt-x" in err
     assert 'msg=validating' in err
 
@@ -133,10 +133,10 @@ def test_extra_context_namespace_emitted(capsys):
 def test_bound_logger_preserves_callsite_extra_flat(capsys):
     """Regression: bind() must not drop call-site extra={...} flat fields."""
     log = obs_logging.get_logger("obs_test.bindextra1")
-    blog = obs_logging.bind(log, profile="cap")
+    blog = obs_logging.bind(log, profile="staging")
     blog.info("upload", extra={"total": 4, "alerts": 1})
     err = capsys.readouterr().err
-    assert "profile=cap" in err   # bound field survives
+    assert "profile=staging" in err   # bound field survives
     assert "total=4" in err       # call-site flat field survives
     assert "alerts=1" in err
 

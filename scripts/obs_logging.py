@@ -197,8 +197,8 @@ def bind(logger: logging.Logger | logging.LoggerAdapter, **fields: Any) -> loggi
 
     Example::
 
-        blog = bind(log, profile="cap", compartment=cmpt)
-        blog.info("validating")   # -> ... msg="validating" profile=cap compartment=...
+        blog = bind(log, profile="staging", compartment=cmpt)
+        blog.info("validating")   # -> ... msg="validating" profile=staging compartment=...
     """
     base_fields: dict[str, Any] = {}
     if isinstance(logger, logging.LoggerAdapter):

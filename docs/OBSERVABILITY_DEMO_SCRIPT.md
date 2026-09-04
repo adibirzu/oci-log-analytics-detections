@@ -10,7 +10,7 @@ Primary goal: show that OCI Log Analytics is being used as one operational surfa
 - Time range to use: `Last 21 days` for threat-hunting drilldowns, `Last 7 days` for the operations-first flow
 - Dashboards configured in the current repo: `34`
 - Active saved searches configured in the current repo: `536`
-- Last live refresh on `2026-05-06`: `334` saved searches across `22` dashboards in `<OCI_PROFILE_CAP>`, with `334 / 334` widgets HIT
+- Last live refresh on `2026-05-06`: `334` saved searches across `22` dashboards in `<OCI_STAGING_PROFILE>`, with `334 / 334` widgets HIT
 - Demo-readiness status: green for multicloud, application, security-correlation, APT, browser, FreeLabFriday, 2025-2026 MELTS, and web-to-cloud threat-hunting flows
 - Detection-rule-compatible audit status: rerun `python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --max-workers 4 --json docs/health/verify-<profile>-21d-2025-2026.json` before presenting
 - Local 21-day synthetic dataset: `221,078` events across `17` JSONL files, including VCN Flow and Network Firewall telemetry for the web-to-cloud, FreeLabFriday, GOAD/AD, 2025-2026 MELTS, and Octo APM drilldowns

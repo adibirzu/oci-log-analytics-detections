@@ -168,6 +168,19 @@ def build_splunk_parallel_offline_steps(*, bootstrap: bool = False) -> list[tupl
             300,
         ),
         (
+            "local exporter streaming success",
+            [
+                python,
+                str(SPLUNK_EXPORTER_CLI),
+                "local-e2e",
+                "--scenario",
+                "success",
+                "--delivery-target",
+                "streaming",
+            ],
+            300,
+        ),
+        (
             "local exporter duplicate",
             [python, str(SPLUNK_EXPORTER_CLI), "local-e2e", "--scenario", "duplicate-invocation"],
             300,
@@ -300,8 +313,16 @@ def _scenario_contract_ok(name: str, output: str) -> bool:
         and receipt.get("provider_validation") == "not_run"
         and receipt.get("provider_verified") is False
     )
-    if name == "local exporter success":
-        return common and receipt.get("status") == "delivered" and receipt.get("checkpoint_committed") is True
+    if name in {"local exporter success", "local exporter streaming success"}:
+        expected_target = (
+            "streaming" if name == "local exporter streaming success" else "hec"
+        )
+        return (
+            common
+            and receipt.get("delivery_target") == expected_target
+            and receipt.get("status") == "delivered"
+            and receipt.get("checkpoint_committed") is True
+        )
     if name == "local exporter duplicate":
         return (
             common
@@ -354,9 +375,12 @@ def run_splunk_parallel_offline_stage(*, bootstrap: bool = False) -> dict[str, o
         "provider_validation": "not_run",
         "provider_verified": False,
         "scenario_counts": {
-            "requested": 4,
+            "requested": 5,
             "passed": scenario_passed,
             "success": 1 if gate_by_name["local exporter success"]["ok"] else 0,
+            "streaming_success": 1
+            if gate_by_name["local exporter streaming success"]["ok"]
+            else 0,
             "duplicate": 1 if gate_by_name["local exporter duplicate"]["ok"] else 0,
             "failure": 1 if gate_by_name["local exporter failure"]["ok"] else 0,
             "replay": 1 if gate_by_name["local exporter replay"]["ok"] else 0,

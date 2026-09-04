@@ -26,8 +26,8 @@ flowchart LR
     n7["checkpoint/DLQ"]
   end
   subgraph G5["Raw parallel boundary"]
-    %% oci-node: n8 = oci_splunk (oci-service: custom)
-    n8["oci-splunk"]
+    %% oci-node: n8 = oci_splunk (oci-service: streaming)
+    n8["OCI Streaming and pinned oci-splunk"]
   end
   subgraph G6["Customer-managed destination boundary"]
     %% oci-node: n9 = splunk_hec (oci-service: custom)
@@ -42,7 +42,8 @@ flowchart LR
   n5 -.->|"control: commit success or quarantine"| n7
   n5 -.->|"telemetry: normalized evidence batch"| n9
   n9 -.->|"response: HEC acceptance"| n5
-  n8 -.->|"telemetry: approved raw stream"| n9
-  n9 -.->|"response: raw delivery receipt"| n8
+  n5 -.->|"telemetry: normalized evidence to reviewed Stream"| n8
+  n8 -.->|"telemetry: approved raw or evidence HEC batch"| n9
+  n9 -.->|"response: consumer HEC receipt"| n8
   classDef oci fill:#FFF3E0,stroke:#C74634,color:#312D2A,stroke-width:2px;
   class n1,n2,n3,n4,n5,n6,n7,n8,n9 oci;

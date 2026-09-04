@@ -56,9 +56,9 @@ Do not introduce a parallel `queries/splunk/` directory.
 
 Documentation may link to the `oci-splunk` main branch for discovery. Resource Manager and production procedures must use a reviewed tag or commit rather than silently tracking mutable `main`.
 
-### AD-5: Option 2 is at-least-once and replayable
+### AD-5: Option 2 is at-least-once and replayable at the selected sink
 
-Alarm and Notifications delivery can repeat. The exporter must tolerate duplicates and must not advance its checkpoint before Splunk HEC confirms the batch.
+Alarm and Notifications delivery can repeat. The exporter must tolerate duplicates and must not advance its query checkpoint before the selected durable sink confirms every item in the batch. For direct HEC, confirmation means the configured HEC response or indexer acknowledgment. For Streaming, confirmation means a zero-failure `PutMessages` response containing one successful result per submitted item; consumer offset, downstream HEC, and Splunk-search receipts remain separate gates owned by the pinned `oci-splunk` consumer. A downstream failure must be recovered from the retained Stream and consumer offset, not by pretending the producer checkpoint proves Splunk acceptance.
 
 Each exported row receives a deterministic event key derived from:
 
@@ -106,7 +106,7 @@ Operational implications:
 - Prove the same canary event in Log Analytics and Splunk before adding another source.
 - Track duplicate ingestion, retention, egress, and Splunk license cost explicitly.
 - On-premises Management Agent records do not automatically appear in OCI Logging and therefore do not enter this raw fan-out unless a separate approved raw route is configured.
-- The dashed Log Analytics detection-to-Streaming link is optional and requires an approved producer or exporter. Log Analytics does not automatically publish detection rows to OCI Streaming; validate the producer, schema, retry behavior, and downstream `oci-splunk` consumer before enabling this path.
+- The dashed Log Analytics detection-to-Streaming link uses the exporter Function's optional Streaming adapter; Log Analytics does not automatically publish detection rows to OCI Streaming. The Function sends the same normalized envelope and event key either directly to HEC or to an exact reviewed Stream for the pinned `oci-splunk` consumer. Validate Stream IAM, retry/DLQ behavior, consumer compatibility, HEC delivery, and Splunk searchability independently before enabling this sink.
 
 ### Mode 2: Log Analytics detection evidence export
 
@@ -261,14 +261,16 @@ Required logical fields:
     "dimensions": {}
   },
   "evidence": {
+    "include_original_content": false,
     "event_time": "<RFC3339>",
     "log_source": "<LOG_SOURCE>",
-    "entity": "<SANITIZED_ENTITY>",
-    "fields": {},
-    "original_content_included": false
+    "entity": null,
+    "fields": []
   },
   "provenance": {
+    "product": "OCI Log Analytics",
     "analytics_plane": "oci_log_analytics",
+    "query_file": "queries/hunting/<QUERY_FILE>.json",
     "query_version": "<QUERY_VERSION>",
     "window_start": "<RFC3339>",
     "window_end": "<RFC3339>"
@@ -289,7 +291,7 @@ sequenceDiagram
   participant N as Notifications
   participant F as Export Function
   participant S as Checkpoint / DLQ
-  participant H as Splunk HEC
+  participant P as Selected sink
 
   L->>D: Saved search evaluates bounded window
   D-->>M: Numeric metric and dimensions
@@ -299,13 +301,13 @@ sequenceDiagram
   F->>L: Query checkpoint-overlap through alarm end
   L-->>F: Selected evidence fields
   F->>F: Redact, normalize, hash, deduplicate, batch
-  F->>H: HEC event batch over verified TLS
-  alt HEC confirms success
+  F->>P: Evidence batch over verified TLS
+  alt Sink confirms every item
     F->>S: Commit checkpoint and receipt
-  else delivery not confirmed
+  else Sink does not confirm delivery
     F->>F: Classify the failure
-    F->>S: Retryable timeout, 429, or 5xx - backoff, then DLQ after budget
-    F->>S: Non-retryable 4xx or schema error - quarantine and hold checkpoint
+    F->>S: Retryable failure goes to DLQ after bounded retries
+    F->>S: Permanent failure goes to quarantine
   end
 ```
 

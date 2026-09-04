@@ -198,7 +198,7 @@ Start from where the logs already exist; do not create an avoidable extra hop.
 | Application emits OpenTelemetry logs | **UploadOtlpLogs API** | OTLP JSON/GZIP with trace/span context | Direct API upload, not a collector endpoint assumption |
 | Application can push JSON events | **LogEvents API** | Programmatic event batches | Observe payload/size limits and signing requirements |
 | Logs accumulate in OCI Object Storage | **ObjectCollectionRule** | Historic, live, or historic-plus-live bucket collection | LIVE modes also use Events and a dedicated public-endpoint Stream |
-| Kubernetes | **Kubernetes Monitoring Add Data workflow** | Cluster logs plus modeled entities | Validate cluster scope and required policies first |
+| Kubernetes | **Kubernetes Monitoring Add Data workflow** | Cluster logs, metrics, object discovery, modeled entities, and dashboards | Start with the [OKE Monitoring One Pager](OKE_MONITORING_ONE_PAGER.md); validate cluster scope and required policies first |
 | Enterprise Manager Cloud Control | **EM Bridge** | Existing EM entity model and target logs | Treat as its own integration workstream |
 | Agent cannot be used but Fluentd already exists | **OCI Log Analytics Fluentd output plugin** | Exception path for existing Fluentd estates | Oracle recommends Management Agent for the best experience |
 

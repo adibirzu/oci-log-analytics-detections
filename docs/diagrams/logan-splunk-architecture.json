@@ -82,10 +82,10 @@
     },
     {
       "id": "oci_splunk",
-      "label": "oci-splunk",
+      "label": "OCI Streaming and pinned oci-splunk",
       "kind": "compute",
       "group": "Raw parallel boundary",
-      "layer": "Workloads",
+      "layer": "Integration",
       "evidence": "code-backed external integration",
       "x": 1310,
       "y": 400
@@ -151,6 +151,12 @@
       "label": "telemetry: normalized evidence batch"
     },
     {
+      "from": "function",
+      "to": "oci_splunk",
+      "type": "telemetry",
+      "label": "telemetry: normalized evidence to reviewed Stream"
+    },
+    {
       "from": "splunk_hec",
       "to": "function",
       "type": "response",
@@ -160,13 +166,13 @@
       "from": "oci_splunk",
       "to": "splunk_hec",
       "type": "telemetry",
-      "label": "telemetry: approved raw stream"
+      "label": "telemetry: approved raw or evidence HEC batch"
     },
     {
       "from": "splunk_hec",
       "to": "oci_splunk",
       "type": "response",
-      "label": "response: raw delivery receipt"
+      "label": "response: consumer HEC receipt"
     }
   ]
 }

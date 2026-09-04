@@ -8,13 +8,15 @@
 
 **Tech Stack:** Python 3.11+, JSON Schema, PyYAML, OCI Python SDK, OCI Functions/Fn Python FDK, Terraform/OCI Resource Manager, OCI Log Analytics, Monitoring, Notifications, Vault, Object Storage, Splunk HEC, pytest, Mermaid, Excalidraw.
 
-**Spec:** `docs/superpowers/specs/2026-09-02-log-analytics-splunk-parallel-design.md`
+**Spec:** `docs/SPLUNK_PARALLEL_DESIGN.md`
 
 ## Implementation status
 
-**Tasks 1-10: complete for the scoped local implementation.** The delivery policy, schemas, generated nine-rule registry, replay-safe exporter, OCI/HEC adapters, operator CLI, opt-in Terraform module, ten Mermaid/Excalidraw workflow pairs, four operator guides, navigation, and self-hashed offline release receipt are present in the file map below. The Splunk-specific offline release stage passes 12/12 gates, and native `terraform init -backend=false` plus `terraform validate` succeeds with OCI provider 8.2.0.
+**Tasks 1-10: complete for the scoped local implementation.** The delivery policy, schemas, generated nine-rule registry, replay-safe exporter, OCI/HEC/Streaming adapters, operator CLI, opt-in Terraform module, ten Mermaid/Excalidraw workflow pairs, four operator guides, navigation, and self-hashed offline release receipt are present in the file map below. The Splunk-specific offline release stage passes 12/12 gates, and native `terraform init -backend=false` plus `terraform validate` succeeds with OCI provider 8.2.0.
 
 Provider validation remains not run: no OCI tenancy, Windows host, Vault secret, live Log Analytics query, Function, Streaming consumer, Splunk HEC endpoint, or Splunk search was contacted by this implementation run. The live-canary follow-on remains an independently approved, target-bound gate. The repository-wide release checklist also reports pre-existing promoted-Sentinel parser-schema drift; that separate gate is not rewritten or waived here.
+
+The dashed Log Analytics detection-to-Streaming route is implemented as a second Mode 2 sink: the exporter Function publishes the same normalized, versioned evidence envelope to an exact OCI Stream, and the pinned `oci-splunk` deployment consumes it into HEC. It remains disabled by default and requires independent Stream/IAM/consumer/provider acceptance. Direct HEC and Streaming delivery are separately configured and tested paths.
 
 Fast verification:
 
@@ -22,6 +24,7 @@ Fast verification:
 python3 scripts/generate_splunk_detection_registry.py --check
 python3 scripts/splunk_evidence_exporter_cli.py validate-config
 python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success --delivery-target streaming
 python3 scripts/release_checklist.py --splunk-parallel-offline-stage
 terraform -chdir=stack init -backend=false
 terraform -chdir=stack validate
@@ -104,7 +107,7 @@ Define these top-level keys with `version: 1`: `defaults`, `raw_sources`, `detec
 
 - [ ] **Step 4: Add strict Draft 2020-12 schemas**
 
-Set `additionalProperties: false` at every object layer. Registry entries require `id`, `title`, `splunk`, `oci_query_file`, `required_sources`, `required_fields`, `fidelity`, `detection`, `delivery`, and `evidence`. Evidence events require `schema_version`, `event_key`, `batch_id`, `detection`, `evidence`, and `provenance`.
+Set `additionalProperties: false` at every object layer. Registry entries require `id`, `title`, `splunk`, `oci_query_file`, `query_version`, `required_sources`, `required_fields`, semantic `fidelity`, `detection`, `delivery`, `evidence`, `alarm_contract`, `governance`, and per-layer `evidence_states`. Evidence events require `schema_version`, `event_key`, `batch_id`, detection metric identity/dimensions, source occurrence metadata and allowlisted fields under `evidence`, plus analytics-plane/query-version provenance.
 
 - [ ] **Step 5: Run schema and sensitive-value tests**
 
@@ -558,7 +561,7 @@ Commit the documentation and documentation tests only if authorized.
 
 - [ ] **Step 1: Write failing release-stage test**
 
-Assert the release checklist calls registry drift validation, schema validation, local exporter success/duplicate/failure scenarios, diagram checks, docs checks, and Terraform static validation without calling OCI, Splunk, HEC, Vault, or external endpoints.
+Assert the release checklist calls registry drift validation, schema validation, direct-HEC and Streaming exporter success, duplicate/failure/replay scenarios, diagram checks, docs checks, and Terraform static validation without calling OCI, Splunk, HEC, Vault, or external endpoints.
 
 - [ ] **Step 2: Confirm RED**
 

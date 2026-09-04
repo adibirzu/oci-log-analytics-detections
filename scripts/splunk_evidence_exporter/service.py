@@ -146,6 +146,7 @@ class EvidenceExportService:
         delivery_ledger: DeliveryLedgerPort | None = None,
         metrics: MetricsPort | None = None,
         reservation_lease: timedelta = timedelta(minutes=10),
+        delivery_target: str = "hec",
     ) -> None:
         self._registry = registry
         self._query = query
@@ -165,6 +166,9 @@ class EvidenceExportService:
         self._log_analytics_namespace = log_analytics_namespace
         self._delivery_ledger = delivery_ledger
         self._metrics = metrics
+        self._delivery_target = delivery_target.strip().casefold()
+        if self._delivery_target not in {"hec", "streaming"}:
+            raise ValueError("delivery target must be hec or streaming")
         if reservation_lease.total_seconds() <= 0:
             raise ValueError("reservation lease must be positive")
         self._reservation_lease = reservation_lease
@@ -182,6 +186,14 @@ class EvidenceExportService:
         delivery = entry.get("delivery", {})
         if not isinstance(delivery, Mapping):
             raise ValueError("registry delivery configuration must be an object")
+        evidence_targets = delivery.get("evidence_targets")
+        if (
+            not isinstance(evidence_targets, list)
+            or self._delivery_target not in evidence_targets
+        ):
+            raise ValueError(
+                "configured delivery target is not allowed for this detection"
+            )
         lookback = _duration(delivery.get("lookback"), self._lookback, "lookback")
         overlap = _duration(delivery.get("overlap"), self._overlap, "overlap")
         max_rows = _bounded_int(delivery.get("max_rows"), self._max_rows, "max_rows")
@@ -258,6 +270,7 @@ class EvidenceExportService:
                     detection_id=detection_id,
                     dimensions=evidence_dimensions,
                     checkpoint=window.end,
+                    delivery_target=self._delivery_target,
                 )
                 # The native Function error alarm is the fallback when the
                 # failure metric itself cannot be emitted. DLQ persistence
@@ -413,6 +426,8 @@ class EvidenceReplayService:
         clock: Callable[[], datetime],
         max_batch_events: int,
         max_attempts: int,
+        delivery_target: str = "hec",
+        registry: object | None = None,
     ) -> None:
         self._checkpoint = checkpoint
         self._hec = hec
@@ -420,6 +435,10 @@ class EvidenceReplayService:
         self._clock = clock
         self._max_batch_events = _runtime_maximum(max_batch_events, "max_batch_events")
         self._max_attempts = _runtime_maximum(max_attempts, "max_attempts")
+        self._delivery_target = delivery_target.strip().casefold()
+        if self._delivery_target not in {"hec", "streaming"}:
+            raise ValueError("delivery target must be hec or streaming")
+        self._registry = registry
 
     def replay(self, record: Mapping[str, object]) -> ReplayReceipt:
         if not isinstance(record, Mapping):
@@ -431,6 +450,7 @@ class EvidenceReplayService:
             "detection_id",
             "dimensions",
             "checkpoint",
+            "delivery_target",
             "delivered_event_keys",
             "remaining_events",
         }
@@ -446,6 +466,31 @@ class EvidenceReplayService:
         detection_id = self._required_text(record.get("detection_id"), "detection_id")
         if re.fullmatch(r"[a-z0-9][a-z0-9-]*", detection_id) is None:
             raise ValueError("dead-letter detection_id is invalid")
+        record_target = self._required_text(
+            record.get("delivery_target"), "delivery_target"
+        ).casefold()
+        if record_target not in {"hec", "streaming"}:
+            raise ValueError("dead-letter delivery target is invalid")
+        if record_target != self._delivery_target:
+            raise ValueError("dead-letter delivery target does not match replay sink")
+        if self._registry is not None:
+            replay_entry = EvidenceExportService._find_entry(
+                self._registry.load(),
+                AlarmTrigger(
+                    detection_id=detection_id,
+                    alarm_end=self._clock(),
+                    namespace="replay",
+                    metric_name="replay",
+                    dimensions={},
+                ),
+                {},
+            )
+            replay_delivery = replay_entry.get("delivery", {})
+            if (
+                not isinstance(replay_delivery, Mapping)
+                or record_target not in replay_delivery.get("evidence_targets", [])
+            ):
+                raise ValueError("dead-letter delivery target is no longer allowed")
         dimensions = self._dimensions(record.get("dimensions"))
         checkpoint = self._checkpoint_time(record.get("checkpoint"))
         delivered_event_keys = self._event_keys(record.get("delivered_event_keys"))
@@ -497,6 +542,7 @@ class EvidenceReplayService:
                     detection_id=detection_id,
                     dimensions=dimensions,
                     checkpoint=checkpoint,
+                    delivery_target=self._delivery_target,
                 )
                 return self._receipt(
                     status="delivery_failed",

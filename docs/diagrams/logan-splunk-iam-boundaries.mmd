@@ -6,7 +6,7 @@ flowchart LR
     connector["Connector Hub identity"]
   end
   subgraph RAW["Independent raw transport"]
-    streaming["OCI Streaming"]
+    streaming["OCI Streaming raw and evidence streams"]
     oci_splunk["oci-splunk"]
   end
   subgraph ONS["Notifications service principal"]
@@ -31,5 +31,6 @@ flowchart LR
   function -.->|"control: Log Analytics query permission"| logan
   function -.->|"control: one secret-bundle read"| vault
   function -.->|"control: checkpoint and DLQ object access"| state
+  function -.->|"control: scoped evidence stream-push option"| streaming
   function -->|"telemetry: evidence batch"| hec
   hec -.->|"response: HEC acceptance"| function

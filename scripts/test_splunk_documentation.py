@@ -34,7 +34,7 @@ NAVIGATION_PAGES = (
 LOCAL_EVIDENCE_EXAMPLE = ROOT / "docs/health/splunk-parallel-local-evidence.example.json"
 COST_GUIDE = ROOT / "docs/LOG_ANALYTICS_COST_OPTIMIZATION.md"
 IMPLEMENTATION_PLAN = (
-    ROOT / "docs/superpowers/plans/2026-09-02-log-analytics-splunk-parallel.md"
+    ROOT / "docs/SPLUNK_PARALLEL_IMPLEMENTATION_PLAN.md"
 )
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 
@@ -124,7 +124,7 @@ def test_navigation_exposes_implementation_assets_and_plan_status() -> None:
         "scripts/splunk_evidence_exporter_cli.py",
         "stack/modules/splunk_evidence_exporter",
         "docs/health/splunk-parallel-local-evidence.example.json",
-        "docs/superpowers/plans/2026-09-02-log-analytics-splunk-parallel.md",
+        "docs/SPLUNK_PARALLEL_IMPLEMENTATION_PLAN.md",
     ):
         assert relative_path in navigation
 
@@ -349,7 +349,7 @@ def test_contributor_release_guidance_links_classified_local_evidence_example() 
     assert "working_tree_dirty" in evidence["evidence_manifest"]
     assert evidence["evidence_manifest"]["working_tree_dirty"] in (True, False)
     assert evidence["status"] == "PASS"
-    assert evidence["scenario_counts"]["passed"] == 4
+    assert evidence["scenario_counts"]["passed"] == 5
     assert evidence["artifact_hashes"]
     assert "docs/health/splunk-parallel-local-evidence.example.json" not in evidence["artifact_hashes"]
     assert evidence["artifact_hashes"] == evidence["evidence_manifest"]["files"]
@@ -414,4 +414,5 @@ def test_common_and_mode_prerequisites_do_not_cross_impose_services() -> None:
         assert "Streaming" in mode1 and "oci-splunk" in mode1
         assert not re.search(r"\b(?:Vault|Function|alarm|subscription)\b", mode1, re.I)
         assert "Vault" in mode2 and "Function" in mode2 and "alarm" in mode2.lower()
-        assert not re.search(r"\b(?:Streaming|oci-splunk)\b", mode2, re.I)
+        assert "Direct HEC" in mode2
+        assert "OCI Streaming" in mode2 and "oci-splunk" in mode2

@@ -750,7 +750,7 @@ if __name__ == "__main__":
     parser.add_argument('--dashboard-name', action='append', dest='dashboard_names',
                         help='Deploy only the named dashboard. Can be supplied multiple times.')
     parser.add_argument('--i-understand-prod', action='store_true', dest='i_understand_prod',
-                        help='Acknowledge a deliberate write against the production PRODUCTION '
+                        help='Acknowledge a deliberate write against the protected production '
                              'tenancy outside the LogAnalytics subtree (or set OCI_ALLOW_PROD_WRITE=1).')
     args = parser.parse_args()
 

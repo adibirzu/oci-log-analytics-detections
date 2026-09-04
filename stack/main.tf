@@ -44,4 +44,7 @@ module "splunk_evidence_exporter" {
   splunk_hec_secret_id                = var.splunk_evidence_exporter_hec_secret_id
   splunk_hec_url                      = var.splunk_evidence_exporter_hec_url
   splunk_hec_index                    = var.splunk_evidence_exporter_hec_index
+  evidence_delivery_target            = var.splunk_evidence_exporter_delivery_target
+  evidence_stream_id                  = var.splunk_evidence_exporter_stream_id
+  evidence_stream_messages_endpoint   = var.splunk_evidence_exporter_stream_messages_endpoint
 }

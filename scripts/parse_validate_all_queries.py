@@ -10,7 +10,7 @@ metadata WITHOUT executing the search, so it isolates "is this query valid?"
 (ERROR) from "is there matching data?" (the smoke test's MISS).
 
 Usage:
-    OCI_PROFILE=cap python3 scripts/parse_validate_all_queries.py [--json out.json]
+    OCI_PROFILE=<OCI_STAGING_PROFILE> python3 scripts/parse_validate_all_queries.py [--json out.json]
 
 Exit codes:
     0 = every query parses

@@ -460,7 +460,7 @@ def main():
     parser.add_argument('--file', action='append', dest='files',
                         help='Only upload the named test data file; repeat for multiple files')
     parser.add_argument('--i-understand-prod', action='store_true', dest='i_understand_prod',
-                        help='Acknowledge a deliberate upload against the production PRODUCTION '
+                        help='Acknowledge a deliberate upload against the protected production '
                              'tenancy outside the LogAnalytics subtree (or set OCI_ALLOW_PROD_WRITE=1).')
     args = parser.parse_args()
 

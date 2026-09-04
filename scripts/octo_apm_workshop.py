@@ -99,7 +99,7 @@ SENSITIVE_BUNDLE_PATTERNS = (
     re.compile(r"\bocid1\.", re.IGNORECASE),
     re.compile(r"\bopc-request-id\b", re.IGNORECASE),
     re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
-    re.compile(r"\boctodemo\.cloud\b", re.IGNORECASE),
+    re.compile(r"\b[a-z0-9-]+\.cloud\b", re.IGNORECASE),
 )
 
 

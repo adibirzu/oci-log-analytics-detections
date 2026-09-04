@@ -53,8 +53,9 @@ Before any provider action, assign and record the owners below.
 ### Mode 2 prerequisites
 
 - One canonical query and eligible detection rule with first Monitoring metric proven; reviewed alarm and Notifications topic/subscription held disabled before the canary.
-- One reviewed Function image/digest, existing Function subnets/optional NSGs, an exact resource-principal dynamic group, and OCI-query plus HTTPS HEC egress.
-- One existing Vault secret containing the HEC credential and private versioned Object Storage checkpoint/DLQ buckets with approved lifecycle.
+- One reviewed Function image/digest, existing Function subnets/optional NSGs, an exact resource-principal dynamic group, OCI-query access, and private versioned Object Storage checkpoint/DLQ buckets with approved lifecycle.
+- Direct HEC: HTTPS HEC egress and one existing Vault secret containing the HEC credential.
+- OCI Streaming: exact evidence Stream and producer permission; the pinned `oci-splunk` consumer owns its separate Streaming credential, HEC credential, egress, and offset lifecycle.
 
 ## Architecture and workflow
 
@@ -78,7 +79,7 @@ flowchart LR
   F --> H
 ```
 
-Collection, parsing, Log Analytics query results, detection-rule execution, Monitoring metric, alarm transition, Notifications delivery, Function invocation, HEC confirmation, checkpoint commit, Splunk searchability, and provider acceptance are separate evidence layers. The dashed detection-to-Streaming branch is optional and needs an independently approved producer, schema, retry policy, and `oci-splunk` consumer contract; Log Analytics does not publish detection rows to Streaming automatically. `RUNNING`, HTTP success, or a rendered page cannot stand in for later layers.
+Collection, parsing, Log Analytics query results, detection-rule execution, Monitoring metric, alarm transition, Notifications delivery, Function invocation, sink confirmation, checkpoint commit, Splunk searchability, and provider acceptance are separate evidence layers. The dashed detection-to-Streaming branch uses the implemented Function Streaming adapter when `SPLUNK_EVIDENCE_TARGET=streaming`; it still needs an independently approved exact Stream, schema, retry policy, scoped Function `stream-push` grant, and pinned `oci-splunk` consumer contract. Log Analytics does not publish detection rows to Streaming automatically. `RUNNING`, HTTP success, or a rendered page cannot stand in for later layers.
 
 ## IAM and network requirements
 
@@ -88,7 +89,7 @@ Run this offline preview and have an OCI IAM reviewer replace every placeholder:
 python3 scripts/splunk_evidence_exporter_cli.py render-iam
 ```
 
-It renders eight review categories and never applies policy.
+It renders nine review categories and never applies policy.
 
 ### Mode 1 IAM and network
 
@@ -191,7 +192,7 @@ Apply mutates OCI. Follow the pinned verification procedure afterward, but keep 
 8. In Splunk Web, create or select the approved index and HEC input with sourcetype `oci:logan:detection`. Choose `response` semantics or enable indexer acknowledgment and configure `indexer_ack` consistently.
 9. During the approved canary window, enable only the reviewed alarm/subscription path, generate one safe event, and validate every layer in the [E2E guide](SPLUNK_E2E_VALIDATION.md). Disable or promote according to the change record.
 
-Expected output is a sanitized `oci.logan.splunk.evidence.v1` event, confirmed HEC batch, checkpoint commit after confirmation, and a Splunk result with the stable `event_key`. The Function must not forward the raw Notifications payload.
+Expected output is a sanitized `oci.logan.splunk.evidence.v1` event and a checkpoint commit only after the selected sink confirms every item. Direct mode requires HEC confirmation. Streaming mode requires a complete zero-failure Stream response, then separate `oci-splunk` consumer-offset, HEC, and Splunk-search receipts. The Function must not forward the raw Notifications payload, and a producer checkpoint is not Splunk acceptance.
 
 The exact scripted deployment sequence and variables are in the [evidence-export runbook](SPLUNK_EVIDENCE_EXPORT_RUNBOOK.md).
 
@@ -199,7 +200,7 @@ The exact scripted deployment sequence and variables are in the [evidence-export
 
 For each source, record `raw`, `evidence`, `both`, or `none`, and separately record each detection's export setting. Raw delivery is disabled in the repository configuration; evidence mappings are enabled but provider delivery remains disabled until deployment and alarm/subscription approval.
 
-On-premises Windows, Linux, and custom-file sources enter Log Analytics through Management Agent source/entity association. Use a Management Gateway only when the network design requires a controlled proxy path. The agent/gateway path needs outbound OCI connectivity, correct entity and source association, fresh-event proof, health/lag monitoring, and capacity review. It does not need to traverse Streaming. Evidence can then use Mode 2; add a separate raw Splunk path only when an owner explicitly approves it. If selected detection evidence must use the existing `oci-splunk` Streaming transport instead of direct HEC, deploy an independently owned producer that emits the registry's normalized envelope to the exact stream, and validate its schema, idempotency key, retry/DLQ behavior, consumer compatibility, and Splunk search receipt. The repository does not silently substitute that producer for the implemented Mode 2 Function-to-HEC path. See [fast onboarding](FAST_ONBOARDING_TRACK.md), [Windows onboarding](WINDOWS_ACCESS_FAST_ONBOARDING.md), and the editable [on-prem diagram](diagrams/logan-splunk-onprem-agent.mmd).
+On-premises Windows, Linux, and custom-file sources enter Log Analytics through Management Agent source/entity association. Use a Management Gateway only when the network design requires a controlled proxy path. The agent/gateway path needs outbound OCI connectivity, correct entity and source association, fresh-event proof, health/lag monitoring, and capacity review. It does not need to traverse Streaming. Evidence can then use Mode 2; add a separate raw Splunk path only when an owner explicitly approves it. For selected evidence through the existing `oci-splunk` transport, configure the same exporter Function with `SPLUNK_EVIDENCE_TARGET=streaming`, the exact Stream OCID and messages endpoint, then validate its versioned envelope, event key, retry/DLQ behavior, consumer compatibility, and Splunk search receipt. Direct HEC and Streaming are separate deployments/acceptance paths; do not switch a live sink without a reviewed plan. See [fast onboarding](FAST_ONBOARDING_TRACK.md), [Windows onboarding](WINDOWS_ACCESS_FAST_ONBOARDING.md), and the editable [on-prem diagram](diagrams/logan-splunk-onprem-agent.mmd).
 
 ## Validation and steady-state operations
 
@@ -215,7 +216,8 @@ Mode 1 also needs Connector Hub errors, stream throughput/retention, consumer la
 | Required field absent | Fix parser/source mapping; do not weaken the query with placeholders |
 | Metric absent | Keep alarm/subscription disabled; inspect scheduled-search eligibility and execution |
 | Query throttled/timed out | Retry only within the bounded window/budget; reduce scope rather than unbound it |
-| HEC timeout, 429, 5xx | Bounded retry, then DLQ; checkpoint must not advance |
+| Direct HEC timeout, 429, 5xx | Bounded retry, then DLQ; checkpoint must not advance |
+| Streaming partial result, failure, or timeout | Bounded producer retry, then DLQ; checkpoint must not advance. After Stream acceptance, recover downstream failures from retained Stream offsets |
 | HEC 400/401/403 or missing secret | Quarantine and correct configuration; never log the token |
 | DLQ/state unavailable | Fail closed; do not send without durable replay state |
 | Duplicate alarm | Preserve stable `event_key`; Splunk may deduplicate while transport receipts remain |
@@ -238,7 +240,7 @@ Rollback Mode 1 by stopping the `oci-splunk` consumer or disabling only the Stre
 
 Rollback Mode 2 by disabling the detection alarm action and the exact Function subscription. Keep collection, parsing, saved search, detection rule, state bucket, and DLQ intact until evidence reconciliation. Do not destroy reused subnets, NSGs, Vault secrets, topics, buckets, or Splunk resources. Terraform destruction requires a separately reviewed ownership-aware plan.
 
-Replay is at-least-once. Inspect sanitized DLQ metadata and delivered keys, bound the remaining events, require HEC confirmation, then commit the checkpoint. The repository exposes an offline `replay-plan`; it does not execute live replay. Retain DLQ/replay receipts until release acceptance.
+Replay is at-least-once. Inspect sanitized DLQ metadata and delivered keys, bound the remaining events, require confirmation from the configured direct-HEC or Streaming sink, then commit the producer checkpoint. Downstream Streaming recovery belongs to the pinned consumer and retained offsets. The repository exposes an offline `replay-plan`; it does not execute live replay. Retain producer, consumer, HEC, and search receipts until release acceptance.
 
 ## Evidence class and limitations
 

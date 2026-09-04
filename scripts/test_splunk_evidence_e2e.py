@@ -70,6 +70,24 @@ def test_local_success_uses_service_and_commits_only_after_mock_hec_delivery():
     }
 
 
+def test_local_success_can_publish_normalized_evidence_to_streaming_for_oci_splunk():
+    result = run_cli(
+        "local-e2e", "--scenario", "success", "--delivery-target", "streaming"
+    )
+
+    assert result.returncode == 0, result.stderr
+    receipt = json.loads(result.stdout)
+    assert receipt["delivery_target"] == "streaming"
+    assert receipt["mock_streaming_event_count"] == receipt["delivered_count"] == 3
+    assert receipt["mock_hec_event_count"] == receipt["hec_attempt_count"] == 0
+    assert receipt["delivery_attempt_count"] == 1
+    assert receipt["scenario_counts"]["delivery_attempts"] == 1
+    assert receipt["scenario_counts"]["hec_attempts"] == 0
+    assert receipt["scenario_counts"]["streaming_attempts"] == 1
+    assert "mock_streaming_delivered" in receipt["operations"]
+    assert receipt["checkpoint_committed"] is True
+
+
 def test_checked_in_provider_raw_alarm_fixture_is_accepted_without_a_custom_detection_id():
     result = run_cli("validate-payload", "--file", "scripts/fixtures/splunk_evidence/oci_raw_alarm.json")
     assert result.returncode == 0, result.stderr

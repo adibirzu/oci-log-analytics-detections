@@ -115,6 +115,27 @@ def test_existing_vault_secret_reference_is_the_only_secret_interface() -> None:
     assert 'resource "oci_vault_secret"' not in terraform
 
 
+def test_exporter_supports_direct_hec_or_existing_evidence_stream_sink() -> None:
+    root_variables = _read(STACK / "variables.tf")
+    root_main = _read(STACK / "main.tf")
+    module_variables = _read(MODULE / "variables.tf")
+    module_main = _read(MODULE / "main.tf")
+
+    assert 'contains(["hec", "streaming"], var.evidence_delivery_target)' in module_variables
+    assert 'variable "evidence_stream_id"' in module_variables
+    assert 'variable "evidence_stream_messages_endpoint"' in module_variables
+    assert "SPLUNK_EVIDENCE_TARGET" in module_main
+    assert "SPLUNK_EVIDENCE_STREAM_ID" in module_main
+    assert "SPLUNK_EVIDENCE_STREAM_MESSAGES_ENDPOINT" in module_main
+    assert 'var.evidence_delivery_target != "hec" ||' in module_main
+    assert 'var.evidence_delivery_target != "streaming" ||' in module_main
+    assert 'variable "splunk_evidence_exporter_delivery_target"' in root_variables
+    assert re.search(
+        r"evidence_delivery_target\s*=\s*var\.splunk_evidence_exporter_delivery_target",
+        root_main,
+    )
+
+
 def test_module_wires_only_the_scoped_exporter_path_with_logging_and_lifecycle() -> None:
     main = _read(MODULE / "main.tf")
 
@@ -295,7 +316,7 @@ def test_identifier_outputs_are_explicitly_sensitive_and_never_include_secrets()
         assert name in identifiers
 
 
-def test_iam_preview_separates_eight_reviewable_policy_boundaries() -> None:
+def test_iam_preview_separates_nine_reviewable_policy_boundaries() -> None:
     result = subprocess.run(
         [sys.executable, str(CLI), "render-iam"],
         cwd=ROOT,
@@ -311,7 +332,8 @@ def test_iam_preview_separates_eight_reviewable_policy_boundaries() -> None:
         "operator",
         "connector-hub-mode-1",
         "function-log-analytics-query",
-        "function-vault-secret",
+            "function-vault-secret",
+            "function-evidence-stream",
         "function-state-dlq",
         "notifications-function-invocation",
         "monitoring",

@@ -6,7 +6,7 @@ System Inventory, and Security Configuration Assessment (SCA) — is also querya
 in OCI LA, alongside the rest of the SOC detection content in this repo.
 
 The forwarder is `scripts/wazuh_to_oci_la.py`. It reuses this repo's OCI auth,
-namespace, log-group resolution and the emdemo production write-guard from
+namespace, log-group resolution and the tenant-neutral production write guard from
 `scripts/oci_config.py` (the same machinery as `scripts/ingest_test_data.py`).
 
 > All hostnames/IPs below use `<PLACEHOLDER>` tokens or the synthetic GOAD lab
@@ -85,7 +85,7 @@ to payload shape, then `rule.groups`, then defaults to `SOC Wazuh Alerts`.
    and sources from `scripts/logsources/wazuh_sources.py`):
 
    ```bash
-   OCI_PROFILE=cap python3 scripts/setup_log_sources.py
+   OCI_PROFILE=<OCI_STAGING_PROFILE> python3 scripts/setup_log_sources.py
    ```
 
    Verify the four `SOC Wazuh *` sources are listed in
@@ -111,8 +111,8 @@ to payload shape, then `rule.groups`, then defaults to `SOC Wazuh Alerts`.
 | `WAZUH_INDEXER_USER` | `--mode indexer` | Indexer username (e.g. `admin`) |
 | `WAZUH_INDEXER_PASSWORD` | `--mode indexer` | Indexer password — **never hardcode**; export at runtime |
 | `WAZUH_INDEXER_VERIFY_TLS` | optional | `false`/`0`/`no` to skip TLS verification for self-signed lab certs (default `true`) |
-| `OCI_PROFILE` | all live runs | OCI CLI profile, e.g. `cap` (staging). `emdemo` is production and write-guarded |
-| `OCI_ALLOW_PROD_WRITE` | emdemo only | `1` to acknowledge a deliberate write to emdemo outside the LogAnalytics subtree (or pass `--i-understand-prod`) |
+| `OCI_PROFILE` | all live runs | OCI CLI profile, e.g. `cap` (staging). `production` is production and write-guarded |
+| `OCI_ALLOW_PROD_WRITE` | production only | `1` to acknowledge a deliberate write to production outside the LogAnalytics subtree (or pass `--i-understand-prod`) |
 | `LA_NAMESPACE`, `LOG_ANALYTICS_LOG_GROUP_ID` | optional | Pin namespace / log group; otherwise auto-discovered (see `oci_config.py`) |
 | `OCI_LOG_LEVEL`, `OCI_LOG_FORMAT` | optional | `INFO`/`DEBUG`; `plain` for human-friendly stderr logs |
 
@@ -152,7 +152,7 @@ forms. A small overlap is harmless — OCI LA dedupes on content + time.
 # /etc/cron.d/wazuh-to-oci-la  — pull the last 15 minutes, every 15 minutes
 */15 * * * * ossec  WAZUH_INDEXER_URL=https://<WAZUH_INDEXER_HOST>:9200 \
   WAZUH_INDEXER_USER=admin WAZUH_INDEXER_PASSWORD="$(cat /var/ossec/.indexer_pw)" \
-  OCI_PROFILE=cap \
+  OCI_PROFILE=<OCI_STAGING_PROFILE> \
   /usr/bin/python3 /opt/oci-log-analytics-detections/scripts/wazuh_to_oci_la.py \
   --mode indexer --lookback 15m >> /var/log/wazuh_to_oci_la.log 2>&1
 ```
@@ -197,7 +197,7 @@ WantedBy=timers.target
 WAZUH_INDEXER_URL=https://<WAZUH_INDEXER_HOST>:9200
 WAZUH_INDEXER_USER=admin
 WAZUH_INDEXER_PASSWORD=<INDEXER_PASSWORD>
-OCI_PROFILE=cap
+OCI_PROFILE=<OCI_STAGING_PROFILE>
 ```
 
 Enable:
@@ -223,7 +223,7 @@ alert matching the `<integration>` block fires, passing the alert file path as
 # Wazuh integrator wrapper: forward a single alert to OCI Log Analytics.
 # $1 = path to the alert JSON file written by integratord.
 ALERT_FILE="$1"
-export OCI_PROFILE=cap
+export OCI_PROFILE=<OCI_STAGING_PROFILE>
 # Source OCI + any required env (chmod 600, owned by root/ossec).
 . /etc/wazuh-to-oci-la.env 2>/dev/null || true
 /usr/bin/python3 /opt/oci-log-analytics-detections/scripts/wazuh_to_oci_la.py \
@@ -299,7 +299,7 @@ forward window):
 You can also confirm the raw uploads landed:
 
 ```bash
-OCI_PROFILE=cap python3 -c "
+OCI_PROFILE=<OCI_STAGING_PROFILE> python3 -c "
 import sys; sys.path.insert(0,'scripts')
 from oci_config import get_la_client, get_namespace
 c=get_la_client(); ns=get_namespace(c)
@@ -316,7 +316,7 @@ for u in c.list_uploads(namespace_name=ns, name_contains='wazuh').data.items:
 |---------|--------------------|
 | `Missing Wazuh indexer credentials` | Export `WAZUH_INDEXER_URL/USER/PASSWORD` before running indexer mode. |
 | Upload error mentioning the source | The `SOC Wazuh *` source doesn't exist — run `scripts/setup_log_sources.py`. |
-| `REFUSING mutating OCI call ... PRODUCTION` | You're on the `emdemo` profile outside the LogAnalytics subtree. Use `OCI_PROFILE=cap`, or pass `--i-understand-prod` / `OCI_ALLOW_PROD_WRITE=1` deliberately. |
+| `REFUSING mutating OCI call ... PRODUCTION` | You're on the `production` profile outside the LogAnalytics subtree. Use `OCI_PROFILE=<OCI_STAGING_PROFILE>`, or pass `--i-understand-prod` / `OCI_ALLOW_PROD_WRITE=1` deliberately. |
 | TLS verify failure to the indexer | Lab self-signed cert: set `WAZUH_INDEXER_VERIFY_TLS=false` (lab only). |
 | Documents classified as Alerts when they should be Vuln/SCA/Inventory | In stdin/file mode there is no `_index`; ensure the payload carries the expected `vulnerability` / `data.sca` / syscollector block, or forward from the indexer where the index name is authoritative. |
 | No data in Log Explorer | Wait 2–3 minutes; confirm the Log Group and time range; check `list_uploads` (above). |

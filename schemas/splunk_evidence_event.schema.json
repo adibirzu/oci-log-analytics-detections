@@ -17,11 +17,13 @@
     "detection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "title", "severity"],
+      "required": ["id", "title", "severity", "metric_namespace", "dimensions"],
       "properties": {
         "id": {"type": "string", "minLength": 1},
         "title": {"type": "string", "minLength": 1},
-        "severity": {"enum": ["low", "medium", "high", "critical"]}
+        "severity": {"enum": ["low", "medium", "high", "critical"]},
+        "metric_namespace": {"type": "string", "minLength": 1},
+        "dimensions": {"type": "object", "maxProperties": 3, "additionalProperties": {"type": ["string", "number", "integer", "boolean", "null"]}}
       }
     },
     "evidenceField": {
@@ -59,9 +61,12 @@
     "evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["include_original_content", "fields"],
+      "required": ["include_original_content", "event_time", "log_source", "entity", "fields"],
       "properties": {
         "include_original_content": {"type": "boolean"},
+        "event_time": {"type": "string", "format": "date-time"},
+        "log_source": {"type": "string", "minLength": 1},
+        "entity": {"type": ["string", "null"]},
         "original_content": {"$ref": "#/$defs/originalContent"},
         "fields": {"type": "array", "items": {"$ref": "#/$defs/evidenceField"}}
       },
@@ -74,10 +79,12 @@
     "provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["product", "query_file", "window_start", "window_end"],
+      "required": ["product", "analytics_plane", "query_file", "query_version", "window_start", "window_end"],
       "properties": {
         "product": {"const": "OCI Log Analytics"},
+        "analytics_plane": {"const": "oci_log_analytics"},
         "query_file": {"type": "string", "pattern": "^queries/(?:apps/|hunting/|sentinel/)?[a-z0-9][a-z0-9_-]*\\.json$"},
+        "query_version": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "window_start": {"type": "string", "format": "date-time"},
         "window_end": {"type": "string", "format": "date-time"}
       }

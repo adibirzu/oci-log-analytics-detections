@@ -19,7 +19,7 @@ Three input modes:
 Each document is classified (alerts vs vulnerability vs syscollector/inventory
 vs sca) by index name and ``rule.groups`` / payload shape, batched per OCI LA
 source, and uploaded through the Log Analytics Upload API. Auth, namespace,
-log-group and the emdemo production write-guard are reused from oci_config.py
+log-group and the tenant-neutral production write guard are reused from oci_config.py
 (mirroring scripts/ingest_test_data.py).
 
 Forwarded JSON is passed through unmodified so it matches the ``*_EXAMPLE``
@@ -30,7 +30,7 @@ Usage::
     # Periodic pull from the indexer (cron / systemd timer on the Wazuh host)
     WAZUH_INDEXER_URL=https://<PLACEHOLDER>:9200 \\
     WAZUH_INDEXER_USER=admin WAZUH_INDEXER_PASSWORD=*** \\
-    OCI_PROFILE=cap python3 scripts/wazuh_to_oci_la.py --mode indexer --lookback 15m
+    OCI_PROFILE=<OCI_STAGING_PROFILE> python3 scripts/wazuh_to_oci_la.py --mode indexer --lookback 15m
 
     # Dry-run a file without calling OCI
     python3 scripts/wazuh_to_oci_la.py --mode file --file test_data/wazuh_alerts.jsonl --dry-run
@@ -629,7 +629,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--i-understand-prod", action="store_true", dest="i_understand_prod",
-        help="Acknowledge a deliberate upload against the emdemo PRODUCTION tenancy "
+        help="Acknowledge a deliberate upload against the protected production tenancy "
              "outside the LogAnalytics subtree (or set OCI_ALLOW_PROD_WRITE=1).",
     )
     return parser

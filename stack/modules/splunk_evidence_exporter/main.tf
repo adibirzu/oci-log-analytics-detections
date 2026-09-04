@@ -21,6 +21,9 @@ locals {
     OCI_LOG_ANALYTICS_NAMESPACE              = var.log_analytics_namespace
     SPLUNK_ALARM_BINDINGS                    = jsonencode({ for binding_key, alarm_id in local.effective_governed_alarm_bindings : alarm_id => binding_key })
     OCI_LOG_ANALYTICS_COMPARTMENT_IN_SUBTREE = tostring(var.log_analytics_compartment_in_subtree)
+    SPLUNK_EVIDENCE_TARGET                   = var.evidence_delivery_target
+    SPLUNK_EVIDENCE_STREAM_ID                = var.evidence_stream_id
+    SPLUNK_EVIDENCE_STREAM_MESSAGES_ENDPOINT = var.evidence_stream_messages_endpoint
     SPLUNK_HEC_SECRET_ID                     = var.splunk_hec_secret_id
     SPLUNK_HEC_URL                           = var.splunk_hec_url
     SPLUNK_HEC_INDEX                         = var.splunk_hec_index
@@ -192,13 +195,18 @@ resource "oci_functions_function" "exporter" {
     }
 
     precondition {
-      condition     = var.splunk_hec_secret_id != ""
-      error_message = "An existing OCI Vault secret OCID is required; never pass the HEC token value."
+      condition     = var.evidence_delivery_target != "hec" || var.splunk_hec_secret_id != ""
+      error_message = "Direct HEC delivery requires an existing OCI Vault secret OCID; never pass the HEC token value."
     }
 
     precondition {
-      condition     = var.splunk_hec_url != "" && var.splunk_hec_index != ""
-      error_message = "The reviewed HTTPS HEC endpoint and target index are required."
+      condition     = var.evidence_delivery_target != "hec" || (var.splunk_hec_url != "" && var.splunk_hec_index != "")
+      error_message = "Direct HEC delivery requires the reviewed HTTPS HEC endpoint and target index."
+    }
+
+    precondition {
+      condition     = var.evidence_delivery_target != "streaming" || (var.evidence_stream_id != "" && var.evidence_stream_messages_endpoint != "")
+      error_message = "Streaming evidence delivery requires an existing reviewed Stream OCID and messages endpoint."
     }
 
     precondition {

@@ -12,6 +12,8 @@ Assign a Splunk content owner, Log Analytics query owner, source/parser owner, d
 
 Required repository inputs are real fields in [`queries/log_source_field_dictionary.json`](../queries/log_source_field_dictionary.json), canonical query placement under `queries/hunting/` or portable source rules under `rules/`, deterministic positive/negative fixtures, and a delivery entry in `config/splunk_parallel_delivery.yaml`. Never create `queries/splunk/`, hand-edit `queries/splunk_detection_registry.json`, or introduce placeholder fields.
 
+The generated registry deliberately separates concerns: `fidelity` describes SPL-to-LAQL semantics; `delivery.raw_mode` and `delivery.evidence_mode` describe transport; `governance` records expected results, false positives, tuning, and cardinality guidance; and `evidence_states` records local, parser, data-hit, dashboard, metric, HEC, and Splunk-search proof independently. `query_version` is the SHA-256 digest of the canonical query artifact included in every evidence event.
+
 ## Architecture and workflow
 
 See the editable [migration architecture](diagrams/logan-splunk-architecture.mmd) and [onboarding sequence](diagrams/logan-splunk-onboarding.mmd).
@@ -47,7 +49,7 @@ Never copy broad example policy unchanged. Resolve every placeholder and verify 
 
 1. In Splunk Web **Search & Reporting**, open the saved search and record its app/version, SPL, time picker, macros/lookups/data models, thresholds, aggregation, suppression, and expected positive and negative results. Do not paste licensed content into a public artifact without permission.
 2. Map every source and field to a real Log Analytics display field. If the source/parser is absent, stop and onboard it before translation.
-3. Classify fidelity as `lossless`, `transformed`, `evidence`, or `unsupported`. Mark unsupported semantics rather than claiming equivalence.
+3. Classify semantic fidelity as `lossless`, `transformed`, or `unsupported`. Evidence delivery is tracked independently under `delivery.evidence_mode`; mark unsupported semantics rather than claiming equivalence.
 4. Author the canonical query in the approved repository seam. Preserve time-window, aggregation, and threshold semantics explicitly.
 5. In OCI Console **Log Analytics → Log Explorer**, paste the LAQL, select the exact compartment/log group and representative window, and run it against approved data. Validate positive and negative controls and inspect parsed fields.
 6. Save the query. If [`queries/detection_rule_specs.json`](../queries/detection_rule_specs.json) marks it eligible, create the scheduled detection rule under **Log Analytics → Administration → Detection Rules**. Use the generated schedule, lookback, numeric metric alias, and at most three dimensions; keep downstream alarms disabled.
@@ -84,7 +86,7 @@ Then review the exact diff and rerun `--check`. Do not hand-edit the generated o
 5. **Monitoring metric:** actual namespace, metric name, value, and bounded dimensions appear.
 6. **Alarm:** reviewed alarm transitions only for the canary.
 7. **Notifications and Function:** exact subscription invokes the expected Function.
-8. **Checkpoint/DLQ:** delivery confirms before checkpoint; failure preserves replay state.
+8. **Checkpoint/DLQ:** the selected sink confirms every item before checkpoint; failure preserves replay state. Direct HEC and OCI Streaming confirmations are distinct, and a Stream write is not a Splunk acceptance receipt.
 9. **HEC confirmation:** configured `response` or `indexer_ack` condition succeeds.
 10. **Splunk searchability:** event is queryable in the intended index/sourcetype.
 11. **Provider acceptance:** all authenticated receipts and owner sign-off are present.

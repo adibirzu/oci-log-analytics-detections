@@ -54,6 +54,9 @@ variableGroups:
       - splunk_evidence_exporter_hec_secret_id
       - splunk_evidence_exporter_hec_url
       - splunk_evidence_exporter_hec_index
+      - splunk_evidence_exporter_delivery_target
+      - splunk_evidence_exporter_stream_id
+      - splunk_evidence_exporter_stream_messages_endpoint
 
 variables:
   compartment_id:
@@ -183,6 +186,32 @@ variables:
     default: ""
     required: false
     sensitive: true
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_delivery_target:
+    type: enum
+    title: "Evidence Delivery Target"
+    description: "Choose direct Splunk HEC or OCI Streaming feeding the pinned oci-splunk consumer."
+    default: "hec"
+    enum: ["hec", "streaming"]
+    required: false
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_stream_id:
+    type: string
+    title: "Existing Evidence Stream OCID"
+    description: "Sensitive resource reference used only for the Streaming evidence target."
+    default: ""
+    required: false
+    sensitive: true
+    visible: enable_splunk_evidence_exporter
+
+  splunk_evidence_exporter_stream_messages_endpoint:
+    type: string
+    title: "Evidence Stream Messages Endpoint"
+    description: "Exact HTTPS messages endpoint for the reviewed evidence stream."
+    default: ""
+    required: false
     visible: enable_splunk_evidence_exporter
 
   splunk_evidence_exporter_object_storage_namespace:

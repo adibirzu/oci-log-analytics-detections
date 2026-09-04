@@ -66,6 +66,9 @@ OCID_RE = re.compile(r"\bocid1\.[A-Za-z0-9][A-Za-z0-9._-]{8,}\b", re.IGNORECASE)
 # leaks through live error payloads. (Generic OCI service hostnames are public and
 # intentionally NOT flagged -- only the namespace inside the path is sensitive.)
 LA_NAMESPACE_PATH_RE = re.compile(r"/namespaces/(?P<value>[a-z0-9]{6,})/", re.IGNORECASE)
+# Project-specific retired environment label. Constructed in two literals so the
+# scanner source itself remains tenant-neutral while still blocking regression.
+RETIRED_TENANT_LABEL_RE = re.compile(r"\b" + "em" + "demo" + r"\b", re.IGNORECASE)
 IPV4_RE = re.compile(
     r"(?<![\d.])"
     r"(?:25[0-5]|2[0-4]\d|1?\d?\d)"
@@ -308,6 +311,20 @@ def scan_file(path: Path) -> list[dict]:
         private_key = PRIVATE_KEY_RE.search(line)
         if private_key:
             findings.append(_finding(path, line_number, "private_key", "critical", line, private_key.start(), private_key.end()))
+
+        retired_label = RETIRED_TENANT_LABEL_RE.search(line)
+        if retired_label:
+            findings.append(
+                _finding(
+                    path,
+                    line_number,
+                    "tenant_label",
+                    "high",
+                    line,
+                    retired_label.start(),
+                    retired_label.end(),
+                )
+            )
 
         for match in SECRET_ASSIGNMENT_RE.finditer(line):
             value = match.group("value")

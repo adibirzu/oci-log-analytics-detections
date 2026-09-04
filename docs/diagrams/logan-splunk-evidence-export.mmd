@@ -1,6 +1,6 @@
 %% Title: Mode 2 - Log Analytics detection evidence export
 %% Evidence: code-backed exporter and configured disabled stack; provider verified = false; release accepted = false
-%% Primary objects: 8
+%% Primary objects: 9
 flowchart LR
   subgraph ANALYTICS["Analytics source-of-truth boundary"]
     logan["Log Analytics"]
@@ -17,6 +17,7 @@ flowchart LR
   end
   subgraph DEST["Customer-managed destination boundary"]
     hec["Splunk HEC"]
+    stream_path["OCI Streaming and pinned oci-splunk"]
   end
   logan -->|"telemetry: bounded saved-search result"| detection
   detection -->|"telemetry: numeric metric and dimensions"| monitoring
@@ -24,6 +25,9 @@ flowchart LR
   notifications -.->|"control: at-least-once invocation"| function
   function -.->|"control: bounded evidence query"| logan
   function -.->|"control: read credential reference"| vault
-  function -->|"telemetry: normalized evidence batches"| hec
+  function -->|"telemetry: direct evidence batch"| hec
   hec -.->|"response: HEC acceptance"| function
-  function -.->|"control: commit after acceptance or quarantine"| state
+  function -->|"telemetry: evidence messages"| stream_path
+  stream_path -.->|"response: Stream producer acceptance"| function
+  stream_path -->|"telemetry: consumer HEC batch"| hec
+  function -.->|"control: commit after selected sink acceptance or quarantine"| state

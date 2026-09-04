@@ -1,19 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-DEFAULT_OUTPUTS_FILE="$(cd "${APP_ROOT}/../.." && pwd)/octo-apm-demo/credentials/emdemo/outputs.json"
-
-: "${OCI_PROFILE:=emdemo}"
-: "${OUTPUTS_FILE:=${DEFAULT_OUTPUTS_FILE}}"
+: "${OCI_PROFILE:?Set OCI_PROFILE to the reviewed OCI target profile}"
+: "${OUTPUTS_FILE:?Set OUTPUTS_FILE to the reviewed, local load-balancer outputs JSON}"
+: "${FORGE_HOSTNAME:?Set FORGE_HOSTNAME to the reviewed public hostname}"
+: "${OKE_CLUSTER_NAME:?Set OKE_CLUSTER_NAME to the exact kubectl context}"
 : "${FORGE_BACKEND_SET:=logan_forge_nodeport}"
 : "${FORGE_HOSTNAME_NAME:=convert}"
-: "${FORGE_HOSTNAME:=convert.octodemo.cloud}"
 : "${FORGE_NODEPORT:=30082}"
 : "${LISTENER_NAME:=http}"
 : "${ROUTING_POLICY_NAME:=host_routing}"
-: "${OKE_CLUSTER_NAME:=octo-apm-demo-oke}"
 : "${SKIP_CONTEXT_CHECK:=false}"
 
 if [[ -z "${FORGE_ROUTING_RULE_NAME:-}" ]]; then
@@ -31,7 +27,7 @@ usage() {
   cat <<EOF
 Usage: $0 [--apply]
 
-Creates or updates the existing Octo APM OCI Load Balancer wiring for
+Creates or updates the reviewed existing OCI Load Balancer wiring for
 ${FORGE_HOSTNAME}. Dry-run is the default.
 
 Environment:

@@ -1,6 +1,7 @@
 version: 1
 defaults:
   delivery_mode: evidence
+  evidence_targets: [hec, streaming]
   include_original_content: false
   lookback: 15m
   overlap: 2m
@@ -27,7 +28,7 @@ detections:
       oci_query_file: queries/hunting/oci_vcn_rejected_traffic_spike.json
       required_sources: [SOC VCN Flow Logs]
       required_fields: [Source IP]
-      fidelity: evidence
+      fidelity: transformed
       detection: {severity: high, mitre_techniques: [T1046]}
       delivery: {delivery_mode: evidence, lookback: 10m, overlap: 2m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
     - id: oci-audit-failures
@@ -41,7 +42,7 @@ detections:
       oci_query_file: queries/hunting/oci_audit_failures.json
       required_sources: [OCI Audit Logs]
       required_fields: [Event Type, User Name, Status]
-      fidelity: evidence
+      fidelity: transformed
       detection: {severity: medium, mitre_techniques: [T1078]}
     - id: oci-iam-policy-change
       title: OCI IAM Policy Changes
@@ -54,7 +55,7 @@ detections:
       oci_query_file: queries/hunting/oci_iam_policy_changes.json
       required_sources: [OCI Audit Logs]
       required_fields: [Event Type, User Name, Source IP]
-      fidelity: evidence
+      fidelity: transformed
       detection: {severity: high, mitre_techniques: [T1098]}
     - id: object-storage-new-external-source
       title: OCI Object Storage Access from External Source
@@ -67,7 +68,7 @@ detections:
       oci_query_file: queries/hunting/oci_object_storage_external_source.json
       required_sources: [OCI Audit Logs]
       required_fields: [Event Type, Source IP, User Name]
-      fidelity: evidence
+      fidelity: transformed
       detection: {severity: medium, mitre_techniques: [T1530]}
       delivery: {delivery_mode: evidence, lookback: 1h, overlap: 5m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
     - id: windows-access-administrator-logon
@@ -81,7 +82,7 @@ detections:
       oci_query_file: queries/hunting/windows_access_administrator_logon.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
       required_fields: [Target User Name, Logon Type, Host Name (Server)]
-      fidelity: evidence
+      fidelity: transformed
       detection: {severity: high, mitre_techniques: [T1078]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
     - id: windows-access-failed-logon-burst
@@ -95,7 +96,7 @@ detections:
       oci_query_file: queries/hunting/windows_access_failed_logon_burst.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
       required_fields: [Source Address, Target User Name, Host Name (Server)]
-      fidelity: evidence
+      fidelity: transformed
       detection: {severity: high, mitre_techniques: [T1110]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
     - id: windows-access-new-local-user
@@ -109,7 +110,7 @@ detections:
       oci_query_file: queries/hunting/windows_access_new_local_user.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
       required_fields: [Target User Name, Subject User Name, Host Name (Server)]
-      fidelity: evidence
+      fidelity: transformed
       detection: {severity: high, mitre_techniques: [T1136.001]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
     - id: windows-access-privileged-group-add
@@ -123,7 +124,7 @@ detections:
       oci_query_file: queries/hunting/windows_access_privileged_group_add.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
       required_fields: [User, Target User Name, Host Name (Server)]
-      fidelity: evidence
+      fidelity: transformed
       detection: {severity: high, mitre_techniques: [T1098]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
     - id: windows-access-rdp-after-hours
@@ -137,7 +138,7 @@ detections:
       oci_query_file: queries/hunting/windows_access_rdp_after_hours.json
       required_sources: [Windows Security Events, Windows Event Security Logs]
       required_fields: [Target User Name, Source Address, Host Name (Server)]
-      fidelity: evidence
+      fidelity: transformed
       detection: {severity: high, mitre_techniques: [T1021.001]}
       delivery: {delivery_mode: evidence, lookback: 5m, overlap: 1m, max_rows: 1000, max_batch_events: 100, max_attempts: 4}
 splunk_target:

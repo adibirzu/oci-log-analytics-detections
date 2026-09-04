@@ -733,13 +733,13 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "T4  telemetry: approved raw stream",
+      "text": "T4  telemetry: approved raw or evidence HEC batch",
       "fontSize": 12,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "T4  telemetry: approved raw stream",
+      "originalText": "T4  telemetry: approved raw or evidence HEC batch",
       "lineHeight": 1.25
     },
     {
@@ -765,13 +765,13 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "R2  response: raw delivery receipt",
+      "text": "R2  response: consumer HEC receipt",
       "fontSize": 12,
       "fontFamily": 5,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "R2  response: raw delivery receipt",
+      "originalText": "R2  response: consumer HEC receipt",
       "lineHeight": 1.25
     },
     {
@@ -863,7 +863,7 @@
       "locked": false,
       "customData": {
         "ociService": null,
-        "layer": "Workloads",
+        "layer": "Integration",
         "primaryObject": true,
         "group": "Collection boundary"
       }
@@ -1297,7 +1297,7 @@
       "locked": false,
       "customData": {
         "ociService": null,
-        "layer": "Workloads",
+        "layer": "Integration",
         "primaryObject": true,
         "group": "Raw parallel boundary"
       }
@@ -1325,13 +1325,13 @@
       "updated": 1,
       "link": null,
       "locked": false,
-      "text": "oci-splunk",
+      "text": "OCI Streaming and pinned oci-splunk",
       "fontSize": 18,
       "fontFamily": 5,
       "textAlign": "center",
       "verticalAlign": "middle",
       "containerId": null,
-      "originalText": "oci-splunk",
+      "originalText": "OCI Streaming and pinned oci-splunk",
       "lineHeight": 1.25
     },
     {
@@ -1903,7 +1903,7 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "telemetry",
-        "label": "telemetry: approved raw stream"
+        "label": "telemetry: approved raw or evidence HEC batch"
       }
     },
     {
@@ -1954,7 +1954,7 @@
       "endArrowhead": "arrow",
       "customData": {
         "flowType": "response",
-        "label": "response: raw delivery receipt"
+        "label": "response: consumer HEC receipt"
       }
     },
     {
@@ -2308,6 +2308,42 @@
       "containerId": null,
       "originalText": "R2",
       "lineHeight": 1.25
+    },
+    {
+      "id": "__oci_edge_12",
+      "type": "arrow",
+      "x": 1250.0,
+      "y": 176.0,
+      "width": 155.0,
+      "height": 224.0,
+      "angle": 0,
+      "strokeColor": "#C74634",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 1082,
+      "version": 1,
+      "versionNonce": 1083,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [[0.0, 0.0], [77.5, 112.0], [155.0, 224.0]],
+      "lastCommittedPoint": null,
+      "startBinding": null,
+      "endBinding": null,
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "customData": {
+        "flowType": "telemetry",
+        "from": "function",
+        "to": "oci_splunk",
+        "label": "telemetry: normalized evidence to reviewed Stream"
+      }
     }
   ],
   "appState": {

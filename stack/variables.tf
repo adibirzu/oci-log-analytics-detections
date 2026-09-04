@@ -135,6 +135,30 @@ variable "splunk_evidence_exporter_hec_secret_id" {
   }
 }
 
+variable "splunk_evidence_exporter_delivery_target" {
+  type        = string
+  description = "Normalized evidence sink: direct HEC or OCI Streaming feeding the pinned oci-splunk consumer"
+  default     = "hec"
+
+  validation {
+    condition     = contains(["hec", "streaming"], var.splunk_evidence_exporter_delivery_target)
+    error_message = "splunk_evidence_exporter_delivery_target must be hec or streaming."
+  }
+}
+
+variable "splunk_evidence_exporter_stream_id" {
+  type        = string
+  description = "Existing reviewed OCI Stream OCID for normalized evidence"
+  default     = ""
+  sensitive   = true
+}
+
+variable "splunk_evidence_exporter_stream_messages_endpoint" {
+  type        = string
+  description = "Exact HTTPS messages endpoint of the reviewed evidence stream"
+  default     = ""
+}
+
 variable "splunk_evidence_exporter_object_storage_namespace" {
   type        = string
   description = "Existing Object Storage namespace for exporter state and DLQ"

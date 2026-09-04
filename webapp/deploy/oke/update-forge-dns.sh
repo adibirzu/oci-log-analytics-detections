@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROFILE="${OCI_PROFILE:-cap}"
-ZONE_NAME="${OCI_DNS_ZONE_NAME:-octodemo.cloud}"
-RECORD_NAME="${FORGE_RECORD_NAME:-convert.octodemo.cloud}"
+: "${OCI_PROFILE:?Set OCI_PROFILE to the reviewed DNS target profile}"
+: "${OCI_DNS_ZONE_NAME:?Set OCI_DNS_ZONE_NAME to the reviewed DNS zone}"
+: "${FORGE_RECORD_NAME:?Set FORGE_RECORD_NAME to the reviewed Forge hostname}"
+PROFILE="${OCI_PROFILE}"
+ZONE_NAME="${OCI_DNS_ZONE_NAME}"
+RECORD_NAME="${FORGE_RECORD_NAME}"
 NAMESPACE="${FORGE_NAMESPACE:-logan-forge}"
 INGRESS_NAME="${FORGE_INGRESS_NAME:-logan-forge}"
 TTL="${FORGE_DNS_TTL:-60}"
 LB_OCID="${FORGE_LB_OCID:-}"
-LB_PROFILE="${FORGE_LB_PROFILE:-emdemo}"
+LB_PROFILE="${FORGE_LB_PROFILE:-${PROFILE}}"
 
 if ! command -v kubectl >/dev/null 2>&1; then
   echo "kubectl is required" >&2

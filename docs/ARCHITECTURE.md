@@ -12,8 +12,9 @@ This repository is an independent, tenant-neutral accelerator for OCI Log Analyt
 4. source, parser, field, saved-search, dashboard, detection-rule, and example-log artifacts;
 5. synthetic evidence generators and guarded ingestion helpers;
 6. manual and script-assisted Windows Event Log onboarding;
-7. OCI Log Analytics dashboards, saved searches, scheduled detections, and alarm plans; and
-8. the integrated Forge webapp plus generated contracts for API, MCP, and multicloud consumers.
+7. an OKE monitoring integration path based on Oracle's Kubernetes Monitoring Quick Start;
+8. OCI Log Analytics dashboards, saved searches, scheduled detections, and alarm plans; and
+9. the integrated Forge webapp plus generated contracts for API, MCP, and multicloud consumers.
 
 It is not a hosted SIEM, a credential broker, or proof that content is deployed in a customer tenancy. Forge and repository automation do not own customer credentials, select the target compartment, or silently enable alarms. Live OCI changes require an explicitly configured target and current approval.
 
@@ -187,6 +188,12 @@ flowchart LR
 
 Log Analytics storage is part of the operating model, especially when the same
 source might stay only in Log Analytics, feed Splunk in parallel, or do both.
+
+### OKE monitoring integration boundary
+
+The [OCI Kubernetes Monitoring Solution](https://github.com/oracle-quickstart/oci-kubernetes-monitoring) is an external Oracle Quick Start, not generated or deployed by this repository. In-cluster Fluentd workloads and discovery jobs send logs and Kubernetes object records to Log Analytics; the Management Agent sends Kubernetes metrics to OCI Monitoring. The solution UI and dashboards consume both planes.
+
+This repository becomes a downstream content consumer only after the operator proves the actual Log Analytics sources and display fields. Its dashboards and detections do not reimplement the Quick Start collectors. Optional Splunk evidence export begins after a governed Log Analytics detection; the raw OCI Logging fan-out path does not automatically contain records collected directly by the Kubernetes solution. See the [OKE Monitoring One Pager](OKE_MONITORING_ONE_PAGER.md) and [OKE Observability Runbook](OKE_OBSERVABILITY_RUNBOOK.md).
 Recent searchable data belongs in active storage. Older data with future
 investigative or compliance value belongs in archive storage. Recalled data
 returns to active storage temporarily and must be released after analysis to
@@ -269,8 +276,8 @@ flowchart LR
   FN --> HEC
 ```
 
-- **Mode 1, raw:** the separate Connector Hub → Streaming → pinned `adibirzu/oci-splunk` path owns raw transport and consumer offsets. Selected Log Analytics detections may also enter Streaming through an explicitly approved producer; this is not an automatic Log Analytics capability.
-- **Mode 2, evidence:** Log Analytics detection metrics trigger a bounded query and normalized HEC envelope; checkpoint advances only after HEC confirmation.
+- **Mode 1, raw:** the separate Connector Hub → Streaming → pinned `adibirzu/oci-splunk` path owns raw transport and consumer offsets. Selected Log Analytics detections can also enter an exact evidence Stream through the Mode 2 exporter Function's Streaming adapter; this is not an automatic Log Analytics capability and requires its own scoped `stream-push` grant and acceptance receipt.
+- **Mode 2, evidence:** Log Analytics detection metrics trigger a bounded query and normalized evidence envelope. Direct-HEC checkpoints advance only after HEC confirmation. Streaming-sink checkpoints advance only after every Stream item is accepted; consumer offsets, downstream HEC, and Splunk search remain independent acceptance gates.
 - **Hybrid:** delivery policy is explicit per source and detection. On-premises Management Agent/optional Management Gateway sources can remain in Log Analytics and use Mode 2 without Streaming.
 
 The architecture keeps collection, parsing, query, detection rule, Monitoring metric, alarm, Notifications, Function, checkpoint/DLQ, HEC confirmation, Splunk searchability, and provider acceptance independently observable. The exporter is opt-in and alarm actions/subscription default to disabled.

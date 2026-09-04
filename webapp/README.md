@@ -9,7 +9,7 @@
 - **Deployment package:** `/api/forge/deployment-package` builds a read-only Resource Manager zip from committed deployment content; it never accepts OCI credentials or tenancy inputs.
 - **Artifact source:** parent repository root by default, or `LOGAN_DETECTIONS_REPO` when explicitly set
 - **Public repository link:** `https://github.com/adibirzu/oci-log-analytics-detections`
-- **Production host targets:** `https://convert.octodemo.cloud` and `https://forge.octodemo.cloud`
+- **Production host target:** supplied at deployment time; no customer hostname is committed
 - **Static host target:** GitHub Pages can serve a limited read-only build when `NEXT_PUBLIC_FORGE_STATIC_EXPORT=1`
 
 The app does not duplicate query generation. It reads:

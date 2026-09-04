@@ -59,6 +59,17 @@ class TestSensitiveValueScanner(unittest.TestCase):
         self.assertNotIn(fixture_value, serialized)
         self.assertIn("<redacted:secret_assignment>", serialized)
 
+    def test_detects_retired_tenant_label_without_echoing_it(self):
+        tenant_label = "em" + "demo"
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self.write_file(root, "deploy.md", f"Forge Webapp on {tenant_label} OKE\n")
+
+            findings = scan_paths([root])
+
+        self.assertIn("tenant_label", self.finding_kinds(findings))
+        self.assertNotIn(tenant_label, json.dumps(findings))
+
     def test_allows_runtime_secret_variable_assignments(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

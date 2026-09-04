@@ -1,8 +1,26 @@
 # OCI Log Analytics Detections Documentation
 
-This directory is the wiki-style guide to using, operating, extending, and deploying this OCI Log Analytics detection-content repository. Start with the guide that matches your role; generated artifacts remain the authoritative source for current inventory and deployment content.
+This directory is the wiki-style guide to using, operating, extending, and deploying this OCI Log Analytics detection-content repository. Start with the customer need or technical guide that matches your role; generated artifacts remain the authoritative source for current inventory and deployment content.
 
-## Customer and SOC teams
+For customer-oriented service definitions, architecture choices, outcomes, and related OCI observability references, use the public [OCI SD Observability documentation hub](https://github.com/adibirzu/oci-sd-observability). This repository remains the implementation source for Log Analytics queries, dashboards, setup scripts, validation, and runbooks.
+
+## Use cases: customer needs and answers
+
+| Customer need | How the solution answers it | Service definition | Technical implementation |
+| --- | --- | --- | --- |
+| Establish a governed Log Analytics service quickly | Provides a phased path for IAM, source selection, collection, parsing, validation, ownership, and rollout rather than enabling every log at once. | [Log Analytics Fast Onboarding](https://github.com/adibirzu/oci-sd-observability/blob/main/service-definitions/LOG_ANALYTICS_FAST_ONBOARDING.md) | [Fast Onboarding Track](FAST_ONBOARDING_TRACK.md) |
+| Detect risky Windows access activity | Collects native Security, System, and Application event channels and supplies dashboard searches and alerts for failed logon bursts, RDP, privileged access, new users, and privileged-group membership. | [Windows Access Monitoring](https://github.com/adibirzu/oci-sd-observability/blob/main/service-definitions/WINDOWS_ACCESS_MONITORING.md) | [Windows Access Fast Onboarding](WINDOWS_ACCESS_FAST_ONBOARDING.md) |
+| Observe Kubernetes workloads and OKE infrastructure | Connects logs, metrics, Kubernetes objects, dashboards, and acceptance checks through Oracle's OKE monitoring patterns and this repository's Log Analytics content. | [OKE Observability](https://github.com/adibirzu/oci-sd-observability/blob/main/service-definitions/OKE_OBSERVABILITY.md) | [OKE Monitoring One Pager](OKE_MONITORING_ONE_PAGER.md) |
+| Keep Splunk while reducing duplicated OCI log volume | Retains and analyzes approved OCI and on-premises evidence in Log Analytics, while supporting either raw OCI fan-out or governed detection-evidence delivery to Splunk. | [Parallel SIEM](https://github.com/adibirzu/oci-sd-observability/blob/main/service-definitions/PARALLEL_SIEM.md) | [Splunk Parallel Operations](SPLUNK_PARALLEL_OPERATIONS.md) and [design](SPLUNK_PARALLEL_DESIGN.md) |
+| Improve Oracle Database security visibility without sending every record to the SIEM | Correlates supported database alert, trace, audit, listener, host, OCI Audit, service, and network telemetry; forwards only customer-approved signals or events. | [Oracle Database Security Analytics](https://github.com/adibirzu/oci-sd-observability/blob/main/service-definitions/ORACLE_DATABASE_SECURITY_ANALYTICS.md) | [Fast Onboarding Track](FAST_ONBOARDING_TRACK.md), [query guide](LOG_ANALYTICS_QUERY_USAGE.md), and related implementation projects |
+| Move OCI, custom, Kubernetes, database, and on-premises logs through the appropriate path | Separates native OCI connectors, Management Agent, Management Gateway, custom ingestion, raw Streaming routes, and derived evidence export so each path can be governed and tested independently. | [Data and SIEM Workflows](https://github.com/adibirzu/oci-sd-observability/blob/main/designs/DATA_AND_SIEM_WORKFLOWS.md) | [Architecture](ARCHITECTURE.md) and [Migration and Security Guide](MIGRATION_AND_SECURITY_GUIDE.md) |
+| Recreate high-value detections instead of blindly copying every SIEM rule | Uses source and field contracts, deterministic conversion, validation gates, dashboards, scheduled detections, and an evidence registry to preserve provenance and document fidelity. | [Parallel SIEM](https://github.com/adibirzu/oci-sd-observability/blob/main/service-definitions/PARALLEL_SIEM.md) | [Splunk Rule Migration](SPLUNK_RULE_MIGRATION.md) and [Cross-SIEM Catalog](CROSS_SIEM_DETECTION_CATALOG.md) |
+| Retain evidence longer while controlling searchable-storage and downstream-SIEM cost | Assigns retention by data class, distinguishes active and archive storage, documents recall/release, and measures raw-to-forwarded volume without discarding required evidence. | [Cost and Retention](https://github.com/adibirzu/oci-sd-observability/blob/main/service-definitions/COST_AND_RETENTION.md) | [Cost Optimization and Archive Retention](LOG_ANALYTICS_COST_OPTIMIZATION.md) |
+| Give analysts repeatable detection and investigation workflows | Supplies curated searches, dashboards, synthetic data, field mappings, attack walkthroughs, and explicit evidence gates. | [Portfolio Architecture](https://github.com/adibirzu/oci-sd-observability/blob/main/designs/PORTFOLIO_ARCHITECTURE.md) | [Threat Hunting Walkthrough](THREAT_HUNTING_WALKTHROUGH.md) and [Using Log Analytics Queries](LOG_ANALYTICS_QUERY_USAGE.md) |
+
+The service definitions answer the customer need and outline choices. The technical links contain implementation steps. A code-backed query, passing local test, or rendered dashboard does not prove source onboarding, OCI delivery, Splunk searchability, or customer acceptance in a target environment.
+
+## Detailed guides for customer and SOC teams
 
 | Need | Read | Outcome |
 | --- | --- | --- |
@@ -11,6 +29,8 @@ This directory is the wiki-style guide to using, operating, extending, and deplo
 | Follow the Windows automation path | [Windows Access Scripted Runbook](WINDOWS_ACCESS_SCRIPTED_RUNBOOK.md) | Guarded PowerShell, local E2E, OCI CLI bundle, dashboard deployment, and per-resource verification |
 | Review the Windows architecture and decisions | [Windows Access Workflow Diagrams](WINDOWS_ACCESS_WORKFLOW_DIAGRAMS.md) | Architecture, parallel paths, alert sequence, troubleshooting tree, and evidence ladder |
 | Establish the first Log Analytics data path | [Fast Onboarding Track](FAST_ONBOARDING_TRACK.md) | IAM, ingestion choice, canary sources, validation, and rollout ownership |
+| Monitor OKE logs, metrics, and Kubernetes objects | [OKE Monitoring One Pager](OKE_MONITORING_ONE_PAGER.md) | Quick Start architecture, IAM review, installation choice, and acceptance gates |
+| Validate and troubleshoot OKE monitoring | [OKE Observability Runbook](OKE_OBSERVABILITY_RUNBOOK.md) | Workload health, Log Analytics entities/logs, Monitoring metrics, dashboards, and metadata repair |
 | Design archive retention and cost controls | [Cost Optimization and Archive Retention](LOG_ANALYTICS_COST_OPTIMIZATION.md) | Active/archive decisions, recall/release workflow, Splunk cost tradeoffs, and long-term retention |
 | Find, run, customize, and validate queries | [Using Log Analytics Queries](LOG_ANALYTICS_QUERY_USAGE.md) | Console, OCL, repository, and live-validation workflow |
 | Plan a migration or SIEM-forwarding design | [Migration and Security Guide](MIGRATION_AND_SECURITY_GUIDE.md) | A phased telemetry, detection, and export plan |
@@ -75,4 +95,4 @@ The protected live workflows never run from untrusted pull requests. A missing c
 - `scripts/splunk_evidence_exporter_cli.py`: offline plan, configuration validation, scenario E2E, canary plan, and replay plan
 - `stack/modules/splunk_evidence_exporter`: opt-in Function, Notifications, state/DLQ, metrics, and alarm module
 - `docs/health/splunk-parallel-local-evidence.example.json`: self-hashed local-only release receipt
-- `docs/superpowers/plans/2026-09-02-log-analytics-splunk-parallel.md`: implementation plan, task traceability, and live-canary boundary
+- `docs/SPLUNK_PARALLEL_IMPLEMENTATION_PLAN.md`: implementation plan, task traceability, and live-canary boundary

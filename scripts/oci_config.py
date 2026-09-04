@@ -252,29 +252,30 @@ def require_oci_config():
         sys.exit(1)
 
 
-# ─── Production write guard (emdemo tenancy safety) ──────────
+# ─── Production write guard (tenant-neutral safety) ──────────
 #
-# Policy (see ~/.claude/CLAUDE.md "OCI Tenancy Boundaries"): the ``emdemo``
-# profile is PRODUCTION and must stay read-only OUTSIDE the LogAnalytics
-# compartment subtree. ``cap`` / ``DEFAULT`` (and any other/unknown profile)
-# are staging/test with full rights, so the guard is a no-op for them.
+# The operator must explicitly name the protected OCI profile. That profile must
+# stay read-only OUTSIDE the LogAnalytics compartment subtree. No real profile or
+# tenancy name is embedded in this repository.
 #
 # This guard is policy-as-code: it raises before any mutating OCI call when the
-# active profile is ``emdemo`` and the target compartment is not within the
-# configured LogAnalytics subtree, unless an explicit operator override is set.
+# active profile matches the configured protected profile and the target
+# compartment is not within the configured LogAnalytics subtree, unless an
+# explicit operator override is set.
 #
 # The allowed LogAnalytics compartment OCID is NEVER hardcoded — it is resolved
-# from env / per-profile ``.env.local.emdemo`` overlay keys. Subtree membership
+# from env / the selected per-profile overlay keys. Subtree membership
 # is approximated by membership in the configured allow-set (the LogAnalytics
 # root plus any explicit children) because traversing the real compartment
 # hierarchy would require a live OCI call, which this guard deliberately avoids.
 
-EMDEMO_PROFILE_NAME = "emdemo"
+PROTECTED_PROFILE_ENV = "OCI_PROTECTED_PROFILE"
+LEGACY_PROTECTED_PROFILE_ENV = "OCI_PRODUCTION_PROFILE"
 PROD_WRITE_OVERRIDE_ENV = "OCI_ALLOW_PROD_WRITE"
 
-# Config keys that may carry the allowed emdemo LogAnalytics compartment OCID.
-# With ``profile_bound=True`` for the emdemo profile, the base key also matches
-# the ``EMDEMO_`` profile-scoped form (e.g. EMDEMO_LOGANALYTICS_COMPARTMENT_OCID).
+# Config keys that may carry the allowed LogAnalytics compartment OCID.
+# With ``profile_bound=True``, the base key also matches the selected profile's
+# scoped form without embedding that profile name in source.
 _LOGANALYTICS_ROOT_KEY = "LOGANALYTICS_COMPARTMENT_OCID"
 _LOGANALYTICS_ROOT_ALIASES = (
     "LOGANALYTICS_COMPARTMENT_ID",
@@ -286,7 +287,7 @@ _LOGANALYTICS_CHILDREN_KEY = "LOGANALYTICS_COMPARTMENT_IDS"
 
 
 class ProdWriteGuardError(RuntimeError):
-    """Raised when a mutating call targets emdemo outside the LogAnalytics subtree."""
+    """Raised when a mutating call cannot prove the OCI target is write-safe."""
 
 
 def _mask_ocid(ocid):
@@ -303,12 +304,24 @@ def _prod_write_override_from_env(env=None):
     return str(env.get(PROD_WRITE_OVERRIDE_ENV, "")).strip() in ("1", "true", "True", "yes")
 
 
+def _protected_profile_from_env(env=None, env_file=None):
+    """Return the normalized protected profile name, or empty when unconfigured."""
+    env = os.environ if env is None else env
+    env_file = _env_local if env_file is None else env_file
+    for key in (PROTECTED_PROFILE_ENV, LEGACY_PROTECTED_PROFILE_ENV):
+        for source in (env, env_file):
+            value = str(source.get(key, "")).strip()
+            if value:
+                return value.casefold()
+    return ""
+
+
 def resolve_loganalytics_compartment_ids(profile=None, env=None, env_file=None):
-    """Resolve the allowed emdemo LogAnalytics compartment OCID(s).
+    """Resolve the allowed protected LogAnalytics compartment OCID(s).
 
     Returns a set of allowed compartment OCIDs. Never hardcodes a real OCID —
-    values come from env vars or the per-profile ``.env.local.emdemo`` overlay.
-    Empty set means "not configured" (the guard fails closed for emdemo).
+    values come from env vars or the selected per-profile overlay. Empty set
+    means "not configured" and the protected-profile guard fails closed.
     """
     env = os.environ if env is None else env
     env_file = _env_local if env_file is None else env_file
@@ -344,16 +357,16 @@ def resolve_loganalytics_compartment_ids(profile=None, env=None, env_file=None):
 
 def assert_write_allowed(compartment_id, profile=None, *, override=False,
                          env=None, env_file=None):
-    """Raise ``ProdWriteGuardError`` for an unsafe write against the emdemo prod tenancy.
+    """Raise ``ProdWriteGuardError`` for an unsafe write against the protected production tenancy.
 
     Semantics:
-      * For any profile other than ``emdemo`` (``cap``/``DEFAULT``/unknown), this
-        is a NO-OP — those tenancies are staging/test with full rights.
-      * For ``emdemo`` it ALLOWS the call only when ``compartment_id`` is within
-        the configured LogAnalytics allow-set, OR when an explicit operator
-        override is in effect (``override=True`` or ``OCI_ALLOW_PROD_WRITE=1``).
+      * The protected profile must be set through ``OCI_PROTECTED_PROFILE`` (the
+        older generic ``OCI_PRODUCTION_PROFILE`` key remains accepted).
+      * Other explicitly selected profiles are not guarded by this function.
+      * The protected profile is allowed only when ``compartment_id`` is within
+        the configured LogAnalytics allow-set or an explicit override is active.
       * Fail-closed: when the LogAnalytics allow-set is unconfigured/empty, an
-        emdemo write is REFUSED (we cannot prove the target is safe).
+        protected-profile write is REFUSED (we cannot prove the target is safe).
 
     The function performs no live OCI calls and is import-safe.
     """
@@ -361,12 +374,20 @@ def assert_write_allowed(compartment_id, profile=None, *, override=False,
     env_file = _env_local if env_file is None else env_file
     active = (profile or _resolve_profile(env=env, env_file=env_file) or "").strip()
 
-    # Non-production profiles: full rights, nothing to guard.
-    if active.lower() != EMDEMO_PROFILE_NAME:
-        return
-
     # Explicit, deliberate operator override (CLI flag → override=True, or env).
     if override or _prod_write_override_from_env(env):
+        return
+
+    protected_profile = _protected_profile_from_env(env, env_file)
+    if not protected_profile:
+        raise ProdWriteGuardError(
+            f"REFUSING mutating OCI call: set {PROTECTED_PROFILE_ENV} to the exact "
+            f"protected OCI profile before any write, or use the explicit "
+            f"--i-understand-prod override for this operation."
+        )
+
+    # A configured non-protected profile is outside this guard's production scope.
+    if active.casefold() != protected_profile:
         return
 
     allowed = resolve_loganalytics_compartment_ids(
@@ -380,8 +401,8 @@ def assert_write_allowed(compartment_id, profile=None, *, override=False,
     if not allowed:
         reason = (
             f"the LogAnalytics allow-set is not configured (set "
-            f"{_LOGANALYTICS_ROOT_KEY} in .env.local.{EMDEMO_PROFILE_NAME} or "
-            f"export {EMDEMO_PROFILE_NAME.upper()}_{_LOGANALYTICS_ROOT_KEY})"
+            f"{_LOGANALYTICS_ROOT_KEY} in the protected profile overlay or its "
+            f"profile-scoped environment variable)"
         )
     else:
         reason = (
@@ -391,7 +412,7 @@ def assert_write_allowed(compartment_id, profile=None, *, override=False,
 
     raise ProdWriteGuardError(
         f"REFUSING mutating OCI call: active profile '{active}' is PRODUCTION and "
-        f"{reason}. emdemo must stay read-only outside LogAnalytics. "
+        f"{reason}. The protected profile must stay read-only outside LogAnalytics. "
         f"If this is intentional, re-run with --i-understand-prod "
         f"(or {PROD_WRITE_OVERRIDE_ENV}=1)."
     )

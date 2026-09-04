@@ -182,6 +182,40 @@ variable "splunk_hec_secret_id" {
   }
 }
 
+variable "evidence_delivery_target" {
+  type        = string
+  description = "Normalized evidence sink: direct Splunk HEC or OCI Streaming for the pinned oci-splunk consumer"
+  default     = "hec"
+
+  validation {
+    condition     = contains(["hec", "streaming"], var.evidence_delivery_target)
+    error_message = "evidence_delivery_target must be hec or streaming."
+  }
+}
+
+variable "evidence_stream_id" {
+  type        = string
+  description = "Existing reviewed OCI Stream OCID used only when evidence_delivery_target is streaming"
+  default     = ""
+  sensitive   = true
+
+  validation {
+    condition     = var.evidence_stream_id == "" || can(regex("^ocid1\\.stream\\.", var.evidence_stream_id))
+    error_message = "evidence_stream_id must be an OCI Stream OCID."
+  }
+}
+
+variable "evidence_stream_messages_endpoint" {
+  type        = string
+  description = "Exact HTTPS messages endpoint of the reviewed evidence stream"
+  default     = ""
+
+  validation {
+    condition     = var.evidence_stream_messages_endpoint == "" || can(regex("^https://[A-Za-z0-9-]+\\.streaming\\.[A-Za-z0-9-]+\\.oci\\.(oraclecloud\\.com|oraclecloud8\\.com|oraclecloud9\\.com|customer-oci\\.com)/?$", var.evidence_stream_messages_endpoint))
+    error_message = "Use an exact OCI Streaming HTTPS messages endpoint without userinfo, port, query, or fragment."
+  }
+}
+
 variable "splunk_hec_url" {
   type        = string
   description = "Reviewed HTTPS Splunk HEC /services/collector/event endpoint without userinfo, query, fragment, or credential material"

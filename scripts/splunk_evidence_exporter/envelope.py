@@ -27,6 +27,7 @@ _QUERY_FILE = re.compile(
     r"queries/(?:apps/|hunting/|sentinel/)?[a-z0-9][a-z0-9_-]*\.json"
 )
 _SEVERITIES = frozenset({"low", "medium", "high", "critical"})
+_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _EVENT_KEYS = frozenset(
     {"schema_version", "event_key", "batch_id", "detection", "evidence", "provenance"}
 )
@@ -64,7 +65,12 @@ def normalize_for_hash(value: object) -> object:
 
 
 def event_key(
-    rule_id: str, row: Mapping[str, object], window: QueryWindow | None = None
+    rule_id: str,
+    row: Mapping[str, object],
+    window: QueryWindow | None = None,
+    *,
+    log_source: str | None = None,
+    entity: str | None = None,
 ) -> str:
     """Return a deterministic key over governed evidence identity only.
 
@@ -91,7 +97,12 @@ def event_key(
         for name, value in row.items()
         if _field_identifier(name) not in moving_window_fields
     }
-    identity: dict[str, object] = {"detection_id": rule_id, "row": normalize_for_hash(identity_row)}
+    identity: dict[str, object] = {
+        "detection_id": rule_id,
+        "log_source": log_source,
+        "entity": entity,
+        "row": normalize_for_hash(identity_row),
+    }
     canonical = json.dumps(
         identity,
         sort_keys=True,
@@ -148,6 +159,23 @@ def _date_time(value: datetime) -> str:
     return _normalize_datetime(value)
 
 
+def _event_time(row: Mapping[str, object], window: QueryWindow) -> str:
+    """Select a stable source occurrence time, falling back to the query bound."""
+    value = next(
+        (row[name] for name in ("Time", "FirstSeen", "LastSeen") if row.get(name) is not None),
+        window.end,
+    )
+    if isinstance(value, datetime):
+        return _date_time(value)
+    if isinstance(value, str) and value.strip():
+        try:
+            parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise ValueError("evidence event time must be an ISO 8601 date-time") from exc
+        return _date_time(parsed)
+    raise ValueError("evidence event time must be an ISO 8601 date-time")
+
+
 def build_evidence_event(
     registry_entry: Mapping[str, object],
     row: Mapping[str, object],
@@ -168,7 +196,10 @@ def build_evidence_event(
     rule_id = registry_entry.get("id")
     title = registry_entry.get("title")
     query_file = registry_entry.get("oci_query_file")
+    query_version = registry_entry.get("query_version")
+    required_sources = registry_entry.get("required_sources")
     detection_config = registry_entry.get("detection")
+    alarm_contract = registry_entry.get("alarm_contract")
     if not isinstance(detection_config, Mapping):
         raise ValueError("registry detection metadata is required")
     severity = detection_config.get("severity")
@@ -176,6 +207,7 @@ def build_evidence_event(
         (rule_id, "registry id"),
         (title, "registry title"),
         (query_file, "registry query file"),
+        (query_version, "registry query version"),
         (severity, "registry severity"),
     ):
         if not isinstance(value, str) or not value.strip():
@@ -184,6 +216,22 @@ def build_evidence_event(
         raise ValueError("registry severity is not supported by the evidence schema")
     if _QUERY_FILE.fullmatch(query_file) is None:
         raise ValueError("registry query file is not a canonical evidence schema path")
+    if _SHA256.fullmatch(query_version) is None:
+        raise ValueError("registry query version must be a SHA-256 digest")
+    if not isinstance(required_sources, list) or not all(
+        isinstance(value, str) and value.strip() for value in required_sources
+    ) or not required_sources:
+        raise ValueError("registry required_sources must be a non-empty list")
+    if not isinstance(alarm_contract, Mapping):
+        raise ValueError("registry alarm contract is required")
+    metric_namespace = alarm_contract.get("metric_namespace")
+    metric_dimensions = alarm_contract.get("metric_dimensions")
+    if not isinstance(metric_namespace, str) or not metric_namespace.strip():
+        raise ValueError("registry metric namespace must be a non-empty string")
+    if not isinstance(metric_dimensions, list) or not all(
+        isinstance(value, str) and value.strip() for value in metric_dimensions
+    ) or len(metric_dimensions) > 3:
+        raise ValueError("registry metric dimensions must be a list of at most three fields")
 
     allowed = registry_entry.get("required_fields")
     if not isinstance(allowed, list) or not all(isinstance(value, str) for value in allowed):
@@ -193,6 +241,16 @@ def build_evidence_event(
     identity_fields = {"Time", "FirstSeen", "LastSeen", "Log Source", "Entity"}
     allowed_names = set(allowed) | identity_fields
     sanitized_row = {name: row[name] for name in row if name in allowed_names}
+    dimensions = {
+        name: _field_value(sanitized_row[name])
+        for name in metric_dimensions
+        if name in sanitized_row
+    }
+    log_source = row.get("Log Source") or required_sources[0]
+    if not isinstance(log_source, str) or not log_source.strip():
+        raise ValueError("evidence log source must be a non-empty string")
+    entity_value = row.get("Entity")
+    entity = str(entity_value) if entity_value is not None else None
     fields: list[dict[str, object]] = []
     for name in sorted(sanitized_row):
         if not isinstance(name, str) or not name:
@@ -211,13 +269,33 @@ def build_evidence_event(
         )
 
     return EvidenceEvent._from_validated_payload(
-        event_key=event_key(rule_id, sanitized_row, window),
+        event_key=event_key(
+            rule_id,
+            sanitized_row,
+            window,
+            log_source=log_source,
+            entity=entity,
+        ),
         batch_id=batch_id,
-        detection={"id": rule_id, "title": title, "severity": severity},
-        evidence={"include_original_content": False, "fields": fields},
+        detection={
+            "id": rule_id,
+            "title": title,
+            "severity": severity,
+            "metric_namespace": metric_namespace,
+            "dimensions": dimensions,
+        },
+        evidence={
+            "include_original_content": False,
+            "event_time": _event_time(row, window),
+            "log_source": log_source,
+            "entity": entity,
+            "fields": fields,
+        },
         provenance={
             "product": "OCI Log Analytics",
+            "analytics_plane": "oci_log_analytics",
             "query_file": query_file,
+            "query_version": query_version,
             "window_start": _date_time(window.start),
             "window_end": _date_time(window.end),
         },
@@ -241,26 +319,36 @@ def restore_evidence_event(payload: Mapping[str, object]) -> EvidenceEvent:
     if not isinstance(batch_id, str) or not batch_id:
         raise ValueError("stored evidence batch id is invalid")
     if not isinstance(detection, Mapping) or set(detection) != {
-        "id",
-        "title",
-        "severity",
+        "id", "title", "severity", "metric_namespace", "dimensions",
     }:
         raise ValueError("stored evidence detection metadata is invalid")
     if (
         any(
             not isinstance(detection.get(name), str) or not detection[name]
-            for name in ("id", "title", "severity")
+            for name in ("id", "title", "severity", "metric_namespace")
         )
         or detection["severity"] not in _SEVERITIES
     ):
         raise ValueError("stored evidence detection metadata is invalid")
+    dimensions = detection.get("dimensions")
+    if not isinstance(dimensions, Mapping) or len(dimensions) > 3 or any(
+        not isinstance(name, str)
+        or not name
+        or not (value is None or isinstance(value, (str, int, float, bool)))
+        or isinstance(value, float) and not math.isfinite(value)
+        for name, value in dimensions.items()
+    ):
+        raise ValueError("stored evidence detection dimensions are invalid")
     if not isinstance(evidence, Mapping) or set(evidence) != {
-        "include_original_content",
-        "fields",
+        "include_original_content", "event_time", "log_source", "entity", "fields",
     }:
         raise ValueError("stored evidence body is invalid")
     if evidence.get("include_original_content") is not False:
         raise ValueError("stored replay evidence must exclude original content")
+    if not isinstance(evidence.get("log_source"), str) or not evidence["log_source"]:
+        raise ValueError("stored evidence log source is invalid")
+    if evidence.get("entity") is not None and not isinstance(evidence["entity"], str):
+        raise ValueError("stored evidence entity is invalid")
     fields = evidence.get("fields")
     if not isinstance(fields, (list, tuple)):
         raise ValueError("stored evidence fields are invalid")
@@ -278,18 +366,22 @@ def restore_evidence_event(payload: Mapping[str, object]) -> EvidenceEvent:
             and not math.isfinite(value)
         ):
             raise ValueError("stored evidence field is invalid")
-    expected_provenance = {"product", "query_file", "window_start", "window_end"}
+    expected_provenance = {
+        "product", "analytics_plane", "query_file", "query_version", "window_start", "window_end"
+    }
     if not isinstance(provenance, Mapping) or set(provenance) != expected_provenance:
         raise ValueError("stored evidence provenance is invalid")
-    if provenance.get("product") != "OCI Log Analytics" or not isinstance(
+    if provenance.get("product") != "OCI Log Analytics" or provenance.get("analytics_plane") != "oci_log_analytics" or not isinstance(
         provenance.get("query_file"), str
     ):
         raise ValueError("stored evidence provenance is invalid")
     if _QUERY_FILE.fullmatch(provenance["query_file"]) is None:
         raise ValueError("stored evidence query file is invalid")
+    if not isinstance(provenance.get("query_version"), str) or _SHA256.fullmatch(provenance["query_version"]) is None:
+        raise ValueError("stored evidence query version is invalid")
     parsed_window = []
-    for name in ("window_start", "window_end"):
-        value = provenance.get(name)
+    for section, name in ((evidence, "event_time"), (provenance, "window_start"), (provenance, "window_end")):
+        value = section.get(name)
         if not isinstance(value, str) or not value:
             raise ValueError("stored evidence window is invalid")
         try:
@@ -298,7 +390,8 @@ def restore_evidence_event(payload: Mapping[str, object]) -> EvidenceEvent:
             raise ValueError("stored evidence window is invalid") from None
         if parsed.tzinfo is None or parsed.utcoffset() is None:
             raise ValueError("stored evidence window is invalid")
-        parsed_window.append(parsed.astimezone(timezone.utc))
+        if name != "event_time":
+            parsed_window.append(parsed.astimezone(timezone.utc))
     if parsed_window[0] > parsed_window[1]:
         raise ValueError("stored evidence window is invalid")
     return EvidenceEvent._from_validated_payload(

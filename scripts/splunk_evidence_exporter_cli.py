@@ -102,9 +102,11 @@ class _InProcessHecAdapter:
         self,
         responses: Sequence[Mapping[str, object] | str],
         operations: list[str],
+        target: str = "hec",
     ) -> None:
         self._responses = tuple(responses)
         self._operations = operations
+        self._target = target
         self.events: list[Mapping[str, object]] = []
         self.attempts = 0
 
@@ -113,7 +115,7 @@ class _InProcessHecAdapter:
             raise RuntimeError("local HEC response fixture is empty")
         response = self._responses[min(self.attempts, len(self._responses) - 1)]
         self.attempts += 1
-        self._operations.append("mock_hec_attempted")
+        self._operations.append(f"mock_{self._target}_attempted")
         if response == "missing-secret":
             raise RuntimeError(
                 "sensitive-marker-never-print raw-provider-identifier-never-print"
@@ -127,7 +129,7 @@ class _InProcessHecAdapter:
         )
         if outcome == "success":
             self.events.extend(event.to_dict() for event in batch.events)
-            self._operations.append("mock_hec_delivered")
+            self._operations.append(f"mock_{self._target}_delivered")
         return response
 
 
@@ -146,6 +148,7 @@ class _InMemoryDeadLetterAdapter:
         detection_id: str | None = None,
         dimensions: Mapping[str, str] | None = None,
         checkpoint: datetime | None = None,
+        delivery_target: str | None = None,
     ) -> None:
         if self._fail_write:
             self._operations.append("dlq_write_failed")
@@ -166,6 +169,7 @@ class _InMemoryDeadLetterAdapter:
                     if checkpoint is not None
                     else None
                 ),
+                "delivery_target": delivery_target,
                 "delivered_event_keys": list(delivered_event_keys),
                 "remaining_events": [event.to_dict() for event in batch.events],
             }
@@ -192,7 +196,7 @@ def _plan() -> dict[str, object]:
                 {
                     "id": "evidence",
                     "enabled_by_default": False,
-                    "flow": "Monitoring -> Notifications -> Function -> Log Analytics -> Splunk HEC",
+                    "flow": "Monitoring -> Notifications -> Function -> Log Analytics -> direct Splunk HEC or OCI Streaming -> pinned oci-splunk -> HEC",
                 },
             ],
             "detection_count": len(detections),
@@ -214,6 +218,7 @@ def _plan() -> dict[str, object]:
                 "log-analytics-query",
                 "notifications-function-invoke",
                 "vault-secret-read",
+                "evidence-stream-push",
                 "checkpoint-dlq-object-access",
                 "operational-telemetry",
             ],
@@ -312,6 +317,9 @@ def _render_function_config() -> dict[str, object]:
                 "SPLUNK_EVIDENCE_DLQ_BUCKET": "<DLQ_BUCKET_NAME>",
                 "OCI_LOG_ANALYTICS_COMPARTMENT_ID": "<LOG_ANALYTICS_COMPARTMENT_ID>",
                 "OCI_LOG_ANALYTICS_COMPARTMENT_IN_SUBTREE": "false",
+                "SPLUNK_EVIDENCE_TARGET": "hec",
+                "SPLUNK_EVIDENCE_STREAM_ID": "<EXISTING_EVIDENCE_STREAM_OCID>",
+                "SPLUNK_EVIDENCE_STREAM_MESSAGES_ENDPOINT": "https://<STREAM_MESSAGES_ENDPOINT>",
                 "SPLUNK_HEC_SECRET_ID": "<EXISTING_VAULT_SECRET_ID>",
                 "SPLUNK_HEC_URL": "https://<SPLUNK_HEC_HOST>/services/collector/event",
                 "SPLUNK_HEC_INDEX": "<SPLUNK_INDEX>",
@@ -381,6 +389,15 @@ def _render_iam() -> dict[str, object]:
                 "Allow dynamic-group <FUNCTION_DYNAMIC_GROUP_NAME> to read secret-bundles in compartment <VAULT_COMPARTMENT_NAME> where target.secret.id='<EXISTING_VAULT_SECRET_OCID>'",
             ],
             "warning": "Reference one existing Vault secret OCID; never render or store its HEC credential value",
+        },
+        {
+            "id": "function-evidence-stream",
+            "principal": "<FUNCTION_DYNAMIC_GROUP_NAME>",
+            "scope": "<EVIDENCE_STREAM_COMPARTMENT_NAME>",
+            "statements": [
+                "Allow dynamic-group <FUNCTION_DYNAMIC_GROUP_NAME> to use stream-push in compartment <EVIDENCE_STREAM_COMPARTMENT_NAME> where target.stream.id='<EXISTING_EVIDENCE_STREAM_OCID>'",
+            ],
+            "warning": "Use only when SPLUNK_EVIDENCE_TARGET=streaming; bind the exact stream and configure the pinned oci-splunk consumer for normalized JSON evidence",
         },
         {
             "id": "function-state-dlq",
@@ -459,7 +476,7 @@ def _canary_plan() -> dict[str, object]:
                 "Generate or identify one approved canary event",
                 "Verify the event and derived evidence in OCI Log Analytics",
                 "Enable only the reviewed canary path under separate live approval",
-                "Verify HEC acknowledgement, Splunk searchability, and checkpoint commit",
+                "Verify direct HEC acknowledgement or Stream write plus oci-splunk consumption, then Splunk searchability and checkpoint commit",
                 "Disable or promote the canary and record rollback, cost, replay, and retention acceptance",
             ],
             "required_evidence": [
@@ -503,7 +520,9 @@ def _service(
     checkpoint: _InMemoryCheckpointAdapter,
     hec: _InProcessHecAdapter,
     dead_letter: _InMemoryDeadLetterAdapter,
-    *, alarm_bindings: Mapping[str, str] | None = None,
+    *,
+    alarm_bindings: Mapping[str, str] | None = None,
+    delivery_target: str = "hec",
 ) -> EvidenceExportService:
     registry = _read_json(REGISTRY_PATH)
     if not isinstance(registry, Mapping):
@@ -523,10 +542,17 @@ def _service(
         max_attempts=4,
         alarm_bindings=alarm_bindings,
         log_analytics_namespace="offline-trusted-log-analytics-namespace",
+        delivery_target=delivery_target,
     )
 
 
-def _local_e2e(scenario: str, *, approve_replay: bool = False, alarm_fixture: Path | None = None) -> dict[str, object]:
+def _local_e2e(
+    scenario: str,
+    *,
+    approve_replay: bool = False,
+    alarm_fixture: Path | None = None,
+    delivery_target: str = "hec",
+) -> dict[str, object]:
     supported = {
         "success",
         "success-after-retry",
@@ -546,14 +572,18 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False, alarm_fixture: Pa
     }
     if scenario not in supported:
         raise ValueError("unsupported local E2E scenario")
+    if delivery_target not in {"hec", "streaming"}:
+        raise ValueError("unsupported local E2E delivery target")
     if scenario == "approved-replay" and not approve_replay:
         raise ValueError("replay requires explicit approval")
     fixture_path = alarm_fixture or FIXTURES / "alarm.json"
+    registry = _read_json(REGISTRY_PATH)
     alarm = _read_json(fixture_path)
     rows = _read_json(FIXTURES / "query_rows.json")
     responses = _read_json(FIXTURES / "hec_responses.json")
     if (
-        not isinstance(alarm, Mapping)
+        not isinstance(registry, Mapping)
+        or not isinstance(alarm, Mapping)
         or not isinstance(rows, list)
         or not isinstance(responses, Mapping)
     ):
@@ -578,12 +608,19 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False, alarm_fixture: Pa
         if response_name == "missing-secret"
         else responses[response_name]
     )
-    hec = _InProcessHecAdapter(response_sequence, operations)
+    hec = _InProcessHecAdapter(response_sequence, operations, target=delivery_target)
     dead_letter = _InMemoryDeadLetterAdapter(
         operations, fail_write=scenario == "dlq-failure"
     )
     bindings = {"redacted-alarm-id": "oci-audit-failures"} if fixture_path.name == "oci_raw_alarm.json" else None
-    service = _service(query, checkpoint, hec, dead_letter, alarm_bindings=bindings)
+    service = _service(
+        query,
+        checkpoint,
+        hec,
+        dead_letter,
+        alarm_bindings=bindings,
+        delivery_target=delivery_target,
+    )
     trigger = AlarmTrigger.from_payload(alarm)
     receipt = service.export(trigger)
     service_name = "EvidenceExportService"
@@ -595,7 +632,9 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False, alarm_fixture: Pa
     total_hec_attempts = hec.attempts
     if scenario == "approved-replay":
         initial_status = receipt.status
-        replay_hec = _InProcessHecAdapter(responses["success"], operations)
+        replay_hec = _InProcessHecAdapter(
+            responses["success"], operations, target=delivery_target
+        )
         receipt = EvidenceReplayService(
             checkpoint=checkpoint,
             hec=replay_hec,
@@ -603,6 +642,8 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False, alarm_fixture: Pa
             clock=lambda: datetime(2026, 9, 2, 7, 16, tzinfo=timezone.utc),
             max_batch_events=100,
             max_attempts=4,
+            delivery_target=delivery_target,
+            registry=_Registry(registry),
         ).replay(dead_letter.records[0])
         service_name = "EvidenceReplayService"
         hec = replay_hec
@@ -627,12 +668,17 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False, alarm_fixture: Pa
     unique_event_keys = set(all_event_keys)
     return {
         "scenario": scenario,
+        "delivery_target": delivery_target,
         "alarm_fixture": str(fixture_path.relative_to(ROOT)) if fixture_path.is_relative_to(ROOT) else fixture_path.name,
         "service": service_name,
         **receipt.to_dict(),
         "query_row_count": query_row_count,
-        "mock_hec_event_count": len(hec.events),
-        "hec_attempt_count": total_hec_attempts,
+        "mock_hec_event_count": len(hec.events) if delivery_target == "hec" else 0,
+        "mock_streaming_event_count": (
+            len(hec.events) if delivery_target == "streaming" else 0
+        ),
+        "delivery_attempt_count": total_hec_attempts,
+        "hec_attempt_count": total_hec_attempts if delivery_target == "hec" else 0,
         "dlq_record_count": len(dead_letter.records),
         "dlq_reason": (
             dead_letter.records[0]["reason"] if dead_letter.records else None
@@ -656,7 +702,11 @@ def _local_e2e(scenario: str, *, approve_replay: bool = False, alarm_fixture: Pa
             "events": receipt.event_count,
             "batches": receipt.batch_count,
             "delivered": receipt.delivered_count,
-            "hec_attempts": total_hec_attempts,
+            "delivery_attempts": total_hec_attempts,
+            "hec_attempts": total_hec_attempts if delivery_target == "hec" else 0,
+            "streaming_attempts": (
+                total_hec_attempts if delivery_target == "streaming" else 0
+            ),
             "dlq_records": len(dead_letter.records),
             "invocations": invocation_count,
             "duplicates": len(all_event_keys) - len(unique_event_keys),
@@ -675,6 +725,9 @@ def _parser() -> argparse.ArgumentParser:
     local.add_argument("--scenario", default="success")
     local.add_argument("--approve-replay", action="store_true")
     local.add_argument("--alarm-fixture", type=Path, help="offline sanitized Monitoring alarm fixture")
+    local.add_argument(
+        "--delivery-target", choices=("hec", "streaming"), default="hec"
+    )
     subparsers.add_parser("validate-config", help="validate local delivery artifacts")
     payload = subparsers.add_parser(
         "validate-payload", help="validate one sanitized alarm payload"
@@ -697,7 +750,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             output = _plan()
         elif arguments.command == "local-e2e":
             output = _local_e2e(
-                arguments.scenario, approve_replay=arguments.approve_replay, alarm_fixture=arguments.alarm_fixture
+                arguments.scenario,
+                approve_replay=arguments.approve_replay,
+                alarm_fixture=arguments.alarm_fixture,
+                delivery_target=arguments.delivery_target,
             )
         elif arguments.command == "validate-config":
             output = _validate_config()

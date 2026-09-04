@@ -6,6 +6,10 @@ const port = Number(process.env.PLAYWRIGHT_PORT ?? 3012)
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${port}`
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const trustedInternalHosts = "logan-forge-lb.logan-forge.svc,logan-forge-lb.logan-forge.svc.cluster.local"
+const optionalPublicOrigins = (process.env.FORGE_TEST_PUBLIC_ORIGINS ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean)
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -47,8 +51,7 @@ export default defineConfig({
           FORGE_ALLOWED_ORIGINS: [
             `http://127.0.0.1:${port}`,
             `http://localhost:${port}`,
-            "https://convert.octodemo.cloud",
-            "https://forge.octodemo.cloud",
+            ...optionalPublicOrigins,
             "http://logan-forge-lb.logan-forge.svc",
             "http://logan-forge-lb.logan-forge.svc.cluster.local",
           ].join(","),

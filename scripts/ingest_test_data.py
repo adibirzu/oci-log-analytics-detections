@@ -460,7 +460,7 @@ def main():
     parser.add_argument('--file', action='append', dest='files',
                         help='Only upload the named test data file; repeat for multiple files')
     parser.add_argument('--i-understand-prod', action='store_true', dest='i_understand_prod',
-                        help='Acknowledge a deliberate upload against the emdemo PRODUCTION '
+                        help='Acknowledge a deliberate upload against the protected production '
                              'tenancy outside the LogAnalytics subtree (or set OCI_ALLOW_PROD_WRITE=1).')
     args = parser.parse_args()
 
@@ -479,7 +479,7 @@ def main():
         print(f"ERROR: {TEST_DATA_DIR} not found. Run generate_test_logs.py first.")
         sys.exit(1)
 
-    # Tenancy safety: refuse uploads to emdemo (prod) outside the LogAnalytics
+    # Tenancy safety: refuse uploads to production (prod) outside the LogAnalytics
     # subtree unless the operator passed --i-understand-prod.
     try:
         assert_write_allowed(resolve_compartment_id(), override=args.i_understand_prod)

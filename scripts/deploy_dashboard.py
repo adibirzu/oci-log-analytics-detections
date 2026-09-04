@@ -667,7 +667,7 @@ def deploy(
         write_dashboard_inventory(inventory=inventory)
         print(f"\n  Dashboard inventory: {DASHBOARD_INVENTORY_PATH}")
 
-    # Tenancy safety: refuse mutating import/cleanup against emdemo (prod) outside
+    # Tenancy safety: refuse mutating import/cleanup against production (prod) outside
     # the LogAnalytics subtree unless the operator passed --i-understand-prod.
     try:
         assert_write_allowed(COMPARTMENT_ID, override=allow_prod_write)
@@ -750,7 +750,7 @@ if __name__ == "__main__":
     parser.add_argument('--dashboard-name', action='append', dest='dashboard_names',
                         help='Deploy only the named dashboard. Can be supplied multiple times.')
     parser.add_argument('--i-understand-prod', action='store_true', dest='i_understand_prod',
-                        help='Acknowledge a deliberate write against the emdemo PRODUCTION '
+                        help='Acknowledge a deliberate write against the protected production '
                              'tenancy outside the LogAnalytics subtree (or set OCI_ALLOW_PROD_WRITE=1).')
     args = parser.parse_args()
 

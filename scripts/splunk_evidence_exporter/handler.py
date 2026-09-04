@@ -11,6 +11,7 @@ from typing import Mapping
 
 from .adapters import (
     OciResourcePrincipalAdapterFactory,
+    OciStreamingEvidenceAdapter,
     SplunkHecAdapter,
 )
 from .models import AlarmTrigger
@@ -82,6 +83,9 @@ def build_service() -> EvidenceExportService:
     max_batch_events = _environment_int(
         "SPLUNK_HEC_MAX_BATCH_EVENTS", 100, minimum=1, maximum=1000
     )
+    delivery_target = os.environ.get("SPLUNK_EVIDENCE_TARGET", "hec").strip().casefold()
+    if delivery_target not in {"hec", "streaming"}:
+        raise RuntimeError("exporter evidence target is invalid")
     oci_adapters = OciResourcePrincipalAdapterFactory.create(
         compartment_id=_required_environment("OCI_LOG_ANALYTICS_COMPARTMENT_ID"),
         compartment_id_in_subtree=os.environ.get(
@@ -89,7 +93,11 @@ def build_service() -> EvidenceExportService:
         ).casefold()
         == "true",
         max_rows_ceiling=max_rows,
-        secret_id=_required_environment("SPLUNK_HEC_SECRET_ID"),
+        secret_id=(
+            _required_environment("SPLUNK_HEC_SECRET_ID")
+            if delivery_target == "hec"
+            else None
+        ),
         namespace=namespace,
         state_bucket=state_bucket,
         dlq_bucket=dlq_bucket,
@@ -103,18 +111,10 @@ def build_service() -> EvidenceExportService:
         raise RuntimeError("exporter alarm bindings are invalid") from None
     if not isinstance(alarm_bindings, Mapping) or not alarm_bindings or not all(isinstance(key, str) and key.strip() and isinstance(value, str) and value.strip() for key, value in alarm_bindings.items()):
         raise RuntimeError("exporter alarm bindings are invalid")
-    return EvidenceExportService(
-        registry=_JsonRegistry(
-            Path(
-                os.environ.get(
-                    "SPLUNK_DETECTION_REGISTRY",
-                    str(_REPOSITORY_ROOT / "queries/splunk_detection_registry.json"),
-                )
-            )
-        ),
-        query=oci_adapters.query,
-        checkpoint=oci_adapters.checkpoint,
-        hec=SplunkHecAdapter(
+    if delivery_target == "hec":
+        if oci_adapters.vault is None:
+            raise RuntimeError("HEC credential adapter is unavailable")
+        delivery = SplunkHecAdapter(
             hec_url=_required_environment("SPLUNK_HEC_URL"),
             token_provider=oci_adapters.vault,  # allow-sensitive-value
             index=_required_environment("SPLUNK_HEC_INDEX"),
@@ -129,7 +129,26 @@ def build_service() -> EvidenceExportService:
                 "SPLUNK_HEC_LOCAL_TEST_MODE", "false"
             ).casefold()
             == "true",
+        )
+    else:
+        delivery = OciStreamingEvidenceAdapter.from_resource_principal(
+            stream_id=_required_environment("SPLUNK_EVIDENCE_STREAM_ID"),
+            messages_endpoint=_required_environment(
+                "SPLUNK_EVIDENCE_STREAM_MESSAGES_ENDPOINT"
+            ),
+        )
+    return EvidenceExportService(
+        registry=_JsonRegistry(
+            Path(
+                os.environ.get(
+                    "SPLUNK_DETECTION_REGISTRY",
+                    str(_REPOSITORY_ROOT / "queries/splunk_detection_registry.json"),
+                )
+            )
         ),
+        query=oci_adapters.query,
+        checkpoint=oci_adapters.checkpoint,
+        hec=delivery,
         dead_letter=oci_adapters.dead_letter,
         clock=lambda: datetime.now(timezone.utc),
         lookback=timedelta(
@@ -159,6 +178,7 @@ def build_service() -> EvidenceExportService:
         log_analytics_namespace=_required_environment("OCI_LOG_ANALYTICS_NAMESPACE"),
         delivery_ledger=oci_adapters.ledger,
         metrics=oci_adapters.metrics,
+        delivery_target=delivery_target,
     )
 
 

@@ -5,6 +5,12 @@ for Forge and Octo APM OKE deployments. Keep it placeholder-safe: do not commit
 tenancy names, OCIDs, public IPs, API tokens, backend URLs, or OCI profile names
 from a live environment.
 
+Start with the [OKE Monitoring One Pager](OKE_MONITORING_ONE_PAGER.md) for the
+architecture, supported installation paths, IAM review, and acceptance ladder.
+This runbook provides the deeper operational checks. Upstream implementation:
+[`oracle-quickstart/oci-kubernetes-monitoring`](https://github.com/oracle-quickstart/oci-kubernetes-monitoring),
+with reviewed baseline [`oci-onm-4.3.0`](https://github.com/oracle-quickstart/oci-kubernetes-monitoring/releases/tag/oci-onm-4.3.0).
+
 ## Required Variables
 
 Set these in your shell or CI secret context before running live checks:
@@ -24,8 +30,8 @@ installed into a different namespace.
 
 ## OKE Deployment Checks
 
-Before pushing a new container image, check the node architecture. Apple/ARM
-workstations produce ARM images by default, while OKE workers are often AMD64.
+Before pushing a new container image, check the node architecture. The build
+host architecture can differ from the OKE worker architecture.
 
 ```bash
 kubectl config current-context
@@ -35,8 +41,9 @@ kubectl get nodes -o custom-columns=NAME:.metadata.name,ARCH:.status.nodeInfo.ar
 Build and push for the node architecture, not the workstation architecture:
 
 ```bash
+export OKE_IMAGE_PLATFORM="linux/amd64" # set from the reviewed node architecture
 docker buildx build \
-  --platform linux/amd64 \
+  --platform "$OKE_IMAGE_PLATFORM" \
   -t "$IMAGE_REPO:$IMAGE_TAG" \
   --push .
 ```

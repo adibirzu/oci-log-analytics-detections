@@ -13,12 +13,12 @@ Run this flow per OCI profile when preparing a clean demo. Generating per profil
 
 ```bash
 # Generate and ingest into the primary demo profile
-env OCI_PROFILE=<OCI_PROFILE_CAP> python3 scripts/setup_log_sources.py
-env OCI_PROFILE=<OCI_PROFILE_CAP> python3 scripts/generate_dashboard_data.py --days 21 --geo-interval 15 --validate
-env OCI_PROFILE=<OCI_PROFILE_CAP> python3 scripts/ingest_test_data.py --validate
-env OCI_PROFILE=<OCI_PROFILE_CAP> python3 scripts/ingest_test_data.py --mode direct
-env OCI_PROFILE=<OCI_PROFILE_CAP> python3 scripts/deploy_dashboard.py --cleanup --skip-live-validation --query-lookback 21d --query-timeout 90
-env OCI_PROFILE=<OCI_PROFILE_CAP> python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --max-workers 4 --json docs/health/verify-<profile>-21d-2025-2026.json
+env OCI_PROFILE=<OCI_STAGING_PROFILE> python3 scripts/setup_log_sources.py
+env OCI_PROFILE=<OCI_STAGING_PROFILE> python3 scripts/generate_dashboard_data.py --days 21 --geo-interval 15 --validate
+env OCI_PROFILE=<OCI_STAGING_PROFILE> python3 scripts/ingest_test_data.py --validate
+env OCI_PROFILE=<OCI_STAGING_PROFILE> python3 scripts/ingest_test_data.py --mode direct
+env OCI_PROFILE=<OCI_STAGING_PROFILE> python3 scripts/deploy_dashboard.py --cleanup --skip-live-validation --query-lookback 21d --query-timeout 90
+env OCI_PROFILE=<OCI_STAGING_PROFILE> python3 scripts/verify_deployed_dashboards.py --lookback 21d --query-timeout 90 --max-workers 4 --json docs/health/verify-<profile>-21d-2025-2026.json
 
 # Generate and ingest into DEFAULT
 env OCI_PROFILE=DEFAULT python3 scripts/setup_log_sources.py

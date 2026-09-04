@@ -22,7 +22,7 @@ BASENAMES = (
     "logan-splunk-troubleshooting",
 )
 REQUIRED_COMPONENTS = (
-    "oci-splunk",
+    "OCI Streaming and pinned oci-splunk",
     "Management Agent",
     "Log Analytics",
     "Monitoring",
@@ -66,6 +66,7 @@ FOCUSED_TOPOLOGY = {
             ("function", "logan"): "control: Log Analytics query permission",
             ("function", "vault"): "control: one secret-bundle read",
             ("function", "state"): "control: checkpoint and DLQ object access",
+            ("function", "streaming"): "control: scoped evidence stream-push option",
             ("function", "hec"): "telemetry: evidence batch",
             ("hec", "function"): "response: HEC acceptance",
         },

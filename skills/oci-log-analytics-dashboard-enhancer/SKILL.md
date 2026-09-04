@@ -176,7 +176,7 @@ For Octo APM Demo and other application observability dashboards:
 - Pair correlation widgets deliberately: one trend/timeline, one trace/span rollup, one error or payment-threat table, and one raw-log or link view for investigation.
 - Do not put LAQL colon placeholders such as `:attack_id`, `:trace_id`, or `:request_id` in saved-search or dashboard queries. OCI Log Analytics rejects them in dashboard widgets with parser errors like `Unexpected input for WHERE: :attack_id` or `Unexpected input for SEARCH: :attack_id`. Dashboard-safe queries must run without runtime placeholders; for manual pivots, document copied Log Explorer filters with placeholder literals such as `'Attack ID' = '<ATTACK_ID>'`.
 
-Current Octo APM workshop baseline, last live-verified in `emdemo` on 2026-05-12:
+Current Octo APM workshop baseline, last live-verified in `production` on 2026-05-12:
 
 - `OCI-DEMO: Octo APM Demo Dashboard` has 17 tiles and 17 embedded saved searches pinned to `l21d`.
 - The dashboard returned 17/17 widget HITs over `24h` after fresh workshop evidence ingestion.

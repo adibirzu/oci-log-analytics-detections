@@ -77,6 +77,20 @@ The Function must have no inbound route. Its reviewed existing subnets need OCI 
 
 Expected output after deployment but before canary is a disabled alarm/action, optionally absent Function subscription, versioned private buckets, service logs, a digest-reviewed Function, and no HEC event. After canary, expect a bounded query receipt, HEC confirmation, checkpoint commit, and searchable Splunk event.
 
+Choose exactly one normalized evidence sink per exporter deployment:
+
+- Direct HEC: `evidence_delivery_target = "hec"`, with the reviewed HEC URL/index and one Vault secret reference.
+- Existing `oci-splunk` transport: `evidence_delivery_target = "streaming"`, with `evidence_stream_id` and `evidence_stream_messages_endpoint`. Grant only the Function dynamic group `stream-push` on that exact Stream and configure the pinned `oci-splunk` consumer for the `oci.logan.splunk.evidence.v1` JSON messages. HEC credentials stay with `oci-splunk`, not this Function.
+
+Offline canaries for both sinks:
+
+```bash
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success
+python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success --delivery-target streaming
+```
+
+These prove service sequencing, normalized messages, retry/DLQ behavior, per-detection sink authorization, and selected-sink checkpoint ordering locally. They do not prove a provider Stream write, consumer offset, HEC acceptance, or Splunk search.
+
 ## Scripted flow with separate approvals
 
 All commands run from the repository root. Only the repository CLI previews, validators, and deterministic Function context staging are offline. Image build/publish, Terraform dependency initialization, provider read/plan, apply, canary, and replay are separate phases with separate evidence and approvals.
@@ -187,7 +201,8 @@ Only the module interface exposes alternative HEC acknowledgment and guardrail v
 | Alarm | Controlled transition | Alarm history |
 | Notifications | Exact Function subscription delivery | Topic/subscription receipt |
 | Function | Sanitized invocation and bounded query | Function service log |
-| Checkpoint/DLQ | Commit only after confirmation; failure retained | Object version metadata |
+| Checkpoint/DLQ | Commit only after complete selected-sink confirmation; producer failure retained | Object version metadata |
+| OCI Streaming sink | One accepted result per item and zero failures | Sanitized `PutMessages` receipt |
 | HEC confirmation | `response` success or confirmed indexer ack | Sanitized transport receipt |
 | Splunk searchability | Correct index/sourcetype/event key | Search job/result receipt |
 | Provider acceptance | All layers plus owner decision | Signed evidence packet |
@@ -201,6 +216,7 @@ Only the module interface exposes alternative HEC acknowledgment and guardrail v
 - DLQ write failure: fail closed; do not report success.
 - Duplicate invocation: stable event keys permit Splunk-side deduplication; at-least-once receipts remain.
 - Indexer-ack mode: checkpoint waits for `/services/collector/ack` confirmation, not only `ackId` issuance.
+- Streaming mode: checkpoint waits for one successful result per submitted item and zero failures; downstream consumer/HEC recovery uses retained Stream offsets.
 
 ### Alarm and evidence binding guardrails
 
@@ -225,7 +241,7 @@ First disable the detection alarm/action and exact Notifications Function subscr
 
 Cleanup may remove module-created resources only after ownership review; never destroy reused subnets, NSGs, Vault secrets, buckets, topics, or Splunk resources. A Terraform destroy plan is a new destructive approval. Preserve sanitized receipts and verify no HEC token, raw payload, OCID, IP, hostname, or customer topology is published.
 
-Replay preserves event keys and is at-least-once. Never advance the checkpoint before every remaining HEC batch is confirmed; preserve failed items in DLQ.
+Replay preserves event keys and is at-least-once. Never advance the producer checkpoint before every remaining batch is confirmed by the configured HEC or Streaming sink; preserve failed producer items in DLQ. A Streaming checkpoint does not replace downstream consumer-offset, HEC, or search receipts.
 
 ## Evidence class and limitations
 

@@ -257,6 +257,7 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
                 "sensitive value scan",
                 "splunk parallel red contracts",
                 "local exporter success",
+                "local exporter streaming success",
                 "local exporter duplicate",
                 "local exporter failure",
                 "local exporter replay",
@@ -269,17 +270,21 @@ class TestReleaseChecklistOrdering(unittest.TestCase):
         commands = [step[1] for step in stage_steps]
         self.assertIn("--check", commands[0])
         scenario_commands = [command for command in commands if "--scenario" in command]
-        self.assertEqual(len(scenario_commands), 4)
+        self.assertEqual(len(scenario_commands), 5)
         self.assertEqual(scenario_commands[0][scenario_commands[0].index("--scenario") + 1], "success")
         self.assertIn("--alarm-fixture", scenario_commands[0])
         self.assertEqual(
             scenario_commands[0][scenario_commands[0].index("--alarm-fixture") + 1],
             "scripts/fixtures/splunk_evidence/oci_raw_alarm.json",
         )
-        self.assertEqual(scenario_commands[1][-2:], ["--scenario", "duplicate-invocation"])
-        self.assertEqual(scenario_commands[2][-2:], ["--scenario", "500"])
         self.assertEqual(
-            scenario_commands[3][-3:],
+            scenario_commands[1][-4:],
+            ["--scenario", "success", "--delivery-target", "streaming"],
+        )
+        self.assertEqual(scenario_commands[2][-2:], ["--scenario", "duplicate-invocation"])
+        self.assertEqual(scenario_commands[3][-2:], ["--scenario", "500"])
+        self.assertEqual(
+            scenario_commands[4][-3:],
             ["--scenario", "approved-replay", "--approve-replay"],
         )
         self.assertIn("scripts/test_splunk_diagrams.py", commands[names.index("diagram validation")])
@@ -341,15 +346,16 @@ class TestReleaseChecklistEvidence(unittest.TestCase):
         self.assertEqual(
             evidence["scenario_counts"],
             {
-                "requested": 4,
-                "passed": 4,
+                "requested": 5,
+                "passed": 5,
                 "success": 1,
+                "streaming_success": 1,
                 "duplicate": 1,
                 "failure": 1,
                 "replay": 1,
             },
         )
-        self.assertEqual(evidence["gate_counts"], {"total": 12, "passed": 12, "failed": 0})
+        self.assertEqual(evidence["gate_counts"], {"total": 13, "passed": 13, "failed": 0})
         self.assertTrue(all(gate["ok"] for gate in evidence["gates"]))
         self.assertIn("queries/splunk_detection_registry.json", evidence["artifact_hashes"])
         self.assertIn("schemas/splunk_evidence_event.schema.json", evidence["artifact_hashes"])
@@ -420,8 +426,11 @@ class TestReleaseChecklistEvidence(unittest.TestCase):
     def test_static_terraform_contract_works_without_provider_cache(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
-            shutil.copytree(Path(release_checklist.PROJECT_DIR) / "stack", root / "stack")
-            shutil.rmtree(root / "stack/.terraform", ignore_errors=True)
+            shutil.copytree(
+                Path(release_checklist.PROJECT_DIR) / "stack",
+                root / "stack",
+                ignore=shutil.ignore_patterns(".terraform"),
+            )
             result = subprocess.run(
                 [sys.executable, str(Path(release_checklist.PROJECT_DIR) / "scripts/validate_terraform_static.py"), "--root", str(root), "--check-format"],
                 text=True, capture_output=True, check=False,

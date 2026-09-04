@@ -31,7 +31,7 @@ class EvidenceQueryPort(Protocol):
 
 @runtime_checkable
 class HecDeliveryPort(Protocol):
-    """Deliver an immutable batch and return sanitized response metadata."""
+    """Deliver an immutable batch to HEC or a governed Streaming sink."""
 
     def deliver(self, batch: ExportBatch) -> Mapping[str, object]: ...
 
@@ -65,6 +65,7 @@ class QuarantinePort(Protocol):
         detection_id: str | None = None,
         dimensions: Mapping[str, str] | None = None,
         checkpoint: datetime | None = None,
+        delivery_target: str | None = None,
     ) -> None: ...
 
 
@@ -89,4 +90,5 @@ class MetricsPort(Protocol):
 # Vocabulary aliases keep later adapters readable without adding behavior.
 LogAnalyticsPort = EvidenceQueryPort
 SplunkHecPort = HecDeliveryPort
+EvidenceDeliveryPort = HecDeliveryPort
 DeadLetterPort = QuarantinePort

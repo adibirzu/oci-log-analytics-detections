@@ -42,7 +42,7 @@ sudo systemctl restart wazuh-manager
   with `OCI_PROFILE=<target> python3 scripts/setup_log_sources.py` (already done
   on `cap`).
 - OCI auth on the host: an `~/.oci/config` profile **or** instance-principal
-  (`OCI_AUTH_MODE=instance_principal`). The `emdemo` prod write-guard applies.
+  (`OCI_AUTH_MODE=instance_principal`). The `production` prod write-guard applies.
 
 ## Verify
 ```text

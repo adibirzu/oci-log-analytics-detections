@@ -2213,6 +2213,42 @@
       "containerId": null,
       "originalText": "R2",
       "lineHeight": 1.25
+    },
+    {
+      "id": "__oci_edge_11",
+      "type": "arrow",
+      "x": 595.0,
+      "y": 310.0,
+      "width": -220.0,
+      "height": -134.0,
+      "angle": 0,
+      "strokeColor": "#C74634",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "roughness": 1,
+      "opacity": 100,
+      "seed": 1080,
+      "version": 1,
+      "versionNonce": 1081,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1,
+      "link": null,
+      "locked": false,
+      "points": [[0.0, 0.0], [-110.0, -67.0], [-220.0, -134.0]],
+      "lastCommittedPoint": null,
+      "startBinding": null,
+      "endBinding": null,
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "customData": {
+        "flowType": "control",
+        "from": "function",
+        "to": "streaming",
+        "label": "control: scoped evidence stream-push option"
+      }
     }
   ],
   "appState": {

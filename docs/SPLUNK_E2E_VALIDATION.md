@@ -24,7 +24,9 @@ Name the test owner, source/system owner, OCI Log Analytics owner, Splunk/HEC ow
 ### Mode 2 prerequisites
 
 - Canonical query, required fields, eligible detection rule, and first Monitoring metric already proven.
-- Reviewed disabled alarm and Notifications trigger, approved Function image/digest/subnet/identity, exact Vault secret reference, and checkpoint/DLQ lifecycle.
+- Reviewed disabled alarm and Notifications trigger, approved Function image/digest/subnet/identity, and checkpoint/DLQ lifecycle.
+- Direct HEC: exact Vault secret reference plus approved HEC endpoint and network path.
+- OCI Streaming: exact stream plus producer permission; the pinned `oci-splunk` consumer owns its own credential and HEC path.
 
 ## Architecture and evidence workflow
 
@@ -46,6 +48,8 @@ flowchart LR
 ```
 
 Mode 1 branches after OCI Logging through its own Connector Hub, Streaming, pinned consumer, HEC, and Splunk-search checks. A Mode 2 HEC receipt does not prove Mode 1 and vice versa.
+
+Mode 2 has two sink variants. Run `python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success` for direct HEC and repeat with `--delivery-target streaming` for the Function → Streaming → pinned `oci-splunk` contract. In a live canary, the Streaming producer checkpoint may advance only after every Stream item is accepted. Consumer offset advance, HEC acceptance, and Splunk search require separate receipts before provider or release acceptance.
 
 ## IAM and network validation
 
@@ -126,7 +130,7 @@ It does not log in or execute. With separate live approval:
 6. **Alarm:** verify the disabled definition, then enable only the reviewed canary action and capture one transition.
 7. **Notifications:** verify the exact topic/subscription delivered to the exact Function.
 8. **Function:** inspect service logs for a sanitized success/failure summary and bounded query counts. No token, raw payload, OCID, IP, hostname, or customer topology belongs in published evidence.
-9. **Checkpoint/DLQ:** on success, verify the checkpoint object/version is later than the prior value and follows HEC confirmation. On failure, verify DLQ creation and no checkpoint advance.
+9. **Checkpoint/DLQ:** on success, verify the checkpoint object/version is later than the prior value and follows confirmation from the selected sink: HEC confirmation for direct mode, or a complete zero-failure Stream result for Streaming mode. On producer failure, verify DLQ creation and no checkpoint advance.
 10. **HEC confirmation:** capture sanitized response status or confirmed indexer acknowledgment according to configured mode.
 11. **Splunk searchability:** in Splunk Web open **Search & Reporting**, set the same UTC window, and run `index=<REVIEWED_INDEX> sourcetype=oci:logan:detection schema_version="oci.logan.splunk.evidence.v1"`. Confirm detection ID, batch ID, and stable event key; do not publish target values.
 12. **Provider acceptance:** disable or promote the canary and have owners accept lag, failures, cost, retention, privacy, replay, and rollback.

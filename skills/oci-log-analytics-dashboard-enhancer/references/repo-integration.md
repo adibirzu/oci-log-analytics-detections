@@ -111,7 +111,7 @@ Latest Octo APM deployment facts to preserve:
 - `OCI-DEMO: Octo APM Demo Dashboard` is the scoped detections-repo dashboard.
 - It contains 17 widgets/saved searches and uses widget-level `l21d` time
   selection for workshop evidence.
-- Live `emdemo` verification on 2026-05-12 showed 17/17 widget HITs and 5/5
+- Live `production` verification on 2026-05-12 showed 17/17 widget HITs and 5/5
   detection-rule query HITs over `24h` after fresh workshop data ingestion.
 - Five Octo APM scheduled-search rules were `ACTIVE`, `READY`, and targeted to
   `MONITORING`.

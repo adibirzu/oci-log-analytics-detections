@@ -16,13 +16,20 @@
       },
       "delivery": {
         "delivery_mode": "evidence",
+        "evidence_mode": "enabled",
+        "evidence_targets": [
+          "hec",
+          "streaming"
+        ],
         "lookback": "1h",
         "max_attempts": 4,
         "max_batch_events": 100,
         "max_rows": 1000,
-        "overlap": "5m"
+        "overlap": "5m",
+        "raw_mode": "disabled"
       },
       "detection": {
+        "mechanism": "scheduled",
         "mitre_techniques": [
           "T1530"
         ],
@@ -32,9 +39,30 @@
         "include_original_content": false,
         "redaction_profile": null
       },
-      "fidelity": "evidence",
+      "evidence_states": {
+        "dashboard_render": "not_run",
+        "data_hit": "not_run",
+        "hec": "not_run",
+        "local": "code_backed",
+        "metric": "not_run",
+        "parser": "not_run",
+        "splunk_search": "not_run"
+      },
+      "fidelity": "transformed",
+      "governance": {
+        "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        "expected_results": "Alert-ready aggregation of OCI Object Storage operations from non-RFC1918 IPv4 source addresses. This preserves the referenced Splunk alert's public-source evidence but omits Splunk iplocation country enrichment and does not claim that the address is new relative to a historical baseline.",
+        "false_positives": [
+          "Approved public clients",
+          "Corporate egress not yet allowlisted",
+          "Expected cross-cloud integrations"
+        ],
+        "security_objective": "Detect and investigate OCI Object Storage Access from External Source.",
+        "tuning": "Validate the threshold and schedule against a representative baseline before promotion."
+      },
       "id": "object-storage-new-external-source",
       "oci_query_file": "queries/hunting/oci_object_storage_external_source.json",
+      "query_version": "37a7f10bf06f64f43f021008c7d5f61d5593eb9fedbaa6e0ad86e5136ab092f8",
       "required_fields": [
         "Event Type",
         "Source IP",
@@ -70,13 +98,20 @@
       },
       "delivery": {
         "delivery_mode": "evidence",
+        "evidence_mode": "enabled",
+        "evidence_targets": [
+          "hec",
+          "streaming"
+        ],
         "lookback": "15m",
         "max_attempts": 4,
         "max_batch_events": 100,
         "max_rows": 1000,
-        "overlap": "2m"
+        "overlap": "2m",
+        "raw_mode": "disabled"
       },
       "detection": {
+        "mechanism": "scheduled",
         "mitre_techniques": [
           "T1078"
         ],
@@ -86,9 +121,30 @@
         "include_original_content": false,
         "redaction_profile": null
       },
-      "fidelity": "evidence",
+      "evidence_states": {
+        "dashboard_render": "not_run",
+        "data_hit": "not_run",
+        "hec": "not_run",
+        "local": "code_backed",
+        "metric": "not_run",
+        "parser": "not_run",
+        "splunk_search": "not_run"
+      },
+      "fidelity": "transformed",
+      "governance": {
+        "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        "expected_results": "Alert-ready aggregation of OCI Audit control-plane operations whose parsed Status is Failure. This is a field-backed approximation of the referenced Splunk message-text search: it preserves failed 4xx/5xx activity but does not independently classify throttling when the parser does not expose it as Failure.",
+        "false_positives": [
+          "Expired credentials",
+          "Denied but expected automation",
+          "Temporary permission or service failures"
+        ],
+        "security_objective": "Detect and investigate OCI Audit Failures.",
+        "tuning": "Validate the threshold and schedule against a representative baseline before promotion."
+      },
       "id": "oci-audit-failures",
       "oci_query_file": "queries/hunting/oci_audit_failures.json",
+      "query_version": "b0ca943cb814d971b83496ed3dcb5c62c09b00dd7f0963d91c1a70697d992b42",
       "required_fields": [
         "Event Type",
         "User Name",
@@ -124,13 +180,20 @@
       },
       "delivery": {
         "delivery_mode": "evidence",
+        "evidence_mode": "enabled",
+        "evidence_targets": [
+          "hec",
+          "streaming"
+        ],
         "lookback": "15m",
         "max_attempts": 4,
         "max_batch_events": 100,
         "max_rows": 1000,
-        "overlap": "2m"
+        "overlap": "2m",
+        "raw_mode": "disabled"
       },
       "detection": {
+        "mechanism": "scheduled",
         "mitre_techniques": [
           "T1098"
         ],
@@ -140,9 +203,30 @@
         "include_original_content": false,
         "redaction_profile": null
       },
-      "fidelity": "evidence",
+      "evidence_states": {
+        "dashboard_render": "not_run",
+        "data_hit": "not_run",
+        "hec": "not_run",
+        "local": "code_backed",
+        "metric": "not_run",
+        "parser": "not_run",
+        "splunk_search": "not_run"
+      },
+      "fidelity": "transformed",
+      "governance": {
+        "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        "expected_results": "Alert-ready aggregation of OCI IAM policy create, update, and delete events. The event selection reuses the existing portable OCI IAM Policy Modified Sigma rule and adds only the aggregation required by scheduled-search detection rules.",
+        "false_positives": [
+          "Authorized administrator changes",
+          "Approved infrastructure-as-code deployments",
+          "Identity lifecycle automation"
+        ],
+        "security_objective": "Detect and investigate OCI IAM Policy Changes.",
+        "tuning": "Validate the threshold and schedule against a representative baseline before promotion."
+      },
       "id": "oci-iam-policy-change",
       "oci_query_file": "queries/hunting/oci_iam_policy_changes.json",
+      "query_version": "3c55d86536963b6de8a0545992dfa92d8c6a69e7f6722b16e322cd85c7f137e7",
       "required_fields": [
         "Event Type",
         "User Name",
@@ -176,13 +260,20 @@
       },
       "delivery": {
         "delivery_mode": "evidence",
+        "evidence_mode": "enabled",
+        "evidence_targets": [
+          "hec",
+          "streaming"
+        ],
         "lookback": "10m",
         "max_attempts": 4,
         "max_batch_events": 100,
         "max_rows": 1000,
-        "overlap": "2m"
+        "overlap": "2m",
+        "raw_mode": "disabled"
       },
       "detection": {
+        "mechanism": "scheduled",
         "mitre_techniques": [
           "T1046"
         ],
@@ -192,9 +283,30 @@
         "include_original_content": false,
         "redaction_profile": null
       },
-      "fidelity": "evidence",
+      "evidence_states": {
+        "dashboard_render": "not_run",
+        "data_hit": "not_run",
+        "hec": "not_run",
+        "local": "code_backed",
+        "metric": "not_run",
+        "parser": "not_run",
+        "splunk_search": "not_run"
+      },
+      "fidelity": "transformed",
+      "governance": {
+        "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        "expected_results": "Alert-ready aggregation for a source address producing more than 100 rejected VCN flow records in the ten-minute scheduled-search window. This preserves the threshold behavior of the referenced Splunk alert while using OCI Log Analytics display fields.",
+        "false_positives": [
+          "Authorized vulnerability scans",
+          "Misconfigured health checks",
+          "Expected blocked internet noise"
+        ],
+        "security_objective": "Detect and investigate OCI VCN Rejected Traffic Spike.",
+        "tuning": "Validate the threshold and schedule against a representative baseline before promotion."
+      },
       "id": "vcn-rejected-traffic-spike",
       "oci_query_file": "queries/hunting/oci_vcn_rejected_traffic_spike.json",
+      "query_version": "60de2b7a4c7bc71d4e3a122bc5fc81bc7632682e11c142897881ebf4b052b566",
       "required_fields": [
         "Source IP"
       ],
@@ -226,13 +338,20 @@
       },
       "delivery": {
         "delivery_mode": "evidence",
+        "evidence_mode": "enabled",
+        "evidence_targets": [
+          "hec",
+          "streaming"
+        ],
         "lookback": "5m",
         "max_attempts": 4,
         "max_batch_events": 100,
         "max_rows": 1000,
-        "overlap": "1m"
+        "overlap": "1m",
+        "raw_mode": "disabled"
       },
       "detection": {
+        "mechanism": "scheduled",
         "mitre_techniques": [
           "T1078"
         ],
@@ -242,9 +361,28 @@
         "include_original_content": false,
         "redaction_profile": null
       },
-      "fidelity": "evidence",
+      "evidence_states": {
+        "dashboard_render": "not_run",
+        "data_hit": "not_run",
+        "hec": "not_run",
+        "local": "code_backed",
+        "metric": "not_run",
+        "parser": "not_run",
+        "splunk_search": "not_run"
+      },
+      "fidelity": "transformed",
+      "governance": {
+        "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        "expected_results": "Alert-ready search for successful logons by the built-in Administrator account. Extend the approved-account filter for renamed or localized administrator accounts.",
+        "false_positives": [
+          "Approved break-glass or local administration"
+        ],
+        "security_objective": "Detect and investigate Windows Administrator Logon.",
+        "tuning": "Validate the threshold and schedule against a representative baseline before promotion."
+      },
       "id": "windows-access-administrator-logon",
       "oci_query_file": "queries/hunting/windows_access_administrator_logon.json",
+      "query_version": "f8f77840f72df2d5e1be30ea094ed9e160da5c0bd86cdb3b3ebaf627079e0ac7",
       "required_fields": [
         "Target User Name",
         "Logon Type",
@@ -281,13 +419,20 @@
       },
       "delivery": {
         "delivery_mode": "evidence",
+        "evidence_mode": "enabled",
+        "evidence_targets": [
+          "hec",
+          "streaming"
+        ],
         "lookback": "5m",
         "max_attempts": 4,
         "max_batch_events": 100,
         "max_rows": 1000,
-        "overlap": "1m"
+        "overlap": "1m",
+        "raw_mode": "disabled"
       },
       "detection": {
+        "mechanism": "scheduled",
         "mitre_techniques": [
           "T1110"
         ],
@@ -297,9 +442,30 @@
         "include_original_content": false,
         "redaction_profile": null
       },
-      "fidelity": "evidence",
+      "evidence_states": {
+        "dashboard_render": "not_run",
+        "data_hit": "not_run",
+        "hec": "not_run",
+        "local": "code_backed",
+        "metric": "not_run",
+        "parser": "not_run",
+        "splunk_search": "not_run"
+      },
+      "fidelity": "transformed",
+      "governance": {
+        "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        "expected_results": "Alert-ready search for more than 10 Security Event 4625 failures from one source address in the five-minute scheduled-search window.",
+        "false_positives": [
+          "Expired credentials",
+          "Misconfigured services",
+          "Authorized password testing"
+        ],
+        "security_objective": "Detect and investigate Windows Failed Logon Burst by Source.",
+        "tuning": "Validate the threshold and schedule against a representative baseline before promotion."
+      },
       "id": "windows-access-failed-logon-burst",
       "oci_query_file": "queries/hunting/windows_access_failed_logon_burst.json",
+      "query_version": "2bf38aa583fcb279a3a98390b25aca9fc676584306247abe1e222499be0543d6",
       "required_fields": [
         "Source Address",
         "Target User Name",
@@ -336,13 +502,20 @@
       },
       "delivery": {
         "delivery_mode": "evidence",
+        "evidence_mode": "enabled",
+        "evidence_targets": [
+          "hec",
+          "streaming"
+        ],
         "lookback": "5m",
         "max_attempts": 4,
         "max_batch_events": 100,
         "max_rows": 1000,
-        "overlap": "1m"
+        "overlap": "1m",
+        "raw_mode": "disabled"
       },
       "detection": {
+        "mechanism": "scheduled",
         "mitre_techniques": [
           "T1136.001"
         ],
@@ -352,9 +525,28 @@
         "include_original_content": false,
         "redaction_profile": null
       },
-      "fidelity": "evidence",
+      "evidence_states": {
+        "dashboard_render": "not_run",
+        "data_hit": "not_run",
+        "hec": "not_run",
+        "local": "code_backed",
+        "metric": "not_run",
+        "parser": "not_run",
+        "splunk_search": "not_run"
+      },
+      "fidelity": "transformed",
+      "governance": {
+        "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        "expected_results": "Alert-ready search for Security Event 4720, indicating that a user account was created on a monitored Windows host.",
+        "false_positives": [
+          "Approved local account provisioning"
+        ],
+        "security_objective": "Detect and investigate Windows New Local User Created.",
+        "tuning": "Validate the threshold and schedule against a representative baseline before promotion."
+      },
       "id": "windows-access-new-local-user",
       "oci_query_file": "queries/hunting/windows_access_new_local_user.json",
+      "query_version": "2ea2dcd5afd0a0d0b759cff723716b6d55e983e67dc9366221bf835d8a59d608",
       "required_fields": [
         "Target User Name",
         "Subject User Name",
@@ -391,13 +583,20 @@
       },
       "delivery": {
         "delivery_mode": "evidence",
+        "evidence_mode": "enabled",
+        "evidence_targets": [
+          "hec",
+          "streaming"
+        ],
         "lookback": "5m",
         "max_attempts": 4,
         "max_batch_events": 100,
         "max_rows": 1000,
-        "overlap": "1m"
+        "overlap": "1m",
+        "raw_mode": "disabled"
       },
       "detection": {
+        "mechanism": "scheduled",
         "mitre_techniques": [
           "T1098"
         ],
@@ -407,9 +606,28 @@
         "include_original_content": false,
         "redaction_profile": null
       },
-      "fidelity": "evidence",
+      "evidence_states": {
+        "dashboard_render": "not_run",
+        "data_hit": "not_run",
+        "hec": "not_run",
+        "local": "code_backed",
+        "metric": "not_run",
+        "parser": "not_run",
+        "splunk_search": "not_run"
+      },
+      "fidelity": "transformed",
+      "governance": {
+        "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        "expected_results": "Alert-ready search for Security Event 4732 additions to the local Administrators or Remote Desktop Users groups.",
+        "false_positives": [
+          "Approved endpoint administration"
+        ],
+        "security_objective": "Detect and investigate Windows User Added to Administrators or Remote Desktop Users.",
+        "tuning": "Validate the threshold and schedule against a representative baseline before promotion."
+      },
       "id": "windows-access-privileged-group-add",
       "oci_query_file": "queries/hunting/windows_access_privileged_group_add.json",
+      "query_version": "14276482f78c7bf18ef2592feaeda5060a44fb85a34791f1dff73d6f3d325459",
       "required_fields": [
         "User",
         "Target User Name",
@@ -446,13 +664,20 @@
       },
       "delivery": {
         "delivery_mode": "evidence",
+        "evidence_mode": "enabled",
+        "evidence_targets": [
+          "hec",
+          "streaming"
+        ],
         "lookback": "5m",
         "max_attempts": 4,
         "max_batch_events": 100,
         "max_rows": 1000,
-        "overlap": "1m"
+        "overlap": "1m",
+        "raw_mode": "disabled"
       },
       "detection": {
+        "mechanism": "scheduled",
         "mitre_techniques": [
           "T1021.001"
         ],
@@ -462,9 +687,28 @@
         "include_original_content": false,
         "redaction_profile": null
       },
-      "fidelity": "evidence",
+      "evidence_states": {
+        "dashboard_render": "not_run",
+        "data_hit": "not_run",
+        "hec": "not_run",
+        "local": "code_backed",
+        "metric": "not_run",
+        "parser": "not_run",
+        "splunk_search": "not_run"
+      },
+      "fidelity": "transformed",
+      "governance": {
+        "cost_cardinality": "Keep the scheduled metric contract to at most three bounded dimensions.",
+        "expected_results": "Alert-ready search for successful RemoteInteractive logons (Security Event 4624, logon type 10) outside the configured 08:00-18:00 query timezone.",
+        "false_positives": [
+          "Approved on-call or cross-time-zone administration"
+        ],
+        "security_objective": "Detect and investigate Windows Successful RDP Logon Outside Business Hours.",
+        "tuning": "Validate the threshold and schedule against a representative baseline before promotion."
+      },
       "id": "windows-access-rdp-after-hours",
       "oci_query_file": "queries/hunting/windows_access_rdp_after_hours.json",
+      "query_version": "f3d0be43371e944512c64df8623e1718d06758cdb97359163fb75fdcbccdd887",
       "required_fields": [
         "Target User Name",
         "Source Address",
@@ -486,7 +730,7 @@
       "title": "Windows Successful RDP Logon Outside Business Hours"
     }
   ],
-  "generated_at": "2026-09-02T17:08:19.349499+00:00",
+  "generated_at": "2026-09-03T10:02:46.358546+00:00",
   "splunk_provenance": {
     "object-storage-new-external-source": {
       "app": "splunk_app_oci",

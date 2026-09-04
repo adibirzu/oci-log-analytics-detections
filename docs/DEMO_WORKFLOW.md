@@ -35,7 +35,7 @@ Validated on `2026-05-12` for local generation and live dashboard deployment:
 - `221,078` synthetic events generated across `17` files in the latest local 21-day dataset
 - `16/16` standard files pass ingest pre-flight validation and direct upload; the scoped Octo APM workshop JSONL is uploaded by the workshop wrapper
 - `29` dashboards and `441` active saved searches resolve from generated inventory after the C2, FreeLabFriday, web-to-cloud, browser, APT, application telemetry, 2025-2026 MELTS, Sentinel, and Octo APM updates
-- `<OCI_PROFILE_CAP>` has older parser/source setup and dashboard evidence; redeploy and reverify before treating the current `536` configured dashboard-widget baseline as live.
+- `<OCI_STAGING_PROFILE>` has older parser/source setup and dashboard evidence; redeploy and reverify before treating the current `536` configured dashboard-widget baseline as live.
 - Live health is validated with a 21-day lookback after full cleanup redeploys. Regenerate `docs/health/verify-<profile>-21d-final.json` and `docs/health/verify-default-21d-final.json` after deploying the current `34`-dashboard inventory.
 
 The current repository configuration resolves to `34` dashboards and `536` active saved searches. The Octo APM workshop, C2, FreeLabFriday, web-to-cloud, and 2025-2026 drilldown widgets request `l21d` so the full three-week incident remains visible after ingest.

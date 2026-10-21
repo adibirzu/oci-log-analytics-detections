@@ -1,0 +1,64 @@
+{
+  "title": "AC-Hunter 07: Threat Intelligence IOC Hit & Safelist Filtering",
+  "description": "Replicates AC-Hunter Threat Intelligence correlation against hostile C2 IPs/ASNs (198.51.100.214, 198.41.200.113, 192.0.2.119, 203.0.113.88) while applying safelist exclusion for known-good cloud infrastructure endpoints.",
+  "query": "('Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Application Logs') and ('Destination IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Client IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Source IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88')) and not ('Destination IP' in ('169.254.169.254')) | stats count as ti_correlated_events, distinctcount('Log Source') as matched_sources by 'Log Source', 'Client IP', 'Status' | where ti_correlated_events >= 1 | sort -ti_correlated_events",
+  "type": "hunting",
+  "hunting_type": "threat_intel_correlation",
+  "cookbook_method": "grouping_correlation",
+  "level": "critical",
+  "tags": [
+    "ac_hunter",
+    "threat_intel",
+    "safelist",
+    "attack.command_and_control",
+    "attack.exfiltration",
+    "attack.t1071",
+    "attack.t1041"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control",
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1071",
+      "T1041",
+      "T1583.001"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "multi_pillar",
+    "candidates": [
+      "SOC VCN Flow Logs",
+      "SOC WAF Security Logs",
+      "SOC Application Logs"
+    ]
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "groupBy": [
+        "Log Source",
+        "Client IP",
+        "Status"
+      ],
+      "valueField": "ti_correlated_events"
+    },
+    "ask_ai_prompts": [
+      "Which threat intelligence C2 IPs matched across multiple log sources after safelist filtering?",
+      "List all internal assets that communicated with 198.51.100.214 or 192.0.2.119."
+    ]
+  },
+  "falsepositives": [
+    "Authorized red-team simulation ranges not yet added to the safelist"
+  ],
+  "investigation_notes": [
+    "Correlates hostile C2 IPs 198.51.100.214 (Primary C2/Exfil), 198.41.200.113 (RMM Relay), 192.0.2.119 (AI Agentic SQL Probe), and 203.0.113.88 (LotL Contractor Drift).",
+    "Safelist filter excludes known internal metadata and management endpoints."
+  ]
+}

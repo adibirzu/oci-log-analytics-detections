@@ -68,7 +68,7 @@ Use this path before recreating dashboards. `deploy_dashboard.py` validates the 
 **Talking Points:**
 - "This is a unified SOC overview pulling security events from OCI Audit, Windows Sysmon, Linux, Cloud Guard, and WAF — all in one dashboard."
 - "Each widget represents a detection rule converted from industry-standard Sigma format into OCI Log Analytics Query Language."
-- "The repo currently ships 522 source rules, 553 Sigma-derived OCI query artifacts, 54 curated app/APM analytics, 146 hunting analytics, 590 live parser-passing Microsoft Sentinel conversions, and 279 MITRE ATT&CK techniques across 14 tactics."
+- "The repo currently ships 522 source rules, 553 Sigma-derived OCI query artifacts, 54 curated app/APM analytics, 156 hunting analytics, 590 live parser-passing Microsoft Sentinel conversions, and 279 MITRE ATT&CK techniques across 14 tactics."
 
 4. **Click into** `SOC: Console Login Failures` — show the OCL query behind it
 5. **Show** the hunting widget: `Hunt: SSH Brute Force` — highlight the frequency analysis pattern:

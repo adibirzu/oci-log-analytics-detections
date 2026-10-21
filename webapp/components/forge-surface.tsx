@@ -7,6 +7,7 @@ import { LogSamplesWorkspace } from "@/components/log-samples/log-samples-worksp
 import type { DeploymentContentSummary } from "@/lib/deployment-content"
 import { ForgeWorkbench } from "@/components/logan-workbench/forge-workbench"
 import type {
+  ForgeCatalogItem,
   LoganCommand,
   LoganConversionExample,
   LoganMappingPattern,
@@ -18,6 +19,7 @@ interface ForgeSurfaceProps {
   commands: LoganCommand[]
   patterns: LoganMappingPattern[]
   examples: LoganConversionExample[]
+  catalogItems?: ForgeCatalogItem[]
   statuses: WorkbenchArtifactReadStatus[]
   generatedAt: string | null
   siemCatalog: SiemLogExamplesCatalog | null
@@ -30,6 +32,7 @@ export function ForgeSurface({
   commands,
   patterns,
   examples,
+  catalogItems = [],
   statuses,
   generatedAt,
   siemCatalog,
@@ -53,6 +56,7 @@ export function ForgeSurface({
       commands={commands}
       patterns={patterns}
       examples={examples}
+      catalogItems={catalogItems}
       statuses={statuses}
       generatedAt={generatedAt}
     />

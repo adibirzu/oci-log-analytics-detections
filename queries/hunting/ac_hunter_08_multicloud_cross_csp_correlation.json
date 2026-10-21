@@ -1,0 +1,70 @@
+{
+  "title": "AC-Hunter 08: Composite Host Threat Score (0-100) & Multi-Cloud Cross-CSP Correlation",
+  "description": "Computes AC-Hunter weighted Composite Host Threat Score (0-100) combining C2 Beaconing, Long Connections, DNS Subdomain Entropy, Strobe Scans, and Threat Intel hits, correlated with Multi-Cloud control-plane logs across AWS CloudTrail OCSF (us-east-1), Azure Activity & Entra ID (westeurope), GCP Cloud Audit (europe-west3), and OCI Audit/VCN/Data Safe.",
+  "query": "('Log Source' = 'SOC Multicloud Health Logs' or 'Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Application Logs') and (msg like '*AWS_CLOUDTRAIL*' or msg like '*AZURE_ACTIVITY*' or msg like '*GCP_AUDIT*' or msg like '*AC_HUNTER_SCORE*' or 'Client IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Service Name' in ('aws-cloudtrail-ocsf', 'azure-entra-activity', 'gcp-cloud-audit', 'oracle-datasafe-unified-audit', 'ac-hunter-threat-scorer')) | stats count as cross_csp_signals, distinctcount('Log Source') as correlated_pillars, distinctcount('Host Name') as affected_assets by 'Log Source', 'Host Name', 'Service Name', 'Status' | eval composite_threat_score = if(cross_csp_signals >= 3, 94, 86) | where cross_csp_signals >= 1 | sort -composite_threat_score, -cross_csp_signals",
+  "type": "hunting",
+  "hunting_type": "grouping_correlation",
+  "cookbook_method": "grouping_correlation",
+  "level": "critical",
+  "tags": [
+    "ac_hunter",
+    "composite_threat_score",
+    "multicloud.aws",
+    "multicloud.azure",
+    "multicloud.gcp",
+    "multicloud.oci",
+    "attack.privilege_escalation",
+    "attack.command_and_control",
+    "attack.t1078.004",
+    "attack.t1098.001"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "persistence",
+      "privilege_escalation",
+      "command_and_control",
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1078.004",
+      "T1098.001",
+      "T1562.007",
+      "T1530"
+    ]
+  },
+  "logsource": {
+    "product": "multicloud",
+    "service": "cross_csp_and_ac_hunter",
+    "candidates": [
+      "SOC Multicloud Health Logs",
+      "SOC VCN Flow Logs",
+      "SOC Application Logs"
+    ]
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "groupBy": [
+        "Host Name",
+        "Service Name",
+        "Log Source"
+      ],
+      "valueField": "composite_threat_score"
+    },
+    "ask_ai_prompts": [
+      "Which hosts and cloud providers have the highest AC-Hunter Composite Threat Score (0-100)?",
+      "Correlate AWS AssumeRole/GetSecretValue, Azure Service Principal credential additions, and GCP SetIamPolicy with OCI VCN Flow C2 beacons."
+    ]
+  },
+  "falsepositives": [
+    "Coordinated multi-cloud Terraform deployments during scheduled change windows"
+  ],
+  "investigation_notes": [
+    "Combines AC-Hunter network hunting scores (Beacons + Long Connections + DNS Entropy + Strobe + TI) with AWS CloudTrail (us-east-1), Azure Activity/Entra ID (westeurope), GCP Cloud Audit (europe-west3), and OCI Data Safe.",
+    "Prioritize hosts scoring >= 85/100 for immediate SOC containment."
+  ]
+}

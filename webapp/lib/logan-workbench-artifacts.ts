@@ -106,13 +106,45 @@ const capabilityMatrixSchema = z
   })
   .passthrough()
 
+const forgeCatalogItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  surface: z.enum(["workbench_example", "threat_report_2026", "hunting", "application", "detection"]),
+  pack_or_category: z.string(),
+  severity: z.string(),
+  source_language: sourceLanguageSchema,
+  source_query: z.string(),
+  expected_logan_ql: z.string(),
+  explanation: z.string(),
+  support_level: supportLevelSchema,
+  log_sources: z.array(z.string()).optional().default([]),
+  mitre_techniques: z.array(z.string()).optional().default([]),
+  mitre_tactics: z.array(z.string()).optional().default([]),
+})
+
+const forgeCatalogSchema = z
+  .object({
+    schema_version: z.literal("1.0.0"),
+    generated_at: z.string(),
+    total_items: z.number().int().nonnegative(),
+    surface_counts: z.record(z.number()),
+    items: z.array(forgeCatalogItemSchema),
+  })
+  .passthrough()
+
 export type LoganCommand = z.infer<typeof commandSchema>
 export type LoganMappingPattern = z.infer<typeof mappingPatternSchema>
 export type LoganConversionExample = z.infer<typeof conversionExampleSchema>
 export type LoganCapabilityMatrix = z.infer<typeof capabilityMatrixSchema>
+export type ForgeCatalogItem = z.infer<typeof forgeCatalogItemSchema>
 export type LoganSourceLanguage = z.infer<typeof sourceLanguageSchema>
 
-type WorkbenchArtifactKey = "referenceCatalog" | "mappingPatterns" | "conversionExamples" | "capabilityMatrix"
+type WorkbenchArtifactKey =
+  | "referenceCatalog"
+  | "mappingPatterns"
+  | "conversionExamples"
+  | "capabilityMatrix"
+  | "forgeDetectionCatalog"
 
 export interface WorkbenchArtifactReadStatus {
   key: WorkbenchArtifactKey
@@ -132,6 +164,7 @@ export interface LoganWorkbenchArtifacts {
   commands: LoganCommand[]
   patterns: LoganMappingPattern[]
   examples: LoganConversionExample[]
+  catalogItems: ForgeCatalogItem[]
   capabilityMatrix: LoganCapabilityMatrix | null
   statuses: WorkbenchArtifactReadStatus[]
   errors: string[]
@@ -168,35 +201,49 @@ async function readJsonArtifact<TSchema extends z.ZodTypeAny>(
 }
 
 export const getLoganWorkbenchArtifacts = cache(async (): Promise<LoganWorkbenchArtifacts> => {
-  const [referenceCatalog, mappingPatterns, conversionExamples, capabilityMatrix] = await Promise.all([
-    readJsonArtifact(
-      "referenceCatalog",
-      "Logan QL command reference",
-      "queries/logan_ql_reference_catalog.json",
-      referenceCatalogSchema,
-    ),
-    readJsonArtifact(
-      "mappingPatterns",
-      "Cross-QL mapping patterns",
-      "queries/cross_ql_mapping_patterns.json",
-      mappingPatternsSchema,
-    ),
-    readJsonArtifact(
-      "conversionExamples",
-      "Conversion examples",
-      "queries/conversion_examples.json",
-      conversionExamplesSchema,
-    ),
-    readJsonArtifact(
-      "capabilityMatrix",
-      "QL conversion capability matrix",
-      "queries/ql_conversion_capability_matrix.json",
-      capabilityMatrixSchema,
-    ),
-  ])
+  const [referenceCatalog, mappingPatterns, conversionExamples, capabilityMatrix, forgeDetectionCatalog] =
+    await Promise.all([
+      readJsonArtifact(
+        "referenceCatalog",
+        "Logan QL command reference",
+        "queries/logan_ql_reference_catalog.json",
+        referenceCatalogSchema,
+      ),
+      readJsonArtifact(
+        "mappingPatterns",
+        "Cross-QL mapping patterns",
+        "queries/cross_ql_mapping_patterns.json",
+        mappingPatternsSchema,
+      ),
+      readJsonArtifact(
+        "conversionExamples",
+        "Conversion examples",
+        "queries/conversion_examples.json",
+        conversionExamplesSchema,
+      ),
+      readJsonArtifact(
+        "capabilityMatrix",
+        "QL conversion capability matrix",
+        "queries/ql_conversion_capability_matrix.json",
+        capabilityMatrixSchema,
+      ),
+      readJsonArtifact(
+        "forgeDetectionCatalog",
+        "Full Forge detection catalog",
+        "queries/forge_detection_catalog.json",
+        forgeCatalogSchema,
+      ),
+    ])
 
-  const statuses = [referenceCatalog.status, mappingPatterns.status, conversionExamples.status, capabilityMatrix.status]
+  const statuses = [
+    referenceCatalog.status,
+    mappingPatterns.status,
+    conversionExamples.status,
+    capabilityMatrix.status,
+    forgeDetectionCatalog.status,
+  ]
   const generatedAt =
+    forgeDetectionCatalog.data?.generated_at ??
     conversionExamples.data?.generated_at ??
     mappingPatterns.data?.generated_at ??
     referenceCatalog.data?.generated_at ??
@@ -208,6 +255,7 @@ export const getLoganWorkbenchArtifacts = cache(async (): Promise<LoganWorkbench
     commands: referenceCatalog.data?.commands ?? [],
     patterns: mappingPatterns.data?.patterns ?? [],
     examples: conversionExamples.data?.examples ?? [],
+    catalogItems: forgeDetectionCatalog.data?.items ?? [],
     capabilityMatrix: capabilityMatrix.data,
     statuses,
     errors: statuses.filter((status) => !status.ok).map((status) => `${status.label}: ${status.error}`),

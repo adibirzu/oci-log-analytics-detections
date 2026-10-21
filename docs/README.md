@@ -96,3 +96,7 @@ The protected live workflows never run from untrusted pull requests. A missing c
 - `stack/modules/splunk_evidence_exporter`: opt-in Function, Notifications, state/DLQ, metrics, and alarm module
 - `docs/health/splunk-parallel-local-evidence.example.json`: self-hashed local-only release receipt
 - `docs/SPLUNK_PARALLEL_IMPLEMENTATION_PLAN.md`: implementation plan, task traceability, and live-canary boundary
+
+## Threat hunting integrations
+
+[Threat hunting integration guide](THREAT_HUNTING_INTEGRATIONS.md): generated curated-hunt bundles, competitor reference intake, CLI, Forge APIs, and artifact-only MCP with customer-controlled Logan execution.

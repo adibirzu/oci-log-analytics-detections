@@ -1,0 +1,63 @@
+{
+  "title": "AC-Hunter 03: DNS Beaconing, Tunneling & FQDN Subdomain Entropy",
+  "description": "Replicates AC-Hunter C2-over-DNS analysis by detecting high counts of distinct randomized subdomains per registered base domain (*.exfil.c2-stage.example.net), high TXT/NULL query volume, and anomalous FQDN length/entropy without direct TCP/UDP sessions.",
+  "query": "('Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Network Firewall Logs') and ('Query Name' like '*exfil.c2-stage.example.net*' or 'Destination IP' = '198.51.100.214' or msg like '*subdomain_entropy*') | eval fqdn_length = length('Query Name') | where fqdn_length > 14 | stats count as dns_queries, distinctcount('Query Name') as distinct_subdomains by 'Host Name', 'Destination IP', 'Query Name' | where dns_queries >= 1 | sort -distinct_subdomains, -dns_queries",
+  "type": "hunting",
+  "hunting_type": "field_analysis",
+  "cookbook_method": "outlier_detection",
+  "level": "critical",
+  "tags": [
+    "ac_hunter",
+    "dns.tunneling",
+    "dns.entropy",
+    "attack.command_and_control",
+    "attack.exfiltration",
+    "attack.t1071.004",
+    "attack.t1048.003"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control",
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1071.004",
+      "T1048.003",
+      "T1568.002"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon_dns",
+    "candidates": [
+      "Windows Sysmon Operational Logs",
+      "SOC Windows Sysmon Logs",
+      "SOC Network Firewall Logs"
+    ]
+  },
+  "dashboard": {
+    "visualizationType": "bar",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "groupBy": [
+        "Host Name",
+        "Query Name"
+      ],
+      "valueField": "dns_queries"
+    },
+    "ask_ai_prompts": [
+      "Which parent domains exhibit high distinct subdomain counts indicative of DNS tunneling?",
+      "How many hex-encoded TXT queries targeted exfil.c2-stage.example.net?"
+    ]
+  },
+  "falsepositives": [
+    "Anti-spam DNSBL lookups or CDN dynamic cache-busting FQDNs"
+  ],
+  "investigation_notes": [
+    "AC-Hunter flags parent domains with hundreds of unique subdomains (e.g., 342 distinct subdomains under exfil.c2-stage.example.net).",
+    "Check Sysmon Event ID 22 process attribution (e.g., C:\\Users\\Public\\splunkd.exe on kingslanding)."
+  ]
+}

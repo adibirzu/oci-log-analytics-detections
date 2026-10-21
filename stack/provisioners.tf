@@ -9,14 +9,14 @@ resource "null_resource" "deploy_log_sources" {
       OCI_TENANCY_ID     = var.tenancy_ocid
       OCI_COMPARTMENT_ID = var.compartment_id
       LA_NAMESPACE       = local.la_namespace
-      LA_LOG_GROUP_ID    = oci_log_analytics_log_analytics_log_group.soc_detection.id
+      LA_LOG_GROUP_ID    = local.effective_log_group_id
     }
   }
 
   depends_on = [oci_log_analytics_log_analytics_log_group.soc_detection]
 
   triggers = {
-    log_group_id = oci_log_analytics_log_analytics_log_group.soc_detection.id
+    log_group_id = local.effective_log_group_id
   }
 }
 
@@ -31,7 +31,7 @@ resource "null_resource" "deploy_dashboards" {
       OCI_TENANCY_ID     = var.tenancy_ocid
       OCI_COMPARTMENT_ID = var.compartment_id
       LA_NAMESPACE       = local.la_namespace
-      LA_LOG_GROUP_ID    = oci_log_analytics_log_analytics_log_group.soc_detection.id
+      LA_LOG_GROUP_ID    = local.effective_log_group_id
     }
   }
 
@@ -41,7 +41,7 @@ resource "null_resource" "deploy_dashboards" {
   ]
 
   triggers = {
-    log_group_id = oci_log_analytics_log_analytics_log_group.soc_detection.id
+    log_group_id = local.effective_log_group_id
   }
 }
 
@@ -56,7 +56,7 @@ resource "null_resource" "ingest_test_data" {
       OCI_TENANCY_ID     = var.tenancy_ocid
       OCI_COMPARTMENT_ID = var.compartment_id
       LA_NAMESPACE       = local.la_namespace
-      LA_LOG_GROUP_ID    = oci_log_analytics_log_analytics_log_group.soc_detection.id
+      LA_LOG_GROUP_ID    = local.effective_log_group_id
     }
   }
 
@@ -67,6 +67,6 @@ resource "null_resource" "ingest_test_data" {
   ]
 
   triggers = {
-    log_group_id = oci_log_analytics_log_analytics_log_group.soc_detection.id
+    log_group_id = local.effective_log_group_id
   }
 }

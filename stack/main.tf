@@ -9,7 +9,8 @@ data "oci_log_analytics_namespaces" "this" {
 }
 
 locals {
-  la_namespace = data.oci_log_analytics_namespaces.this.namespace_collection[0].items[0].namespace
+  la_namespace           = var.existing_log_analytics_namespace != "" ? var.existing_log_analytics_namespace : data.oci_log_analytics_namespaces.this.namespace_collection[0].items[0].namespace
+  effective_log_group_id = (var.deployment_mode == "attach_existing" && var.existing_log_group_id != "") || var.use_existing_log_group ? var.existing_log_group_id : (length(oci_log_analytics_log_analytics_log_group.soc_detection) > 0 ? oci_log_analytics_log_analytics_log_group.soc_detection[0].id : var.existing_log_group_id)
 
   stream_definitions = {
     "soc-detection-oci-audit"      = { log_source = "OCI Audit Logs" }

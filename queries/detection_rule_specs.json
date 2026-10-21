@@ -1,6 +1,6 @@
 {
-  "total_queries": 762,
-  "eligible_queries": 193,
+  "total_queries": 763,
+  "eligible_queries": 194,
   "ineligible_queries": 569,
   "specs": [
     {
@@ -21001,6 +21001,39 @@
           "User Name"
         ],
         "severity": "critical",
+        "create_alarm_by_default": false
+      }
+    },
+    {
+      "query_file": "queries/hunting/oci_programmatic_credential_creation_burst.json",
+      "title": "OCI Programmatic Credential Creation Burst",
+      "severity": "high",
+      "eligible": true,
+      "metric_name": "CredentialChanges",
+      "dimensions": [
+        "User Name",
+        "Source IP"
+      ],
+      "schedule": "5m",
+      "lookback": "15m",
+      "query": "'Log Source' = 'OCI Audit Logs' and ('Event Type' = 'com.oraclecloud.identitycontrolplane.uploadapikey' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.createauthtoken' or 'Event Type' = 'com.oraclecloud.identitycontrolplane.createcustomersecretkey') | stats count as CredentialChanges, distinctcount('Event Type') as CredentialTypes, earliest(Time) as FirstSeen, latest(Time) as LastSeen by 'User Name', 'Source IP' | where CredentialChanges > 1 or CredentialTypes > 1 | sort -CredentialChanges",
+      "reasons": [],
+      "detection_maturity": "validated_locally",
+      "source_confidence": "medium",
+      "field_coverage": "not_evaluated",
+      "test_data_coverage": "not_evaluated",
+      "live_validation_status": "not_run",
+      "dashboard_readiness": "not_dashboard_annotated",
+      "scheduled_rule_eligibility": "deployable",
+      "alarm_template": {
+        "enabled": true,
+        "namespace": "oci_log_analytics_detections",
+        "metric_name": "CredentialChanges",
+        "dimensions": [
+          "User Name",
+          "Source IP"
+        ],
+        "severity": "high",
         "create_alarm_by_default": false
       }
     },

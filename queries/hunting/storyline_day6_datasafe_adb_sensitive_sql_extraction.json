@@ -1,0 +1,45 @@
+{
+  "title": "Storyline Day 6: Oracle Data Safe & Autonomous Database Sensitive SQL Extraction",
+  "description": "Detects Day 6 of the 7-day multi-pillar adversary storyline: unauthorized SQL schema enumeration (all_tab_columns) and bulk sensitive PII extraction (CRM_CORE.CUSTOMER_PII) against Autonomous Databases guardian-standalone-adb and oci4cca-observeai-adb.",
+  "query": "'Log Source' = 'SOC Application Logs' and ('DB Target' in ('guardian-standalone-adb', 'oci4cca-observeai-adb') or 'DB Statement' like '*CUSTOMER_PII*' or 'DB Statement' like '*all_tab_columns*') | stats count as db_audit_hits, distinctcount('DB Target') as targeted_databases by 'DB Target', User, 'Attack Stage' | sort -db_audit_hits",
+  "type": "hunting",
+  "hunting_type": "grouping_correlation",
+  "cookbook_method": "grouping_correlation",
+  "level": "critical",
+  "tags": [
+    "storyline.7day",
+    "storyline.day6",
+    "oci.datasafe",
+    "oci.adb",
+    "attack.collection",
+    "attack.discovery",
+    "attack.t1213",
+    "attack.t1005",
+    "attack.t1530"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "discovery",
+      "collection"
+    ],
+    "techniques": [
+      "T1213",
+      "T1005",
+      "T1530"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "datasafe_and_application",
+    "candidates": [
+      "SOC Application Logs"
+    ]
+  },
+  "falsepositives": [
+    "Scheduled DBA schema migration or Oracle Data Safe sensitive data discovery job"
+  ],
+  "investigation_notes": [
+    "Verify DB Statement and Attack Stage on guardian-standalone-adb and oci4cca-observeai-adb.",
+    "Check Oracle Data Safe finding ORA-DS-PRIV-004 and confirm Data Safe masking policy enforcement."
+  ]
+}

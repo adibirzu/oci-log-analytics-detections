@@ -1,0 +1,130 @@
+{
+  "schema_version": "oci.logan.hunting.local-release.v1",
+  "review_date": "2026-10-13",
+  "example": true,
+  "receipt_type": "local_example",
+  "evidence_class": "locally verified",
+  "provider_validation": "unverified",
+  "automatic_upstream_import": "unverified",
+  "deployment": "not_run",
+  "publication": "not_run",
+  "working_tree_changes_retained": true,
+  "bundle_schema_version": "1.0.0",
+  "content_digest": "25a38f98740fbf0646c0888ec04658291a7941f7e90b6db16431f85d2fcabc1c",
+  "inventory": {
+    "curated_hunts": 156,
+    "local_field_ready": 69,
+    "blocked": 87,
+    "packs": 4,
+    "new_reference_candidates": 8,
+    "registered_reference_sources": 5
+  },
+  "checks": {
+    "python_full_suite": {
+      "command": "python3 -m pytest -q",
+      "passed": 1484,
+      "skipped": 5,
+      "subtests_passed": 41
+    },
+    "offline_release": {
+      "command": "python3 scripts/release_checklist.py",
+      "status": "PASS",
+      "gates_passed": 24,
+      "gates_total": 24
+    },
+    "webapp_unit": {
+      "command": "pnpm --dir webapp test:unit",
+      "passed": 10
+    },
+    "webapp_api": {
+      "command": "playwright test tests/e2e/hunting-api.spec.ts against built local runtime",
+      "passed": 2
+    },
+    "webapp_build": "PASS",
+    "webapp_lint": "PASS",
+    "webapp_typecheck": "PASS",
+    "sensitive_value_scan": "PASS",
+    "mcp_stdio_handshake": "PASS",
+    "generated_runtime_staging": "PASS",
+    "bundle_freshness": "PASS"
+  },
+  "independent_review": {
+    "important_findings": 3,
+    "fixed": 3,
+    "critical_findings": 0,
+    "deferred_minors": []
+  },
+  "rulings": [
+    {
+      "decision": "Preserve existing dirty checkout; no git operations",
+      "reason": "Approved native local delivery",
+      "cost": "Review before commit; file-based evidence has no git recovery"
+    },
+    {
+      "decision": "Copy required metadata into generated runtime staging",
+      "reason": "Freshness checks need the three configuration inputs",
+      "cost": "Older checkouts must regenerate before staging"
+    },
+    {
+      "decision": "Keep provider, automatic upstream import, file-level licensing/publication, and unrelated work outside local acceptance",
+      "reason": "Separate evidence/authority boundaries",
+      "cost": "Live and publication acceptance remain unverified"
+    },
+    {
+      "decision": "Classify existing migrated SIEM catalog as metadata",
+      "reason": "Nested catalog is not a single runnable detection; canonical generation failed",
+      "cost": "Catalog is excluded from single-query counting/deployment; original content preserved"
+    },
+    {
+      "decision": "Use built production API runtime after watcher exhaustion",
+      "reason": "Avoid dev watcher EMFILE during final API verification",
+      "cost": "Final checks do not certify development hot reload"
+    }
+  ],
+  "artifact_hashes": {
+    "README.md": "d7572d09fb5ffe42ed3b75a5a8ae5e54b4c69639cabe28f9574e26a445893aa5",
+    "config/hunting_packs.json": "a7f0383d1a022693ef1d098b55be55b436e8d4b7b3d83753c7fd582d52826cc0",
+    "config/hunting_reference_candidates.json": "0c25ce8a6520e14d9abfcce351dc4301364d3049179db5cb4b0ce95cecfda3bb",
+    "config/threat_intel_sources.json": "b71e6ca619a5c65fd031ea8a7bb3b5096bf32f1bca72c267afecbe9959fb3b1c",
+    "docs/INTEGRATION_SCHEMA.md": "4b994c94ae8639973c71ec6ab4e0c0057fb3afff6e5408f2e0dcad3cc5339bb2",
+    "docs/README.md": "aea8edfb823af979e2de5aaf7193759a0d38a79466b7736094b8161bcbfc6909",
+    "docs/THREAT_HUNTING_INTEGRATIONS.md": "27ffeac0d7e519887eac9904e304dcfbabdd1d4b7ed6008b62bca795f480f6df",
+    "docs/health/splunk-parallel-local-evidence.example.json": "6bb3ff96cfa0a237d40c2b7d44882d35f7134a584b3e3bc4e994471c30dfc350",
+    "examples/hunting_integrations/logan_mcp_handoff.py": "0dca954964c89c7169ef775238258aeb4004177f9f11b98fc6cbe6a6e7ac4222",
+    "examples/hunting_integrations/mcp-client.example.json": "e24c53c1a82d26fad64a52e322d5e094fd847b5b85b2ec20437e550819191c5b",
+    "queries/content_candidates.json": "5001cc6aad9b7682b168ace54559c9b0dadbcffa593a3e99ded29ac6f03c3c37",
+    "queries/hunting_integration_bundle.json": "219258172264005f6c52659ff3f5703560a28fed754c1e5397b6fb563ab3c8b3",
+    "requirements-hunting-test.txt": "5267831375ee9215f4a267b35d07ef05f0ad2a01dee3e28676e49e8f51840379",
+    "requirements-mcp.txt": "285b92898ac75730a6eda445d28a8a9fec45f3c16c14c435ebbef335163ea08b",
+    "schemas/hunting_integration_bundle.schema.json": "4c8365a5118cde87fbb949212e55102332a7f3676ce663f488c56d9bc09a06db",
+    "scripts/content_discovery.py": "b935dc72f201a449ea894a0efda0e54d1f4d28b87e8d1d148206d2f0c78af50d",
+    "scripts/fixtures/logan_mcp/catalog_contract.json": "550c43f7e903e3c55f73e08b002c2cc084e49a5360d4b68d09f25d712d396a95",
+    "scripts/generate_hunting_bundle.py": "5e4483477580525814036d46b279f2e15b537563649f7c0d832d92eea088d8fb",
+    "scripts/hunting_bundle.py": "c91e6a7cde483e238468c5e71c86e79b2dab9d1ece129dde1e6c36a43824c539",
+    "scripts/hunting_fields.py": "0ac4e7c44f45895fbe9e33334983d355fdfe1e141070a4e55abf86104003e5c0",
+    "scripts/hunting_integration_cli.py": "7d96f7478219eb88467c497d290cbbc0178bc5e1f4c6e32da6d8778b536e1a4a",
+    "scripts/hunting_integrations/__init__.py": "b6935a28c489a3772fb81bbb4bef414013d2878e674206b72e4d1614c119f3ea",
+    "scripts/hunting_integrations/loader.py": "bff00a9d3122226d405745f305f2e9d8149485bf8738a1a958bad2225bbabd60",
+    "scripts/hunting_integrations/logan_yaml.py": "5e7a42b8e11bfc67deac5a4236a31d445e78706ef5578766c733a56b6e63e660",
+    "scripts/hunting_mcp_server.py": "8094edf380d24fb3afd03c48fa2633e1cd565ab70cbd2cd51c9b0f3042680c9c",
+    "scripts/hunting_reference_intake.py": "114288bb5a390af362c255dc70a8c4a5497948070f715c66262f38c54c1dc158",
+    "scripts/hunting_schema.py": "abce4b48b34538e00d05d391563d7ca67bda43673aab595976994ebb76392b68",
+    "scripts/query_artifacts.py": "669213336cb5f7ff186726ca38ebca737bded939c179c797e0adef5fc75089bf",
+    "scripts/release_checklist.py": "7fef897d092183a8f1bb50b8dc7bf5c7154dcd0c7dc5e1661ca9aa3f4e441327",
+    "scripts/test_hunting_bundle.py": "163980bb40dd71827f4ee2b8173ef6d498bb2efce6f96b13c1a63e773125e20a",
+    "scripts/test_hunting_integration_cli.py": "2e733c89875c10776bf625adddd0e61716766d7819d3465ef4752f286836be88",
+    "scripts/test_hunting_mcp_server.py": "d2e944796764313f96a7895e08902f7abd241ef86e8ac4aeddecb72f1f8cce90",
+    "scripts/test_hunting_reference_intake.py": "8bb3d5de89ad3c61e524845ec1e8eecab8a9500b6a5ada2d514694a4b77e3a37",
+    "scripts/test_hunting_release_gate.py": "06ab233dd19d80f94e91c02c07077483f7e28f5d955825d20e212e1ea7f1a4ba",
+    "scripts/test_hunting_runtime_staging.py": "2ef72d009577f3da567a426a9e9ed7d9cdc2e08c9fd6021a93ad804fa9f31e34",
+    "scripts/test_query_artifacts.py": "1e65aad1165dc3e0b13cca0ea91f6b4a276f55440f5aabe9c309caf7471100ef",
+    "webapp/app/api/forge/hunting-bundle/route.ts": "0422041049f66ce1eedfb8e333bff2556964b6ef00bbe320ab7b8163984c5198",
+    "webapp/app/api/forge/hunts/[id]/route.ts": "8788d8239d6bb4b767ae712a6042e3365976b72c37cffda5cfaeca4137406c19",
+    "webapp/app/api/forge/hunts/route.ts": "92cc7940ebe87f9619e48e74a57ce2a358986cc98d85bc99db5199cafee7005b",
+    "webapp/deploy/oke/stage-detections-runtime.sh": "602fe7adcad20de7ed6ba31d80437c183c610d16a1858e096cdf43fb639a1893",
+    "webapp/lib/hunting-artifacts.ts": "134df4416e9f49d6dc708d78674e9e0b67230c0bb1d5751f09b670f26606567c",
+    "webapp/lib/hunting-contracts.ts": "ea4c3ee6f26ce40907cfded4a747cfbce806586dfbf5d8f7ece4692a2db4431a",
+    "webapp/tests/e2e/hunting-api.spec.ts": "fa38556987429170019d473846e3e79cb334407a6ce4f056ea3a5ecfc2ecc10f",
+    "webapp/tests/unit/hunting-contracts.test.ts": "73ac43e7d01b94f951fd2830c96817ee03173130c00569b53715092078f19aaa"
+  }
+}

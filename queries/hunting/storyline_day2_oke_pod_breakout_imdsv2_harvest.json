@@ -1,0 +1,46 @@
+{
+  "title": "Storyline Day 2: OKE Pod Breakout & IMDSv2 Credential Harvesting",
+  "description": "Detects Day 2 of the 7-day multi-pillar adversary storyline: a compromised OKE application pod executing curl against the OCI Instance Metadata Service (169.254.169.254/opc/v2/instance/) and enumerating Kubernetes service account tokens.",
+  "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'SOC Application Logs') and ('Command Line' like '*169.254.169.254/opc/v2/instance/*' or 'Process Command Line' like '*169.254.169.254/opc/v2/instance/*' or msg like '*serviceaccount/token*') | stats count as breakout_hits, distinctcount('Process Name') as processes by 'Host Name', 'Process Name' | sort -breakout_hits",
+  "type": "hunting",
+  "hunting_type": "grouping_correlation",
+  "cookbook_method": "grouping_correlation",
+  "level": "critical",
+  "tags": [
+    "storyline.7day",
+    "storyline.day2",
+    "oci.oke",
+    "oci.imdsv2",
+    "attack.credential_access",
+    "attack.privilege_escalation",
+    "attack.t1552.005",
+    "attack.t1552.007",
+    "attack.t1611"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "credential_access",
+      "privilege_escalation"
+    ],
+    "techniques": [
+      "T1552.005",
+      "T1552.007",
+      "T1611"
+    ]
+  },
+  "logsource": {
+    "product": "linux",
+    "service": "oke_and_syslog",
+    "candidates": [
+      "SOC Linux Syslog Logs",
+      "SOC Application Logs"
+    ]
+  },
+  "falsepositives": [
+    "OCI Kubernetes node initialization scripts calling IMDSv2 from the host namespace rather than an application pod"
+  ],
+  "investigation_notes": [
+    "Verify whether the process probing 169.254.169.254/opc/v2/instance/ originated inside an application pod such as portal-web-7d9c8b.",
+    "Check Kubernetes audit logs for secret reads using the harvested service account token."
+  ]
+}

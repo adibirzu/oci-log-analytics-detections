@@ -18,7 +18,7 @@ resource "oci_sch_service_connector" "soc_detection" {
 
   target {
     kind         = "loggingAnalytics"
-    log_group_id = oci_log_analytics_log_analytics_log_group.soc_detection.id
+    log_group_id = local.effective_log_group_id
 
     dimensions {
       dimension_value {

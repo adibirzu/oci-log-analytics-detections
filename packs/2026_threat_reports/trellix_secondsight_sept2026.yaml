@@ -1,0 +1,80 @@
+# Trellix SecondSight Threat Hunting Report (September 2026) — OCI Log Analytics & APM Detection Pack
+# Source: https://www.trellix.com/advanced-research-center/threat-reports/secondsight-threat-hunting-report-september-2026/
+version: 1
+pack_id: trellix-secondsight-sept-2026
+title: "Trellix SecondSight Threat Hunting Report (September 2026) — H1 2026 Campaigns"
+source_report: "https://www.trellix.com/advanced-research-center/threat-reports/secondsight-threat-hunting-report-september-2026/"
+campaigns:
+  - id: TRELLIX-2026-01
+    name: "APT28 (Fancy Bear / UAC-0001) CVE-2026-21509 Office OLE Bypass & Scheduled Task Persistence"
+    mitre_attack: ["T1566.001", "T1203", "T1053.005", "T1071.001"]
+    peak_type: hypothesis_driven
+    description: >-
+      Detects exploitation of Microsoft Office OLE security feature bypass (CVE-2026-21509)
+      followed by suspicious COM/scheduled task creation and webhook/cloud-storage egress.
+    log_analytics_query: >-
+      'Log Source' in ('Windows Security Events', 'Windows Sysmon Events', 'Windows Event Security Logs', 'SOC Windows Sysmon Logs')
+      and ('Event ID' in ('4688', '4698', '1', '11')
+           and ('Command Line' like '%cve-2026-21509%' or 'Command Line' like '%schtasks%/create%' or 'Parent Process Name' like '%WINWORD.EXE%'))
+      | stats count as hit_count, earliest('Time') as first_seen, latest('Time') as last_seen by 'Host Name', 'User Name', 'Command Line'
+    apm_trace_filter: "operationName = 'document.ole.parse' AND span.status = 'ERROR'"
+    metric_indicator: "oci_security_hunt.ole_bypass_spawn_count"
+
+  - id: TRELLIX-2026-02
+    name: "Bitter APT FIFA World Cup Diplomatic Lure & BDarkRAT Beacon"
+    mitre_attack: ["T1566.002", "T1219", "T1071.001", "T1059.003"]
+    peak_type: hypothesis_driven
+    description: >-
+      Detects compromised diplomatic/partner mailbox phishing lures deploying BDarkRAT
+      with periodic HTTP beacon jitter and staging directories.
+    log_analytics_query: >-
+      'Log Source' in ('Windows Sysmon Events', 'OCI VCN Flow Unified Schema Logs', 'SOC VCN Flow Logs')
+      and ('Process Name' like '%BDark%' or 'Command Line' like '%worldcup%lure%' or 'Destination Port' in (8443, 4443))
+      | stats count as beacon_events, distinctcount('Destination Port') as beacon_ports by 'Host Name', 'Destination IP'
+    apm_trace_filter: "serviceName = 'mail-gateway' AND http.status_code >= 400"
+    metric_indicator: "oci_security_hunt.bdarkrat_beacon_jitter"
+
+  - id: TRELLIX-2026-03
+    name: "DarkSword iOS Exploit Kit Mobile-to-Cloud Session Pivot"
+    mitre_attack: ["T1539", "T1550.004", "T1078.004"]
+    peak_type: baseline_eda
+    description: >-
+      Detects anomalous mobile user-agent session token replay against OCI Identity Domains
+      or enterprise portals originating from untrusted ASN after mobile exploit kit delivery.
+    log_analytics_query: >-
+      'Log Source' in ('OCI Audit Logs', 'OCI API Gateway Access Logs', 'SOC Application Logs')
+      and 'User Agent' like '%Mobile/%Safari%'
+      and ('Event Type' like '%TokenExchange%' or 'Response Code' in ('401', '403', '200'))
+      | stats distinctcount('Source IP') as asn_spread, count as hits by 'User Name', 'User Agent'
+      | where asn_spread > 1
+    apm_trace_filter: "http.user_agent LIKE '%Mobile%' AND auth.token_replay_suspected = 'true'"
+    metric_indicator: "oci_security_hunt.mobile_token_replay_count"
+
+  - id: TRELLIX-2026-04
+    name: "JSCeal Campaign — Node.js Runtime + Encoded PowerShell In-Memory Infostealer"
+    mitre_attack: ["T1059.001", "T1059.007", "T1555.003", "T1552.005"]
+    peak_type: hypothesis_driven
+    description: >-
+      Detects legitimate Node.js runtime spawning encoded PowerShell or shell sub-processes
+      attempting browser/wallet theft or OCI instance metadata (IMDSv2) credential harvesting.
+    log_analytics_query: >-
+      'Log Source' in ('Linux Auditd Logs', 'Linux Sysmon Logs', 'Windows Sysmon Events')
+      and 'Parent Process Name' in ('node', 'node.exe')
+      and ('Command Line' like '%-enc%' or 'Command Line' like '%fromBase64String%' or 'Command Line' like '%169.254.169.254/opc/v2/%')
+      | stats count as suspicious_execs by 'Host Name', 'Parent Process Name', 'Command Line', 'Trace ID'
+    apm_trace_filter: "component = 'nodejs-worker' AND custom.child_process_spawn = 'true'"
+    metric_indicator: "oci_security_hunt.jsceal_node_spawn_count"
+
+  - id: TRELLIX-2026-05
+    name: "Axios npm Supply Chain Maintainer Compromise & Post-Install RAT"
+    mitre_attack: ["T1195.002", "T1059.007", "T1071.001"]
+    peak_type: hypothesis_driven
+    description: >-
+      Detects compromised npm package execution (Axios supply-chain pattern) initiating
+      unexpected outbound telemetry or credential environment scraping from application pods.
+    log_analytics_query: >-
+      'Log Source' in ('OKE Application Logs', 'Linux Auditd Logs', 'OCI VCN Flow Unified Schema Logs', 'SOC Application Logs')
+      and ('Message' like '%axios%postinstall%' or 'Message' like '%npm_package_name=axios%egress_anomaly%')
+      | stats count as supply_chain_hits by 'Host Name', 'Service Name', 'Destination IP', 'Trace ID'
+    apm_trace_filter: "library.name = 'axios' AND peer.service = 'untrusted-registry-telemetry'"
+    metric_indicator: "oci_security_hunt.npm_supply_chain_egress_bytes"

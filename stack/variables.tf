@@ -15,7 +15,36 @@ variable "region" {
   description = "OCI region for deployment (auto-populated by ORM)"
 }
 
+variable "deployment_mode" {
+  type        = string
+  description = "Deployment strategy: greenfield (provisions fresh Log Analytics resources) or attach_existing (attaches to pre-existing log groups/resources)"
+  default     = "attach_existing"
+
+  validation {
+    condition     = contains(["greenfield", "attach_existing"], var.deployment_mode)
+    error_message = "deployment_mode must be greenfield or attach_existing."
+  }
+}
+
+variable "existing_log_analytics_namespace" {
+  type        = string
+  description = "Pre-existing Log Analytics tenancy namespace (leave empty to auto-discover tenancy namespace)"
+  default     = ""
+}
+
 # --- Log Analytics ---
+
+variable "use_existing_log_group" {
+  type        = bool
+  description = "Attach to an existing Log Analytics log group instead of creating a new one"
+  default     = false
+}
+
+variable "existing_log_group_id" {
+  type        = string
+  description = "OCID of an existing Log Analytics log group (when use_existing_log_group is true or in attach_existing mode)"
+  default     = ""
+}
 
 variable "log_group_name" {
   type        = string

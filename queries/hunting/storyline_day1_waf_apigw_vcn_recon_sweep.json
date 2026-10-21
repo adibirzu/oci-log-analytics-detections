@@ -1,0 +1,47 @@
+{
+  "title": "Storyline Day 1: External Port Scan, WAF/API Gateway 401/403 Bursts & VCN Flow Sweeps",
+  "description": "Detects Day 1 of the 7-day multi-pillar adversary storyline: external reconnaissance and API enumeration bursts (HTTP 401/403 spikes) against shop and crm endpoints alongside anomalous inbound VCN Flow Log REJECT port sweeps from 198.51.100.214.",
+  "query": "('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC VCN Flow Logs') and ('Client IP' = '198.51.100.214' or 'Source IP' = '198.51.100.214' or 'Response Code' in ('401', '403') or 'Action' = 'REJECT') | stats count as recon_events, distinctcount('Destination Port') as ports_probed, distinctcount('Request URL') as urls_probed by 'Log Source', 'Trace ID' | where recon_events >= 1 | sort -recon_events",
+  "type": "hunting",
+  "hunting_type": "grouping_correlation",
+  "cookbook_method": "grouping_correlation",
+  "level": "high",
+  "tags": [
+    "storyline.7day",
+    "storyline.day1",
+    "oci.waf",
+    "oci.vcn_flow",
+    "attack.reconnaissance",
+    "attack.initial_access",
+    "attack.t1595.001",
+    "attack.t1595.002",
+    "attack.t1190"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "reconnaissance",
+      "initial_access"
+    ],
+    "techniques": [
+      "T1595.001",
+      "T1595.002",
+      "T1190"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "waf_and_vcn_flow",
+    "candidates": [
+      "SOC WAF Security Logs",
+      "SOC VCN Flow Logs"
+    ]
+  },
+  "falsepositives": [
+    "Authorized external vulnerability assessment or scheduled DAST scanning windows",
+    "Public Internet background noise against perimeter load balancers"
+  ],
+  "investigation_notes": [
+    "Correlate Client IP / Source IP 198.51.100.214 across SOC WAF Security Logs and SOC VCN Flow Logs.",
+    "Pivot on Trace ID to inspect downstream OKE pod execution on Day 2."
+  ]
+}

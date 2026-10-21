@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/rishabh-ghosh24/logan-mcp-server",
+  "revision": "ca98c3d094086d685dc3689bd633356db9294a0f",
+  "source_path": "src/oci_logan_mcp/catalog.py",
+  "root_key": "queries",
+  "required_fields": ["name", "query", "description"],
+  "optional_fields": ["entry_id", "category", "tags"],
+  "compatibility": "format_only; no automatic catalog import or provider validation"
+}

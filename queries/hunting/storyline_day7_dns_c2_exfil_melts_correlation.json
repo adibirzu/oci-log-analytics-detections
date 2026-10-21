@@ -1,0 +1,47 @@
+{
+  "title": "Storyline Day 7: DNS Tunneling, C2 Egress & ObserveAI MELTS Automated Containment",
+  "description": "Detects Day 7 of the 7-day multi-pillar adversary storyline: high-volume DNS tunneling queries (*.exfil.c2-stage.example.net) and outbound VCN Flow Log transfer to C2 IP 198.51.100.214, correlated across MELTS by the ObserveAI / Coordinator AI Agent.",
+  "query": "('Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Application Logs') and ('Destination IP' = '198.51.100.214' or 'Client IP' = '198.51.100.214' or msg like '*exfil.c2-stage.example.net*') | stats count as exfil_signals, distinctcount('Log Source') as correlated_pillars by 'Destination IP', 'Trace ID' | sort -exfil_signals",
+  "type": "hunting",
+  "hunting_type": "grouping_correlation",
+  "cookbook_method": "grouping_correlation",
+  "level": "critical",
+  "tags": [
+    "storyline.7day",
+    "storyline.day7",
+    "oci.vcn_flow",
+    "oci.observeai",
+    "attack.exfiltration",
+    "attack.command_and_control",
+    "attack.t1048.003",
+    "attack.t1071.004",
+    "attack.t1041"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control",
+      "exfiltration"
+    ],
+    "techniques": [
+      "T1048.003",
+      "T1071.004",
+      "T1041"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "multi_pillar_melts",
+    "candidates": [
+      "Windows Sysmon Operational Logs",
+      "SOC VCN Flow Logs",
+      "SOC Application Logs"
+    ]
+  },
+  "falsepositives": [
+    "Approved external backup or CDN replication endpoints"
+  ],
+  "investigation_notes": [
+    "Correlate Trace ID across OCI Log Analytics, OCI APM traces, OCI Monitoring (octo_security_melts), and Langfuse AI Agent spans.",
+    "Verify automated NSG and WAF containment status for C2 IP 198.51.100.214."
+  ]
+}

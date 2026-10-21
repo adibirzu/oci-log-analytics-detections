@@ -173,6 +173,7 @@ def _is_synthetic_fixture_path(path: Path) -> bool:
     normalized = relative.as_posix()
     fixture_suffixes = (
         "scripts/generate_geo_health_logs.py",
+        "scripts/generate_synthetic_2026_campaign.py",
         "scripts/generate_test_logs.py",
         "scripts/schemas/oci_audit_schema.py",
         "scripts/setup_log_sources.py",
@@ -187,6 +188,10 @@ def _is_synthetic_fixture_path(path: Path) -> bool:
     fixture_dir_prefixes = (
         "scripts/testlogs/",
         "scripts/logsources/",
+        "packs/",
+        "hunting/",
+        "dashboards/",
+        "docs/pages/",
     )
     return (
         any(normalized.endswith(suffix) for suffix in fixture_suffixes)

@@ -1,0 +1,62 @@
+{
+  "title": "AC-Hunter 06: Multi-Protocol & Non-Standard Port Abuse (8443, 7844, 4444, 5985)",
+  "description": "Detects C2 callbacks, RMM tunnels, and lateral movement over non-standard ports (8443, 7844, 4444, 5985, 8888) or application protocol mismatches across VCN Flow, Sysmon Network, and Network Firewall logs.",
+  "query": "('Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Network Firewall Logs') and ('Destination Port' in (8443, 7844, 4444, 5985, 8888) or msg like '*protocol_mismatch*') | stats count as anomalous_port_flows, distinctcount('Destination Port') as non_standard_ports by 'Source IP', 'Destination IP', 'Destination Port', 'Protocol' | where anomalous_port_flows >= 1 | sort -anomalous_port_flows",
+  "type": "hunting",
+  "hunting_type": "outlier_detection",
+  "cookbook_method": "sorting_stacking",
+  "level": "high",
+  "tags": [
+    "ac_hunter",
+    "non_standard_port",
+    "protocol_mismatch",
+    "attack.command_and_control",
+    "attack.t1571",
+    "attack.t1572"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1571",
+      "T1090",
+      "T1572"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "network",
+    "candidates": [
+      "SOC VCN Flow Logs",
+      "SOC Sysmon Network Logs",
+      "SOC Network Firewall Logs"
+    ]
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "groupBy": [
+        "Destination Port",
+        "Source IP",
+        "Destination IP"
+      ],
+      "valueField": "anomalous_port_flows"
+    },
+    "ask_ai_prompts": [
+      "Which internal hosts are communicating over non-standard ports 8443, 7844, 4444, or 5985?",
+      "Identify any protocol mismatches on external egress connections."
+    ]
+  },
+  "falsepositives": [
+    "Custom internal admin portals running on port 8443"
+  ],
+  "investigation_notes": [
+    "Port 7844 is default for Cloudflare Argo Tunnel (cloudflared); Port 8888/8443 are used by Caldera Sandcat and HTTPS C2 listeners; Port 5985 is WinRM.",
+    "Cross-reference with Sysmon process creation (Event ID 1) and Network Connection (Event ID 3)."
+  ]
+}

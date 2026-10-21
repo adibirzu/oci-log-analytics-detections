@@ -1,0 +1,104 @@
+# Hunt.io / Splunk PEAK Threat Hunting Framework — Structured Playbooks for OCI-DEMO
+# Sources:
+#   - https://hunt.io/glossary/peak-threat-hunting-framework
+#   - https://hunt.io/glossary/threat-hunting-examples
+version: 1
+pack_id: huntio-peak-framework-2026
+title: "PEAK Threat Hunting Framework (Prepare, Execute, Act with Knowledge) — OCI & Data Safe Playbooks"
+references:
+  - "https://hunt.io/glossary/peak-threat-hunting-framework"
+  - "https://hunt.io/glossary/threat-hunting-examples"
+  - "https://www.trellix.com/advanced-research-center/threat-reports/secondsight-threat-hunting-report-september-2026/"
+  - "https://www.crowdstrike.com/en-us/blog/crowdstrike-2026-threat-hunting-report/"
+hunts:
+  - hunt_id: PEAK-HUNT-2026-01
+    title: "Hypothesis-Driven Hunt: JSCeal Node.js Runtime & Axios Supply-Chain Credential Harvesting"
+    peak_methodology: Hypothesis-Driven
+    prepare:
+      topic: "Trusted runtime (Node.js) and npm supply-chain abuse (Trellix SecondSight Sept 2026)"
+      hypothesis: >-
+        Adversaries leveraging compromised npm packages (Axios pattern) or JSCeal loaders
+        spawn encoded sub-shells from Node.js containers to query OCI IMDSv2 (169.254.169.254)
+        and exfiltrate workload identity tokens.
+      data_sources:
+        - "Linux Auditd / Sysmon (`node` -> `sh`/`pwsh -enc`)"
+        - "OCI VCN Flow Logs (egress & IMDSv2 probe)"
+        - "OCI APM OpenTelemetry Traces (`trace_id` correlation across frontend/API spans)"
+        - "OCI Monitoring (`oci_security_hunt.jsceal_node_spawn_count`)"
+    execute:
+      log_analytics_query: >-
+        'Log Source' in ('Linux Auditd Logs', 'OKE Application Logs', 'SOC Linux Syslog Logs', 'SOC Application Logs')
+        and ('Parent Process Name' = 'node' or 'Message' like '%axios%postinstall%')
+        | stats count as hits, values('Command Line') as commands by 'Host Name', 'Service Name', 'Trace ID'
+      expected_finding: "Pod `portal-web` (`node`) spawns encoded shell probing `169.254.169.254/opc/v2/instance/` with correlated APM trace span."
+    act_with_knowledge:
+      detection_promoted: "TRELLIX-2026-04 / TRELLIX-2026-05 scheduled detection task in OCI Log Analytics"
+      hardening_action: "Enforce OKE pod security context (`allowPrivilegeEscalation: false`), restrict IMDSv2 hop-limit, and pin npm package digests."
+
+  - hunt_id: PEAK-HUNT-2026-02
+    title: "Hypothesis-Driven Hunt: Unauthorized Cryptomining & OLE/RAT Scheduled Task Persistence"
+    peak_methodology: Hypothesis-Driven
+    prepare:
+      topic: "Resource hijacking (Hunt.io Cryptomining Example) & APT28/Bitter APT persistence (Trellix Sept 2026)"
+      hypothesis: >-
+        Compromised application or AD nodes execute disguised binaries or scheduled tasks communicating
+        over non-standard stratum/beacon ports (3333, 4444, 8443) while causing sustained CPU spikes.
+      data_sources:
+        - "Windows Security / Sysmon (`EventID 4688, 4698, 1, 3`)"
+        - "Linux Auditd process execution (`--donate-level`, `stratum+tcp`)"
+        - "OCI Monitoring (`CpuUtilization`, `oci_security_hunt.cpu_anomaly`)"
+    execute:
+      log_analytics_query: >-
+        'Log Source' in ('Linux Auditd Logs', 'Windows Sysmon Events', 'OCI VCN Flow Unified Schema Logs', 'SOC VCN Flow Logs')
+        and ('Command Line' like '%stratum+tcp%' or 'Command Line' like '%--donate-level%' or 'Destination Port' in (3333, 4444, 8443))
+        | stats count as network_beacons, distinctcount('Destination IP') as target_endpoints by 'Host Name', 'User Name', 'Destination Port'
+      expected_finding: "Service account on internal worker initiates outbound stratum/beacon connection on port 4444 correlated with 96% CPU spike."
+    act_with_knowledge:
+      detection_promoted: "Persistent SIEM/Log Analytics rule combining non-standard egress port + OCI Monitoring CPU alarm"
+      hardening_action: "Lock down NSG egress rules to whitelisted OCIR/OSN CIDRs only."
+
+  - hunt_id: PEAK-HUNT-2026-03
+    title: "Baseline / EDA Hunt: Network Edge & Cloud Management Plane Drift (82% Malware-Free LotL)"
+    peak_methodology: Baseline-EDA
+    prepare:
+      topic: "Management plane access baseline deviation (Hunt.io Router/Edge Example + CrowdStrike 2026 82% Malware-Free)"
+      hypothesis: >-
+        Normal administrative operations against OCI NSGs, Bastion sessions, and Autonomous Database wallets
+        follow predictable NOC source subnets and maintenance windows; out-of-window calls or unapproved RMM tools
+        indicate living-off-the-land credential abuse.
+      data_sources:
+        - "OCI Audit Logs (`UpdateNetworkSecurityGroupSecurityRules`, `GenerateAutonomousDatabaseWallet`)"
+        - "OCI Bastion / SSH Auth Logs"
+        - "OCI Data Safe Audit Trails (admin login client program & OS user baseline)"
+    execute:
+      log_analytics_query: >-
+        'Log Source' = 'OCI Audit Logs'
+        and 'Event Name' in ('UpdateNetworkSecurityGroupSecurityRules', 'GenerateAutonomousDatabaseWallet', 'UpdateSecurityList')
+        | stats count as admin_calls, values('Event Name') as actions by 'User Name', 'Source IP', 'User Agent'
+      expected_finding: "Non-NOC identity invokes `GenerateAutonomousDatabaseWallet` and widens NSG ingress outside maintenance window."
+    act_with_knowledge:
+      detection_promoted: "CS-OVERWATCH-2026-02 baseline deviation alert in Guardian (`guardian.<DNS_DOMAIN>`)"
+      hardening_action: "Require OCI IAM Identity Domain MFA step-up and network-source restriction for NSG and DB wallet operations."
+
+  - hunt_id: PEAK-HUNT-2026-04
+    title: "Model-Assisted Threat Hunt (M-ATH): AI-Agent Burst Probing to OCI Data Safe Sensitive DB Extraction"
+    peak_methodology: Model-Assisted-M-ATH
+    prepare:
+      topic: "Machine-speed AI adversary operations (CrowdStrike 2026: 89% YoY surge, 2.5x agentic leads) targeting Autonomous Database (C15)"
+      hypothesis: >-
+        Statistical burst scoring (`math_burst_score >= 2.5`) on request inter-arrival times and query entropy
+        isolates automated AI-agent reconnaissance pivoting from API Gateway into bulk `SELECT` queries against sensitive ATP tables.
+      data_sources:
+        - "OCI API Gateway & WAF Logs"
+        - "OCI APM Distributed Traces (`math.agentic_burst_score`, `db.stmt`)"
+        - "OCI Data Safe Unified Audit & Security Assessment (`C15`)"
+    execute:
+      log_analytics_query: >-
+        'Log Source' in ('OCI API Gateway Access Logs', 'OCI Data Safe Unified Audit Logs', 'SOC Application Logs')
+        and ('Message' like '%CUSTOMER_PII%' or 'Message' like '%PAYMENT_TOKENS%' or 'Request URL' like '%/api/%')
+        | stats count as total_events, distinctcount('Request URL') as endpoint_spread, values('Service Name') as accessed_services by 'Trace ID', 'User Name', 'Host Name'
+        | where total_events >= 1
+      expected_finding: "High-velocity agentic trace (`math_burst_score=3.4`) enumerates `/api/v1/customers/export` and triggers Data Safe audit alert on `CUSTOMER_PII` and `PAYMENT_TOKENS` (masked in UI)."
+    act_with_knowledge:
+      detection_promoted: "CS-OVERWATCH-2026-01 + CS-OVERWATCH-2026-04 multi-signal M-ATH rule in ObserveAI & Guardian"
+      hardening_action: "Apply OCI WAF rate-limiting, enforce Data Safe masking policy (`${OCI_DEMO_PREFIX}-datasafe-masking-policy`), and revoke compromised app token."

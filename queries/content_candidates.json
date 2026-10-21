@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-09-04T15:47:32.383697+00:00",
+  "generated_at": "2026-10-13T05:04:10.632353+00:00",
   "source_registry": {
     "version": "1.0",
     "sources": [
@@ -66,20 +66,78 @@
         "license": "owned",
         "intake_mode": "curated_reference",
         "promotion_policy": "can promote after local and CAP validation"
+      },
+      {
+        "id": "google_csa",
+        "name": "GoogleCloudPlatform/security-analytics",
+        "type": "rule_reference",
+        "url": "https://github.com/GoogleCloudPlatform/security-analytics",
+        "revision": "2dd8565557e043e25d16df8f7743b9e69374d6f3",
+        "license": "Apache-2.0",
+        "role": "hunt_reference",
+        "intake_mode": "reviewed_pinned_reference",
+        "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
+      },
+      {
+        "id": "matano",
+        "name": "matanolabs/matano",
+        "type": "integration_reference",
+        "url": "https://github.com/matanolabs/matano",
+        "revision": "84133693769ece362822c3bf423fb9956d32fe92",
+        "license": "Apache-2.0",
+        "role": "capability_reference",
+        "intake_mode": "reviewed_pinned_reference",
+        "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
+      },
+      {
+        "id": "kustoking",
+        "name": "KustoKing/Hunting-Queries-Detection-Rules",
+        "type": "rule_reference",
+        "url": "https://github.com/KustoKing/Hunting-Queries-Detection-Rules",
+        "revision": "f59e974d34b78e3d6bbf7fb8c52fc607c048d684",
+        "license": "BSD-3-Clause",
+        "role": "hunt_reference",
+        "intake_mode": "reviewed_pinned_reference",
+        "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
+      },
+      {
+        "id": "bertjanp",
+        "name": "Bert-JanP/Hunting-Queries-Detection-Rules",
+        "type": "rule_reference",
+        "url": "https://github.com/Bert-JanP/Hunting-Queries-Detection-Rules",
+        "revision": "1c92e563cca5375e50525df8b455e6117091a27a",
+        "license": "BSD-3-Clause",
+        "role": "hunt_reference",
+        "intake_mode": "reviewed_pinned_reference",
+        "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
+      },
+      {
+        "id": "logan_mcp",
+        "name": "rishabh-ghosh24/logan-mcp-server",
+        "type": "integration_reference",
+        "url": "https://github.com/rishabh-ghosh24/logan-mcp-server",
+        "revision": "ca98c3d094086d685dc3689bd633356db9294a0f",
+        "license": "MIT",
+        "role": "capability_reference",
+        "intake_mode": "reviewed_pinned_reference",
+        "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
       }
     ]
   },
   "summary": {
-    "total_candidates": 38,
+    "total_candidates": 46,
     "by_classification": {
       "dashboard-only hunt": 2,
-      "needs field mapping": 29,
+      "needs field mapping": 37,
       "not applicable to OCI Log Analytics": 7
     },
     "by_source_type": {
+      "bertjanp": 1,
       "elastic_csp_gap": 24,
       "elastic_detection_reference": 11,
-      "internal_workshop": 3
+      "google_csa": 6,
+      "internal_workshop": 3,
+      "kustoking": 1
     },
     "duplicates_collapsed": 1
   },
@@ -309,6 +367,78 @@
       ]
     },
     {
+      "id": "reference:authentication_burst",
+      "title": "Failed authentication bursts",
+      "source_ids": [
+        "google_csa"
+      ],
+      "source_file": "backends/bigquery/sql/1_03_excessive_login_failures.sql",
+      "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/1_03_excessive_login_failures.sql",
+      "source_sha256": "5c1c2ab557f50ef927612887ca1779a5a8dc234198f959e96c47e9a519906b69",
+      "mitre_techniques": [
+        "T1110"
+      ],
+      "local_queries": [
+        "hunting/oci_console_brute_force.json"
+      ],
+      "mapping_gaps": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ],
+      "required_fields": [],
+      "upstream_tables": [
+        "cloudaudit_googleapis_com_data_access"
+      ],
+      "upstream_fields": [
+        "protopayload_auditlog.authenticationInfo.principalEmail",
+        "protopayload_auditlog.methodName",
+        "protopayload_auditlog.serviceName"
+      ],
+      "semantic_limitations": [
+        "Local links are behavioral analogues, not translated upstream detections."
+      ],
+      "source_type": "google_csa",
+      "source_types": [
+        "google_csa"
+      ],
+      "affected_platform": "cross_platform",
+      "candidate_log_sources": [],
+      "mitre_tactics": [],
+      "core_indicators": [],
+      "detection_idea": "Failed authentication bursts",
+      "licensing": {
+        "mode": "metadata_only",
+        "licenses": [
+          "Apache-2.0"
+        ]
+      },
+      "attribution": {
+        "references": [
+          "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/1_03_excessive_login_failures.sql"
+        ]
+      },
+      "provenance": [
+        {
+          "source_id": "google_csa",
+          "revision": "2dd8565557e043e25d16df8f7743b9e69374d6f3",
+          "license": "Apache-2.0",
+          "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/1_03_excessive_login_failures.sql",
+          "source_sha256": "5c1c2ab557f50ef927612887ca1779a5a8dc234198f959e96c47e9a519906b69"
+        }
+      ],
+      "readiness": "blocked",
+      "evidence_class": "code-backed",
+      "review_status": "candidate",
+      "dedupe_key": "content:201786d9de482f68b194e01f",
+      "source_urls": [
+        "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/1_03_excessive_login_failures.sql"
+      ],
+      "duplicate_count": 1,
+      "classification": "needs field mapping",
+      "classification_reasons": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ]
+    },
+    {
       "id": "cand_beb150c90c2d7c6d",
       "title": "Identity compromise and OCI cloud abuse",
       "sigma_id": "",
@@ -396,6 +526,78 @@
       ]
     },
     {
+      "id": "reference:logging_changes",
+      "title": "Logging control changes",
+      "source_ids": [
+        "google_csa"
+      ],
+      "source_file": "backends/bigquery/sql/3_01_logging_settings_modified.sql",
+      "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/3_01_logging_settings_modified.sql",
+      "source_sha256": "458fd6459a93581a06f5d4b8131305887aa2e798819929a270ac4b5f668f5904",
+      "mitre_techniques": [
+        "T1562.008"
+      ],
+      "local_queries": [],
+      "mapping_gaps": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ],
+      "required_fields": [],
+      "upstream_tables": [
+        "cloudaudit_googleapis_com_activity"
+      ],
+      "upstream_fields": [
+        "protopayload_auditlog.authenticationInfo.principalEmail",
+        "protopayload_auditlog.methodName",
+        "protopayload_auditlog.requestMetadata.callerIp",
+        "protopayload_auditlog.resourceName",
+        "protopayload_auditlog.serviceName"
+      ],
+      "semantic_limitations": [
+        "Local links are behavioral analogues, not translated upstream detections."
+      ],
+      "source_type": "google_csa",
+      "source_types": [
+        "google_csa"
+      ],
+      "affected_platform": "cross_platform",
+      "candidate_log_sources": [],
+      "mitre_tactics": [],
+      "core_indicators": [],
+      "detection_idea": "Logging control changes",
+      "licensing": {
+        "mode": "metadata_only",
+        "licenses": [
+          "Apache-2.0"
+        ]
+      },
+      "attribution": {
+        "references": [
+          "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/3_01_logging_settings_modified.sql"
+        ]
+      },
+      "provenance": [
+        {
+          "source_id": "google_csa",
+          "revision": "2dd8565557e043e25d16df8f7743b9e69374d6f3",
+          "license": "Apache-2.0",
+          "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/3_01_logging_settings_modified.sql",
+          "source_sha256": "458fd6459a93581a06f5d4b8131305887aa2e798819929a270ac4b5f668f5904"
+        }
+      ],
+      "readiness": "blocked",
+      "evidence_class": "code-backed",
+      "review_status": "candidate",
+      "dedupe_key": "content:d58207628f40bfb305f569ba",
+      "source_urls": [
+        "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/3_01_logging_settings_modified.sql"
+      ],
+      "duplicate_count": 1,
+      "classification": "needs field mapping",
+      "classification_reasons": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ]
+    },
+    {
       "id": "cand_711fe7f8a53a8dde",
       "title": "MFA fatigue/push spam",
       "sigma_id": "",
@@ -436,6 +638,82 @@
       "classification": "not applicable to OCI Log Analytics",
       "classification_reasons": [
         "no candidate OCI Log Analytics source group is known"
+      ]
+    },
+    {
+      "id": "reference:network_fanout",
+      "title": "Network host and port fan-out",
+      "source_ids": [
+        "google_csa"
+      ],
+      "source_file": "backends/bigquery/sql/6_01_hosts_reaching_to_many_other_hosts_or_ports.sql",
+      "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/6_01_hosts_reaching_to_many_other_hosts_or_ports.sql",
+      "source_sha256": "e33ea87d759df2ecdda14d91482c93e42bbf18f8a5968723b4e9eddfc7c48978",
+      "mitre_techniques": [
+        "T1046"
+      ],
+      "local_queries": [
+        "hunting/oci_vcn_external_egress_traffic.json"
+      ],
+      "mapping_gaps": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ],
+      "required_fields": [],
+      "upstream_tables": [
+        "compute_googleapis_com_vpc_flows"
+      ],
+      "upstream_fields": [
+        "jsonPayload.connection.dest_ip",
+        "jsonPayload.connection.dest_port",
+        "jsonPayload.connection.src_ip",
+        "jsonPayload.dest_instance.vm_name",
+        "jsonPayload.reporter",
+        "jsonPayload.src_instance.vm_name",
+        "jsonPayload.start_time"
+      ],
+      "semantic_limitations": [
+        "Local links are behavioral analogues, not translated upstream detections."
+      ],
+      "source_type": "google_csa",
+      "source_types": [
+        "google_csa"
+      ],
+      "affected_platform": "cross_platform",
+      "candidate_log_sources": [],
+      "mitre_tactics": [],
+      "core_indicators": [],
+      "detection_idea": "Network host and port fan-out",
+      "licensing": {
+        "mode": "metadata_only",
+        "licenses": [
+          "Apache-2.0"
+        ]
+      },
+      "attribution": {
+        "references": [
+          "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/6_01_hosts_reaching_to_many_other_hosts_or_ports.sql"
+        ]
+      },
+      "provenance": [
+        {
+          "source_id": "google_csa",
+          "revision": "2dd8565557e043e25d16df8f7743b9e69374d6f3",
+          "license": "Apache-2.0",
+          "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/6_01_hosts_reaching_to_many_other_hosts_or_ports.sql",
+          "source_sha256": "e33ea87d759df2ecdda14d91482c93e42bbf18f8a5968723b4e9eddfc7c48978"
+        }
+      ],
+      "readiness": "blocked",
+      "evidence_class": "code-backed",
+      "review_status": "candidate",
+      "dedupe_key": "content:fadfb63ca85f84e7308a932a",
+      "source_urls": [
+        "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/6_01_hosts_reaching_to_many_other_hosts_or_ports.sql"
+      ],
+      "duplicate_count": 1,
+      "classification": "needs field mapping",
+      "classification_reasons": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
       ]
     },
     {
@@ -1289,6 +1567,305 @@
       ]
     },
     {
+      "id": "reference:object_access",
+      "title": "Object access from a new IP",
+      "source_ids": [
+        "google_csa"
+      ],
+      "source_file": "backends/bigquery/sql/5_31_cloud_storage_object_accessed_from_new_IP.sql",
+      "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/5_31_cloud_storage_object_accessed_from_new_IP.sql",
+      "source_sha256": "f22a8818e31c10058da65142ea4427b2aa41ee8ee93eb7af739a20b5dda96c18",
+      "mitre_techniques": [
+        "T1530"
+      ],
+      "local_queries": [
+        "hunting/oci_object_storage_external_source.json"
+      ],
+      "mapping_gaps": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ],
+      "required_fields": [],
+      "upstream_tables": [
+        "cloudaudit_googleapis_com_data_access"
+      ],
+      "upstream_fields": [
+        "protopayload_auditlog.authenticationInfo.principalEmail",
+        "protopayload_auditlog.methodName",
+        "protopayload_auditlog.requestMetadata.callerIp",
+        "protopayload_auditlog.requestMetadata.callerSuppliedUserAgent",
+        "protopayload_auditlog.resourceName",
+        "protopayload_auditlog.serviceName"
+      ],
+      "semantic_limitations": [
+        "Local links are behavioral analogues, not translated upstream detections.",
+        "Upstream uses 60-day history; external source filtering does not establish first-seen behavior."
+      ],
+      "source_type": "google_csa",
+      "source_types": [
+        "google_csa"
+      ],
+      "affected_platform": "cross_platform",
+      "candidate_log_sources": [],
+      "mitre_tactics": [],
+      "core_indicators": [],
+      "detection_idea": "Object access from a new IP",
+      "licensing": {
+        "mode": "metadata_only",
+        "licenses": [
+          "Apache-2.0"
+        ]
+      },
+      "attribution": {
+        "references": [
+          "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/5_31_cloud_storage_object_accessed_from_new_IP.sql"
+        ]
+      },
+      "provenance": [
+        {
+          "source_id": "google_csa",
+          "revision": "2dd8565557e043e25d16df8f7743b9e69374d6f3",
+          "license": "Apache-2.0",
+          "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/5_31_cloud_storage_object_accessed_from_new_IP.sql",
+          "source_sha256": "f22a8818e31c10058da65142ea4427b2aa41ee8ee93eb7af739a20b5dda96c18"
+        }
+      ],
+      "readiness": "blocked",
+      "evidence_class": "code-backed",
+      "review_status": "candidate",
+      "dedupe_key": "content:10fa4345a9127e9f6b61953e",
+      "source_urls": [
+        "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/5_31_cloud_storage_object_accessed_from_new_IP.sql"
+      ],
+      "duplicate_count": 1,
+      "classification": "needs field mapping",
+      "classification_reasons": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ]
+    },
+    {
+      "id": "reference:privileged_access",
+      "title": "Privileged access",
+      "source_ids": [
+        "google_csa"
+      ],
+      "source_file": "backends/bigquery/sql/1_01_login_highly_privileged_account.sql",
+      "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/1_01_login_highly_privileged_account.sql",
+      "source_sha256": "6b61007b5bd77dd7f7a70a59641c7dc4ee1ed33faff0efae23ae33e31b1e5560",
+      "mitre_techniques": [
+        "T1078.004"
+      ],
+      "local_queries": [
+        "hunting/oci_after_hours_iam_activity.json"
+      ],
+      "mapping_gaps": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ],
+      "required_fields": [],
+      "upstream_tables": [
+        "cloudaudit_googleapis_com_data_access",
+        "parameter",
+        "value"
+      ],
+      "upstream_fields": [
+        "protopayload_auditlog.authenticationInfo.principalEmail",
+        "protopayload_auditlog.metadataJson",
+        "protopayload_auditlog.methodName",
+        "protopayload_auditlog.requestMetadata.callerIp",
+        "protopayload_auditlog.serviceName"
+      ],
+      "semantic_limitations": [
+        "Local links are behavioral analogues, not translated upstream detections."
+      ],
+      "source_type": "google_csa",
+      "source_types": [
+        "google_csa"
+      ],
+      "affected_platform": "cross_platform",
+      "candidate_log_sources": [],
+      "mitre_tactics": [],
+      "core_indicators": [],
+      "detection_idea": "Privileged access",
+      "licensing": {
+        "mode": "metadata_only",
+        "licenses": [
+          "Apache-2.0"
+        ]
+      },
+      "attribution": {
+        "references": [
+          "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/1_01_login_highly_privileged_account.sql"
+        ]
+      },
+      "provenance": [
+        {
+          "source_id": "google_csa",
+          "revision": "2dd8565557e043e25d16df8f7743b9e69374d6f3",
+          "license": "Apache-2.0",
+          "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/1_01_login_highly_privileged_account.sql",
+          "source_sha256": "6b61007b5bd77dd7f7a70a59641c7dc4ee1ed33faff0efae23ae33e31b1e5560"
+        }
+      ],
+      "readiness": "blocked",
+      "evidence_class": "code-backed",
+      "review_status": "candidate",
+      "dedupe_key": "content:c2de23300f34ad078351b941",
+      "source_urls": [
+        "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/1_01_login_highly_privileged_account.sql"
+      ],
+      "duplicate_count": 1,
+      "classification": "needs field mapping",
+      "classification_reasons": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ]
+    },
+    {
+      "id": "reference:iam_changes",
+      "title": "Privileged role assignments",
+      "source_ids": [
+        "kustoking"
+      ],
+      "source_file": "Microsoft Entra ID/Monitor Privileged Role Assignments.md",
+      "source_url": "https://github.com/KustoKing/Hunting-Queries-Detection-Rules/blob/f59e974d34b78e3d6bbf7fb8c52fc607c048d684/Microsoft%20Entra%20ID/Monitor%20Privileged%20Role%20Assignments.md",
+      "source_sha256": "5e63b664f8f2cf9c0818dbb93e2047ac362f691a580e6881874add4c6436b2de",
+      "mitre_techniques": [
+        "T1098"
+      ],
+      "local_queries": [
+        "hunting/oci_iam_policy_changes.json"
+      ],
+      "mapping_gaps": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ],
+      "required_fields": [],
+      "upstream_tables": [
+        "AuditLogs"
+      ],
+      "upstream_fields": [
+        "TimeGenerated",
+        "TargetResources",
+        "OperationName",
+        "InitiatedBy",
+        "AdditionalDetails"
+      ],
+      "semantic_limitations": [
+        "Local links are behavioral analogues, not translated upstream detections."
+      ],
+      "source_type": "kustoking",
+      "source_types": [
+        "kustoking"
+      ],
+      "affected_platform": "cross_platform",
+      "candidate_log_sources": [],
+      "mitre_tactics": [],
+      "core_indicators": [],
+      "detection_idea": "Privileged role assignments",
+      "licensing": {
+        "mode": "metadata_only",
+        "licenses": [
+          "BSD-3-Clause"
+        ]
+      },
+      "attribution": {
+        "references": [
+          "https://github.com/KustoKing/Hunting-Queries-Detection-Rules/blob/f59e974d34b78e3d6bbf7fb8c52fc607c048d684/Microsoft%20Entra%20ID/Monitor%20Privileged%20Role%20Assignments.md"
+        ]
+      },
+      "provenance": [
+        {
+          "source_id": "kustoking",
+          "revision": "f59e974d34b78e3d6bbf7fb8c52fc607c048d684",
+          "license": "BSD-3-Clause",
+          "source_url": "https://github.com/KustoKing/Hunting-Queries-Detection-Rules/blob/f59e974d34b78e3d6bbf7fb8c52fc607c048d684/Microsoft%20Entra%20ID/Monitor%20Privileged%20Role%20Assignments.md",
+          "source_sha256": "5e63b664f8f2cf9c0818dbb93e2047ac362f691a580e6881874add4c6436b2de"
+        }
+      ],
+      "readiness": "blocked",
+      "evidence_class": "code-backed",
+      "review_status": "candidate",
+      "dedupe_key": "content:e27e5a50fdd2dc52fca4c762",
+      "source_urls": [
+        "https://github.com/KustoKing/Hunting-Queries-Detection-Rules/blob/f59e974d34b78e3d6bbf7fb8c52fc607c048d684/Microsoft%20Entra%20ID/Monitor%20Privileged%20Role%20Assignments.md"
+      ],
+      "duplicate_count": 1,
+      "classification": "needs field mapping",
+      "classification_reasons": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ]
+    },
+    {
+      "id": "reference:endpoint_rarity",
+      "title": "Rare connections by Office processes",
+      "source_ids": [
+        "bertjanp"
+      ],
+      "source_file": "Defender For Endpoint/RareConnectionsMadeByOffice.md",
+      "source_url": "https://github.com/Bert-JanP/Hunting-Queries-Detection-Rules/blob/1c92e563cca5375e50525df8b455e6117091a27a/Defender%20For%20Endpoint/RareConnectionsMadeByOffice.md",
+      "source_sha256": "b7f2dad9f0d4ba4a46cbfcb7df52c2f349a542156c12eff11fef76b1950bd4c9",
+      "mitre_techniques": [
+        "T1071.001"
+      ],
+      "local_queries": [
+        "hunting/win_rare_parent_child_process.json"
+      ],
+      "mapping_gaps": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ],
+      "required_fields": [],
+      "upstream_tables": [
+        "DeviceRegistryEvents"
+      ],
+      "upstream_fields": [
+        "ActionType",
+        "RegistryKey",
+        "DeviceName"
+      ],
+      "semantic_limitations": [
+        "Local links are behavioral analogues, not translated upstream detections.",
+        "Registry-derived Office connection rarity differs from process parent/child rarity."
+      ],
+      "source_type": "bertjanp",
+      "source_types": [
+        "bertjanp"
+      ],
+      "affected_platform": "cross_platform",
+      "candidate_log_sources": [],
+      "mitre_tactics": [],
+      "core_indicators": [],
+      "detection_idea": "Rare connections by Office processes",
+      "licensing": {
+        "mode": "metadata_only",
+        "licenses": [
+          "BSD-3-Clause"
+        ]
+      },
+      "attribution": {
+        "references": [
+          "https://github.com/Bert-JanP/Hunting-Queries-Detection-Rules/blob/1c92e563cca5375e50525df8b455e6117091a27a/Defender%20For%20Endpoint/RareConnectionsMadeByOffice.md"
+        ]
+      },
+      "provenance": [
+        {
+          "source_id": "bertjanp",
+          "revision": "1c92e563cca5375e50525df8b455e6117091a27a",
+          "license": "BSD-3-Clause",
+          "source_url": "https://github.com/Bert-JanP/Hunting-Queries-Detection-Rules/blob/1c92e563cca5375e50525df8b455e6117091a27a/Defender%20For%20Endpoint/RareConnectionsMadeByOffice.md",
+          "source_sha256": "b7f2dad9f0d4ba4a46cbfcb7df52c2f349a542156c12eff11fef76b1950bd4c9"
+        }
+      ],
+      "readiness": "blocked",
+      "evidence_class": "code-backed",
+      "review_status": "candidate",
+      "dedupe_key": "content:0595e49bd22964331f2ab266",
+      "source_urls": [
+        "https://github.com/Bert-JanP/Hunting-Queries-Detection-Rules/blob/1c92e563cca5375e50525df8b455e6117091a27a/Defender%20For%20Endpoint/RareConnectionsMadeByOffice.md"
+      ],
+      "duplicate_count": 1,
+      "classification": "needs field mapping",
+      "classification_reasons": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ]
+    },
+    {
       "id": "cand_95f07a78d559c72c",
       "title": "Resource mass deletion",
       "sigma_id": "",
@@ -1372,6 +1949,78 @@
       "classification": "not applicable to OCI Log Analytics",
       "classification_reasons": [
         "no candidate OCI Log Analytics source group is known"
+      ]
+    },
+    {
+      "id": "reference:api_usage",
+      "title": "Unusual API usage",
+      "source_ids": [
+        "google_csa"
+      ],
+      "source_file": "backends/bigquery/sql/4_01_unusually_high_api_usage_by_user_identity.sql",
+      "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/4_01_unusually_high_api_usage_by_user_identity.sql",
+      "source_sha256": "094751e487c055da6c89137580c36c48231b051fe2c5f4ab59a4c38410c943df",
+      "mitre_techniques": [
+        "T1106"
+      ],
+      "local_queries": [
+        "hunting/oci_api_burst_by_user.json"
+      ],
+      "mapping_gaps": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
+      ],
+      "required_fields": [],
+      "upstream_tables": [
+        "cloudaudit_googleapis_com_"
+      ],
+      "upstream_fields": [
+        "protopayload_auditlog.authenticationInfo.principalEmail",
+        "protopayload_auditlog.methodName"
+      ],
+      "semantic_limitations": [
+        "Local links are behavioral analogues, not translated upstream detections.",
+        "Upstream uses rolling average and standard deviation; a fixed API burst threshold is not equivalent."
+      ],
+      "source_type": "google_csa",
+      "source_types": [
+        "google_csa"
+      ],
+      "affected_platform": "cross_platform",
+      "candidate_log_sources": [],
+      "mitre_tactics": [],
+      "core_indicators": [],
+      "detection_idea": "Unusual API usage",
+      "licensing": {
+        "mode": "metadata_only",
+        "licenses": [
+          "Apache-2.0"
+        ]
+      },
+      "attribution": {
+        "references": [
+          "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/4_01_unusually_high_api_usage_by_user_identity.sql"
+        ]
+      },
+      "provenance": [
+        {
+          "source_id": "google_csa",
+          "revision": "2dd8565557e043e25d16df8f7743b9e69374d6f3",
+          "license": "Apache-2.0",
+          "source_url": "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/4_01_unusually_high_api_usage_by_user_identity.sql",
+          "source_sha256": "094751e487c055da6c89137580c36c48231b051fe2c5f4ab59a4c38410c943df"
+        }
+      ],
+      "readiness": "blocked",
+      "evidence_class": "code-backed",
+      "review_status": "candidate",
+      "dedupe_key": "content:99b89b48be4b1104f12b811a",
+      "source_urls": [
+        "https://github.com/GoogleCloudPlatform/security-analytics/blob/2dd8565557e043e25d16df8f7743b9e69374d6f3/backends/bigquery/sql/4_01_unusually_high_api_usage_by_user_identity.sql"
+      ],
+      "duplicate_count": 1,
+      "classification": "needs field mapping",
+      "classification_reasons": [
+        "Upstream telemetry and behavior require source-specific mapping and semantic review; local links are analogous investigation starting points."
       ]
     },
     {
@@ -1517,6 +2166,7 @@
         "https://github.com/elastic/detection-rules"
       ],
       "duplicate_count": 2,
+      "mapping_gaps": [],
       "duplicates": [
         {
           "title": "Windows coverage gap: T1037 Boot or Logon Initialization Scripts",

@@ -40,14 +40,14 @@ Published counts come from [`queries/catalog.json`](../queries/catalog.json), [`
 | Sigma-derived browser/app queries | 8 | `queries/catalog.json:inventory.source_derived_app_queries` |
 | Promoted Sentinel queries | 590 | `queries/catalog.json:total_sentinel_queries` |
 | Curated app analytics | 54 | `queries/catalog.json:inventory.curated_app_queries` |
-| Curated hunting analytics | 155 | `queries/catalog.json:total_hunting` |
-| Total query content | 1,352 | `queries/catalog.json:total_content_items` |
+| Curated hunting analytics | 156 | `queries/catalog.json:total_hunting` |
+| Total query content | 1,353 | `queries/catalog.json:total_content_items` |
 | Dashboards | 35 | `queries/dashboard_inventory.json:summary.total_dashboards` |
 | Dashboard saved searches/widgets | 541 | `queries/dashboard_inventory.json:summary.total_widgets` |
 | Advanced visualization widgets | 161 | `queries/dashboard_inventory.json:summary.advanced_visualization_widgets` |
 | Latest local synthetic events | 93,142 across 25 NDJSON files | `test_data/manifest.json` |
 
-The 553 Sigma-derived queries are the 545 top-level queries plus 8 browser/app queries. The 209 curated analytics are 54 app queries plus 155 hunting queries. Sentinel content is source-derived but is not counted as Sigma-derived.
+The 553 Sigma-derived queries are the 545 top-level queries plus 8 browser/app queries. The 210 curated analytics are 54 app queries plus 156 hunting queries. Sentinel content is source-derived but is not counted as Sigma-derived.
 
 ## Repository content architecture
 

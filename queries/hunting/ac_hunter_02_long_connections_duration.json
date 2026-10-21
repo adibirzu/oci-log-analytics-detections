@@ -1,0 +1,64 @@
+{
+  "title": "AC-Hunter 02: Long Connections & Persistent RMM/Backdoor Sessions",
+  "description": "Replicates AC-Hunter Long Connection detection for persistent outbound network sessions (SSH, RDP, Cloudflared/AnyDesk RMM tunnels, interactive reverse shells) exceeding duration thresholds from 3600s (1h base) through 14820s, 28400s, and up to 86400s (24h).",
+  "query": "('Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Application Logs') and ('Destination IP' in ('198.41.200.113', '198.51.100.214') or 'Destination Port' in (7844, 8443, 3389, 22) or msg like '*long_connection*' or msg like '*cloudflared*') | stats count as session_events, distinctcount('Log Source') as sources_observed by 'Source IP', 'Destination IP', 'Destination Port', 'Trace ID' | eval duration_tier = if(session_events >= 2, 'high_12h_plus_28400s', 'medium_4h_to_8h_14820s') | where session_events >= 1 | sort -session_events",
+  "type": "hunting",
+  "hunting_type": "outlier_detection",
+  "cookbook_method": "outlier_detection",
+  "level": "high",
+  "tags": [
+    "ac_hunter",
+    "long_connections",
+    "rmm.cloudflared",
+    "oci.vcn_flow",
+    "attack.command_and_control",
+    "attack.t1219",
+    "attack.t1572"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control",
+      "lateral_movement"
+    ],
+    "techniques": [
+      "T1219",
+      "T1572",
+      "T1021.001"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "vcn_and_sysmon",
+    "candidates": [
+      "SOC VCN Flow Logs",
+      "SOC Windows Sysmon Logs",
+      "SOC Application Logs"
+    ]
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "groupBy": [
+        "Source IP",
+        "Destination IP",
+        "Destination Port"
+      ],
+      "valueField": "session_events"
+    },
+    "ask_ai_prompts": [
+      "Which outbound connections stayed open beyond the 3600s (1h) and 14400s (4h) thresholds?",
+      "Identify whether cloudflared or RMM processes initiated these long-lived tunnels."
+    ]
+  },
+  "falsepositives": [
+    "Approved site-to-site VPN tunnels or database replication streams"
+  ],
+  "investigation_notes": [
+    "AC-Hunter categorizes long connections into Base (1h / 3600s), Low (4h / 14400s), Medium (8h / 28800s), and High (12h+ / 43200s-86400s).",
+    "Verify sessions to 198.41.200.113:7844 (14,820s) and 198.51.100.214:8443 (28,400s)."
+  ]
+}

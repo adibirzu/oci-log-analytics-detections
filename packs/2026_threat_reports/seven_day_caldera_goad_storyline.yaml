@@ -1,0 +1,113 @@
+# 7-Day Multi-Pillar Threat Hunting & Caldera/GOAD Adversary Emulation Storyline (2026)
+# Correlates OCI Log Analytics, OCI Monitoring, OCI APM (OpenTelemetry), Oracle Data Safe, and Langfuse AI Agent Reasoning
+version: 1
+pack_id: seven-day-caldera-goad-storyline-2026
+title: "7-Day Multi-Pillar Threat Hunting & Caldera/GOAD Adversary Emulation Storyline"
+background_service_tasks:
+  - id: BG-SVC-01
+    name: "Automated Autonomous Database Incremental Backups & Data Safe Audit Sync"
+    schedule: "Daily ~02:15–02:50 UTC"
+    sources: ["SOC Application Logs", "OCI Audit Logs"]
+  - id: BG-SVC-02
+    name: "OKE Node Kubelet Heartbeats & Container Readiness Checks"
+    schedule: "Daily ~06:18–06:55 UTC"
+    sources: ["SOC Linux Syslog Logs", "SOC Application Logs"]
+  - id: BG-SVC-03
+    name: "Enterprise CRM to Drone Shop Order Synchronization Jobs"
+    schedule: "Daily ~10:11–10:50 UTC"
+    sources: ["SOC Application Logs"]
+  - id: BG-SVC-04
+    name: "OCI DevOps Build Pipeline Runs & OCIR Image Verification"
+    schedule: "Daily ~14:22–14:55 UTC"
+    sources: ["OCI Audit Logs"]
+  - id: BG-SVC-05
+    name: "OKE Workload Identity & IAM Scoped Token Refreshes"
+    schedule: "Daily ~18:25–18:55 UTC"
+    sources: ["OCI Audit Logs"]
+
+days:
+  - day: 1
+    id: STORYLINE-DAY-01
+    name: "Day 1 — Recon & Initial Access: External Port Scan, WAF/API Gateway 401/403 Bursts & VCN Flow Sweeps"
+    mitre_attack: ["T1595.001", "T1595.002", "T1190", "T1110.004"]
+    peak_type: baseline_eda
+    query_file: "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json"
+    log_analytics_query: >-
+      ('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC VCN Flow Logs')
+      and ('Client IP' = '198.51.100.214' or 'Source IP' = '198.51.100.214' or 'Response Code' in ('401', '403') or 'Action' = 'REJECT')
+      | stats count as recon_events, distinctcount('Destination Port') as ports_probed, distinctcount('Request URL') as urls_probed by 'Log Source', 'Trace ID'
+      | where recon_events >= 1
+      | sort -recon_events
+
+  - day: 2
+    id: STORYLINE-DAY-02
+    name: "Day 2 — OKE Pod Breakout & IMDSv2 Harvesting: Container Metadata & K8s ServiceAccount Token Theft"
+    mitre_attack: ["T1552.005", "T1552.007", "T1611", "T1059.004"]
+    peak_type: hypothesis_driven
+    query_file: "hunting/storyline_day2_oke_pod_breakout_imdsv2_harvest.json"
+    log_analytics_query: >-
+      ('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'SOC Application Logs')
+      and ('Command Line' like '*169.254.169.254/opc/v2/instance/*' or 'Process Command Line' like '*169.254.169.254/opc/v2/instance/*' or msg like '*serviceaccount/token*')
+      | stats count as breakout_hits, distinctcount('Process Name') as processes by 'Host Name', 'Process Name'
+      | sort -breakout_hits
+
+  - day: 3
+    id: STORYLINE-DAY-03
+    name: "Day 3 — Caldera Agent Deployment & GOAD AD Discovery: Sandcat Beacon, AdFind & SharpHound"
+    mitre_attack: ["T1053.005", "T1087.002", "T1069.002", "T1482", "T1071.001"]
+    peak_type: hypothesis_driven
+    query_file: "hunting/storyline_day3_caldera_sandcat_goad_ad_discovery.json"
+    log_analytics_query: >-
+      ('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Event Security Logs')
+      and ('Host Name (Server)' in ('kingslanding', 'winterfell', 'castelblack') or Entity in ('kingslanding', 'winterfell', 'castelblack'))
+      and ('Command Line' like '*splunkd.exe*' or 'Command Line' like '*AdFind*' or 'Command Line' like '*SharpHound*')
+      | stats count as discovery_events, distinctcount('Process Name') as tools_observed by 'Host Name (Server)', 'Process Name'
+      | sort -discovery_events
+
+  - day: 4
+    id: STORYLINE-DAY-04
+    name: "Day 4 — Living-off-the-Land RMM & Lateral Movement: Encoded PowerShell, AMSI Bypass, Cloudflared & Kerberoasting"
+    mitre_attack: ["T1059.001", "T1562.001", "T1219", "T1558.003"]
+    peak_type: hypothesis_driven
+    query_file: "hunting/storyline_day4_lotl_rmm_kerberoasting_lateral.json"
+    log_analytics_query: >-
+      ('Log Source' = 'Windows PowerShell Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Event Security Logs')
+      and ('Event ID' in ('4104', '4769', '1') and ('Command Line' like '*-EncodedCommand*' or 'Command Line' like '*cloudflared*' or 'Event ID' = '4769'))
+      | stats count as lateral_events, distinctcount('Event ID') as distinct_signals by 'Host Name (Server)', 'Event ID'
+      | sort -lateral_events
+
+  - day: 5
+    id: STORYLINE-DAY-05
+    name: "Day 5 — Privilege Escalation & Persistence: DCSync on KingsLanding DC01, Service Creation & OCI IAM Drift"
+    mitre_attack: ["T1003.006", "T1543.003", "T1053.005", "T1098.001"]
+    peak_type: hypothesis_driven
+    query_file: "hunting/storyline_day5_dcsync_persistence_iam_drift.json"
+    log_analytics_query: >-
+      ('Log Source' = 'Windows Event Security Logs' or 'Log Source' = 'Windows Event System Logs')
+      and ('Event ID' in ('4662', '7045', '4698') and 'Host Name (Server)' in ('kingslanding', 'winterfell', 'castelblack'))
+      | stats count as persistence_events, distinctcount('Event ID') as event_types by 'Host Name (Server)', User
+      | sort -persistence_events
+
+  - day: 6
+    id: STORYLINE-DAY-06
+    name: "Day 6 — Database Reconnaissance & Data Safe Alerting: Unauthorized Schema Enumeration & Bulk PII Extraction"
+    mitre_attack: ["T1213", "T1005", "T1530", "T1078.004"]
+    peak_type: model_assisted_math
+    query_file: "hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json"
+    log_analytics_query: >-
+      'Log Source' = 'SOC Application Logs'
+      and ('DB Target' in ('guardian-standalone-adb', 'oci4cca-observeai-adb') or 'DB Statement' like '*CUSTOMER_PII*' or 'DB Statement' like '*all_tab_columns*')
+      | stats count as db_audit_hits, distinctcount('DB Target') as targeted_databases by 'DB Target', User, 'Attack Stage'
+      | sort -db_audit_hits
+
+  - day: 7
+    id: STORYLINE-DAY-07
+    name: "Day 7 — Exfiltration Attempt & AI Automated Containment: DNS Tunneling, C2 Egress & ObserveAI Agent Investigation"
+    mitre_attack: ["T1048.003", "T1071.004", "T1041", "T1567"]
+    peak_type: model_assisted_math
+    query_file: "hunting/storyline_day7_dns_c2_exfil_melts_correlation.json"
+    log_analytics_query: >-
+      ('Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Application Logs')
+      and ('Destination IP' = '198.51.100.214' or 'Client IP' = '198.51.100.214' or msg like '*exfil.c2-stage.example.net*')
+      | stats count as exfil_signals, distinctcount('Log Source') as correlated_pillars by 'Destination IP', 'Trace ID'
+      | sort -exfil_signals

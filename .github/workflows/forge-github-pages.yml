@@ -10,8 +10,12 @@ on:
       - "queries/logan_ql_reference_catalog.json"
       - "queries/cross_ql_mapping_patterns.json"
       - "queries/conversion_examples.json"
+      - "queries/forge_detection_catalog.json"
+      - "queries/catalog.json"
+      - "queries/hunting_integration_bundle.json"
       - "queries/ql_conversion_capability_matrix.json"
       - "queries/siem_log_examples.json"
+      - "packs/2026_threat_reports/**"
       - ".github/workflows/forge-github-pages.yml"
 
 permissions:

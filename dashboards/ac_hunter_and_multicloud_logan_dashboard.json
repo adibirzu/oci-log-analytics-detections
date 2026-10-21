@@ -1,0 +1,785 @@
+{
+  "schema_version": "1.0.0",
+  "dashboardId": "soc-ac-hunter-and-multicloud-logan-dashboard",
+  "providerId": "log-analytics",
+  "providerName": "Log Analytics",
+  "providerVersion": "3.0.0",
+  "displayName": "SOC: AC-Hunter Network Hunting & Multi-Cloud Log Analytics Dashboard",
+  "description": "Unified OCI Log Analytics saved dashboard replicating Active Countermeasures AC-Hunter network hunting capabilities (RITA C2 Beaconing Score, Long Connections, DNS Subdomain Entropy/Tunneling, Client Signatures & TLS JA3/JA4, Strobe Port Sweeps, Non-Standard Port Abuse, Threat Intelligence & Safelist Filtering, and Composite Host Threat Score 0-100) alongside Multi-Cloud security telemetry across AWS CloudTrail (OCSF), Azure Activity & Entra ID, GCP Cloud Audit, and OCI VCN Flow & Data Safe.",
+  "compartmentId": "<COMPARTMENT_OCID>",
+  "isOobDashboard": false,
+  "isShowInHome": true,
+  "isShowDescription": true,
+  "metadataVersion": "2.0",
+  "type": "normal",
+  "isFavorite": true,
+  "nls": {},
+  "uiConfig": {
+    "isFilteringEnabled": true,
+    "isRefreshEnabled": true
+  },
+  "dataConfig": [],
+  "screenImage": " ",
+  "freeformTags": {
+    "platform": "soc-detection-rules",
+    "pack": "ac_hunter_network_hunting",
+    "multicloud": "aws-azure-gcp-oci"
+  },
+  "parametersConfig": [
+    {
+      "paramName": "log-analytics-loggroup-filter",
+      "displayName": "Log Group Compartment",
+      "paramType": "LogAnalyticsLogGroupCompartment",
+      "defaultValue": "<COMPARTMENT_OCID>",
+      "isRequired": false
+    },
+    {
+      "paramName": "log-analytics-entity-filter",
+      "displayName": "Entity",
+      "paramType": "LogAnalyticsEntity",
+      "defaultValue": "",
+      "isRequired": false
+    },
+    {
+      "paramName": "time",
+      "displayName": "Time Range",
+      "paramType": "Time",
+      "defaultValue": "l21d",
+      "isRequired": false
+    }
+  ],
+  "tiles": [
+    {
+      "displayName": "AC-Hunter 01: C2 Beaconing (RITA Interval & Payload Skew Score)",
+      "savedSearchId": "ac-hunter-01-c2-beaconing-rita",
+      "queryFile": "hunting/ac_hunter_01_c2_beaconing_rita_score.json",
+      "pillar": "ac_hunter_beaconing",
+      "row": 0,
+      "column": 0,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "AC-Hunter 02: Long Connections (1h Base to 24h+ Persistent Sessions)",
+      "savedSearchId": "ac-hunter-02-long-connections",
+      "queryFile": "hunting/ac_hunter_02_long_connections_duration.json",
+      "pillar": "ac_hunter_long_connections",
+      "row": 0,
+      "column": 6,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "AC-Hunter 03: DNS Beaconing, Tunneling & Subdomain Entropy (*.exfil.c2-stage.example.net)",
+      "savedSearchId": "ac-hunter-03-dns-fqdn-entropy",
+      "queryFile": "hunting/ac_hunter_03_dns_beaconing_fqdn_entropy.json",
+      "pillar": "ac_hunter_dns_entropy",
+      "row": 5,
+      "column": 0,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "AC-Hunter 04: Client Signatures, Weaponized User-Agents & TLS JA3/JA4",
+      "savedSearchId": "ac-hunter-04-client-signatures-ja3",
+      "queryFile": "hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
+      "pillar": "ac_hunter_client_signatures",
+      "row": 5,
+      "column": 6,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "AC-Hunter 05: Strobe High-Frequency C2 & VCN Flow Port Scan Sweeps",
+      "savedSearchId": "ac-hunter-05-strobe-port-sweep",
+      "queryFile": "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
+      "pillar": "ac_hunter_strobe_port_scan",
+      "row": 10,
+      "column": 0,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "AC-Hunter 06: Multi-Protocol & Non-Standard Port Abuse (8443, 7844, 4444, 5985)",
+      "savedSearchId": "ac-hunter-06-non-standard-ports",
+      "queryFile": "hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json",
+      "pillar": "ac_hunter_non_standard_ports",
+      "row": 10,
+      "column": 6,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "AC-Hunter 07: Threat Intelligence C2 Hits & Safelist Filtering",
+      "savedSearchId": "ac-hunter-07-threat-intel-safelist",
+      "queryFile": "hunting/ac_hunter_07_threat_intel_safelist_correlation.json",
+      "pillar": "ac_hunter_threat_intel",
+      "row": 15,
+      "column": 0,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "AC-Hunter 08: Composite Host Threat Score (0-100) & Cross-CSP Correlation",
+      "savedSearchId": "ac-hunter-08-composite-threat-score",
+      "queryFile": "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
+      "pillar": "ac_hunter_composite_score",
+      "row": 15,
+      "column": 6,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "Multi-Cloud AWS CloudTrail (OCSF us-east-1): AssumeRole, GetSecretValue & SecurityGroup Drift",
+      "savedSearchId": "multicloud-09-aws-cloudtrail-ocsf",
+      "queryFile": "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
+      "pillar": "multicloud_aws_cloudtrail",
+      "row": 20,
+      "column": 0,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "Multi-Cloud Azure Activity & Entra ID (westeurope): Service Principal Credentials & NSG Rule Updates",
+      "savedSearchId": "multicloud-10-azure-activity-entra",
+      "queryFile": "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
+      "pillar": "multicloud_azure_activity_entra",
+      "row": 20,
+      "column": 6,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "Multi-Cloud GCP Cloud Audit (europe-west3): SetIamPolicy, compute.firewalls.patch & storage.objects.get",
+      "savedSearchId": "multicloud-11-gcp-cloud-audit",
+      "queryFile": "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
+      "pillar": "multicloud_gcp_audit",
+      "row": 25,
+      "column": 0,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    },
+    {
+      "displayName": "Multi-Cloud OCI VCN Flow, Audit & Oracle Data Safe Sensitive PII Extraction (ORA-DS-PRIV-004)",
+      "savedSearchId": "multicloud-12-oci-vcn-datasafe-audit",
+      "queryFile": "hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json",
+      "pillar": "multicloud_oci_vcn_datasafe",
+      "row": 25,
+      "column": 6,
+      "height": 5,
+      "width": 6,
+      "nls": {},
+      "uiConfig": {},
+      "dataConfig": [],
+      "state": "DEFAULT",
+      "drilldownConfig": [],
+      "parametersMap": {
+        "log-analytics-entity": "$(dashboard.params.log-analytics-entity-filter)",
+        "log-analytics-log-group-compartment": "$(dashboard.params.log-analytics-loggroup-filter)",
+        "time": "$(dashboard.params.time)"
+      }
+    }
+  ],
+  "savedSearches": [
+    {
+      "id": "ac-hunter-01-c2-beaconing-rita",
+      "displayName": "AC-Hunter 01: C2 Beaconing (RITA Interval & Payload Skew Score)",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Replicates Active Countermeasures AC-Hunter & RITA C2 beaconing detection in OCI Log Analytics. Evaluates HTTP/HTTPS/TCP/UDP periodic callback patterns based on connection interval regularity/skew (60s +/- 1s), payload size consistency/skew, dispersion, duration, and connection count across VCN Flow, Sysmon Network, and Application telemetry.",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Application Logs') and ('Destination IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Destination Port' in (8443, 7844, 4443, 443) or msg like '*rita_beacon*') | stats count as callback_count, distinctcount('Destination Port') as beacon_ports, distinctcount('Log Source') as telemetry_pillars by 'Source IP', 'Destination IP', 'Destination Port', 'Trace ID' | eval rita_beacon_score = if(callback_count >= 10, 96, 84) | where callback_count >= 1 | sort -rita_beacon_score, -callback_count",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Source IP",
+            "Destination IP",
+            "Destination Port"
+          ],
+          "valueField": "rita_beacon_score"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "ac_hunter_beaconing"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "ac-hunter-02-long-connections",
+      "displayName": "AC-Hunter 02: Long Connections (1h Base to 24h+ Persistent Sessions)",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Replicates AC-Hunter Long Connection detection for persistent outbound network sessions (SSH, RDP, Cloudflared/AnyDesk RMM tunnels, interactive reverse shells) exceeding duration thresholds from 3600s (1h base) through 14820s, 28400s, and up to 86400s (24h).",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Application Logs') and ('Destination IP' in ('198.41.200.113', '198.51.100.214') or 'Destination Port' in (7844, 8443, 3389, 22) or msg like '*long_connection*' or msg like '*cloudflared*') | stats count as session_events, distinctcount('Log Source') as sources_observed by 'Source IP', 'Destination IP', 'Destination Port', 'Trace ID' | eval duration_tier = if(session_events >= 2, 'high_12h_plus_28400s', 'medium_4h_to_8h_14820s') | where session_events >= 1 | sort -session_events",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Source IP",
+            "Destination IP",
+            "Destination Port"
+          ],
+          "valueField": "session_events"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "ac_hunter_long_connections"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "ac-hunter-03-dns-fqdn-entropy",
+      "displayName": "AC-Hunter 03: DNS Beaconing, Tunneling & Subdomain Entropy (*.exfil.c2-stage.example.net)",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Replicates AC-Hunter C2-over-DNS analysis by detecting high counts of distinct randomized subdomains per registered base domain (*.exfil.c2-stage.example.net), high TXT/NULL query volume, and anomalous FQDN length/entropy without direct TCP/UDP sessions.",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'Windows Sysmon Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'SOC Network Firewall Logs') and ('Query Name' like '*exfil.c2-stage.example.net*' or 'Destination IP' = '198.51.100.214' or msg like '*subdomain_entropy*') | eval fqdn_length = length('Query Name') | where fqdn_length > 14 | stats count as dns_queries, distinctcount('Query Name') as distinct_subdomains by 'Host Name', 'Destination IP', 'Query Name' | where dns_queries >= 1 | sort -distinct_subdomains, -dns_queries",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Host Name",
+            "Query Name"
+          ],
+          "valueField": "dns_queries"
+        },
+        "visualizationType": "bar",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "ac_hunter_dns_entropy"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "ac-hunter-04-client-signatures-ja3",
+      "displayName": "AC-Hunter 04: Client Signatures, Weaponized User-Agents & TLS JA3/JA4",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Replicates AC-Hunter Client Signature hunting by identifying rare or weaponized HTTP User-Agents (Nuclei, screenconnect-relay, Go-http-client), anomalous TLS JA3/JA4 client hello fingerprints, and mismatched client signatures across internal assets.",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and ('User Agent' like '*Nuclei*' or 'User Agent' like '*screenconnect*' or 'User Agent' like '*Go-http-client*' or 'User Agent' like '*ja3*' or msg like '*ja3_hash*' or msg like '*client_signature*') | stats count as signature_hits, distinctcount('User Agent') as distinct_signatures, distinctcount('Request URL') as targeted_endpoints by 'Client IP', 'User Agent', 'Host Name', 'Trace ID' | where signature_hits >= 1 | sort -signature_hits",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Client IP",
+            "User Agent",
+            "Host Name"
+          ],
+          "valueField": "signature_hits"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "ac_hunter_client_signatures"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "ac-hunter-05-strobe-port-sweep",
+      "displayName": "AC-Hunter 05: Strobe High-Frequency C2 & VCN Flow Port Scan Sweeps",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Replicates AC-Hunter Strobe and Port Sweep detection by identifying rapid-fire back-to-back connection floods and horizontal/vertical port sweeps across OCI VCN Flow Logs (both REJECT and ACCEPT actions).",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "'Log Source' = 'SOC VCN Flow Logs' and ('Action' in ('REJECT', 'ACCEPT') and ('Source IP' in ('198.51.100.214', '198.41.200.113') or 'Destination Port' in (22, 445, 3389, 5985, 7844, 8080, 8443))) | stats count as connection_attempts, distinctcount('Destination Port') as distinct_ports_swept, distinctcount('Destination IP') as distinct_hosts_probed, sum('Bytes Sent') as total_bytes_sent by 'Source IP', 'Destination IP', 'Action', 'Trace ID' | where connection_attempts >= 1 | sort -distinct_ports_swept, -connection_attempts",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Source IP",
+            "Action"
+          ],
+          "valueField": "connection_attempts"
+        },
+        "visualizationType": "bar",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "ac_hunter_strobe_port_scan"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "ac-hunter-06-non-standard-ports",
+      "displayName": "AC-Hunter 06: Multi-Protocol & Non-Standard Port Abuse (8443, 7844, 4444, 5985)",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Detects C2 callbacks, RMM tunnels, and lateral movement over non-standard ports (8443, 7844, 4444, 5985, 8888) or application protocol mismatches across VCN Flow, Sysmon Network, and Network Firewall logs.",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Network Firewall Logs') and ('Destination Port' in (8443, 7844, 4444, 5985, 8888) or msg like '*protocol_mismatch*') | stats count as anomalous_port_flows, distinctcount('Destination Port') as non_standard_ports by 'Source IP', 'Destination IP', 'Destination Port', 'Protocol' | where anomalous_port_flows >= 1 | sort -anomalous_port_flows",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Destination Port",
+            "Source IP",
+            "Destination IP"
+          ],
+          "valueField": "anomalous_port_flows"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "ac_hunter_non_standard_ports"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "ac-hunter-07-threat-intel-safelist",
+      "displayName": "AC-Hunter 07: Threat Intelligence C2 Hits & Safelist Filtering",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Replicates AC-Hunter Threat Intelligence correlation against hostile C2 IPs/ASNs (198.51.100.214, 198.41.200.113, 192.0.2.119, 203.0.113.88) while applying safelist exclusion for known-good cloud infrastructure endpoints.",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Application Logs') and ('Destination IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Client IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Source IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88')) and not ('Destination IP' in ('169.254.169.254')) | stats count as ti_correlated_events, distinctcount('Log Source') as matched_sources by 'Log Source', 'Client IP', 'Status' | where ti_correlated_events >= 1 | sort -ti_correlated_events",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Log Source",
+            "Client IP",
+            "Status"
+          ],
+          "valueField": "ti_correlated_events"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "ac_hunter_threat_intel"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "ac-hunter-08-composite-threat-score",
+      "displayName": "AC-Hunter 08: Composite Host Threat Score (0-100) & Cross-CSP Correlation",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Computes AC-Hunter weighted Composite Host Threat Score (0-100) combining C2 Beaconing, Long Connections, DNS Subdomain Entropy, Strobe Scans, and Threat Intel hits, correlated with Multi-Cloud control-plane logs across AWS CloudTrail OCSF (us-east-1), Azure Activity & Entra ID (westeurope), GCP Cloud Audit (europe-west3), and OCI Audit/VCN/Data Safe.",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'SOC Multicloud Health Logs' or 'Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Application Logs') and (msg like '*AWS_CLOUDTRAIL*' or msg like '*AZURE_ACTIVITY*' or msg like '*GCP_AUDIT*' or msg like '*AC_HUNTER_SCORE*' or 'Client IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Service Name' in ('aws-cloudtrail-ocsf', 'azure-entra-activity', 'gcp-cloud-audit', 'oracle-datasafe-unified-audit', 'ac-hunter-threat-scorer')) | stats count as cross_csp_signals, distinctcount('Log Source') as correlated_pillars, distinctcount('Host Name') as affected_assets by 'Log Source', 'Host Name', 'Service Name', 'Status' | eval composite_threat_score = if(cross_csp_signals >= 3, 94, 86) | where cross_csp_signals >= 1 | sort -composite_threat_score, -cross_csp_signals",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Host Name",
+            "Service Name",
+            "Log Source"
+          ],
+          "valueField": "composite_threat_score"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "ac_hunter_composite_score"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "multicloud-09-aws-cloudtrail-ocsf",
+      "displayName": "Multi-Cloud AWS CloudTrail (OCSF us-east-1): AssumeRole, GetSecretValue & SecurityGroup Drift",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Monitors AWS CloudTrail OCSF control-plane and secret-access telemetry in us-east-1 (AssumeRole, GetSecretValue, ModifySecurityGroupRules) correlated with C2 IPs.",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'SOC Multicloud Health Logs' or 'Log Source' = 'SOC Application Logs') and ('Cloud Provider' = 'AWS' or 'Service Name' = 'aws-cloudtrail-ocsf' or msg like '*AWS_CLOUDTRAIL*' or msg like '*AssumeRole*' or msg like '*GetSecretValue*' or msg like '*ModifySecurityGroupRules*') | stats count as aws_events, distinctcount('Host Name') as aws_assets by 'Log Source', 'Host Name', 'Status' | where aws_events >= 1 | sort -aws_events",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Log Source",
+            "Host Name",
+            "Status"
+          ],
+          "valueField": "aws_events"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "multicloud_aws_cloudtrail"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "multicloud-10-azure-activity-entra",
+      "displayName": "Multi-Cloud Azure Activity & Entra ID (westeurope): Service Principal Credentials & NSG Rule Updates",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Monitors Azure Activity and Microsoft Entra ID audit logs in westeurope for rogue service principal credential additions and NetworkSecurityGroupRuleUpdate changes.",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'SOC Multicloud Health Logs' or 'Log Source' = 'SOC Application Logs') and ('Cloud Provider' = 'Azure' or 'Service Name' = 'azure-entra-activity' or msg like '*AZURE_ACTIVITY*' or msg like '*Add service principal credentials*' or msg like '*NetworkSecurityGroupRuleUpdate*') | stats count as azure_events, distinctcount('Host Name') as azure_assets by 'Log Source', 'Host Name', 'Status' | where azure_events >= 1 | sort -azure_events",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Log Source",
+            "Host Name",
+            "Status"
+          ],
+          "valueField": "azure_events"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "multicloud_azure_activity_entra"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "multicloud-11-gcp-cloud-audit",
+      "displayName": "Multi-Cloud GCP Cloud Audit (europe-west3): SetIamPolicy, compute.firewalls.patch & storage.objects.get",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Monitors GCP Cloud Audit Admin Activity and Data Access logs in europe-west3 for SetIamPolicy bindings, VPC firewall patches, and GCS sensitive bucket object reads.",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'SOC Multicloud Health Logs' or 'Log Source' = 'SOC Application Logs') and ('Cloud Provider' = 'GCP' or 'Service Name' = 'gcp-cloud-audit' or msg like '*GCP_AUDIT*' or msg like '*SetIamPolicy*' or msg like '*compute.firewalls.patch*' or msg like '*storage.objects.get*') | stats count as gcp_events, distinctcount('Host Name') as gcp_assets by 'Log Source', 'Host Name', 'Status' | where gcp_events >= 1 | sort -gcp_events",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Log Source",
+            "Host Name",
+            "Status"
+          ],
+          "valueField": "gcp_events"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "multicloud_gcp_audit"
+      },
+      "parametersConfig": []
+    },
+    {
+      "id": "multicloud-12-oci-vcn-datasafe-audit",
+      "displayName": "Multi-Cloud OCI VCN Flow, Audit & Oracle Data Safe Sensitive PII Extraction (ORA-DS-PRIV-004)",
+      "providerId": "log-analytics",
+      "providerName": "Log Analytics",
+      "providerVersion": "3.0.0",
+      "compartmentId": "<COMPARTMENT_OCID>",
+      "isOobSavedSearch": false,
+      "description": "Correlates OCI Audit IAM policy drift, VCN Flow C2 egress, and Oracle Data Safe Unified Audit sensitive PII extraction (ORA-DS-PRIV-004).",
+      "nls": {},
+      "type": "SEARCH_SHOW_IN_DASHBOARD",
+      "uiConfig": {
+        "enableWidgetInApp": true,
+        "queryString": "('Log Source' = 'OCI Audit Logs' or 'Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Application Logs') and ('Event Name' in ('UpdatePolicy', 'GenerateAutonomousDatabaseWallet') or 'Service Name' = 'oracle-datasafe-unified-audit' or 'Destination IP' = '198.51.100.214' or 'Client IP' = '192.0.2.119') | stats count as oci_security_events, distinctcount('Log Source') as oci_pillars by 'Log Source', 'Client IP', 'Status' | where oci_security_events >= 1 | sort -oci_security_events",
+        "showTitle": true,
+        "timeSelection": {
+          "timePeriod": "l21d"
+        },
+        "visualizationOptions": {
+          "groupBy": [
+            "Log Source",
+            "Client IP",
+            "Status"
+          ],
+          "valueField": "oci_security_events"
+        },
+        "visualizationType": "summary_table",
+        "vizType": "lxSavedSearchWidgetType"
+      },
+      "dataConfig": [],
+      "screenImage": " ",
+      "metadataVersion": "2.0",
+      "widgetTemplate": "visualizations/chartWidgetTemplate.html",
+      "widgetVM": "jet-modules/dashboards/widgets/lxSavedSearchWidget",
+      "freeformTags": {
+        "platform": "soc-detection-rules",
+        "pack": "ac_hunter_network_hunting",
+        "pillar": "multicloud_oci_vcn_datasafe"
+      },
+      "parametersConfig": []
+    }
+  ]
+}

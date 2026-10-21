@@ -1,0 +1,4 @@
+# Optional artifact-only MCP server; tested locally on Python 3.11.
+# SDK v1 documentation: https://github.com/modelcontextprotocol/python-sdk/tree/v1.25.0
+-r requirements.txt
+mcp==1.25.0

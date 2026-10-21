@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hunting integration bundle",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "generator",
+    "content_digest",
+    "input_digests",
+    "packs",
+    "queries"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "generator": {
+      "const": "scripts/generate_hunting_bundle.py"
+    },
+    "content_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "input_digests": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "packs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "query_paths"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "query_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "queries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "source_path",
+          "title",
+          "description",
+          "query",
+          "query_sha256",
+          "severity",
+          "evidence_class",
+          "tags",
+          "source_candidates",
+          "false_positives",
+          "investigation_notes",
+          "pack_ids",
+          "dashboard_references",
+          "mitre_attack",
+          "provenance",
+          "guidance",
+          "field_contract"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source_path": {
+            "type": "string",
+            "pattern": "^hunting/[a-z0-9][a-z0-9_-]*\\.json$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "query_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "severity": {
+            "enum": [
+              "informational",
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "evidence_class": {
+            "const": "code-backed"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_candidates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "false_positives": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "investigation_notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pack_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dashboard_references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mitre_attack": {
+            "type": "object"
+          },
+          "provenance": {
+            "type": "object"
+          },
+          "guidance": {
+            "type": "object"
+          },
+          "field_contract": {
+            "type": "object",
+            "required": [
+              "status",
+              "required_fields",
+              "unmapped_fields",
+              "reasons"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "ready",
+                  "blocked"
+                ]
+              },
+              "required_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "unmapped_fields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

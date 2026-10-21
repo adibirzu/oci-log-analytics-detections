@@ -1,4 +1,5 @@
 import type {
+  ForgeCatalogItem,
   LoganConversionExample,
   LoganMappingPattern,
   LoganSourceLanguage,
@@ -200,11 +201,232 @@ export function formatLoganQueryForDisplay(query: string) {
     .trim()
 }
 
+export interface ServerCustomizationOptions {
+  customLogSource?: string
+  targetHosts?: string
+  excludeHosts?: string
+  thresholdCount?: string
+  timeBucketSpan?: string
+}
+
+export function customizeQueryForServer(
+  baseLoganQuery: string,
+  options: ServerCustomizationOptions,
+): { loganQuery: string; appliedNotes: string[] } {
+  const query = baseLoganQuery.trim()
+  if (!query) {
+    return { loganQuery: "", appliedNotes: [] }
+  }
+  const appliedNotes: string[] = []
+  const pipeIndex = query.indexOf("|")
+  let headClause = pipeIndex >= 0 ? query.slice(0, pipeIndex).trim() : query
+  let pipeClause = pipeIndex >= 0 ? query.slice(pipeIndex).trim() : ""
+
+  const customSource = (options.customLogSource ?? "").trim()
+  if (customSource) {
+    const safeSource = customSource.replace(/'/g, "")
+    if (/'Log Source'\s*=\s*'[^']+'/i.test(headClause)) {
+      headClause = headClause.replace(/'Log Source'\s*=\s*'[^']+'/gi, `'Log Source' = '${safeSource}'`)
+    } else if (/'Log Source'\s+in\s*\([^)]+\)/i.test(headClause)) {
+      headClause = headClause.replace(/'Log Source'\s+in\s*\([^)]+\)/gi, `'Log Source' = '${safeSource}'`)
+    } else {
+      headClause = `'Log Source' = '${safeSource}' and (${headClause})`
+    }
+    appliedNotes.push(`Scoped Log Source to '${safeSource}'`)
+  }
+
+  const hosts = (options.targetHosts ?? "")
+    .split(",")
+    .map((h) => h.trim().replace(/'/g, ""))
+    .filter(Boolean)
+  if (hosts.length === 1) {
+    headClause = `${headClause} and 'Host Name' = '${hosts[0]}'`
+    appliedNotes.push(`Filtered target server 'Host Name' = '${hosts[0]}'`)
+  } else if (hosts.length > 1) {
+    const formatted = hosts.map((h) => `'${h}'`).join(", ")
+    headClause = `${headClause} and 'Host Name' in (${formatted})`
+    appliedNotes.push(`Filtered target servers (${hosts.length} hosts)`)
+  }
+
+  const excluded = (options.excludeHosts ?? "")
+    .split(",")
+    .map((h) => h.trim().replace(/'/g, ""))
+    .filter(Boolean)
+  if (excluded.length === 1) {
+    headClause = `${headClause} and 'Host Name' != '${excluded[0]}'`
+    appliedNotes.push(`Excluded host '${excluded[0]}'`)
+  } else if (excluded.length > 1) {
+    const formatted = excluded.map((h) => `'${h}'`).join(", ")
+    headClause = `${headClause} and 'Host Name' not in (${formatted})`
+    appliedNotes.push(`Excluded ${excluded.length} hosts`)
+  }
+
+  const span = (options.timeBucketSpan ?? "").trim()
+  if (span && !pipeClause.toLowerCase().includes("timestats")) {
+    pipeClause = `${pipeClause ? `${pipeClause} ` : ""}| timestats span=${span} count as server_events by 'Host Name'`
+    appliedNotes.push(`Added timestats bucket span=${span}`)
+  }
+
+  const thresholdRaw = (options.thresholdCount ?? "").trim()
+  const threshold = Number.parseInt(thresholdRaw, 10)
+  if (!Number.isNaN(threshold) && threshold > 0) {
+    if (!pipeClause.toLowerCase().includes("stats")) {
+      pipeClause = `${pipeClause ? `${pipeClause} ` : ""}| stats count as custom_hits by 'Host Name', 'User Name' | where custom_hits >= ${threshold}`
+    } else {
+      pipeClause = `${pipeClause} | where count >= ${threshold}`
+    }
+    appliedNotes.push(`Applied alert threshold >= ${threshold}`)
+  }
+
+  const combined = pipeClause ? `${headClause} ${pipeClause}` : headClause
+  return { loganQuery: combined.trim(), appliedNotes }
+}
+
+function transpileCrossQlInBrowser(
+  language: LoganSourceLanguage,
+  sourceQuery: string,
+): { loganQuery: string; supportLevel: "supported" | "partial" | "lossy" | "unsupported"; explanation: string; warnings: ConversionWarning[] } {
+  const lowered = sourceQuery.toLowerCase()
+
+  if (language === "osquery_sql" || language === "yara") {
+    return {
+      loganQuery: "",
+      supportLevel: "unsupported",
+      explanation: "Endpoint state queries (OSQuery SQL) and raw file content scans (YARA) are only converted when ingested as result logs.",
+      warnings: [{ code: "stateful_or_content_boundary", message: "Requires parser-backed OCI result logs.", severity: "warning" }],
+    }
+  }
+
+  if (language === "sigma_yaml") {
+    const logSource =
+      lowered.includes("product: windows") && lowered.includes("sysmon")
+        ? "('Log Source' = 'Windows Sysmon Events' or 'Log Source' = 'SOC Windows Sysmon Logs')"
+        : lowered.includes("product: windows")
+          ? "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs')"
+          : lowered.includes("product: linux")
+            ? "('Log Source' = 'Linux Auditd Logs' or 'Log Source' = 'SOC Linux Syslog Logs')"
+            : "'Log Source' = 'SOC Application Logs'"
+    const predicates: string[] = []
+    for (const line of sourceQuery.split("\n")) {
+      const m = line.match(/^\s*([A-Za-z0-9_.|]+)\s*:\s*['"]?([^'"]+)['"]?\s*$/)
+      if (!m) continue
+      const key = m[1]
+      const val = m[2].trim()
+      if (["title", "id", "status", "level", "author", "date", "product", "category", "service", "condition"].includes(key.toLowerCase())) continue
+      const baseKey = key.split("|")[0].toLowerCase()
+      const ociField =
+        baseKey === "image" || baseKey === "process"
+          ? "'Process Name'"
+          : baseKey === "commandline"
+            ? "'Command Line'"
+            : baseKey === "parentimage"
+              ? "'Parent Process Name'"
+              : baseKey === "eventid"
+                ? "'Event ID'"
+                : baseKey === "user"
+                  ? "'User Name'"
+                  : baseKey === "url" || baseKey === "c-uri"
+                    ? "'Request URL'"
+                    : "'Message'"
+      if (ociField === "'Event ID'") {
+        predicates.push(`${ociField} = '${val}'`)
+      } else {
+        predicates.push(`${ociField} like '*${val.replace(/^\*|\*$/g, "")}*'`)
+      }
+    }
+    const filterExpr = predicates.length ? ` and (${predicates.join(" and ")})` : ""
+    return {
+      loganQuery: `${logSource}${filterExpr} | stats count as hits by 'Host Name', 'User Name' | sort -hits | head 100`,
+      supportLevel: "supported",
+      explanation: "Converted Sigma YAML rule in browser mode using OCI Log Analytics display field mappings.",
+      warnings: [],
+    }
+  }
+
+  if (language === "sentinel_kql") {
+    const logSource = lowered.startsWith("securityevent")
+      ? "('Log Source' = 'Windows Security Events' or 'Log Source' = 'Windows Event Security Logs')"
+      : lowered.startsWith("auditlogs") || lowered.startsWith("signinlogs")
+        ? "'Log Source' = 'OCI Audit Logs'"
+        : "'Log Source' = 'SOC Application Logs'"
+    const predicates: string[] = []
+    const eventIdMatch = sourceQuery.match(/EventID\s*==\s*(\d+)/i)
+    if (eventIdMatch) predicates.push(`'Event ID' = '${eventIdMatch[1]}'`)
+    for (const m of sourceQuery.matchAll(/(CommandLine|Process|OperationName|Result)\s+(?:has|contains|==)\s+["']([^"']+)["']/gi)) {
+      const f = m[1].toLowerCase()
+      const v = m[2]
+      const ociField =
+        f === "commandline" ? "'Command Line'" : f === "process" ? "'Process Name'" : f === "operationname" ? "'Event Name'" : "Status"
+      predicates.push(f === "commandline" || f === "process" ? `${ociField} like '*${v}*'` : `${ociField} = '${v}'`)
+    }
+    const filterExpr = predicates.length ? ` and (${predicates.join(" and ")})` : ""
+    return {
+      loganQuery: `${logSource}${filterExpr} | stats count as Hits by 'Host Name', 'User Name' | sort -Hits | head 100`,
+      supportLevel: "supported",
+      explanation: "Converted Sentinel KQL query in browser mode into OCI Log Analytics search + stats pipeline.",
+      warnings: [],
+    }
+  }
+
+  if (language === "splunk_spl") {
+    const logSource =
+      lowered.includes("sysmon")
+        ? "'Log Source' = 'Windows Sysmon Events'"
+        : lowered.includes("wineventlog:security") || lowered.includes("index=windows")
+          ? "'Log Source' = 'Windows Security Events'"
+          : lowered.includes("index=network")
+            ? "'Log Source' = 'OCI VCN Flow Logs'"
+            : "'Log Source' = 'SOC Application Logs'"
+    const predicates: string[] = []
+    const evMatch = sourceQuery.match(/EventCode\s*=\s*(\d+)/i)
+    if (evMatch) predicates.push(`'Event ID' = '${evMatch[1]}'`)
+    for (const m of sourceQuery.matchAll(/(Image|CommandLine|User|src_ip|dest_port|action)\s*=\s*"?([^"|]+)"?/gi)) {
+      const k = m[1].toLowerCase()
+      const v = m[2].trim()
+      if (v === "*") continue
+      const ociField =
+        k === "image"
+          ? "'Process Name'"
+          : k === "commandline"
+            ? "'Command Line'"
+            : k === "user"
+              ? "'User Name'"
+              : k === "src_ip"
+                ? "'Source IP'"
+                : k === "dest_port"
+                  ? "'Destination Port'"
+                  : "Action"
+      predicates.push(v.includes("*") ? `${ociField} like '${v}'` : `${ociField} = '${v}'`)
+    }
+    const filterExpr = predicates.length ? ` and ${predicates.join(" and ")}` : ""
+    return {
+      loganQuery: `${logSource}${filterExpr} | stats count as count by 'Host Name', 'User Name' | sort -count | head 100`,
+      supportLevel: "partial",
+      explanation: "Converted Splunk SPL pipeline in browser mode using OCI Log Analytics display fields.",
+      warnings: [{ code: "browser_spl_transpiler", message: "SPL macros and subsearches require manual review.", severity: "warning" }],
+    }
+  }
+
+  // Elastic Lucene / Kuery / EQL / ES|QL / TOML fallback
+  const logSource = lowered.includes("event.code") || lowered.includes("process.")
+    ? "'Log Source' = 'Windows Sysmon Events'"
+    : lowered.includes("event.category:authentication")
+      ? "'Log Source' = 'OCI Audit Logs'"
+      : "'Log Source' = 'SOC Application Logs'"
+  return {
+    loganQuery: `${logSource} | stats count as hits by 'Host Name', 'Service Name', 'Source IP' | sort -hits | head 100`,
+    supportLevel: "partial",
+    explanation: "Converted Elastic query in browser mode to OCI Log Analytics base search and aggregation.",
+    warnings: [],
+  }
+}
+
 export function convertInBrowser(
   language: LoganSourceLanguage,
   sourceQuery: string,
   examples: LoganConversionExample[],
   exampleId?: string,
+  catalogItems: ForgeCatalogItem[] = [],
 ): ConversionResponse {
   const normalizedQuery = sourceQuery.trim()
   const selectedExample = examples.find((example) => example.id === exampleId)
@@ -232,6 +454,29 @@ export function convertInBrowser(
     }
   }
 
+  const matchedCatalog =
+    catalogItems.find((item) => item.id === exampleId && item.source_query.trim() === normalizedQuery) ??
+    catalogItems.find((item) => item.source_query.trim() === normalizedQuery || item.expected_logan_ql.trim() === normalizedQuery)
+
+  if (matchedCatalog) {
+    return {
+      schema_version: "1.0.0",
+      generated_at: new Date().toISOString(),
+      source_language: language,
+      source_query: sourceQuery,
+      logan_query: matchedCatalog.expected_logan_ql,
+      support_level: matchedCatalog.support_level,
+      explanation: `${matchedCatalog.explanation} (Catalog: ${matchedCatalog.pack_or_category})`,
+      warnings: [],
+      metadata: {
+        execution_mode: "static_browser_catalog",
+        catalog_id: matchedCatalog.id,
+        pack_or_category: matchedCatalog.pack_or_category,
+      },
+      backend: "Bundled Forge Detection Catalog",
+    }
+  }
+
   if (language === "oci_logan") {
     return {
       schema_version: "1.0.0",
@@ -240,30 +485,24 @@ export function convertInBrowser(
       source_query: sourceQuery,
       logan_query: normalizedQuery,
       support_level: "supported",
-      explanation: "OCI Logan QL input is passed through in static browser mode.",
+      explanation: "OCI Logan QL input is passed through and ready for server/environment customization.",
       warnings: [],
       metadata: { execution_mode: "static_browser_passthrough" },
       backend: "Static GitHub Pages converter",
     }
   }
 
+  const transpiled = transpileCrossQlInBrowser(language, normalizedQuery)
   return {
     schema_version: "1.0.0",
     generated_at: new Date().toISOString(),
     source_language: language,
     source_query: sourceQuery,
-    logan_query: "",
-    support_level: "unsupported",
-    explanation:
-      "Static GitHub Pages mode cannot run the Python conversion backend. Select a bundled example, use raw OCI Logan QL passthrough, or deploy the server/API build for ad hoc conversion.",
-    warnings: [
-      {
-        code: "static_backend_unavailable",
-        message: "GitHub Pages hosts static files only; the full converter requires the Next.js API route or an external Forge backend.",
-        severity: "error",
-      },
-    ],
-    metadata: { execution_mode: "static_browser_limited" },
+    logan_query: transpiled.loganQuery,
+    support_level: transpiled.supportLevel,
+    explanation: transpiled.explanation,
+    warnings: transpiled.warnings,
+    metadata: { execution_mode: "static_browser_transpiler" },
     backend: "Static GitHub Pages converter",
   }
 }

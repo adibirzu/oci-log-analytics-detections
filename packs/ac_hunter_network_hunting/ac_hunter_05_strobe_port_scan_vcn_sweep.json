@@ -1,0 +1,63 @@
+{
+  "title": "AC-Hunter 05: Strobe High-Frequency C2 & VCN Flow Port Scan Sweeps",
+  "description": "Replicates AC-Hunter Strobe and Port Sweep detection by identifying rapid-fire back-to-back connection floods and horizontal/vertical port sweeps across OCI VCN Flow Logs (both REJECT and ACCEPT actions).",
+  "query": "'Log Source' = 'SOC VCN Flow Logs' and ('Action' in ('REJECT', 'ACCEPT') and ('Source IP' in ('198.51.100.214', '198.41.200.113') or 'Destination Port' in (22, 445, 3389, 5985, 7844, 8080, 8443))) | stats count as connection_attempts, distinctcount('Destination Port') as distinct_ports_swept, distinctcount('Destination IP') as distinct_hosts_probed, sum('Bytes Sent') as total_bytes_sent by 'Source IP', 'Destination IP', 'Action', 'Trace ID' | where connection_attempts >= 1 | sort -distinct_ports_swept, -connection_attempts",
+  "type": "hunting",
+  "hunting_type": "frequency_analysis",
+  "cookbook_method": "grouping_correlation",
+  "level": "high",
+  "tags": [
+    "ac_hunter",
+    "strobe",
+    "port_scan",
+    "oci.vcn_flow",
+    "attack.discovery",
+    "attack.reconnaissance",
+    "attack.t1046",
+    "attack.t1595.001"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "reconnaissance",
+      "discovery",
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1046",
+      "T1595.001",
+      "T1071"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "vcn_flow",
+    "candidates": [
+      "SOC VCN Flow Logs"
+    ]
+  },
+  "dashboard": {
+    "visualizationType": "bar",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "groupBy": [
+        "Source IP",
+        "Action"
+      ],
+      "valueField": "connection_attempts"
+    },
+    "ask_ai_prompts": [
+      "Which source IPs triggered strobe connection floods or vertical port sweeps in VCN Flow Logs?",
+      "Compare REJECT vs ACCEPT port sweep counts from 198.51.100.214."
+    ]
+  },
+  "falsepositives": [
+    "Authorized internal vulnerability scanners or load balancer health probes"
+  ],
+  "investigation_notes": [
+    "AC-Hunter classifies rapid back-to-back connections as Strobes so high-frequency C2 floods do not skew standard beacon interval math.",
+    "Review distinct_ports_swept across ports 22, 445, 3389, 5985, 8080, and 8443."
+  ]
+}

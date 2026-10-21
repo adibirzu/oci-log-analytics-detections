@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "packs": [
+    {
+      "id": "identity_credentials",
+      "title": "Identity and credential abuse",
+      "query_paths": [
+        "hunting/oci_console_brute_force.json",
+        "hunting/oci_programmatic_credential_creation_burst.json",
+        "hunting/cloud_identity_control_plane_takeover.json"
+      ]
+    },
+    {
+      "id": "control_plane",
+      "title": "Control plane changes",
+      "query_paths": [
+        "hunting/oci_iam_policy_changes.json",
+        "hunting/cloud_control_plane_discovery_burst.json",
+        "hunting/oci_resource_deletion_wave.json"
+      ]
+    },
+    {
+      "id": "data_collection",
+      "title": "Data access and collection",
+      "query_paths": [
+        "hunting/cloud_secret_and_object_collection.json",
+        "hunting/oci_object_storage_external_source.json"
+      ]
+    },
+    {
+      "id": "network_endpoint",
+      "title": "Network and endpoint triage",
+      "query_paths": [
+        "hunting/oci_vcn_external_egress_traffic.json",
+        "hunting/oci_vcn_rejected_traffic_spike.json",
+        "hunting/win_rare_parent_child_process.json",
+        "hunting/linux_rare_process_by_host.json"
+      ]
+    },
+    {
+      "id": "storyline_7day_caldera_goad",
+      "title": "7-Day Multi-Pillar Threat Hunting & Caldera/GOAD Emulation Storyline",
+      "query_paths": [
+        "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json",
+        "hunting/storyline_day2_oke_pod_breakout_imdsv2_harvest.json",
+        "hunting/storyline_day3_caldera_sandcat_goad_ad_discovery.json",
+        "hunting/storyline_day4_lotl_rmm_kerberoasting_lateral.json",
+        "hunting/storyline_day5_dcsync_persistence_iam_drift.json",
+        "hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json",
+        "hunting/storyline_day7_dns_c2_exfil_melts_correlation.json"
+      ]
+    },
+    {
+      "id": "ac_hunter_network_hunting",
+      "title": "AC-Hunter Network Threat Hunting & Multi-Cloud Cross-CSP Correlation",
+      "query_paths": [
+        "hunting/ac_hunter_01_c2_beaconing_rita_score.json",
+        "hunting/ac_hunter_02_long_connections_duration.json",
+        "hunting/ac_hunter_03_dns_beaconing_fqdn_entropy.json",
+        "hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
+        "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
+        "hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json",
+        "hunting/ac_hunter_07_threat_intel_safelist_correlation.json",
+        "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json"
+      ]
+    }
+  ]
+}

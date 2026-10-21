@@ -264,8 +264,61 @@
       "synthetic_log_shape": "SOC Application Logs with Response Code and Service Name.",
       "title": "OCI Logan QL Passthrough",
       "warnings": []
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'SOC Application Logs' and Action = 'login_failed' | stats count as failures by 'User Name', 'Source IP' | sort -failures | head 100",
+      "explanation": "Splunk index and sourcetype map to SOC Application Logs; action and fields map to OCI display names; stats and sort are translated to Logan QL pipeline commands.",
+      "id": "spl-app-failed-auth-spike",
+      "pattern_ids": [
+        "spl-filter-to-search-where",
+        "spl-transform-pipeline",
+        "sort-limit-top"
+      ],
+      "source_language": "splunk_spl",
+      "source_query": "index=soc sourcetype=\"SOC Application Logs\" action=login_failed | stats count as failures by user, src_ip | sort -failures",
+      "support_level": "partial",
+      "synthetic_log_shape": "SOC Application Logs with User Name, Source IP, and Action fields.",
+      "title": "Splunk SPL Application Authentication Failure Spike",
+      "warnings": [
+        "SPL conversion covers common pipeline commands; macros, subsearches, rex/spath extraction, joins, and transactions require manual handling."
+      ]
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'SOC Application Logs' and 'Event Type' = 'user_login' and Status = 'failure' | stats count as fail_count by 'Source IP', 'User Name' | sort -fail_count | head 25",
+      "explanation": "Self-authored ES|QL pipeline example mapping authentication failure rollups to SOC Application Logs with OCI display fields.",
+      "id": "elastic-esql-auth-failure-spike",
+      "pattern_ids": [
+        "elastic-esql-pipeline",
+        "sort-limit-top"
+      ],
+      "source_language": "elastic_esql",
+      "source_query": "FROM logs-auth*\n| WHERE event.action == \"user_login\" and event.outcome == \"failure\"\n| STATS fail_count = count(*) BY source.ip, user.name\n| SORT fail_count DESC\n| LIMIT 25",
+      "support_level": "partial",
+      "synthetic_log_shape": "SOC Application Logs with Event Type, Status, Source IP, and User Name.",
+      "title": "Elastic ES|QL Authentication Failure Rollup",
+      "warnings": [
+        "Only common ES|QL pipeline commands are converted in the first implementation tranche."
+      ]
+    },
+    {
+      "expected_logan_ql": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4769' and TicketEncryptionType = '0x17' | stats count as requests by 'User Name', 'Service Name' | sort -requests | head 100",
+      "explanation": "Splunk Windows security event query mapping EventCode 4769 and RC4 encryption type into Logan QL filtering and aggregation.",
+      "id": "spl-ad-kerberoasting-ticket",
+      "pattern_ids": [
+        "spl-filter-to-search-where",
+        "spl-transform-pipeline",
+        "sort-limit-top"
+      ],
+      "source_language": "splunk_spl",
+      "source_query": "index=windows sourcetype=WinEventLog:Security EventCode=4769 TicketEncryptionType=0x17 | stats count as requests by User, ServiceName | sort -requests",
+      "support_level": "partial",
+      "synthetic_log_shape": "Windows Security Events with Event ID 4769, User Name, and Service Name.",
+      "title": "Splunk SPL Kerberoasting Service Ticket Request Spike",
+      "warnings": [
+        "SPL conversion covers common pipeline commands; macros, subsearches, rex/spath extraction, joins, and transactions require manual handling."
+      ]
     }
   ],
-  "generated_at": "2026-06-12T15:26:27Z",
+  "generated_at": "2026-10-21T05:35:08Z",
   "schema_version": "1.0.0"
 }

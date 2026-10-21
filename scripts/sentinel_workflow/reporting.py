@@ -6,6 +6,7 @@ import ast
 import json
 import re
 from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
@@ -153,16 +154,38 @@ def load_sentinel_dashboard_counts(inventory_path: Path = DEFAULT_DASHBOARD_INVE
     return dict(sorted(dashboards.items()))
 
 
+def _report_age_hours(report: dict, now: datetime | None = None) -> float | None:
+    """Return the report age when it carries a valid ISO-8601 timestamp."""
+    generated_at = report.get("generated_at")
+    if not isinstance(generated_at, str) or not generated_at.strip():
+        return None
+    try:
+        created_at = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if created_at.tzinfo is None:
+        return None
+    reference_time = now or datetime.now(timezone.utc)
+    if reference_time.tzinfo is None:
+        raise ValueError("now must be timezone-aware")
+    return round((reference_time - created_at).total_seconds() / 3600, 3)
+
+
 def build_status(
     *,
     report_path: Path = DEFAULT_REPORT_PATH,
     sentinel_dir: Path = DEFAULT_SENTINEL_DIR,
     dashboard_inventory: Path = DEFAULT_DASHBOARD_INVENTORY,
+    max_report_age_hours: float | None = None,
+    now: datetime | None = None,
 ) -> dict:
     """Build a compact status summary across Sentinel report and artifacts."""
+    if max_report_age_hours is not None and max_report_age_hours <= 0:
+        raise ValueError("max_report_age_hours must be positive")
     report = load_report(report_path)
     summary = report.get("summary", {})
     runtime_profile = report.get("runtime_profile", {})
+    report_age_hours = _report_age_hours(report, now=now)
     promoted_counts = load_promoted_query_counts(sentinel_dir)
     dashboard_counts = load_sentinel_dashboard_counts(dashboard_inventory)
     promoted_files = promoted_counts.get("files", 0)
@@ -172,11 +195,18 @@ def build_status(
         "live_passed_matches_files": summary.get("live_validation_passed", 0) == promoted_files,
         "all_promoted_files_live_passed": set(live_status) <= {"passed"} and promoted_files > 0,
         "sentinel_dashboards_present": len(dashboard_counts) > 0,
+        "report_age_within_limit": (
+            max_report_age_hours is None
+            or (report_age_hours is not None and report_age_hours <= max_report_age_hours)
+        ),
     }
     return {
         "status": "ok" if all(checks.values()) else "attention",
         "summary": summary,
         "runtime_profile": runtime_profile,
+        "report_generated_at": report.get("generated_at", ""),
+        "report_age_hours": report_age_hours,
+        "max_report_age_hours": max_report_age_hours,
         "promoted_files": promoted_files,
         "promoted_categories": promoted_counts.get("categories", {}),
         "promoted_live_status": live_status,
@@ -365,6 +395,7 @@ def build_next_query_backlog(
     ))
     for candidate in candidates:
         candidate.pop("_priority", None)
+    reason_counts = Counter(candidate["reason"] for candidate in candidates if candidate.get("reason"))
     return {
         "summary": report.get("summary", {}),
         "work_type": requested_type,
@@ -372,6 +403,7 @@ def build_next_query_backlog(
         "candidates": candidates[:limit],
         "candidate_count": len(candidates),
         "work_type_counts": dict(Counter(candidate["work_type"] for candidate in candidates)),
+        "reason_counts": _count_rows(reason_counts, limit=len(reason_counts)),
     }
 
 
@@ -534,6 +566,11 @@ def print_next_query_backlog(backlog: dict, as_json: bool = False) -> None:
         }
         for name, count in sorted(counts.items(), key=lambda item: (strategy_priority[item[0]], item[0])):
             print(f"    {count:>4} {name}")
+    reason_counts = backlog.get("reason_counts", [])
+    if reason_counts:
+        print("  top_blockers:")
+        for row in reason_counts[:10]:
+            print(f"    {row.get('count', 0):>4} {row.get('reason', '')}")
     print("  candidates:")
     candidates = backlog.get("candidates", [])
     if not candidates:

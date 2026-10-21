@@ -1,0 +1,50 @@
+{
+  "title": "Storyline Day 3: Caldera Agent Deployment & GOAD Active Directory Discovery",
+  "description": "Detects Day 3 of the 7-day multi-pillar adversary storyline: Caldera Sandcat agent deployment (splunkd.exe) on GOAD-DC01 (kingslanding), GOAD-DC02 (winterfell), and GOAD-SRV02 (castelblack) followed by AdFind LDAP enumeration and SharpHound BloodHound collection.",
+  "query": "('Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Event Security Logs') and ('Host Name (Server)' in ('kingslanding', 'winterfell', 'castelblack') or Entity in ('kingslanding', 'winterfell', 'castelblack')) and ('Command Line' like '*splunkd.exe*' or 'Command Line' like '*AdFind*' or 'Command Line' like '*SharpHound*') | stats count as discovery_events, distinctcount('Process Name') as tools_observed by 'Host Name (Server)', 'Process Name' | sort -discovery_events",
+  "type": "hunting",
+  "hunting_type": "grouping_correlation",
+  "cookbook_method": "grouping_correlation",
+  "level": "critical",
+  "tags": [
+    "storyline.7day",
+    "storyline.day3",
+    "caldera",
+    "goad",
+    "attack.execution",
+    "attack.discovery",
+    "attack.command_and_control",
+    "attack.t1053.005",
+    "attack.t1087.002",
+    "attack.t1482",
+    "attack.t1071.001"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "discovery",
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1053.005",
+      "T1087.002",
+      "T1482",
+      "T1071.001"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "sysmon_and_security",
+    "candidates": [
+      "SOC Windows Sysmon Logs",
+      "Windows Event Security Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate Splunk Universal Forwarder binaries installed under C:\\Program Files\\SplunkUniversalForwarder\\bin\\"
+  ],
+  "investigation_notes": [
+    "Inspect C:\\Users\\Public\\splunkd.exe command line arguments for Caldera C2 server URLs (-server http://192.168.100.78:8888).",
+    "Correlate AdFind and SharpHound execution timestamps across kingslanding, winterfell, and castelblack."
+  ]
+}

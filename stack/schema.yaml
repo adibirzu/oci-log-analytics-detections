@@ -5,6 +5,12 @@ version: "1.0.0"
 locale: "en"
 
 variableGroups:
+  - title: "Deployment Mode"
+    description: "Choose greenfield provisioning or attachment to existing OCI resources"
+    variables:
+      - deployment_mode
+      - existing_log_analytics_namespace
+
   - title: "General Configuration"
     description: "Required OCI identifiers"
     variables:
@@ -15,6 +21,8 @@ variableGroups:
   - title: "Log Analytics"
     description: "Log Analytics log group settings"
     variables:
+      - use_existing_log_group
+      - existing_log_group_id
       - log_group_name
       - log_group_description
 
@@ -59,6 +67,43 @@ variableGroups:
       - splunk_evidence_exporter_stream_messages_endpoint
 
 variables:
+  deployment_mode:
+    type: enum
+    title: "Deployment Mode"
+    description: "greenfield (provisions fresh Log Analytics resources) or attach_existing (attaches to pre-existing log groups and resources)"
+    enum:
+      - greenfield
+      - attach_existing
+    default: attach_existing
+    required: true
+
+  existing_log_analytics_namespace:
+    type: string
+    title: "Existing Log Analytics Namespace"
+    description: "Tenancy Log Analytics namespace (leave empty to auto-discover)"
+    required: false
+
+  use_existing_log_group:
+    type: boolean
+    title: "Use Existing Log Group"
+    description: "Attach to an existing Log Analytics log group instead of creating a new one"
+    default: false
+    required: false
+
+  existing_log_group_id:
+    type: oci:loganalytics:loggroup:id
+    title: "Existing Log Group OCID"
+    description: "OCID of an existing Log Analytics log group"
+    required: false
+    visible:
+      or:
+        - eq:
+            - ${use_existing_log_group}
+            - true
+        - eq:
+            - ${deployment_mode}
+            - attach_existing
+
   compartment_id:
     type: oci:identity:compartment:id
     title: "Compartment"

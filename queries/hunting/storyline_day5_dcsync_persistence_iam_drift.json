@@ -1,0 +1,48 @@
+{
+  "title": "Storyline Day 5: DCSync Replication & Service Persistence on GOAD KingsLanding",
+  "description": "Detects Day 5 of the 7-day multi-pillar adversary storyline: Active Directory DCSync replication rights abuse (EventID 4662 DS-Replication-Get-Changes) on GOAD-DC01 (kingslanding) paired with Windows service installation persistence (EventID 7045 / 4698).",
+  "query": "('Log Source' = 'Windows Event Security Logs' or 'Log Source' = 'Windows Event System Logs') and ('Event ID' in ('4662', '7045', '4698') and 'Host Name (Server)' in ('kingslanding', 'winterfell', 'castelblack')) | stats count as persistence_events, distinctcount('Event ID') as event_types by 'Host Name (Server)', User | sort -persistence_events",
+  "type": "hunting",
+  "hunting_type": "grouping_correlation",
+  "cookbook_method": "grouping_correlation",
+  "level": "critical",
+  "tags": [
+    "storyline.7day",
+    "storyline.day5",
+    "goad",
+    "dcsync",
+    "attack.credential_access",
+    "attack.persistence",
+    "attack.privilege_escalation",
+    "attack.t1003.006",
+    "attack.t1543.003",
+    "attack.t1053.005"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "credential_access",
+      "persistence",
+      "privilege_escalation"
+    ],
+    "techniques": [
+      "T1003.006",
+      "T1543.003",
+      "T1053.005"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "security_and_system",
+    "candidates": [
+      "Windows Event Security Logs",
+      "Windows Event System Logs"
+    ]
+  },
+  "falsepositives": [
+    "Legitimate Domain Controller computer accounts (ending in $) performing Active Directory replication"
+  ],
+  "investigation_notes": [
+    "Confirm whether User performing EventID 4662 with GUID 1131f6aa-9c07-11d1-f79f-00c04fc2dcd2 is a non-DC user account such as petyr.baelish.",
+    "Check EventID 7045 Service File Name for C:\\Users\\Public\\splunkd.exe or unauthorized C2 endpoints."
+  ]
+}

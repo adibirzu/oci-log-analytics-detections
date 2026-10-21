@@ -242,6 +242,55 @@ class TestSentinelConversionWorkflowBacklogStatus(unittest.TestCase):
                 "unsupported",
             ])
 
+    def test_next_query_backlog_groups_identical_blockers(self):
+        """Operators need the total unlock value, not only the first matching rule."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            report_path.write_text(json.dumps({
+                "summary": {"attempted_candidates": 3},
+                "attempted": [
+                    {
+                        "title": "Join one",
+                        "sentinel_id": "join-one",
+                        "quality_score": 90,
+                        "conversion_status": "skipped",
+                        "skip_reasons": ["unsupported KQL operator: join"],
+                        "local_validation_errors": [],
+                        "live_validation_status": "not_run",
+                    },
+                    {
+                        "title": "Join two",
+                        "sentinel_id": "join-two",
+                        "quality_score": 80,
+                        "conversion_status": "skipped",
+                        "skip_reasons": ["unsupported KQL operator: join"],
+                        "local_validation_errors": [],
+                        "live_validation_status": "not_run",
+                    },
+                    {
+                        "title": "Parse",
+                        "sentinel_id": "parse-one",
+                        "quality_score": 70,
+                        "conversion_status": "skipped",
+                        "skip_reasons": ["unsupported KQL operator: parse"],
+                        "local_validation_errors": [],
+                        "live_validation_status": "not_run",
+                    },
+                ],
+            }), encoding="utf-8")
+
+            backlog = build_next_query_backlog(
+                report_path=report_path,
+                work_type="kql_support",
+                limit=1,
+            )
+
+            self.assertEqual(backlog["candidate_count"], 3)
+            self.assertEqual(backlog["reason_counts"], [
+                {"reason": "unsupported KQL operator: join", "count": 2},
+                {"reason": "unsupported KQL operator: parse", "count": 1},
+            ])
+
     def test_next_query_backlog_includes_oci_gap_for_mapping_candidates(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             report_path = Path(tmpdir) / "report.json"

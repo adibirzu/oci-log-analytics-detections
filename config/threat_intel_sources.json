@@ -63,6 +63,61 @@
       "license": "owned",
       "intake_mode": "curated_reference",
       "promotion_policy": "can promote after local and CAP validation"
+    },
+    {
+      "id": "google_csa",
+      "name": "GoogleCloudPlatform/security-analytics",
+      "type": "rule_reference",
+      "url": "https://github.com/GoogleCloudPlatform/security-analytics",
+      "revision": "2dd8565557e043e25d16df8f7743b9e69374d6f3",
+      "license": "Apache-2.0",
+      "role": "hunt_reference",
+      "intake_mode": "reviewed_pinned_reference",
+      "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
+    },
+    {
+      "id": "matano",
+      "name": "matanolabs/matano",
+      "type": "integration_reference",
+      "url": "https://github.com/matanolabs/matano",
+      "revision": "84133693769ece362822c3bf423fb9956d32fe92",
+      "license": "Apache-2.0",
+      "role": "capability_reference",
+      "intake_mode": "reviewed_pinned_reference",
+      "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
+    },
+    {
+      "id": "kustoking",
+      "name": "KustoKing/Hunting-Queries-Detection-Rules",
+      "type": "rule_reference",
+      "url": "https://github.com/KustoKing/Hunting-Queries-Detection-Rules",
+      "revision": "f59e974d34b78e3d6bbf7fb8c52fc607c048d684",
+      "license": "BSD-3-Clause",
+      "role": "hunt_reference",
+      "intake_mode": "reviewed_pinned_reference",
+      "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
+    },
+    {
+      "id": "bertjanp",
+      "name": "Bert-JanP/Hunting-Queries-Detection-Rules",
+      "type": "rule_reference",
+      "url": "https://github.com/Bert-JanP/Hunting-Queries-Detection-Rules",
+      "revision": "1c92e563cca5375e50525df8b455e6117091a27a",
+      "license": "BSD-3-Clause",
+      "role": "hunt_reference",
+      "intake_mode": "reviewed_pinned_reference",
+      "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
+    },
+    {
+      "id": "logan_mcp",
+      "name": "rishabh-ghosh24/logan-mcp-server",
+      "type": "integration_reference",
+      "url": "https://github.com/rishabh-ghosh24/logan-mcp-server",
+      "revision": "ca98c3d094086d685dc3689bd633356db9294a0f",
+      "license": "MIT",
+      "role": "capability_reference",
+      "intake_mode": "reviewed_pinned_reference",
+      "promotion_policy": "metadata_only_until_mapping_and_semantic_review"
     }
   ]
 }

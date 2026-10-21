@@ -13,7 +13,7 @@
     ],
     "third_party_rule_content": "excluded"
   },
-  "generated_at": "2026-06-12T15:26:27Z",
+  "generated_at": "2026-10-21T05:35:08Z",
   "generated_by": "scripts/analyze_ql_conversion_coverage.py",
   "schema_version": "1.0.0",
   "source_capabilities": [

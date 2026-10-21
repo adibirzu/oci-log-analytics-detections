@@ -1,0 +1,65 @@
+{
+  "title": "AC-Hunter 04: Client Signature, User-Agent & TLS JA3/JA4 Fingerprint Anomalies",
+  "description": "Replicates AC-Hunter Client Signature hunting by identifying rare or weaponized HTTP User-Agents (Nuclei, screenconnect-relay, Go-http-client), anomalous TLS JA3/JA4 client hello fingerprints, and mismatched client signatures across internal assets.",
+  "query": "('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Application Logs' or 'Log Source' = 'SOC Network Firewall Logs') and ('User Agent' like '*Nuclei*' or 'User Agent' like '*screenconnect*' or 'User Agent' like '*Go-http-client*' or 'User Agent' like '*ja3*' or msg like '*ja3_hash*' or msg like '*client_signature*') | stats count as signature_hits, distinctcount('User Agent') as distinct_signatures, distinctcount('Request URL') as targeted_endpoints by 'Client IP', 'User Agent', 'Host Name', 'Trace ID' | where signature_hits >= 1 | sort -signature_hits",
+  "type": "hunting",
+  "hunting_type": "rare_value",
+  "cookbook_method": "sorting_stacking",
+  "level": "high",
+  "tags": [
+    "ac_hunter",
+    "client_signatures",
+    "ja3.tls",
+    "user_agent",
+    "attack.reconnaissance",
+    "attack.command_and_control",
+    "attack.t1071.001",
+    "attack.t1595.002"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "reconnaissance",
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1071.001",
+      "T1595.002",
+      "T1219"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "waf_and_application",
+    "candidates": [
+      "SOC WAF Security Logs",
+      "SOC Application Logs",
+      "SOC Network Firewall Logs"
+    ]
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "groupBy": [
+        "Client IP",
+        "User Agent",
+        "Host Name"
+      ],
+      "valueField": "signature_hits"
+    },
+    "ask_ai_prompts": [
+      "Which rare User-Agents or TLS JA3/JA4 fingerprints appeared across WAF and Application logs?",
+      "Are any internal hosts presenting multiple mismatched client signatures?"
+    ]
+  },
+  "falsepositives": [
+    "Authorized DevOps automation scripts using Go-http-client or python-requests"
+  ],
+  "investigation_notes": [
+    "Inspect weaponized User-Agents (Nuclei/3.3.0, screenconnect-relay, Go-http-client/1.1) and TLS JA3/JA4 fingerprints.",
+    "Correlate Client IP with VCN Flow and OCI Audit activity."
+  ]
+}

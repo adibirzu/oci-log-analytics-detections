@@ -255,6 +255,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--strict", action="store_true", help="Return non-zero when status checks need attention.")
     parser.add_argument("--limit", type=int, default=10, help="Maximum rows for triage or next-queries sections.")
     parser.add_argument(
+        "--max-report-age-hours",
+        type=float,
+        default=None,
+        help="Make status --strict fail when the canonical report is older than this positive age limit.",
+    )
+    parser.add_argument(
         "--work-type",
         choices=["all", *NEXT_QUERY_WORK_TYPES.keys()],
         default="all",
@@ -344,6 +350,7 @@ def main(argv: list[str] | None = None) -> int:
                 report_path=report_path,
                 sentinel_dir=sentinel_dir,
                 dashboard_inventory=dashboard_inventory,
+                max_report_age_hours=args.max_report_age_hours,
             )
             print_status(status, as_json=args.json)
             if args.strict and status.get("status") != "ok":

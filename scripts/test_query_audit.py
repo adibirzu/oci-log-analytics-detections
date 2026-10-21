@@ -187,6 +187,20 @@ class TestQueryAudit(unittest.TestCase):
             self.assertIn("'Process Name' = 'bash'", query, query_file)
             self.assertNotIn("'Log Source' = 'Linux Audit Logs'", query, query_file)
 
+    def test_oci_programmatic_credential_creation_hunt_correlates_known_audit_events(self):
+        payload = self.load_query_payload(
+            "queries/hunting/oci_programmatic_credential_creation_burst.json"
+        )
+        query = payload["query"]
+
+        self.assertIn("'Log Source' = 'OCI Audit Logs'", query)
+        self.assertIn("com.oraclecloud.identitycontrolplane.uploadapikey", query)
+        self.assertIn("com.oraclecloud.identitycontrolplane.createauthtoken", query)
+        self.assertIn("com.oraclecloud.identitycontrolplane.createcustomersecretkey", query)
+        self.assertIn("distinctcount('Event Type') as CredentialTypes", query)
+        self.assertIn("CredentialChanges > 1 or CredentialTypes > 1", query)
+        self.assertNotIn("Original Log Content", query)
+
     def test_oci_success_status_selectors_include_native_parser_code(self):
         import yaml
 

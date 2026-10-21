@@ -32,6 +32,8 @@ from query_artifacts import is_saved_search_query_file
 # Roots where detection-query JSON is legitimately expected (or is non-query JSON)
 ALLOWED_ROOT_NAMES = {
     "queries",
+    "packs",
+    "dashboards",
     "rules",
     "config",
     "schemas",

@@ -7,6 +7,9 @@ from pathlib import Path
 
 GENERATED_QUERY_ARTIFACT_FILENAMES = {
     "catalog.json",
+    "forge_detection_catalog.json",
+    "hunting_integration_bundle.json",
+    "migrated_siem_20_queries.json",
     "content_candidates.json",
     "conversion_examples.json",
     "cross_siem_detection_catalog.json",

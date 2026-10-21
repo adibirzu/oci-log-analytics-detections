@@ -9,3 +9,13 @@
 - ConfigMaps/mounts: none created or patched by this packet; existing deployment mounts preserved.
 - Blockers: prior dirty application work, existing branch history, redaction and authoritative tests require their owner gates before broad merge. Scanner checkout resolves Git to its parent dev directory and cannot be independently committed as a Scanner repository. No remote push authorized/performed.
 - Recommended Next Step: use the canonical OCI-DEMO generator check for managed artifacts; reconcile only redaction-clean reviewed changes into local main while preserving every unrelated source/index change. Record final branch hashes and individual holds in OCI-DEMO session handoff.
+
+
+## 2026-10-21 Agent 17b authorized local application consolidation
+
+- Last Updated: 2026-10-21. Owner: consolidation coordinator.
+- Files: authorized pending application, UI, backend, test, deployment-source and documentation candidates; exact scoped diff retained in Git. Runtime env/data, databases, browser artifacts, generated site output and unrelated harness installs excluded and preserved.
+- Verification Evidence: staged full-file identifier redaction and Python syntax checks; focused offline verification results recorded in the OCI-DEMO consolidation report. Original index/diff recovery patches retained privately.
+- ConfigMaps and mounts: no live changes in this packet. Live routes/screenshots: not refreshed; previous receipts remain historical. No push or deployment.
+- Blockers: full application/release acceptance is not established; scanner semantic reconciliation requires approval after automatic review rejection. Local merge is source consolidation only.
+- Recommended Next Step: inspect local main diff and outstanding test/environment failures before any separately authorized publication or deployment.

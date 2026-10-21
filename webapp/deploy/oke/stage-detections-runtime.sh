@@ -21,7 +21,12 @@ fi
 require_file "${DETECTIONS_REPO}/queries/logan_ql_reference_catalog.json"
 require_file "${DETECTIONS_REPO}/queries/cross_ql_mapping_patterns.json"
 require_file "${DETECTIONS_REPO}/queries/conversion_examples.json"
+require_file "${DETECTIONS_REPO}/queries/forge_detection_catalog.json"
 require_file "${DETECTIONS_REPO}/queries/catalog.json"
+require_file "${DETECTIONS_REPO}/queries/hunting_integration_bundle.json"
+for metadata in hunting_packs.json hunting_reference_candidates.json threat_intel_sources.json; do
+  require_file "${DETECTIONS_REPO}/config/${metadata}"
+done
 require_file "${DETECTIONS_REPO}/queries/dashboard_inventory.json"
 require_file "${DETECTIONS_REPO}/queries/siem_log_examples.json"
 require_file "${DETECTIONS_REPO}/test_data/manifest.json"
@@ -36,6 +41,9 @@ mkdir -p "${RUNTIME_DIR}/config/mapping" "${RUNTIME_DIR}/test_data"
 
 rsync -a --delete --exclude "__pycache__/" --exclude "*.pyc" "${DETECTIONS_REPO}/scripts/" "${RUNTIME_DIR}/scripts/"
 rsync -a --delete "${DETECTIONS_REPO}/queries/" "${RUNTIME_DIR}/queries/"
+for metadata in hunting_packs.json hunting_reference_candidates.json threat_intel_sources.json; do
+  cp "${DETECTIONS_REPO}/config/${metadata}" "${RUNTIME_DIR}/config/${metadata}"
+done
 cp "${DETECTIONS_REPO}/config/sigma_oci_mapping.yaml" "${RUNTIME_DIR}/config/sigma_oci_mapping.yaml"
 cp "${DETECTIONS_REPO}/config/sentinel_oci_mapping.yaml" "${RUNTIME_DIR}/config/sentinel_oci_mapping.yaml"
 rsync -a --delete "${DETECTIONS_REPO}/config/mapping/" "${RUNTIME_DIR}/config/mapping/"

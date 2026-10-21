@@ -18,6 +18,8 @@ This repository is scoped to OCI Log Analytics query, dashboard, and Forge webap
 
 The integrated UI lives in `webapp/` and consumes generated artifacts from this repository instead of duplicating query generation or dashboard deployment logic. External API, MCP, and cross-platform integrations follow the same generated-artifact contract. Runtime helpers such as Streaming, Service Connector Hub, Resource Manager, and manifest export support the demo and deployment path, but the canonical product surface remains `rules/**`, `queries/**`, `test_data/manifest.json`, `scripts/deploy_dashboard.py`, and `webapp/`.
 
+> **Operational Handover Guide**: See [HANDOVER.md](HANDOVER.md) for complete architecture continuity, OKE deployment layout, AC-Hunter network threat hunting pack, 2026 report packs, and validation commands.
+
 ## Project Scope and Deployment Boundary
 
 This project is a detection-content and OCI Log Analytics delivery repository. It authors and converts detection queries, validates their field and source contracts, produces parser-safe examples, and packages dashboard/saved-search deployment content. It is not a hosted SIEM and it never stores a customer's OCI credentials, tenancy values, raw production logs, or management-plane access in Forge.
@@ -82,6 +84,15 @@ python3 scripts/splunk_evidence_exporter_cli.py local-e2e --scenario success --d
 python3 scripts/release_checklist.py --splunk-parallel-offline-stage
 ```
 
+## Threat hunting integrations
+
+Use the [threat hunting integration guide](docs/THREAT_HUNTING_INTEGRATIONS.md) for a complete curated hunting bundle, four behavioral packs, CLI/REST/MCP discovery, and compatible Logan MCP YAML export. Source references retain attribution and mapping gaps; local readiness is separate from provider validation.
+
+### AC-Hunter Network Threat Hunting Pack
+Located in `packs/ac_hunter_network_hunting/`:
+- 8 network behavioral queries: C2 Beaconing (RITA score), Long Connections, DNS Beaconing & Entropy, Client Signatures (JA3/User-Agent), Strobe Port Scans / VCN Sweeps, Non-Standard Port Protocols, Threat Intel Safelist Correlation, and Multi-Cloud Cross-CSP Correlation.
+- Unified dashboard: `dashboards/ac_hunter_and_multicloud_logan_dashboard.json`.
+
 ## Current Inventory
 This repository ships both source authoring content and generated OCI query assets. Published counts should come from the generated catalog, not from hand-maintained release notes.
 
@@ -90,12 +101,12 @@ This repository ships both source authoring content and generated OCI query asse
   - 545 top-level detections in `queries/*.json`
   - 8 browser/app telemetry detections in `queries/apps/*.json`
 - **Microsoft Sentinel converted queries:** 590 live OCI parser-passing queries
-- **Curated analytics:** 209
+- **Curated analytics:** 225
   - 54 app telemetry analytics in `queries/apps/`
-  - 155 hunting analytics in `queries/hunting/`
-- **Total query artifacts/content items:** 1,352
+  - 171 hunting analytics in `queries/hunting/`
+- **Total query artifacts/content items:** 1,368
 - **Source rule breakdown:** Windows (302), Cloud/OCI (102), Linux (80), Web/WAF (38)
-- **Combined MITRE ATT&CK coverage:** 279 techniques across 14 tactics
+- **Combined MITRE ATT&CK coverage:** 284 techniques across 14 tactics
 - **STIG coverage:** 24 detections spanning 12 controls
 - **Atomic Red Team coverage:** 280 / 397 testable rules have ART mappings (70.5%)
 - **Dashboard inventory:** 35 dashboards with 541 active dashboard saved searches and 161 advanced visualization widgets

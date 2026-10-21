@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0.0",
+  "pack_id": "ac_hunter_network_hunting",
+  "title": "AC-Hunter Network Threat Hunting & Multi-Cloud Log Analytics Correlation Pack",
+  "version": "2026.10.1",
+  "description": "Production-ready OCI Log Analytics detection & hunting pack replicating Active Countermeasures AC-Hunter core network threat hunting capabilities (RITA C2 Beaconing, Long Connections, DNS Subdomain Entropy/Tunneling, Client Signature & TLS JA3/JA4 Anomalies, Strobe/Port Scan Sweeps, Non-Standard Port/Protocol Mismatch, Threat Intelligence & Safelist Filtering, and Composite Host Threat Scoring) correlated with Multi-Cloud control-plane & data-plane logs (AWS CloudTrail OCSF, Azure Activity & Entra ID, GCP Cloud Audit, OCI Audit/VCN Flow, and Oracle Data Safe).",
+  "reference_urls": [
+    "https://www.activecountermeasures.com/ac-hunter-features/",
+    "https://github.com/activecm/rita",
+    "https://docs.oracle.com/en-us/iaas/log-analytics/doc/query-search.html"
+  ],
+  "capabilities_replicated": [
+    {
+      "id": "AC-HUNTER-01",
+      "feature": "C2 Beaconing Detection (RITA Algorithm)",
+      "query_file": "hunting/ac_hunter_01_c2_beaconing_rita_score.json",
+      "pack_file": "packs/ac_hunter_network_hunting/ac_hunter_01_c2_beaconing_rita_score.json",
+      "pillars": ["Timestamp Interval Regularity/Skew", "Payload Data Size Consistency/Skew", "Duration Consistency", "Connection Dispersion & Histogram Analysis"],
+      "mitre_attack": ["T1071.001", "T1573", "T1095"]
+    },
+    {
+      "id": "AC-HUNTER-02",
+      "feature": "Long Connections Detection",
+      "query_file": "hunting/ac_hunter_02_long_connections_duration.json",
+      "pack_file": "packs/ac_hunter_network_hunting/ac_hunter_02_long_connections_duration.json",
+      "pillars": ["Base (>=3600s / 1h)", "Low (>=14400s / 4h)", "Medium (>=28800s / 8h)", "High (>=43200s / 12h+ up to 86400s)"],
+      "mitre_attack": ["T1219", "T1572", "T1021.001", "T1021.004"]
+    },
+    {
+      "id": "AC-HUNTER-03",
+      "feature": "DNS Beaconing, Tunneling & FQDN Subdomain Entropy",
+      "query_file": "hunting/ac_hunter_03_dns_beaconing_fqdn_entropy.json",
+      "pack_file": "packs/ac_hunter_network_hunting/ac_hunter_03_dns_beaconing_fqdn_entropy.json",
+      "pillars": ["Distinct Subdomain Count per Registered Domain (*.exfil.c2-stage.example.net)", "High TXT/NULL Query Volume", "Anomalous DNS Query Frequency"],
+      "mitre_attack": ["T1071.004", "T1048.003", "T1568.002"]
+    },
+    {
+      "id": "AC-HUNTER-04",
+      "feature": "Client Signature / User-Agent & TLS JA3/JA4 Fingerprint Anomalies",
+      "query_file": "hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
+      "pack_file": "packs/ac_hunter_network_hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
+      "pillars": ["Rare/Weaponized User-Agents (Nuclei, screenconnect-relay, Go-http-client)", "TLS JA3/JA4 Handshake Hashes", "Mismatched Client Signatures per Internal Asset"],
+      "mitre_attack": ["T1071.001", "T1595.002", "T1219"]
+    },
+    {
+      "id": "AC-HUNTER-05",
+      "feature": "Strobe / Port Scan & Reconnaissance Detection",
+      "query_file": "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
+      "pack_file": "packs/ac_hunter_network_hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
+      "pillars": ["High-Frequency Back-to-Back Strobe Connections", "Horizontal Subnet Sweeps", "Vertical Port Scans across VCN Flow Logs (REJECT & ACCEPT)"],
+      "mitre_attack": ["T1046", "T1595.001", "T1071"]
+    },
+    {
+      "id": "AC-HUNTER-06",
+      "feature": "Multi-Protocol / Non-Standard Port Abuse",
+      "query_file": "hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json",
+      "pack_file": "packs/ac_hunter_network_hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json",
+      "pillars": ["Unexpected C2/RMM Ports (8443, 7844, 4444, 5985, 8888)", "Application Protocol vs Port Mismatch"],
+      "mitre_attack": ["T1571", "T1090", "T1572"]
+    },
+    {
+      "id": "AC-HUNTER-07",
+      "feature": "Threat Intelligence & Safelist Filtering",
+      "query_file": "hunting/ac_hunter_07_threat_intel_safelist_correlation.json",
+      "pack_file": "packs/ac_hunter_network_hunting/ac_hunter_07_threat_intel_safelist_correlation.json",
+      "pillars": ["Hostile C2 IP/ASN Correlation (198.51.100.214, 198.41.200.113, 192.0.2.119, 203.0.113.88)", "Safelist Exclusion for Known-Good Cloud Endpoints"],
+      "mitre_attack": ["T1583.001", "T1071", "T1041"]
+    },
+    {
+      "id": "AC-HUNTER-08",
+      "feature": "Composite Host Threat Score & Multi-Cloud Cross-CSP Correlation",
+      "query_file": "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
+      "pack_file": "packs/ac_hunter_network_hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
+      "pillars": ["Weighted Composite Threat Score (0-100)", "AWS CloudTrail OCSF (us-east-1)", "Azure Activity & Entra ID (westeurope)", "GCP Cloud Audit (europe-west3)", "OCI Audit, VCN Flow & Data Safe Correlation"],
+      "mitre_attack": ["T1078.004", "T1098.001", "T1562.007", "T1530"]
+    }
+  ],
+  "dashboard_definition": "dashboards/ac_hunter_and_multicloud_logan_dashboard.json",
+  "multicloud_sources": [
+    {
+      "csp": "AWS",
+      "region": "us-east-1",
+      "telemetry": "AWS CloudTrail (OCSF)",
+      "key_events": ["AssumeRole", "GetSecretValue", "ModifySecurityGroupRules"],
+      "oci_log_sources": ["SOC Multicloud Health Logs", "SOC Application Logs"]
+    },
+    {
+      "csp": "Azure",
+      "region": "westeurope",
+      "telemetry": "Azure Activity & Entra ID Audit Logs",
+      "key_events": ["Add service principal credentials", "NetworkSecurityGroupRuleUpdate"],
+      "oci_log_sources": ["SOC Multicloud Health Logs", "SOC Application Logs"]
+    },
+    {
+      "csp": "GCP",
+      "region": "europe-west3",
+      "telemetry": "GCP Cloud Audit Logs",
+      "key_events": ["SetIamPolicy", "compute.firewalls.patch", "storage.objects.get"],
+      "oci_log_sources": ["SOC Multicloud Health Logs", "SOC Application Logs"]
+    },
+    {
+      "csp": "OCI",
+      "region": "eu-frankfurt-1",
+      "telemetry": "OCI Audit, VCN Flow Logs, WAF Security Logs & Data Safe Unified Audit",
+      "key_events": ["UpdatePolicy", "GenerateAutonomousDatabaseWallet", "ORA-DS-PRIV-004"],
+      "oci_log_sources": ["OCI Audit Logs", "SOC VCN Flow Logs", "SOC WAF Security Logs", "SOC Application Logs"]
+    }
+  ]
+}

@@ -33,6 +33,7 @@ REFERENCE_PATH = PROJECT_ROOT / "queries" / "logan_ql_reference_catalog.json"
 PATTERNS_PATH = PROJECT_ROOT / "queries" / "cross_ql_mapping_patterns.json"
 EXAMPLES_PATH = PROJECT_ROOT / "queries" / "conversion_examples.json"
 CAPABILITY_MATRIX_PATH = PROJECT_ROOT / "queries" / "ql_conversion_capability_matrix.json"
+FORGE_CATALOG_PATH = PROJECT_ROOT / "queries" / "forge_detection_catalog.json"
 
 REQUIRED_COMMANDS = [
     "search",
@@ -667,11 +668,308 @@ def build_examples() -> dict:
             "synthetic_log_shape": "SOC Application Logs with Response Code and Service Name.",
             "pattern_ids": ["sort-limit-top"],
         },
+        {
+            "id": "spl-app-failed-auth-spike",
+            "title": "Splunk SPL Application Authentication Failure Spike",
+            "source_language": "splunk_spl",
+            "source_query": "index=soc sourcetype=\"SOC Application Logs\" action=login_failed | stats count as failures by user, src_ip | sort -failures",
+            "expected_logan_ql": "'Log Source' = 'SOC Application Logs' and Action = 'login_failed' | stats count as failures by 'User Name', 'Source IP' | sort -failures | head 100",
+            "explanation": "Splunk index and sourcetype map to SOC Application Logs; action and fields map to OCI display names; stats and sort are translated to Logan QL pipeline commands.",
+            "warnings": [
+                "SPL conversion covers common pipeline commands; macros, subsearches, rex/spath extraction, joins, and transactions require manual handling."
+            ],
+            "support_level": "partial",
+            "synthetic_log_shape": "SOC Application Logs with User Name, Source IP, and Action fields.",
+            "pattern_ids": ["spl-filter-to-search-where", "spl-transform-pipeline", "sort-limit-top"],
+        },
+        {
+            "id": "elastic-esql-auth-failure-spike",
+            "title": "Elastic ES|QL Authentication Failure Rollup",
+            "source_language": "elastic_esql",
+            "source_query": "FROM logs-auth*\n| WHERE event.action == \"user_login\" and event.outcome == \"failure\"\n| STATS fail_count = count(*) BY source.ip, user.name\n| SORT fail_count DESC\n| LIMIT 25",
+            "expected_logan_ql": "'Log Source' = 'SOC Application Logs' and 'Event Type' = 'user_login' and Status = 'failure' | stats count as fail_count by 'Source IP', 'User Name' | sort -fail_count | head 25",
+            "explanation": "Self-authored ES|QL pipeline example mapping authentication failure rollups to SOC Application Logs with OCI display fields.",
+            "warnings": [
+                "Only common ES|QL pipeline commands are converted in the first implementation tranche."
+            ],
+            "support_level": "partial",
+            "synthetic_log_shape": "SOC Application Logs with Event Type, Status, Source IP, and User Name.",
+            "pattern_ids": ["elastic-esql-pipeline", "sort-limit-top"],
+        },
+        {
+            "id": "spl-ad-kerberoasting-ticket",
+            "title": "Splunk SPL Kerberoasting Service Ticket Request Spike",
+            "source_language": "splunk_spl",
+            "source_query": "index=windows sourcetype=WinEventLog:Security EventCode=4769 TicketEncryptionType=0x17 | stats count as requests by User, ServiceName | sort -requests",
+            "expected_logan_ql": "'Log Source' = 'Windows Security Events' and 'Event ID' = '4769' and TicketEncryptionType = '0x17' | stats count as requests by 'User Name', 'Service Name' | sort -requests | head 100",
+            "explanation": "Splunk Windows security event query mapping EventCode 4769 and RC4 encryption type into Logan QL filtering and aggregation.",
+            "warnings": [
+                "SPL conversion covers common pipeline commands; macros, subsearches, rex/spath extraction, joins, and transactions require manual handling."
+            ],
+            "support_level": "partial",
+            "synthetic_log_shape": "Windows Security Events with Event ID 4769, User Name, and Service Name.",
+            "pattern_ids": ["spl-filter-to-search-where", "spl-transform-pipeline", "sort-limit-top"],
+        },
     ]
     return {
         "schema_version": "1.0.0",
         "generated_at": generated_at,
         "examples": examples,
+    }
+
+
+def _extract_log_sources(logan_ql: str, fallback: list[str] | None = None) -> list[str]:
+    found: list[str] = []
+    for m in re.finditer(r"'Log Source'\s*=\s*'([^']+)'", logan_ql):
+        if m.group(1) not in found:
+            found.append(m.group(1))
+    for m in re.finditer(r"'Log Source'\s+in\s*\(([^)]+)\)", logan_ql, flags=re.IGNORECASE):
+        for s in re.findall(r"'([^']+)'", m.group(1)):
+            if s not in found:
+                found.append(s)
+    for item in fallback or []:
+        if item and item not in found:
+            found.append(item)
+    return found or ["OCI Log Analytics"]
+
+
+def build_forge_detection_catalog(examples_payload: dict) -> dict:
+    import yaml
+
+    generated_at = now_iso()
+    items: list[dict] = []
+    seen_ids: set[str] = set()
+
+    # 1. Cross-QL Workbench Conversion Examples (20)
+    for ex in examples_payload.get("examples", []):
+        ex_id = ex["id"]
+        seen_ids.add(ex_id)
+        items.append(
+            {
+                "id": ex_id,
+                "title": ex["title"],
+                "surface": "workbench_example",
+                "pack_or_category": "Cross-QL Workbench Examples",
+                "severity": "high",
+                "source_language": ex["source_language"],
+                "source_query": ex["source_query"],
+                "expected_logan_ql": ex["expected_logan_ql"],
+                "explanation": ex["explanation"],
+                "support_level": ex["support_level"],
+                "log_sources": _extract_log_sources(ex["expected_logan_ql"]),
+                "mitre_techniques": re.findall(r"T\d{4}(?:\.\d{3})?", ex["source_query"], flags=re.IGNORECASE),
+                "mitre_tactics": [],
+            }
+        )
+
+    # 2. 2026 Threat Reports & 7-Day Caldera/GOAD Storyline Packs
+    packs_dir = PROJECT_ROOT / "packs" / "2026_threat_reports"
+    if packs_dir.is_dir():
+        for pack_file in sorted(packs_dir.glob("*.yaml")):
+            doc = yaml.safe_load(pack_file.read_text(encoding="utf-8")) or {}
+            pack_title = doc.get("title") or pack_file.stem
+            entries = (
+                doc.get("days")
+                or doc.get("detections")
+                or doc.get("campaigns")
+                or doc.get("hunts")
+                or []
+            )
+            for entry in entries:
+                entry_id = str(entry.get("id") or entry.get("hunt_id") or f"{pack_file.stem}").strip()
+                if not entry_id or entry_id in seen_ids:
+                    continue
+                seen_ids.add(entry_id)
+                logan_ql = (
+                    entry.get("log_analytics_query")
+                    or (entry.get("execute") or {}).get("log_analytics_query")
+                    or ""
+                ).strip()
+                title = (
+                    entry.get("title")
+                    or entry.get("name")
+                    or entry_id
+                )
+                desc = (
+                    entry.get("description")
+                    or entry.get("perpetrator_narrative")
+                    or (entry.get("prepare") or {}).get("hypothesis")
+                    or pack_title
+                )
+                mitre = entry.get("mitre_attack") or []
+                tactics = [entry["tactic"]] if entry.get("tactic") else []
+                items.append(
+                    {
+                        "id": entry_id,
+                        "title": f"[{entry_id}] {title}",
+                        "surface": "threat_report_2026",
+                        "pack_or_category": pack_title.split("—")[0].strip(),
+                        "severity": "critical" if "DAY-05" in entry_id or "DAY-06" in entry_id or "DAY-07" in entry_id else "high",
+                        "source_language": "oci_logan",
+                        "source_query": logan_ql,
+                        "expected_logan_ql": logan_ql,
+                        "explanation": str(desc).strip(),
+                        "support_level": "supported",
+                        "log_sources": _extract_log_sources(logan_ql, entry.get("log_sources") if isinstance(entry.get("log_sources"), list) else None),
+                        "mitre_techniques": [str(m) for m in mitre],
+                        "mitre_tactics": [str(t) for t in tactics],
+                    }
+                )
+
+    # 3. Hunting queries (queries/hunting/*.json)
+    hunting_dir = PROJECT_ROOT / "queries" / "hunting"
+    if hunting_dir.is_dir():
+        for qfile in sorted(hunting_dir.glob("*.json")):
+            data = json.loads(qfile.read_text(encoding="utf-8"))
+            qid = f"hunting/{qfile.stem}"
+            if qid in seen_ids:
+                continue
+            seen_ids.add(qid)
+            logan_ql = str(data.get("query") or "").strip()
+            mitre_obj = data.get("mitre_attack") or {}
+            logsource_obj = data.get("logsource") or {}
+            is_storyline = qfile.stem.startswith("storyline_day")
+            is_ac_hunter = qfile.stem.startswith("ac_hunter_")
+            items.append(
+                {
+                    "id": qid,
+                    "title": str(data.get("title") or qfile.stem),
+                    "surface": "hunting",
+                    "pack_or_category": (
+                        "7-Day Storyline Hunts"
+                        if is_storyline
+                        else ("AC-Hunter & Multi-Cloud Hunts" if is_ac_hunter else "Threat Hunting Library")
+                    ),
+                    "severity": str(data.get("level") or "medium").lower(),
+                    "source_language": "oci_logan",
+                    "source_query": logan_ql,
+                    "expected_logan_ql": logan_ql,
+                    "explanation": str(data.get("description") or "OCI Log Analytics threat hunting query.").strip(),
+                    "support_level": "supported",
+                    "log_sources": _extract_log_sources(logan_ql, logsource_obj.get("candidates") if isinstance(logsource_obj, dict) else None),
+                    "mitre_techniques": [str(t) for t in (mitre_obj.get("techniques") or [])],
+                    "mitre_tactics": [str(t) for t in (mitre_obj.get("tactics") or [])],
+                }
+            )
+
+    # 4. Application / APM queries (queries/apps/*.json)
+    apps_dir = PROJECT_ROOT / "queries" / "apps"
+    if apps_dir.is_dir():
+        for qfile in sorted(apps_dir.glob("*.json")):
+            data = json.loads(qfile.read_text(encoding="utf-8"))
+            qid = f"apps/{qfile.stem}"
+            if qid in seen_ids:
+                continue
+            seen_ids.add(qid)
+            logan_ql = str(data.get("query") or "").strip()
+            mitre_obj = data.get("mitre_attack") or {}
+            logsource_obj = data.get("logsource") or {}
+            items.append(
+                {
+                    "id": qid,
+                    "title": str(data.get("title") or qfile.stem),
+                    "surface": "application",
+                    "pack_or_category": "Application & APM Security",
+                    "severity": str(data.get("level") or "high").lower(),
+                    "source_language": "oci_logan",
+                    "source_query": logan_ql,
+                    "expected_logan_ql": logan_ql,
+                    "explanation": str(data.get("description") or "Application & APM security detection query.").strip(),
+                    "support_level": "supported",
+                    "log_sources": _extract_log_sources(logan_ql, logsource_obj.get("candidates") if isinstance(logsource_obj, dict) else None),
+                    "mitre_techniques": [str(t) for t in (mitre_obj.get("techniques") or [])],
+                    "mitre_tactics": [str(t) for t in (mitre_obj.get("tactics") or [])],
+                }
+            )
+
+    # 5. All Detection Rules in queries/*.json (excluding generated catalog/workbench artifacts)
+    excluded_top_files = {
+        "catalog.json",
+        "conversion_examples.json",
+        "cross_ql_mapping_patterns.json",
+        "dashboard_inventory.json",
+        "forge_detection_catalog.json",
+        "hunting_integration_bundle.json",
+        "logan_ql_reference_catalog.json",
+        "ql_conversion_capability_matrix.json",
+        "siem_log_examples.json",
+    }
+    queries_dir = PROJECT_ROOT / "queries"
+    for qfile in sorted(queries_dir.glob("*.json")):
+        if qfile.name in excluded_top_files:
+            continue
+        data = json.loads(qfile.read_text(encoding="utf-8"))
+        if not isinstance(data, dict) or "query" not in data:
+            continue
+        qid = f"detection/{qfile.stem}"
+        if qid in seen_ids:
+            continue
+        seen_ids.add(qid)
+        logan_ql = str(data.get("query") or "").strip()
+        mitre_obj = data.get("mitre_attack") or {}
+        logsource_obj = data.get("logsource") or {}
+        product = str((logsource_obj.get("product") if isinstance(logsource_obj, dict) else "") or "oci").capitalize()
+        items.append(
+            {
+                "id": qid,
+                "title": str(data.get("title") or qfile.stem),
+                "surface": "detection",
+                "pack_or_category": f"{product} Detections",
+                "severity": str(data.get("level") or "medium").lower(),
+                "source_language": "oci_logan",
+                "source_query": logan_ql,
+                "expected_logan_ql": logan_ql,
+                "explanation": str(data.get("description") or "Production OCI Log Analytics detection rule.").strip(),
+                "support_level": "supported",
+                "log_sources": _extract_log_sources(logan_ql, logsource_obj.get("candidates") if isinstance(logsource_obj, dict) else None),
+                "mitre_techniques": [str(t) for t in (mitre_obj.get("techniques") or [])],
+                "mitre_tactics": [str(t) for t in (mitre_obj.get("tactics") or [])],
+            }
+        )
+
+    # 6. All Sentinel-converted Detection Rules in queries/sentinel/*.json
+    sentinel_dir = PROJECT_ROOT / "queries" / "sentinel"
+    if sentinel_dir.is_dir():
+        for qfile in sorted(sentinel_dir.glob("*.json")):
+            data = json.loads(qfile.read_text(encoding="utf-8"))
+            if not isinstance(data, dict) or "query" not in data:
+                continue
+            qid = f"sentinel/{qfile.stem}"
+            if qid in seen_ids:
+                continue
+            seen_ids.add(qid)
+            logan_ql = str(data.get("query") or "").strip()
+            mitre_obj = data.get("mitre_attack") or {}
+            logsource_obj = data.get("logsource") or {}
+            items.append(
+                {
+                    "id": qid,
+                    "title": str(data.get("title") or qfile.stem),
+                    "surface": "detection",
+                    "pack_or_category": "Sentinel Detections",
+                    "severity": str(data.get("level") or "medium").lower(),
+                    "source_language": "oci_logan",
+                    "source_query": logan_ql,
+                    "expected_logan_ql": logan_ql,
+                    "explanation": str(data.get("description") or "Sentinel-to-OCI Log Analytics detection rule.").strip(),
+                    "support_level": "supported",
+                    "log_sources": _extract_log_sources(logan_ql, logsource_obj.get("candidates") if isinstance(logsource_obj, dict) else None),
+                    "mitre_techniques": [str(t) for t in (mitre_obj.get("techniques") or [])],
+                    "mitre_tactics": [str(t) for t in (mitre_obj.get("tactics") or [])],
+                }
+            )
+
+    surface_counts: dict[str, int] = {}
+    for item in items:
+        s = item["surface"]
+        surface_counts[s] = surface_counts.get(s, 0) + 1
+
+    return {
+        "schema_version": "1.0.0",
+        "generated_at": generated_at,
+        "total_items": len(items),
+        "surface_counts": surface_counts,
+        "items": items,
     }
 
 
@@ -686,14 +984,17 @@ def main() -> int:
     parser.add_argument("--elastic-repo", type=Path, help="Optional local elastic/detection-rules checkout for aggregate counts")
     args = parser.parse_args()
 
+    examples_payload = build_examples()
     write_json(REFERENCE_PATH, build_reference_catalog(refresh_docs=args.refresh_docs))
     write_json(PATTERNS_PATH, build_patterns())
-    write_json(EXAMPLES_PATH, build_examples())
+    write_json(EXAMPLES_PATH, examples_payload)
     write_json(CAPABILITY_MATRIX_PATH, build_matrix(args.elastic_repo))
+    write_json(FORGE_CATALOG_PATH, build_forge_detection_catalog(examples_payload))
     print(f"wrote {REFERENCE_PATH.relative_to(PROJECT_ROOT)}")
     print(f"wrote {PATTERNS_PATH.relative_to(PROJECT_ROOT)}")
     print(f"wrote {EXAMPLES_PATH.relative_to(PROJECT_ROOT)}")
     print(f"wrote {CAPABILITY_MATRIX_PATH.relative_to(PROJECT_ROOT)}")
+    print(f"wrote {FORGE_CATALOG_PATH.relative_to(PROJECT_ROOT)}")
     return 0
 
 

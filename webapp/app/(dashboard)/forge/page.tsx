@@ -18,6 +18,7 @@ export default async function ForgePage() {
         commands={artifacts.commands}
         patterns={artifacts.patterns}
         examples={artifacts.examples}
+        catalogItems={artifacts.catalogItems}
         statuses={artifacts.statuses}
         generatedAt={artifacts.generatedAt}
         siemCatalog={siemExamples.catalog}

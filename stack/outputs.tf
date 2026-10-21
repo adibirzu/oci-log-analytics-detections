@@ -4,8 +4,13 @@ output "la_namespace" {
 }
 
 output "log_group_id" {
-  description = "OCID of the created Log Analytics log group"
-  value       = oci_log_analytics_log_analytics_log_group.soc_detection.id
+  description = "OCID of the effective Log Analytics log group"
+  value       = local.effective_log_group_id
+}
+
+output "deployment_mode" {
+  description = "Active deployment strategy (greenfield or attach_existing)"
+  value       = var.deployment_mode
 }
 
 output "compartment_id" {

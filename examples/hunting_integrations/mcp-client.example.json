@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "oci-hunting-content": {
+      "command": "<PYTHON_WITH_OPTIONAL_MCP_SDK>",
+      "args": ["<DETECTIONS_REPO>/scripts/hunting_mcp_server.py"]
+    },
+    "logan-runtime": {
+      "command": "<LOGAN_MCP_VENV>/bin/oci-logan-mcp",
+      "args": ["--user", "<USER_LABEL>", "--read-only"]
+    }
+  }
+}

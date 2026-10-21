@@ -201,6 +201,44 @@ class TestSentinelConversionWorkflowCommands(unittest.TestCase):
             self.assertFalse(status["checks"]["promoted_count_matches_files"])
             self.assertFalse(status["checks"]["sentinel_dashboards_present"])
 
+    def test_build_status_can_enforce_report_freshness(self):
+        """A strict status gate must reject a report older than its declared SLA."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            report_path = root / "report.json"
+            sentinel_dir = root / "sentinel"
+            inventory_path = root / "dashboard_inventory.json"
+            sentinel_dir.mkdir()
+            report_path.write_text(json.dumps({
+                "generated_at": "2026-06-10T00:00:00+00:00",
+                "summary": {
+                    "promoted_count": 1,
+                    "live_validation_passed": 1,
+                    "live_validation_failed": 0,
+                },
+            }), encoding="utf-8")
+            (sentinel_dir / "one.json").write_text(json.dumps({
+                "sentinel_category": "identity",
+                "level": "medium",
+                "live_validation_status": "passed",
+            }), encoding="utf-8")
+            inventory_path.write_text(json.dumps({"dashboards": [{
+                "name": "SOC: Microsoft Sentinel Identity Converted Detections",
+                "widget_count": 1,
+            }]}), encoding="utf-8")
+
+            status = build_status(
+                report_path=report_path,
+                sentinel_dir=sentinel_dir,
+                dashboard_inventory=inventory_path,
+                max_report_age_hours=24,
+                now=datetime(2026, 6, 12, tzinfo=timezone.utc),
+            )
+
+            self.assertEqual(status["status"], "attention")
+            self.assertFalse(status["checks"]["report_age_within_limit"])
+            self.assertEqual(status["report_age_hours"], 48.0)
+
     def test_render_report_html_escapes_failure_content(self):
         report = {
             "source": {"repository": "https://example.invalid/repo"},

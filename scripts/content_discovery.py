@@ -324,6 +324,12 @@ def deduplicate_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, A
         existing["duplicate_count"] += 1
         existing["source_types"] = _merge_list(existing.get("source_types", []), candidate.get("source_type"))
         existing["source_urls"] = _merge_list(existing.get("source_urls", []), candidate.get("source_url"))
+        for value in candidate.get("provenance", []):
+            if value not in existing.setdefault("provenance", []):
+                existing["provenance"].append(value)
+        existing["mapping_gaps"] = _merge_list(existing.get("mapping_gaps", []), candidate.get("mapping_gaps", []))
+        if candidate.get("readiness") == "blocked":
+            existing["readiness"] = "blocked"
         for field in ("mitre_tactics", "mitre_techniques", "candidate_log_sources", "required_fields", "core_indicators"):
             existing[field] = _merge_list(existing.get(field, []), candidate.get(field, []))
         existing.setdefault("duplicates", []).append({
@@ -351,7 +357,10 @@ def classify_candidate(candidate: dict[str, Any], field_dictionary: dict[str, An
     )
     reasons: list[str] = []
 
-    if not candidate.get("candidate_log_sources"):
+    if candidate.get("mapping_gaps"):
+        classification = "needs field mapping"
+        reasons.extend(candidate["mapping_gaps"])
+    elif not candidate.get("candidate_log_sources"):
         classification = "not applicable to OCI Log Analytics"
         reasons.append("no candidate OCI Log Analytics source group is known")
     elif missing_fields:
@@ -430,6 +439,9 @@ def build_candidate_inventory(
                     candidates.append(normalize_elastic_coverage_gap(tactic, technique, name))
 
         candidates.extend(build_internal_workshop_candidates())
+        from hunting_reference_intake import load_hunting_references
+        candidates.extend(load_hunting_references(
+            Path(PROJECT_DIR) / "config/hunting_reference_candidates.json", load_source_registry()))
 
     if include_local_rules:
         candidates.extend(load_sigma_rules_from_dir(Path(PROJECT_DIR) / "rules"))

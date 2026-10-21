@@ -1,0 +1,71 @@
+# CrowdStrike 2026 Threat Hunting Report — OverWatch Behavioral & Agentic Detection Pack
+# Source: https://www.crowdstrike.com/en-us/blog/crowdstrike-2026-threat-hunting-report/
+version: 1
+pack_id: crowdstrike-2026-overwatch
+title: "CrowdStrike 2026 Threat Hunting Report — AI-Enabled Adversaries, Malware-Free LotL & Rapid PoC Exploitation"
+source_report: "https://www.crowdstrike.com/en-us/blog/crowdstrike-2026-threat-hunting-report/"
+key_metrics_referenced:
+  ai_enabled_adversary_yoy_increase_pct: 89
+  agentic_detection_lead_multiplier: 2.5
+  malware_free_detections_pct: 82
+  poc_to_exploitation_window_hours: 24
+detections:
+  - id: CS-OVERWATCH-2026-01
+    name: "AI-Agent Driven Machine-Speed API Reconnaissance & Token Enumeration (2.5x Agentic Multiplier)"
+    mitre_attack: ["T1595.002", "T1078.004", "T1110.004"]
+    peak_type: model_assisted_math
+    description: >-
+      Identifies machine-speed API discovery and multi-endpoint parameter probing where
+      inter-arrival request variance (<150ms) and tool-chain fanout match autonomous LLM/agentic adversary patterns.
+    log_analytics_query: >-
+      'Log Source' in ('OCI API Gateway Access Logs', 'OCI Audit Logs', 'SOC Application Logs')
+      and ('Response Code' in ('200', '401', '403', '429') or 'Event Name' in ('GetSecretBundle', 'ListSecrets'))
+      | stats count as request_burst, distinctcount('Request URL') as path_fanout by 'Source IP', 'User Name', 'Trace ID'
+      | where request_burst >= 25 and path_fanout >= 8
+    apm_trace_filter: "math.agentic_burst_score >= 2.5 AND http.status_code IN (200, 401, 403, 429)"
+    metric_indicator: "oci_security_hunt.math_burst_score"
+
+  - id: CS-OVERWATCH-2026-02
+    name: "Malware-Free Living-off-the-Land (82% LotL) — Out-of-Hours Cloud Admin & RMM Tool Abuse"
+    mitre_attack: ["T1219", "T1078.004", "T1562.007", "T1098"]
+    peak_type: baseline_eda
+    description: >-
+      Detects hands-on-keyboard interactive intrusion using legitimate RMM binaries or
+      OCI CLI credentials outside established administrative baseline hours to modify NSGs or export DB wallets.
+    log_analytics_query: >-
+      'Log Source' in ('OCI Audit Logs', 'Linux Auditd Logs', 'SOC Windows Sysmon Logs')
+      and ('Event Name' in ('UpdateNetworkSecurityGroupSecurityRules', 'GenerateAutonomousDatabaseWallet', 'CreateUser', 'CreateApiKey')
+           or 'Process Name' in ('anydesk', 'screenconnect', 'cloudflared', 'ngrok'))
+      | stats count as admin_drift_events by 'User Name', 'Event Name', 'Source IP', 'Compartment Name'
+    apm_trace_filter: "operationName IN ('GenerateAutonomousDatabaseWallet', 'UpdateNetworkSecurityGroupSecurityRules')"
+    metric_indicator: "oci_security_hunt.lotl_admin_drift_count"
+
+  - id: CS-OVERWATCH-2026-03
+    name: "ALTERED SPIDER Rapid Dependency & CI/CD Pipeline Poisoning"
+    mitre_attack: ["T1195.002", "T1552.001", "T1530"]
+    peak_type: hypothesis_driven
+    description: >-
+      Detects rapid multi-package dependency mutations and unauthorized secret/vault read bursts
+      characteristic of ALTERED SPIDER supply-chain campaigns.
+    log_analytics_query: >-
+      'Log Source' in ('OCI Audit Logs', 'OKE Application Logs', 'SOC Application Logs')
+      and ('Event Name' in ('GetSecretBundle', 'GetSecretBundleByName', 'ListSecrets')
+           or 'Message' like '%altered_spider_dep_probe%')
+      | stats count as vault_reads, distinctcount('Event Name') as distinct_secrets by 'User Name', 'Source IP', 'Trace ID'
+      | where vault_reads >= 10
+    apm_trace_filter: "serviceName = 'ci-artifact-runner' AND vault.secret_bundle_burst = 'true'"
+    metric_indicator: "oci_security_hunt.vault_secret_read_burst"
+
+  - id: CS-OVERWATCH-2026-04
+    name: "Sub-24h N-Day PoC Exploitation Probe to Autonomous Database Bulk Extraction (Data Safe Correlated)"
+    mitre_attack: ["T1190", "T1213", "T1005", "T1530"]
+    peak_type: model_assisted_math
+    description: >-
+      Correlates edge web/API exploitation probes with downstream OCI Data Safe unified audit
+      events showing high-volume SELECT extraction on sensitive PII/credential tables.
+    log_analytics_query: >-
+      'Log Source' in ('OCI Data Safe Unified Audit Logs', 'OCI WAF Logs', 'OKE Application Logs', 'SOC Application Logs')
+      and (Action = 'SELECT' or 'Message' like '%CUSTOMER_PII%' or 'Message' like '%PAYMENT_TOKENS%' or Action in ('DETECT', 'BLOCK'))
+      | stats count as db_rows_probed, distinctcount('Service Name') as sensitive_tables by 'User Name', 'Host Name', 'Trace ID'
+    apm_trace_filter: "db.system = 'oracle' AND db.datasafe.sensitive_table_access = 'true'"
+    metric_indicator: "oci_datasafe.sensitive_query_count"

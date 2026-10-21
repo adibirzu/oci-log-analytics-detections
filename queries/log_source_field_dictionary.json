@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "generated_at": "2026-09-04T15:47:32.973181+00:00",
+  "generated_at": "2026-10-21T05:35:06.507775+00:00",
   "summary": {
     "total_fields": 338,
     "parser_count": 23,
     "source_count": 23,
     "reserved_mapping_violations": 0,
-    "fields_with_query_usage": 170
+    "fields_with_query_usage": 172
   },
   "approved_builtins": [
     "Channel",
@@ -681,8 +681,10 @@
         "windows_defender_operational.jsonl"
       ],
       "queries_using_it": [
+        "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
         "hunting/oci_vcn_external_egress_traffic.json",
         "hunting/oci_vcn_rejected_traffic_spike.json",
+        "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json",
         "hunting/waf_attack_frequency_by_source.json",
         "hunting/waf_multi_attack_scoring.json",
         "hunting/web_attack_geo_anomaly.json",
@@ -1774,7 +1776,8 @@
         "apps/oke_rule_privileged_workload_count.json",
         "apps/oke_secrets_and_rbac_abuse.json",
         "hunting/melts_apm_log_trace_correlation.json",
-        "hunting/melts_attack_path_link.json"
+        "hunting/melts_attack_path_link.json",
+        "hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -2193,6 +2196,7 @@
         "vcn_flow.jsonl"
       ],
       "queries_using_it": [
+        "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
         "hunting/c2_destination_ips.json",
         "hunting/c2_https_beaconing.json",
         "hunting/exfiltration_after_initial_access_2025_2026.json",
@@ -2523,6 +2527,9 @@
         "genai_gateway_prompt_injection_blocked.json",
         "genai_gateway_sensitive_data_leak.json",
         "genai_gateway_unauthorized_inference.json",
+        "hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
+        "hunting/ac_hunter_07_threat_intel_safelist_correlation.json",
+        "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
         "hunting/browser_attack_frequency_analysis.json",
         "hunting/flf_credential_stuffing_pattern.json",
         "hunting/oci_iam_fusion_activity_correlation.json",
@@ -2530,6 +2537,8 @@
         "hunting/sharepoint_toolshell_exploitation.json",
         "hunting/sharepoint_toolshell_webshell_post_exploit.json",
         "hunting/ssh_brute_force_frequency.json",
+        "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json",
+        "hunting/storyline_day7_dns_c2_exfil_melts_correlation.json",
         "hunting/waf_attack_frequency_by_source.json",
         "hunting/waf_multi_attack_scoring.json",
         "hunting/waf_sqli_pattern_stacking.json",
@@ -2797,6 +2806,9 @@
         "hunting/melts_datasource_coverage_kpi.json",
         "hunting/melts_last_week_risk_exposure.json",
         "hunting/rmm_post_compromise_activity.json",
+        "hunting/storyline_day2_oke_pod_breakout_imdsv2_harvest.json",
+        "hunting/storyline_day3_caldera_sandcat_goad_ad_discovery.json",
+        "hunting/storyline_day4_lotl_rmm_kerberoasting_lateral.json",
         "hunting/windows_credential_access_cluster.json",
         "hunting/windows_defense_evasion_score.json",
         "hunting/windows_lateral_movement_cluster.json",
@@ -3736,7 +3748,9 @@
         "select * from orders where id = :id"
       ],
       "contract_datasets": [],
-      "queries_using_it": [],
+      "queries_using_it": [
+        "hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -3778,7 +3792,8 @@
       "contract_datasets": [],
       "queries_using_it": [
         "apps/apm_octo_db_spans.json",
-        "apps/app_db_performance_correlation.json"
+        "apps/app_db_performance_correlation.json",
+        "hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -4096,6 +4111,12 @@
       ],
       "queries_using_it": [
         "cloud_guard_instance_security_high_severity_pivots.json",
+        "hunting/ac_hunter_01_c2_beaconing_rita_score.json",
+        "hunting/ac_hunter_02_long_connections_duration.json",
+        "hunting/ac_hunter_03_dns_beaconing_fqdn_entropy.json",
+        "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
+        "hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json",
+        "hunting/ac_hunter_07_threat_intel_safelist_correlation.json",
         "hunting/c2_affected_hosts_kpi.json",
         "hunting/c2_beacon_activity_timeline.json",
         "hunting/c2_communication_topology.json",
@@ -4112,6 +4133,7 @@
         "hunting/melts_last_week_risk_exposure.json",
         "hunting/network_c2_beaconing.json",
         "hunting/oci_vcn_external_egress_traffic.json",
+        "hunting/storyline_day7_dns_c2_exfil_melts_correlation.json",
         "hunting/web_to_cloud_attack_path_link.json",
         "hunting/web_to_cloud_attack_timeline.json",
         "hunting/web_to_cloud_compromised_machines.json",
@@ -4252,6 +4274,10 @@
       ],
       "queries_using_it": [
         "bluelight_graph_api_c2.json",
+        "hunting/ac_hunter_01_c2_beaconing_rita_score.json",
+        "hunting/ac_hunter_02_long_connections_duration.json",
+        "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
+        "hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json",
         "hunting/c2_affected_hosts_kpi.json",
         "hunting/c2_beacon_activity_timeline.json",
         "hunting/c2_communication_topology.json",
@@ -4261,6 +4287,7 @@
         "hunting/flf_port_knocking_sequence.json",
         "hunting/network_c2_beaconing.json",
         "hunting/oci_vcn_external_egress_traffic.json",
+        "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json",
         "hunting/web_to_cloud_vcn_egress.json",
         "hunting/win_lateral_movement_timeline.json",
         "sentinel/detect-bluekeep-exploitation-attempts.json",
@@ -4844,6 +4871,8 @@
         "hunting/goad_caldera_sandcat_activity.json",
         "hunting/kerberoasting_anomaly_detection.json",
         "hunting/logon_anomaly_by_account.json",
+        "hunting/storyline_day4_lotl_rmm_kerberoasting_lateral.json",
+        "hunting/storyline_day5_dcsync_persistence_iam_drift.json",
         "hunting/windows_access_administrator_logon.json",
         "hunting/windows_access_failed_logon_burst.json",
         "hunting/windows_access_new_local_user.json",
@@ -5045,6 +5074,7 @@
         "hunting/oci_object_storage_external_source.json",
         "hunting/oci_off_hours_activity.json",
         "hunting/oci_privilege_escalation_chain.json",
+        "hunting/oci_programmatic_credential_creation_burst.json",
         "hunting/oci_resource_deletion_wave.json",
         "hunting/oci_resource_destruction_spike.json",
         "hunting/timeseries_login_anomaly.json",
@@ -6847,6 +6877,9 @@
         "cloud_guard_instance_security_pack_coverage.json",
         "cloud_guard_instance_security_raw_result_detail.json",
         "genai_gateway_model_provenance_failure.json",
+        "hunting/ac_hunter_03_dns_beaconing_fqdn_entropy.json",
+        "hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
+        "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
         "hunting/c2_dns_beacon_sources.json",
         "hunting/coordinator_affected_hosts_kpi.json",
         "hunting/coordinator_top_affected_hosts.json",
@@ -6862,6 +6895,7 @@
         "hunting/multicloud_geo_health_regional_map.json",
         "hunting/multicloud_geo_health_tier_status.json",
         "hunting/multicloud_geo_health_unhealthy_regions.json",
+        "hunting/storyline_day2_oke_pod_breakout_imdsv2_harvest.json",
         "hunting/wazuh_fim_events.json",
         "hunting/wazuh_hunting_recent_alerts.json",
         "hunting/wazuh_inventory_hosts.json",
@@ -7037,6 +7071,9 @@
         "hunting/melts_last_week_risk_exposure.json",
         "hunting/network_c2_beaconing.json",
         "hunting/rmm_post_compromise_activity.json",
+        "hunting/storyline_day3_caldera_sandcat_goad_ad_discovery.json",
+        "hunting/storyline_day4_lotl_rmm_kerberoasting_lateral.json",
+        "hunting/storyline_day5_dcsync_persistence_iam_drift.json",
         "hunting/web_to_cloud_compromised_machines.json",
         "hunting/windows_access_administrator_logon.json",
         "hunting/windows_access_failed_logon_burst.json",
@@ -11543,7 +11580,8 @@
         "apps/oke_rule_privileged_workload_count.json",
         "apps/oke_secrets_and_rbac_abuse.json",
         "cloud_guard_instance_security_high_severity_pivots.json",
-        "cloud_guard_instance_security_raw_result_detail.json"
+        "cloud_guard_instance_security_raw_result_detail.json",
+        "hunting/storyline_day2_oke_pod_breakout_imdsv2_harvest.json"
       ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
@@ -11875,6 +11913,8 @@
         "hunting/melts_datasource_coverage_kpi.json",
         "hunting/melts_last_week_risk_exposure.json",
         "hunting/rmm_post_compromise_activity.json",
+        "hunting/storyline_day2_oke_pod_breakout_imdsv2_harvest.json",
+        "hunting/storyline_day3_caldera_sandcat_goad_ad_discovery.json",
         "hunting/web_to_cloud_compromised_machines.json",
         "hunting/win_lateral_movement_timeline.json",
         "hunting/win_lolbin_frequency_anomaly.json",
@@ -12433,7 +12473,9 @@
         "sysmon_network.jsonl",
         "vcn_flow.jsonl"
       ],
-      "queries_using_it": [],
+      "queries_using_it": [
+        "hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json"
+      ],
       "dashboards_using_it": [],
       "reserved_backing_field": ""
     },
@@ -12606,6 +12648,7 @@
       ],
       "contract_datasets": [],
       "queries_using_it": [
+        "hunting/ac_hunter_03_dns_beaconing_fqdn_entropy.json",
         "hunting/c2_beacon_activity_timeline.json",
         "hunting/c2_dns_beacon_queries_kpi.json",
         "hunting/c2_dns_beacon_sources.json",
@@ -13293,6 +13336,7 @@
         "apps/atlas_ml_service_denial_request_flood.json",
         "apps/atlas_prompt_injection_via_app_request.json",
         "genai_gateway_model_theft_export.json",
+        "hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
         "hunting/browser_attack_frequency_analysis.json",
         "hunting/compromised_machines_and_data_2025_2026.json",
         "hunting/flf_vsagent_http_beaconing.json",
@@ -13303,6 +13347,7 @@
         "hunting/melts_last_week_risk_exposure.json",
         "hunting/sharepoint_toolshell_exploitation.json",
         "hunting/sharepoint_toolshell_webshell_post_exploit.json",
+        "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json",
         "hunting/waf_multi_attack_scoring.json",
         "hunting/waf_sqli_pattern_stacking.json",
         "hunting/web_brute_force_frequency.json",
@@ -13616,6 +13661,7 @@
         "hunting/flf_credential_stuffing_pattern.json",
         "hunting/sharepoint_toolshell_exploitation.json",
         "hunting/sharepoint_toolshell_webshell_post_exploit.json",
+        "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json",
         "hunting/web_brute_force_frequency.json",
         "hunting/web_directory_scan_clustering.json",
         "hunting/web_owasp_multi_stage_attack.json",
@@ -14880,6 +14926,7 @@
         "apps/oke_exec_and_node_escape.json",
         "apps/oke_kubernetes_attack_overview.json",
         "apps/oke_privileged_workload_creation.json",
+        "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
         "hunting/browser_attack_frequency_analysis.json",
         "hunting/melts_apm_log_trace_correlation.json",
         "kerberoasting_rc4_ticket_request.json",
@@ -15480,6 +15527,11 @@
         "apps/oke_secrets_and_rbac_abuse.json",
         "bluelight_drive_by_compromise.json",
         "bluelight_onedrive_exfiltration.json",
+        "hunting/ac_hunter_01_c2_beaconing_rita_score.json",
+        "hunting/ac_hunter_02_long_connections_duration.json",
+        "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
+        "hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json",
+        "hunting/ac_hunter_07_threat_intel_safelist_correlation.json",
         "hunting/c2_affected_hosts_kpi.json",
         "hunting/c2_communication_topology.json",
         "hunting/c2_destination_ips.json",
@@ -15499,9 +15551,11 @@
         "hunting/oci_iam_rapid_changes.json",
         "hunting/oci_multi_user_same_ip.json",
         "hunting/oci_object_storage_external_source.json",
+        "hunting/oci_programmatic_credential_creation_burst.json",
         "hunting/oci_resource_destruction_spike.json",
         "hunting/oci_vcn_external_egress_traffic.json",
         "hunting/oci_vcn_rejected_traffic_spike.json",
+        "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json",
         "hunting/web_to_cloud_attack_path_link.json",
         "hunting/web_to_cloud_attack_timeline.json",
         "hunting/web_to_cloud_cloud_abuse.json",
@@ -15994,6 +16048,8 @@
         "windows_defender_operational.jsonl"
       ],
       "queries_using_it": [
+        "hunting/ac_hunter_07_threat_intel_safelist_correlation.json",
+        "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
         "hunting/multicloud_geo_health_by_provider.json",
         "hunting/multicloud_geo_health_regional_map.json",
         "hunting/multicloud_geo_health_tier_status.json",
@@ -17379,6 +17435,10 @@
         "apps/oke_secrets_and_rbac_abuse.json",
         "genai_gateway_denial_of_ml_service.json",
         "genai_gateway_jailbreak_blocked.json",
+        "hunting/ac_hunter_01_c2_beaconing_rita_score.json",
+        "hunting/ac_hunter_02_long_connections_duration.json",
+        "hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
+        "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
         "hunting/clickfix_clipboard_powershell_execution.json",
         "hunting/clickfix_lolbin_payload_execution.json",
         "hunting/cloud_identity_aitm_token_abuse.json",
@@ -17394,6 +17454,8 @@
         "hunting/rmm_post_compromise_activity.json",
         "hunting/sharepoint_toolshell_exploitation.json",
         "hunting/sharepoint_toolshell_webshell_post_exploit.json",
+        "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json",
+        "hunting/storyline_day7_dns_c2_exfil_melts_correlation.json",
         "hunting/web_to_cloud_attack_path_link.json",
         "hunting/web_to_cloud_attack_timeline.json",
         "hunting/web_to_cloud_cloud_abuse.json",
@@ -17923,6 +17985,7 @@
         "apps/apm_dom_attack_detection.json",
         "apps/apm_session_hijacking_detection.json",
         "apps/apm_suspicious_js_patterns.json",
+        "hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
         "hunting/flf_vsagent_http_beaconing.json",
         "hunting/oci_unusual_api_caller.json",
         "hunting/web_directory_scan_clustering.json",
@@ -18042,6 +18105,7 @@
         "hunting/oci_object_storage_external_source.json",
         "hunting/oci_off_hours_activity.json",
         "hunting/oci_privilege_escalation_chain.json",
+        "hunting/oci_programmatic_credential_creation_burst.json",
         "hunting/oci_resource_deletion_wave.json",
         "hunting/oci_resource_destruction_spike.json",
         "hunting/web_to_cloud_attack_path_link.json",

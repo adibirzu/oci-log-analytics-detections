@@ -477,6 +477,8 @@ def build_steps(
         ("cloud guard instance security synthetic contract", [python, str(SCRIPTS_DIR / "validate_cloud_guard_instance_security.py")], 300),
         ("catalog generation", [python, str(SCRIPTS_DIR / "generate_catalog.py")], 300),
         ("dashboard inventory export", [python, str(SCRIPTS_DIR / "deploy_dashboard.py"), "--export-inventory"], 300),
+        ("hunting integration bundle generation", [python, str(SCRIPTS_DIR / "generate_hunting_bundle.py")], 300),
+        ("hunting integration bundle freshness", [python, str(SCRIPTS_DIR / "generate_hunting_bundle.py"), "--check"], 300),
         ("octo apm workshop bundle validation", [python, str(SCRIPTS_DIR / "octo_apm_workshop.py"), "--validate-bundle"], 300),
         # Keep the independent local Splunk evidence result before the known
         # Sentinel drift gate, so a Sentinel blocker cannot hide it.

@@ -1,0 +1,55 @@
+{
+  "title": "Storyline Day 4: Living-off-the-Land RMM Tunnel, AMSI Bypass & Kerberoasting",
+  "description": "Detects Day 4 of the 7-day multi-pillar adversary storyline: PowerShell encoded command execution and AMSI bypass attempts (EventID 4104), RMM tunnel creation (cloudflared.exe), and Kerberoasting RC4 ticket requests (EventID 4769) across GOAD servers.",
+  "query": "('Log Source' = 'Windows PowerShell Operational Logs' or 'Log Source' = 'SOC Windows Sysmon Logs' or 'Log Source' = 'Windows Event Security Logs') and ('Event ID' in ('4104', '4769', '1') and ('Command Line' like '*-EncodedCommand*' or 'Command Line' like '*cloudflared*' or 'Event ID' = '4769')) | stats count as lateral_events, distinctcount('Event ID') as distinct_signals by 'Host Name (Server)', 'Event ID' | sort -lateral_events",
+  "type": "hunting",
+  "hunting_type": "grouping_correlation",
+  "cookbook_method": "grouping_correlation",
+  "level": "critical",
+  "tags": [
+    "storyline.7day",
+    "storyline.day4",
+    "goad",
+    "lotl",
+    "rmm",
+    "attack.execution",
+    "attack.defense_evasion",
+    "attack.credential_access",
+    "attack.command_and_control",
+    "attack.t1059.001",
+    "attack.t1562.001",
+    "attack.t1219",
+    "attack.t1558.003"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "execution",
+      "defense_evasion",
+      "credential_access",
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1059.001",
+      "T1562.001",
+      "T1219",
+      "T1558.003"
+    ]
+  },
+  "logsource": {
+    "product": "windows",
+    "service": "powershell_sysmon_security",
+    "candidates": [
+      "Windows PowerShell Operational Logs",
+      "SOC Windows Sysmon Logs",
+      "Windows Event Security Logs"
+    ]
+  },
+  "falsepositives": [
+    "Approved Cloudflare Tunnel connectors on designated edge gateway hosts",
+    "Legacy Active Directory service accounts explicitly configured for RC4 encryption"
+  ],
+  "investigation_notes": [
+    "Review PowerShell Script Block Text (EventID 4104) on winterfell for AmsiUtils reflection.",
+    "Check EventID 4769 service ticket requests for encryption type 0x17 targeting MSSQLSvc and HTTP SPNs."
+  ]
+}

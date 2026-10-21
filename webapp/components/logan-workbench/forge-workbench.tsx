@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import type {
+  ForgeCatalogItem,
   LoganCommand,
   LoganConversionExample,
   LoganMappingPattern,
@@ -48,6 +49,7 @@ import {
   auditStatusClass,
   clientSideWarnings,
   convertInBrowser,
+  customizeQueryForServer,
   deriveMetadata,
   formatLoganQueryForDisplay,
   getRelevantCommands,
@@ -63,10 +65,13 @@ import { EditorFrame, MetadataPanel, MetadataTabs } from "./forge-workbench-pane
 const repositoryUrl = "https://github.com/adibirzu/oci-log-analytics-detections"
 const staticExport = process.env.NEXT_PUBLIC_FORGE_STATIC_EXPORT === "1"
 
+type SurfaceFilter = "all" | "workbench_example" | "threat_report_2026" | "hunting" | "detection" | "application"
+
 interface ForgeWorkbenchProps {
   commands: LoganCommand[]
   patterns: LoganMappingPattern[]
   examples: LoganConversionExample[]
+  catalogItems?: ForgeCatalogItem[]
   statuses: WorkbenchArtifactReadStatus[]
   generatedAt: string | null
 }
@@ -94,10 +99,24 @@ function auditEntry(
   }
 }
 
-export function ForgeWorkbench({ commands, patterns, examples, statuses, generatedAt }: ForgeWorkbenchProps) {
+export function ForgeWorkbench({
+  commands,
+  patterns,
+  examples,
+  catalogItems = [],
+  statuses,
+  generatedAt,
+}: ForgeWorkbenchProps) {
   const firstExample = examples[0]
   const [selectedExampleId, setSelectedExampleId] = useState(firstExample?.id ?? "")
   const selectedExample = examples.find((example) => example.id === selectedExampleId) ?? firstExample
+  const [surfaceFilter, setSurfaceFilter] = useState<SurfaceFilter>("all")
+  const [customizerOpen, setCustomizerOpen] = useState(false)
+  const [customLogSource, setCustomLogSource] = useState("")
+  const [targetHosts, setTargetHosts] = useState("")
+  const [excludeHosts, setExcludeHosts] = useState("")
+  const [thresholdCount, setThresholdCount] = useState("")
+  const [timeBucketSpan, setTimeBucketSpan] = useState("")
   const [sourceLanguage, setSourceLanguage] = useState<LoganSourceLanguage>(
     selectedExample?.source_language ?? "sigma_yaml",
   )
@@ -175,17 +194,42 @@ export function ForgeWorkbench({ commands, patterns, examples, statuses, generat
     }
   }, [addAudit])
 
-  const filteredExamples = useMemo(() => {
+  const allLibraryItems = useMemo<ForgeCatalogItem[]>(() => {
+    if (catalogItems.length) return catalogItems
+    return examples.map((ex) => ({
+      id: ex.id,
+      title: ex.title,
+      surface: "workbench_example" as const,
+      pack_or_category: "Cross-QL Workbench Examples",
+      severity: "high",
+      source_language: ex.source_language,
+      source_query: ex.source_query,
+      expected_logan_ql: ex.expected_logan_ql,
+      explanation: ex.explanation,
+      support_level: ex.support_level,
+      log_sources: [],
+      mitre_techniques: [],
+      mitre_tactics: [],
+    }))
+  }, [catalogItems, examples])
+
+  const filteredCatalogItems = useMemo(() => {
     const query = exampleSearch.toLowerCase().trim()
-    if (!query) return examples
-    return examples.filter((example) => {
+    return allLibraryItems.filter((item) => {
+      if (surfaceFilter !== "all" && item.surface !== surfaceFilter) return false
+      if (!query) return true
       return (
-        example.title.toLowerCase().includes(query) ||
-        languageLabels[example.source_language].toLowerCase().includes(query) ||
-        example.id.includes(query)
+        item.title.toLowerCase().includes(query) ||
+        languageLabels[item.source_language].toLowerCase().includes(query) ||
+        item.id.toLowerCase().includes(query) ||
+        item.pack_or_category.toLowerCase().includes(query) ||
+        item.mitre_techniques.some((t) => t.toLowerCase().includes(query)) ||
+        item.log_sources.some((s) => s.toLowerCase().includes(query))
       )
     })
-  }, [exampleSearch, examples])
+  }, [allLibraryItems, exampleSearch, surfaceFilter])
+
+  const visibleCatalogItems = useMemo(() => filteredCatalogItems.slice(0, 120), [filteredCatalogItems])
 
   const filteredCommands = useMemo(() => {
     const query = commandSearch.toLowerCase().trim()
@@ -224,28 +268,83 @@ export function ForgeWorkbench({ commands, patterns, examples, statuses, generat
   const shellPadding = density === "compact" ? "gap-3 p-3" : "gap-4 p-5"
   const blockingWarningCount = sourceWarnings.filter((warning) => warning.severity === "error").length
 
-  const loadExample = useCallback(
-    (example: LoganConversionExample) => {
-      setSelectedExampleId(example.id)
-      setSourceLanguage(example.source_language)
-      setSourceQuery(example.source_query)
+  const loadCatalogItem = useCallback(
+    (item: ForgeCatalogItem) => {
+      setSelectedExampleId(item.id)
+      setSourceLanguage(item.source_language)
+      setSourceQuery(item.source_query)
       setMetadataTab("mitre")
+      const matchingEx = examples.find((e) => e.id === item.id)
       setResult({
         schema_version: "1.0.0",
         generated_at: generatedAt ?? "",
-        source_language: example.source_language,
-        source_query: example.source_query,
-        logan_query: example.expected_logan_ql,
-        support_level: example.support_level,
-        explanation: example.explanation,
-        warnings: example.warnings.map((message) => ({ code: "example_warning", message, severity: "warning" })),
-        metadata: {},
-        backend: "Generated example catalog",
+        source_language: item.source_language,
+        source_query: item.source_query,
+        logan_query: item.expected_logan_ql,
+        support_level: item.support_level,
+        explanation: item.explanation,
+        warnings: (matchingEx?.warnings ?? []).map((message) => ({
+          code: "example_warning",
+          message,
+          severity: "warning",
+        })),
+        metadata: {
+          catalog_id: item.id,
+          surface: item.surface,
+          pack_or_category: item.pack_or_category,
+          mitre_techniques: item.mitre_techniques,
+        },
+        backend: item.surface === "workbench_example" ? "Generated example catalog" : "Forge detection catalog",
       })
-      addAudit(auditEntry("LOAD", example.id, `loaded ${languageLabels[example.source_language]} example`, "ok"))
+      addAudit(auditEntry("LOAD", item.id, `loaded ${item.pack_or_category} rule`, "ok"))
     },
-    [addAudit, generatedAt],
+    [addAudit, examples, generatedAt],
   )
+
+  const applyServerCustomization = useCallback(() => {
+    const baseQuery = result?.logan_query || sourceQuery
+    const { loganQuery, appliedNotes } = customizeQueryForServer(baseQuery, {
+      customLogSource,
+      targetHosts,
+      excludeHosts,
+      thresholdCount,
+      timeBucketSpan,
+    })
+    if (!loganQuery) return
+    setResult((prev) => ({
+      schema_version: "1.0.0",
+      generated_at: new Date().toISOString(),
+      source_language: prev?.source_language ?? sourceLanguage,
+      source_query: prev?.source_query ?? sourceQuery,
+      logan_query: loganQuery,
+      support_level: prev?.support_level ?? "supported",
+      explanation: appliedNotes.length
+        ? `${prev?.explanation ?? "Customized query."} [Server Enhancer: ${appliedNotes.join("; ")}]`
+        : prev?.explanation ?? "Customized query for server environment.",
+      warnings: prev?.warnings ?? [],
+      metadata: { ...(prev?.metadata ?? {}), server_customized: true, applied_enhancements: appliedNotes },
+      backend: "Server Environment Enhancer",
+    }))
+    addAudit(
+      auditEntry(
+        "ENHANCE",
+        selectedExampleId || "custom",
+        appliedNotes.join(", ") || "customized query for server",
+        "ok",
+      ),
+    )
+  }, [
+    addAudit,
+    customLogSource,
+    excludeHosts,
+    result?.logan_query,
+    selectedExampleId,
+    sourceLanguage,
+    sourceQuery,
+    targetHosts,
+    thresholdCount,
+    timeBucketSpan,
+  ])
 
   const convert = useCallback(async () => {
     if (!csrfToken) {
@@ -263,7 +362,13 @@ export function ForgeWorkbench({ commands, patterns, examples, statuses, generat
     setError("")
     try {
       if (staticExport) {
-        const payload = convertInBrowser(sourceLanguage, sourceQuery, examples, selectedExampleId || undefined)
+        const payload = convertInBrowser(
+          sourceLanguage,
+          sourceQuery,
+          examples,
+          selectedExampleId || undefined,
+          allLibraryItems,
+        )
         setResult(payload)
         setMetadataTab("mitre")
         addAudit(auditEntry("CONVERT", languageLabels[sourceLanguage], "conversion completed in static browser mode", "ok"))
@@ -297,7 +402,7 @@ export function ForgeWorkbench({ commands, patterns, examples, statuses, generat
     } finally {
       setConverting(false)
     }
-  }, [addAudit, csrfToken, examples, readOnly, selectedExampleId, sourceLanguage, sourceQuery, sourceWarnings])
+  }, [addAudit, allLibraryItems, csrfToken, examples, readOnly, selectedExampleId, sourceLanguage, sourceQuery, sourceWarnings])
 
   const copyOutput = useCallback(async () => {
     if (!result?.logan_query) return
@@ -355,8 +460,8 @@ export function ForgeWorkbench({ commands, patterns, examples, statuses, generat
               <div className="hidden h-9 w-px bg-border-strong/60 lg:block" aria-hidden="true" />
               <p className="max-w-md text-meta text-muted-foreground">
                 {staticExport
-                  ? "Browse static conversion examples and pass through raw OCI queries on GitHub Pages."
-                  : "Translate Sigma, Sentinel KQL, SPL, Elastic, and raw OCI queries into OCI Log Analytics QL through the secured backend."}
+                  ? `Browse all ${allLibraryItems.length.toLocaleString()} detection & hunting rules, convert Sigma/KQL/SPL/Elastic queries in-browser, and customize rules for your servers on GitHub Pages.`
+                  : `Translate Sigma, Sentinel KQL, SPL, Elastic, and ${allLibraryItems.length.toLocaleString()} catalog detections into OCI Log Analytics QL and customize for your servers.`}
               </p>
             </div>
           </div>
@@ -465,30 +570,59 @@ export function ForgeWorkbench({ commands, patterns, examples, statuses, generat
                   <FileCode2 className="size-4 text-primary" />
                   <span className="text-sm font-semibold">Rule library</span>
                 </div>
-                <span className="rounded-md bg-primary/12 px-2 py-0.5 font-mono text-[11px] text-primary tabular-nums">
-                  {examples.length}
+                <span
+                  className="rounded-md bg-primary/12 px-2 py-0.5 font-mono text-[11px] text-primary tabular-nums"
+                  data-testid="library-total-count"
+                >
+                  {filteredCatalogItems.length} / {allLibraryItems.length}
                 </span>
               </div>
-              <div className="relative">
+              <div className="relative mb-2">
                 <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   value={exampleSearch}
                   onChange={(event) => setExampleSearch(event.target.value)}
-                  placeholder="Filter library"
+                  placeholder="Search 1,400+ rules, MITRE, packs…"
                   className="h-9 border-border bg-surface-sunken/50 pl-8"
                   data-testid="example-search"
                 />
               </div>
+              <div className="flex flex-wrap gap-1" data-testid="surface-filter-bar">
+                {(
+                  [
+                    { id: "all", label: "All" },
+                    { id: "threat_report_2026", label: "2026 & 7d Story" },
+                    { id: "hunting", label: "Hunting" },
+                    { id: "detection", label: "Detections" },
+                    { id: "application", label: "App/APM" },
+                    { id: "workbench_example", label: "Examples" },
+                  ] as Array<{ id: SurfaceFilter; label: string }>
+                ).map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setSurfaceFilter(tab.id)}
+                    data-testid={`surface-filter-${tab.id}`}
+                    className={`rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
+                      surfaceFilter === tab.id
+                        ? "bg-primary/20 text-primary ring-1 ring-inset ring-primary/40"
+                        : "bg-surface-sunken/60 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="min-h-0 flex-1 space-y-2 overflow-auto p-2.5">
-              {filteredExamples.map((example) => {
-                const isActive = selectedExampleId === example.id
+              {visibleCatalogItems.map((item) => {
+                const isActive = selectedExampleId === item.id
                 return (
                   <button
-                    key={example.id}
+                    key={item.id}
                     type="button"
-                    onClick={() => loadExample(example)}
-                    data-testid={`example-${example.id}`}
+                    onClick={() => loadCatalogItem(item)}
+                    data-testid={`example-${item.id}`}
                     aria-pressed={isActive}
                     className={`group relative w-full overflow-hidden rounded-lg border p-3 text-left transition-colors duration-150 ${
                       isActive
@@ -503,16 +637,21 @@ export function ForgeWorkbench({ commands, patterns, examples, statuses, generat
                       aria-hidden="true"
                     />
                     <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 text-sm font-medium leading-snug text-foreground">{example.title}</div>
-                      <span className={`shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase ${supportBadgeClass(example.support_level)}`}>
-                        {example.support_level}
+                      <div className="min-w-0 text-sm font-medium leading-snug text-foreground">{item.title}</div>
+                      <span className={`shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase ${supportBadgeClass(item.support_level)}`}>
+                        {item.support_level}
                       </span>
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
                       <span className="rounded bg-muted px-1.5 py-0.5 font-medium text-muted-foreground">
-                        {languageLabels[example.source_language]}
+                        {languageLabels[item.source_language]}
                       </span>
-                      <span className="truncate font-mono opacity-70">{example.pattern_ids.slice(0, 2).join(" · ")}</span>
+                      <span className="truncate font-mono opacity-80">{item.pack_or_category}</span>
+                      {item.mitre_techniques.length ? (
+                        <span className="rounded bg-primary/10 px-1 py-0.5 font-mono text-[10px] text-primary">
+                          {item.mitre_techniques.slice(0, 2).join(", ")}
+                        </span>
+                      ) : null}
                     </div>
                   </button>
                 )
@@ -644,11 +783,97 @@ export function ForgeWorkbench({ commands, patterns, examples, statuses, generat
                   <Button variant="outline" size="icon" className="size-8" onClick={shareOutput} title="Copy share link" aria-label="Copy share link">
                     {shared ? <Check className="size-4 text-severity-ok" /> : <Link2 className="size-4" />}
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 text-xs"
+                    onClick={() => setCustomizerOpen((prev) => !prev)}
+                    data-testid="toggle-server-customizer"
+                  >
+                    <SlidersHorizontal className="size-3.5" />
+                    Customize for Server
+                  </Button>
                   <Button size="sm" className="btn-brand h-8" onClick={deploy} disabled={readOnly || !output}>
                     Deploy
                   </Button>
                 </div>
               </div>
+              {customizerOpen ? (
+                <div
+                  className="grid gap-2 border-b border-border/70 bg-surface-sunken/50 p-3 text-xs"
+                  data-testid="server-customizer-panel"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-foreground">
+                      Customer Server & Environment Query Enhancer
+                    </span>
+                    <span className="text-[11px] text-muted-foreground">
+                      Scope log sources, hostnames, and alert thresholds for your servers
+                    </span>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    <Input
+                      value={customLogSource}
+                      onChange={(e) => setCustomLogSource(e.target.value)}
+                      placeholder="Custom Log Source (e.g. Windows Security Events)"
+                      className="h-8 text-xs"
+                      data-testid="custom-log-source-input"
+                    />
+                    <Input
+                      value={targetHosts}
+                      onChange={(e) => setTargetHosts(e.target.value)}
+                      placeholder="Target Host(s) (e.g. dc01.corp, srv-app-01)"
+                      className="h-8 text-xs"
+                      data-testid="target-hosts-input"
+                    />
+                    <Input
+                      value={excludeHosts}
+                      onChange={(e) => setExcludeHosts(e.target.value)}
+                      placeholder="Exclude Host(s) (e.g. scanner-01)"
+                      className="h-8 text-xs"
+                      data-testid="exclude-hosts-input"
+                    />
+                    <Input
+                      value={thresholdCount}
+                      onChange={(e) => setThresholdCount(e.target.value)}
+                      placeholder="Min Hit Threshold (e.g. 5)"
+                      className="h-8 text-xs"
+                      data-testid="threshold-count-input"
+                    />
+                    <Input
+                      value={timeBucketSpan}
+                      onChange={(e) => setTimeBucketSpan(e.target.value)}
+                      placeholder="Timestats Bucket (e.g. 5m, 15m, 1h)"
+                      className="h-8 text-xs"
+                      data-testid="time-bucket-input"
+                    />
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        size="sm"
+                        className="btn-brand h-8 flex-1 text-xs"
+                        onClick={applyServerCustomization}
+                        data-testid="apply-server-customization"
+                      >
+                        Apply to Query
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs"
+                        onClick={() => {
+                          setCustomLogSource("")
+                          setTargetHosts("")
+                          setExcludeHosts("")
+                          setThresholdCount("")
+                          setTimeBucketSpan("")
+                        }}
+                      >
+                        Reset
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
               <EditorFrame
                 value={displayOutput}
                 label="OCI Logan QL output"

@@ -1,0 +1,63 @@
+{
+  "title": "AC-Hunter 01: C2 Beaconing Detection (RITA Periodic Callback Score)",
+  "description": "Replicates Active Countermeasures AC-Hunter & RITA C2 beaconing detection in OCI Log Analytics. Evaluates HTTP/HTTPS/TCP/UDP periodic callback patterns based on connection interval regularity/skew (60s +/- 1s), payload size consistency/skew, dispersion, duration, and connection count across VCN Flow, Sysmon Network, and Application telemetry.",
+  "query": "('Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC Sysmon Network Logs' or 'Log Source' = 'SOC Application Logs') and ('Destination IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Destination Port' in (8443, 7844, 4443, 443) or msg like '*rita_beacon*') | stats count as callback_count, distinctcount('Destination Port') as beacon_ports, distinctcount('Log Source') as telemetry_pillars by 'Source IP', 'Destination IP', 'Destination Port', 'Trace ID' | eval rita_beacon_score = if(callback_count >= 10, 96, 84) | where callback_count >= 1 | sort -rita_beacon_score, -callback_count",
+  "type": "hunting",
+  "hunting_type": "frequency_analysis",
+  "cookbook_method": "sorting_stacking",
+  "level": "critical",
+  "tags": [
+    "ac_hunter",
+    "rita",
+    "c2.beaconing",
+    "oci.vcn_flow",
+    "attack.command_and_control",
+    "attack.t1071.001",
+    "attack.t1573"
+  ],
+  "mitre_attack": {
+    "tactics": [
+      "command_and_control"
+    ],
+    "techniques": [
+      "T1071.001",
+      "T1573",
+      "T1095"
+    ]
+  },
+  "logsource": {
+    "product": "oci",
+    "service": "network_and_application",
+    "candidates": [
+      "SOC VCN Flow Logs",
+      "SOC Sysmon Network Logs",
+      "SOC Application Logs"
+    ]
+  },
+  "dashboard": {
+    "visualizationType": "summary_table",
+    "showTitle": true,
+    "timeSelection": {
+      "timePeriod": "l21d"
+    },
+    "visualizationOptions": {
+      "groupBy": [
+        "Source IP",
+        "Destination IP",
+        "Destination Port"
+      ],
+      "valueField": "rita_beacon_score"
+    },
+    "ask_ai_prompts": [
+      "Which internal hosts exhibit the highest RITA C2 beaconing score and regular 60s callback intervals?",
+      "Correlate the top C2 beacon destinations with downstream Data Safe or IAM drift events."
+    ]
+  },
+  "falsepositives": [
+    "Authorized cloud monitoring heartbeats or NTP/health-check polling to approved endpoints"
+  ],
+  "investigation_notes": [
+    "Inspect RITA score pillars: timestamp interval skew (60s +/- 1s), payload size skew, and connection count from kingslanding, winterfell, castelblack, and OKE worker nodes.",
+    "Pivot on Trace ID and Destination IP (198.51.100.214:8443, 198.41.200.113:7844) across VCN Flow and Sysmon logs."
+  ]
+}

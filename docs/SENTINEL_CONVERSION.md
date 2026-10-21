@@ -1,17 +1,15 @@
 # Microsoft Sentinel Conversion Workflow
 
-Date: 2026-05-14
+Date: 2026-09-18
 
 This document describes the Microsoft Sentinel KQL to OCI Log Analytics / Logan QL conversion path. It is intentionally conservative: local conversion is useful for development, but only live OCI parser-passing queries are promoted under `queries/sentinel/`.
 
 ## Current Baseline
 
 - Official Microsoft Sentinel candidates available: 4,452
-- Current canonical live report: 100 attempted, 60 promoted/live-passed, 2 live failures, 40 local skips in the current cohort
-- Current promoted surface: 60 queries in `queries/sentinel/`, each live parser-passing
-- Current synthetic live-hit evidence: 20 / 60 promoted queries have non-empty live-hit evidence; `queries/sentinel_drift.json` lists the remaining 40 under `synthetic_hit_gaps`
-- Current remaining synthetic-hit split: all 40 promoted gaps are `synthetic_ready` and can be live-validated directly
-- Previous full-promotion run failed uniformly with `query validation exceeded 20s`; use the synthetic parser loop for small batches before scaling again
+- Canonical live report snapshot: 4,452 attempted, 590 promoted/live-parser-passing, 17 live failures, and 3,862 skips
+- Promoted surface: 590 query JSON files in `queries/sentinel/`, each marked `live_validation_status: passed`
+- The canonical report is a dated provider-validation receipt, not ongoing acceptance. Use the optional freshness status gate before treating it as current evidence.
 
 The canonical machine-readable status is `queries/sentinel_conversion_report.json`. The static operator review page is `docs/sentinel_converter.html`.
 
@@ -65,6 +63,8 @@ python3 scripts/sentinel_conversion_workflow.py triage --json
 python3 scripts/sentinel_conversion_workflow.py next-queries --limit 10
 python3 scripts/sentinel_conversion_workflow.py next-queries --strategy foundational --limit 10
 python3 scripts/sentinel_conversion_workflow.py next-queries --work-type field_mapping --json
+# Show the top repeated blockers before selecting a converter investment.
+python3 scripts/sentinel_conversion_workflow.py next-queries --work-type kql_support --strategy foundational --limit 10
 
 # Generate parser-aware synthetic logs and explicit OCI parser/source gaps for a small batch.
 python3 scripts/sentinel_conversion_workflow.py synthetic-plan --top 25 --progress-interval 0
@@ -268,7 +268,7 @@ Recommended loop for later/new Sentinel query development:
 6. Promote only with live validation: `python3 scripts/sentinel_conversion_workflow.py promote --top all --timeout 20`.
 7. Run `refresh-artifacts`, `page`, `status --json --strict`, focused tests, and the full verification loop.
 
-`next-queries --json` is intended for `webapp/`, downstream UIs, or backlog automation. It includes the candidate title, Sentinel ID, quality score, source path/URL, work type, reason, and next step.
+`next-queries --json` is intended for `webapp/`, downstream UIs, or backlog automation. It includes the candidate title, Sentinel ID, quality score, source path/URL, work type, reason, and next step. It also provides `reason_counts`, sorted by recurrence, so a converter investment can be evaluated by the number of candidates it could unblock rather than the first matching rule alone.
 
 ## Status Check
 
@@ -281,6 +281,8 @@ Recommended loop for later/new Sentinel query development:
 - Sentinel dashboard presence in `queries/dashboard_inventory.json`
 
 Use `--json` when `webapp/`, a downstream UI, MCP server, or CI job needs a machine-readable summary. Add `--strict` when the command should exit non-zero if the report, promoted files, live status, or Sentinel dashboard inventory needs attention. For isolated checks, override the artifact locations with `--report`, `--sentinel-dir`, and `--dashboard-inventory`.
+
+Add `--max-report-age-hours <positive-hours>` to make `status --strict` fail when the report timestamp is missing, invalid, or older than the selected evidence window. For example, `python3 scripts/sentinel_conversion_workflow.py status --json --strict --max-report-age-hours 24` checks artifact reconciliation and requires a report no more than one day old. This is a local freshness gate; it does not rerun OCI validation or upgrade the evidence class.
 
 ## Validation
 

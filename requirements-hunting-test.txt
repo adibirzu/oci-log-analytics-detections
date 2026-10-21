@@ -1,0 +1,4 @@
+# Optional local hunting contract verification, including schema and stdio tests.
+-r requirements-mcp.txt
+pytest>=8.0,<10
+jsonschema>=4.25,<5

@@ -1,0 +1,20 @@
+import { test,expect } from '@playwright/test'
+test('hunting discovery, filters, detail, and ETag',async ({request})=>{
+  const list=await request.get('/api/forge/hunts?pack=identity_credentials&limit=1')
+  expect(list.status()).toBe(200)
+  const body=await list.json();expect(body.total).toBe(3);expect(body.items).toHaveLength(1)
+  expect(body.items[0].query).toBeUndefined()
+  const detail=await request.get('/api/forge/hunts/'+encodeURIComponent(body.items[0].id))
+  expect(detail.status()).toBe(200);expect((await detail.json()).query).toBeTruthy()
+  const repeat=await request.get('/api/forge/hunts?pack=identity_credentials&limit=1',{headers:{'if-none-match':list.headers().etag}})
+  expect(repeat.status()).toBe(304)
+  const full=await request.get('/api/forge/hunting-bundle')
+  expect(full.status()).toBe(200);expect((await full.json()).content_digest).toBe(body.content_digest)
+})
+test('hunting rejects bad filters and missing IDs without leaking paths',async ({request})=>{
+  for(const filter of ['limit=201','offset=-1','unknown=x','readiness=maybe']) expect((await request.get('/api/forge/hunts?'+filter)).status()).toBe(400)
+  const missing=await request.get('/api/forge/hunts/'+encodeURIComponent('hunt:hunting/missing'))
+  expect(missing.status()).toBe(404)
+  const invalid=await request.get('/api/forge/hunts/'+encodeURIComponent('hunt:other/secret'))
+  expect(invalid.status()).toBe(400);expect(await invalid.text()).not.toContain('/Users/')
+})

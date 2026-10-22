@@ -1,0 +1,12 @@
+# .harness/project.toml: harness-library consumption contract v1.
+contract = "v1"
+project = "oci-log-analytics-detections"
+repo = "adibirzu/oci-log-analytics-detections"
+base_branch = "main"
+harness_pin = "8bc4daa8e2eb50a7134b77df78b5a54f86ce050a"
+suite_command = "python3.11 scripts/generate_synthetic_2026_campaign.py --dry-run --mask partial"
+lint_command = "python3.11 -m py_compile scripts/generate_synthetic_2026_campaign.py"
+forbidden_paths = ['^\.env\.local$']
+forbidden_ids_extra = []
+lessons_project_key = "oci-log-analytics-detections"
+owners = ["adibirzu"]

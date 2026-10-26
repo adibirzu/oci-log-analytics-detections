@@ -4,7 +4,7 @@ The `stack/` directory contains the Terraform definition used to deploy the supp
 
 ## Scope
 
-The package includes the committed Terraform stack, deployment scripts, generated queries, mappings, and schemas needed by the supported automation. It intentionally excludes local credentials, Terraform state, ignored caches, and disposable `test_data/`. The package does not export or move raw customer logs.
+Package inputs, exclusions, extracted working directory and Git-free staging are defined by the [deployment package contract](../docs/DEPLOYMENT.md#package-source-inventory-and-executable-closure). The package does not export or move raw customer logs.
 
 The stack can create or update OCI Log Analytics content and its declared supporting resources, including log groups, streams, Service Connector Hub resources, custom log sources, dashboards, and saved searches. Review the Terraform plan for the selected variables before applying it.
 

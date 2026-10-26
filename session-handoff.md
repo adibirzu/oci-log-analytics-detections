@@ -12,6 +12,19 @@
 - Generated only through `python scripts/release_checklist.py --refresh-splunk-parallel-example`: bootstrap and final offline stages passed; the refreshed example records 13/13 gates, 5/5 scenarios, 97/97 independently recomputed artifact hashes, `external_calls: []`, and `provider_validation: not_run`. The unchanged `scripts/check_module_size.py` gate passed with zero violations. These are local source/generation checks, not deployed parser acceptance.
 - Remaining gates: outer executor owns integrated tests, lint, independent final review, push/PR/CI and release acceptance after this material test change. Earlier integrated counts are historical, not rerun here. The reported raw Gitleaks diagnostic remains failed with four classified findings; it was not rerun or waived. No provider actions, promotion, deployment, credential use, public artifacts, or PR19 integration occurred in this review phase.
 
+## 2026-10-27 ORM executable package closure
+
+Base `f44ee1be0b16a0caa9f79f14b7c615f8f10c30bd`. The
+[package contract](docs/DEPLOYMENT.md#package-source-inventory-and-executable-closure)
+owns behavior, local verification, archive-scan triage and remaining gates;
+KB-001 indexes the repair. Coordinator independently passed 42 tests plus 24
+subtests in 21.57 seconds under all-network/operator-credential denial. All five
+implementation/test hashes match the reviewed freeze. Independent review's
+JSON variable-file finding is resolved; scoped lint/shell checks and changed-source
+privacy checks pass. No generated archive is publicly uploaded. Source publication
+gates, full application, OCI-DEMO admission, provider and release acceptance remain
+open; dirty root instruction/context edits are preserved.
+
 ## 2026-10-21 OCI4CCA ecosystem contract synchronization
 
 - Last Updated: 2026-10-21. Owner: cross-project ecosystem coordinator.

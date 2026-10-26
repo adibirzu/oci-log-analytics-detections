@@ -2,7 +2,7 @@ resource "null_resource" "deploy_log_sources" {
   count = var.deploy_log_sources ? 1 : 0
 
   provisioner "local-exec" {
-    command     = "python3 ${path.module}/scripts/setup_log_sources.py"
+    command     = "python3 ../scripts/setup_log_sources.py"
     working_dir = path.module
 
     environment = {
@@ -24,7 +24,7 @@ resource "null_resource" "deploy_dashboards" {
   count = var.deploy_dashboards ? 1 : 0
 
   provisioner "local-exec" {
-    command     = var.deploy_dashboard_cleanup ? "python3 ${path.module}/scripts/deploy_dashboard.py --cleanup" : "python3 ${path.module}/scripts/deploy_dashboard.py"
+    command     = var.deploy_dashboard_cleanup ? "python3 ../scripts/deploy_dashboard.py --cleanup" : "python3 ../scripts/deploy_dashboard.py"
     working_dir = path.module
 
     environment = {
@@ -49,7 +49,7 @@ resource "null_resource" "ingest_test_data" {
   count = var.ingest_test_data ? 1 : 0
 
   provisioner "local-exec" {
-    command     = "python3 ${path.module}/scripts/ingest_test_data.py --mode direct"
+    command     = "python3 ../scripts/ingest_test_data.py --mode direct"
     working_dir = path.module
 
     environment = {

@@ -73,6 +73,20 @@ runtime and retains the inventory used by the unchanged Forge download caller.
 The staging generator also includes required package inputs such as
 `requirements.txt`; exported package generation does not require `.git`.
 
+For a standalone Git-free export, run from the repository root:
+
+```bash
+python3 scripts/build_orm_stack.py --stage-runtime ./orm-runtime
+python3 ./orm-runtime/scripts/build_orm_stack.py --out ./oci-log-analytics-deployment.zip
+```
+
+The export destination must be absent. It contains `.orm-source-inventory.json`
+with schema version `forge.orm-source-inventory.v1` and a `files` object mapping
+selected relative paths to SHA-256 digests. Keep it with the exported sources;
+the builder verifies it automatically. `--include-runtime-manifest` requires
+`--stage-runtime` and adds only `test_data/manifest.json` for Forge runtime use;
+that metadata is outside the package inventory and is not included in the ZIP.
+
 Locally verified: 42 tests plus 24 subtests passed in a coordinator rerun with all
 network and operator-credential access denied. Actual extracted default commands
 used recording SDK/query/CLI boundaries. Git-free staging, deterministic bytes,
@@ -119,7 +133,7 @@ Pull request and local conversion lanes remain credential-free.
 | Sentinel local conversion | Local development / pull request | None | Produces reports and candidate validation without promotion |
 | Sentinel live promotion | Scheduled or manual | `live-oci` environment secrets | Promotes only parser-passing, live-validated candidates |
 | Forge GitHub Pages | Push/workflow dispatch | Repository Pages enabled | Builds static Forge and deploys when Pages is available |
-| Forge dynamic deployment package | Customer request in Forge | None in Forge | Produces a committed-content zip; customer plans/applies in OCI |
+| Forge dynamic deployment package | Customer request in Forge | None in Forge | Produces a zip under the package source contract above; customer plans/applies in OCI |
 | Resource Manager plan/apply | Customer action in OCI | Customer OCI session and IAM | Creates/updates only the reviewed tenancy resources |
 
 Do not make a missing environment secret, a disabled GitHub Pages configuration, or a failed live OCI query look like successful deployment. The preflights distinguish a deliberate skip from a genuine validation or apply failure.

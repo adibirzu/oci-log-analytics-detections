@@ -12,7 +12,11 @@ This repository packages OCI Log Analytics detection content; it does not collec
 4. Review the Terraform plan.
 5. Apply with a principal that has the required IAM permissions.
 
-The package contains the committed stack, deployment scripts, queries, mappings, and schemas. It excludes credentials, Terraform state, ignored tooling state, and generated `test_data/` so an ORM upload cannot accidentally carry local tenancy data.
+The package contains selected tracked working bytes for the stack, deployment
+scripts, queries, mappings and schemas, or the same bytes from a verified staged
+inventory. It excludes local credential/state formats and generated `test_data/`.
+Content review and scanning remain required; selection alone is not proof that
+every tracked value is suitable for distribution.
 
 ## Before You Apply
 
@@ -45,7 +49,49 @@ terraform -chdir=stack init -backend=false
 terraform -chdir=stack validate
 ```
 
-The package builder includes committed deployment surfaces only. It rejects an incomplete stack and excludes local state, credentials, caches, and disposable test data.
+### Package source inventory and executable closure
+
+The archive retains sibling `stack/` and `scripts/` directories. Configure the
+Resource Manager source working directory as `stack`. Provisioners execute
+`../scripts/...` from that directory. The default source/dashboard entry points
+are locally exercised from the extracted layout; optional ingestion still needs
+operator-supplied synthetic or approved input data because raw `test_data/` is
+not distributed.
+
+The owning builder selects tracked working files from the repository root, or
+validates a versioned path-to-SHA-256 inventory for a Git-free export. It rejects
+noncanonical paths, missing/tampered selected bytes, symlinks, special files and
+selected JSON Terraform variable files before replacing output. Validation
+covers local Python imports, literal Terraform file/module dependencies and
+dashboard query references. Static checks do not prove arbitrary computed imports
+or file references. No browser input supplies inventory authority or credentials.
+
+ZIP member ordering, timestamps and modes are deterministic. Package creation
+uses a temporary file and atomic replacement; invalid input preserves an existing
+archive. Runtime staging prepares its replacement before moving an existing
+runtime and retains the inventory used by the unchanged Forge download caller.
+The staging generator also includes required package inputs such as
+`requirements.txt`; exported package generation does not require `.git`.
+
+Locally verified: 42 tests plus 24 subtests passed in a coordinator rerun with all
+network and operator-credential access denied. Actual extracted default commands
+used recording SDK/query/CLI boundaries. Git-free staging, deterministic bytes,
+missing dependencies, stale/tampered inventories, path/output safety and private
+JSON variable refusal were exercised. Scoped Ruff, ShellCheck, Bash syntax,
+whitespace, changed-source sensitive scanning and the final code-diff secret scan
+passed. Independent review's JSON variable-file finding was repaired and resolved.
+
+A broader archive diagnostic still reports 148 sensitive-value candidates and
+12 generic-key candidates. All were factually classified as synthetic examples,
+published indicators, public resolver/control references or verified content
+digests; all 31 flagged files match the reviewed public baseline byte-for-byte.
+No actual private credential or customer value was established. These scan
+statuses remain failed diagnostics; triage is not a clean-scan or release claim.
+Canonical detection content and optional operator tooling remain intact.
+
+Full application/image, provider plans/applies, OCI-DEMO snapshot admission,
+Marketplace and release acceptance remain separate. No generated archive is
+published by this source change.
 
 ## GitHub Pages Preflight
 

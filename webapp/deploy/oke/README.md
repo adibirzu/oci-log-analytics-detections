@@ -13,6 +13,11 @@ Required production posture:
 
 ## Build and Deploy
 
+Runtime staging and Git-free deployment-package generation use the owning
+[package inventory contract](../../../docs/DEPLOYMENT.md#package-source-inventory-and-executable-closure).
+Stage only reviewed source bytes. Hash verification does not replace privacy
+review or authorize the build/deployment commands below.
+
 Run from `webapp/`:
 
 ```bash

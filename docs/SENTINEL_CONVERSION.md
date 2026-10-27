@@ -48,13 +48,15 @@ it cannot renew the historical live result, prove current deployed parser
 identity, or establish current provider acceptance. Provider revalidation remains
 a separate target-bound operation. Existing live-status, report, baseline-query
 and optional nonempty synthetic-hit gates remain in force. `--write-hashes`
-refuses accepted records before writing any file.
+refuses accepted records before writing any file. The postpromotion workflow
+invokes the drift checker without that flag, validating existing bindings without
+rewriting promoted records.
 
 Focused offline verification:
 
 ```bash
 python3.11 -m pytest -q scripts/test_parser_contract.py scripts/test_sentinel_compatibility.py scripts/test_sentinel_drift_check.py scripts/test_sentinel_converter.py scripts/test_sentinel_conversion_workflow.py
-python3.11 scripts/sentinel_drift_check.py --output /private/tmp/sentinel-local-drift.json
+python3.11 scripts/sentinel_drift_check.py --output sentinel-local-drift.json
 ```
 
 ## Current Baseline

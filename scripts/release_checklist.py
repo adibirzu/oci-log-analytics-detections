@@ -250,7 +250,13 @@ def _splunk_evidence_manifest() -> dict[str, object]:
         "registry-referenced-queries": registry_query_paths,
         "offline-stage-dependencies": stage_script_paths,
         "schemas-config": [* (PROJECT_DIR / "schemas").glob("splunk_*.json"), PROJECT_DIR / "config/splunk_parallel_delivery.yaml"],
-        "release-tests": [PROJECT_DIR / "scripts/release_checklist.py", *SCRIPTS_DIR.glob("test_splunk_*.py"), SCRIPTS_DIR / "test_check_inventory_drift.py"],
+        "release-tests": [
+            PROJECT_DIR / "scripts/release_checklist.py",
+            *SCRIPTS_DIR.glob("test_splunk_*.py"),
+            *SCRIPTS_DIR.glob("splunk_exporter_*_cases.py"),
+            SCRIPTS_DIR / "splunk_exporter_cases_common.py",
+            SCRIPTS_DIR / "test_check_inventory_drift.py",
+        ],
         "function-supply-chain": [
             PROJECT_DIR / "stack/modules/splunk_evidence_exporter/function/README.md",
             PROJECT_DIR / "stack/modules/splunk_evidence_exporter/function/func.yaml",

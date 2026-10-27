@@ -12,7 +12,7 @@ Date: 2026-06-29
 - The Resource Manager handoff remains on the same surface at `/forge?view=deployment`; its package endpoint has no tenancy or credential inputs and sends the customer to the OCI Console for the privileged apply.
 - Allowed API routes are `/api/forge/session`, `/api/forge/convert`, `/api/forge/artifacts`, `/api/forge/deployment-package`, and `/api/health`.
 - Local development reads artifacts from the repository root by default.
-- Container deployments stage a minimal read-only artifact bundle with `webapp/deploy/oke/stage-detections-runtime.sh`.
+- Container deployments use `webapp/deploy/oke/stage-detections-runtime.sh` to stage read-only sources and artifacts under the [deployment package contract](DEPLOYMENT.md#package-source-inventory-and-executable-closure).
 
 ## Artifacts Used by the UI
 

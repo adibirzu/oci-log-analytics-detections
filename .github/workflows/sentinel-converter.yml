@@ -294,7 +294,7 @@ jobs:
             --lookback "${LOOKBACK}" \
             --timeout 60 \
             --progress-interval 0
-          python scripts/sentinel_drift_check.py --write-hashes
+          python scripts/sentinel_drift_check.py
           python scripts/scan_sensitive_values.py --json \
             queries/sentinel \
             queries/sentinel_conversion_report.json \

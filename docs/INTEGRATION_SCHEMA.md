@@ -247,7 +247,7 @@ The five Sentinel dashboard groups are loaded from `queries/sentinel/*.json` onl
 
 ## `queries/sentinel_conversion_report.json`
 
-The Sentinel report is an operational conversion artifact, not a saved-search query. It records the official Sentinel source metadata, aggregate conversion totals, unsupported feature counts, and one attempted record per ranked candidate.
+The Sentinel report is an operational conversion artifact, not a saved-search query. It records the official Sentinel source metadata, aggregate conversion totals, unsupported feature counts, and one attempted record per ranked candidate. Query/parser/identity bindings and fixed historical compatibility are governed by the [local parser compatibility contract](SENTINEL_CONVERSION.md#local-parser-compatibility-contract).
 
 Current top-level shape:
 

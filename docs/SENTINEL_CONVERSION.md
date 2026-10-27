@@ -4,6 +4,61 @@ Date: 2026-09-18
 
 This document describes the Microsoft Sentinel KQL to OCI Log Analytics / Logan QL conversion path. It is intentionally conservative: local conversion is useful for development, but only live OCI parser-passing queries are promoted under `queries/sentinel/`.
 
+## Local parser compatibility contract
+
+`forge.parser-contract.v1` separates parser structure from dictionary diagnostics.
+The shared `scripts/parser_contract.py` projection includes field types, raw
+paths, parser sequences, source associations, ordered candidate preferences,
+reserved mappings, builtins and dataset contracts. It excludes timestamps,
+example values and query/dashboard usage diagnostics. Unknown structural keys
+or dictionary versions fail closed. Producer and drift consumer use the same
+canonicalization. Future conversion reports copy the query/parser/identity
+binding from each generated payload; a changed query cannot inherit an old
+report binding merely by recomputing its payload hash.
+
+The legacy `parser_schema_hash` is retained as observed metadata. The 590
+existing promoted records are not rewritten. The generated
+`config/sentinel_legacy_compatibility_v1.json` binds their exact reviewed bytes
+to public historical source commit
+`94809dcb20b872728785458c88aad794869da7f6` and reviewed baseline
+`f44ee1be0b16a0caa9f79f14b7c615f8f10c30bd`. Its whitelisted records contain
+identifiers and hashes, not query text or provider payloads. Historical report
+rows, query identities, original dictionary bindings and unchanged query
+bodies must agree. Original mappings and candidate preference order must be
+preserved. The unexplained later raw hash is reported as
+`unresolved_preserved`; it is not declared valid or silently replaced.
+
+The checked-in manifest has an explicit byte anchor in the consumer module.
+Shallow CI validates those reviewed bindings without Git history or network
+access. Missing, modified or unknown bindings fail closed. CI does not generate
+trusted history from current working files. An owner changing the source refs,
+projection, manifest or its anchor must regenerate and independently review
+the complete change. The generator reads fixed Git objects, not dirty working
+files, and refuses unavailable provenance:
+
+```bash
+python3.11 scripts/generate_sentinel_compatibility.py --check
+# Explicit owner preparation only; requires both fixed historical objects:
+python3.11 scripts/generate_sentinel_compatibility.py --write
+```
+
+`sentinel_drift_check.py` reports `locally_verified_compatibility` and
+`provider_revalidated: false`. This can close local source/dictionary consistency;
+it cannot renew the historical live result, prove current deployed parser
+identity, or establish current provider acceptance. Provider revalidation remains
+a separate target-bound operation. Existing live-status, report, baseline-query
+and optional nonempty synthetic-hit gates remain in force. `--write-hashes`
+refuses accepted records before writing any file. The postpromotion workflow
+invokes the drift checker without that flag, validating existing bindings without
+rewriting promoted records.
+
+Focused offline verification:
+
+```bash
+python3.11 -m pytest -q scripts/test_parser_contract.py scripts/test_sentinel_compatibility.py scripts/test_sentinel_drift_check.py scripts/test_sentinel_converter.py scripts/test_sentinel_conversion_workflow.py
+python3.11 scripts/sentinel_drift_check.py --output sentinel-local-drift.json
+```
+
 ## Current Baseline
 
 - Official Microsoft Sentinel candidates available: 4,452

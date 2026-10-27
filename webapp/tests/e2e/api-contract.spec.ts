@@ -155,7 +155,7 @@ test.describe("GET /api/forge/artifacts — contract", () => {
     expect(payload.commandsCount as number).toBeGreaterThanOrEqual(0)
   })
 
-  test("reports all four expected artifact keys in statuses", async ({ request }) => {
+  test("reports all five expected artifact keys in statuses", async ({ request }) => {
     const response = await request.get("/api/forge/artifacts")
     const payload = (await response.json()) as { statuses: Array<{ key: string }> }
 
@@ -164,6 +164,7 @@ test.describe("GET /api/forge/artifacts — contract", () => {
     expect(keys).toContain("mappingPatterns")
     expect(keys).toContain("conversionExamples")
     expect(keys).toContain("capabilityMatrix")
+    expect(keys).toContain("forgeDetectionCatalog")
   })
 
   test("sets Cache-Control: no-store", async ({ request }) => {

@@ -54,6 +54,8 @@ for _candidate in (_PROJECT_ROOT, _SCRIPTS_DIR):
     if str(_candidate) not in sys.path:
         sys.path.insert(0, str(_candidate))
 
+from scripts.parser_contract import bind_query, raw_schema_hash  # noqa: E402
+
 from scripts.sync_sentinel_kql import (  # noqa: E402,F401 — re-exported for legacy callers
     DEFAULT_CACHE_DIR,
     SENTINEL_LICENSE_URL,
@@ -149,9 +151,7 @@ def _parser_schema_hash(dictionary_path: Path = FIELD_DICTIONARY_PATH) -> str:
         payload = json.loads(dictionary_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return ""
-    payload.pop("generated_at", None)
-    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    return raw_schema_hash(payload)
 
 
 def _reference_entries(candidate: dict) -> list[dict]:
@@ -182,7 +182,8 @@ def _dashboard_metadata(query: str) -> dict:
 def build_query_payload(candidate: dict, query: str, source_info: dict, live_validation_status: str) -> dict:
     """Build a saved-search JSON payload for one promoted Sentinel conversion."""
     level = candidate.get("severity", "medium")
-    return {
+    dictionary = json.loads(FIELD_DICTIONARY_PATH.read_text(encoding="utf-8"))
+    payload = {
         "title": candidate.get("title", "Microsoft Sentinel Converted Detection"),
         "description": candidate.get("description", ""),
         "query": query,
@@ -196,7 +197,7 @@ def build_query_payload(candidate: dict, query: str, source_info: dict, live_val
         "conversion_confidence": "medium",
         "source_confidence": "high",
         "live_validation_status": live_validation_status,
-        "parser_schema_hash": _parser_schema_hash(),
+        "parser_schema_hash": raw_schema_hash(dictionary),
         "sentinel_tables": source_info.get("tables", []),
         "sentinel_category": source_info.get("category", "unknown"),
         "tags": ["microsoft_sentinel", f"sentinel.{source_info.get('category', 'unknown')}"],
@@ -220,6 +221,8 @@ def build_query_payload(candidate: dict, query: str, source_info: dict, live_val
         "test_data_coverage": "not_evaluated",
         "scheduled_rule_eligibility": "not_evaluated",
     }
+    payload["parser_contract"] = bind_query(dictionary, payload)
+    return payload
 
 
 def convert_candidate(candidate: dict, mapping: dict, live_validation_status: str = "not_run") -> ConversionResult:

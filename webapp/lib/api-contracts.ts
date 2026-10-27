@@ -127,6 +127,7 @@ export const artifactKeySchema = z.enum([
   "mappingPatterns",
   "conversionExamples",
   "capabilityMatrix",
+  "forgeDetectionCatalog",
 ])
 export type ArtifactKey = z.infer<typeof artifactKeySchema>
 

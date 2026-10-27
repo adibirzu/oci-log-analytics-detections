@@ -403,6 +403,23 @@ class TestReleaseChecklistEvidence(unittest.TestCase):
             self.assertIn(path, manifest["files"])
             self.assertNotIn(path, manifest["missing"])
 
+    def test_offline_manifest_binds_relocated_exporter_cases(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            scripts = root / "scripts"
+            scripts.mkdir()
+            for name in ("splunk_exporter_delivery_cases.py", "splunk_exporter_cases_common.py"):
+                with self.subTest(helper=name):
+                    helper = scripts / name
+                    helper.write_bytes(b"synthetic case revision one\n")
+                    with patch.object(release_checklist, "PROJECT_DIR", root), patch.object(release_checklist, "SCRIPTS_DIR", scripts):
+                        before = release_checklist._splunk_evidence_manifest()["files"]
+                        helper.write_bytes(b"synthetic case revision two\n")
+                        after = release_checklist._splunk_evidence_manifest()["files"]
+                    key = helper.relative_to(root).as_posix()
+                    self.assertIn(key, before)
+                    self.assertNotEqual(before[key], after[key])
+
     def test_manifest_is_complete_and_has_identity(self):
         manifest = release_checklist._splunk_evidence_manifest()
         self.assertTrue(manifest["complete"], manifest["missing"])

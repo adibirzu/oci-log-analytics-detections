@@ -70,6 +70,12 @@ ZIP member ordering, timestamps and modes are deterministic. Package creation
 uses a temporary file and atomic replacement; invalid input preserves an existing
 archive. Runtime staging prepares its replacement before moving an existing
 runtime and retains the inventory used by the unchanged Forge download caller.
+If replacement fails or staging receives INT, TERM or HUP before completion, the
+stager attempts to restore the previous runtime. If restoration fails or the
+destination is occupied, it retains `previous/` inside the staging directory and
+prints its recovery path to stderr; preserve that directory for operator recovery.
+The executable regression cases are in
+[`scripts/test_hunting_runtime_staging.py`](../scripts/test_hunting_runtime_staging.py).
 The staging generator also includes required package inputs such as
 `requirements.txt`; exported package generation does not require `.git`.
 

@@ -38,17 +38,32 @@ if [[ -L "${RUNTIME_DIR}" ]]; then
   exit 1
 fi
 STAGING_DIR="$(mktemp -d "${APP_ROOT}/.logan-detections-stage.XXXXXX")"
-trap 'rm -rf -- "${STAGING_DIR}"' EXIT
+COMMITTED=false
+cleanup() {
+  local status=$?
+  trap - EXIT
+  if [[ -e "${STAGING_DIR}/previous" && "${COMMITTED}" != true ]]; then
+    if [[ -e "${RUNTIME_DIR}" || -L "${RUNTIME_DIR}" ]] ||
+       ! mv -- "${STAGING_DIR}/previous" "${RUNTIME_DIR}"; then
+      echo "Previous runtime retained for recovery at ${STAGING_DIR}/previous" >&2
+      return 1
+    fi
+  fi
+  rm -rf -- "${STAGING_DIR}"
+  return "${status}"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
 python3 "${DETECTIONS_REPO}/scripts/build_orm_stack.py" \
   --stage-runtime "${STAGING_DIR}/runtime" --include-runtime-manifest
 if [[ -e "${RUNTIME_DIR}" ]]; then
   mv -- "${RUNTIME_DIR}" "${STAGING_DIR}/previous"
 fi
 if ! mv -- "${STAGING_DIR}/runtime" "${RUNTIME_DIR}"; then
-  if [[ -e "${STAGING_DIR}/previous" ]]; then
-    mv -- "${STAGING_DIR}/previous" "${RUNTIME_DIR}"
-  fi
   exit 1
 fi
+COMMITTED=true
 
 echo "Staged Logan detections runtime artifacts at ${RUNTIME_DIR}"

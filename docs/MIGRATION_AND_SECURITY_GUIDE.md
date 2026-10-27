@@ -95,7 +95,7 @@ unzip -t /tmp/oci-log-analytics-deployment.zip
 
 Create an OCI Resource Manager stack from the package, select the target compartment and region, run a plan, and approve an apply only after reviewing every proposed resource. See [Deployment Guide](DEPLOYMENT.md) and [stack package guide](../stack/README.md).
 
-The package excludes credentials, Terraform state, ignored caches, and generated test data. Forge does not accept OCI credentials, tenancy IDs, profile names, or target-compartment values.
+Package source selection, exclusions and content-review requirements follow the [deployment package contract](DEPLOYMENT.md#package-source-inventory-and-executable-closure). Forge does not accept OCI credentials, tenancy IDs, profile names, or target-compartment values.
 
 ### 5. Validate before operationalizing
 

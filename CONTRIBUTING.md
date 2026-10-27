@@ -64,18 +64,26 @@ This repository publishes detection content across multiple surfaces. Pick the r
    [The checked-in evidence packet](docs/health/splunk-parallel-local-evidence.example.json)
    is a tenant-neutral local example, not a provider or customer receipt.
 
-   After an intentional change to a hashed Splunk offline-stage input, refresh both
-   manifest hash maps in this local example before running the offline stage. The
-   example is deliberately excluded from its own manifest to avoid self-reference.
+   After an intentional change to a hashed Splunk offline-stage input, regenerate
+   the local example only through its owning generator:
+
+   ```bash
+   python3 scripts/release_checklist.py --refresh-splunk-parallel-example
+   ```
+
+   This runs the bootstrap and final offline stages; never hand-edit the packet
+   or its manifest hashes. Relocated exporter case modules and their shared
+   helper are included in the input manifest. The example is deliberately excluded from its own manifest to avoid self-reference.
    Its `git_head_at_execution` and `git_head_tree_at_execution` fields identify
    the checkout observed when the packet was generated; they do not claim the
    eventual commit containing the example. `working_tree_dirty` records whether
    tracked changes were present at generation time.
 
    The default checklist runs this local stage before the fail-closed Sentinel
-   drift gate. If the checklist stops at `sentinel drift check`, record the
-   exact blocker `parser_schema_hash_mismatch`; do not edit promoted Sentinel
-   JSON to force a green result.
+   drift gate. If that gate fails, record its actual diagnostic and follow the
+   [local parser compatibility contract](docs/SENTINEL_CONVERSION.md#local-parser-compatibility-contract);
+   do not edit promoted Sentinel JSON or restamp accepted records to force a
+   green result.
 
 4. Inspect the generated artifacts you changed:
    - `queries/catalog.json`

@@ -572,42 +572,65 @@ def test_adapter_ports_are_runtime_checkable_structural_protocols():
     assert isinstance(Quarantine(), QuarantinePort)
 
 
-def test_domain_modules_have_no_infrastructure_or_implicit_clock_dependencies():
-    package = ROOT / "scripts/splunk_evidence_exporter"
-    domain_files = [
-        package / name
-        for name in ("models.py", "window.py", "envelope.py", "retry.py", "ports.py")
-    ]
-    forbidden_import_roots = {
-        "oci",
-        "os",
-        "requests",
-        "socket",
-        "subprocess",
-        "urllib",
-    }
-    forbidden_calls = {
-        "datetime.now",
-        "datetime.utcnow",
-        "open",
-        "os.getenv",
-        "os.environ",
-        "Path.write_text",
-        "Path.write_bytes",
-    }
+def test_domain_modules_have_no_infrastructure_or_implicit_clock_dependencies(monkeypatch):
+    import datetime as datetime_module
+    import importlib
+    from types import ModuleType
 
-    for path in domain_files:
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        imports = {
-            alias.name.split(".", 1)[0]
-            for node in ast.walk(tree)
-            if isinstance(node, (ast.Import, ast.ImportFrom))
-            for alias in node.names
-        }
-        calls = {
-            ast.unparse(node.func)
-            for node in ast.walk(tree)
-            if isinstance(node, ast.Call)
-        }
-        assert imports.isdisjoint(forbidden_import_roots), path.name
-        assert calls.isdisjoint(forbidden_calls), path.name
+    class ExplicitDatetime(datetime):
+        @classmethod
+        def now(cls, *args, **kwargs):
+            raise AssertionError("implicit clock attempted")
+
+        utcnow = today = now
+
+    package_name = "_splunk_pure_domain_contract"
+    package = ModuleType(package_name)
+    package.__path__ = [str(ROOT / "scripts/splunk_evidence_exporter")]
+    payload = alarm_payload()
+    entry = registry_entry()
+    try:
+        with monkeypatch.context() as isolated:
+            isolated.setitem(sys.modules, package_name, package)
+            isolated.setattr(datetime_module, "datetime", ExplicitDatetime)
+            with runtime_side_effect_guard(isolated, domain=True) as attempts:
+                for operation in (
+                    lambda: __import__("oci", fromlist=["client"]),
+                    lambda: __import__("oci.client"),
+                    lambda: open("credential-under-test"),
+                    lambda: socket.create_connection(("example.invalid", 443)),
+                    lambda: os.getenv("OCI_CONFIG_FILE"),
+                ):
+                    with pytest.raises(AssertionError):
+                        operation()
+                attempts.clear()
+                modules = {
+                    name: importlib.import_module(f"{package_name}.{name}")
+                    for name in ("models", "window", "envelope", "retry", "ports")
+                }
+                trigger = modules["models"].AlarmTrigger.from_payload(payload)
+                window = modules["window"].calculate_window(
+                    trigger.alarm_end, timedelta(minutes=5), timedelta(minutes=2),
+                    maximum=timedelta(hours=1),
+                )
+                event = modules["envelope"].build_evidence_event(
+                    entry, {"Status": "Failure", "api_token": "synthetic-value"},
+                    window, batch_id="pure-domain-batch",
+                )
+                batches = modules["envelope"].batch_events([event, event], 1)
+                assert window.duration == timedelta(minutes=7)
+                fields = {field["name"]: field["value"] for field in event.to_dict()["evidence"]["fields"]}
+                assert fields == {"Status": "Failure", "api_token": "[REDACTED]"}
+                assert [batch.events for batch in batches] == [(event,), (event,)]
+                assert modules["envelope"].event_key("oci-audit-failures", {"Status": "Failure"}) == modules["envelope"].event_key("oci-audit-failures", {"Status": "Failure"})
+                assert modules["retry"].classify_hec_failure(200, response={"code": 0}) == "success"
+                assert modules["retry"].classify_hec_failure(503) == "retryable"
+                assert modules["retry"].classify_hec_failure(401) == "quarantine"
+                assert isinstance(SimpleNamespace(query_evidence=lambda **kwargs: []), modules["ports"].EvidenceQueryPort)
+                with pytest.raises(ValueError, match="positive"):
+                    modules["window"].calculate_window(trigger.alarm_end, timedelta(0), timedelta(0))
+                assert attempts == []
+    finally:
+        for name in tuple(sys.modules):
+            if name.startswith(f"{package_name}."):
+                sys.modules.pop(name)

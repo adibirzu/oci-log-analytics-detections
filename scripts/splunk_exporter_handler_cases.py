@@ -234,20 +234,133 @@ def test_function_service_selects_streaming_sink_without_hec_credentials(monkeyp
     }
 
 
-def test_handler_has_no_oci_sdk_import_client_or_model_construction():
-    source = (ROOT / "scripts/splunk_evidence_exporter/handler.py").read_text(
-        encoding="utf-8"
-    )
-    tree = ast.parse(source)
-    imports = {
-        alias.name.split(".", 1)[0]
-        for node in ast.walk(tree)
-        if isinstance(node, (ast.Import, ast.ImportFrom))
-        for alias in node.names
-    }
+def test_handler_has_no_oci_sdk_import_client_or_model_construction(monkeypatch):
+    import oci
 
-    assert "oci" not in imports
-    assert "LogAnalyticsClient" not in source
-    assert "SecretsClient" not in source
-    assert "ObjectStorageClient" not in source
-    assert "oci.log_analytics.models" not in source
+    raw = (ROOT / "scripts/fixtures/splunk_evidence/oci_raw_alarm.json").read_bytes()
+    entry = registry_entry()
+    entry["alarm_contract"].update({
+        "binding_key": "oci-audit-failures",
+        "metric_name": "AuditFailures",
+        "metric_dimensions": ["Event Type", "User Name", "Status"],
+        "query": "AuditFailures[15m].sum() > 0",
+        "allowed_dimensions": {},
+        "alarm_dimension_to_log_field": {},
+    })
+    for name, value in {
+        "OBJECT_STORAGE_NAMESPACE": "namespace-under-test",
+        "SPLUNK_EVIDENCE_STATE_BUCKET": "state-under-test",
+        "SPLUNK_EVIDENCE_DLQ_BUCKET": "dlq-under-test",
+        "OCI_LOG_ANALYTICS_COMPARTMENT_ID": "compartment-under-test",
+        "OCI_LOG_ANALYTICS_NAMESPACE": "trusted-la-namespace",
+        "OCI_LOG_ANALYTICS_COMPARTMENT_IN_SUBTREE": "false",
+        "SPLUNK_EXPORTER_TELEMETRY_NAMESPACE": "telemetry-under-test",
+        "SPLUNK_ALARM_BINDINGS": json.dumps({"redacted-alarm-id": "oci-audit-failures"}),
+        "SPLUNK_EVIDENCE_MAX_ROWS": "23",
+        "SPLUNK_HEC_MAX_BATCH_EVENTS": "1",
+        "SPLUNK_HEC_URL": "https://splunk.example.invalid:8088",
+        "SPLUNK_HEC_SECRET_ID": "secret-reference-under-test",
+        "SPLUNK_HEC_INDEX": "evidence-index",
+        "SPLUNK_HEC_SOURCETYPE": "oci:logan:detection",
+        "SPLUNK_EVIDENCE_STREAM_ID": "stream-under-test",
+        "SPLUNK_EVIDENCE_STREAM_MESSAGES_ENDPOINT": "https://streaming.example.invalid",
+    }.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.setattr(handler_module._JsonRegistry, "load", lambda self: {"detections": [entry]})
+
+    for target in ("hec", "streaming"):
+        calls, requests, batches, checkpoints = [], [], [], []
+        monkeypatch.setenv("SPLUNK_EVIDENCE_TARGET", target)
+
+        class Query:
+            def query_evidence(self, **request):
+                requests.append(request)
+                return [{"Status": "Failure"}]
+
+        class State:
+            def load_checkpoint(self, detection_id, dimensions):
+                calls.append(("load", detection_id, dict(dimensions)))
+                return None
+
+            def save_checkpoint(self, detection_id, dimensions, checkpoint):
+                checkpoints.append((detection_id, dict(dimensions), checkpoint))
+
+        class Sink:
+            def deliver(self, batch):
+                batches.append(batch)
+                return {"status": 200, "response": {"code": 0}}
+
+        bundle = SimpleNamespace(query=Query(), checkpoint=State(), dead_letter=object(), ledger=None, metrics=None, vault=object())
+
+        def factory(**kwargs):
+            calls.append(("factory", kwargs))
+            return bundle
+
+        def sink_factory(**kwargs):
+            calls.append((target, kwargs))
+            return Sink()
+
+        monkeypatch.setattr(handler_module.OciResourcePrincipalAdapterFactory, "create", factory)
+        monkeypatch.setattr(handler_module, "SplunkHecAdapter", sink_factory)
+        monkeypatch.setattr(handler_module.OciStreamingEvidenceAdapter, "from_resource_principal", sink_factory)
+        with runtime_side_effect_guard(monkeypatch) as attempts:
+            for operation in (
+                lambda: __import__("oci", fromlist=["client"]),
+                lambda: oci.log_analytics.LogAnalyticsClient(config={}),
+                lambda: oci.auth.signers.get_resource_principals_signer(),
+                lambda: open("credential-under-test"),
+                lambda: socket.create_connection(("example.invalid", 443)),
+            ):
+                with pytest.raises(AssertionError):
+                    operation()
+            attempts.clear()
+            for operation in (
+                lambda: __import__("oci", fromlist=["client"]),
+                lambda: oci.secrets.SecretsClient(config={}),
+                lambda: open("credential-under-test"),
+                lambda: socket.create_connection(("example.invalid", 443)),
+            ):
+                def unsafe_factory(**kwargs):
+                    operation()
+                    return bundle
+
+                with monkeypatch.context() as negative:
+                    negative.setattr(handler_module.OciResourcePrincipalAdapterFactory, "create", unsafe_factory)
+                    with pytest.raises(RuntimeError, match="evidence export failed"):
+                        handler_module.handler(object(), io.BytesIO(raw))
+                assert attempts
+                assert requests == batches == checkpoints == calls == []
+                attempts.clear()
+            result = handler_module.handler(object(), io.BytesIO(raw))
+            assert attempts == []
+
+        assert [call[0] for call in calls] == ["factory", target, "load"]
+        factory_arguments = calls[0][1]
+        assert factory_arguments == {
+            "compartment_id": "compartment-under-test",
+            "compartment_id_in_subtree": False,
+            "max_rows_ceiling": 23,
+            "secret_id": "secret-reference-under-test" if target == "hec" else None,
+            "namespace": "namespace-under-test",
+            "state_bucket": "state-under-test",
+            "dlq_bucket": "dlq-under-test",
+            "telemetry_namespace": "telemetry-under-test",
+            "query_loader": handler_module._load_query,
+            "clock": factory_arguments["clock"],
+        }
+        assert callable(factory_arguments["clock"])
+        if target == "hec":
+            assert calls[1][1]["token_provider"] is bundle.vault
+            assert calls[1][1]["hec_url"] == "https://splunk.example.invalid:8088"
+        else:
+            assert calls[1][1] == {"stream_id": "stream-under-test", "messages_endpoint": "https://streaming.example.invalid"}
+        assert len(requests) == len(batches) == len(checkpoints) == 1
+        assert requests[0]["namespace"] == "trusted-la-namespace"
+        assert requests[0]["query_file"] == entry["oci_query_file"]
+        assert requests[0]["max_rows"] == 23
+        assert requests[0]["dimensions"] == {}
+        assert checkpoints[0] == (entry["id"], {}, requests[0]["window"].end)
+        assert batches[0].events[0].to_dict()["evidence"]["fields"] == [{"name": "Status", "value": "Failure"}]
+        assert result["status"] == "delivered"
+        assert result["delivered_count"] == result["event_count"] == 1
+        assert result["checkpoint_committed"] is True

@@ -17,6 +17,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+try:
+    from .parser_contract import ContractError, load_legacy_manifest, validate_local_binding, raw_schema_hash
+except ImportError:
+    from parser_contract import ContractError, load_legacy_manifest, validate_local_binding, raw_schema_hash
+
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 SENTINEL_DIR = PROJECT_DIR / "queries" / "sentinel"
@@ -25,11 +30,26 @@ DICTIONARY_PATH = PROJECT_DIR / "queries" / "log_source_field_dictionary.json"
 OUTPUT_PATH = PROJECT_DIR / "queries" / "sentinel_drift.json"
 SYNTHETIC_LIVE_RESULTS_PATH = PROJECT_DIR / "queries" / "sentinel_synthetic_live_results.json"
 SYNTHETIC_PLAN_PATH = PROJECT_DIR / "queries" / "sentinel_synthetic_plan.json"
+LEGACY_MANIFEST_PATH = PROJECT_DIR / "config" / "sentinel_legacy_compatibility_v1.json"
 
 
 def _read_json(path: Path) -> dict[str, Any]:
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ContractError("Invalid local JSON structure")
+            result[key] = value
+        return result
+
+    def invalid_constant(_value):
+        raise ContractError("Invalid local JSON structure")
+
     with path.open(encoding="utf-8") as handle:
-        return json.load(handle)
+        value = json.load(handle, object_pairs_hook=unique, parse_constant=invalid_constant)
+    if not isinstance(value, dict):
+        raise ContractError("Invalid local JSON structure")
+    return value
 
 
 def stable_json_hash(payload: Any) -> str:
@@ -38,12 +58,7 @@ def stable_json_hash(payload: Any) -> str:
 
 
 def parser_schema_hash(dictionary_path: Path = DICTIONARY_PATH) -> str:
-    payload = {
-        key: value
-        for key, value in _read_json(dictionary_path).items()
-        if key != "generated_at"
-    }
-    return stable_json_hash(payload)
+    return raw_schema_hash(_read_json(dictionary_path))
 
 
 def query_body_hash(query: str) -> str:
@@ -61,6 +76,8 @@ def load_promoted_files(sentinel_dir: Path = SENTINEL_DIR) -> list[dict[str, Any
     records: list[dict[str, Any]] = []
     for path in sorted(sentinel_dir.glob("*.json")):
         payload = _read_json(path)
+        if not isinstance(payload.get("query"), str):
+            raise ContractError("Invalid local query binding")
         records.append({
             "path": _relative(path, sentinel_dir),
             "title": payload.get("title", ""),
@@ -75,11 +92,20 @@ def load_promoted_files(sentinel_dir: Path = SENTINEL_DIR) -> list[dict[str, Any
 
 def load_report_promotions(report_path: Path = REPORT_PATH) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     report = _read_json(report_path)
+    if not isinstance(report.get("summary", {}), dict):
+        raise ContractError("Invalid local report structure")
     promoted: dict[str, dict[str, Any]] = {}
-    for item in report.get("attempted", []):
+    attempted = report.get("attempted", [])
+    if not isinstance(attempted, list):
+        raise ContractError("Invalid local report structure")
+    for item in attempted:
+        if not isinstance(item, dict):
+            raise ContractError("Invalid local report structure")
         output_file = item.get("output_file")
         if output_file:
-            promoted[str(output_file)] = item
+            if not isinstance(output_file, str) or output_file in promoted:
+                raise ContractError("Invalid local report structure")
+            promoted[output_file] = item
     return report, promoted
 
 
@@ -153,13 +179,20 @@ def build_drift_report(
     synthetic_live_results_path: Path | None = SYNTHETIC_LIVE_RESULTS_PATH,
     synthetic_plan_path: Path | None = SYNTHETIC_PLAN_PATH,
     require_synthetic_hits: bool = False,
+    legacy_manifest_path: Path | None = LEGACY_MANIFEST_PATH,
 ) -> dict[str, Any]:
-    current_hash = parser_schema_hash(dictionary_path)
+    dictionary = _read_json(dictionary_path)
+    current_hash = raw_schema_hash(dictionary)
     current = load_promoted_files(sentinel_dir)
     report, report_promotions = load_report_promotions(report_path)
     baseline = load_baseline(baseline_path) or try_load_git_baseline(baseline_ref)
     synthetic_hits = load_synthetic_hits(synthetic_live_results_path)
     synthetic_plan_statuses = load_synthetic_plan_statuses(synthetic_plan_path)
+    report_bytes = report_path.read_bytes()
+    try:
+        manifest = load_legacy_manifest(legacy_manifest_path) if legacy_manifest_path else None
+    except ContractError:
+        manifest = None
 
     file_by_output = {item["output_file"]: item for item in current}
     file_by_path = {item["path"]: item for item in current}
@@ -209,14 +242,17 @@ def build_drift_report(
                 "type": "missing_parser_schema_hash",
                 "path": record["path"],
             })
-        elif record["parser_schema_hash"] != current_hash:
-            drift.append({
-                "severity": "error",
-                "type": "parser_schema_hash_mismatch",
-                "path": record["path"],
-                "expected": current_hash,
-                "actual": record["parser_schema_hash"],
-            })
+        else:
+            source = sentinel_dir / Path(record["output_file"]).name
+            data = source.read_bytes()
+            payload = json.loads(data)
+            try:
+                record["binding_status"] = validate_local_binding(payload, data, record["output_file"], dictionary, report_promotions.get(record["output_file"], {}), report_bytes, manifest)
+                if record["binding_status"] == "legacy_source_compatible":
+                    record["legacy_raw_hash_status"] = "unresolved_preserved"
+            except (ContractError, KeyError, TypeError, ValueError):
+                record["binding_status"] = "unavailable"
+                drift.append({"severity": "error", "type": "parser_contract_binding_invalid", "path": record["path"]})
         if require_synthetic_hits and record["sentinel_id"] not in synthetic_hits:
             drift.append({
                 "severity": "error",
@@ -263,10 +299,14 @@ def build_drift_report(
     error_count = sum(1 for item in drift if item.get("severity") == "error")
     return {
         "version": "1.0",
+        "evidence_class": "locally_verified_compatibility",
+        "provider_revalidated": False,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "parser_schema_hash": current_hash,
         "summary": {
             "promoted_files": len(current),
+            "legacy_source_compatible": sum(record.get("binding_status") == "legacy_source_compatible" for record in current),
+            "versioned_local_contract": sum(record.get("binding_status") == "versioned_local_contract" for record in current),
             "report_promoted_count": int(summary.get("promoted_count", 0) or 0),
             "report_live_validation_passed": int(summary.get("live_validation_passed", 0) or 0),
             "baseline_records": len(baseline),
@@ -288,6 +328,8 @@ def write_parser_schema_hashes(
     dictionary_path: Path = DICTIONARY_PATH,
 ) -> int:
     current_hash = parser_schema_hash(dictionary_path)
+    if any(_read_json(path).get("live_validation_status") in {"passed", "ok", "success"} for path in sentinel_dir.glob("*.json")):
+        raise ContractError("Accepted records cannot be restamped")
     changed = 0
     for path in sorted(sentinel_dir.glob("*.json")):
         payload = _read_json(path)
@@ -304,6 +346,7 @@ def main() -> int:
     parser.add_argument("--sentinel-dir", default=str(SENTINEL_DIR))
     parser.add_argument("--report", default=str(REPORT_PATH))
     parser.add_argument("--dictionary", default=str(DICTIONARY_PATH))
+    parser.add_argument("--legacy-manifest", default=str(LEGACY_MANIFEST_PATH))
     parser.add_argument("--output", default=str(OUTPUT_PATH))
     parser.add_argument("--baseline", default="", help="Optional previous sentinel_drift.json path")
     parser.add_argument("--baseline-ref", default="", help="Optional git ref containing queries/sentinel_drift.json")
@@ -329,6 +372,7 @@ def main() -> int:
         synthetic_live_results_path=Path(args.synthetic_live_results),
         synthetic_plan_path=Path(args.synthetic_plan),
         require_synthetic_hits=args.require_synthetic_hits,
+        legacy_manifest_path=Path(args.legacy_manifest),
     )
 
     output_path = Path(args.output)
@@ -353,4 +397,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except (ContractError, OSError, ValueError, KeyError, TypeError):
+        print("Sentinel compatibility check failed; invalid local binding", file=sys.stderr)
+        raise SystemExit(1)

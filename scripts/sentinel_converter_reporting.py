@@ -171,6 +171,7 @@ def build_conversion_report(
                     else "skipped"
                 ),
                 "output_file": result.output_file,
+                "parser_contract": dict(result.query_payload["parser_contract"]) if result.query_payload and result.query_payload.get("parser_contract") else None,
                 "skip_reasons": result.skip_reasons,
                 "local_validation_errors": result.local_validation_errors,
                 "tier": tier,

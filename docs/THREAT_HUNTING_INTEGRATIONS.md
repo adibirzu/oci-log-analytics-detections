@@ -13,10 +13,11 @@ accuracy, or customer acceptance. Review a query's requirements before execution
 
 ## Content and evidence
 
-The current bundle includes all 156 curated hunts. At initial implementation,
-69 passed local source/field checks and 87 were blocked by unresolved source or
-field associations. Generate and inspect the bundle for current counts; these
-states are deliberately conservative, and a blocked record remains discoverable.
+The bundle includes every canonical JSON query under `queries/hunting/`, with
+each source path represented exactly once. The Forge hunting contract checks
+compare bundle membership independently against that directory. Inspect the
+generated bundle for current counts and source/field readiness; these states
+are deliberately conservative, and a blocked record remains discoverable.
 Candidate references are separate from executable query artifacts.
 
 Eight reviewed metadata candidates reference pinned files from

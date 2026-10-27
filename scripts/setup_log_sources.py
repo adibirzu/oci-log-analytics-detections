@@ -53,6 +53,7 @@ from oci.log_analytics.models import (
 from logsources.definitions import *  # noqa: F401,F403,E402
 from logsources.field_helpers import *  # noqa: F401,F403,E402
 from obs_logging import get_logger, bind  # noqa: E402
+from log_source_setup_plan import build_dry_run_plan  # noqa: E402
 
 # Additive structured diagnostics on stderr; the stdout prints stay the UX/test
 # contract. Correlates the live field/parser/source creation lifecycle by run-id.
@@ -419,54 +420,10 @@ def main():
         sys.exit(0 if ok else 1)
 
     if args.dry_run:
-        fields_to_create, field_mappings = select_field_contract(
-            octo_apm_only=octo_apm_only,
-            application_only=application_only,
-        )
-        if windows_access_only:
-            fields_to_create = windows_access_fields
-        elif not application_only:
-            field_mappings = []
-        print("DRY RUN - would create:")
-        print(f"  up to {len(unique_preserving_order(fields_to_create))} custom fields")
-        print("  existing namespace fields are reused by exact display name")
-        print("  run with --field-audit to inspect live reuse before creating fields")
-        if windows_access_only:
-            print("  2 JSON parsers for deterministic Security/System synthetic upload validation")
-            print(f"  1 log source: {WINSEC_SOURCE_DISPLAY} ({WINSEC_SOURCE_INTERNAL})")
-            print(f"  1 log source: {WINSYS_SOURCE_DISPLAY} ({WINSYS_SOURCE_INTERNAL})")
-            print("  Application-channel fixtures are validated locally; optional upload reuses an existing SOC Application Logs source")
-            print("  continuous collection reuses Oracle-defined Windows Security/System/Application Events sources")
-            return
-        if application_only:
-            print(f"  1 JSON parser: {APP_PARSER_DISPLAY} ({len(field_mappings)} field maps)")
-            print(f"  1 log source: {APP_SOURCE_DISPLAY} ({APP_SOURCE_INTERNAL})")
-            return
-        print(f"  19 JSON parsers")
-        print(f"  up to 21 log sources (SOC sources skipped when native equivalent exists):")
-        print(f"    - {LINUX_SOURCE_DISPLAY} ({LINUX_SOURCE_INTERNAL})")
-        print(f"    - {WINDOWS_SOURCE_DISPLAY} ({WINDOWS_SOURCE_INTERNAL})")
-        print(f"    - {CG_SOURCE_DISPLAY} ({CG_SOURCE_INTERNAL})")
-        print(f"    - {CGIS_SOURCE_DISPLAY} ({CGIS_SOURCE_INTERNAL})")
-        print(f"    - {OSQUERY_SOURCE_DISPLAY} ({OSQUERY_SOURCE_INTERNAL})")
-        print(f"    - {WINSEC_SOURCE_DISPLAY} ({WINSEC_SOURCE_INTERNAL})")
-        print(f"    - {WINSYS_SOURCE_DISPLAY} ({WINSYS_SOURCE_INTERNAL})")
-        print(f"    - {WINPS_SOURCE_DISPLAY} ({WINPS_SOURCE_INTERNAL})")
-        print(f"    - {WINDEF_SOURCE_DISPLAY} ({WINDEF_SOURCE_INTERNAL})")
-        print(f"    - {LINSEC_SOURCE_DISPLAY} ({LINSEC_SOURCE_INTERNAL})")
-        print(f"    - {SYSMON_SOURCE_DISPLAY} ({SYSMON_SOURCE_INTERNAL})")
-        print(f"    - {SYSNET_SOURCE_DISPLAY} ({SYSNET_SOURCE_INTERNAL})")
-        print(f"    - {WAF_SOURCE_DISPLAY} ({WAF_SOURCE_INTERNAL})")
-        print(f"    - {LB_SOURCE_DISPLAY} ({LB_SOURCE_INTERNAL})")
-        print(f"    - {WEBAPP_SOURCE_DISPLAY} ({WEBAPP_SOURCE_INTERNAL})")
-        print(f"    - {APP_SOURCE_DISPLAY} ({APP_SOURCE_INTERNAL})")
-        print(f"    - {GENAI_SOURCE_DISPLAY} ({GENAI_SOURCE_INTERNAL})")
-        print(f"    - {AZURE_CUSTOM_SOURCE_DISPLAY} ({AZURE_CUSTOM_SOURCE_INTERNAL})")
-        print(f"    - {VCN_SOURCE_DISPLAY} ({VCN_SOURCE_INTERNAL})")
-        print(f"    - {FW_SOURCE_DISPLAY} ({FW_SOURCE_INTERNAL})")
-        print(f"    - {HEALTH_SOURCE_DISPLAY} ({HEALTH_SOURCE_INTERNAL})")
-        for _wz_internal, _wz_display, _wz_desc, _wz_parser in WAZUH_SOURCE_SPECS:
-            print(f"    - {_wz_display} ({_wz_internal})")
+        print(build_dry_run_plan(
+            octo_apm_only=octo_apm_only, application_only=application_only,
+            windows_access_only=windows_access_only,
+        ), end="")
         return
 
     la_client = get_la_client(timeout=(10, LOG_ANALYTICS_READ_TIMEOUT_SECONDS))

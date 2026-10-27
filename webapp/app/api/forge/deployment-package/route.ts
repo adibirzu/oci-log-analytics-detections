@@ -1,10 +1,10 @@
 /**
  * GET /api/forge/deployment-package
  *
- * Builds a read-only OCI Resource Manager package from committed deployment
- * content. The endpoint accepts no input and never receives OCI credentials or
- * tenancy identifiers; the user authenticates and selects a compartment inside
- * the OCI Resource Manager console.
+ * Builds a read-only OCI Resource Manager package under the source selection
+ * contract in docs/DEPLOYMENT.md. The endpoint accepts no input and never
+ * receives OCI credentials or tenancy identifiers; the user authenticates and
+ * selects a compartment inside the OCI Resource Manager console.
  */
 
 import { execFile } from "node:child_process"

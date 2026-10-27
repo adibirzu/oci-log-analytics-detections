@@ -6,7 +6,7 @@
 
 - **Only exposed product surface:** `/forge`
 - **API surface:** `/api/forge/session`, `/api/forge/convert`, `/api/forge/artifacts`, `/api/forge/deployment-package`, and `/api/health`
-- **Deployment package:** `/api/forge/deployment-package` builds a read-only Resource Manager zip from committed deployment content; it never accepts OCI credentials or tenancy inputs.
+- **Deployment package:** `/api/forge/deployment-package` builds a read-only Resource Manager zip under the [deployment package contract](../docs/DEPLOYMENT.md#package-source-inventory-and-executable-closure); it never accepts OCI credentials or tenancy inputs.
 - **Artifact source:** parent repository root by default, or `LOGAN_DETECTIONS_REPO` when explicitly set
 - **Public repository link:** `https://github.com/adibirzu/oci-log-analytics-detections`
 - **Production host target:** supplied at deployment time; no customer hostname is committed
@@ -36,7 +36,7 @@ The local app reads artifacts from `..` when `LOGAN_DETECTIONS_REPO` is unset. S
 
 ## OCI Resource Manager Deployment
 
-The **Deploy to OCI** workspace keeps privileged operations in the OCI Console. It explains the package scope, requires an acknowledgement before opening Resource Manager, and lets a dynamic Forge deployment download `oci-log-analytics-deployment.zip`. The package is built from `stack/`, `scripts/`, `queries/`, `config/`, and `schemas/`; it excludes credentials, Terraform state, and disposable `test_data/`.
+The **Deploy to OCI** workspace keeps privileged operations in the OCI Console. It explains the package scope, requires an acknowledgement before opening Resource Manager, and lets a dynamic Forge deployment download `oci-log-analytics-deployment.zip`. Package source selection and exclusions follow the deployment package contract linked above.
 
 GitHub Pages is read-only and has no API route, so static Forge exports link to the reviewed `stack/` source instead. See [../stack/README.md](../stack/README.md) for the customer deployment sequence.
 

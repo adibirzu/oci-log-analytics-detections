@@ -24,7 +24,7 @@ The integrated UI lives in `webapp/` and consumes generated artifacts from this 
 
 This project is a detection-content and OCI Log Analytics delivery repository. It authors and converts detection queries, validates their field and source contracts, produces parser-safe examples, and packages dashboard/saved-search deployment content. It is not a hosted SIEM and it never stores a customer's OCI credentials, tenancy values, raw production logs, or management-plane access in Forge.
 
-For a customer deployment, Forge prepares the committed Resource Manager package and opens OCI Resource Manager. The customer selects the target compartment, reviews the Terraform plan, and applies it with their own OCI session and IAM permissions. This boundary keeps tenancy selection, approval, and privileged writes inside the OCI Console. See [DEPLOYMENT.md](docs/DEPLOYMENT.md) and [stack/README.md](stack/README.md) for the supported workflow and prerequisites.
+For a customer deployment, Forge prepares a Resource Manager package under the [deployment package contract](docs/DEPLOYMENT.md#package-source-inventory-and-executable-closure) and opens OCI Resource Manager. The customer selects the target compartment, reviews the Terraform plan, and applies it with their own OCI session and IAM permissions. This boundary keeps tenancy selection, approval, and privileged writes inside the OCI Console. See [DEPLOYMENT.md](docs/DEPLOYMENT.md) and [stack/README.md](stack/README.md) for the supported workflow and prerequisites.
 
 ## Start Here: OCI Security Migration
 

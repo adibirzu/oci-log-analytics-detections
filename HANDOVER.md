@@ -5,6 +5,13 @@
 
 ---
 
+## 2026-10-27 — local ORM package closure repair
+
+The [deployment package contract](docs/DEPLOYMENT.md#package-source-inventory-and-executable-closure)
+owns selected-byte inventories, extracted entrypoint behavior, Git-free staging,
+local verification and archive-scan triage. These are local source/package
+receipts; provider, image, OCI-DEMO admission and release acceptance remain open.
+
 ## 1. Overview & Architectural Role
 
 **OCI Log Analytics Detection Rules & Logan Forge** is the canonical detection-content, threat hunting query, and query translation repository for Oracle Cloud Infrastructure (OCI) Log Analytics. It compiles industry-standard Sigma rules and Microsoft Sentinel detections into OCI Log Analytics Query Language (OCL), and provides Logan Forge, an interactive webapp for QL translation and dashboard deployment.

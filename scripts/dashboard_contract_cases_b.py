@@ -29,18 +29,6 @@ from deploy_dashboard import (
 from oci_config import QUERIES_DIR
 
 
-UNSUPPORTED_DASHBOARD_QUERY_PATTERNS = (
-    "regexextract(",
-    "countif(",
-    "case(",
-    " REGEX MATCH ",
-    "TicketEncryptionType",
-    "PrivilegeList",
-    "Properties like",
-    "'Request Action Type'",
-    "'Target Server Name'",
-)
-
 class DashboardContractCasesB:
 
 

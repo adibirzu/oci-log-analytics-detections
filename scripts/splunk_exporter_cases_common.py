@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """Public-contract tests for the pure Splunk evidence exporter domain."""
 
-import ast
 import base64
+import builtins
 import io
 import json
+import os
+import socket
+import subprocess
+import sys
+from contextlib import contextmanager
 from dataclasses import FrozenInstanceError
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -51,6 +56,41 @@ ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE_VALIDATOR = jsonschema.Draft202012Validator(
     json.loads((ROOT / "schemas/splunk_evidence_event.schema.json").read_text())
 )
+
+
+@contextmanager
+def runtime_side_effect_guard(monkeypatch, *, domain=False):
+    attempts = []
+    original_import = builtins.__import__
+
+    def forbidden(*args, **kwargs):
+        attempts.append("external side effect")
+        raise AssertionError("external side effect attempted")
+
+    def guarded_import(name, *args, **kwargs):
+        if name.split(".", 1)[0] in ({"oci", "os", "requests", "socket", "subprocess", "urllib"} if domain else {"oci"}):
+            attempts.append(name)
+            raise AssertionError(f"infrastructure import attempted: {name}")
+        return original_import(name, *args, **kwargs)
+
+    with monkeypatch.context() as guard:
+        guard.setattr(builtins, "__import__", guarded_import)
+        guard.setattr(builtins, "open", forbidden)
+        guard.setattr(io, "open", forbidden)
+        guard.setattr(socket.socket, "connect", forbidden)
+        guard.setattr(socket.socket, "connect_ex", forbidden)
+        guard.setattr(socket, "create_connection", forbidden)
+        guard.setattr(socket, "getaddrinfo", forbidden)
+        guard.setattr(subprocess, "Popen", forbidden)
+        for name, module in tuple(sys.modules.items()):
+            if name == "oci" or name.startswith("oci."):
+                for attribute, value in tuple(vars(module).items()):
+                    if callable(value) and (attribute.endswith("Client") or attribute in {"from_file", "get_resource_principals_signer"}):
+                        guard.setattr(module, attribute, forbidden)
+        if domain:
+            guard.setattr(os, "getenv", forbidden)
+            guard.setattr(os, "environ", SimpleNamespace(get=forbidden))
+        yield attempts
 
 
 def alarm_payload(**overrides):

@@ -14,6 +14,8 @@ from sentinel_drift_check import (  # noqa: E402
     parser_schema_hash,
     write_parser_schema_hashes,
 )
+from scripts.parser_contract import bind_query
+from scripts.test_parser_contract import dictionary as parser_dictionary
 
 
 class TestSentinelDriftCheck(unittest.TestCase):
@@ -27,18 +29,24 @@ class TestSentinelDriftCheck(unittest.TestCase):
         sentinel_dir = root / "sentinel"
         dictionary = root / "dictionary.json"
         report = root / "report.json"
-        self.write_json(dictionary, {"fields": [{"display_name": "User"}], "approved_builtins": ["Log Source"]})
+        definition = parser_dictionary()
+        self.write_json(dictionary, definition)
         current_hash = parser_schema_hash(dictionary)
-        self.write_json(sentinel_dir / "one.json", {
+        payload = {
             "title": "One",
             "query": "'Log Source' = 'SOC Windows Sysmon Logs'",
             "sentinel_id": "one",
+            "sentinel_source_path": "synthetic/one.yaml",
+            "source_type": "microsoft_sentinel",
+            "conversion_status": "promoted",
             "live_validation_status": "passed",
             "parser_schema_hash": current_hash,
-        })
+        }
+        payload["parser_contract"] = bind_query(definition, payload)
+        self.write_json(sentinel_dir / "one.json", payload)
         self.write_json(report, {
             "summary": {"promoted_count": 1, "live_validation_passed": 1},
-            "attempted": [{"output_file": "sentinel/one.json", "live_validation_status": "passed"}],
+            "attempted": [{"output_file": "sentinel/one.json", "live_validation_status": "passed", "sentinel_id": "one", "source_path": "synthetic/one.yaml", "parser_contract": payload["parser_contract"]}],
         })
         return temp, sentinel_dir, dictionary, report
 
@@ -71,21 +79,25 @@ class TestSentinelDriftCheck(unittest.TestCase):
         self.assertEqual(drift["summary"]["error_count"], 1)
         self.assertEqual(drift["drift"][0]["type"], "missing_parser_schema_hash")
 
-    def test_write_parser_schema_hashes_repairs_missing_hash(self):
+    def test_write_parser_schema_hashes_refuses_accepted_records(self):
         temp, sentinel_dir, dictionary, report = self.fixture_tree()
         self.addCleanup(temp.cleanup)
         payload = json.loads((sentinel_dir / "one.json").read_text(encoding="utf-8"))
         del payload["parser_schema_hash"]
         self.write_json(sentinel_dir / "one.json", payload)
 
-        self.assertEqual(write_parser_schema_hashes(sentinel_dir=sentinel_dir, dictionary_path=dictionary), 1)
+        before = (sentinel_dir / "one.json").read_bytes()
+        with self.assertRaisesRegex(ValueError, "Accepted records cannot be restamped"):
+            write_parser_schema_hashes(sentinel_dir=sentinel_dir, dictionary_path=dictionary)
+        self.assertEqual((sentinel_dir / "one.json").read_bytes(), before)
         drift = build_drift_report(
             sentinel_dir=sentinel_dir,
             dictionary_path=dictionary,
             report_path=report,
         )
 
-        self.assertEqual(drift["summary"]["error_count"], 0)
+        self.assertEqual(drift["summary"]["error_count"], 1)
+        self.assertEqual(drift["drift"][0]["type"], "missing_parser_schema_hash")
 
     def test_baseline_query_hash_change_is_error(self):
         temp, sentinel_dir, dictionary, report = self.fixture_tree()

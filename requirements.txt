@@ -2,3 +2,4 @@
 oci>=2.130.0
 PyYAML>=6.0
 python-dotenv>=1.0.0
+jsonschema>=4.25,<5

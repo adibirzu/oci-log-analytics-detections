@@ -118,6 +118,11 @@ def test_shallow_export_uses_only_reviewed_bindings_and_rejects_tampering(tmp_pa
     target.write_text(json.dumps(payload))
     assert subprocess.run(command, capture_output=True).returncode == 1
     target.write_bytes(original)
+    report = export / "queries/sentinel_conversion_report.json"
+    report_bytes = report.read_bytes()
+    report.write_bytes(report_bytes + b" ")
+    assert subprocess.run(command, capture_output=True).returncode == 1
+    report.write_bytes(report_bytes)
     manifest = export / "config/sentinel_legacy_compatibility_v1.json"
     manifest.write_bytes(manifest.read_bytes() + b" ")
     assert subprocess.run(command, capture_output=True).returncode == 1

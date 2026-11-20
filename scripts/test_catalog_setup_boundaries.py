@@ -22,8 +22,9 @@ def test_actual_inventory_output_bytes_match_pre_refactor_contract(tmp_path):
     path = tmp_path / "inventory.json"
     inventory = build_dashboard_inventory(generated_at="2026-07-01T00:00:00+00:00")
     write_dashboard_inventory(path=str(path), inventory=inventory)
+    # Golden output from sanitized pre-refactor commit 788e6bc.
     assert hashlib.sha256(path.read_bytes()).hexdigest() == (
-        "6570ef6e844b152fb765bc6396b47076a3a65594bdda74d965813e676e6e8858"
+        "fb5e76b47e8bb59cea6b3d4a6611b26af5d3cffd3013c8b01eebac154deaf3b0"
     )
 
 

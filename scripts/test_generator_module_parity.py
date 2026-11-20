@@ -9,22 +9,23 @@ import pytest
 import generate_logan_workbench_artifacts as workbench
 import generate_synthetic_2026_campaign as campaign
 
+# Synthetic baselines were regenerated on sanitized pre-refactor commit 788e6bc.
 EXPECTED = {
     "patterns.json": "4e9d3de0ff6a6b224926e43718851085ad1af4953d2547e4ca471e6c02722695",
     "examples.json": "021c9374522392c002a1a0b5e59ab016ed4841daadbb136ea874f3cff0c72b04",
     "reference.json": "a91be814f36d8579537ac5fe288845588b57658814cf1ad79726d980ac7ed301",
-    "story-default-off.json": "8831838a3645cff783f17e7a6670ad912c4975e3a5137ff0b0fa016badbf2afa",
-    "campaign-default-off.json": "441d1266024ccf8d6393e730c61c11f4977492c85dff30576815398b366a897c",
-    "story-default-partial.json": "8831838a3645cff783f17e7a6670ad912c4975e3a5137ff0b0fa016badbf2afa",
-    "campaign-default-partial.json": "7bb855a7b0807628a8e1603cc3b7708213a2469ee3cefb6bc2eecfb30cc200ae",
-    "story-default-strict.json": "8831838a3645cff783f17e7a6670ad912c4975e3a5137ff0b0fa016badbf2afa",
-    "campaign-default-strict.json": "2c93d49ad90ade0dd8193978af0fa743261f3885a2c7567f13f1611008150f82",
-    "story-custom-off.json": "4a40ede62a31dd948753df500039ad03e683c3c584c04dd7f89d2e9e727da5dc",
-    "campaign-custom-off.json": "19ba02246c216b6fa66623110a7474c5aaf12b6428b93ef93308a95705c408cd",
-    "story-custom-partial.json": "4a40ede62a31dd948753df500039ad03e683c3c584c04dd7f89d2e9e727da5dc",
-    "campaign-custom-partial.json": "cca466961f115ab62a827dd4ef768877e1e05425052244f3776062aa810176ce",
-    "story-custom-strict.json": "4a40ede62a31dd948753df500039ad03e683c3c584c04dd7f89d2e9e727da5dc",
-    "campaign-custom-strict.json": "ccca61e31d921a8706a8699cfb97aff3370c98ec8fe18df839234cba90dcd14a",
+    "story-default-off.json": "8876650d1be9c74382cd6e13c51fdd05fbccdd303d53fa3299092986f27f32a4",
+    "campaign-default-off.json": "680e68b27bf91afbf9b03e200e71ff57d6381174bf428a66d33290130c998aab",
+    "story-default-partial.json": "8876650d1be9c74382cd6e13c51fdd05fbccdd303d53fa3299092986f27f32a4",
+    "campaign-default-partial.json": "e4d734e4f501731d97b388f7166e66192bc319b6e400a3afe8c5c9cd756ca6f8",
+    "story-default-strict.json": "8876650d1be9c74382cd6e13c51fdd05fbccdd303d53fa3299092986f27f32a4",
+    "campaign-default-strict.json": "c1a1c5fdc07e000fbc235a5e2e18a7f1f2fd1676945fe404a6f7d5ea30f599b8",
+    "story-custom-off.json": "c54b0e0195b24f07944c625214f3048eb14a6db70bbbd9d0be9d4afe89532377",
+    "campaign-custom-off.json": "0f91d2aa9135ce475f9cd4f70945b0e2ab9343173ad4b830713eea490ccbdce7",
+    "story-custom-partial.json": "c54b0e0195b24f07944c625214f3048eb14a6db70bbbd9d0be9d4afe89532377",
+    "campaign-custom-partial.json": "8150c12750b3fc46e7c5ce351df1672d56046adc53e12a675fa427b1c3bda7b9",
+    "story-custom-strict.json": "c54b0e0195b24f07944c625214f3048eb14a6db70bbbd9d0be9d4afe89532377",
+    "campaign-custom-strict.json": "340d2875a7c444a8e84bf888d5801cc193da3b31ac1a915650ecea370678bc22",
     "cli-stdout.json": "09d228b698d7a851a05a98f365e6319ecbece7fcfa2b1adc7b523de7a7b7ef7b",
 }
 

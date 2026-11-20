@@ -1,0 +1,6128 @@
+{
+  "$schema": "https://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "bom-ref": "pkg:npm/%40alloc/quick-lru@5.2.0",
+      "name": "@alloc/quick-lru",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40alloc/quick-lru@5.2.0",
+      "type": "library",
+      "version": "5.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40emnapi/core@1.10.0",
+      "name": "@emnapi/core",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40emnapi/core@1.10.0",
+      "type": "library",
+      "version": "1.10.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40emnapi/runtime@1.10.0",
+      "name": "@emnapi/runtime",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40emnapi/runtime@1.10.0",
+      "type": "library",
+      "version": "1.10.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40emnapi/wasi-threads@1.2.1",
+      "name": "@emnapi/wasi-threads",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40emnapi/wasi-threads@1.2.1",
+      "type": "library",
+      "version": "1.2.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40eslint-community/eslint-utils@4.9.1",
+      "name": "@eslint-community/eslint-utils",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint-community/eslint-utils@4.9.1",
+      "type": "library",
+      "version": "4.9.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40eslint-community/regexpp@4.12.2",
+      "name": "@eslint-community/regexpp",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint-community/regexpp@4.12.2",
+      "type": "library",
+      "version": "4.12.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40eslint/config-array@0.21.2",
+      "name": "@eslint/config-array",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/config-array@0.21.2",
+      "type": "library",
+      "version": "0.21.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40eslint/config-helpers@0.4.2",
+      "name": "@eslint/config-helpers",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/config-helpers@0.4.2",
+      "type": "library",
+      "version": "0.4.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40eslint/core@0.17.0",
+      "name": "@eslint/core",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/core@0.17.0",
+      "type": "library",
+      "version": "0.17.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40eslint/eslintrc@3.3.5",
+      "name": "@eslint/eslintrc",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/eslintrc@3.3.5",
+      "type": "library",
+      "version": "3.3.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40eslint/js@9.39.4",
+      "name": "@eslint/js",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/js@9.39.4",
+      "type": "library",
+      "version": "9.39.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40eslint/object-schema@2.1.7",
+      "name": "@eslint/object-schema",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/object-schema@2.1.7",
+      "type": "library",
+      "version": "2.1.7"
+    },
+    {
+      "bom-ref": "pkg:npm/%40eslint/plugin-kit@0.4.1",
+      "name": "@eslint/plugin-kit",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40eslint/plugin-kit@0.4.1",
+      "type": "library",
+      "version": "0.4.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40floating-ui/core@1.7.2",
+      "name": "@floating-ui/core",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40floating-ui/core@1.7.2",
+      "type": "library",
+      "version": "1.7.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40floating-ui/dom@1.7.2",
+      "name": "@floating-ui/dom",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40floating-ui/dom@1.7.2",
+      "type": "library",
+      "version": "1.7.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40floating-ui/react-dom@2.1.4",
+      "name": "@floating-ui/react-dom",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40floating-ui/react-dom@2.1.4",
+      "type": "library",
+      "version": "2.1.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40floating-ui/utils@0.2.10",
+      "name": "@floating-ui/utils",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40floating-ui/utils@0.2.10",
+      "type": "library",
+      "version": "0.2.10"
+    },
+    {
+      "bom-ref": "pkg:npm/%40humanfs/core@0.19.2",
+      "name": "@humanfs/core",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40humanfs/core@0.19.2",
+      "type": "library",
+      "version": "0.19.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40humanfs/node@0.16.8",
+      "name": "@humanfs/node",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40humanfs/node@0.16.8",
+      "type": "library",
+      "version": "0.16.8"
+    },
+    {
+      "bom-ref": "pkg:npm/%40humanfs/types@0.15.0",
+      "name": "@humanfs/types",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40humanfs/types@0.15.0",
+      "type": "library",
+      "version": "0.15.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40humanwhocodes/module-importer@1.0.1",
+      "name": "@humanwhocodes/module-importer",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40humanwhocodes/module-importer@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40humanwhocodes/retry@0.4.3",
+      "name": "@humanwhocodes/retry",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40humanwhocodes/retry@0.4.3",
+      "type": "library",
+      "version": "0.4.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/colour@1.1.0",
+      "name": "@img/colour",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/colour@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-darwin-arm64@0.34.5",
+      "name": "@img/sharp-darwin-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-darwin-arm64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-darwin-x64@0.34.5",
+      "name": "@img/sharp-darwin-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-darwin-x64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-darwin-arm64@1.2.4",
+      "name": "@img/sharp-libvips-darwin-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-darwin-arm64@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-darwin-x64@1.2.4",
+      "name": "@img/sharp-libvips-darwin-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-darwin-x64@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-linux-arm64@1.2.4",
+      "name": "@img/sharp-libvips-linux-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-arm64@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-linux-arm@1.2.4",
+      "name": "@img/sharp-libvips-linux-arm",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-arm@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-linux-ppc64@1.2.4",
+      "name": "@img/sharp-libvips-linux-ppc64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-ppc64@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-linux-riscv64@1.2.4",
+      "name": "@img/sharp-libvips-linux-riscv64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-riscv64@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-linux-s390x@1.2.4",
+      "name": "@img/sharp-libvips-linux-s390x",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-s390x@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-linux-x64@1.2.4",
+      "name": "@img/sharp-libvips-linux-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linux-x64@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-linuxmusl-arm64@1.2.4",
+      "name": "@img/sharp-libvips-linuxmusl-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linuxmusl-arm64@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-libvips-linuxmusl-x64@1.2.4",
+      "name": "@img/sharp-libvips-linuxmusl-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-libvips-linuxmusl-x64@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-linux-arm64@0.34.5",
+      "name": "@img/sharp-linux-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-arm64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-linux-arm@0.34.5",
+      "name": "@img/sharp-linux-arm",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-arm@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-linux-ppc64@0.34.5",
+      "name": "@img/sharp-linux-ppc64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-ppc64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-linux-riscv64@0.34.5",
+      "name": "@img/sharp-linux-riscv64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-riscv64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-linux-s390x@0.34.5",
+      "name": "@img/sharp-linux-s390x",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-s390x@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-linux-x64@0.34.5",
+      "name": "@img/sharp-linux-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linux-x64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-linuxmusl-arm64@0.34.5",
+      "name": "@img/sharp-linuxmusl-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linuxmusl-arm64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-linuxmusl-x64@0.34.5",
+      "name": "@img/sharp-linuxmusl-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-linuxmusl-x64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-wasm32@0.34.5",
+      "name": "@img/sharp-wasm32",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-wasm32@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-win32-arm64@0.34.5",
+      "name": "@img/sharp-win32-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-win32-arm64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-win32-ia32@0.34.5",
+      "name": "@img/sharp-win32-ia32",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-win32-ia32@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40img/sharp-win32-x64@0.34.5",
+      "name": "@img/sharp-win32-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-win32-x64@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40jridgewell/gen-mapping@0.3.13",
+      "name": "@jridgewell/gen-mapping",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40jridgewell/gen-mapping@0.3.13",
+      "type": "library",
+      "version": "0.3.13"
+    },
+    {
+      "bom-ref": "pkg:npm/%40jridgewell/resolve-uri@3.1.2",
+      "name": "@jridgewell/resolve-uri",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40jridgewell/resolve-uri@3.1.2",
+      "type": "library",
+      "version": "3.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40jridgewell/sourcemap-codec@1.5.5",
+      "name": "@jridgewell/sourcemap-codec",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40jridgewell/sourcemap-codec@1.5.5",
+      "type": "library",
+      "version": "1.5.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40jridgewell/trace-mapping@0.3.31",
+      "name": "@jridgewell/trace-mapping",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40jridgewell/trace-mapping@0.3.31",
+      "type": "library",
+      "version": "0.3.31"
+    },
+    {
+      "bom-ref": "pkg:npm/%40napi-rs/wasm-runtime@0.2.12",
+      "name": "@napi-rs/wasm-runtime",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40napi-rs/wasm-runtime@0.2.12",
+      "type": "library",
+      "version": "0.2.12"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/env@15.5.18",
+      "name": "@next/env",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/env@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/eslint-plugin-next@15.5.18",
+      "name": "@next/eslint-plugin-next",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/eslint-plugin-next@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/swc-darwin-arm64@15.5.18",
+      "name": "@next/swc-darwin-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-darwin-arm64@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/swc-darwin-x64@15.5.18",
+      "name": "@next/swc-darwin-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-darwin-x64@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/swc-linux-arm64-gnu@15.5.18",
+      "name": "@next/swc-linux-arm64-gnu",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-linux-arm64-gnu@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/swc-linux-arm64-musl@15.5.18",
+      "name": "@next/swc-linux-arm64-musl",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-linux-arm64-musl@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/swc-linux-x64-gnu@15.5.18",
+      "name": "@next/swc-linux-x64-gnu",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-linux-x64-gnu@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/swc-linux-x64-musl@15.5.18",
+      "name": "@next/swc-linux-x64-musl",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-linux-x64-musl@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/swc-win32-arm64-msvc@15.5.18",
+      "name": "@next/swc-win32-arm64-msvc",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-win32-arm64-msvc@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40next/swc-win32-x64-msvc@15.5.18",
+      "name": "@next/swc-win32-x64-msvc",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40next/swc-win32-x64-msvc@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/%40nodelib/fs.scandir@2.1.5",
+      "name": "@nodelib/fs.scandir",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40nodelib/fs.scandir@2.1.5",
+      "type": "library",
+      "version": "2.1.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40nodelib/fs.stat@2.0.5",
+      "name": "@nodelib/fs.stat",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40nodelib/fs.stat@2.0.5",
+      "type": "library",
+      "version": "2.0.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40nodelib/fs.walk@1.2.8",
+      "name": "@nodelib/fs.walk",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40nodelib/fs.walk@1.2.8",
+      "type": "library",
+      "version": "1.2.8"
+    },
+    {
+      "bom-ref": "pkg:npm/%40nolyfill/is-core-module@1.0.39",
+      "name": "@nolyfill/is-core-module",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40nolyfill/is-core-module@1.0.39",
+      "type": "library",
+      "version": "1.0.39"
+    },
+    {
+      "bom-ref": "pkg:npm/%40playwright/test@1.60.0",
+      "name": "@playwright/test",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40playwright/test@1.60.0",
+      "type": "library",
+      "version": "1.60.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/primitive@1.1.3",
+      "name": "@radix-ui/primitive",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/primitive@1.1.3",
+      "type": "library",
+      "version": "1.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-arrow@1.1.7",
+      "name": "@radix-ui/react-arrow",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-arrow@1.1.7",
+      "type": "library",
+      "version": "1.1.7"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-collection@1.1.7",
+      "name": "@radix-ui/react-collection",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-collection@1.1.7",
+      "type": "library",
+      "version": "1.1.7"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-compose-refs@1.1.2",
+      "name": "@radix-ui/react-compose-refs",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-compose-refs@1.1.2",
+      "type": "library",
+      "version": "1.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-context@1.1.2",
+      "name": "@radix-ui/react-context",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-context@1.1.2",
+      "type": "library",
+      "version": "1.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-dialog@1.1.15",
+      "name": "@radix-ui/react-dialog",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-dialog@1.1.15",
+      "type": "library",
+      "version": "1.1.15"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-dismissable-layer@1.1.11",
+      "name": "@radix-ui/react-dismissable-layer",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-dismissable-layer@1.1.11",
+      "type": "library",
+      "version": "1.1.11"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-focus-guards@1.1.3",
+      "name": "@radix-ui/react-focus-guards",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-focus-guards@1.1.3",
+      "type": "library",
+      "version": "1.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-focus-scope@1.1.7",
+      "name": "@radix-ui/react-focus-scope",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-focus-scope@1.1.7",
+      "type": "library",
+      "version": "1.1.7"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-id@1.1.1",
+      "name": "@radix-ui/react-id",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-id@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-popper@1.2.8",
+      "name": "@radix-ui/react-popper",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-popper@1.2.8",
+      "type": "library",
+      "version": "1.2.8"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-portal@1.1.9",
+      "name": "@radix-ui/react-portal",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-portal@1.1.9",
+      "type": "library",
+      "version": "1.1.9"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-presence@1.1.5",
+      "name": "@radix-ui/react-presence",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-presence@1.1.5",
+      "type": "library",
+      "version": "1.1.5"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-primitive@2.1.3",
+      "name": "@radix-ui/react-primitive",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-primitive@2.1.3",
+      "type": "library",
+      "version": "2.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-primitive@2.1.4",
+      "name": "@radix-ui/react-primitive",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-primitive@2.1.4",
+      "type": "library",
+      "version": "2.1.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-separator@1.1.8",
+      "name": "@radix-ui/react-separator",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-separator@1.1.8",
+      "type": "library",
+      "version": "1.1.8"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-slot@1.2.3",
+      "name": "@radix-ui/react-slot",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-slot@1.2.3",
+      "type": "library",
+      "version": "1.2.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-slot@1.2.4",
+      "name": "@radix-ui/react-slot",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-slot@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-switch@1.2.6",
+      "name": "@radix-ui/react-switch",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-switch@1.2.6",
+      "type": "library",
+      "version": "1.2.6"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-toast@1.2.15",
+      "name": "@radix-ui/react-toast",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-toast@1.2.15",
+      "type": "library",
+      "version": "1.2.15"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-tooltip@1.2.8",
+      "name": "@radix-ui/react-tooltip",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-tooltip@1.2.8",
+      "type": "library",
+      "version": "1.2.8"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-use-callback-ref@1.1.1",
+      "name": "@radix-ui/react-use-callback-ref",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-use-callback-ref@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-use-controllable-state@1.2.2",
+      "name": "@radix-ui/react-use-controllable-state",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-use-controllable-state@1.2.2",
+      "type": "library",
+      "version": "1.2.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-use-effect-event@0.0.2",
+      "name": "@radix-ui/react-use-effect-event",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-use-effect-event@0.0.2",
+      "type": "library",
+      "version": "0.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-use-escape-keydown@1.1.1",
+      "name": "@radix-ui/react-use-escape-keydown",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-use-escape-keydown@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-use-layout-effect@1.1.1",
+      "name": "@radix-ui/react-use-layout-effect",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-use-layout-effect@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-use-previous@1.1.1",
+      "name": "@radix-ui/react-use-previous",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-use-previous@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-use-rect@1.1.1",
+      "name": "@radix-ui/react-use-rect",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-use-rect@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-use-size@1.1.1",
+      "name": "@radix-ui/react-use-size",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-use-size@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/react-visually-hidden@1.2.3",
+      "name": "@radix-ui/react-visually-hidden",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/react-visually-hidden@1.2.3",
+      "type": "library",
+      "version": "1.2.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40radix-ui/rect@1.1.1",
+      "name": "@radix-ui/rect",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40radix-ui/rect@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40rtsao/scc@1.1.0",
+      "name": "@rtsao/scc",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40rtsao/scc@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40rushstack/eslint-patch@1.16.1",
+      "name": "@rushstack/eslint-patch",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40rushstack/eslint-patch@1.16.1",
+      "type": "library",
+      "version": "1.16.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40swc/helpers@0.5.15",
+      "name": "@swc/helpers",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40swc/helpers@0.5.15",
+      "type": "library",
+      "version": "0.5.15"
+    },
+    {
+      "bom-ref": "pkg:npm/%40tybys/wasm-util@0.10.2",
+      "name": "@tybys/wasm-util",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40tybys/wasm-util@0.10.2",
+      "type": "library",
+      "version": "0.10.2"
+    },
+    {
+      "bom-ref": "pkg:npm/%40types/estree@1.0.8",
+      "name": "@types/estree",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40types/estree@1.0.8",
+      "type": "library",
+      "version": "1.0.8"
+    },
+    {
+      "bom-ref": "pkg:npm/%40types/json-schema@7.0.15",
+      "name": "@types/json-schema",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40types/json-schema@7.0.15",
+      "type": "library",
+      "version": "7.0.15"
+    },
+    {
+      "bom-ref": "pkg:npm/%40types/json5@0.0.29",
+      "name": "@types/json5",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40types/json5@0.0.29",
+      "type": "library",
+      "version": "0.0.29"
+    },
+    {
+      "bom-ref": "pkg:npm/%40types/node@22.0.0",
+      "name": "@types/node",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40types/node@22.0.0",
+      "type": "library",
+      "version": "22.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40types/react-dom@19.0.0",
+      "name": "@types/react-dom",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40types/react-dom@19.0.0",
+      "type": "library",
+      "version": "19.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40types/react@19.0.0",
+      "name": "@types/react",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40types/react@19.0.0",
+      "type": "library",
+      "version": "19.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/eslint-plugin@8.59.3",
+      "name": "@typescript-eslint/eslint-plugin",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/eslint-plugin@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/parser@8.59.3",
+      "name": "@typescript-eslint/parser",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/parser@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/project-service@8.59.3",
+      "name": "@typescript-eslint/project-service",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/project-service@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/scope-manager@8.59.3",
+      "name": "@typescript-eslint/scope-manager",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/scope-manager@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/tsconfig-utils@8.59.3",
+      "name": "@typescript-eslint/tsconfig-utils",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/tsconfig-utils@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/type-utils@8.59.3",
+      "name": "@typescript-eslint/type-utils",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/type-utils@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/types@8.59.3",
+      "name": "@typescript-eslint/types",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/types@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/typescript-estree@8.59.3",
+      "name": "@typescript-eslint/typescript-estree",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/typescript-estree@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/utils@8.59.3",
+      "name": "@typescript-eslint/utils",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/utils@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40typescript-eslint/visitor-keys@8.59.3",
+      "name": "@typescript-eslint/visitor-keys",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40typescript-eslint/visitor-keys@8.59.3",
+      "type": "library",
+      "version": "8.59.3"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-android-arm-eabi@1.11.1",
+      "name": "@unrs/resolver-binding-android-arm-eabi",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-android-arm-eabi@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-android-arm64@1.11.1",
+      "name": "@unrs/resolver-binding-android-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-android-arm64@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-darwin-arm64@1.11.1",
+      "name": "@unrs/resolver-binding-darwin-arm64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-darwin-arm64@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-darwin-x64@1.11.1",
+      "name": "@unrs/resolver-binding-darwin-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-darwin-x64@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-freebsd-x64@1.11.1",
+      "name": "@unrs/resolver-binding-freebsd-x64",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-freebsd-x64@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-arm-gnueabihf@1.11.1",
+      "name": "@unrs/resolver-binding-linux-arm-gnueabihf",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-arm-gnueabihf@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-arm-musleabihf@1.11.1",
+      "name": "@unrs/resolver-binding-linux-arm-musleabihf",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-arm-musleabihf@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-arm64-gnu@1.11.1",
+      "name": "@unrs/resolver-binding-linux-arm64-gnu",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-arm64-gnu@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-arm64-musl@1.11.1",
+      "name": "@unrs/resolver-binding-linux-arm64-musl",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-arm64-musl@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-ppc64-gnu@1.11.1",
+      "name": "@unrs/resolver-binding-linux-ppc64-gnu",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-ppc64-gnu@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-riscv64-gnu@1.11.1",
+      "name": "@unrs/resolver-binding-linux-riscv64-gnu",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-riscv64-gnu@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-riscv64-musl@1.11.1",
+      "name": "@unrs/resolver-binding-linux-riscv64-musl",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-riscv64-musl@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-s390x-gnu@1.11.1",
+      "name": "@unrs/resolver-binding-linux-s390x-gnu",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-s390x-gnu@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-x64-gnu@1.11.1",
+      "name": "@unrs/resolver-binding-linux-x64-gnu",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-x64-gnu@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-linux-x64-musl@1.11.1",
+      "name": "@unrs/resolver-binding-linux-x64-musl",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-linux-x64-musl@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-wasm32-wasi@1.11.1",
+      "name": "@unrs/resolver-binding-wasm32-wasi",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-wasm32-wasi@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-win32-arm64-msvc@1.11.1",
+      "name": "@unrs/resolver-binding-win32-arm64-msvc",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-win32-arm64-msvc@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-win32-ia32-msvc@1.11.1",
+      "name": "@unrs/resolver-binding-win32-ia32-msvc",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-win32-ia32-msvc@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/%40unrs/resolver-binding-win32-x64-msvc@1.11.1",
+      "name": "@unrs/resolver-binding-win32-x64-msvc",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/%40unrs/resolver-binding-win32-x64-msvc@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/acorn-jsx@5.3.2",
+      "name": "acorn-jsx",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/acorn-jsx@5.3.2",
+      "type": "library",
+      "version": "5.3.2"
+    },
+    {
+      "bom-ref": "pkg:npm/acorn@8.16.0",
+      "name": "acorn",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/acorn@8.16.0",
+      "type": "library",
+      "version": "8.16.0"
+    },
+    {
+      "bom-ref": "pkg:npm/ajv@6.15.0",
+      "name": "ajv",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/ajv@6.15.0",
+      "type": "library",
+      "version": "6.15.0"
+    },
+    {
+      "bom-ref": "pkg:npm/ansi-styles@4.3.0",
+      "name": "ansi-styles",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/ansi-styles@4.3.0",
+      "type": "library",
+      "version": "4.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/any-promise@1.3.0",
+      "name": "any-promise",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/any-promise@1.3.0",
+      "type": "library",
+      "version": "1.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/anymatch@3.1.3",
+      "name": "anymatch",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/anymatch@3.1.3",
+      "type": "library",
+      "version": "3.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/arg@5.0.2",
+      "name": "arg",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/arg@5.0.2",
+      "type": "library",
+      "version": "5.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/argparse@2.0.1",
+      "name": "argparse",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/argparse@2.0.1",
+      "type": "library",
+      "version": "2.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/aria-hidden@1.2.6",
+      "name": "aria-hidden",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/aria-hidden@1.2.6",
+      "type": "library",
+      "version": "1.2.6"
+    },
+    {
+      "bom-ref": "pkg:npm/aria-query@5.3.2",
+      "name": "aria-query",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/aria-query@5.3.2",
+      "type": "library",
+      "version": "5.3.2"
+    },
+    {
+      "bom-ref": "pkg:npm/array-buffer-byte-length@1.0.2",
+      "name": "array-buffer-byte-length",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/array-buffer-byte-length@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/array-includes@3.1.9",
+      "name": "array-includes",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/array-includes@3.1.9",
+      "type": "library",
+      "version": "3.1.9"
+    },
+    {
+      "bom-ref": "pkg:npm/array.prototype.findlast@1.2.5",
+      "name": "array.prototype.findlast",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/array.prototype.findlast@1.2.5",
+      "type": "library",
+      "version": "1.2.5"
+    },
+    {
+      "bom-ref": "pkg:npm/array.prototype.findlastindex@1.2.6",
+      "name": "array.prototype.findlastindex",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/array.prototype.findlastindex@1.2.6",
+      "type": "library",
+      "version": "1.2.6"
+    },
+    {
+      "bom-ref": "pkg:npm/array.prototype.flat@1.3.3",
+      "name": "array.prototype.flat",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/array.prototype.flat@1.3.3",
+      "type": "library",
+      "version": "1.3.3"
+    },
+    {
+      "bom-ref": "pkg:npm/array.prototype.flatmap@1.3.3",
+      "name": "array.prototype.flatmap",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/array.prototype.flatmap@1.3.3",
+      "type": "library",
+      "version": "1.3.3"
+    },
+    {
+      "bom-ref": "pkg:npm/array.prototype.tosorted@1.1.4",
+      "name": "array.prototype.tosorted",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/array.prototype.tosorted@1.1.4",
+      "type": "library",
+      "version": "1.1.4"
+    },
+    {
+      "bom-ref": "pkg:npm/arraybuffer.prototype.slice@1.0.4",
+      "name": "arraybuffer.prototype.slice",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/arraybuffer.prototype.slice@1.0.4",
+      "type": "library",
+      "version": "1.0.4"
+    },
+    {
+      "bom-ref": "pkg:npm/ast-types-flow@0.0.8",
+      "name": "ast-types-flow",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/ast-types-flow@0.0.8",
+      "type": "library",
+      "version": "0.0.8"
+    },
+    {
+      "bom-ref": "pkg:npm/async-function@1.0.0",
+      "name": "async-function",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/async-function@1.0.0",
+      "type": "library",
+      "version": "1.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/autoprefixer@10.4.20",
+      "name": "autoprefixer",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/autoprefixer@10.4.20",
+      "type": "library",
+      "version": "10.4.20"
+    },
+    {
+      "bom-ref": "pkg:npm/available-typed-arrays@1.0.7",
+      "name": "available-typed-arrays",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/available-typed-arrays@1.0.7",
+      "type": "library",
+      "version": "1.0.7"
+    },
+    {
+      "bom-ref": "pkg:npm/axe-core@4.11.4",
+      "name": "axe-core",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/axe-core@4.11.4",
+      "type": "library",
+      "version": "4.11.4"
+    },
+    {
+      "bom-ref": "pkg:npm/axobject-query@4.1.0",
+      "name": "axobject-query",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/axobject-query@4.1.0",
+      "type": "library",
+      "version": "4.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/balanced-match@1.0.2",
+      "name": "balanced-match",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/balanced-match@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/balanced-match@4.0.4",
+      "name": "balanced-match",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/balanced-match@4.0.4",
+      "type": "library",
+      "version": "4.0.4"
+    },
+    {
+      "bom-ref": "pkg:npm/binary-extensions@2.3.0",
+      "name": "binary-extensions",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/binary-extensions@2.3.0",
+      "type": "library",
+      "version": "2.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/brace-expansion@1.1.14",
+      "name": "brace-expansion",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/brace-expansion@1.1.14",
+      "type": "library",
+      "version": "1.1.14"
+    },
+    {
+      "bom-ref": "pkg:npm/brace-expansion@5.0.6",
+      "name": "brace-expansion",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/brace-expansion@5.0.6",
+      "type": "library",
+      "version": "5.0.6"
+    },
+    {
+      "bom-ref": "pkg:npm/braces@3.0.3",
+      "name": "braces",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/braces@3.0.3",
+      "type": "library",
+      "version": "3.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/browserslist@4.25.1",
+      "name": "browserslist",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/browserslist@4.25.1",
+      "type": "library",
+      "version": "4.25.1"
+    },
+    {
+      "bom-ref": "pkg:npm/call-bind-apply-helpers@1.0.2",
+      "name": "call-bind-apply-helpers",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/call-bind-apply-helpers@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/call-bind@1.0.9",
+      "name": "call-bind",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/call-bind@1.0.9",
+      "type": "library",
+      "version": "1.0.9"
+    },
+    {
+      "bom-ref": "pkg:npm/call-bound@1.0.4",
+      "name": "call-bound",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/call-bound@1.0.4",
+      "type": "library",
+      "version": "1.0.4"
+    },
+    {
+      "bom-ref": "pkg:npm/callsites@3.1.0",
+      "name": "callsites",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/callsites@3.1.0",
+      "type": "library",
+      "version": "3.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/camelcase-css@2.0.1",
+      "name": "camelcase-css",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/camelcase-css@2.0.1",
+      "type": "library",
+      "version": "2.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/caniuse-lite@1.0.30001727",
+      "name": "caniuse-lite",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/caniuse-lite@1.0.30001727",
+      "type": "library",
+      "version": "1.0.30001727"
+    },
+    {
+      "bom-ref": "pkg:npm/caniuse-lite@1.0.30001793",
+      "name": "caniuse-lite",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/caniuse-lite@1.0.30001793",
+      "type": "library",
+      "version": "1.0.30001793"
+    },
+    {
+      "bom-ref": "pkg:npm/chalk@4.1.2",
+      "name": "chalk",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/chalk@4.1.2",
+      "type": "library",
+      "version": "4.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/chokidar@3.6.0",
+      "name": "chokidar",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/chokidar@3.6.0",
+      "type": "library",
+      "version": "3.6.0"
+    },
+    {
+      "bom-ref": "pkg:npm/class-variance-authority@0.7.1",
+      "name": "class-variance-authority",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/class-variance-authority@0.7.1",
+      "type": "library",
+      "version": "0.7.1"
+    },
+    {
+      "bom-ref": "pkg:npm/client-only@0.0.1",
+      "name": "client-only",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/client-only@0.0.1",
+      "type": "library",
+      "version": "0.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/clsx@2.1.1",
+      "name": "clsx",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/clsx@2.1.1",
+      "type": "library",
+      "version": "2.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/color-convert@2.0.1",
+      "name": "color-convert",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/color-convert@2.0.1",
+      "type": "library",
+      "version": "2.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/color-name@1.1.4",
+      "name": "color-name",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/color-name@1.1.4",
+      "type": "library",
+      "version": "1.1.4"
+    },
+    {
+      "bom-ref": "pkg:npm/commander@4.1.1",
+      "name": "commander",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/commander@4.1.1",
+      "type": "library",
+      "version": "4.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/concat-map@0.0.1",
+      "name": "concat-map",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/concat-map@0.0.1",
+      "type": "library",
+      "version": "0.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/cross-spawn@7.0.6",
+      "name": "cross-spawn",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/cross-spawn@7.0.6",
+      "type": "library",
+      "version": "7.0.6"
+    },
+    {
+      "bom-ref": "pkg:npm/cssesc@3.0.0",
+      "name": "cssesc",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/cssesc@3.0.0",
+      "type": "library",
+      "version": "3.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/csstype@3.1.3",
+      "name": "csstype",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/csstype@3.1.3",
+      "type": "library",
+      "version": "3.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/damerau-levenshtein@1.0.8",
+      "name": "damerau-levenshtein",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/damerau-levenshtein@1.0.8",
+      "type": "library",
+      "version": "1.0.8"
+    },
+    {
+      "bom-ref": "pkg:npm/data-view-buffer@1.0.2",
+      "name": "data-view-buffer",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/data-view-buffer@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/data-view-byte-length@1.0.2",
+      "name": "data-view-byte-length",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/data-view-byte-length@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/data-view-byte-offset@1.0.1",
+      "name": "data-view-byte-offset",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/data-view-byte-offset@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/debug@3.2.7",
+      "name": "debug",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/debug@3.2.7",
+      "type": "library",
+      "version": "3.2.7"
+    },
+    {
+      "bom-ref": "pkg:npm/debug@4.4.3",
+      "name": "debug",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/debug@4.4.3",
+      "type": "library",
+      "version": "4.4.3"
+    },
+    {
+      "bom-ref": "pkg:npm/deep-is@0.1.4",
+      "name": "deep-is",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/deep-is@0.1.4",
+      "type": "library",
+      "version": "0.1.4"
+    },
+    {
+      "bom-ref": "pkg:npm/define-data-property@1.1.4",
+      "name": "define-data-property",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/define-data-property@1.1.4",
+      "type": "library",
+      "version": "1.1.4"
+    },
+    {
+      "bom-ref": "pkg:npm/define-properties@1.2.1",
+      "name": "define-properties",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/define-properties@1.2.1",
+      "type": "library",
+      "version": "1.2.1"
+    },
+    {
+      "bom-ref": "pkg:npm/detect-libc@2.1.2",
+      "name": "detect-libc",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/detect-libc@2.1.2",
+      "type": "library",
+      "version": "2.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/detect-node-es@1.1.0",
+      "name": "detect-node-es",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/detect-node-es@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/didyoumean@1.2.2",
+      "name": "didyoumean",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/didyoumean@1.2.2",
+      "type": "library",
+      "version": "1.2.2"
+    },
+    {
+      "bom-ref": "pkg:npm/dlv@1.1.3",
+      "name": "dlv",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/dlv@1.1.3",
+      "type": "library",
+      "version": "1.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/doctrine@2.1.0",
+      "name": "doctrine",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/doctrine@2.1.0",
+      "type": "library",
+      "version": "2.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/dunder-proto@1.0.1",
+      "name": "dunder-proto",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/dunder-proto@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/electron-to-chromium@1.5.187",
+      "name": "electron-to-chromium",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/electron-to-chromium@1.5.187",
+      "type": "library",
+      "version": "1.5.187"
+    },
+    {
+      "bom-ref": "pkg:npm/emoji-regex@9.2.2",
+      "name": "emoji-regex",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/emoji-regex@9.2.2",
+      "type": "library",
+      "version": "9.2.2"
+    },
+    {
+      "bom-ref": "pkg:npm/es-abstract@1.24.2",
+      "name": "es-abstract",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/es-abstract@1.24.2",
+      "type": "library",
+      "version": "1.24.2"
+    },
+    {
+      "bom-ref": "pkg:npm/es-define-property@1.0.1",
+      "name": "es-define-property",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/es-define-property@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/es-errors@1.3.0",
+      "name": "es-errors",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/es-errors@1.3.0",
+      "type": "library",
+      "version": "1.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/es-iterator-helpers@1.3.2",
+      "name": "es-iterator-helpers",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/es-iterator-helpers@1.3.2",
+      "type": "library",
+      "version": "1.3.2"
+    },
+    {
+      "bom-ref": "pkg:npm/es-object-atoms@1.1.1",
+      "name": "es-object-atoms",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/es-object-atoms@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/es-set-tostringtag@2.1.0",
+      "name": "es-set-tostringtag",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/es-set-tostringtag@2.1.0",
+      "type": "library",
+      "version": "2.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/es-shim-unscopables@1.1.0",
+      "name": "es-shim-unscopables",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/es-shim-unscopables@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/es-to-primitive@1.3.0",
+      "name": "es-to-primitive",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/es-to-primitive@1.3.0",
+      "type": "library",
+      "version": "1.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/escalade@3.2.0",
+      "name": "escalade",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/escalade@3.2.0",
+      "type": "library",
+      "version": "3.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/escape-string-regexp@4.0.0",
+      "name": "escape-string-regexp",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/escape-string-regexp@4.0.0",
+      "type": "library",
+      "version": "4.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-config-next@15.5.18",
+      "name": "eslint-config-next",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-config-next@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-import-resolver-node@0.3.10",
+      "name": "eslint-import-resolver-node",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-import-resolver-node@0.3.10",
+      "type": "library",
+      "version": "0.3.10"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-import-resolver-typescript@3.10.1",
+      "name": "eslint-import-resolver-typescript",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-import-resolver-typescript@3.10.1",
+      "type": "library",
+      "version": "3.10.1"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-module-utils@2.12.1",
+      "name": "eslint-module-utils",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-module-utils@2.12.1",
+      "type": "library",
+      "version": "2.12.1"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-plugin-import@2.32.0",
+      "name": "eslint-plugin-import",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-plugin-import@2.32.0",
+      "type": "library",
+      "version": "2.32.0"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-plugin-jsx-a11y@6.10.2",
+      "name": "eslint-plugin-jsx-a11y",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-plugin-jsx-a11y@6.10.2",
+      "type": "library",
+      "version": "6.10.2"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-plugin-react-hooks@5.2.0",
+      "name": "eslint-plugin-react-hooks",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-plugin-react-hooks@5.2.0",
+      "type": "library",
+      "version": "5.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-plugin-react@7.37.5",
+      "name": "eslint-plugin-react",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-plugin-react@7.37.5",
+      "type": "library",
+      "version": "7.37.5"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-scope@8.4.0",
+      "name": "eslint-scope",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-scope@8.4.0",
+      "type": "library",
+      "version": "8.4.0"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-visitor-keys@3.4.3",
+      "name": "eslint-visitor-keys",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-visitor-keys@3.4.3",
+      "type": "library",
+      "version": "3.4.3"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-visitor-keys@4.2.1",
+      "name": "eslint-visitor-keys",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-visitor-keys@4.2.1",
+      "type": "library",
+      "version": "4.2.1"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint-visitor-keys@5.0.1",
+      "name": "eslint-visitor-keys",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint-visitor-keys@5.0.1",
+      "type": "library",
+      "version": "5.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/eslint@9.39.4",
+      "name": "eslint",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/eslint@9.39.4",
+      "type": "library",
+      "version": "9.39.4"
+    },
+    {
+      "bom-ref": "pkg:npm/espree@10.4.0",
+      "name": "espree",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/espree@10.4.0",
+      "type": "library",
+      "version": "10.4.0"
+    },
+    {
+      "bom-ref": "pkg:npm/esquery@1.7.0",
+      "name": "esquery",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/esquery@1.7.0",
+      "type": "library",
+      "version": "1.7.0"
+    },
+    {
+      "bom-ref": "pkg:npm/esrecurse@4.3.0",
+      "name": "esrecurse",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/esrecurse@4.3.0",
+      "type": "library",
+      "version": "4.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/estraverse@5.3.0",
+      "name": "estraverse",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/estraverse@5.3.0",
+      "type": "library",
+      "version": "5.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/esutils@2.0.3",
+      "name": "esutils",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/esutils@2.0.3",
+      "type": "library",
+      "version": "2.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/fast-deep-equal@3.1.3",
+      "name": "fast-deep-equal",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fast-deep-equal@3.1.3",
+      "type": "library",
+      "version": "3.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/fast-glob@3.3.1",
+      "name": "fast-glob",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fast-glob@3.3.1",
+      "type": "library",
+      "version": "3.3.1"
+    },
+    {
+      "bom-ref": "pkg:npm/fast-glob@3.3.3",
+      "name": "fast-glob",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fast-glob@3.3.3",
+      "type": "library",
+      "version": "3.3.3"
+    },
+    {
+      "bom-ref": "pkg:npm/fast-json-stable-stringify@2.1.0",
+      "name": "fast-json-stable-stringify",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fast-json-stable-stringify@2.1.0",
+      "type": "library",
+      "version": "2.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/fast-levenshtein@2.0.6",
+      "name": "fast-levenshtein",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fast-levenshtein@2.0.6",
+      "type": "library",
+      "version": "2.0.6"
+    },
+    {
+      "bom-ref": "pkg:npm/fastq@1.20.1",
+      "name": "fastq",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fastq@1.20.1",
+      "type": "library",
+      "version": "1.20.1"
+    },
+    {
+      "bom-ref": "pkg:npm/fdir@6.5.0",
+      "name": "fdir",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fdir@6.5.0",
+      "type": "library",
+      "version": "6.5.0"
+    },
+    {
+      "bom-ref": "pkg:npm/file-entry-cache@8.0.0",
+      "name": "file-entry-cache",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/file-entry-cache@8.0.0",
+      "type": "library",
+      "version": "8.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/fill-range@7.1.1",
+      "name": "fill-range",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fill-range@7.1.1",
+      "type": "library",
+      "version": "7.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/find-up@5.0.0",
+      "name": "find-up",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/find-up@5.0.0",
+      "type": "library",
+      "version": "5.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/flat-cache@4.0.1",
+      "name": "flat-cache",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/flat-cache@4.0.1",
+      "type": "library",
+      "version": "4.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/flatted@3.4.2",
+      "name": "flatted",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/flatted@3.4.2",
+      "type": "library",
+      "version": "3.4.2"
+    },
+    {
+      "bom-ref": "pkg:npm/for-each@0.3.5",
+      "name": "for-each",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/for-each@0.3.5",
+      "type": "library",
+      "version": "0.3.5"
+    },
+    {
+      "bom-ref": "pkg:npm/fraction.js@4.3.7",
+      "name": "fraction.js",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fraction.js@4.3.7",
+      "type": "library",
+      "version": "4.3.7"
+    },
+    {
+      "bom-ref": "pkg:npm/fsevents@2.3.2",
+      "name": "fsevents",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fsevents@2.3.2",
+      "type": "library",
+      "version": "2.3.2"
+    },
+    {
+      "bom-ref": "pkg:npm/fsevents@2.3.3",
+      "name": "fsevents",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/fsevents@2.3.3",
+      "type": "library",
+      "version": "2.3.3"
+    },
+    {
+      "bom-ref": "pkg:npm/function-bind@1.1.2",
+      "name": "function-bind",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/function-bind@1.1.2",
+      "type": "library",
+      "version": "1.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/function.prototype.name@1.1.8",
+      "name": "function.prototype.name",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/function.prototype.name@1.1.8",
+      "type": "library",
+      "version": "1.1.8"
+    },
+    {
+      "bom-ref": "pkg:npm/functions-have-names@1.2.3",
+      "name": "functions-have-names",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/functions-have-names@1.2.3",
+      "type": "library",
+      "version": "1.2.3"
+    },
+    {
+      "bom-ref": "pkg:npm/generator-function@2.0.1",
+      "name": "generator-function",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/generator-function@2.0.1",
+      "type": "library",
+      "version": "2.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/get-intrinsic@1.3.0",
+      "name": "get-intrinsic",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/get-intrinsic@1.3.0",
+      "type": "library",
+      "version": "1.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/get-nonce@1.0.1",
+      "name": "get-nonce",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/get-nonce@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/get-proto@1.0.1",
+      "name": "get-proto",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/get-proto@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/get-symbol-description@1.1.0",
+      "name": "get-symbol-description",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/get-symbol-description@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/get-tsconfig@4.14.0",
+      "name": "get-tsconfig",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/get-tsconfig@4.14.0",
+      "type": "library",
+      "version": "4.14.0"
+    },
+    {
+      "bom-ref": "pkg:npm/glob-parent@5.1.2",
+      "name": "glob-parent",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/glob-parent@5.1.2",
+      "type": "library",
+      "version": "5.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/glob-parent@6.0.2",
+      "name": "glob-parent",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/glob-parent@6.0.2",
+      "type": "library",
+      "version": "6.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/globals@14.0.0",
+      "name": "globals",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/globals@14.0.0",
+      "type": "library",
+      "version": "14.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/globalthis@1.0.4",
+      "name": "globalthis",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/globalthis@1.0.4",
+      "type": "library",
+      "version": "1.0.4"
+    },
+    {
+      "bom-ref": "pkg:npm/gopd@1.2.0",
+      "name": "gopd",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/gopd@1.2.0",
+      "type": "library",
+      "version": "1.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/has-bigints@1.1.0",
+      "name": "has-bigints",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/has-bigints@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/has-flag@4.0.0",
+      "name": "has-flag",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/has-flag@4.0.0",
+      "type": "library",
+      "version": "4.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/has-property-descriptors@1.0.2",
+      "name": "has-property-descriptors",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/has-property-descriptors@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/has-proto@1.2.0",
+      "name": "has-proto",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/has-proto@1.2.0",
+      "type": "library",
+      "version": "1.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/has-symbols@1.1.0",
+      "name": "has-symbols",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/has-symbols@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/has-tostringtag@1.0.2",
+      "name": "has-tostringtag",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/has-tostringtag@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/hasown@2.0.3",
+      "name": "hasown",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/hasown@2.0.3",
+      "type": "library",
+      "version": "2.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/ignore@5.3.2",
+      "name": "ignore",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/ignore@5.3.2",
+      "type": "library",
+      "version": "5.3.2"
+    },
+    {
+      "bom-ref": "pkg:npm/ignore@7.0.5",
+      "name": "ignore",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/ignore@7.0.5",
+      "type": "library",
+      "version": "7.0.5"
+    },
+    {
+      "bom-ref": "pkg:npm/import-fresh@3.3.1",
+      "name": "import-fresh",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/import-fresh@3.3.1",
+      "type": "library",
+      "version": "3.3.1"
+    },
+    {
+      "bom-ref": "pkg:npm/imurmurhash@0.1.4",
+      "name": "imurmurhash",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/imurmurhash@0.1.4",
+      "type": "library",
+      "version": "0.1.4"
+    },
+    {
+      "bom-ref": "pkg:npm/internal-slot@1.1.0",
+      "name": "internal-slot",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/internal-slot@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/is-array-buffer@3.0.5",
+      "name": "is-array-buffer",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-array-buffer@3.0.5",
+      "type": "library",
+      "version": "3.0.5"
+    },
+    {
+      "bom-ref": "pkg:npm/is-async-function@2.1.1",
+      "name": "is-async-function",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-async-function@2.1.1",
+      "type": "library",
+      "version": "2.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/is-bigint@1.1.0",
+      "name": "is-bigint",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-bigint@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/is-binary-path@2.1.0",
+      "name": "is-binary-path",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-binary-path@2.1.0",
+      "type": "library",
+      "version": "2.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/is-boolean-object@1.2.2",
+      "name": "is-boolean-object",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-boolean-object@1.2.2",
+      "type": "library",
+      "version": "1.2.2"
+    },
+    {
+      "bom-ref": "pkg:npm/is-bun-module@2.0.0",
+      "name": "is-bun-module",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-bun-module@2.0.0",
+      "type": "library",
+      "version": "2.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/is-callable@1.2.7",
+      "name": "is-callable",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-callable@1.2.7",
+      "type": "library",
+      "version": "1.2.7"
+    },
+    {
+      "bom-ref": "pkg:npm/is-core-module@2.16.2",
+      "name": "is-core-module",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-core-module@2.16.2",
+      "type": "library",
+      "version": "2.16.2"
+    },
+    {
+      "bom-ref": "pkg:npm/is-data-view@1.0.2",
+      "name": "is-data-view",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-data-view@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/is-date-object@1.1.0",
+      "name": "is-date-object",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-date-object@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/is-extglob@2.1.1",
+      "name": "is-extglob",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-extglob@2.1.1",
+      "type": "library",
+      "version": "2.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/is-finalizationregistry@1.1.1",
+      "name": "is-finalizationregistry",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-finalizationregistry@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/is-generator-function@1.1.2",
+      "name": "is-generator-function",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-generator-function@1.1.2",
+      "type": "library",
+      "version": "1.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/is-glob@4.0.3",
+      "name": "is-glob",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-glob@4.0.3",
+      "type": "library",
+      "version": "4.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/is-map@2.0.3",
+      "name": "is-map",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-map@2.0.3",
+      "type": "library",
+      "version": "2.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/is-negative-zero@2.0.3",
+      "name": "is-negative-zero",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-negative-zero@2.0.3",
+      "type": "library",
+      "version": "2.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/is-number-object@1.1.1",
+      "name": "is-number-object",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-number-object@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/is-number@7.0.0",
+      "name": "is-number",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-number@7.0.0",
+      "type": "library",
+      "version": "7.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/is-regex@1.2.1",
+      "name": "is-regex",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-regex@1.2.1",
+      "type": "library",
+      "version": "1.2.1"
+    },
+    {
+      "bom-ref": "pkg:npm/is-set@2.0.3",
+      "name": "is-set",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-set@2.0.3",
+      "type": "library",
+      "version": "2.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/is-shared-array-buffer@1.0.4",
+      "name": "is-shared-array-buffer",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-shared-array-buffer@1.0.4",
+      "type": "library",
+      "version": "1.0.4"
+    },
+    {
+      "bom-ref": "pkg:npm/is-string@1.1.1",
+      "name": "is-string",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-string@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/is-symbol@1.1.1",
+      "name": "is-symbol",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-symbol@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/is-typed-array@1.1.15",
+      "name": "is-typed-array",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-typed-array@1.1.15",
+      "type": "library",
+      "version": "1.1.15"
+    },
+    {
+      "bom-ref": "pkg:npm/is-weakmap@2.0.2",
+      "name": "is-weakmap",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-weakmap@2.0.2",
+      "type": "library",
+      "version": "2.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/is-weakref@1.1.1",
+      "name": "is-weakref",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-weakref@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/is-weakset@2.0.4",
+      "name": "is-weakset",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/is-weakset@2.0.4",
+      "type": "library",
+      "version": "2.0.4"
+    },
+    {
+      "bom-ref": "pkg:npm/isarray@2.0.5",
+      "name": "isarray",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/isarray@2.0.5",
+      "type": "library",
+      "version": "2.0.5"
+    },
+    {
+      "bom-ref": "pkg:npm/isexe@2.0.0",
+      "name": "isexe",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/isexe@2.0.0",
+      "type": "library",
+      "version": "2.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/iterator.prototype@1.1.5",
+      "name": "iterator.prototype",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/iterator.prototype@1.1.5",
+      "type": "library",
+      "version": "1.1.5"
+    },
+    {
+      "bom-ref": "pkg:npm/jiti@1.21.7",
+      "name": "jiti",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/jiti@1.21.7",
+      "type": "library",
+      "version": "1.21.7"
+    },
+    {
+      "bom-ref": "pkg:npm/js-tokens@4.0.0",
+      "name": "js-tokens",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/js-tokens@4.0.0",
+      "type": "library",
+      "version": "4.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/js-yaml@4.1.1",
+      "name": "js-yaml",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/js-yaml@4.1.1",
+      "type": "library",
+      "version": "4.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/json-buffer@3.0.1",
+      "name": "json-buffer",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/json-buffer@3.0.1",
+      "type": "library",
+      "version": "3.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/json-schema-traverse@0.4.1",
+      "name": "json-schema-traverse",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/json-schema-traverse@0.4.1",
+      "type": "library",
+      "version": "0.4.1"
+    },
+    {
+      "bom-ref": "pkg:npm/json-stable-stringify-without-jsonify@1.0.1",
+      "name": "json-stable-stringify-without-jsonify",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/json-stable-stringify-without-jsonify@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/json5@1.0.2",
+      "name": "json5",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/json5@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/jsx-ast-utils@3.3.5",
+      "name": "jsx-ast-utils",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/jsx-ast-utils@3.3.5",
+      "type": "library",
+      "version": "3.3.5"
+    },
+    {
+      "bom-ref": "pkg:npm/keyv@4.5.4",
+      "name": "keyv",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/keyv@4.5.4",
+      "type": "library",
+      "version": "4.5.4"
+    },
+    {
+      "bom-ref": "pkg:npm/language-subtag-registry@0.3.23",
+      "name": "language-subtag-registry",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/language-subtag-registry@0.3.23",
+      "type": "library",
+      "version": "0.3.23"
+    },
+    {
+      "bom-ref": "pkg:npm/language-tags@1.0.9",
+      "name": "language-tags",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/language-tags@1.0.9",
+      "type": "library",
+      "version": "1.0.9"
+    },
+    {
+      "bom-ref": "pkg:npm/levn@0.4.1",
+      "name": "levn",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/levn@0.4.1",
+      "type": "library",
+      "version": "0.4.1"
+    },
+    {
+      "bom-ref": "pkg:npm/lilconfig@3.1.3",
+      "name": "lilconfig",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/lilconfig@3.1.3",
+      "type": "library",
+      "version": "3.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/lines-and-columns@1.2.4",
+      "name": "lines-and-columns",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/lines-and-columns@1.2.4",
+      "type": "library",
+      "version": "1.2.4"
+    },
+    {
+      "bom-ref": "pkg:npm/locate-path@6.0.0",
+      "name": "locate-path",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/locate-path@6.0.0",
+      "type": "library",
+      "version": "6.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/lodash.merge@4.6.2",
+      "name": "lodash.merge",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/lodash.merge@4.6.2",
+      "type": "library",
+      "version": "4.6.2"
+    },
+    {
+      "bom-ref": "pkg:npm/loose-envify@1.4.0",
+      "name": "loose-envify",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/loose-envify@1.4.0",
+      "type": "library",
+      "version": "1.4.0"
+    },
+    {
+      "bom-ref": "pkg:npm/lucide-react@0.454.0",
+      "name": "lucide-react",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/lucide-react@0.454.0",
+      "type": "library",
+      "version": "0.454.0"
+    },
+    {
+      "bom-ref": "pkg:npm/math-intrinsics@1.1.0",
+      "name": "math-intrinsics",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/math-intrinsics@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/merge2@1.4.1",
+      "name": "merge2",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/merge2@1.4.1",
+      "type": "library",
+      "version": "1.4.1"
+    },
+    {
+      "bom-ref": "pkg:npm/micromatch@4.0.8",
+      "name": "micromatch",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/micromatch@4.0.8",
+      "type": "library",
+      "version": "4.0.8"
+    },
+    {
+      "bom-ref": "pkg:npm/minimatch@10.2.5",
+      "name": "minimatch",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/minimatch@10.2.5",
+      "type": "library",
+      "version": "10.2.5"
+    },
+    {
+      "bom-ref": "pkg:npm/minimatch@3.1.5",
+      "name": "minimatch",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/minimatch@3.1.5",
+      "type": "library",
+      "version": "3.1.5"
+    },
+    {
+      "bom-ref": "pkg:npm/minimist@1.2.8",
+      "name": "minimist",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/minimist@1.2.8",
+      "type": "library",
+      "version": "1.2.8"
+    },
+    {
+      "bom-ref": "pkg:npm/ms@2.1.3",
+      "name": "ms",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/ms@2.1.3",
+      "type": "library",
+      "version": "2.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/mz@2.7.0",
+      "name": "mz",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/mz@2.7.0",
+      "type": "library",
+      "version": "2.7.0"
+    },
+    {
+      "bom-ref": "pkg:npm/nanoid@3.3.12",
+      "name": "nanoid",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/nanoid@3.3.12",
+      "type": "library",
+      "version": "3.3.12"
+    },
+    {
+      "bom-ref": "pkg:npm/napi-postinstall@0.3.4",
+      "name": "napi-postinstall",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/napi-postinstall@0.3.4",
+      "type": "library",
+      "version": "0.3.4"
+    },
+    {
+      "bom-ref": "pkg:npm/natural-compare@1.4.0",
+      "name": "natural-compare",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/natural-compare@1.4.0",
+      "type": "library",
+      "version": "1.4.0"
+    },
+    {
+      "bom-ref": "pkg:npm/next-themes@0.4.6",
+      "name": "next-themes",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/next-themes@0.4.6",
+      "type": "library",
+      "version": "0.4.6"
+    },
+    {
+      "bom-ref": "pkg:npm/next@15.5.18",
+      "name": "next",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/next@15.5.18",
+      "type": "library",
+      "version": "15.5.18"
+    },
+    {
+      "bom-ref": "pkg:npm/node-exports-info@1.6.0",
+      "name": "node-exports-info",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/node-exports-info@1.6.0",
+      "type": "library",
+      "version": "1.6.0"
+    },
+    {
+      "bom-ref": "pkg:npm/node-releases@2.0.19",
+      "name": "node-releases",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/node-releases@2.0.19",
+      "type": "library",
+      "version": "2.0.19"
+    },
+    {
+      "bom-ref": "pkg:npm/normalize-path@3.0.0",
+      "name": "normalize-path",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/normalize-path@3.0.0",
+      "type": "library",
+      "version": "3.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/normalize-range@0.1.2",
+      "name": "normalize-range",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/normalize-range@0.1.2",
+      "type": "library",
+      "version": "0.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/object-assign@4.1.1",
+      "name": "object-assign",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/object-assign@4.1.1",
+      "type": "library",
+      "version": "4.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/object-hash@3.0.0",
+      "name": "object-hash",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/object-hash@3.0.0",
+      "type": "library",
+      "version": "3.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/object-inspect@1.13.4",
+      "name": "object-inspect",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/object-inspect@1.13.4",
+      "type": "library",
+      "version": "1.13.4"
+    },
+    {
+      "bom-ref": "pkg:npm/object-keys@1.1.1",
+      "name": "object-keys",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/object-keys@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/object.assign@4.1.7",
+      "name": "object.assign",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/object.assign@4.1.7",
+      "type": "library",
+      "version": "4.1.7"
+    },
+    {
+      "bom-ref": "pkg:npm/object.entries@1.1.9",
+      "name": "object.entries",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/object.entries@1.1.9",
+      "type": "library",
+      "version": "1.1.9"
+    },
+    {
+      "bom-ref": "pkg:npm/object.fromentries@2.0.8",
+      "name": "object.fromentries",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/object.fromentries@2.0.8",
+      "type": "library",
+      "version": "2.0.8"
+    },
+    {
+      "bom-ref": "pkg:npm/object.groupby@1.0.3",
+      "name": "object.groupby",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/object.groupby@1.0.3",
+      "type": "library",
+      "version": "1.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/object.values@1.2.1",
+      "name": "object.values",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/object.values@1.2.1",
+      "type": "library",
+      "version": "1.2.1"
+    },
+    {
+      "bom-ref": "pkg:npm/optionator@0.9.4",
+      "name": "optionator",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/optionator@0.9.4",
+      "type": "library",
+      "version": "0.9.4"
+    },
+    {
+      "bom-ref": "pkg:npm/own-keys@1.0.1",
+      "name": "own-keys",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/own-keys@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/p-limit@3.1.0",
+      "name": "p-limit",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/p-limit@3.1.0",
+      "type": "library",
+      "version": "3.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/p-locate@5.0.0",
+      "name": "p-locate",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/p-locate@5.0.0",
+      "type": "library",
+      "version": "5.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/parent-module@1.0.1",
+      "name": "parent-module",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/parent-module@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/path-exists@4.0.0",
+      "name": "path-exists",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/path-exists@4.0.0",
+      "type": "library",
+      "version": "4.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/path-key@3.1.1",
+      "name": "path-key",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/path-key@3.1.1",
+      "type": "library",
+      "version": "3.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/path-parse@1.0.7",
+      "name": "path-parse",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/path-parse@1.0.7",
+      "type": "library",
+      "version": "1.0.7"
+    },
+    {
+      "bom-ref": "pkg:npm/picocolors@1.1.1",
+      "name": "picocolors",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/picocolors@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/picomatch@2.3.2",
+      "name": "picomatch",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/picomatch@2.3.2",
+      "type": "library",
+      "version": "2.3.2"
+    },
+    {
+      "bom-ref": "pkg:npm/picomatch@4.0.4",
+      "name": "picomatch",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/picomatch@4.0.4",
+      "type": "library",
+      "version": "4.0.4"
+    },
+    {
+      "bom-ref": "pkg:npm/pify@2.3.0",
+      "name": "pify",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/pify@2.3.0",
+      "type": "library",
+      "version": "2.3.0"
+    },
+    {
+      "bom-ref": "pkg:npm/pirates@4.0.7",
+      "name": "pirates",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/pirates@4.0.7",
+      "type": "library",
+      "version": "4.0.7"
+    },
+    {
+      "bom-ref": "pkg:npm/playwright-core@1.60.0",
+      "name": "playwright-core",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/playwright-core@1.60.0",
+      "type": "library",
+      "version": "1.60.0"
+    },
+    {
+      "bom-ref": "pkg:npm/playwright@1.60.0",
+      "name": "playwright",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/playwright@1.60.0",
+      "type": "library",
+      "version": "1.60.0"
+    },
+    {
+      "bom-ref": "pkg:npm/possible-typed-array-names@1.1.0",
+      "name": "possible-typed-array-names",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/possible-typed-array-names@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/postcss-import@15.1.0",
+      "name": "postcss-import",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/postcss-import@15.1.0",
+      "type": "library",
+      "version": "15.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/postcss-js@4.1.0",
+      "name": "postcss-js",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/postcss-js@4.1.0",
+      "type": "library",
+      "version": "4.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/postcss-load-config@6.0.1",
+      "name": "postcss-load-config",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/postcss-load-config@6.0.1",
+      "type": "library",
+      "version": "6.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/postcss-nested@6.2.0",
+      "name": "postcss-nested",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/postcss-nested@6.2.0",
+      "type": "library",
+      "version": "6.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/postcss-selector-parser@6.1.2",
+      "name": "postcss-selector-parser",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/postcss-selector-parser@6.1.2",
+      "type": "library",
+      "version": "6.1.2"
+    },
+    {
+      "bom-ref": "pkg:npm/postcss-value-parser@4.2.0",
+      "name": "postcss-value-parser",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/postcss-value-parser@4.2.0",
+      "type": "library",
+      "version": "4.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/postcss@8.5.14",
+      "name": "postcss",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/postcss@8.5.14",
+      "type": "library",
+      "version": "8.5.14"
+    },
+    {
+      "bom-ref": "pkg:npm/prelude-ls@1.2.1",
+      "name": "prelude-ls",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/prelude-ls@1.2.1",
+      "type": "library",
+      "version": "1.2.1"
+    },
+    {
+      "bom-ref": "pkg:npm/prop-types@15.8.1",
+      "name": "prop-types",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/prop-types@15.8.1",
+      "type": "library",
+      "version": "15.8.1"
+    },
+    {
+      "bom-ref": "pkg:npm/punycode@2.3.1",
+      "name": "punycode",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/punycode@2.3.1",
+      "type": "library",
+      "version": "2.3.1"
+    },
+    {
+      "bom-ref": "pkg:npm/queue-microtask@1.2.3",
+      "name": "queue-microtask",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/queue-microtask@1.2.3",
+      "type": "library",
+      "version": "1.2.3"
+    },
+    {
+      "bom-ref": "pkg:npm/react-dom@19.0.0",
+      "name": "react-dom",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/react-dom@19.0.0",
+      "type": "library",
+      "version": "19.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/react-is@16.13.1",
+      "name": "react-is",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/react-is@16.13.1",
+      "type": "library",
+      "version": "16.13.1"
+    },
+    {
+      "bom-ref": "pkg:npm/react-remove-scroll-bar@2.3.8",
+      "name": "react-remove-scroll-bar",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/react-remove-scroll-bar@2.3.8",
+      "type": "library",
+      "version": "2.3.8"
+    },
+    {
+      "bom-ref": "pkg:npm/react-remove-scroll@2.7.1",
+      "name": "react-remove-scroll",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/react-remove-scroll@2.7.1",
+      "type": "library",
+      "version": "2.7.1"
+    },
+    {
+      "bom-ref": "pkg:npm/react-style-singleton@2.2.3",
+      "name": "react-style-singleton",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/react-style-singleton@2.2.3",
+      "type": "library",
+      "version": "2.2.3"
+    },
+    {
+      "bom-ref": "pkg:npm/react@19.0.0",
+      "name": "react",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/react@19.0.0",
+      "type": "library",
+      "version": "19.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/read-cache@1.0.0",
+      "name": "read-cache",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/read-cache@1.0.0",
+      "type": "library",
+      "version": "1.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/readdirp@3.6.0",
+      "name": "readdirp",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/readdirp@3.6.0",
+      "type": "library",
+      "version": "3.6.0"
+    },
+    {
+      "bom-ref": "pkg:npm/reflect.getprototypeof@1.0.10",
+      "name": "reflect.getprototypeof",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/reflect.getprototypeof@1.0.10",
+      "type": "library",
+      "version": "1.0.10"
+    },
+    {
+      "bom-ref": "pkg:npm/regexp.prototype.flags@1.5.4",
+      "name": "regexp.prototype.flags",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/regexp.prototype.flags@1.5.4",
+      "type": "library",
+      "version": "1.5.4"
+    },
+    {
+      "bom-ref": "pkg:npm/resolve-from@4.0.0",
+      "name": "resolve-from",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/resolve-from@4.0.0",
+      "type": "library",
+      "version": "4.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/resolve-pkg-maps@1.0.0",
+      "name": "resolve-pkg-maps",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/resolve-pkg-maps@1.0.0",
+      "type": "library",
+      "version": "1.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/resolve@1.22.12",
+      "name": "resolve",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/resolve@1.22.12",
+      "type": "library",
+      "version": "1.22.12"
+    },
+    {
+      "bom-ref": "pkg:npm/resolve@2.0.0-next.7",
+      "name": "resolve",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/resolve@2.0.0-next.7",
+      "type": "library",
+      "version": "2.0.0-next.7"
+    },
+    {
+      "bom-ref": "pkg:npm/reusify@1.1.0",
+      "name": "reusify",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/reusify@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/run-parallel@1.2.0",
+      "name": "run-parallel",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/run-parallel@1.2.0",
+      "type": "library",
+      "version": "1.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/safe-array-concat@1.1.4",
+      "name": "safe-array-concat",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/safe-array-concat@1.1.4",
+      "type": "library",
+      "version": "1.1.4"
+    },
+    {
+      "bom-ref": "pkg:npm/safe-push-apply@1.0.0",
+      "name": "safe-push-apply",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/safe-push-apply@1.0.0",
+      "type": "library",
+      "version": "1.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/safe-regex-test@1.1.0",
+      "name": "safe-regex-test",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/safe-regex-test@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/scheduler@0.25.0",
+      "name": "scheduler",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/scheduler@0.25.0",
+      "type": "library",
+      "version": "0.25.0"
+    },
+    {
+      "bom-ref": "pkg:npm/semver@6.3.1",
+      "name": "semver",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/semver@6.3.1",
+      "type": "library",
+      "version": "6.3.1"
+    },
+    {
+      "bom-ref": "pkg:npm/semver@7.8.0",
+      "name": "semver",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/semver@7.8.0",
+      "type": "library",
+      "version": "7.8.0"
+    },
+    {
+      "bom-ref": "pkg:npm/set-function-length@1.2.2",
+      "name": "set-function-length",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/set-function-length@1.2.2",
+      "type": "library",
+      "version": "1.2.2"
+    },
+    {
+      "bom-ref": "pkg:npm/set-function-name@2.0.2",
+      "name": "set-function-name",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/set-function-name@2.0.2",
+      "type": "library",
+      "version": "2.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/set-proto@1.0.0",
+      "name": "set-proto",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/set-proto@1.0.0",
+      "type": "library",
+      "version": "1.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/sharp@0.34.5",
+      "name": "sharp",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/sharp@0.34.5",
+      "type": "library",
+      "version": "0.34.5"
+    },
+    {
+      "bom-ref": "pkg:npm/shebang-command@2.0.0",
+      "name": "shebang-command",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/shebang-command@2.0.0",
+      "type": "library",
+      "version": "2.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/shebang-regex@3.0.0",
+      "name": "shebang-regex",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/shebang-regex@3.0.0",
+      "type": "library",
+      "version": "3.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/side-channel-list@1.0.1",
+      "name": "side-channel-list",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/side-channel-list@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/side-channel-map@1.0.1",
+      "name": "side-channel-map",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/side-channel-map@1.0.1",
+      "type": "library",
+      "version": "1.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/side-channel-weakmap@1.0.2",
+      "name": "side-channel-weakmap",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/side-channel-weakmap@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/side-channel@1.1.0",
+      "name": "side-channel",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/side-channel@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/source-map-js@1.2.1",
+      "name": "source-map-js",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/source-map-js@1.2.1",
+      "type": "library",
+      "version": "1.2.1"
+    },
+    {
+      "bom-ref": "pkg:npm/stable-hash@0.0.5",
+      "name": "stable-hash",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/stable-hash@0.0.5",
+      "type": "library",
+      "version": "0.0.5"
+    },
+    {
+      "bom-ref": "pkg:npm/stop-iteration-iterator@1.1.0",
+      "name": "stop-iteration-iterator",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/stop-iteration-iterator@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/string.prototype.includes@2.0.1",
+      "name": "string.prototype.includes",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/string.prototype.includes@2.0.1",
+      "type": "library",
+      "version": "2.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/string.prototype.matchall@4.0.12",
+      "name": "string.prototype.matchall",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/string.prototype.matchall@4.0.12",
+      "type": "library",
+      "version": "4.0.12"
+    },
+    {
+      "bom-ref": "pkg:npm/string.prototype.repeat@1.0.0",
+      "name": "string.prototype.repeat",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/string.prototype.repeat@1.0.0",
+      "type": "library",
+      "version": "1.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/string.prototype.trim@1.2.10",
+      "name": "string.prototype.trim",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/string.prototype.trim@1.2.10",
+      "type": "library",
+      "version": "1.2.10"
+    },
+    {
+      "bom-ref": "pkg:npm/string.prototype.trimend@1.0.9",
+      "name": "string.prototype.trimend",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/string.prototype.trimend@1.0.9",
+      "type": "library",
+      "version": "1.0.9"
+    },
+    {
+      "bom-ref": "pkg:npm/string.prototype.trimstart@1.0.8",
+      "name": "string.prototype.trimstart",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/string.prototype.trimstart@1.0.8",
+      "type": "library",
+      "version": "1.0.8"
+    },
+    {
+      "bom-ref": "pkg:npm/strip-bom@3.0.0",
+      "name": "strip-bom",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/strip-bom@3.0.0",
+      "type": "library",
+      "version": "3.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/strip-json-comments@3.1.1",
+      "name": "strip-json-comments",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/strip-json-comments@3.1.1",
+      "type": "library",
+      "version": "3.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/styled-jsx@5.1.6",
+      "name": "styled-jsx",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/styled-jsx@5.1.6",
+      "type": "library",
+      "version": "5.1.6"
+    },
+    {
+      "bom-ref": "pkg:npm/sucrase@3.35.1",
+      "name": "sucrase",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/sucrase@3.35.1",
+      "type": "library",
+      "version": "3.35.1"
+    },
+    {
+      "bom-ref": "pkg:npm/supports-color@7.2.0",
+      "name": "supports-color",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/supports-color@7.2.0",
+      "type": "library",
+      "version": "7.2.0"
+    },
+    {
+      "bom-ref": "pkg:npm/supports-preserve-symlinks-flag@1.0.0",
+      "name": "supports-preserve-symlinks-flag",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/supports-preserve-symlinks-flag@1.0.0",
+      "type": "library",
+      "version": "1.0.0"
+    },
+    {
+      "bom-ref": "pkg:npm/tailwind-merge@2.5.5",
+      "name": "tailwind-merge",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/tailwind-merge@2.5.5",
+      "type": "library",
+      "version": "2.5.5"
+    },
+    {
+      "bom-ref": "pkg:npm/tailwindcss-animate@1.0.7",
+      "name": "tailwindcss-animate",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/tailwindcss-animate@1.0.7",
+      "type": "library",
+      "version": "1.0.7"
+    },
+    {
+      "bom-ref": "pkg:npm/tailwindcss@3.4.19",
+      "name": "tailwindcss",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/tailwindcss@3.4.19",
+      "type": "library",
+      "version": "3.4.19"
+    },
+    {
+      "bom-ref": "pkg:npm/thenify-all@1.6.0",
+      "name": "thenify-all",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/thenify-all@1.6.0",
+      "type": "library",
+      "version": "1.6.0"
+    },
+    {
+      "bom-ref": "pkg:npm/thenify@3.3.1",
+      "name": "thenify",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/thenify@3.3.1",
+      "type": "library",
+      "version": "3.3.1"
+    },
+    {
+      "bom-ref": "pkg:npm/tinyglobby@0.2.16",
+      "name": "tinyglobby",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/tinyglobby@0.2.16",
+      "type": "library",
+      "version": "0.2.16"
+    },
+    {
+      "bom-ref": "pkg:npm/to-regex-range@5.0.1",
+      "name": "to-regex-range",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/to-regex-range@5.0.1",
+      "type": "library",
+      "version": "5.0.1"
+    },
+    {
+      "bom-ref": "pkg:npm/ts-api-utils@2.5.0",
+      "name": "ts-api-utils",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/ts-api-utils@2.5.0",
+      "type": "library",
+      "version": "2.5.0"
+    },
+    {
+      "bom-ref": "pkg:npm/ts-interface-checker@0.1.13",
+      "name": "ts-interface-checker",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/ts-interface-checker@0.1.13",
+      "type": "library",
+      "version": "0.1.13"
+    },
+    {
+      "bom-ref": "pkg:npm/tsconfig-paths@3.15.0",
+      "name": "tsconfig-paths",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/tsconfig-paths@3.15.0",
+      "type": "library",
+      "version": "3.15.0"
+    },
+    {
+      "bom-ref": "pkg:npm/tslib@2.8.1",
+      "name": "tslib",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/tslib@2.8.1",
+      "type": "library",
+      "version": "2.8.1"
+    },
+    {
+      "bom-ref": "pkg:npm/type-check@0.4.0",
+      "name": "type-check",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/type-check@0.4.0",
+      "type": "library",
+      "version": "0.4.0"
+    },
+    {
+      "bom-ref": "pkg:npm/typed-array-buffer@1.0.3",
+      "name": "typed-array-buffer",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/typed-array-buffer@1.0.3",
+      "type": "library",
+      "version": "1.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/typed-array-byte-length@1.0.3",
+      "name": "typed-array-byte-length",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/typed-array-byte-length@1.0.3",
+      "type": "library",
+      "version": "1.0.3"
+    },
+    {
+      "bom-ref": "pkg:npm/typed-array-byte-offset@1.0.4",
+      "name": "typed-array-byte-offset",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/typed-array-byte-offset@1.0.4",
+      "type": "library",
+      "version": "1.0.4"
+    },
+    {
+      "bom-ref": "pkg:npm/typed-array-length@1.0.7",
+      "name": "typed-array-length",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/typed-array-length@1.0.7",
+      "type": "library",
+      "version": "1.0.7"
+    },
+    {
+      "bom-ref": "pkg:npm/typescript@5.0.2",
+      "name": "typescript",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/typescript@5.0.2",
+      "type": "library",
+      "version": "5.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/unbox-primitive@1.1.0",
+      "name": "unbox-primitive",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/unbox-primitive@1.1.0",
+      "type": "library",
+      "version": "1.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/undici-types@6.11.1",
+      "name": "undici-types",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/undici-types@6.11.1",
+      "type": "library",
+      "version": "6.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/unrs-resolver@1.11.1",
+      "name": "unrs-resolver",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/unrs-resolver@1.11.1",
+      "type": "library",
+      "version": "1.11.1"
+    },
+    {
+      "bom-ref": "pkg:npm/update-browserslist-db@1.1.3",
+      "name": "update-browserslist-db",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/update-browserslist-db@1.1.3",
+      "type": "library",
+      "version": "1.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/uri-js@4.4.1",
+      "name": "uri-js",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/uri-js@4.4.1",
+      "type": "library",
+      "version": "4.4.1"
+    },
+    {
+      "bom-ref": "pkg:npm/use-callback-ref@1.3.3",
+      "name": "use-callback-ref",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/use-callback-ref@1.3.3",
+      "type": "library",
+      "version": "1.3.3"
+    },
+    {
+      "bom-ref": "pkg:npm/use-sidecar@1.1.3",
+      "name": "use-sidecar",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/use-sidecar@1.1.3",
+      "type": "library",
+      "version": "1.1.3"
+    },
+    {
+      "bom-ref": "pkg:npm/util-deprecate@1.0.2",
+      "name": "util-deprecate",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/util-deprecate@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/which-boxed-primitive@1.1.1",
+      "name": "which-boxed-primitive",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/which-boxed-primitive@1.1.1",
+      "type": "library",
+      "version": "1.1.1"
+    },
+    {
+      "bom-ref": "pkg:npm/which-builtin-type@1.2.1",
+      "name": "which-builtin-type",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/which-builtin-type@1.2.1",
+      "type": "library",
+      "version": "1.2.1"
+    },
+    {
+      "bom-ref": "pkg:npm/which-collection@1.0.2",
+      "name": "which-collection",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/which-collection@1.0.2",
+      "type": "library",
+      "version": "1.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/which-typed-array@1.1.20",
+      "name": "which-typed-array",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/which-typed-array@1.1.20",
+      "type": "library",
+      "version": "1.1.20"
+    },
+    {
+      "bom-ref": "pkg:npm/which@2.0.2",
+      "name": "which",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/which@2.0.2",
+      "type": "library",
+      "version": "2.0.2"
+    },
+    {
+      "bom-ref": "pkg:npm/word-wrap@1.2.5",
+      "name": "word-wrap",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/word-wrap@1.2.5",
+      "type": "library",
+      "version": "1.2.5"
+    },
+    {
+      "bom-ref": "pkg:npm/yocto-queue@0.1.0",
+      "name": "yocto-queue",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/yocto-queue@0.1.0",
+      "type": "library",
+      "version": "0.1.0"
+    },
+    {
+      "bom-ref": "pkg:npm/zod@3.24.1",
+      "name": "zod",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "webapp/pnpm-lock.yaml"
+        }
+      ],
+      "purl": "pkg:npm/zod@3.24.1",
+      "type": "library",
+      "version": "3.24.1"
+    },
+    {
+      "bom-ref": "pkg:pypi/fdk@0.1.90",
+      "name": "fdk",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "stack/modules/splunk_evidence_exporter/function/requirements.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "stack/modules/splunk_evidence_exporter/function/requirements.txt: fdk==0.1.90"
+        }
+      ],
+      "purl": "pkg:pypi/fdk@0.1.90",
+      "type": "library",
+      "version": "0.1.90"
+    },
+    {
+      "bom-ref": "pkg:pypi/hypothesis",
+      "name": "hypothesis",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "requirements-dev.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "requirements-dev.txt: hypothesis>=6.150"
+        }
+      ],
+      "purl": "pkg:pypi/hypothesis",
+      "type": "library"
+    },
+    {
+      "bom-ref": "pkg:pypi/jsonschema",
+      "name": "jsonschema",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "requirements.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "requirements.txt: jsonschema>=4.25,<5"
+        },
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "requirements-hunting-test.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "requirements-hunting-test.txt: jsonschema>=4.25,<5"
+        }
+      ],
+      "purl": "pkg:pypi/jsonschema",
+      "type": "library"
+    },
+    {
+      "bom-ref": "pkg:pypi/mcp@1.25.0",
+      "name": "mcp",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "requirements-mcp.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "requirements-mcp.txt: mcp==1.25.0"
+        }
+      ],
+      "purl": "pkg:pypi/mcp@1.25.0",
+      "type": "library",
+      "version": "1.25.0"
+    },
+    {
+      "bom-ref": "pkg:pypi/oci",
+      "name": "oci",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "requirements.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "requirements.txt: oci>=2.130.0"
+        }
+      ],
+      "purl": "pkg:pypi/oci",
+      "type": "library"
+    },
+    {
+      "bom-ref": "pkg:pypi/oci@2.160.3",
+      "name": "oci",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "stack/modules/splunk_evidence_exporter/function/requirements.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "stack/modules/splunk_evidence_exporter/function/requirements.txt: oci==2.160.3"
+        }
+      ],
+      "purl": "pkg:pypi/oci@2.160.3",
+      "type": "library",
+      "version": "2.160.3"
+    },
+    {
+      "bom-ref": "pkg:pypi/pytest",
+      "name": "pytest",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "requirements-dev.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "requirements-dev.txt: pytest>=8.3"
+        },
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "requirements-hunting-test.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "requirements-hunting-test.txt: pytest>=8.0,<10"
+        }
+      ],
+      "purl": "pkg:pypi/pytest",
+      "type": "library"
+    },
+    {
+      "bom-ref": "pkg:pypi/python-dotenv",
+      "name": "python-dotenv",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "requirements.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "requirements.txt: python-dotenv>=1.0.0"
+        }
+      ],
+      "purl": "pkg:pypi/python-dotenv",
+      "type": "library"
+    },
+    {
+      "bom-ref": "pkg:pypi/pyyaml",
+      "name": "pyyaml",
+      "properties": [
+        {
+          "name": "oci-log-analytics-detections:source",
+          "value": "requirements.txt"
+        },
+        {
+          "name": "oci-log-analytics-detections:requirement",
+          "value": "requirements.txt: PyYAML>=6.0"
+        }
+      ],
+      "purl": "pkg:pypi/pyyaml",
+      "type": "library"
+    }
+  ],
+  "compositions": [
+    {
+      "aggregate": "incomplete",
+      "assemblies": [
+        "oci-log-analytics-detections"
+      ]
+    }
+  ],
+  "metadata": {
+    "component": {
+      "bom-ref": "oci-log-analytics-detections",
+      "description": "Repository dependency inventory from Python requirements and the webapp pnpm lockfile. Python transitives, infrastructure, and built images are outside this inventory.",
+      "name": "oci-log-analytics-detections",
+      "type": "application"
+    },
+    "properties": [
+      {
+        "name": "oci-log-analytics-detections:sha256:requirements-dev.txt",
+        "value": "1a9ae90b6bdeeba48818ba78e97d3fdc29bee7381f517ea654d5fdc0b6928d6e"
+      },
+      {
+        "name": "oci-log-analytics-detections:sha256:requirements-hunting-test.txt",
+        "value": "5267831375ee9215f4a267b35d07ef05f0ad2a01dee3e28676e49e8f51840379"
+      },
+      {
+        "name": "oci-log-analytics-detections:sha256:requirements-mcp.txt",
+        "value": "285b92898ac75730a6eda445d28a8a9fec45f3c16c14c435ebbef335163ea08b"
+      },
+      {
+        "name": "oci-log-analytics-detections:sha256:requirements.txt",
+        "value": "e094400a33d79f978ae92f658b70d122cc90db554209f18fef60e25cc13dcfb0"
+      },
+      {
+        "name": "oci-log-analytics-detections:sha256:stack/modules/splunk_evidence_exporter/function/requirements.txt",
+        "value": "fbf4e7a227fa12eff57a79bebacf3dbdbf638d65a37dc1be3c2f2d12b34ece08"
+      },
+      {
+        "name": "oci-log-analytics-detections:sha256:webapp/pnpm-lock.yaml",
+        "value": "fa4a6abf55b22fd72f7e7625baa3efbc5aa350f0d39b379a58719c5db35513f6"
+      }
+    ]
+  },
+  "specVersion": "1.6",
+  "version": 1
+}

@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0.0",
-  "generated_at": "2026-10-21T05:35:07.939332+00:00",
+  "generated_at": "2026-11-20T10:53:49.061986+00:00",
   "generator": "scripts/generate_hunting_bundle.py",
   "input_digests": {
     "config/hunting_packs.json": "65a945bf5d145fecd8b457d7b562ac2573f7d79d2965ce4cca0b222bb8faff3a",
     "config/hunting_reference_candidates.json": "c6c66f7629f11b838aa77801e66dbd562827fceea16b5c403792469ec96608fa",
     "config/threat_intel_sources.json": "f8b35717dd4efd0e4c60f0ee0dbd3eec92d2282e856cc32dc9a620c2643a6780",
-    "queries/catalog.json": "013bbacdb847e97c8c2df309b4d2183b0ebdb2e99797b99dd8c59fd2b7aaac22",
+    "queries/catalog.json": "cf824fbdf10fb4c6d39bac642c492478b5c78ea40ebd7202d96db312556fd519",
     "queries/log_source_field_dictionary.json": "a7841432d63927a53b303ca275ab8d3dfa7a625fbedb4a25b498401611494fbb",
-    "queries/dashboard_inventory.json": "76cbdbcc4e035147880a6c02d6eae242f17a23808882491eee9388289c59978a",
+    "queries/dashboard_inventory.json": "a72e86347fd075599276af6f4450831c4a89288d91902a9ca62bb253ea2ff91d",
     "schemas/hunting_integration_bundle.schema.json": "2f5fa25ef92139a49e2e50b62e86f241eea916380442014cd5c7a0e6ec603ad6",
     "scripts/hunting_bundle.py": "c91e6a7cde483e238468c5e71c86e79b2dab9d1ece129dde1e6c36a43824c539",
     "scripts/field_dictionary.py": "3dbabbe89e140b3a38fddae924ff13e1a595ddf34d742193172ecb7d7430f793",
@@ -20,7 +20,7 @@
     "queries/hunting/ac_hunter_04_client_signatures_ja3_user_agent.json": "7dc439ccac9be91a582f76579e2f3884dae20532561fc2d97cf0ed925d269b58",
     "queries/hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json": "5afddfd503f4ce8ff6db10de58598ed9b2e63ab1c7d0b70aa1177b1af5ab117f",
     "queries/hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json": "85619ed433218a0aab617e1150bf7d1307ab7d9e47e0a676106610e89052797a",
-    "queries/hunting/ac_hunter_07_threat_intel_safelist_correlation.json": "7fb76b607b3a577bbe3fe602aceb0f6fae3c5d7607e793e23c0c9c8aa2694125",
+    "queries/hunting/ac_hunter_07_threat_intel_safelist_correlation.json": "d1d25f52f44d8c97aaa0bc28981341452dec7b26a3ee6d9e47ff4c4efa7c5aff",
     "queries/hunting/ac_hunter_08_multicloud_cross_csp_correlation.json": "db0ae1fcec3a1b7b52f4938941ae7a340fcc8c9fe0d850ee29f5d2d62dc18ff1",
     "queries/hunting/ad_attack_timeline.json": "fc8b6d9a9aefe06b77c1b8179ecfcc330fed11710666475545bd6bea27d57803",
     "queries/hunting/bluelight_apt37_kill_chain.json": "581d0d7bab03ff9a9ccb792d3909e5836e386a3619e5b2b9c839d3ccf483d741",
@@ -47,14 +47,14 @@
     "queries/hunting/cloud_identity_control_plane_takeover.json": "571744bf3872e15da72abae0bf28f38ede1d4bb0348fed92c7d048b040285993",
     "queries/hunting/cloud_secret_and_object_collection.json": "25a765417049d4a92408efd345d53dfe022febb0380351db94a1efed5940d8b4",
     "queries/hunting/compromised_machines_and_data_2025_2026.json": "d564a467654f3402e250dcd9ee65c601f522aef71580cfe2a6863bd85de5e8ac",
-    "queries/hunting/coordinator_affected_hosts_kpi.json": "6af66d69974a1f0b1fe27b79517e0cd097691f14d632a726b75df9c145edd8c1",
-    "queries/hunting/coordinator_attack_timeline.json": "cbfae9d54ca002333006d9a8774956a9a9b9f6fd19b3a69bf3a6805b43c0e7af",
-    "queries/hunting/coordinator_critical_alerts_kpi.json": "6f7a8810d4c5d31c8f571db2e051f58f5ca54d63cba783e91d559593ae9eb881",
-    "queries/hunting/coordinator_mitre_sunburst.json": "305c937d0bcfc8e186a5d9bc6d1b3be690cf5b9b164f9d4caa2aded6886e326f",
-    "queries/hunting/coordinator_mitre_techniques_kpi.json": "6ecfdad76920477f95863824cfd13eaae81e37d01ab544d725222290a33daa4d",
-    "queries/hunting/coordinator_scenario_breakdown.json": "3188d2fa2cdd078dbe26e4d72aef3e4d0d4e158556600842b801839ac62655d9",
-    "queries/hunting/coordinator_top_affected_hosts.json": "fa5a93ffff4c4caccb19d3ce5c6f7599791f8cd649d9e71fd409900b620b85d8",
-    "queries/hunting/coordinator_total_hits_kpi.json": "e5425d6d6e680d8926125ec58e28268be701535e090ca02ddd1124bed9ea4648",
+    "queries/hunting/coordinator_affected_hosts_kpi.json": "2b4cbb388867186768cbce107e542bd750c27b4fa8178542525a12a5e88caee3",
+    "queries/hunting/coordinator_attack_timeline.json": "774d06de423960c20c744dbf08df16a5b7719635ab94ca26935694f01d22bc23",
+    "queries/hunting/coordinator_critical_alerts_kpi.json": "918bacfd54dcf29bdbac7485840f958b08da1bb162a30b5602e6a65322aa2bcf",
+    "queries/hunting/coordinator_mitre_sunburst.json": "1b4d851b17d1319861d67a2b79807c4324ec743df3f568e054795a852aefd032",
+    "queries/hunting/coordinator_mitre_techniques_kpi.json": "ec01ae211b640095a2ae45ba193bd790dcf9083ac4908113902266237fa16a96",
+    "queries/hunting/coordinator_scenario_breakdown.json": "aadc7b030c3debe08247cd302dc10c4767c86ae55279aad4c103495733da393f",
+    "queries/hunting/coordinator_top_affected_hosts.json": "c236c0375358526da0c9a58323c211bc82d1d3897dec41de12fefd47ca442bf2",
+    "queries/hunting/coordinator_total_hits_kpi.json": "54220ceca2f2194943a089083f2e241f42e22b3a377c4963878031686c707bf6",
     "queries/hunting/crashfix_python_rat_activity.json": "53672182ea0457e2bd97a2ed43e1d5fdf5b8d3539feaf2e37080ce8bf4a9e2a3",
     "queries/hunting/credential_attack_correlation.json": "60ed2ec7bf010694eb8fec2f36419e4517aaf19cac165ee65e35fe620ff11e4a",
     "queries/hunting/demo_attack_timeline.json": "04f214703b3d259a1e49022025b11c6da26b841706e6784fa5b0aa11b1136dd6",
@@ -71,7 +71,7 @@
     "queries/hunting/flf_port_knocking_sequence.json": "f42ffbb3ca384cb862ca986c58ed102d94784305b335d30caa00b2e720f1e557",
     "queries/hunting/flf_vsagent_http_beaconing.json": "a85ea1997def3312195df89c13316a8b235fd577ced12dfa2e86d702ba5fba37",
     "queries/hunting/goad_caldera_attack_chain.json": "ec49177d0d63ca05f5db3ae93305f9d9222193d600a25f453c0179c0ac98eda3",
-    "queries/hunting/goad_caldera_sandcat_activity.json": "eeb7b5b5ab0c8b28dc4703b2450c02a0c995f5d45be37637bf7744ca97a721ba",
+    "queries/hunting/goad_caldera_sandcat_activity.json": "24e89a6f723ed322cabd370ee50388220cd30ccebb1ca7879f4dd343a94df723",
     "queries/hunting/kerberoasting_anomaly_detection.json": "2c07f1faed9f33a73db06af71ad26607d843e16c1dd7d90d07c0f302e7c2441c",
     "queries/hunting/linux_data_staging_exfil.json": "52ddd6f6b411e16abcf54dd205c08414cf10205ad8f5861f2db1e3145b43f464",
     "queries/hunting/linux_multi_stage_attack.json": "f23d70a8d97f297a170b9d3041066673a8aa1817b1d80a81039c4bd84f584a16",
@@ -121,11 +121,11 @@
     "queries/hunting/sharepoint_toolshell_webshell_post_exploit.json": "a60f5584eee31323e1b75e2732330dd503d0deb207e722ffe87aafe2d7084bdf",
     "queries/hunting/ssh_brute_force_frequency.json": "2609e19a3c1243cf3a23f10310906bbbf6f1fcf9b1d0c414926cb2cd22e726e9",
     "queries/hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json": "cbec56fe482a6c1687da87f8f122ee01cb12e9b37c68458ffe982a55ddeb92e0",
-    "queries/hunting/storyline_day2_oke_pod_breakout_imdsv2_harvest.json": "64439d1eac7f8ecfedfc499a746ac208b6780b63716498d554a835c9ab7f3b29",
-    "queries/hunting/storyline_day3_caldera_sandcat_goad_ad_discovery.json": "e3be7e7958c3628c442323af333880fcd0dc2dcfc85bd57db671783d2754f455",
+    "queries/hunting/storyline_day2_oke_pod_breakout_imdsv2_harvest.json": "43ac80ecf01259582cd4c9783476570ec321844b9bbd35b5dd599e67330af065",
+    "queries/hunting/storyline_day3_caldera_sandcat_goad_ad_discovery.json": "e10a66161c8ca2ab48cd503bebaa36ef05ce8c9ed2ecb713a37216909594ba5f",
     "queries/hunting/storyline_day4_lotl_rmm_kerberoasting_lateral.json": "7d269f38cf339a7be63826f5a1f59552debf963834e237c62000544b25e245e6",
     "queries/hunting/storyline_day5_dcsync_persistence_iam_drift.json": "0e34ec71c552ceafe28df1438aeaa5e1d6141a93d26c1350d825bcba0dbd4bd6",
-    "queries/hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json": "78a1a479d9ed18451ecf8d6a240f742a38164fde0b9f2c61047ed564f76d19cd",
+    "queries/hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json": "e42c70e31384887bb68a661c17d42d36059a7a6b2fcbd6d3f359db78881ed974",
     "queries/hunting/storyline_day7_dns_c2_exfil_melts_correlation.json": "881f2ff4ff735131da64abeb523f80955a13b402c7f436424cc2761e4c5ec38f",
     "queries/hunting/timeseries_login_anomaly.json": "9201ad874fde9ccf75e6771e433d7f80418fc1afbfdeaa7f6b4a061edc12217d",
     "queries/hunting/waf_attack_frequency_by_source.json": "8394a16821543ebe0732782322009d7b5fba621202cc1fdff2e7490d3399571e",
@@ -165,7 +165,7 @@
     "queries/hunting/web_to_cloud_cloud_abuse.json": "4621a876cd6c39d08ec80b04a25cb8fcfa6bb79d99aea0bca7fc6f32b89233f1",
     "queries/hunting/web_to_cloud_compromised_identity.json": "9ceaac6bb1eca3178652e468c656da8b0ffc3472781fa89a854ff500aa85bc9d",
     "queries/hunting/web_to_cloud_compromised_machines.json": "61d4a382e72f65560666ed9d555d604e4fe7527c924a68e1a2d1d0a499425adf",
-    "queries/hunting/web_to_cloud_entry_point.json": "604c2a007549272a238b70dd3c1f66421373f291e13843ce0630dcffbe71fcee",
+    "queries/hunting/web_to_cloud_entry_point.json": "007511566765a124cea7ce59527bb088b394cd1bcd76389d13d396fb3495d28c",
     "queries/hunting/web_to_cloud_exfiltration.json": "dc5929169927447d54c88153b331f685d8fc400b066f54ad8991cfcf89363c2e",
     "queries/hunting/web_to_cloud_firewall_c2.json": "95f6450f7bf67fd37dd8db13b2069f63ba3422d30e53ed0e70b4767511a6a147",
     "queries/hunting/web_to_cloud_mitre_sunburst.json": "ae8f60779bcd9581dd4e13240dbe5ef2addd311751eb87e3ca59a8e3d9aafa0f",
@@ -641,7 +641,7 @@
       "title": "AC-Hunter 07: Threat Intelligence IOC Hit & Safelist Filtering",
       "description": "Replicates AC-Hunter Threat Intelligence correlation against hostile C2 IPs/ASNs (198.51.100.214, 198.41.200.113, 192.0.2.119, 203.0.113.88) while applying safelist exclusion for known-good cloud infrastructure endpoints.",
       "query": "('Log Source' = 'SOC VCN Flow Logs' or 'Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Application Logs') and ('Destination IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Client IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88') or 'Source IP' in ('198.51.100.214', '198.41.200.113', '192.0.2.119', '203.0.113.88')) and not ('Destination IP' in ('192.0.2.40')) | stats count as ti_correlated_events, distinctcount('Log Source') as matched_sources by 'Log Source', 'Client IP', 'Status' | where ti_correlated_events >= 1 | sort -ti_correlated_events",
-      "query_sha256": "9045363ca32a955375d1e263fa07bc28d76c9811cb2201cfbc955986e5bf1b39",
+      "query_sha256": "58dbc7442c647472a790a0256a3ab0f92961d019b152e7f4780f471307f88b70",
       "severity": "critical",
       "mitre_attack": {
         "tactics": [
@@ -2348,7 +2348,7 @@
       "title": "Coordinator Scenarios: Affected Hosts (l7d)",
       "description": "Distinct host count across all 15 oci-coordinator hunt scenarios. Surfaces blast radius — how many unique hosts triggered at least one critical-severity scenario over the last 7 days.",
       "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*192.0.2.40*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats distinctcount('Host Name') as AffectedHosts",
-      "query_sha256": "3d7e3dc20d01d802670a3cc5b9845804832ec9f90875e8b5c4aba3890afd728d",
+      "query_sha256": "7ec00937b2091416896249e4c13748f51f24a83d7f6a8116703243b47746161f",
       "severity": "high",
       "mitre_attack": {},
       "tags": [
@@ -2387,7 +2387,7 @@
       "title": "Coordinator Scenarios: Attack Timeline (l7d)",
       "description": "Histogram of scenario hits per hour across the last 7 days. Spot bursts of activity and pivot timing between scenarios.",
       "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*192.0.2.40*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | timestats span = 1h count as Hits",
-      "query_sha256": "ed2a689a0fde0116a315cb5bb6bd3d33175503f6f9c785b743c342fd13da6fdd",
+      "query_sha256": "40e77a745f096f69f74e5ef3dcfb0597be56a38f81f9e4c5fabc27bf34775fcc",
       "severity": "high",
       "mitre_attack": {},
       "tags": [
@@ -2430,7 +2430,7 @@
       "title": "Coordinator Scenarios: Critical Alerts (l7d)",
       "description": "Tile count of CAT I / critical hunt scenarios observed. All 15 scenarios in the oci-coordinator showcase carry critical severity, so this equals the total scenario hits.",
       "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*192.0.2.40*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as CriticalAlerts",
-      "query_sha256": "5f0452935dc89a0bd3a1e05c24b3610c164a8b47ed42fb0b06bef72514c32ce6",
+      "query_sha256": "bb4620227f4c46c286822aed847530e940c36db4533a38d71edda80f7fa3ca31",
       "severity": "critical",
       "mitre_attack": {},
       "tags": [
@@ -2468,7 +2468,7 @@
       "title": "Coordinator Scenarios: Log Source → Process (l7d)",
       "description": "Sunburst rollup of scenario hits grouped by Log Source then Process Name. Compact attacker-toolchain view without eval/case (parser-native fields only) — useful for spotting which process families drive each log-source's noise.",
       "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*192.0.2.40*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as Events by 'Log Source', 'Process Name' | sort -Events",
-      "query_sha256": "ae751eb0d557c77b97290909728101a2bbfc451795f63c293703e3926f5af178",
+      "query_sha256": "28fbc3393da8ec6baf4732f2db8bdd88cc22497bd7b58bad7811b089488f134e",
       "severity": "high",
       "mitre_attack": {},
       "tags": [
@@ -2507,7 +2507,7 @@
       "title": "Coordinator Scenarios: Distinct Processes Observed (l7d)",
       "description": "Distinct count of process names observed across the 15 oci-coordinator hunting scenarios. Higher cardinality signals broader attacker toolchain breadth across the kill-chain.",
       "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*192.0.2.40*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats distinctcount('Process Name') as DistinctProcesses",
-      "query_sha256": "6cef4f60be67ee92f9afae9f6af33b4cb3ba19f43fe303fde5d90b012c4f0f17",
+      "query_sha256": "1de63c96cf12dd8ddfdd75239809cf6136acf22951b3696d7c1baeb38ef20892",
       "severity": "high",
       "mitre_attack": {},
       "tags": [
@@ -2546,7 +2546,7 @@
       "title": "Coordinator Scenarios: Log Source Breakdown (l7d)",
       "description": "Bar chart of scenario hits grouped by Log Source. Identifies which telemetry stream (Linux audit, APM, Web, OCI Audit) is generating the most threat-hunt noise so analysts pivot to the right log first.",
       "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*192.0.2.40*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as Hits by 'Log Source' | sort -Hits",
-      "query_sha256": "e954aa11e30efda6bd6328ab624fe4eea8f6d68c9667757c0c0c87f75d0c9333",
+      "query_sha256": "542878e9f91ba76649a6ac444fea38786fd6b1c64c9fd41ef54aa18dc49b5ada",
       "severity": "high",
       "mitre_attack": {},
       "tags": [
@@ -2584,7 +2584,7 @@
       "title": "Coordinator Scenarios: Top Affected Hosts (l7d)",
       "description": "Horizontal bar chart of hosts ranked by number of scenario hits across the 15 oci-coordinator hunts. Spot stations under sustained attack or pivot points.",
       "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*192.0.2.40*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as Hits by 'Host Name' | sort -Hits | head 15",
-      "query_sha256": "159258475952c18ded1356e6ff562b55fab9b9dd54dba2ee7dba6f2fd74528ad",
+      "query_sha256": "e0b6b3af9e1305143371a32cc67e8021f569d7d07c6e4868b4fb94d4e8d6808a",
       "severity": "high",
       "mitre_attack": {},
       "tags": [
@@ -2623,7 +2623,7 @@
       "title": "Coordinator Scenarios: Total Hits (l7d)",
       "description": "Total number of events matching any of the 15 oci-coordinator hunting scenarios over the last 7 days. Combines Linux audit/syslog, OCI Audit, APM application, and web/WAF sources.",
       "query": "'Log Source' = 'SOC Linux Syslog Logs' and (msg like '*nc -lvp*' or msg like '*ncat -lvp*' or msg like '*socat TCP-LISTEN*' or msg like '*boopkit*' or msg like '*bpftool prog load*' or msg like '*/sys/fs/bpf/*' or msg like '*nsenter -t 1*' or msg like '*release_agent*' or msg like '*insmod /tmp/*' or msg like '*insmod /dev/shm/*' or msg like '*>> /etc/passwd*' or msg like '*> /etc/shadow*' or msg like '*/dev/shm/*' or msg like '*/dev/tcp/*' or msg like '*bash -i >&*' or msg like '*/var/www/html/*' or msg like '*192.0.2.40*' or msg like '*ppid=python*' or msg like '*ppid=node*' or msg like '*ppid=java*' or msg like '*ppid=php*' or msg like '*cat /etc/shadow*') | stats count as TotalHits",
-      "query_sha256": "ff3f3875c49a2d5f49558ae8a8cce2b7cce2d5162724011a815ff99947b53dc3",
+      "query_sha256": "65682198fa612b0270dbaa97d696dd4e180d0e44ce78d7b97dfbaf159781bb7f",
       "severity": "critical",
       "mitre_attack": {},
       "tags": [
@@ -6367,7 +6367,7 @@
       "title": "Storyline Day 2: OKE Pod Breakout & IMDSv2 Credential Harvesting",
       "description": "Detects Day 2 of the 7-day multi-pillar adversary storyline: a compromised OKE application pod executing curl against the OCI Instance Metadata Service (192.0.2.40/opc/v2/instance/) and enumerating Kubernetes service account tokens.",
       "query": "('Log Source' = 'SOC Linux Syslog Logs' or 'Log Source' = 'SOC Application Logs') and ('Command Line' like '*192.0.2.40/opc/v2/instance/*' or 'Process Command Line' like '*192.0.2.40/opc/v2/instance/*' or msg like '*serviceaccount/token*') | stats count as breakout_hits, distinctcount('Process Name') as processes by 'Host Name', 'Process Name' | sort -breakout_hits",
-      "query_sha256": "6583af207dcfd2219d2c0f029f3ecaf44606e5572bfc2739d14d55ff2dbdc7ea",
+      "query_sha256": "f2769fa8e05678dae632496c0b94ff0f1b0df45c096a6ae62a752af926398a9c",
       "severity": "critical",
       "mitre_attack": {
         "tactics": [
@@ -6637,7 +6637,7 @@
       "title": "Storyline Day 6: Oracle Data Safe & Autonomous Database Sensitive SQL Extraction",
       "description": "Detects Day 6 of the 7-day multi-pillar adversary storyline: unauthorized SQL schema enumeration (all_tab_columns) and bulk sensitive PII extraction (CRM_CORE.CUSTOMER_PII) against Autonomous Databases guardian-standalone-adb and demo-observeai-adb.",
       "query": "'Log Source' = 'SOC Application Logs' and ('DB Target' in ('guardian-standalone-adb', 'demo-observeai-adb') or 'DB Statement' like '*CUSTOMER_PII*' or 'DB Statement' like '*all_tab_columns*') | stats count as db_audit_hits, distinctcount('DB Target') as targeted_databases by 'DB Target', User, 'Attack Stage' | sort -db_audit_hits",
-      "query_sha256": "3170bee7eeb41aa7bc23161a3e862c50946101c15fc79a02cae6d1ab0cc9182d",
+      "query_sha256": "0e68f71c380eed5b99a4a69d2defd34bb3b1f6d654875f7d30b5b725ff64f96a",
       "severity": "critical",
       "mitre_attack": {
         "tactics": [
@@ -8554,7 +8554,7 @@
       "title": "Web-to-Cloud: Entry Point and SSRF Evidence",
       "description": "Identifies the initial web request that reached the application tier and attempted access to the cloud instance metadata endpoint. Use the Request URL, Client IP, backend host, and Trace ID to start the investigation.",
       "query": "('Log Source' = 'SOC WAF Security Logs' or 'Log Source' = 'SOC Load Balancer Access Logs' or 'Log Source' = 'SOC Web Application Logs' or 'Log Source' = 'SOC Application Logs') and ('Trace ID' = 'trace_w2c_entry_001' or 'Client IP' = '203.0.113.50' or 'Request URL' like '*192.0.2.40*') | stats count as Events, unique('Action') as Actions, unique('Response Code') as ResponseCodes, unique('Request URL') as Requests by 'Client IP', 'Trace ID', 'Log Source', 'Host Name' | sort -Events",
-      "query_sha256": "daf72c933b7c8a5c4baccc0ffb52cceaab2eb2121dde08f6cd955c7c7bc3cc15",
+      "query_sha256": "ab1b9b334d0762b8076a344605accfc7d7df4d70ef89093067b0745f03121e3d",
       "severity": "critical",
       "mitre_attack": {
         "tactics": [
@@ -9642,5 +9642,5 @@
       "guidance": {}
     }
   ],
-  "content_digest": "919086fd396e1e6be0f3078869fe39822f0c93f397ba28220af33a7860afdded"
+  "content_digest": "9c0051f9aeed050147f920f1b7e8de04ede19d7aa3b063b736f16679b439f2df"
 }

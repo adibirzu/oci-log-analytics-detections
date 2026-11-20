@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 
 VERSION = "forge.parser-contract.v1"
-LEGACY_MANIFEST_SHA256 = "5c6a010fdef63879c0bfb3e87cc947296f43f38eb947594bfed66243886e6a26"
+LEGACY_MANIFEST_SHA256 = "95c648fe5df131c2b9f2752b1ba2a26ce2f905d3f2f08d40c2ebad099baccdc1"
 TOP = {"version", "generated_at", "summary", "validation", "approved_builtins", "reserved_for_custom_parsers", "source_candidate_groups", "parsers", "sources", "fields"}
 FIELD = {"display_name", "kind", "type", "raw_json_paths", "parsers", "sources", "source_candidate_groups", "example_values", "contract_datasets", "queries_using_it", "dashboards_using_it", "reserved_backing_field"}
 PARSER = {"parser_name", "parser_display", "source_internal", "source_display", "field_count"}

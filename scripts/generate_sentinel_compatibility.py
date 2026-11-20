@@ -19,6 +19,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 HISTORICAL = "94809dcb20b872728785458c88aad794869da7f6"
 REVIEWED = "f44ee1be0b16a0caa9f79f14b7c615f8f10c30bd"
+SANITIZED_REPORT = "8f2b56f3dd878bea3af070546c2778ac9cc07a87"
 OUTPUT = ROOT / "config/sentinel_legacy_compatibility_v1.json"
 DICTIONARY = "queries/log_source_field_dictionary.json"
 REPORT = "queries/sentinel_conversion_report.json"
@@ -71,6 +72,35 @@ def raw_schema(dictionary):
     return contract_hash({k: v for k, v in dictionary.items() if k != "generated_at"})
 
 
+def verify_sanitized_report(historical, sanitized):
+    """Allow only the pinned change to a skipped conversion diagnostic."""
+    old_features = historical["unsupported_features"]
+    new_features = sanitized["unsupported_features"]
+    removed = old_features.keys() - new_features.keys()
+    added = new_features.keys() - old_features.keys()
+    if len(removed) != 1 or len(added) != 1:
+        raise ContractError("Unexpected sanitized report diagnostics")
+    old_reason = removed.pop()
+    new_reason = added.pop()
+    if old_features[old_reason] != 1 or not all(
+        reason.startswith("unsupported predicate expression: not(ipv4_is_match(")
+        for reason in (old_reason, new_reason)
+    ):
+        raise ContractError("Unexpected sanitized report diagnostic")
+    old_features[new_reason] = old_features.pop(old_reason)
+    skipped = [
+        row for row in historical["attempted"]
+        if not row.get("output_file") and row.get("live_validation_status") == "not_run"
+        and old_reason in row.get("skip_reasons", [])
+    ]
+    if len(skipped) != 1:
+        raise ContractError("Unexpected sanitized report row")
+    reasons = skipped[0]["skip_reasons"]
+    reasons[reasons.index(old_reason)] = new_reason
+    if historical != sanitized:
+        raise ContractError("Sanitized report differs outside the skipped diagnostic")
+
+
 def generate(root=ROOT):
     old_raw = git(root, "show", f"{HISTORICAL}:{DICTIONARY}")
     new_raw = git(root, "show", f"{REVIEWED}:{DICTIONARY}")
@@ -81,7 +111,9 @@ def generate(root=ROOT):
     old_dictionary, new_dictionary = json.loads(old_raw), json.loads(new_raw)
     old_contract, new_contract = parser_contract(old_dictionary), parser_contract(new_dictionary)
     require_additive(old_contract, new_contract)
-    report = json.loads(report_raw)
+    sanitized_raw = git(root, "show", f"{SANITIZED_REPORT}:{REPORT}")
+    report = json.loads(sanitized_raw)
+    verify_sanitized_report(json.loads(report_raw), report)
     rows = [row for row in report["attempted"] if row.get("output_file")]
     by_output = {row["output_file"]: row for row in rows}
     before, after = corpus(root, HISTORICAL), corpus(root, REVIEWED)
@@ -106,7 +138,7 @@ def generate(root=ROOT):
         bindings.append({"output_file": output, "historical_blob": old_blobs[path], "reviewed_blob": new_blobs[path], "reviewed_file_sha256": hashlib.sha256(after[path]).hexdigest(), "query_sha256": hashlib.sha256(current["query"].encode()).hexdigest(), "identity_sha256": identity_hash(current), "historical_report_row_sha256": contract_hash(row)})
     if len(observed) != 1 or not all(isinstance(v, str) and len(v) == 64 for v in observed):
         raise ContractError("Unclassified legacy hash")
-    return {"schema_version": "forge.sentinel-legacy-compatibility.v1", "evidence_class": "code-backed-local-source-binding", "provider_revalidated": False, "historical_commit": HISTORICAL, "reviewed_commit": REVIEWED, "historical_report_blob": git(root, "rev-parse", f"{HISTORICAL}:{REPORT}").decode().strip(), "historical_dictionary_blob": git(root, "rev-parse", f"{HISTORICAL}:{DICTIONARY}").decode().strip(), "historical_raw_schema_sha256": old_hash, "observed_legacy_raw_schema_sha256": observed.pop(), "legacy_raw_hash_status": "unresolved_preserved", "historical_parser_contract": old_contract, "reviewed_parser_contract_sha256": contract_hash(new_contract), "reviewed_report_sha256": hashlib.sha256(current_report).hexdigest(), "bindings": bindings}
+    return {"schema_version": "forge.sentinel-legacy-compatibility.v1", "evidence_class": "code-backed-local-source-binding", "provider_revalidated": False, "historical_commit": HISTORICAL, "reviewed_commit": REVIEWED, "historical_report_blob": git(root, "rev-parse", f"{HISTORICAL}:{REPORT}").decode().strip(), "historical_dictionary_blob": git(root, "rev-parse", f"{HISTORICAL}:{DICTIONARY}").decode().strip(), "historical_raw_schema_sha256": old_hash, "observed_legacy_raw_schema_sha256": observed.pop(), "legacy_raw_hash_status": "unresolved_preserved", "historical_parser_contract": old_contract, "reviewed_parser_contract_sha256": contract_hash(new_contract), "sanitized_report_commit": SANITIZED_REPORT, "reviewed_report_sha256": hashlib.sha256(sanitized_raw).hexdigest(), "bindings": bindings}
 
 
 def encoded(manifest):

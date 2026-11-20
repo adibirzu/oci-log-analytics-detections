@@ -47,7 +47,7 @@
     "scripts/fixtures/splunk_evidence/query_rows.json": "bc881adbb94ce583015466c6a178361449eefcc06537478e0843e22e0381377c",
     "scripts/generate_splunk_detection_registry.py": "9b30ba5a98d5bf0fc04f55fb0d7641fdcac2f0f6764b3c8878b613fbdb516411",
     "scripts/release_checklist.py": "4e90c9f9ba50e25ff4319f33f87acccaf6ac0f5f56b060ae417e691655c26cf5",
-    "scripts/scan_sensitive_values.py": "8b4347ed67798bab395880c1474f7a06568729dcc70675a295f7d518398d02af",
+    "scripts/scan_sensitive_values.py": "ae8cfc2ec1951bbeaec0922ae1d4873c51cda8d2ee7df3436d1fc357ef9d4fb9",
     "scripts/sitecustomize.py": "edd37132889310d7808c7ec416a58e574c47c03f5544c3e3b8107cc61e1ea4fb",
     "scripts/splunk_evidence_exporter/__init__.py": "1f366c60e2c85e89b01f48f2f04ada30e1f7120440eb55989b909dea7380d82d",
     "scripts/splunk_evidence_exporter/adapter_utils.py": "30ca87e7beb0f708ca6ae7e684a1c60f03c647bb4041069a83ce4831e94220ba",
@@ -69,7 +69,7 @@
     "scripts/splunk_exporter_domain_cases.py": "30683aa437344eee0b3b41693f56e35a7d7f2fe2c032238f07063ec7d2a6d75d",
     "scripts/splunk_exporter_handler_cases.py": "3d0c464eb86af7b637a0d3c14664ca1bad6e867d377513c283988d70ed8ea851",
     "scripts/splunk_exporter_service_cases.py": "e2936ba39b1dcb849ddc8dc580f63d295736bdacaa2068a421b5fe959305fd9a",
-    "scripts/test_check_inventory_drift.py": "64a06d1dccc719dbb4aec7cd6eadb2350c62d3ccc6e63d3f1d2c9cf541561590",
+    "scripts/test_check_inventory_drift.py": "f9e6891f06b003e5613f397ad9de0f513c2f551a856136690c201ee7a8678a78",
     "scripts/test_splunk_detection_registry.py": "75812960e2844428b767144835e1e93c528c71c73dcf5df558b6d27b17f507ca",
     "scripts/test_splunk_diagrams.py": "91718eac646529e5efd1a6dce7d2598b45a4614427bdba3787aa896b10620839",
     "scripts/test_splunk_documentation.py": "750cfe258926ae0d2928808f46fa21ca05b0965e911cb642e9ae79af09e58689",
@@ -149,7 +149,7 @@
       "scripts/fixtures/splunk_evidence/query_rows.json": "bc881adbb94ce583015466c6a178361449eefcc06537478e0843e22e0381377c",
       "scripts/generate_splunk_detection_registry.py": "9b30ba5a98d5bf0fc04f55fb0d7641fdcac2f0f6764b3c8878b613fbdb516411",
       "scripts/release_checklist.py": "4e90c9f9ba50e25ff4319f33f87acccaf6ac0f5f56b060ae417e691655c26cf5",
-      "scripts/scan_sensitive_values.py": "8b4347ed67798bab395880c1474f7a06568729dcc70675a295f7d518398d02af",
+      "scripts/scan_sensitive_values.py": "ae8cfc2ec1951bbeaec0922ae1d4873c51cda8d2ee7df3436d1fc357ef9d4fb9",
       "scripts/sitecustomize.py": "edd37132889310d7808c7ec416a58e574c47c03f5544c3e3b8107cc61e1ea4fb",
       "scripts/splunk_evidence_exporter/__init__.py": "1f366c60e2c85e89b01f48f2f04ada30e1f7120440eb55989b909dea7380d82d",
       "scripts/splunk_evidence_exporter/adapter_utils.py": "30ca87e7beb0f708ca6ae7e684a1c60f03c647bb4041069a83ce4831e94220ba",
@@ -171,7 +171,7 @@
       "scripts/splunk_exporter_domain_cases.py": "30683aa437344eee0b3b41693f56e35a7d7f2fe2c032238f07063ec7d2a6d75d",
       "scripts/splunk_exporter_handler_cases.py": "3d0c464eb86af7b637a0d3c14664ca1bad6e867d377513c283988d70ed8ea851",
       "scripts/splunk_exporter_service_cases.py": "e2936ba39b1dcb849ddc8dc580f63d295736bdacaa2068a421b5fe959305fd9a",
-      "scripts/test_check_inventory_drift.py": "64a06d1dccc719dbb4aec7cd6eadb2350c62d3ccc6e63d3f1d2c9cf541561590",
+      "scripts/test_check_inventory_drift.py": "f9e6891f06b003e5613f397ad9de0f513c2f551a856136690c201ee7a8678a78",
       "scripts/test_splunk_detection_registry.py": "75812960e2844428b767144835e1e93c528c71c73dcf5df558b6d27b17f507ca",
       "scripts/test_splunk_diagrams.py": "91718eac646529e5efd1a6dce7d2598b45a4614427bdba3787aa896b10620839",
       "scripts/test_splunk_documentation.py": "750cfe258926ae0d2928808f46fa21ca05b0965e911cb642e9ae79af09e58689",
@@ -200,12 +200,12 @@
       "stack/streaming.tf": "51ff3d3829e9e2a9a20f991c006c7fd627bb6f17d2dfb13d22705e0dbdc85c6f",
       "stack/variables.tf": "fa4227c0b203f5461e0125634fd88380d601d73fcddb8a3fb5c5a8c850218a2f"
     },
-    "git_head_at_execution": "3a32ade7888386763ec2e9da06d8787ff290758c",
-    "git_head_tree_at_execution": "7c5784fd3ca8225935bb58da0ecabe4510cdc344",
+    "git_head_at_execution": "d0c1e05d58024612c6823cb212b7e3092e249f72",
+    "git_head_tree_at_execution": "3c03d67aa90d98f792d53926880d660ef9bc2b18",
     "missing": [],
     "tool_versions": {
       "git": "git version 2.54.0 (Apple Git-157)",
-      "python": "3.11.16"
+      "python": "3.11.15"
     },
     "working_tree_dirty": true
   },

@@ -17962,6 +17962,7 @@
   "provider_revalidated": false,
   "reviewed_commit": "f44ee1be0b16a0caa9f79f14b7c615f8f10c30bd",
   "reviewed_parser_contract_sha256": "5a4b7271162db7223d33e0833cd4ac0aac75b70430aa0def768bd7a21635cdd1",
-  "reviewed_report_sha256": "1e45e63de675a995f532476b0313b02b577da89650737caa1ec630f349a98ab2",
+  "reviewed_report_sha256": "ac5f48b9fc59f2e26da0a60036901bcbc30b046d805c28844c2f8e853481b16f",
+  "sanitized_report_commit": "8f2b56f3dd878bea3af070546c2778ac9cc07a87",
   "schema_version": "forge.sentinel-legacy-compatibility.v1"
 }

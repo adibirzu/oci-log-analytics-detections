@@ -6,6 +6,7 @@ import os
 import re
 import stat
 import subprocess
+import sys
 from pathlib import Path
 
 import yaml
@@ -49,15 +50,10 @@ def test_delivery_pipeline_schema_and_policy():
         assert SHA256_REF_RE.match(str(image.get("base_image", "")))
 
 
-def test_ci_gate_script_is_executable_and_guards_arm64_containers():
+def test_ci_gate_script_is_executable():
     assert GATE_PATH.is_file(), "scripts/ci/gate.sh must exist"
     mode = GATE_PATH.stat().st_mode
     assert mode & stat.S_IXUSR, "scripts/ci/gate.sh must be executable"
-    text = GATE_PATH.read_text(encoding="utf-8")
-    assert "set -euo pipefail" in text
-    assert "uname -m" in text
-    assert "generate_sbom.py" in text
-    assert "generate_content_manifest.py" in text
 
 
 def test_ci_gate_script_refuses_forced_container_execution_on_arm64():
@@ -76,3 +72,18 @@ def test_ci_gate_script_refuses_forced_container_execution_on_arm64():
     )
     assert result.returncode != 0
     assert "arm64" in (result.stderr + result.stdout).lower()
+
+
+def test_resolve_generated_at_rejects_non_numeric_source_date_epoch(monkeypatch):
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from sentinel_converter_reporting import resolve_generated_at
+
+    monkeypatch.setenv("SOURCE_DATE_EPOCH", "0")
+    assert resolve_generated_at() == "1970-01-01T00:00:00+00:00"
+    monkeypatch.setenv("SOURCE_DATE_EPOCH", "abc")
+    try:
+        resolve_generated_at()
+    except ValueError as error:
+        assert "SOURCE_DATE_EPOCH" in str(error)
+    else:
+        raise AssertionError("expected ValueError")

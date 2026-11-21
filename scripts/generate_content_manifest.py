@@ -150,6 +150,9 @@ def _collect_packs(root: Path) -> list[dict[str, Any]]:
                 continue
             raw = report_pack.read_bytes()
             payload = yaml.safe_load(raw.decode("utf-8")) or {}
+            if not isinstance(payload, dict):
+                msg = f"Expected YAML mapping in {report_pack.relative_to(root).as_posix()}"
+                raise TypeError(msg)
             title = str(payload.get("title") or payload.get("name") or report_pack.stem)
             query_path_set: set[str] = set()
             for section in ("hunts", "queries", "days"):

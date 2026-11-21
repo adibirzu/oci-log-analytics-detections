@@ -303,3 +303,20 @@ def test_checked_in_manifest_captures_tracked_threat_reports_and_dashboard_tiles
     assert ac_hunter["widget_count"] == 12
     assert len(ac_hunter["query_files"]) == 9
     assert manifest["summary"]["total_dashboard_widgets"] == 553
+
+
+def test_non_mapping_pack_yaml_fails_cleanly(tmp_path):
+    _seed_mini_repo(tmp_path)
+    (tmp_path / "packs").mkdir()
+    (tmp_path / "packs" / "bad.yaml").write_text("- a\n- b\n", encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, "-X", "utf8", str(tmp_path / "scripts" / "generate_content_manifest.py"), "--write", "--root", str(tmp_path)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=20,
+        check=False,
+    )
+    assert result.returncode != 0
+    assert "Traceback" not in result.stderr
+    assert "Content manifest generation failed" in result.stderr + result.stdout

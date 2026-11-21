@@ -100,7 +100,11 @@ def resolve_generated_at(generated_at: str | None = None) -> str:
         return str(generated_at).strip()
     epoch = os.environ.get("SOURCE_DATE_EPOCH", "").strip()
     if epoch:
-        return datetime.fromtimestamp(int(epoch), tz=timezone.utc).isoformat()
+        try:
+            return datetime.fromtimestamp(int(epoch), tz=timezone.utc).isoformat()
+        except (ValueError, OverflowError, OSError) as error:
+            msg = f"SOURCE_DATE_EPOCH must be an integer number of seconds, got {epoch!r}"
+            raise ValueError(msg) from error
     return datetime.now(timezone.utc).isoformat()
 
 

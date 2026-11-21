@@ -179,6 +179,70 @@ class TestSentinelConversionProvenance(unittest.TestCase):
                 tamper_code = main(["provenance", "--report", str(report_path), "--json"])
             self.assertEqual(tamper_code, 1)
 
+    def test_workflow_provenance_command_rejects_missing_and_contradictory_digests(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "report.json"
+            base_report = build_conversion_report(
+                candidates=[],
+                attempted=[],
+                results=[],
+                source={"name": "Microsoft Sentinel"},
+                validate_live=False,
+                generated_at="2026-06-01T00:00:00+00:00",
+            )
+            expected_hash = base_report["provenance_sha256"]
+
+            # Historical report with no embedded provenance fields still hashes, but fails verification
+            historical = {
+                k: v for k, v in base_report.items() if k not in {"provenance", "provenance_sha256"}
+            }
+            report_path.write_text(json.dumps(historical, indent=2) + "\n", encoding="utf-8")
+            stdout = StringIO()
+            with redirect_stdout(stdout):
+                missing_code = main(["provenance", "--report", str(report_path), "--json"])
+            self.assertEqual(missing_code, 1)
+            missing_payload = json.loads(stdout.getvalue())
+            self.assertEqual(missing_payload["provenance_sha256"], expected_hash)
+            self.assertIsNone(missing_payload["recorded_provenance_sha256"])
+            self.assertFalse(missing_payload["verified"])
+
+            # Empty recorded digest must also fail verification
+            empty_digest = {**historical, "provenance_sha256": ""}
+            report_path.write_text(json.dumps(empty_digest, indent=2) + "\n", encoding="utf-8")
+            stdout = StringIO()
+            with redirect_stdout(stdout):
+                empty_code = main(["provenance", "--report", str(report_path), "--json"])
+            self.assertEqual(empty_code, 1)
+            self.assertFalse(json.loads(stdout.getvalue())["verified"])
+
+            # Contradictory nested digest with matching top-level digest must fail
+            contradictory_nested = {
+                **base_report,
+                "provenance": {**base_report["provenance"], "provenance_sha256": "0" * 64},
+            }
+            report_path.write_text(
+                json.dumps(contradictory_nested, indent=2) + "\n", encoding="utf-8"
+            )
+            stdout = StringIO()
+            with redirect_stdout(stdout):
+                nested_mismatch_code = main(["provenance", "--report", str(report_path), "--json"])
+            self.assertEqual(nested_mismatch_code, 1)
+            self.assertFalse(json.loads(stdout.getvalue())["verified"])
+
+            # Contradictory top-level digest with matching nested digest must fail
+            contradictory_top = {
+                **base_report,
+                "provenance_sha256": "f" * 64,
+            }
+            report_path.write_text(
+                json.dumps(contradictory_top, indent=2) + "\n", encoding="utf-8"
+            )
+            stdout = StringIO()
+            with redirect_stdout(stdout):
+                top_mismatch_code = main(["provenance", "--report", str(report_path), "--json"])
+            self.assertEqual(top_mismatch_code, 1)
+            self.assertFalse(json.loads(stdout.getvalue())["verified"])
+
     def test_write_report_html_uses_report_generated_at_deterministically(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

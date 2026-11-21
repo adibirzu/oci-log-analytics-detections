@@ -1,12 +1,22 @@
 {
-  "content_digest": "b50a8be39d12ec1f64efe1472163da3194135e50d2067f2da751ddba2f9904e6",
+  "content_digest": "4057e506612a23a1333517322c31a44bdfb23192f5485a3aed3fe1142c1ecb4c",
   "dashboards": [
     {
       "name": "SOC: AC-Hunter Network Hunting & Multi-Cloud Log Analytics Dashboard",
-      "query_files": [],
+      "query_files": [
+        "hunting/ac_hunter_01_c2_beaconing_rita_score.json",
+        "hunting/ac_hunter_02_long_connections_duration.json",
+        "hunting/ac_hunter_03_dns_beaconing_fqdn_entropy.json",
+        "hunting/ac_hunter_04_client_signatures_ja3_user_agent.json",
+        "hunting/ac_hunter_05_strobe_port_scan_vcn_sweep.json",
+        "hunting/ac_hunter_06_non_standard_port_protocol_mismatch.json",
+        "hunting/ac_hunter_07_threat_intel_safelist_correlation.json",
+        "hunting/ac_hunter_08_multicloud_cross_csp_correlation.json",
+        "hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json"
+      ],
       "sha256": "5509656bf31aca7eaa1c28a2701e7c8598b0533e6ac2e0816aafbe05f72c863f",
       "source": "dashboards/ac_hunter_and_multicloud_logan_dashboard.json",
-      "widget_count": 0
+      "widget_count": 12
     },
     {
       "name": "C2 & Beaconing Detection",
@@ -932,7 +942,7 @@
       "title": "AC-Hunter Network Threat Hunting & Multi-Cloud Log Analytics Correlation Pack"
     },
     {
-      "id": "crowdstrike_2026_overwatch",
+      "id": "crowdstrike-2026-overwatch",
       "path": "packs/2026_threat_reports/crowdstrike_2026_overwatch.yaml",
       "query_paths": [],
       "sha256": "b392e4132841d8eccc53fcb0a1d2f03aee5efa8aa77b8dfd98488ae46a0adddc",
@@ -940,7 +950,7 @@
       "title": "CrowdStrike 2026 Threat Hunting Report \u2014 AI-Enabled Adversaries, Malware-Free LotL & Rapid PoC Exploitation"
     },
     {
-      "id": "peak_framework_hunts",
+      "id": "huntio-peak-framework-2026",
       "path": "packs/2026_threat_reports/peak_framework_hunts.yaml",
       "query_paths": [],
       "sha256": "a5ba47c2eb608f89a3009d2f233636264b02aa14d2f0c07561ff5c55c012ecde",
@@ -948,15 +958,23 @@
       "title": "PEAK Threat Hunting Framework (Prepare, Execute, Act with Knowledge) \u2014 OCI & Data Safe Playbooks"
     },
     {
-      "id": "seven_day_caldera_goad_storyline",
+      "id": "seven-day-caldera-goad-storyline-2026",
       "path": "packs/2026_threat_reports/seven_day_caldera_goad_storyline.yaml",
-      "query_paths": [],
+      "query_paths": [
+        "hunting/storyline_day1_waf_apigw_vcn_recon_sweep.json",
+        "hunting/storyline_day2_oke_pod_breakout_imdsv2_harvest.json",
+        "hunting/storyline_day3_caldera_sandcat_goad_ad_discovery.json",
+        "hunting/storyline_day4_lotl_rmm_kerberoasting_lateral.json",
+        "hunting/storyline_day5_dcsync_persistence_iam_drift.json",
+        "hunting/storyline_day6_datasafe_adb_sensitive_sql_extraction.json",
+        "hunting/storyline_day7_dns_c2_exfil_melts_correlation.json"
+      ],
       "sha256": "8a60e74152352266963525f0506e3dc3d8ab997b5ce96a34243db8f2ab95aa0f",
       "source_type": "threat_report_pack",
       "title": "7-Day Multi-Pillar Threat Hunting & Caldera/GOAD Adversary Emulation Storyline"
     },
     {
-      "id": "trellix_secondsight_sept2026",
+      "id": "trellix-secondsight-sept-2026",
       "path": "packs/2026_threat_reports/trellix_secondsight_sept2026.yaml",
       "query_paths": [],
       "sha256": "5f57b0e85b850401927688c782101c85b825e4b3fe2ceebe1a184ffe2e1e621b",
@@ -16102,15 +16120,15 @@
       "web": 38,
       "windows": 302
     },
-    "total_dashboard_widgets": 541,
+    "total_dashboard_widgets": 553,
     "total_dashboards": 36,
     "total_packs": 11,
     "total_queries": 1368,
     "total_rules": 522
   },
   "surface_digests": {
-    "dashboards": "0615791b009a971b998d1fa0fb5f5b64301d34ab78f0c5453c28f8a245f3ecfc",
-    "packs": "4715f776d0de849a6a9e3f3fdc5f26ad336856516caf7beb4e24eaf7ada7f76b",
+    "dashboards": "2c5f7595f1992075a1674d859d4495dc34c89abe180a29f6086bff5667798428",
+    "packs": "67ad0effc098ba033670b36d808229c4ee857bde92b6887d14649e11e3e7f5d1",
     "queries": "84c6fc16888b50335f6a0742b50ebba3b9c1fcf03eb90c8a0ad3000dae28b6c4",
     "rules": "6e573c9c66c016820d91ef4b2247dcc7f78b8fa73de7f8a7546887ca0731272f"
   }

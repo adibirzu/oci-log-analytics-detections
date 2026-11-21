@@ -6,9 +6,17 @@ import hashlib
 import json
 import os
 import re
+import sys
 from collections import Counter
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
+
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_PROJECT_ROOT = _SCRIPT_DIR.parent
+for _path in (_PROJECT_ROOT, _SCRIPT_DIR):
+    if str(_path) not in sys.path:
+        sys.path.insert(0, str(_path))
 
 from scripts.kql._facade_impl import ConversionResult
 from scripts.redaction import redact_text

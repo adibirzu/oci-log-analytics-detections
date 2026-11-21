@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -402,3 +404,58 @@ class TestSentinelConversionWorkflowCommands(unittest.TestCase):
             payload = json.loads(output.getvalue())
             self.assertEqual(payload["summary"]["attempted_candidates"], 1)
             self.assertEqual(payload["top_skip_reasons"][0]["reason"], "unsupported KQL operator: join")
+
+    def test_direct_script_execution_succeeds_without_pythonpath(self):
+        project_dir = Path(__file__).resolve().parents[2]
+        clean_env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+
+        help_proc = subprocess.run(
+            [sys.executable, "scripts/sentinel_conversion_workflow.py", "--help"],
+            cwd=project_dir,
+            env=clean_env,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=False,
+        )
+        self.assertEqual(help_proc.returncode, 0, help_proc.stderr)
+        self.assertIn("usage:", help_proc.stdout.lower())
+
+        dry_proc = subprocess.run(
+            [
+                sys.executable,
+                "scripts/sentinel_conversion_workflow.py",
+                "local",
+                "--dry-run",
+                "--top",
+                "1",
+            ],
+            cwd=project_dir,
+            env=clean_env,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=False,
+        )
+        self.assertEqual(dry_proc.returncode, 0, dry_proc.stderr)
+        self.assertIn("scripts/convert_sentinel_kql.py", dry_proc.stdout)
+
+        reporting_proc = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys; "
+                    "sys.path = [p for p in sys.path if not p.endswith('/scripts')]; "
+                    "import scripts.sentinel_converter_reporting as r; "
+                    "assert hasattr(r, 'compute_conversion_provenance_hash')"
+                ),
+            ],
+            cwd=project_dir,
+            env=clean_env,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=False,
+        )
+        self.assertEqual(reporting_proc.returncode, 0, reporting_proc.stderr)

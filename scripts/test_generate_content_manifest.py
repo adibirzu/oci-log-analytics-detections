@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from generate_content_manifest import validate_content_manifest
+from generate_content_manifest import build_content_manifest, validate_content_manifest
 from query_artifacts import is_generated_query_artifact, is_saved_search_query_file
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -215,3 +215,91 @@ def test_checked_in_content_manifest_matches_repo_and_schema():
         check=False,
     )
     assert check.returncode == 0, check.stderr
+
+
+def test_manifest_extracts_threat_report_pack_ids_days_and_dashboard_tiles(tmp_path):
+    _seed_mini_repo(tmp_path)
+    threat_dir = tmp_path / "packs" / "2026_threat_reports"
+    threat_dir.mkdir(parents=True, exist_ok=True)
+    (threat_dir / "storyline_pack.yaml").write_text(
+        "version: 1\n"
+        "pack_id: seven-day-storyline-pack\n"
+        "title: Storyline Pack\n"
+        "days:\n"
+        "  - day: 1\n"
+        "    query_file: hunting/day1.json\n"
+        "  - day: 2\n"
+        "    query_file: hunting/day2.json\n",
+        encoding="utf-8",
+    )
+    (threat_dir / "hunts_pack.yml").write_text(
+        "pack_id: hunts-yaml-pack\n"
+        "title: Hunts Pack\n"
+        "hunts:\n"
+        "  - query_file: hunting/hunt1.json\n",
+        encoding="utf-8",
+    )
+    (threat_dir / "queries_id_pack.yaml").write_text(
+        "id: queries-id-fallback\n"
+        "name: Queries ID Pack\n"
+        "queries:\n"
+        "  - query_file: hunting/query1.json\n",
+        encoding="utf-8",
+    )
+    (threat_dir / "filename_fallback_pack.yaml").write_text(
+        "title: Filename Fallback Pack\n"
+        "detections:\n"
+        "  - id: DET-1\n",
+        encoding="utf-8",
+    )
+
+    (tmp_path / "dashboards" / "ac_hunter_export.json").write_text(
+        json.dumps(
+            {
+                "displayName": "AC-Hunter Export",
+                "tiles": [
+                    {"displayName": "T1", "queryFile": "hunting/t1.json"},
+                    {"displayName": "T2", "queryFile": "hunting/t2.json"},
+                    {"displayName": "T3", "queryFile": "hunting/t2.json"},
+                ],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    manifest = build_content_manifest(tmp_path)
+    packs = {item["path"]: item for item in manifest["packs"]}
+    assert packs["packs/2026_threat_reports/storyline_pack.yaml"]["id"] == "seven-day-storyline-pack"
+    assert packs["packs/2026_threat_reports/storyline_pack.yaml"]["query_paths"] == [
+        "hunting/day1.json",
+        "hunting/day2.json",
+    ]
+    assert packs["packs/2026_threat_reports/hunts_pack.yml"]["id"] == "hunts-yaml-pack"
+    assert packs["packs/2026_threat_reports/hunts_pack.yml"]["query_paths"] == ["hunting/hunt1.json"]
+    assert packs["packs/2026_threat_reports/queries_id_pack.yaml"]["id"] == "queries-id-fallback"
+    assert packs["packs/2026_threat_reports/queries_id_pack.yaml"]["query_paths"] == ["hunting/query1.json"]
+    assert packs["packs/2026_threat_reports/filename_fallback_pack.yaml"]["id"] == "filename_fallback_pack"
+
+    dashboards = {item["source"]: item for item in manifest["dashboards"]}
+    ac_hunter = dashboards["dashboards/ac_hunter_export.json"]
+    assert ac_hunter["name"] == "AC-Hunter Export"
+    assert ac_hunter["widget_count"] == 3
+    assert ac_hunter["query_files"] == ["hunting/t1.json", "hunting/t2.json"]
+
+
+def test_checked_in_manifest_captures_tracked_threat_reports_and_dashboard_tiles():
+    manifest = json.loads((ROOT / ARTIFACT).read_text(encoding="utf-8"))
+    packs = {item["path"]: item for item in manifest["packs"]}
+    assert packs["packs/2026_threat_reports/crowdstrike_2026_overwatch.yaml"]["id"] == "crowdstrike-2026-overwatch"
+    assert packs["packs/2026_threat_reports/peak_framework_hunts.yaml"]["id"] == "huntio-peak-framework-2026"
+    assert packs["packs/2026_threat_reports/trellix_secondsight_sept2026.yaml"]["id"] == "trellix-secondsight-sept-2026"
+    storyline = packs["packs/2026_threat_reports/seven_day_caldera_goad_storyline.yaml"]
+    assert storyline["id"] == "seven-day-caldera-goad-storyline-2026"
+    assert len(storyline["query_paths"]) == 7
+
+    dashboards = {item["source"]: item for item in manifest["dashboards"]}
+    ac_hunter = dashboards["dashboards/ac_hunter_and_multicloud_logan_dashboard.json"]
+    assert ac_hunter["widget_count"] == 12
+    assert len(ac_hunter["query_files"]) == 9
+    assert manifest["summary"]["total_dashboard_widgets"] == 553

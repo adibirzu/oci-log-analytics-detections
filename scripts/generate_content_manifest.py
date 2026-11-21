@@ -151,15 +151,17 @@ def _collect_packs(root: Path) -> list[dict[str, Any]]:
             raw = report_pack.read_bytes()
             payload = yaml.safe_load(raw.decode("utf-8")) or {}
             title = str(payload.get("title") or payload.get("name") or report_pack.stem)
-            hunts = payload.get("hunts") or payload.get("queries") or []
-            query_paths = sorted(
-                str(item.get("query_file", ""))
-                for item in hunts
-                if isinstance(item, dict) and item.get("query_file")
-            )
+            query_path_set: set[str] = set()
+            for section in ("hunts", "queries", "days"):
+                items = payload.get(section)
+                if isinstance(items, list):
+                    for item in items:
+                        if isinstance(item, dict) and item.get("query_file"):
+                            query_path_set.add(str(item["query_file"]))
+            query_paths = sorted(query_path_set)
             entries.append(
                 {
-                    "id": str(payload.get("id") or report_pack.stem),
+                    "id": str(payload.get("pack_id") or payload.get("id") or report_pack.stem),
                     "title": title,
                     "source_type": "threat_report_pack",
                     "path": report_pack.relative_to(root).as_posix(),
@@ -202,12 +204,19 @@ def _collect_dashboards(root: Path) -> list[dict[str, Any]]:
         for path in sorted(dashboards_dir.glob("*.json")):
             raw = path.read_bytes()
             payload = json.loads(raw.decode("utf-8"))
-            widgets = payload.get("widgets", []) if isinstance(payload.get("widgets"), list) else []
+            raw_widgets = payload.get("widgets")
+            if isinstance(raw_widgets, list):
+                widgets = raw_widgets
+            elif isinstance(payload.get("tiles"), list):
+                widgets = payload["tiles"]
+            else:
+                widgets = []
             query_files = sorted(
                 {
-                    str(widget["query_file"])
+                    str(widget.get("query_file") or widget.get("queryFile"))
                     for widget in widgets
-                    if isinstance(widget, dict) and widget.get("query_file")
+                    if isinstance(widget, dict)
+                    and (widget.get("query_file") or widget.get("queryFile"))
                 }
             )
             entries.append(

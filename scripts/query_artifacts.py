@@ -11,6 +11,7 @@ GENERATED_QUERY_ARTIFACT_FILENAMES = {
     "hunting_integration_bundle.json",
     "migrated_siem_20_queries.json",
     "content_candidates.json",
+    "content_manifest.json",
     "conversion_examples.json",
     "cross_siem_detection_catalog.json",
     "cross_ql_mapping_patterns.json",

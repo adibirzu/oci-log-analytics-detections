@@ -325,12 +325,27 @@ python3 scripts/sentinel_conversion_workflow.py status --json --strict</pre>
 """
 
 
+def _resolve_report_generated_at(report: dict, generated_at: datetime | None) -> datetime | None:
+    if generated_at is not None:
+        return generated_at
+    raw = report.get("generated_at")
+    if isinstance(raw, str) and raw.strip():
+        try:
+            parsed = datetime.fromisoformat(raw.strip().replace("Z", "+00:00"))
+            if parsed.tzinfo is not None:
+                return parsed
+        except ValueError:
+            pass
+    return None
+
+
 def write_report_html(
     *,
     report_path: Path = DEFAULT_REPORT_PATH,
     output_path: Path = DEFAULT_HTML_PATH,
     sentinel_dir: Path = DEFAULT_SENTINEL_DIR,
     dashboard_inventory: Path = DEFAULT_DASHBOARD_INVENTORY,
+    generated_at: datetime | None = None,
 ) -> Path:
     """Write the static HTML report page and return its path."""
     report = load_report(report_path)
@@ -338,6 +353,7 @@ def write_report_html(
         report,
         sentinel_counts=load_promoted_query_counts(sentinel_dir),
         dashboard_counts=load_sentinel_dashboard_counts(dashboard_inventory),
+        generated_at=_resolve_report_generated_at(report, generated_at),
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(html_text, encoding="utf-8")

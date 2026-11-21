@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -10,6 +12,7 @@ from contextlib import redirect_stdout
 from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from sentinel_conversion_workflow import (  # noqa: E402
@@ -24,6 +27,7 @@ from sentinel_conversion_workflow import (  # noqa: E402
     resolve_top,
     write_report_html,
 )
+from sentinel_workflow.html_report import _resolve_report_generated_at  # noqa: E402
 
 
 class TestSentinelConversionWorkflowCommands(unittest.TestCase):
@@ -283,6 +287,27 @@ class TestSentinelConversionWorkflowCommands(unittest.TestCase):
         self.assertIn("next-queries --limit 10", html_text)
         self.assertIn("status --json --strict", html_text)
 
+    def test_resolve_report_generated_at_treats_naive_timestamp_as_utc(self):
+        report = {"generated_at": "2026-01-01T00:00:00"}
+
+        self.assertEqual(
+            _resolve_report_generated_at(report, None),
+            datetime(2026, 1, 1, tzinfo=timezone.utc),
+        )
+
+    def test_render_report_html_uses_naive_timestamp_across_calls(self):
+        report = {"generated_at": "2026-01-01T00:00:00"}
+        with patch("sentinel_workflow.html_report.datetime", wraps=datetime) as clock:
+            clock.now.side_effect = [
+                datetime(2030, 1, 1, tzinfo=timezone.utc),
+                datetime(2030, 1, 2, tzinfo=timezone.utc),
+            ]
+            first = render_report_html(report)
+            second = render_report_html(report)
+
+        self.assertEqual(first, second)
+        self.assertIn("<span>Generated: 2026-01-01T00:00:00+00:00</span>", first)
+
     def test_write_report_html_creates_static_page(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -402,3 +427,58 @@ class TestSentinelConversionWorkflowCommands(unittest.TestCase):
             payload = json.loads(output.getvalue())
             self.assertEqual(payload["summary"]["attempted_candidates"], 1)
             self.assertEqual(payload["top_skip_reasons"][0]["reason"], "unsupported KQL operator: join")
+
+    def test_direct_script_execution_succeeds_without_pythonpath(self):
+        project_dir = Path(__file__).resolve().parents[2]
+        clean_env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+
+        help_proc = subprocess.run(
+            [sys.executable, "scripts/sentinel_conversion_workflow.py", "--help"],
+            cwd=project_dir,
+            env=clean_env,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=False,
+        )
+        self.assertEqual(help_proc.returncode, 0, help_proc.stderr)
+        self.assertIn("usage:", help_proc.stdout.lower())
+
+        dry_proc = subprocess.run(
+            [
+                sys.executable,
+                "scripts/sentinel_conversion_workflow.py",
+                "local",
+                "--dry-run",
+                "--top",
+                "1",
+            ],
+            cwd=project_dir,
+            env=clean_env,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=False,
+        )
+        self.assertEqual(dry_proc.returncode, 0, dry_proc.stderr)
+        self.assertIn("scripts/convert_sentinel_kql.py", dry_proc.stdout)
+
+        reporting_proc = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "import sys; "
+                    "sys.path = [p for p in sys.path if not p.endswith('/scripts')]; "
+                    "import scripts.sentinel_converter_reporting as r; "
+                    "assert hasattr(r, 'compute_conversion_provenance_hash')"
+                ),
+            ],
+            cwd=project_dir,
+            env=clean_env,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=False,
+        )
+        self.assertEqual(reporting_proc.returncode, 0, reporting_proc.stderr)

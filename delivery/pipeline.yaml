@@ -1,0 +1,59 @@
+schema_version: "1.0"
+service: oci-log-analytics-detections
+description: >
+  Deterministic build, provenance, content-manifest, and delivery pipeline
+  separating non-container workstation gates from amd64 container executors.
+
+policy:
+  digest_only: true
+  disallow_unpinned_base_images: true
+  allow_local_amd64_emulation_on_arm64: false
+  require_sbom_check: true
+  require_content_manifest_check: true
+  require_deterministic_conversion_provenance: true
+
+tiers:
+  workstation:
+    description: Non-container local verification tier safe on Apple Silicon (arm64) and amd64 hosts.
+    container_execution: false
+    architectures:
+      - arm64
+      - amd64
+    gate_script: scripts/ci/gate.sh
+    checks:
+      - deterministic-sentinel-provenance
+      - dockerfile-digest-pin-contract
+      - delivery-pipeline-contract
+      - cyclonedx-sbom-check
+      - content-manifest-check
+      - hunting-bundle-check
+      - module-size-check
+      - sensitive-value-scan
+      - ruff-lint
+      - shellcheck
+  container_executor:
+    description: Dedicated linux/amd64 CI/runner tier for multi-stage Docker image builds and attestations.
+    container_execution: true
+    platform: linux/amd64
+    runner: ubuntu-latest
+    build_tool: docker-buildx
+    provenance: true
+    sbom: true
+
+images:
+  - name: logan-forge
+    dockerfile: webapp/Dockerfile
+    context: webapp
+    target_platform: linux/amd64
+    base_image: node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a
+    stages:
+      - deps
+      - builder
+      - runner
+  - name: logan-forge-lean
+    dockerfile: webapp/Dockerfile.lean
+    context: webapp
+    target_platform: linux/amd64
+    base_image: node:22-alpine@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a
+    stages:
+      - default

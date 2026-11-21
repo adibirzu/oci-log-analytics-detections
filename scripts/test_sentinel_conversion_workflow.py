@@ -11,6 +11,7 @@ from sentinel_workflow_tests.backlog_status import (  # noqa: F401
     TestSentinelConversionWorkflowBacklogStatus,
 )
 from sentinel_workflow_tests.commands import TestSentinelConversionWorkflowCommands  # noqa: F401
+from sentinel_workflow_tests.provenance import TestSentinelConversionProvenance  # noqa: F401
 
 
 if __name__ == "__main__":

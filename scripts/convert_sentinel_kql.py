@@ -365,6 +365,7 @@ def convert_candidates(
     progress_stream=None,
     profile: dict | None = None,
     workers: int = 1,
+    generated_at: str | None = None,
 ) -> dict:
     """Rank, convert, optionally live-validate, and optionally write queries."""
     attempted = select_top_candidates(candidates, mapping, top=top)
@@ -493,9 +494,10 @@ def convert_candidates(
         source=source or {},
         validate_live=validate_live,
         profile=profile,
+        generated_at=generated_at,
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     maybe_progress(
         (
             f"complete attempted={total_attempted} converted={report['summary']['converted_count']} "
@@ -574,6 +576,11 @@ def main() -> int:
             "1 = serial (exact original path). Default: min(8, cpu_count)."
         ),
     )
+    parser.add_argument(
+        "--generated-at",
+        default=None,
+        help="Optional ISO-8601 timestamp override for deterministic conversion reports.",
+    )
     args = parser.parse_args()
 
     if args.write_working and not args.validate_live and not args.allow_local_write:
@@ -602,6 +609,7 @@ def main() -> int:
         progress_every=args.progress_every,
         profile=profile,
         workers=args.workers,
+        generated_at=args.generated_at,
     )
     if args.migration_plan_out:
         build_migration_plan_from_report(report, Path(args.migration_plan_out))

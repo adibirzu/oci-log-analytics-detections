@@ -10,6 +10,13 @@ import subprocess
 import sys
 from pathlib import Path
 
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_PROJECT_ROOT = _SCRIPT_DIR.parent
+for _path in (_PROJECT_ROOT, _SCRIPT_DIR):
+    if str(_path) not in sys.path:
+        sys.path.insert(0, str(_path))
+
+from sentinel_converter_reporting import compute_conversion_provenance_hash
 from sentinel_workflow.cache import build_live_cache_key
 from sentinel_workflow.reporting import (
     NEXT_QUERY_STRATEGIES,
@@ -99,6 +106,7 @@ def build_convert_command(
     discovery_report: Path | None = None,
     migration_plan_out: Path | None = None,
     workers: int = 1,
+    generated_at: str | None = None,
 ) -> list[str]:
     """Build the low-level converter command for a workflow mode."""
     command = [
@@ -127,6 +135,8 @@ def build_convert_command(
         command.extend(["--progress-every", str(progress_every)])
     if workers != 1:
         command.extend(["--workers", str(workers)])
+    if generated_at:
+        command.extend(["--generated-at", generated_at])
 
     if mode == "local":
         command.append("--validate-local")
@@ -161,6 +171,7 @@ def run_convert_mode(args, mode: str, report_path: Path) -> None:
         discovery_report=Path(args.discovery_report) if args.discovery_report else None,
         migration_plan_out=Path(args.migration_plan_out) if args.migration_plan_out else None,
         workers=args.workers,
+        generated_at=args.generated_at,
     )
     if args.candidates_file != str(DEFAULT_CANDIDATES_FILE):
         command.extend(["--candidates-file", args.candidates_file])
@@ -218,6 +229,7 @@ def build_parser() -> argparse.ArgumentParser:
             "next-queries",
             "synthetic-plan",
             "live-cache-key",
+            "provenance",
             "all",
         ],
         help="Workflow step to run.",
@@ -280,6 +292,11 @@ def build_parser() -> argparse.ArgumentParser:
             "Parallel conversion worker threads for the CPU-bound convert_candidate phase "
             "(local and promote commands only). 1 = serial. Default: min(8, cpu_count)."
         ),
+    )
+    parser.add_argument(
+        "--generated-at",
+        default=None,
+        help="Optional ISO-8601 timestamp override for deterministic conversion reports.",
     )
     return parser
 
@@ -395,6 +412,41 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(key)
         return 0
+
+    if args.command == "provenance":
+        if args.dry_run:
+            print("Would compute and verify Sentinel conversion report provenance hash.")
+            return 0
+        report = _read_json(report_path)
+        computed = compute_conversion_provenance_hash(report)
+        top_present = "provenance_sha256" in report
+        top_recorded = report.get("provenance_sha256")
+        provenance_obj = report.get("provenance")
+        nested_present = isinstance(provenance_obj, dict) and "provenance_sha256" in provenance_obj
+        nested_recorded = provenance_obj.get("provenance_sha256") if nested_present else None
+
+        present_values: list[object] = []
+        if top_present:
+            present_values.append(top_recorded)
+        if nested_present:
+            present_values.append(nested_recorded)
+
+        verified = bool(present_values) and all(
+            isinstance(value, str) and bool(value.strip()) and value == computed
+            for value in present_values
+        )
+        recorded = top_recorded or nested_recorded or None
+        payload = {
+            "report": _project_relative(report_path),
+            "provenance_sha256": computed,
+            "recorded_provenance_sha256": recorded,
+            "verified": verified,
+        }
+        if args.json:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(f"Sentinel conversion provenance: sha256={computed} verified={verified}")
+        return 0 if verified else 1
 
     if args.command == "all":
         run_convert_mode(args, "promote", report_path)

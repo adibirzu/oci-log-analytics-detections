@@ -130,6 +130,14 @@ python3 scripts/sentinel_conversion_workflow.py status --json
 python3 scripts/sentinel_conversion_workflow.py status --json --strict
 ```
 
+Conversion reports are reproducible: keys are sorted, and `generated_at` comes from `--generated-at <ISO-8601>` (on the wrapper or the converter), else `SOURCE_DATE_EPOCH` (integer seconds; any other value is an error), else the wall clock. `provenance_sha256` covers every report field except `generated_at`, `provenance`, and `provenance_sha256`. Verify a report offline (exit 1 on mismatch):
+
+```bash
+python3 scripts/sentinel_conversion_workflow.py provenance --json
+```
+
+The offline gate `scripts/ci/gate.sh` runs this check with the Dockerfile digest-pin, SBOM, content-manifest, and hunting-bundle checks; it refuses container execution on arm64 hosts. Its tiers and image pins are declared in `delivery/pipeline.yaml`.
+
 The low-level converter remains available when a focused debugging run is needed:
 
 ```bash

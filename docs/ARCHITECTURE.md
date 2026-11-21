@@ -121,6 +121,7 @@ The JSON specifications and Mermaid files are tenant-neutral design artifacts. S
 | `queries/log_source_field_dictionary.json` | `scripts/field_dictionary.py` | Approved source/display-field dictionary |
 | `queries/detection_rule_specs.json` | `scripts/detection_rule_creator.py` | Scheduled-search rule specifications |
 | `queries/siem_log_examples.json` | `scripts/generate_siem_log_examples.py` | Redacted parser-development examples |
+| `queries/content_manifest.json` | `scripts/generate_content_manifest.py --write` (`--check` verifies drift) | Deterministic content import manifest; contract `schemas/content_manifest.schema.json` |
 | `queries/manifest.json` | `scripts/export_for_multicloud.py --manifest-only` | Derivative integration manifest |
 | `webapp/**` | Next.js application | Reads generated contracts; does not own generation |
 

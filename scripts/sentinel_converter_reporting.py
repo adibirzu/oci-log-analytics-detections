@@ -2,10 +2,21 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import re
+import sys
 from collections import Counter
 from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_PROJECT_ROOT = _SCRIPT_DIR.parent
+for _path in (_PROJECT_ROOT, _SCRIPT_DIR):
+    if str(_path) not in sys.path:
+        sys.path.insert(0, str(_path))
 
 from scripts.kql._facade_impl import ConversionResult
 from scripts.redaction import redact_text
@@ -80,6 +91,40 @@ def _tier_for_result(result: "ConversionResult") -> str:
     return "tier_1"
 
 
+VOLATILE_PROVENANCE_FIELDS = ("generated_at", "provenance", "provenance_sha256")
+
+
+def resolve_generated_at(generated_at: str | None = None) -> str:
+    """Resolve an ISO-8601 UTC timestamp from explicit input, SOURCE_DATE_EPOCH, or wall clock."""
+    if generated_at is not None and str(generated_at).strip():
+        return str(generated_at).strip()
+    epoch = os.environ.get("SOURCE_DATE_EPOCH", "").strip()
+    if epoch:
+        try:
+            return datetime.fromtimestamp(int(epoch), tz=timezone.utc).isoformat()
+        except (ValueError, OverflowError, OSError) as error:
+            msg = f"SOURCE_DATE_EPOCH must be an integer number of seconds, got {epoch!r}"
+            raise ValueError(msg) from error
+    return datetime.now(timezone.utc).isoformat()
+
+
+def compute_conversion_provenance_hash(report: dict[str, Any]) -> str:
+    """Return a deterministic SHA-256 digest over non-volatile conversion report fields."""
+    stable_payload = {
+        key: value
+        for key, value in report.items()
+        if key not in VOLATILE_PROVENANCE_FIELDS
+    }
+    canonical = json.dumps(
+        stable_payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
 def build_conversion_report(
     candidates: list[dict],
     attempted: list[dict],
@@ -87,6 +132,8 @@ def build_conversion_report(
     source: dict,
     validate_live: bool,
     profile: dict | None = None,
+    *,
+    generated_at: str | None = None,
 ) -> dict:
     """Build the Sentinel conversion report artifact."""
     unsupported_counts = Counter()
@@ -129,9 +176,9 @@ def build_conversion_report(
         tier_distribution[tier_key] += 1
         result_tiers.append(tier_key)
 
-    return {
+    report = {
         "version": "1.0",
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": resolve_generated_at(generated_at),
         "source": source or {
             "name": "Microsoft Sentinel",
             "repository": SENTINEL_WEB_URL,
@@ -193,3 +240,13 @@ def build_conversion_report(
             for result, tier in zip(results, result_tiers)
         ],
     }
+    provenance_sha256 = compute_conversion_provenance_hash(report)
+    report["provenance_sha256"] = provenance_sha256
+    report["provenance"] = {
+        "schema_version": "1.0",
+        "evidence_class": "local-conversion-provenance",
+        "hash_algorithm": "sha256",
+        "excluded_volatile_fields": list(VOLATILE_PROVENANCE_FIELDS),
+        "provenance_sha256": provenance_sha256,
+    }
+    return report

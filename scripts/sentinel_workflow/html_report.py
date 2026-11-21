@@ -49,7 +49,7 @@ def render_report_html(
     """Render a static HTML review page for the Sentinel conversion report."""
     sentinel_counts = sentinel_counts or {}
     dashboard_counts = dashboard_counts or {}
-    generated_at = generated_at or datetime.now(timezone.utc)
+    generated_at = _resolve_report_generated_at(report, generated_at) or datetime.now(timezone.utc)
     summary = report.get("summary", {})
     source = report.get("source", {})
     unsupported = report.get("unsupported_features", {})
@@ -332,8 +332,9 @@ def _resolve_report_generated_at(report: dict, generated_at: datetime | None) ->
     if isinstance(raw, str) and raw.strip():
         try:
             parsed = datetime.fromisoformat(raw.strip().replace("Z", "+00:00"))
-            if parsed.tzinfo is not None:
-                return parsed
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            return parsed
         except ValueError:
             pass
     return None
@@ -353,7 +354,7 @@ def write_report_html(
         report,
         sentinel_counts=load_promoted_query_counts(sentinel_dir),
         dashboard_counts=load_sentinel_dashboard_counts(dashboard_inventory),
-        generated_at=_resolve_report_generated_at(report, generated_at),
+        generated_at=generated_at,
     )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(html_text, encoding="utf-8")

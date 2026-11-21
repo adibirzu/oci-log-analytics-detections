@@ -12,6 +12,7 @@ from contextlib import redirect_stdout
 from datetime import datetime, timezone
 from io import StringIO
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from sentinel_conversion_workflow import (  # noqa: E402
@@ -26,6 +27,7 @@ from sentinel_conversion_workflow import (  # noqa: E402
     resolve_top,
     write_report_html,
 )
+from sentinel_workflow.html_report import _resolve_report_generated_at  # noqa: E402
 
 
 class TestSentinelConversionWorkflowCommands(unittest.TestCase):
@@ -284,6 +286,27 @@ class TestSentinelConversionWorkflowCommands(unittest.TestCase):
         self.assertIn("sentinel_conversion_workflow.py triage", html_text)
         self.assertIn("next-queries --limit 10", html_text)
         self.assertIn("status --json --strict", html_text)
+
+    def test_resolve_report_generated_at_treats_naive_timestamp_as_utc(self):
+        report = {"generated_at": "2026-01-01T00:00:00"}
+
+        self.assertEqual(
+            _resolve_report_generated_at(report, None),
+            datetime(2026, 1, 1, tzinfo=timezone.utc),
+        )
+
+    def test_render_report_html_uses_naive_timestamp_across_calls(self):
+        report = {"generated_at": "2026-01-01T00:00:00"}
+        with patch("sentinel_workflow.html_report.datetime", wraps=datetime) as clock:
+            clock.now.side_effect = [
+                datetime(2030, 1, 1, tzinfo=timezone.utc),
+                datetime(2030, 1, 2, tzinfo=timezone.utc),
+            ]
+            first = render_report_html(report)
+            second = render_report_html(report)
+
+        self.assertEqual(first, second)
+        self.assertIn("<span>Generated: 2026-01-01T00:00:00+00:00</span>", first)
 
     def test_write_report_html_creates_static_page(self):
         with tempfile.TemporaryDirectory() as tmpdir:

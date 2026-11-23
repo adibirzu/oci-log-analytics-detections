@@ -55,14 +55,39 @@ pnpm e2e
 
 ## GitHub Pages Static Build
 
-GitHub Pages can host the Forge page only as a static/read-only build. Static mode does not include the Next.js API routes, CSRF session endpoint, Python converter, or backend deployment actions. It supports bundled example conversions, raw OCI Logan QL passthrough, and the read-only Log Samples parser workspace in the browser.
+GitHub Pages hosts read-only builds of Forge and the Detection Rules Explorer. Static mode does not include the Next.js API routes, CSRF session endpoint, Python converter, or backend deployment actions. It supports bundled example conversions, raw OCI Logan QL passthrough, and the read-only Log Samples parser workspace in the browser.
 
 ```bash
 cd webapp
 NEXT_PUBLIC_FORGE_BASE_PATH=/oci-log-analytics-detections pnpm build:pages
 ```
 
-The static export is written to `webapp/out`. The `Forge GitHub Pages` workflow publishes that directory from GitHub Actions.
+The static export is written to `webapp/out`. The Forge GitHub Pages workflow uploads that directory. At a repository subpath, the Explorer is at `/oci-log-analytics-detections/explorer/`. Pages activation and deployment require the repository owner's approval. The `build:pages` command stages the public Forge catalog before it runs Next.js. The existing workflow's path filters require a manual workflow dispatch after merge for updates confined to the content manifest or mapping inputs.
+
+### Detection Rules Explorer preview
+
+Run these commands from the repository root with Python 3.11 or newer.
+
+```bash
+preview="$(mktemp -d)"
+python3 scripts/build_detection_explorer.py --output "$preview"
+python3 -m http.server 8000 --bind 127.0.0.1 --directory "$preview"
+```
+
+Open `http://localhost:8000/`. The same Explorer files work under a repository subpath. The browser fetches one generated catalog and runs all search and filtering locally. The Pages build also derives a public Forge catalog that omits companion telemetry examples containing private address literals.
+
+The build indexes base detections, promoted Sentinel conversions, app analytics, and the companion hunts listed in the [cross-SIEM catalog](../config/cross_siem_detection_catalog.json). Each entry copies its OCL string from the original query JSON after checking that file against the content manifest. The six cross-SIEM detection families remain visible in the relevant hunts.
+
+The [mapping ledger](../config/detection_explorer_mappings.json) links each vendor rule to its official file at a pinned revision. Exact links match the core detection condition. Related links share documented behavior and can differ in telemetry, thresholds, or filters. OCI-specific entries use OCI-native telemetry. Unmapped entries have no verified link for that vendor. Repository SPL examples appear separately with their own label. Coverage measures the ATT&CK tags recorded in the catalog.
+
+For offline mapping audits, unpack the official source archives for the two revisions in the ledger into one directory. Run the builder with `--upstream-root` pointing there to verify each upstream path, ID, title, and SHA-256 against its source. Use the repository Python requirements for the audit.
+
+```bash
+python3 -m pytest -q scripts/test_detection_explorer.py
+PLAYWRIGHT_BASE_URL=http://127.0.0.1:1 pnpm --dir webapp e2e detection-explorer.spec.ts
+```
+
+The browser spec starts a static server on an ephemeral port for both the root and repository-subpath cases. Set `EXPLORER_SCREENSHOTS` to a directory outside the checkout to capture desktop and mobile images.
 
 ## Security Posture
 

@@ -63,6 +63,7 @@ firebase-debug.log
 /.codex/
 /.lavish/
 /.planning/
+/.playwright-mcp/
 /.superpowers/
 /docs/superpowers/
 

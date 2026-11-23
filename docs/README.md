@@ -76,7 +76,7 @@ The service definitions answer the customer need and outline choices. The techni
 | `Webapp CI` | Forge or parser-sample changes | Typecheck, lint, build, and API-contract E2E | Credential-free |
 | `Sentinel Converter` | Relevant changes, manual, and scheduled | Local conversion, report consistency, and guarded live promotion | Local/PR lanes credential-free; live lane requires protected secrets |
 | `Live OCI Validation` | Manual trusted-maintainer dispatch | Real OCI parser validation | Protected `live-oci` environment only |
-| `Forge GitHub Pages` | Main branch or manual dispatch | Static Forge build and publication | Deployment runs only when Pages is enabled |
+| `Forge GitHub Pages` | Main branch or manual dispatch | Static Forge and Detection Rules Explorer build and publication | Deployment runs only when Pages is enabled |
 
 The protected live workflows never run from untrusted pull requests. A missing credential is reported as a clear preflight result in the Sentinel scheduled/manual lane; it is not treated as a successful live validation. See [Deployment Guide](DEPLOYMENT.md) for the customer deployment workflow and configuration details.
 

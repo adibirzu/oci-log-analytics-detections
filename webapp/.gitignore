@@ -5,6 +5,7 @@
 
 # next.js
 /.next/
+/.next-pages-artifacts/
 /out/
 
 # playwright (generated test output)

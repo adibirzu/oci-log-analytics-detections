@@ -34,6 +34,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
+import { publicAssetPath } from "@/lib/public-assets"
 import type {
   ForgeCatalogItem,
   LoganCommand,
@@ -503,6 +504,11 @@ export function ForgeWorkbench({
             >
               {mounted && resolvedTheme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </Button>
+            {staticExport && (
+              <Button asChild variant="outline" size="sm">
+                <a href={publicAssetPath("/explorer/")}>Detection Rules Explorer</a>
+              </Button>
+            )}
             <Button asChild variant="outline" size="sm">
               <a href={repositoryUrl} target="_blank" rel="noreferrer" title="Open repository for local setup and enhancements">
                 <Github className="size-4" />
@@ -805,7 +811,7 @@ export function ForgeWorkbench({
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-foreground">
-                      Customer Server & Environment Query Enhancer
+                      Customer Server &amp; Environment Query Enhancer
                     </span>
                     <span className="text-[11px] text-muted-foreground">
                       Scope log sources, hostnames, and alert thresholds for your servers

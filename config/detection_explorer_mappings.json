@@ -1,0 +1,478 @@
+{
+  "sources": {
+    "elastic": {
+      "revision": "9d792a8f6731542935156db61eaba88bf337e819",
+      "rules": [
+        {
+          "id": "2215b8bd-1759-4ffa-8ab8-55c8e6b32e7f",
+          "title": "SSH Authorized Keys File Activity",
+          "path": "rules/cross-platform/persistence_ssh_authorized_keys_modification.toml",
+          "sha256": "931f48ac6c23ec9a376ef016f17921b3c618a6599f26ce044e0798126b3e29d2"
+        },
+        {
+          "id": "5c6f4c58-b381-452a-8976-f1b1c6aa0def",
+          "title": "First Time Seen Account Performing DCSync",
+          "path": "rules/windows/credential_access_dcsync_newterm_subjectuser.toml",
+          "sha256": "e7b750723e912a14f296fa68d09aa541d85d44706adbd740761a374f3e3325a6"
+        },
+        {
+          "id": "9f962927-1a4f-45f3-a57b-287f2c7029c1",
+          "title": "Potential Credential Access via DCSync",
+          "path": "rules/windows/credential_access_dcsync_replication_rights.toml",
+          "sha256": "90b289067ad501d8d29ebc4e17180def533d3fd6bc6a081a055022394ec09bbc"
+        },
+        {
+          "id": "c5c9f591-d111-4cf8-baec-c26a39bc31ef",
+          "title": "Potential Credential Access via Renamed COM+ Services DLL",
+          "path": "rules/windows/credential_access_suspicious_comsvcs_imageload.toml",
+          "sha256": "935a50b8d98965ce9b9a8b93fb77664afa168634e6082226be9e54604eabb6b7"
+        },
+        {
+          "id": "d331bbe2-6db4-4941-80a5-8270db72eb61",
+          "title": "Clearing Windows Event Logs",
+          "path": "rules/windows/defense_evasion_clearing_windows_event_logs.toml",
+          "sha256": "d2bf2d330081ce843b17cfb2d105f9a21e8ca9474ba2964126258775aed33965"
+        },
+        {
+          "id": "45ac4800-840f-414c-b221-53dd36a5aaf7",
+          "title": "Windows Event Logs Cleared",
+          "path": "rules/windows/defense_evasion_clearing_windows_security_logs.toml",
+          "sha256": "2242e8e370926ecebf810d9f3f85ee54ac58cfcd630e454e82813d80e2ea075f"
+        },
+        {
+          "id": "fd70c98a-c410-42dc-a2e3-761c71848acf",
+          "title": "Suspicious CertUtil Commands",
+          "path": "rules/windows/defense_evasion_suspicious_certutil_commands.toml",
+          "sha256": "53e229b9d638128eae2f476c594f5528989f56804c0dbe1983c6323423d31ac4"
+        },
+        {
+          "id": "fbad57ec-4442-48db-a34f-5ee907b44a22",
+          "title": "Potential Fake CAPTCHA Phishing Attack",
+          "path": "rules/windows/execution_windows_fakecaptcha_cmd_ps.toml",
+          "sha256": "b769223eacc4e56d5d2c2215f6e0e1fbbe38ca052dc22f0f3dd3c64331e78c67"
+        },
+        {
+          "id": "7dc45430-7407-4790-b89e-c857c3f6bf23",
+          "title": "Potential Execution via FileFix Phishing Attack",
+          "path": "rules/windows/execution_windows_phish_clickfix.toml",
+          "sha256": "9a94f3f65acf0a88506bd63ff7c13c34c44bcfb095edd8bc881eb9a0babb1ad5"
+        },
+        {
+          "id": "1cd01db9-be24-4bef-8e7c-e923f0ff78ab",
+          "title": "Incoming Execution via WinRM Remote Shell",
+          "path": "rules/windows/lateral_movement_incoming_winrm_shell_execution.toml",
+          "sha256": "e2b046edd89c88dce16ffce7fcb41019a6c24a402ea36f6824f7e7b90b1e6258"
+        },
+        {
+          "id": "afcce5ad-65de-4ed2-8516-5e093d3ac99a",
+          "title": "Local Scheduled Task Creation",
+          "path": "rules/windows/persistence_local_scheduled_task_creation.toml",
+          "sha256": "6174a24f8970c345229b683516bcc13a9e15a004bba6fca8f21cd67d566e7c9f"
+        },
+        {
+          "id": "15a8ba77-1c13-4274-88fe-6bd14133861e",
+          "title": "Scheduled Task Execution at Scale via GPO",
+          "path": "rules/windows/privilege_escalation_group_policy_scheduled_task.toml",
+          "sha256": "9ff1537c5f0997324246d2c4f26532484e0d741fd718f2dc954536beb05c6d76"
+        }
+      ]
+    },
+    "splunk": {
+      "revision": "21509485465aaed2cfa4604e3d2ab5ee52975f0a",
+      "rules": [
+        {
+          "id": "bfe94226-8c10-11eb-a4b3-acde48001122",
+          "title": "CertUtil With Decode Argument",
+          "path": "detections/endpoint/certutil_with_decode_argument.yml",
+          "sha256": "dddccef5057cefef243bde20f7707fe5f955431dcd153c1d3e32f74b675f5135"
+        },
+        {
+          "id": "8943b567-f14d-4ee8-a0bb-2121d4ce3184",
+          "title": "Dump LSASS via comsvcs DLL",
+          "path": "detections/endpoint/dump_lsass_via_comsvcs_dll.yml",
+          "sha256": "e4be7f4b2831852e0d4b1881a94aa837e50c9efb790136c1b0ff179241eefa3e"
+        },
+        {
+          "id": "5cc67381-44fa-4111-8a37-7a230943f027",
+          "title": "Kerberoasting spn request with RC4 encryption",
+          "path": "detections/endpoint/kerberoasting_spn_request_with_rc4_encryption.yml",
+          "sha256": "294781d5f3b91c70d4572bd7d4590e4a819a3b244c85554e9b40f65b6da54c20"
+        },
+        {
+          "id": "f5ab595e-28e5-4327-8077-5008ba97c850",
+          "title": "Linux SSH Authorized Keys Modification",
+          "path": "detections/endpoint/linux_ssh_authorized_keys_modification.yml",
+          "sha256": "06939c0c1dc8c68c4330501bb12ad741434a38b85629257c4ecfbb98eb10c724"
+        },
+        {
+          "id": "7d4c618e-4716-11ec-951c-3e22fbd008af",
+          "title": "Remote Process Instantiation via WinRM and PowerShell Script Block",
+          "path": "detections/endpoint/remote_process_instantiation_via_winrm_and_powershell_script_block.yml",
+          "sha256": "91549eedc7aa35e7e410ab34f06bfd6506b9a1aa5b324109c5def2c0fce35c04"
+        },
+        {
+          "id": "ad517544-aff9-4c96-bd99-d6eb43bfbb6a",
+          "title": "Windows Event Log Cleared",
+          "path": "detections/endpoint/windows_event_log_cleared.yml",
+          "sha256": "3c2db8fbe98de541c5a383d76a34ff1fa202e57c377913e599100a961e1b10ec"
+        },
+        {
+          "id": "fdb829a8-db84-4832-b64b-3e964cd44f01",
+          "title": "Windows Eventlog Cleared Via Wevtutil",
+          "path": "detections/endpoint/windows_eventlog_cleared_via_wevtutil.yml",
+          "sha256": "5a2df850689bd10b9a549facf8c4690fc00c6fbe42e3eeda3db1cc4da0280c21"
+        },
+        {
+          "id": "7fac8d40-e370-45ea-a4a3-031bbcc18b02",
+          "title": "Windows File Download Via CertUtil",
+          "path": "detections/endpoint/windows_file_download_via_certutil.yml",
+          "sha256": "cd02b409aa21c7759f692b7c19033d2ce1c797f1d928d5ab41b5f423661dba1c"
+        },
+        {
+          "id": "d81d4d3d-76b5-4f21-ab51-b17d5164c106",
+          "title": "Windows PowerShell FakeCAPTCHA Clipboard Execution",
+          "path": "detections/endpoint/windows_powershell_fakecaptcha_clipboard_execution.yml",
+          "sha256": "8f2f030cfdbfd3683fa7125b6ea907d612aeb43a68e5a0ac25f2ca17488f8009"
+        },
+        {
+          "id": "28b80028-851d-4b8d-88a5-375ba115418a",
+          "title": "Windows Remote Management Execute Shell",
+          "path": "detections/endpoint/windows_remote_management_execute_shell.yml",
+          "sha256": "2df5c4791a911bb547a6c46106baa2168be700fc3396f92f7f7050522a25f74e"
+        },
+        {
+          "id": "350032cd-3d3f-4278-afc8-e01cf5c33524",
+          "title": "Windows Scheduled Task Created in a Group Policy Object",
+          "path": "detections/endpoint/windows_scheduled_task_created_in_a_group_policy_object.yml",
+          "sha256": "98c181594416f9e8eb0857bbafd20eb89c738149ba01497fdf39cd77029c5619"
+        },
+        {
+          "id": "7e03b682-3965-4598-8e91-a60a40a3f7e4",
+          "title": "Windows Scheduled Task Created Via XML",
+          "path": "detections/endpoint/windows_scheduled_task_created_via_xml.yml",
+          "sha256": "7de0b1622786d28b9b42fddbcb2b65e8f64cf59f1b2092e890ecac4e2c31a643"
+        },
+        {
+          "id": "1f44c126-c26a-4dd3-83bb-0f9a0f03ecc3",
+          "title": "Windows Scheduled Task with Suspicious Command",
+          "path": "detections/endpoint/windows_scheduled_task_with_suspicious_command.yml",
+          "sha256": "93ad955fc8ba96e3aecc280684c3108c24169c8d2bb1031082e251948e0c0b3c"
+        },
+        {
+          "id": "7a0dda67-4cc7-4113-b3bd-b3f1489a98bf",
+          "title": "Windows SharePoint Spinstall0 Webshell File Creation",
+          "path": "detections/endpoint/windows_sharepoint_spinstall0_webshell_file_creation.yml",
+          "sha256": "fb9765a0a31ea188ffdef869b0b2eee7436bc7c853abc2aa850b316a847ffd90"
+        },
+        {
+          "id": "ac490de2-ee39-421c-b61b-1c4005dde427",
+          "title": "Windows SharePoint Spinstall0 GET Request",
+          "path": "detections/web/windows_sharepoint_spinstall0_get_request.yml",
+          "sha256": "6c6f9abb9e9cb481490ec3cd5c8b59fd3b1e382b426ebb46913b80ebd0f5516e"
+        },
+        {
+          "id": "508b2649-3a1e-4a4c-ba9d-3cc05e1a1b70",
+          "title": "Windows SharePoint ToolPane Endpoint Exploitation Attempt",
+          "path": "detections/web/windows_sharepoint_toolpane_endpoint_exploitation_attempt.yml",
+          "sha256": "d2a638671fc83aaee5d685ad47fc637a3e8d3c35c3c73f46eaa85032f943b631"
+        }
+      ]
+    }
+  },
+  "links": [
+    {
+      "oci": "queries/clickfix_fake_captcha_powershell_execution.json",
+      "vendor": "elastic",
+      "id": "fbad57ec-4442-48db-a34f-5ee907b44a22",
+      "confidence": "related",
+      "rationale": "Both look for command execution induced by fake CAPTCHA phishing. The process and command-line patterns differ."
+    },
+    {
+      "oci": "queries/clickfix_fake_captcha_powershell_execution.json",
+      "vendor": "splunk",
+      "id": "d81d4d3d-76b5-4f21-ab51-b17d5164c106",
+      "confidence": "related",
+      "rationale": "Both cover Windows PowerShell execution prompted by fake CAPTCHA instructions. Their signal requirements differ."
+    },
+    {
+      "oci": "queries/credential_dumping_via_comsvcs_with_rundll32.json",
+      "vendor": "elastic",
+      "id": "c5c9f591-d111-4cf8-baec-c26a39bc31ef",
+      "confidence": "related",
+      "rationale": "Both cover suspicious rundll32 and COM Services activity associated with credential dumping. Their event types differ."
+    },
+    {
+      "oci": "queries/credential_dumping_via_comsvcs_with_rundll32.json",
+      "vendor": "splunk",
+      "id": "8943b567-f14d-4ee8-a0bb-2121d4ce3184",
+      "confidence": "related",
+      "rationale": "Both cover dumping activity from rundll32 using the COM Services DLL. Their command-line conditions differ."
+    },
+    {
+      "oci": "queries/dcsync_directory_replication.json",
+      "vendor": "elastic",
+      "id": "5c6f4c58-b381-452a-8976-f1b1c6aa0def",
+      "confidence": "related",
+      "rationale": "Both use Directory Service Access event 4662 and directory replication rights to detect suspicious DCSync. Elastic applies a new-terms condition."
+    },
+    {
+      "oci": "queries/dcsync_enablement_replication_rights_granted_via_directory_change_5136.json",
+      "vendor": "elastic",
+      "id": "9f962927-1a4f-45f3-a57b-287f2c7029c1",
+      "confidence": "related",
+      "rationale": "OCI flags permissions changes that grant replication rights. Elastic flags subsequent use of replication rights through Windows event 4662."
+    },
+    {
+      "oci": "queries/gpo_scheduled_task_written_to_sysvol.json",
+      "vendor": "elastic",
+      "id": "15a8ba77-1c13-4274-88fe-6bd14133861e",
+      "confidence": "related",
+      "rationale": "Both monitor scheduled task artifacts in Group Policy paths. Their file activity requirements differ."
+    },
+    {
+      "oci": "queries/gpo_scheduled_task_written_to_sysvol.json",
+      "vendor": "splunk",
+      "id": "350032cd-3d3f-4278-afc8-e01cf5c33524",
+      "confidence": "related",
+      "rationale": "Both cover scheduled task persistence through Group Policy. The required filesystem telemetry differs."
+    },
+    {
+      "oci": "queries/hunting/clickfix_clipboard_powershell_execution.json",
+      "vendor": "elastic",
+      "id": "fbad57ec-4442-48db-a34f-5ee907b44a22",
+      "confidence": "related",
+      "rationale": "Both look for PowerShell execution induced by fake CAPTCHA phishing. Process and command-line constraints differ."
+    },
+    {
+      "oci": "queries/hunting/clickfix_clipboard_powershell_execution.json",
+      "vendor": "splunk",
+      "id": "d81d4d3d-76b5-4f21-ab51-b17d5164c106",
+      "confidence": "related",
+      "rationale": "Both look for PowerShell execution tied to fake CAPTCHA clipboard instructions. They use different telemetry and thresholds."
+    },
+    {
+      "oci": "queries/hunting/clickfix_lolbin_payload_execution.json",
+      "vendor": "elastic",
+      "id": "7dc45430-7407-4790-b89e-c857c3f6bf23",
+      "confidence": "related",
+      "rationale": "Both look for ClickFix follow-on activity through Windows utilities. The upstream rule covers a broader set of launch patterns."
+    },
+    {
+      "oci": "queries/hunting/sharepoint_toolshell_exploitation.json",
+      "vendor": "splunk",
+      "id": "508b2649-3a1e-4a4c-ba9d-3cc05e1a1b70",
+      "confidence": "related",
+      "rationale": "Both use HTTP activity to flag requests associated with SharePoint ToolShell. OCI includes broader endpoint and telemetry coverage."
+    },
+    {
+      "oci": "queries/hunting/sharepoint_toolshell_webshell_post_exploit.json",
+      "vendor": "splunk",
+      "id": "7a0dda67-4cc7-4113-b3bd-b3f1489a98bf",
+      "confidence": "related",
+      "rationale": "Both cover the same SharePoint webshell filename. Splunk uses filesystem creation while OCI uses web requests and application telemetry."
+    },
+    {
+      "oci": "queries/hunting/sharepoint_toolshell_webshell_post_exploit.json",
+      "vendor": "splunk",
+      "id": "ac490de2-ee39-421c-b61b-1c4005dde427",
+      "confidence": "related",
+      "rationale": "Both look for web requests to the SharePoint webshell path. OCI also looks at post-exploitation request behavior and application traces."
+    },
+    {
+      "oci": "queries/hunting/windows_defense_evasion_score.json",
+      "vendor": "elastic",
+      "id": "d331bbe2-6db4-4941-80a5-8270db72eb61",
+      "confidence": "related",
+      "rationale": "Windows log clearing is one of several signals contributing to the OCI defense-evasion score."
+    },
+    {
+      "oci": "queries/hunting/windows_defense_evasion_score.json",
+      "vendor": "splunk",
+      "id": "fdb829a8-db84-4832-b64b-3e964cd44f01",
+      "confidence": "related",
+      "rationale": "Windows log clearing through wevtutil is one of several signals contributing to the OCI defense-evasion score."
+    },
+    {
+      "oci": "queries/hunting/windows_lateral_movement_cluster.json",
+      "vendor": "elastic",
+      "id": "1cd01db9-be24-4bef-8e7c-e923f0ff78ab",
+      "confidence": "related",
+      "rationale": "The OCI hunt correlates multiple lateral movement methods, including WinRM. The upstream rule focuses on incoming WinRM execution."
+    },
+    {
+      "oci": "queries/hunting/windows_lateral_movement_cluster.json",
+      "vendor": "splunk",
+      "id": "28b80028-851d-4b8d-88a5-375ba115418a",
+      "confidence": "related",
+      "rationale": "The OCI hunt includes WinRM alongside other lateral movement signals. The upstream rule focuses on Windows remote-shell execution."
+    },
+    {
+      "oci": "queries/kerberoasting_rc4_ticket_request.json",
+      "vendor": "splunk",
+      "id": "5cc67381-44fa-4111-8a37-7a230943f027",
+      "confidence": "related",
+      "rationale": "Both use Windows Kerberos service ticket event 4769 and RC4 encryption as evidence. The upstream rule adds service-account filters."
+    },
+    {
+      "oci": "queries/linux_ssh_authorized_keys_modified.json",
+      "vendor": "elastic",
+      "id": "2215b8bd-1759-4ffa-8ab8-55c8e6b32e7f",
+      "confidence": "related",
+      "rationale": "Both detect changes to SSH authorized_keys. Elastic includes multiple operating systems and its own tooling filters."
+    },
+    {
+      "oci": "queries/linux_ssh_authorized_keys_modified.json",
+      "vendor": "splunk",
+      "id": "f5ab595e-28e5-4327-8077-5008ba97c850",
+      "confidence": "related",
+      "rationale": "Both detect Linux SSH authorized_keys changes. Filesystem field matching and filtering differ."
+    },
+    {
+      "oci": "queries/lsass_memory_dump_via_comsvcs_dll.json",
+      "vendor": "elastic",
+      "id": "c5c9f591-d111-4cf8-baec-c26a39bc31ef",
+      "confidence": "related",
+      "rationale": "Both cover misuse of the Windows COM Services DLL to dump LSASS. Elastic uses a different event relationship."
+    },
+    {
+      "oci": "queries/lsass_memory_dump_via_comsvcs_dll.json",
+      "vendor": "splunk",
+      "id": "8943b567-f14d-4ee8-a0bb-2121d4ce3184",
+      "confidence": "related",
+      "rationale": "Both cover LSASS dumping through the COM Services DLL. Process and command-line constraints differ."
+    },
+    {
+      "oci": "queries/scheduled_task_xml_import.json",
+      "vendor": "splunk",
+      "id": "7e03b682-3965-4598-8e91-a60a40a3f7e4",
+      "confidence": "related",
+      "rationale": "Both look for creating scheduled tasks from XML. Their process and arguments filters differ."
+    },
+    {
+      "oci": "queries/sentinel/clearing_of_forensic_evidence_from_event_logs_using_wevtutil.json",
+      "vendor": "elastic",
+      "id": "d331bbe2-6db4-4941-80a5-8270db72eb61",
+      "confidence": "related",
+      "rationale": "The promoted OCI rule and Elastic rule both cover wevtutil log clearing. Elastic covers additional tools and actions."
+    },
+    {
+      "oci": "queries/sentinel/clearing_of_forensic_evidence_from_event_logs_using_wevtutil.json",
+      "vendor": "splunk",
+      "id": "fdb829a8-db84-4832-b64b-3e964cd44f01",
+      "confidence": "related",
+      "rationale": "Both detect log clearing through wevtutil. Telemetry and filter details differ."
+    },
+    {
+      "oci": "queries/suspicious_scheduled_task_creation.json",
+      "vendor": "elastic",
+      "id": "afcce5ad-65de-4ed2-8516-5e093d3ac99a",
+      "confidence": "related",
+      "rationale": "Both detect scheduled task creation. The OCI rule focuses on actions in user-writable paths."
+    },
+    {
+      "oci": "queries/suspicious_scheduled_task_creation.json",
+      "vendor": "splunk",
+      "id": "1f44c126-c26a-4dd3-83bb-0f9a0f03ecc3",
+      "confidence": "related",
+      "rationale": "Both cover scheduled tasks with suspicious executable actions. The command conditions differ."
+    },
+    {
+      "oci": "queries/sysmon_lateral_movement_via_winrm.json",
+      "vendor": "elastic",
+      "id": "1cd01db9-be24-4bef-8e7c-e923f0ff78ab",
+      "confidence": "related",
+      "rationale": "Both look for process execution tied to WinRM on Windows. Process filters differ."
+    },
+    {
+      "oci": "queries/sysmon_lateral_movement_via_winrm.json",
+      "vendor": "splunk",
+      "id": "28b80028-851d-4b8d-88a5-375ba115418a",
+      "confidence": "related",
+      "rationale": "Both look for Windows shell execution via WinRM. Process selection differs."
+    },
+    {
+      "oci": "queries/windows_certutil_download_or_decode.json",
+      "vendor": "elastic",
+      "id": "fd70c98a-c410-42dc-a2e3-761c71848acf",
+      "confidence": "related",
+      "rationale": "Both cover suspicious certutil use. Their option sets differ."
+    },
+    {
+      "oci": "queries/windows_certutil_download_or_decode.json",
+      "vendor": "splunk",
+      "id": "7fac8d40-e370-45ea-a4a3-031bbcc18b02",
+      "confidence": "related",
+      "rationale": "Both cover file downloads through certutil. The OCI rule also covers decoding."
+    },
+    {
+      "oci": "queries/windows_certutil_download_or_decode.json",
+      "vendor": "splunk",
+      "id": "bfe94226-8c10-11eb-a4b3-acde48001122",
+      "confidence": "related",
+      "rationale": "Both cover certutil decoding. The OCI rule also covers download activity."
+    },
+    {
+      "oci": "queries/windows_event_log_cleared_via_wevtutil.json",
+      "vendor": "elastic",
+      "id": "d331bbe2-6db4-4941-80a5-8270db72eb61",
+      "confidence": "related",
+      "rationale": "Both cover command-line log clearing. Elastic covers additional tools and actions."
+    },
+    {
+      "oci": "queries/windows_event_log_cleared_via_wevtutil.json",
+      "vendor": "splunk",
+      "id": "fdb829a8-db84-4832-b64b-3e964cd44f01",
+      "confidence": "related",
+      "rationale": "Both cover the wevtutil log-clearing command. Process field matching and exclusions differ."
+    },
+    {
+      "oci": "queries/windows_event_log_clearing.json",
+      "vendor": "elastic",
+      "id": "d331bbe2-6db4-4941-80a5-8270db72eb61",
+      "confidence": "related",
+      "rationale": "Both detect processes clearing Windows logs. The upstream rule covers additional tools and process patterns."
+    },
+    {
+      "oci": "queries/windows_event_log_clearing.json",
+      "vendor": "splunk",
+      "id": "fdb829a8-db84-4832-b64b-3e964cd44f01",
+      "confidence": "related",
+      "rationale": "Both cover wevtutil log clearing. OCI also checks PowerShell clearing activity."
+    },
+    {
+      "oci": "queries/windows_scheduled_task_creation_via_schtasks.json",
+      "vendor": "elastic",
+      "id": "afcce5ad-65de-4ed2-8516-5e093d3ac99a",
+      "confidence": "related",
+      "rationale": "Both cover task creation using schtasks. Elastic applies a different local execution scope."
+    },
+    {
+      "oci": "queries/windows_security_log_cleared_event.json",
+      "vendor": "elastic",
+      "id": "45ac4800-840f-414c-b221-53dd36a5aaf7",
+      "confidence": "related",
+      "rationale": "Both detect Security and System log-clearing events. Elastic matches normalized event actions while OCI uses native Windows event IDs."
+    },
+    {
+      "oci": "queries/windows_security_log_cleared_event.json",
+      "vendor": "splunk",
+      "id": "ad517544-aff9-4c96-bd99-d6eb43bfbb6a",
+      "confidence": "exact",
+      "rationale": "Both select Windows Security event 1102 and System event 104 for the core signal. Aggregation fields and downstream filtering differ."
+    },
+    {
+      "oci": "queries/winrm_lateral_movement_via_powershell.json",
+      "vendor": "elastic",
+      "id": "1cd01db9-be24-4bef-8e7c-e923f0ff78ab",
+      "confidence": "related",
+      "rationale": "Both look for Windows commands executed via WinRM. Elastic evaluates endpoint process ancestry."
+    },
+    {
+      "oci": "queries/winrm_lateral_movement_via_powershell.json",
+      "vendor": "splunk",
+      "id": "7d4c618e-4716-11ec-951c-3e22fbd008af",
+      "confidence": "related",
+      "rationale": "Both cover WinRM remote execution involving PowerShell. Splunk uses PowerShell script block telemetry."
+    }
+  ]
+}

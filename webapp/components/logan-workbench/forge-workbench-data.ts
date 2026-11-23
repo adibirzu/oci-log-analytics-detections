@@ -696,7 +696,7 @@ function sampleValueForField(field: string, combinedText: string) {
   if (field.includes("User")) return "example\\analyst"
   if (field.includes("Request URL")) return "/search?q=%3Cscript%3Ealert(1)%3C/script%3E"
   if (field.includes("Response Code")) return "200"
-  if (field.includes("Source IP")) return "10.0.12.24"
+  if (field.includes("Source IP")) return "192.0.2.24"
   if (field.includes("Service Name")) return "checkout-api"
   return "sample-value"
 }

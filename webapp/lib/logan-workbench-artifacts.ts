@@ -9,6 +9,8 @@ const detectionsRepoPath = process.env.LOGAN_DETECTIONS_REPO
   ? path.resolve(process.env.LOGAN_DETECTIONS_REPO)
   : path.resolve(process.cwd(), "..")
 
+const staticExport = process.env.NEXT_PUBLIC_FORGE_STATIC_EXPORT === "1"
+
 const supportLevelSchema = z.enum(["supported", "partial", "lossy", "unsupported"])
 const sourceLanguageSchema = z.enum([
   "sigma_yaml",
@@ -176,8 +178,9 @@ async function readJsonArtifact<TSchema extends z.ZodTypeAny>(
   label: string,
   relativePath: string,
   schema: TSchema,
+  root = detectionsRepoPath,
 ): Promise<WorkbenchArtifactReadResult<z.output<TSchema>>> {
-  const absolutePath = path.join(detectionsRepoPath, relativePath)
+  const absolutePath = path.join(root, relativePath)
 
   try {
     const fileContents = await readFile(absolutePath, "utf8")
@@ -232,6 +235,7 @@ export const getLoganWorkbenchArtifacts = cache(async (): Promise<LoganWorkbench
         "Full Forge detection catalog",
         "queries/forge_detection_catalog.json",
         forgeCatalogSchema,
+        staticExport ? path.resolve(".next-pages-artifacts") : detectionsRepoPath,
       ),
     ])
 

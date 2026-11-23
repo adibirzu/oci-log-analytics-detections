@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Detection Rules Explorer · OCI Log Analytics</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./explorer.css">
+  <script src="./explorer.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to explorer</a>
+  <header class="topbar">
+    <div class="frame topbar-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> OCI Log Analytics</div>
+      <button class="small-button theme" id="theme" type="button" aria-label="Switch to dark theme">Dark theme</button>
+    </div>
+  </header>
+  <main class="frame" id="main">
+    <section class="intro" aria-labelledby="title">
+      <h1 id="title">Detection Rules Explorer</h1>
+      <p class="lede">Browse OCI Log Analytics queries and compare verified Elastic and Splunk rule references.</p>
+      <ul class="metrics" id="metrics"></ul>
+    </section>
+
+    <section class="coverage" aria-labelledby="coverage-title">
+      <div class="coverage-title">
+        <h2 id="coverage-title">MITRE ATT&amp;CK coverage</h2>
+        <span id="coverage-summary"></span>
+      </div>
+      <div id="tactics" class="tactics"></div>
+    </section>
+
+    <section aria-label="Rule library" class="library">
+      <div class="toolbar" role="group" aria-label="Catalog perspective">
+        <button type="button" data-vendor="oci" aria-pressed="true">OCI Log Analytics</button>
+        <button type="button" data-vendor="elastic" aria-pressed="false">Elastic</button>
+        <button type="button" data-vendor="splunk" aria-pressed="false">Splunk</button>
+      </div>
+      <div class="search-row">
+        <div class="search-field">
+          <label for="search" class="sr-only">Search rules</label>
+          <input type="search" id="search" placeholder="Search rules, queries, tags, or ATT&CK IDs" autocomplete="off">
+          <kbd aria-hidden="true">/</kbd>
+        </div>
+        <button class="small-button filter-toggle" id="filter-toggle" type="button" aria-controls="filters" aria-expanded="false">Filters</button>
+      </div>
+      <div class="catalog">
+        <aside id="filters" class="filters" aria-labelledby="filters-heading">
+          <div class="filter-heading">
+            <h2 id="filters-heading">Filters</h2>
+            <button class="text-button" type="button" id="clear">Clear filters</button>
+          </div>
+          <div id="facets"></div>
+        </aside>
+        <div class="results">
+          <div class="result-heading">
+            <p id="results-status" role="status">Loading rules…</p>
+            <div id="chips" class="chips"></div>
+          </div>
+          <div id="results"></div>
+          <nav id="pagination" class="pagination" aria-label="Result pages" hidden>
+            <button type="button" class="small-button" id="previous">Previous</button>
+            <span id="page-status"></span>
+            <button type="button" class="small-button" id="next">Next</button>
+          </nav>
+        </div>
+      </div>
+    </section>
+  </main>
+  <dialog id="detail" aria-labelledby="detail-title">
+    <header class="detail-header">
+      <h2 id="detail-title"></h2>
+      <button id="close-detail" type="button" class="small-button" autofocus>Close</button>
+    </header>
+    <div id="detail-content" class="detail-content"></div>
+  </dialog>
+</body>
+</html>

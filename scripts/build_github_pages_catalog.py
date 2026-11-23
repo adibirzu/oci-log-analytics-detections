@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from build_detection_explorer import pages_forge_catalog, public_json
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = PROJECT_ROOT / "scripts"
 WEBAPP_DIR = PROJECT_ROOT / "webapp"
@@ -45,9 +47,8 @@ def main() -> int:
     else:
         docs_pages = PROJECT_ROOT / "docs" / "pages"
         docs_pages.mkdir(parents=True, exist_ok=True)
-        src = PROJECT_ROOT / "queries" / "forge_detection_catalog.json"
         dst = docs_pages / "forge_detection_catalog.json"
-        dst.write_bytes(src.read_bytes())
+        dst.write_text(public_json(pages_forge_catalog()), encoding="utf-8")
 
     print("Successfully rebuilt GitHub Pages catalog and detection artifacts.")
     return 0

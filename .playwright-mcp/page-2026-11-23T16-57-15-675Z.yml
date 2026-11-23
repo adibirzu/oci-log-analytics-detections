@@ -1,0 +1,29 @@
+- generic [active] [ref=f1e1]:
+  - link "Skip to explorer" [ref=f1e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f1e3]:
+    - generic [ref=f1e4]:
+      - generic [ref=f1e5]: OCI Log Analytics
+      - button "Switch to dark theme" [ref=f1e7] [cursor=pointer]: Dark theme
+  - main [ref=f1e8]:
+    - region "Detection Rules Explorer" [ref=f1e9]:
+      - heading "Detection Rules Explorer" [level=1] [ref=f1e10]
+      - paragraph [ref=f1e11]: Browse OCI Log Analytics queries and compare verified Elastic and Splunk rule references.
+      - list
+    - region "MITRE ATT&CK coverage" [ref=f1e12]:
+      - heading "MITRE ATT&CK coverage" [level=2] [ref=f1e14]
+    - region "Rule library" [ref=f1e15]:
+      - group "Catalog perspective" [ref=f1e16]:
+        - button "OCI Log Analytics" [pressed] [ref=f1e17] [cursor=pointer]
+        - button "Elastic" [ref=f1e18] [cursor=pointer]
+        - button "Splunk" [ref=f1e19] [cursor=pointer]
+      - generic [ref=f1e21]:
+        - generic [ref=f1e22]: Search rules
+        - searchbox "Search rules" [ref=f1e23]
+        - generic [aria-hidden]: /
+      - generic [ref=f1e24]:
+        - complementary "Filters" [ref=f1e25]:
+          - generic [ref=f1e26]:
+            - heading "Filters" [level=2] [ref=f1e27]
+            - button "Clear filters" [ref=f1e28] [cursor=pointer]
+        - status [ref=f1e31]: Loading rules…

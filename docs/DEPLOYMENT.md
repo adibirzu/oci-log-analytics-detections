@@ -138,7 +138,7 @@ Pull request and local conversion lanes remain credential-free.
 | Rule conversion and catalog generation | Local development / pull request | None | Rebuilds generated artifacts and validates contracts |
 | Sentinel local conversion | Local development / pull request | None | Produces reports and candidate validation without promotion |
 | Sentinel live promotion | Scheduled or manual | `live-oci` environment secrets | Promotes only parser-passing, live-validated candidates |
-| Forge GitHub Pages | Push/workflow dispatch | Repository Pages enabled | Builds static Forge and deploys when Pages is available |
+| Forge GitHub Pages | Push/workflow dispatch | Repository Pages enabled | Builds static Forge and the Detection Rules Explorer; deploys when Pages is available |
 | Forge dynamic deployment package | Customer request in Forge | None in Forge | Produces a zip under the package source contract above; customer plans/applies in OCI |
 | Resource Manager plan/apply | Customer action in OCI | Customer OCI session and IAM | Creates/updates only the reviewed tenancy resources |
 

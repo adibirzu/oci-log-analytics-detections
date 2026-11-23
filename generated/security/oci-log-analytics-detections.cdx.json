@@ -861,7 +861,7 @@
       "version": "1.0.39"
     },
     {
-      "bom-ref": "pkg:npm/%40playwright/test@1.60.0",
+      "bom-ref": "pkg:npm/%40playwright/test@1.61.1",
       "name": "@playwright/test",
       "properties": [
         {
@@ -869,9 +869,9 @@
           "value": "webapp/pnpm-lock.yaml"
         }
       ],
-      "purl": "pkg:npm/%40playwright/test@1.60.0",
+      "purl": "pkg:npm/%40playwright/test@1.61.1",
       "type": "library",
-      "version": "1.60.0"
+      "version": "1.61.1"
     },
     {
       "bom-ref": "pkg:npm/%40radix-ui/primitive@1.1.3",
@@ -4696,7 +4696,7 @@
       "version": "4.0.7"
     },
     {
-      "bom-ref": "pkg:npm/playwright-core@1.60.0",
+      "bom-ref": "pkg:npm/playwright-core@1.61.1",
       "name": "playwright-core",
       "properties": [
         {
@@ -4704,12 +4704,12 @@
           "value": "webapp/pnpm-lock.yaml"
         }
       ],
-      "purl": "pkg:npm/playwright-core@1.60.0",
+      "purl": "pkg:npm/playwright-core@1.61.1",
       "type": "library",
-      "version": "1.60.0"
+      "version": "1.61.1"
     },
     {
-      "bom-ref": "pkg:npm/playwright@1.60.0",
+      "bom-ref": "pkg:npm/playwright@1.61.1",
       "name": "playwright",
       "properties": [
         {
@@ -4717,9 +4717,9 @@
           "value": "webapp/pnpm-lock.yaml"
         }
       ],
-      "purl": "pkg:npm/playwright@1.60.0",
+      "purl": "pkg:npm/playwright@1.61.1",
       "type": "library",
-      "version": "1.60.0"
+      "version": "1.61.1"
     },
     {
       "bom-ref": "pkg:npm/possible-typed-array-names@1.1.0",
@@ -6119,7 +6119,7 @@
       },
       {
         "name": "oci-log-analytics-detections:sha256:webapp/pnpm-lock.yaml",
-        "value": "fa4a6abf55b22fd72f7e7625baa3efbc5aa350f0d39b379a58719c5db35513f6"
+        "value": "162fda76197c82b3aaa6c362fc210f5fdf655242b2ef954bf4a36297f262a7dc"
       }
     ]
   },

@@ -9,7 +9,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useSidebar } from "@/components/ui/sidebar"
 import { publicAssetPath } from "@/lib/public-assets"
 
-const staticExport = process.env.NEXT_PUBLIC_FORGE_STATIC_EXPORT === "1"
 const repositoryUrl = "https://github.com/adibirzu/oci-log-analytics-detections"
 
 export function DashboardHeader() {
@@ -53,11 +52,6 @@ export function DashboardHeader() {
           <div className="truncate text-xs font-medium text-muted-foreground">{isDeployment ? "Review and apply in your OCI compartment" : isLogSamples ? "OCI Logging + Logan detections" : "OCI Log Analytics QL"}</div>
         </div>
       </div>
-      {staticExport && (
-        <Button asChild variant="outline" size="sm">
-          <a href={publicAssetPath("/explorer/")}>Detection Rules Explorer</a>
-        </Button>
-      )}
       <Button asChild variant="outline" size="sm">
         <a href={repositoryUrl} target="_blank" rel="noreferrer">
           <Github className="size-4" />

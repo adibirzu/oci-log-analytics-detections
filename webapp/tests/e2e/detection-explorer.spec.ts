@@ -57,8 +57,12 @@ for (const [label, viewport, path] of [
     page.on("response", (response) => { if (response.status() >= 400) errors.push(response.url()) })
     await page.goto(origin + path)
     await expect(page.getByRole("heading", { name: "Detection Rules Explorer" })).toBeVisible()
-    await expect(page.getByText(/1,197 OCI rules/)).toBeVisible()
-    await expect(page.getByRole("status").filter({ hasText: "1,216" })).toBeVisible()
+    const catalogResponse = await request.get(origin + path + "catalog.json")
+    expect(catalogResponse.ok()).toBeTruthy()
+    const data: { rules: Array<{ id: string, kind: string, query: string }> } = await catalogResponse.json()
+    const ruleCount = data.rules.filter(({ kind }) => kind !== "hunting").length
+    await expect(page.getByText(ruleCount.toLocaleString("en-US") + " OCI rules", { exact: true })).toBeVisible()
+    await expect(page.getByRole("status").filter({ hasText: data.rules.length.toLocaleString("en-US") })).toBeVisible()
     const screenshots = process.env.EXPLORER_SCREENSHOTS
     if (screenshots) await page.screenshot({ path: join(screenshots, `${label}-catalog.png`) })
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width)
@@ -101,8 +105,6 @@ for (const [label, viewport, path] of [
       await page.screenshot({ path: join(screenshots, `${label}-detail.png`) })
       if (label === "mobile") await page.setViewportSize(viewport)
     }
-    const baseRepoResponse = await request.get(origin + path + "catalog.json")
-    const data: { rules: Array<{ id: string, query: string }> } = await baseRepoResponse.json()
     const expected = data.rules.find(({ id }) => id === "queries/hunting/clickfix_clipboard_powershell_execution.json")
     expect(expected).toBeDefined()
     await dialog.getByRole("button", { name: "Copy query" }).click()

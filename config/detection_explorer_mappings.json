@@ -220,7 +220,7 @@
       "vendor": "elastic",
       "id": "9f962927-1a4f-45f3-a57b-287f2c7029c1",
       "confidence": "related",
-      "rationale": "Both look for changes that grant directory replication rights. Elastic's directory-object conditions differ."
+      "rationale": "OCI flags permissions changes that grant replication rights. Elastic flags subsequent use of replication rights through Windows event 4662."
     },
     {
       "oci": "queries/gpo_scheduled_task_written_to_sysvol.json",

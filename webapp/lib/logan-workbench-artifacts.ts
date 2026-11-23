@@ -9,7 +9,8 @@ const detectionsRepoPath = process.env.LOGAN_DETECTIONS_REPO
   ? path.resolve(process.env.LOGAN_DETECTIONS_REPO)
   : path.resolve(process.cwd(), "..")
 
-const staticExport = process.env.NEXT_PUBLIC_FORGE_STATIC_EXPORT === "1"
+const staticExport =
+  process.env.NEXT_PUBLIC_FORGE_STATIC_EXPORT === "1" || process.env.FORGE_STATIC_EXPORT === "1"
 
 const supportLevelSchema = z.enum(["supported", "partial", "lossy", "unsupported"])
 const sourceLanguageSchema = z.enum([
@@ -238,6 +239,10 @@ export const getLoganWorkbenchArtifacts = cache(async (): Promise<LoganWorkbench
         staticExport ? path.resolve(".next-pages-artifacts") : detectionsRepoPath,
       ),
     ])
+
+  if (staticExport && !forgeDetectionCatalog.data) {
+    throw new Error("Forge Pages catalog is unavailable. Run pnpm build:pages to stage the public catalog.")
+  }
 
   const statuses = [
     referenceCatalog.status,

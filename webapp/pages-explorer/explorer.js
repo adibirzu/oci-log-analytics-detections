@@ -210,8 +210,8 @@ function mappingPanel(rule, vendor) {
   const panel = node("section", null, "mapping");
   panel.append(node("h3", vendors[vendor]));
   const mapping = rule.mappings[vendor];
-  panel.append(tag(statusLabels[mapping.status], mapping.status));
   if (!mapping.references.length) {
+    panel.append(tag(statusLabels[mapping.status], mapping.status));
     const reason = mapping.status === "oci-specific"
       ? "This query uses OCI telemetry. No vendor reference has been verified."
       : "No official rule has been verified for this query.";

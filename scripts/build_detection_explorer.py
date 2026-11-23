@@ -9,7 +9,6 @@ import ipaddress
 import json
 import re
 import shutil
-import tomllib
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -94,6 +93,8 @@ def verify_upstream(vendor: str, reference: dict, upstream_root: Path) -> None:
     snapshot = upstream_root / f"{repo.split('/')[1]}-{reference['revision']}"
     raw = (snapshot / reference["path"]).read_bytes()
     if vendor == "elastic":
+        import tomllib
+
         document = tomllib.loads(raw.decode())["rule"]
         identity = document["rule_id"], document["name"]
     else:
@@ -186,7 +187,9 @@ def build_catalog(upstream_root: Path | None) -> dict:
 
         source = item.get("logsource") or {}
         sources = log_sources(query, source)
-        platform = source.get("product") or "unspecified"
+        platform = source.get("product")
+        if not platform:
+            platform = "oci" if sources and all(name.startswith("OCI ") for name in sources) else "unspecified"
         attack = item.get("mitre_attack", {})
         tactics = {tactic.replace("commandand_control", "command_and_control") for tactic in attack.get("tactics", [])}
         techniques = sorted({

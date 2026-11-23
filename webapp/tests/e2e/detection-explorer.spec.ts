@@ -67,7 +67,16 @@ for (const [label, viewport, path] of [
     if (screenshots) await page.screenshot({ path: join(screenshots, `${label}-catalog.png`) })
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width)
 
-    if (label === "mobile") await page.getByRole("button", { name: "Filters" }).click()
+    if (label === "mobile") {
+      const reconnaissance = page.getByRole("button", { name: /^Reconnaissance,/ }).getByText("Reconnaissance", { exact: true })
+      const lines = await reconnaissance.evaluate((label) => {
+        const range = document.createRange()
+        range.selectNodeContents(label)
+        return range.getClientRects().length
+      })
+      expect(lines).toBe(1)
+      await page.getByRole("button", { name: "Filters" }).click()
+    }
     await page.getByLabel("Filter by severity").selectOption("high")
     await page.getByLabel("Filter by tactic").selectOption({ label: "Execution" })
     await page.getByLabel("Filter by technique").selectOption("T1059.001")
@@ -84,6 +93,7 @@ for (const [label, viewport, path] of [
     const search = page.getByRole("searchbox")
     await expect(search).toBeFocused()
     await search.fill("clickfix clipboard powershell")
+    await expect(page.locator("kbd")).toBeHidden()
     await page.getByLabel("Filter by Elastic mapping").selectOption("related")
     await page.getByLabel("Filter by Splunk mapping").selectOption("related")
     await page.getByRole("button", { name: "ClickFix: Clipboard PowerShell Execution", exact: true }).click()
@@ -100,6 +110,7 @@ for (const [label, viewport, path] of [
     await expect(dialog.getByRole("heading", { name: "Splunk Security Content" })).toBeVisible()
     await expect(dialog.getByRole("heading", { name: "Provenance" })).toBeVisible()
     await expect(dialog.getByRole("link", { name: /official source/i })).toHaveCount(2)
+    await expect(dialog.getByText("Related", { exact: true })).toHaveCount(2)
     if (screenshots) {
       if (label === "mobile") await page.setViewportSize({ ...viewport, height: 1130 })
       await page.screenshot({ path: join(screenshots, `${label}-detail.png`) })

@@ -62,7 +62,7 @@ cd webapp
 NEXT_PUBLIC_FORGE_BASE_PATH=/oci-log-analytics-detections pnpm build:pages
 ```
 
-The static export is written to `webapp/out`. The Forge GitHub Pages workflow uploads that directory. At a repository subpath, the Explorer is at `/oci-log-analytics-detections/explorer/`. Pages activation and deployment require the repository owner's approval.
+The static export is written to `webapp/out`. The Forge GitHub Pages workflow uploads that directory. At a repository subpath, the Explorer is at `/oci-log-analytics-detections/explorer/`. Pages activation and deployment require the repository owner's approval. The `build:pages` command stages the public Forge catalog before it runs Next.js. The existing workflow's path filters require a manual workflow dispatch after merge for updates confined to the content manifest or mapping inputs.
 
 ### Detection Rules Explorer preview
 

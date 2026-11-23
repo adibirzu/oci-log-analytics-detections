@@ -53,6 +53,9 @@ def test_exact_query_parity_and_inventory(export):
     assert len(records) == len(catalog["rules"])
     assert records.keys() == expected.keys()
     assert catalog["contentDigest"] == manifest["content_digest"]
+    native_hunt = records["queries/hunting/oci_resource_deletion_wave.json"]
+    assert native_hunt["platform"] == "oci"
+    assert {mapping["status"] for mapping in native_hunt["mappings"].values()} == {"oci-specific"}
     for path, item in expected.items():
         raw = (ROOT / path).read_bytes()
         source = json.loads(raw)

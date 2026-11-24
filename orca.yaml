@@ -1,0 +1,9 @@
+# Orca workspace configuration for adibirzu/oci-log-analytics-detections.
+#
+# Strict key allowlist: `scripts.setup` and `setupAgentStartupPolicy` only.
+# Each worktree provisions its own isolated `.venv` and `webapp/node_modules`;
+# writable dependency directories are never shared across worktrees.
+setupAgentStartupPolicy: start-immediately
+
+scripts:
+  setup: "if [ -f scripts/orca_setup.py ]; then python3 scripts/orca_setup.py; fi"

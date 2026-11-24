@@ -11,6 +11,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -272,6 +273,60 @@ class OrcaEnvHydrationTests(unittest.TestCase):
         self.assertEqual((fake_home / ".oci" / "config").read_text(encoding="utf-8"), "user=ocid1.user.oc1..fake\n")
         self.assertEqual((fake_home / ".kube" / "config").read_text(encoding="utf-8"), "apiVersion: v1\n")
 
+    def test_rejects_hardlinked_env_source_and_destination(self) -> None:
+        env_mod = _load_module("orca_setup_env", ENV_SCRIPT)
+        outside = self._tempdir("outside-hardlink")
+        outside_secret = outside / "secret.txt"
+        outside_secret.write_text(f"OUTSIDE={SECRET_MARKER}\n", encoding="utf-8")
+
+        src = self._tempdir("src-hardlink")
+        _init_git_repo(src)
+        os.link(outside_secret, src / ".env")
+        self.assertGreaterEqual(os.lstat(src / ".env").st_nlink, 2)
+
+        wt = self._tempdir("wt-hardlink")
+        _init_git_repo(wt)
+
+        # CLI hydration must refuse hardlinked source without copying or logging secret
+        res = self._run_hydrate(src, wt)
+        self.assertEqual(res.returncode, 0, res.stderr)
+        self.assertFalse((wt / ".env").exists())
+        self.assertNotIn(SECRET_MARKER, res.stdout + res.stderr)
+        self.assertIn("refus", (res.stdout + res.stderr).lower())
+
+        # Direct API check must fail closed on hardlinked source and hardlinked destination
+        src_fd, _ = env_mod.open_verified_dir(str(src), "src")
+        wt_fd, _ = env_mod.open_verified_dir(str(wt), "wt")
+        try:
+            with self.assertRaises(env_mod.UnsafePathError):
+                env_mod._copy_env_file_fd(src_fd, wt_fd, ".env")
+        finally:
+            os.close(src_fd)
+            os.close(wt_fd)
+
+        src2 = self._tempdir("src-hardlink-dst")
+        _init_git_repo(src2)
+        (src2 / ".env").write_text("SAFE=1\n", encoding="utf-8")
+
+        wt2 = self._tempdir("wt-hardlink-dst")
+        _init_git_repo(wt2)
+        os.link(outside_secret, wt2 / ".env")
+        self.assertGreaterEqual(os.lstat(wt2 / ".env").st_nlink, 2)
+
+        src2_fd, _ = env_mod.open_verified_dir(str(src2), "src2")
+        wt2_fd, _ = env_mod.open_verified_dir(str(wt2), "wt2")
+        try:
+            with self.assertRaises(env_mod.UnsafePathError):
+                env_mod._copy_env_file_fd(src2_fd, wt2_fd, ".env")
+        finally:
+            os.close(src2_fd)
+            os.close(wt2_fd)
+
+        res_dst = self._run_hydrate(src2, wt2)
+        self.assertEqual(res_dst.returncode, 0, res_dst.stderr)
+        self.assertIn("refus", (res_dst.stdout + res_dst.stderr).lower())
+        self.assertEqual(outside_secret.read_text(encoding="utf-8"), f"OUTSIDE={SECRET_MARKER}\n")
+
 
 class OrcaStackSetupTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -518,6 +573,263 @@ if "install" in args:
         )
         self.assertNotEqual(res_pnpm.returncode, 0)
         self.assertIn("pnpm", (res_pnpm.stdout + res_pnpm.stderr).lower())
+
+    def test_corrupt_stamped_venv_syntax_invalidates_stamp_and_rebuilds(self) -> None:
+        main, linked, bindir = self._create_fixture_worktree()
+        counts = self._tempdir("counts-corrupt-venv")
+        self._install_fake_toolchains(bindir, counts)
+
+        env = dict(os.environ)
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        env["PATH"] = f"{bindir}{os.pathsep}{os.environ.get('PATH', '')}"
+        env["ORCA_ROOT_PATH"] = str(main)
+        env["ORCA_WORKTREE_PATH"] = str(linked)
+        env["OCI_LA_ORCA_BASE_PYTHON"] = sys.executable
+
+        cold = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(cold.returncode, 0, cold.stdout + cold.stderr)
+        cold_uv_calls = len((counts / "uv_calls.txt").read_text(encoding="utf-8").splitlines())
+
+        # Corrupt a core runtime module inside the stamped .venv with invalid Python syntax
+        site = next((linked / ".venv").glob("lib/python*/site-packages"))
+        yaml_mod = site / "yaml.py"
+        yaml_mod.write_text("def broken(:\n    pass\n", encoding="utf-8")
+        self.assertTrue((linked / ".venv" / ".orca-setup-stamp.json").is_file())
+
+        repaired = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(repaired.returncode, 0, repaired.stdout + repaired.stderr)
+        after_repair_uv_calls = len((counts / "uv_calls.txt").read_text(encoding="utf-8").splitlines())
+        self.assertGreater(
+            after_repair_uv_calls,
+            cold_uv_calls,
+            "corrupt stamped .venv must invalidate stamp and trigger rebuild",
+        )
+        vpy = linked / ".venv" / "bin" / "python"
+        imp = subprocess.run(
+            [str(vpy), "-c", "import yaml"],
+            cwd=str(linked),
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        self.assertEqual(imp.returncode, 0, imp.stderr)
+
+        # Subsequent warm run is idempotent again
+        warm = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(warm.returncode, 0, warm.stdout + warm.stderr)
+        self.assertEqual(
+            len((counts / "uv_calls.txt").read_text(encoding="utf-8").splitlines()),
+            after_repair_uv_calls,
+        )
+
+    def test_corrupt_stamped_node_modules_json_invalidates_stamp_and_rebuilds(self) -> None:
+        main, linked, bindir = self._create_fixture_worktree()
+        counts = self._tempdir("counts-corrupt-nm")
+        self._install_fake_toolchains(bindir, counts)
+
+        env = dict(os.environ)
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        env["PATH"] = f"{bindir}{os.pathsep}{os.environ.get('PATH', '')}"
+        env["ORCA_ROOT_PATH"] = str(main)
+        env["ORCA_WORKTREE_PATH"] = str(linked)
+        env["OCI_LA_ORCA_BASE_PYTHON"] = sys.executable
+
+        cold = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(cold.returncode, 0, cold.stdout + cold.stderr)
+        self.assertEqual(len((counts / "pnpm_calls.txt").read_text(encoding="utf-8").splitlines()), 1)
+
+        # Case 1: invalid JSON syntax in a required dependency's package.json
+        zod_pkg = linked / "webapp" / "node_modules" / "zod" / "package.json"
+        zod_pkg.write_text("{corrupt-json", encoding="utf-8")
+
+        repaired1 = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(repaired1.returncode, 0, repaired1.stdout + repaired1.stderr)
+        self.assertEqual(
+            len((counts / "pnpm_calls.txt").read_text(encoding="utf-8").splitlines()),
+            2,
+            "invalid JSON in stamped node_modules must trigger clean pnpm reinstall",
+        )
+        zod_data = json.loads(zod_pkg.read_text(encoding="utf-8"))
+        self.assertIsInstance(zod_data, dict)
+        self.assertEqual(zod_data.get("name"), "zod")
+
+        # Case 2: non-object JSON in a required dependency's package.json
+        next_pkg = linked / "webapp" / "node_modules" / "next" / "package.json"
+        next_pkg.write_text("[]", encoding="utf-8")
+
+        repaired2 = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(repaired2.returncode, 0, repaired2.stdout + repaired2.stderr)
+        self.assertEqual(len((counts / "pnpm_calls.txt").read_text(encoding="utf-8").splitlines()), 3)
+        next_data = json.loads(next_pkg.read_text(encoding="utf-8"))
+        self.assertIsInstance(next_data, dict)
+        self.assertEqual(next_data.get("name"), "next")
+
+        # Warm repeat is idempotent again
+        warm = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(warm.returncode, 0, warm.stdout + warm.stderr)
+        self.assertEqual(len((counts / "pnpm_calls.txt").read_text(encoding="utf-8").splitlines()), 3)
+
+    def test_shared_monotonic_deadline_caps_serial_fallbacks(self) -> None:
+        main, linked, bindir = self._create_fixture_worktree()
+        counts = self._tempdir("counts-deadline")
+        self._install_fake_toolchains(bindir, counts)
+
+        # Override fake uv so --offline sleeps 1.1s and fails, then online fallback tries to sleep 5.0s.
+        # With a 2.0s shared end-to-end budget, online fallback must be capped by remaining (~0.9s)
+        # and fail loudly without summing past the deadline.
+        uv_script = bindir / "uv"
+        uv_script.write_text(
+            f"""#!{sys.executable}
+import subprocess, sys, time
+from pathlib import Path
+
+args = sys.argv[1:]
+counter = Path({str(counts)!r}) / "uv_calls.txt"
+with counter.open("a", encoding="utf-8") as fh:
+    fh.write(" ".join(args) + "\\n")
+
+if args[:1] == ["venv"]:
+    subprocess.run([{sys.executable!r}, "-m", "venv", "--without-pip", str(Path(args[-1]))], check=True)
+elif args[:2] == ["pip", "install"]:
+    if "--offline" in args:
+        time.sleep(1.1)
+        sys.exit(1)
+    time.sleep(5.0)
+    sys.exit(0)
+else:
+    sys.exit(2)
+""",
+            encoding="utf-8",
+        )
+        os.chmod(uv_script, 0o755)
+
+        env = dict(os.environ)
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        env["PATH"] = f"{bindir}{os.pathsep}{os.environ.get('PATH', '')}"
+        env["ORCA_ROOT_PATH"] = str(main)
+        env["ORCA_WORKTREE_PATH"] = str(linked)
+        env["OCI_LA_ORCA_BASE_PYTHON"] = sys.executable
+        env["OCI_LA_ORCA_SETUP_TIMEOUT_S"] = "2.0"
+
+        t0 = time.monotonic()
+        res_env = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        elapsed_env = time.monotonic() - t0
+        self.assertNotEqual(res_env.returncode, 0, "exhausted E2E deadline must fail loudly")
+        self.assertLess(elapsed_env, 4.0, f"serial fallback exceeded shared budget: {elapsed_env:.2f}s")
+        combined_env = (res_env.stdout + res_env.stderr).lower()
+        self.assertTrue(
+            "timeout" in combined_env or "deadline" in combined_env,
+            f"expected explicit timeout diagnostic, got: {res_env.stdout + res_env.stderr}",
+        )
+        self.assertFalse((counts / "pnpm_calls.txt").exists(), "must not run pnpm after deadline exhausted")
+
+        # Also verify CLI --timeout when first attempt itself exhausts deadline (must not start fallback)
+        (counts / "uv_calls.txt").unlink()
+        shutil.rmtree(linked / ".venv", ignore_errors=True)
+        uv_script.write_text(
+            f"""#!{sys.executable}
+import subprocess, sys, time
+from pathlib import Path
+
+args = sys.argv[1:]
+counter = Path({str(counts)!r}) / "uv_calls.txt"
+with counter.open("a", encoding="utf-8") as fh:
+    fh.write(" ".join(args) + "\\n")
+
+if args[:1] == ["venv"]:
+    subprocess.run([{sys.executable!r}, "-m", "venv", "--without-pip", str(Path(args[-1]))], check=True)
+elif args[:2] == ["pip", "install"]:
+    time.sleep(3.5)
+    sys.exit(1)
+else:
+    sys.exit(2)
+""",
+            encoding="utf-8",
+        )
+        os.chmod(uv_script, 0o755)
+        env_cli = dict(env)
+        env_cli.pop("OCI_LA_ORCA_SETUP_TIMEOUT_S", None)
+
+        t1 = time.monotonic()
+        res_cli = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT), "--timeout", "1.5"],
+            cwd=str(linked),
+            env=env_cli,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        elapsed_cli = time.monotonic() - t1
+        self.assertNotEqual(res_cli.returncode, 0)
+        self.assertLess(elapsed_cli, 3.0, f"--timeout 1.5 took too long: {elapsed_cli:.2f}s")
+        uv_calls_cli = (counts / "uv_calls.txt").read_text(encoding="utf-8").splitlines()
+        self.assertEqual(len(uv_calls_cli), 2, f"expected venv + offline only, got: {uv_calls_cli}")
 
 
 if __name__ == "__main__":

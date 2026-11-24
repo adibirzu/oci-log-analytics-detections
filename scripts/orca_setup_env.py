@@ -16,6 +16,7 @@ import secrets
 import stat
 import subprocess
 import sys
+import time
 from typing import Callable
 
 _O_NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
@@ -47,6 +48,20 @@ _ROOT_ENV_SUBDIRS: tuple[tuple[str, ...], ...] = (
 
 class UnsafePathError(RuntimeError):
     """Raised when an untrusted path or filesystem entry fails safety checks."""
+
+
+class SetupDeadlineError(RuntimeError):
+    """Raised when the shared end-to-end setup wall-clock budget is exhausted."""
+
+
+def remaining_deadline(deadline: float | None, *, step: str, default: float = 15.0) -> float:
+    """Return remaining seconds before ``deadline``, failing closed if exhausted."""
+    if deadline is None:
+        return default
+    remaining = deadline - time.monotonic()
+    if remaining <= 0.0:
+        raise SetupDeadlineError(f"end-to-end setup deadline exhausted before {step}")
+    return remaining
 
 
 def log_info(message: str) -> None:
@@ -189,7 +204,13 @@ def _clean_git_env() -> dict[str, str]:
     return env
 
 
-def _confirm_git_ignored(repo_dir: Path, repo_fd: int, rel_path: str) -> bool:
+def _confirm_git_ignored(
+    repo_dir: Path,
+    repo_fd: int,
+    rel_path: str,
+    *,
+    deadline: float | None = None,
+) -> bool:
     """Confirm ``repo_dir`` is the git toplevel and ``rel_path`` is untracked + ignored."""
     git_env = _clean_git_env()
     try:
@@ -199,9 +220,13 @@ def _confirm_git_ignored(repo_dir: Path, repo_fd: int, rel_path: str) -> bool:
             env=git_env,
             capture_output=True,
             text=True,
-            timeout=15,
+            timeout=remaining_deadline(deadline, step="git rev-parse"),
             check=False,
         )
+    except subprocess.TimeoutExpired as exc:
+        if deadline is not None:
+            raise SetupDeadlineError("end-to-end setup deadline exhausted during git rev-parse") from exc
+        return False
     except (OSError, subprocess.SubprocessError):
         return False
     if top.returncode != 0 or not top.stdout.strip():
@@ -228,7 +253,7 @@ def _confirm_git_ignored(repo_dir: Path, repo_fd: int, rel_path: str) -> bool:
             env=git_env,
             capture_output=True,
             text=True,
-            timeout=15,
+            timeout=remaining_deadline(deadline, step=f"git ls-files {rel_path}"),
             check=False,
         )
         if tracked.returncode != 1:
@@ -239,10 +264,14 @@ def _confirm_git_ignored(repo_dir: Path, repo_fd: int, rel_path: str) -> bool:
             env=git_env,
             capture_output=True,
             text=True,
-            timeout=15,
+            timeout=remaining_deadline(deadline, step=f"git check-ignore {rel_path}"),
             check=False,
         )
         return ignored.returncode == 0
+    except subprocess.TimeoutExpired as exc:
+        if deadline is not None:
+            raise SetupDeadlineError(f"end-to-end setup deadline exhausted during git ignore check for {rel_path}") from exc
+        return False
     except (OSError, subprocess.SubprocessError):
         return False
 
@@ -265,6 +294,23 @@ def _write_all(fd: int, data: bytes) -> None:
         view = view[written:]
 
 
+def _verify_reg_single_link(
+    st: os.stat_result,
+    label: str,
+    *,
+    expected_id: tuple[int, int] | None = None,
+) -> tuple[int, int]:
+    """Enforce regular file, single hardlink (st_nlink == 1), and stable dev/ino identity."""
+    if stat.S_ISLNK(st.st_mode) or not stat.S_ISREG(st.st_mode):
+        raise UnsafePathError(f"refusing non-regular {label}")
+    if st.st_nlink != 1:
+        raise UnsafePathError(f"refusing hardlinked {label} (st_nlink={st.st_nlink})")
+    identity = (st.st_dev, st.st_ino)
+    if expected_id is not None and identity != expected_id:
+        raise UnsafePathError(f"refusing {label}: file identity changed across fstat")
+    return identity
+
+
 def _copy_env_file_fd(
     src_dir_fd: int,
     dst_dir_fd: int,
@@ -273,14 +319,32 @@ def _copy_env_file_fd(
     _write_bytes_fn: Callable[[int, bytes], None] | None = None,
 ) -> str:
     try:
-        os.lstat(name, dir_fd=dst_dir_fd)
-        return "already exists"
+        st_dst = os.lstat(name, dir_fd=dst_dir_fd)
     except FileNotFoundError:
-        pass
+        st_dst = None
+
+    if st_dst is not None:
+        dst_id = _verify_reg_single_link(st_dst, f"destination {name}")
+        try:
+            dst_fd = os.open(
+                name,
+                os.O_RDONLY | _O_NOFOLLOW | _O_NONBLOCK | _O_CLOEXEC,
+                dir_fd=dst_dir_fd,
+            )
+        except OSError as exc:
+            if exc.errno == errno.ELOOP:
+                raise UnsafePathError(f"refusing symlink destination {name}") from exc
+            if exc.errno == errno.EACCES:
+                return "already exists"
+            raise
+        try:
+            _verify_reg_single_link(os.fstat(dst_fd), f"destination {name} after open", expected_id=dst_id)
+        finally:
+            os.close(dst_fd)
+        return "already exists"
 
     st_src = os.lstat(name, dir_fd=src_dir_fd)
-    if stat.S_ISLNK(st_src.st_mode) or not stat.S_ISREG(st_src.st_mode):
-        raise UnsafePathError(f"refusing non-regular source {name}")
+    src_id = _verify_reg_single_link(st_src, f"source {name}")
 
     in_fd = os.open(
         name,
@@ -288,10 +352,9 @@ def _copy_env_file_fd(
         dir_fd=src_dir_fd,
     )
     try:
-        st_open = os.fstat(in_fd)
-        if not stat.S_ISREG(st_open.st_mode):
-            raise UnsafePathError(f"refusing non-regular source {name} after open")
+        _verify_reg_single_link(os.fstat(in_fd), f"source {name} after open", expected_id=src_id)
         data = _read_all(in_fd)
+        _verify_reg_single_link(os.fstat(in_fd), f"source {name} after read", expected_id=src_id)
     finally:
         os.close(in_fd)
 
@@ -302,25 +365,45 @@ def _copy_env_file_fd(
         0o600,
         dir_fd=dst_dir_fd,
     )
+    linked = False
     try:
         try:
+            tmp_id = _verify_reg_single_link(os.fstat(tmp_fd), f"staging {name}")
             os.fchmod(tmp_fd, 0o600)
             (_write_bytes_fn or _write_all)(tmp_fd, data)
             os.fsync(tmp_fd)
+            _verify_reg_single_link(os.fstat(tmp_fd), f"staging {name} after write", expected_id=tmp_id)
         finally:
             os.close(tmp_fd)
 
         link_kwargs = {"follow_symlinks": False} if os.link in os.supports_follow_symlinks else {}
         try:
             os.link(tmp_name, name, src_dir_fd=dst_dir_fd, dst_dir_fd=dst_dir_fd, **link_kwargs)
-            return "copied"
+            linked = True
         except FileExistsError:
+            st_race = os.lstat(name, dir_fd=dst_dir_fd)
+            _verify_reg_single_link(st_race, f"destination {name}")
             return "already exists"
     finally:
         try:
             os.unlink(tmp_name, dir_fd=dst_dir_fd)
         except FileNotFoundError:
             pass
+
+    if linked:
+        st_final = os.lstat(name, dir_fd=dst_dir_fd)
+        _verify_reg_single_link(st_final, f"destination {name} after link", expected_id=tmp_id)
+        chk_fd = os.open(
+            name,
+            os.O_RDONLY | _O_NOFOLLOW | _O_NONBLOCK | _O_CLOEXEC,
+            dir_fd=dst_dir_fd,
+        )
+        try:
+            _verify_reg_single_link(os.fstat(chk_fd), f"destination {name} after verify", expected_id=tmp_id)
+        finally:
+            os.close(chk_fd)
+        return "copied"
+    return "already exists"
 
 
 def _hydrate_subdir(
@@ -329,6 +412,8 @@ def _hydrate_subdir(
     dst_root_path: Path,
     dst_root_fd: int,
     subdir: tuple[str, ...],
+    *,
+    deadline: float | None = None,
 ) -> tuple[int, int]:
     copied = 0
     skipped = 0
@@ -354,11 +439,11 @@ def _hydrate_subdir(
         try:
             for name in names:
                 rel = f"{prefix}/{name}" if prefix else name
-                if not _confirm_git_ignored(src_root_path, src_root_fd, rel):
+                if not _confirm_git_ignored(src_root_path, src_root_fd, rel, deadline=deadline):
                     log_warn(f"hydrate-env: refusing unignored or tracked source {rel}")
                     skipped += 1
                     continue
-                if not _confirm_git_ignored(dst_root_path, dst_root_fd, rel):
+                if not _confirm_git_ignored(dst_root_path, dst_root_fd, rel, deadline=deadline):
                     log_warn(f"hydrate-env: refusing unignored or tracked destination {rel}")
                     skipped += 1
                     continue
@@ -381,7 +466,7 @@ def _hydrate_subdir(
     return copied, skipped
 
 
-def hydrate_env() -> int:
+def hydrate_env(*, deadline: float | None = None) -> int:
     """Hydrate gitignored local env files from ``$ORCA_ROOT_PATH`` safely."""
     root_raw = os.environ.get("ORCA_ROOT_PATH", "").strip()
     if not root_raw:
@@ -411,11 +496,14 @@ def hydrate_env() -> int:
         total_copied = 0
         total_skipped = 0
         for subdir in _ROOT_ENV_SUBDIRS:
-            c, s = _hydrate_subdir(src_path, src_fd, dst_path, dst_fd, subdir)
+            c, s = _hydrate_subdir(src_path, src_fd, dst_path, dst_fd, subdir, deadline=deadline)
             total_copied += c
             total_skipped += s
         log_info(f"hydrate-env: copied {total_copied} file(s), skipped {total_skipped}")
         return 0
+    except SetupDeadlineError as exc:
+        log_warn(f"hydrate-env: timeout: {exc}")
+        return 1
     except (UnsafePathError, OSError) as exc:
         log_warn(f"hydrate-env: {exc}; no files copied")
         return 0

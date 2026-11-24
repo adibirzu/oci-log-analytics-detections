@@ -726,6 +726,90 @@ if "install" in args:
         self.assertEqual(warm.returncode, 0, warm.stdout + warm.stderr)
         self.assertEqual(len((counts / "pnpm_calls.txt").read_text(encoding="utf-8").splitlines()), 3)
 
+    def test_strict_json_parsing_rejects_nonfinite_constants(self) -> None:
+        setup_mod = _load_module("orca_setup", SETUP_SCRIPT)
+        for bad_constant in ("NaN", "Infinity", "-Infinity"):
+            with self.assertRaises(ValueError):
+                setup_mod._strict_json_loads(f'{{"name": "zod", "version": {bad_constant}}}')
+
+        tmp = self._tempdir("strict-json")
+        stamp_path = tmp / ".orca-setup-stamp.json"
+        for bad_constant in ("NaN", "Infinity", "-Infinity"):
+            stamp_path.write_text(f'{{"fingerprint": {bad_constant}}}', encoding="utf-8")
+            self.assertFalse(setup_mod._stamp_matches(stamp_path, "anything"))
+
+    def test_nonfinite_json_constants_in_stamped_node_modules_invalidate_stamp_and_rebuild(self) -> None:
+        setup_mod = _load_module("orca_setup", SETUP_SCRIPT)
+        main, linked, bindir = self._create_fixture_worktree()
+        counts = self._tempdir("counts-nonfinite-nm")
+        self._install_fake_toolchains(bindir, counts)
+
+        env = dict(os.environ)
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        env["PATH"] = f"{bindir}{os.pathsep}{os.environ.get('PATH', '')}"
+        env["ORCA_ROOT_PATH"] = str(main)
+        env["ORCA_WORKTREE_PATH"] = str(linked)
+        env["OCI_LA_ORCA_BASE_PYTHON"] = sys.executable
+
+        cold = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(cold.returncode, 0, cold.stdout + cold.stderr)
+        self.assertEqual(len((counts / "pnpm_calls.txt").read_text(encoding="utf-8").splitlines()), 1)
+
+        # Corrupt stamped dependency package.json with non-finite JSON constants that Python's
+        # default json.loads accepts but Node's JSON.parse rejects.
+        cases = (
+            ("zod", '{"name":"zod","version":NaN}'),
+            ("next", '{"name":"next","version":Infinity}'),
+            ("react", '{"name":"react","version":-Infinity}'),
+        )
+        for idx, (pkg, payload) in enumerate(cases, start=2):
+            pkg_json = linked / "webapp" / "node_modules" / pkg / "package.json"
+            pkg_json.write_text(payload, encoding="utf-8")
+            self.assertFalse(
+                setup_mod._installed_pnpm_tree_ok(linked / "webapp" / "node_modules"),
+                f"{pkg}/package.json with {payload} must fail strict JSON tree validation",
+            )
+
+            repaired = subprocess.run(
+                [sys.executable, str(SETUP_SCRIPT)],
+                cwd=str(linked),
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=False,
+            )
+            self.assertEqual(repaired.returncode, 0, repaired.stdout + repaired.stderr)
+            self.assertEqual(
+                len((counts / "pnpm_calls.txt").read_text(encoding="utf-8").splitlines()),
+                idx,
+                f"non-finite JSON in {pkg}/package.json must invalidate stamp and trigger reinstall",
+            )
+            repaired_data = json.loads(pkg_json.read_text(encoding="utf-8"))
+            self.assertIsInstance(repaired_data, dict)
+            self.assertEqual(repaired_data.get("name"), pkg)
+
+        # Warm repeat is idempotent again
+        warm = subprocess.run(
+            [sys.executable, str(SETUP_SCRIPT)],
+            cwd=str(linked),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+        self.assertEqual(warm.returncode, 0, warm.stdout + warm.stderr)
+        self.assertEqual(len((counts / "pnpm_calls.txt").read_text(encoding="utf-8").splitlines()), len(cases) + 1)
+
     def test_shared_monotonic_deadline_caps_serial_fallbacks(self) -> None:
         main, linked, bindir = self._create_fixture_worktree()
         counts = self._tempdir("counts-deadline")

@@ -114,10 +114,19 @@ def _run_with_deadline(
         ) from exc
 
 
+def _reject_non_finite_json(constant: str) -> object:
+    raise ValueError(f"non-finite JSON constant is not allowed: {constant}")
+
+
+def _strict_json_loads(raw: str) -> object:
+    """Parse JSON while rejecting non-standard NaN, Infinity, and -Infinity constants."""
+    return json.loads(raw, parse_constant=_reject_non_finite_json)
+
+
 def _write_json_atomic(path: Path, payload: dict[str, object]) -> None:
     tmp = path.with_name(f".{path.name}.tmp-{os.getpid()}-{secrets.token_hex(4)}")
     with open(tmp, "w", encoding="utf-8") as fh:
-        fh.write(json.dumps(payload, indent=2) + "\n")
+        fh.write(json.dumps(payload, indent=2, allow_nan=False) + "\n")
         fh.flush()
         os.fsync(fh.fileno())
     os.replace(tmp, path)
@@ -125,9 +134,9 @@ def _write_json_atomic(path: Path, payload: dict[str, object]) -> None:
 
 def _stamp_matches(stamp_path: Path, fingerprint: str) -> bool:
     try:
-        data = json.loads(stamp_path.read_text(encoding="utf-8"))
+        data = _strict_json_loads(stamp_path.read_text(encoding="utf-8"))
         return isinstance(data, dict) and data.get("fingerprint") == fingerprint
-    except (OSError, json.JSONDecodeError):
+    except (OSError, UnicodeDecodeError, ValueError):
         return False
 
 
@@ -151,7 +160,7 @@ def _probe_python(
     )
     script = (
         "import importlib, importlib.util, json, os, pathlib, sys; "
-        "mods = json.loads(sys.argv[1]); "
+        "mods = json.loads(sys.argv[1], parse_constant=lambda c: (_ for _ in ()).throw(ValueError(c))); "
         "missing = []; corrupt = []; "
         "\nfor m in mods:\n"
         "    spec = importlib.util.find_spec(m)\n"
@@ -172,9 +181,9 @@ def _probe_python(
         "print(json.dumps({'version': list(sys.version_info[:2]), "
         "'prefix': os.path.realpath(sys.prefix), "
         "'base_prefix': os.path.realpath(sys.base_prefix), "
-        "'missing': missing, 'corrupt': corrupt}))"
+        "'missing': missing, 'corrupt': corrupt}, allow_nan=False))"
     )
-    arg = json.dumps(list(REQUIRED_MODULES) if check_modules else [])
+    arg = json.dumps(list(REQUIRED_MODULES) if check_modules else [], allow_nan=False)
     try:
         proc = _run_with_deadline(
             [str(python_bin), "-B", "-c", script, arg],
@@ -190,8 +199,10 @@ def _probe_python(
     if proc.returncode != 0:
         return False, f"probe exited {proc.returncode}", None
     try:
-        info = json.loads(str(proc.stdout).strip())
-    except json.JSONDecodeError:
+        info = _strict_json_loads(str(proc.stdout).strip())
+    except ValueError:
+        return False, "invalid probe output", None
+    if not isinstance(info, dict):
         return False, "invalid probe output", None
     ver = tuple(info.get("version") or ())
     if len(ver) < 2 or ver < MIN_PYTHON:
@@ -436,8 +447,8 @@ def _installed_pnpm_tree_ok(node_modules: Path) -> bool:
         if not real_pkg_json.startswith(nm_real + os.sep):
             return False
         try:
-            parsed = json.loads(pkg_json.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            parsed = _strict_json_loads(pkg_json.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, ValueError):
             return False
         if not isinstance(parsed, dict) or parsed.get("name") != pkg:
             return False
